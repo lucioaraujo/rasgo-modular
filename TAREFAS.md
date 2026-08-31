@@ -1,11 +1,20 @@
 # RASGO Modular — tarefas e continuidade
 
-**Atualizado:** 2026-08-16  
+**Atualizado:** 2026-08-30 (retomada documental)
 **Estado:** `prototype`
 
 Esta é a lista operacional do projeto. A arquitetura conceitual permanece em
 [`RASGO_MODULAR.md`](RASGO_MODULAR.md); decisões transversais e reutilização
 continuam no inventário global.
+
+## Continuidade de acervo — proporcional ao desenvolvimento
+
+- [ ] Quando houver release, migração, entrega ou promoção de módulo escolhida,
+  definir o recorte de fontes/documentação, gerar manifesto/checksum e testar a
+  restauração do pacote.
+- Enquanto o graph engine estiver em prototipagem, registrar decisões, testes e
+  próximo passo neste arquivo ou na arquitetura; não criar pacote de
+  preservação a cada experimento.
 
 ## Concluído
 
