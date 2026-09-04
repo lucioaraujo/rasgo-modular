@@ -10,11 +10,231 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(rasgo_modular_core INTERFACE)
 target_include_directories(rasgo_modular_core INTERFACE src)
 
+find_package(Threads REQUIRED)
+
 if(BUILD_TESTING)
+    set(rasgo_modular_warnings)
+    if(NOT MSVC)
+        set(rasgo_modular_warnings -Wall -Wextra -Wpedantic -Werror)
+    endif()
+
     add_executable(rasgo_modular_graph_tests tests/test_graph_engine.cpp)
     target_link_libraries(rasgo_modular_graph_tests PRIVATE rasgo_modular_core)
-    if(NOT MSVC)
-        target_compile_options(rasgo_modular_graph_tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
-    endif()
+    target_compile_options(rasgo_modular_graph_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_graph_tests COMMAND rasgo_modular_graph_tests)
+
+    add_executable(rasgo_modular_signal_graph_tests tests/test_signal_graph.cpp)
+    target_link_libraries(rasgo_modular_signal_graph_tests
+        PRIVATE rasgo_modular_core Threads::Threads)
+    target_compile_options(rasgo_modular_signal_graph_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_signal_graph_tests COMMAND rasgo_modular_signal_graph_tests)
+
+    add_executable(rasgo_modular_function_generator_tests tests/test_function_generator.cpp)
+    target_link_libraries(rasgo_modular_function_generator_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_function_generator_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_function_generator_tests COMMAND rasgo_modular_function_generator_tests)
+
+    add_executable(rasgo_modular_filter_tests tests/test_filter.cpp)
+    target_link_libraries(rasgo_modular_filter_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_filter_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_filter_tests COMMAND rasgo_modular_filter_tests)
+
+    add_executable(rasgo_modular_decision_tests tests/test_decision.cpp)
+    target_link_libraries(rasgo_modular_decision_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_decision_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_decision_tests COMMAND rasgo_modular_decision_tests)
+
+    add_executable(rasgo_modular_clock_tests tests/test_clock.cpp)
+    target_link_libraries(rasgo_modular_clock_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_clock_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_clock_tests COMMAND rasgo_modular_clock_tests)
+
+    add_executable(rasgo_modular_envelope_tests tests/test_envelope.cpp)
+    target_link_libraries(rasgo_modular_envelope_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_envelope_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_envelope_tests COMMAND rasgo_modular_envelope_tests)
+
+    add_executable(rasgo_modular_memory_tests tests/test_memory.cpp)
+    target_link_libraries(rasgo_modular_memory_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_memory_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_memory_tests COMMAND rasgo_modular_memory_tests)
+
+    add_executable(rasgo_modular_turing_tests tests/test_turing.cpp)
+    target_link_libraries(rasgo_modular_turing_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_turing_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_turing_tests COMMAND rasgo_modular_turing_tests)
+
+    add_executable(rasgo_modular_matter_tests tests/test_matter.cpp)
+    target_link_libraries(rasgo_modular_matter_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_matter_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_matter_tests COMMAND rasgo_modular_matter_tests)
+
+    add_executable(rasgo_modular_space_tests tests/test_space.cpp)
+    target_link_libraries(rasgo_modular_space_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_space_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_space_tests COMMAND rasgo_modular_space_tests)
+
+    add_executable(rasgo_modular_string_tests tests/test_string.cpp)
+    target_link_libraries(rasgo_modular_string_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_string_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_string_tests COMMAND rasgo_modular_string_tests)
+
+    add_executable(rasgo_modular_quantizer_tests tests/test_quantizer.cpp)
+    target_link_libraries(rasgo_modular_quantizer_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_quantizer_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_quantizer_tests COMMAND rasgo_modular_quantizer_tests)
+
+    add_executable(rasgo_modular_parametric_tests tests/test_parametric.cpp)
+    target_link_libraries(rasgo_modular_parametric_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_parametric_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_parametric_tests COMMAND rasgo_modular_parametric_tests)
+
+    add_executable(rasgo_modular_harmony_tests tests/test_harmony.cpp)
+    target_link_libraries(rasgo_modular_harmony_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_harmony_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_harmony_tests COMMAND rasgo_modular_harmony_tests)
+
+    add_executable(rasgo_modular_sequence_tests tests/test_sequence.cpp)
+    target_link_libraries(rasgo_modular_sequence_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_sequence_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_sequence_tests COMMAND rasgo_modular_sequence_tests)
+
+    add_executable(rasgo_modular_mix_tests tests/test_mix.cpp)
+    target_link_libraries(rasgo_modular_mix_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_mix_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_mix_tests COMMAND rasgo_modular_mix_tests)
+
+    add_executable(rasgo_modular_oscillator_tests tests/test_oscillator.cpp)
+    target_link_libraries(rasgo_modular_oscillator_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_oscillator_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_oscillator_tests COMMAND rasgo_modular_oscillator_tests)
+
+    add_executable(rasgo_modular_noise_tests tests/test_noise.cpp)
+    target_link_libraries(rasgo_modular_noise_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_noise_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_noise_tests COMMAND rasgo_modular_noise_tests)
+
+    add_executable(rasgo_modular_vca_tests tests/test_vca.cpp)
+    target_link_libraries(rasgo_modular_vca_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_vca_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_vca_tests COMMAND rasgo_modular_vca_tests)
+
+    add_executable(rasgo_modular_control_tests tests/test_control.cpp)
+    target_link_libraries(rasgo_modular_control_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_control_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_control_tests COMMAND rasgo_modular_control_tests)
+
+    add_executable(rasgo_modular_logic_tests tests/test_logic.cpp)
+    target_link_libraries(rasgo_modular_logic_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_logic_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_logic_tests COMMAND rasgo_modular_logic_tests)
+
+    add_executable(rasgo_modular_sample_hold_tests tests/test_sample_hold.cpp)
+    target_link_libraries(rasgo_modular_sample_hold_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_sample_hold_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_sample_hold_tests COMMAND rasgo_modular_sample_hold_tests)
+    add_executable(rasgo_modular_shape_tests tests/test_shape.cpp)
+    target_link_libraries(rasgo_modular_shape_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_shape_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_shape_tests COMMAND rasgo_modular_shape_tests)
+
+    add_executable(rasgo_modular_lpg_tests tests/test_lpg.cpp)
+    target_link_libraries(rasgo_modular_lpg_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_lpg_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_lpg_tests COMMAND rasgo_modular_lpg_tests)
+
+    add_executable(rasgo_modular_chord_tests tests/test_chord.cpp)
+    target_link_libraries(rasgo_modular_chord_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_chord_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_chord_tests COMMAND rasgo_modular_chord_tests)
+
+    add_executable(rasgo_modular_drift_tests tests/test_drift.cpp)
+    target_link_libraries(rasgo_modular_drift_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_drift_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_drift_tests COMMAND rasgo_modular_drift_tests)
+
+    add_executable(rasgo_modular_switch_tests tests/test_switch.cpp)
+    target_link_libraries(rasgo_modular_switch_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_switch_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_switch_tests COMMAND rasgo_modular_switch_tests)
+
+    add_executable(rasgo_modular_scope_tests tests/test_scope.cpp)
+    target_link_libraries(rasgo_modular_scope_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_scope_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_scope_tests COMMAND rasgo_modular_scope_tests)
+
+    add_executable(rasgo_modular_trigseq_tests tests/test_trigseq.cpp)
+    target_link_libraries(rasgo_modular_trigseq_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_trigseq_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_trigseq_tests COMMAND rasgo_modular_trigseq_tests)
+
+    add_executable(rasgo_modular_abacus_tests tests/test_abacus.cpp)
+    target_link_libraries(rasgo_modular_abacus_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_abacus_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_abacus_tests COMMAND rasgo_modular_abacus_tests)
+
+    add_executable(rasgo_modular_wasp_tests tests/test_wasp.cpp)
+    target_link_libraries(rasgo_modular_wasp_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_wasp_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_wasp_tests COMMAND rasgo_modular_wasp_tests)
+
+    add_executable(rasgo_modular_panel_layout_tests tests/test_panel_layout.cpp)
+    target_link_libraries(rasgo_modular_panel_layout_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_panel_layout_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_panel_layout_tests COMMAND rasgo_modular_panel_layout_tests)
+
+    add_executable(rasgo_modular_matrix_tests tests/test_matrix.cpp)
+    target_link_libraries(rasgo_modular_matrix_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_matrix_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_matrix_tests COMMAND rasgo_modular_matrix_tests)
+
+    add_executable(rasgo_modular_mult_tests tests/test_mult.cpp)
+    target_link_libraries(rasgo_modular_mult_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_mult_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_mult_tests COMMAND rasgo_modular_mult_tests)
+endif()
+
+add_executable(rasgo_modular_primeiro_fragmento examples/primeiro_fragmento.cpp)
+target_link_libraries(rasgo_modular_primeiro_fragmento PRIVATE rasgo_modular_core)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_primeiro_fragmento PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+add_executable(rasgo_modular_peca_generativa examples/peca_generativa.cpp)
+target_link_libraries(rasgo_modular_peca_generativa PRIVATE rasgo_modular_core)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_peca_generativa PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+add_executable(rasgo_modular_peca_generativa_2 examples/peca_generativa_2.cpp)
+target_link_libraries(rasgo_modular_peca_generativa_2 PRIVATE rasgo_modular_core)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_peca_generativa_2 PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+add_executable(rasgo_modular_peca_generativa_3 examples/peca_generativa_3.cpp)
+target_link_libraries(rasgo_modular_peca_generativa_3 PRIVATE rasgo_modular_core)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_peca_generativa_3 PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+# ---------------------------------------------------------------------------
+# Front-end de TESTE: painel gráfico (X11 + ALSA). Não faz parte do core.
+# Só compila em Linux com libX11 e libasound disponíveis.
+# ---------------------------------------------------------------------------
+find_library(RASGO_X11 X11)
+find_library(RASGO_ASOUND asound)
+find_library(RASGO_XRANDR Xrandr)
+if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
+    add_executable(rasgo_modular_panel apps/panel/panel_main.cpp)
+    target_include_directories(rasgo_modular_panel PRIVATE src apps)
+    target_link_libraries(rasgo_modular_panel
+        PRIVATE rasgo_modular_core Threads::Threads
+                ${RASGO_X11} ${RASGO_XRANDR} ${RASGO_ASOUND})
+    if(NOT MSVC)
+        target_compile_options(rasgo_modular_panel PRIVATE -Wall -Wextra)
+    endif()
+    message(STATUS "rasgo_modular_panel: painel gráfico de teste habilitado")
+else()
+    message(STATUS "rasgo_modular_panel: pulado (falta libX11 ou libasound)")
 endif()

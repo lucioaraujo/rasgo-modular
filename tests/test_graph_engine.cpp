@@ -1,7 +1,6 @@
 #include "core/Graph.hpp"
 #include "core/ArchiveStorage.hpp"
 
-#include <cassert>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -10,6 +9,19 @@
 using namespace rasgo::modular;
 
 namespace {
+
+// Verificação de teste que NÃO some sob NDEBUG. `assert()` vira no-op numa
+// build Release, e aí as flags `bool ...Rejected` viravam "set but not
+// used" com `-Werror` - a build Release quebrava e os testes ficavam
+// vazios. `check()` sempre avalia, conta a falha e o processo sai != 0.
+int g_failures = 0;
+void check(const bool condition, const char* const expression) {
+    if (!condition) {
+        std::cerr << "CHECK FALHOU: " << expression << '\n';
+        ++g_failures;
+    }
+}
+#define assert(x) check((x), #x)
 
 std::unique_ptr<Module> factory(const std::string& type) {
     if (type == "SOURCE.CONSTANT")
@@ -307,5 +319,10 @@ int main() {
     expectNear(restoredEvents.output(eventGate, 0), 1.0f);
     assert(restoredEvents.eventOutput(eventSource, 0).timestamp == 42);
 
-    std::cout << "RASGO Modular graph engine tests passed\n";
+    if (g_failures == 0) {
+        std::cout << "RASGO Modular graph engine tests passed\n";
+        return 0;
+    }
+    std::cerr << g_failures << " verificacao(oes) falhou(aram)\n";
+    return 1;
 }
