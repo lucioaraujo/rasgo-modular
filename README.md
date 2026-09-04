@@ -1,9 +1,39 @@
 # Rasgo Modular
 
-**Identificador arquivístico:** `ARQ-RSM-001`
-**Estado:** protótipo C++17 de graph engine modular
-**Licença de distribuição:** a definir antes de reutilização externa ou
-publicação
+**Identificador arquivístico:** `ARQ-RSM-001` — ingresso e manifesto em
+[`../RASGO_ARQUIVO/`](../RASGO_ARQUIVO/INGRESSO_ARQ-RSM-001.md)
+**Estado:** protótipo C++17 — **marco 1** (2026-09-01): fundação
+`SignalGraph` + 6 módulos DSP + peça de 40 s. **marco 2**
+(2026-09-02): + `MEMORY` (granular/freeze) + `TURING` (registrador) +
+`MATTER` (modal) + `SPACE` (multitap) + `STRING` (corda/guia-de-onda) +
+`QUANTIZER` (escala) + `PARAMETRIC` (EQ, RBJ) + `HARMONY` (movimento
+harmônico — 6 técnicas reais) + `SEQUENCE` (sequenciador de passos
+editável, 5 modos de leitura) + `MIXER` (4 canais, pan de potência
+constante) + `MASTER` (largura mid/side, bloqueio de DC, limitador, VU) +
+**modelo de conexão de 3 camadas** (matriz + constelação + semântico,
+serializado no patch) + 3 peças (40/50/55 s) + **painel gráfico de teste**
+(`apps/panel/`, X11 + ALSA) + `OSC` (oscilador subtrativo antialias, 1
+V/oct, 5 formas, sync, TZFM) + `NOISE` (branco/rosa/brown + S&H) + `VCA`
+(duplo, linear/exp, atenuverter) + `CONTROL` (atenuversor/offset/slew/
+retificação/soma de CV) + `LOGIC` (÷/× de clock, AND/OR/XOR, flip-flop,
+gate delay). **marco 3** (2026-09-04): + `SH` (S&H duplo) + `SHAPE`
+(wavefolder/ring-mod) + `LPG` (low-pass gate a vactrol) + `CHORD` (VCO
+parafônico) + `DRIFT` (campo de deriva) + `SWITCH` (chave/mux-demux) +
+`SCOPE` (medidor/osciloscópio) + `TRIGSEQ` (grade de gates) + `ABACUS`
+(aritmética/lógica de CV) + `WASP` (filtro áspero) + `MATRIX` (matriz de
+roteamento 4×4) + `MULT` (múltiplo processado); **`connectToParameter`
+aditivo** (a modulação soma sobre o knob) + **antialiasing** (helper
+`Oversampler2x` 2× + ADAA) + **displays por módulo no painel** (grade
+clicável da MATRIX, espectro do SCOPE, lanes do TRIGSEQ) + profundidade
+por módulo (op bit a bit, slew assimétrico, voice-leading, ring-mod,
+memória de topologia…). **Rack de partida
+completo**; 34 módulos DSP, 35 alvos CTest verdes (Debug + Release), 4
+peças de exemplo byte-idênticas. Custodiante: Lúcio de Araújo.
+**Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
+(decisão do autor, 2026-09-01: "a mesma que temos usado" → a licença
+habitual da família RASGO). Código de terceiros só entra sob licença
+livre compatível com AGPLv3 (MIT/BSD/ISC/Apache-2.0/LGPL/GPL/AGPL) e com
+proveniência registrada.
 
 ## Apresentação
 
@@ -16,15 +46,22 @@ conceitual, não como um projeto separado.
 ## Retomada e fontes locais
 
 - [`RASGO_MODULAR.md`](RASGO_MODULAR.md) — arquitetura, taxonomia, fluxos,
-  decisões e pesquisa;
-- [`TAREFAS.md`](TAREFAS.md) — estado operacional, testes e próximo marco;
-- `CMakeLists.txt` e `tests/test_graph_engine.cpp` — protótipo executável e
-  teste do graph engine.
+  decisões e pesquisa; §29 = proveniência e licença;
+- [`TAREFAS.md`](TAREFAS.md) — estado operacional, testes e próximo marco
+  ("Registro da etapa — 2026-09-01");
+- [`PESQUISA_MODULOS.md`](PESQUISA_MODULOS.md) — pesquisa de módulos e ordem
+  de execução (§2);
+- [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
+  modelo, testes);
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 34 módulos
+  (+ `Oversampler.hpp`, helper 2× compartilhado);
+  `examples/*` = as peças; `apps/panel/` = painel gráfico de teste;
+  `CMakeLists.txt` + `tests/` = 35 alvos CTest.
 
-O protótipo separa áudio, controle, evento e descritor, possui blocos de tamanho
-fixo e testa o grafo mínimo. A documentação registra build e `ctest` aprovados
-para o estado atual; integração multimodal completa, scheduler stateful,
-realtime safety ampliada e segundo consumidor continuam pendentes.
+O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
+existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
+Scheduler stateful, realtime safety ampliada, front-ends e segundo
+consumidor continuam pendentes (marco 2).
 
 ## Limites e promoção
 
@@ -35,7 +72,14 @@ ou integração entre instrumentos antes de estabilizar o contrato de dados.
 
 ## Próxima tarefa arquivística
 
-Em marco estável de release, migração, entrega ou promoção de módulo, definir o
-recorte de fontes/documentação e então gerar manifesto/checksum e testar
-restauração. Enquanto o protótipo evolui, atualizar arquitetura e tarefas sem
-criar pacote de preservação a cada experimento.
+**Feito no marco 1 (2026-09-01):** ingresso `ARQ-RSM-001` atualizado,
+licença registrada (AGPLv3-or-later), manifesto de integridade em
+[`../RASGO_ARQUIVO/MANIFESTO_ARQ-RSM-001_marco-1_2026-09-01.md`](../RASGO_ARQUIVO/MANIFESTO_ARQ-RSM-001_marco-1_2026-09-01.md)
+(inventário somente leitura + SHA-256).
+
+**Pendente (só quando o estado deixar de ser móvel):** cópia de
+preservação congelada + teste de restauração — atrelar a um commit/tag do
+marco, à migração de diretórios ou ao handoff do marco 2. Enquanto o
+protótipo evolui, basta atualizar `TAREFAS.md`, este README e o ingresso;
+não se cria pacote de preservação a cada etapa (governança
+`VM_STUDIO_ARCHIVE.md §167-181`).
