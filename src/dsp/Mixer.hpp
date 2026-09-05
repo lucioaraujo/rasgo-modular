@@ -21,6 +21,14 @@
 //   - mixer de barramento clássico - ganho por canal + soma + ganho de
 //     saída; fan-in explícito (aqui um nó, não N cabos numa porta).
 //
+// SEGURANÇA DE BARRAMENTO (2026-09-05): a soma passa por um joelho `tanh`
+// bem suave — **transparente até 1,0 (0 dBFS)** (mixagem sensata não é
+// tocada; os testes de soma linear continuam exatos), comprime de leve
+// acima, teto ~1,35 (+2,6 dBFS). Sem isto um patch generativo quente (ou
+// uma mutação) mandava +5..+10 dB pro MASTER, que aí limitava DEMAIS /
+// bombeava / distorcia — o "clipe" reportado pelo autor. Não é limitador
+// (isso é do MASTER), é só não deixar a soma passar do razoável.
+//
 // Determinístico (sem RNG). Sem alocação.
 
 namespace rasgo::modular {
@@ -56,16 +64,19 @@ public:
         Panel p;
         p.hp = 14;
         p.add(Widget::Kind::Label, "MIXER", "", 2.5f, 2.0f);
+        // passe de ergonomia 2026-09-06: o toggle MUTE subiu (y82->y76) e
+        // o jack do canal desceu (y98->y102) — os rótulos "M" e "1..4"
+        // estavam se tocando entre as duas fileiras.
         for (int c = 0; c < 4; ++c) {
             const std::string n = std::to_string(c + 1);
             const float x = 8.0f + static_cast<float>(c) * 16.0f;
             p.add(Widget::Kind::Slider, ("CH" + n), "gain" + n, x, 12.0f);
-            p.add(Widget::Kind::Knob, "PAN", "pan" + n, x, 62.0f);
-            p.add(Widget::Kind::Toggle, "M", "mute" + n, x, 82.0f);
-            p.add(Widget::Kind::Jack, n, "in:ch" + n, x, 98.0f);
+            p.add(Widget::Kind::Knob, "PAN", "pan" + n, x, 60.0f);
+            p.add(Widget::Kind::Toggle, "MUTE", "mute" + n, x, 78.0f);
+            p.add(Widget::Kind::Jack, n, "in:ch" + n, x, 102.0f);
         }
-        p.add(Widget::Kind::Knob, "OUT", "out_gain", 8.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "L+R", "out:out", 56.0f, 116.0f);
+        p.add(Widget::Kind::Knob, "OUT", "out_gain", 8.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "L+R", "out:out", 56.0f, 118.0f);
         return p;
     }
 
@@ -98,8 +109,8 @@ public:
                 l += s * panL[c];
                 r += s * panR[c];
             }
-            l *= outGain;
-            r *= outGain;
+            l = busKnee(l * outGain);
+            r = busKnee(r * outGain);
             if (channels >= 2) {
                 out.at(0, frame) = l;
                 out.at(1, frame) = r;
@@ -117,6 +128,14 @@ private:
     }
     static float dbToGain(const float db) noexcept {
         return db <= -60.0f ? 0.0f : std::pow(10.0f, db / 20.0f);
+    }
+    // joelho de barramento: |x| <= 1,0 passa EXATO; acima, tanh suave,
+    // teto ~1,35. Um patch quente não estoura seco no MASTER.
+    static float busKnee(const float x) noexcept {
+        const float a = x < 0.0f ? -x : x;
+        if (a <= 1.0f) return x;
+        const float shaped = 1.0f + 0.35f * std::tanh((a - 1.0f) / 0.35f);
+        return x < 0.0f ? -shaped : shaped;
     }
 };
 

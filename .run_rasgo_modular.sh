@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # Compila (Release) e abre o painel de teste do RASGO Modular.
 #
-#   ./.run_rasgo_modular.sh            # build + abre o painel
+#   ./.run_rasgo_modular.sh            # build + abre o painel NUM SEED NOVO
+#                                       # (instrumento generativo -- timbre,
+#                                       # cabeamento e forma diferentes toda vez)
 #   ./.run_rasgo_modular.sh --seed 42  # abre já num patch de cabeamento (seed 42)
+#   ./.run_rasgo_modular.sh --resume   # carrega a sessão salva, de propósito
+#                                       # (retoma um patch feito à mão)
 #   ./.run_rasgo_modular.sh --tests    # roda os testes e sai
 #   ./.run_rasgo_modular.sh --clean    # apaga o build e recompila do zero
+#
+# RASGO_AUDIO_IN_DEVICE=hw:1,0 ./.run_rasgo_modular.sh  # entrada de captura
+#   do módulo AUDIO-IN (padrão "default"); só importa com AUDIO-IN no patch.
 #
 # Release, não Debug: com o rack cheio (20+ módulos, reverb e modelos
 # físicos) o Debug não fecha o tempo real no dispositivo do autor e a
@@ -18,12 +25,14 @@ panel="$build_dir/rasgo_modular_panel"
 run_tests=0
 seed=""
 want_seed=0
+resume=0
 for arg in "$@"; do
     if [[ "$want_seed" -eq 1 ]]; then seed="$arg"; want_seed=0; continue; fi
     case "$arg" in
         --tests|-t) run_tests=1 ;;
         --clean|-c) rm -rf "$build_dir" ;;
         --seed|-s) want_seed=1 ;;
+        --resume|-r) resume=1 ;;
         --help|-h)
             sed -n '2,11p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
             exit 0 ;;
@@ -49,4 +58,9 @@ if [[ -n "$seed" ]]; then
     echo "abrindo no seed $seed"
     exec env RASGO_SEED="$seed" "$panel"
 fi
+if [[ "$resume" -eq 1 ]]; then
+    echo "retomando a sessão salva"
+    exec env RASGO_RESUME=1 "$panel"
+fi
+echo "abrindo num seed novo (instrumento generativo)"
 exec "$panel"

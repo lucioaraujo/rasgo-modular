@@ -59,7 +59,7 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "CONTROL", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "out", "", 2.5f, 7.0f, 40.0f);
+        p.add(Widget::Kind::Display, "out", "", 2.5f, 6.0f, 56.0f);
         const char* rows[5] = {"SCALE", "OFF", "RECT", "SLEW", "CRV"};
         const char* ids[5] = {"scale", "offset", "rectify", "slew", "curve"};
         for (int ch = 0; ch < 2; ++ch) {

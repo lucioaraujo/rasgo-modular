@@ -9,6 +9,8 @@
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
+#include "dsp/AudioIn.hpp"
+#include "dsp/Chaos.hpp"
 #include "dsp/Chord.hpp"
 #include "dsp/Control.hpp"
 #include "dsp/Decision.hpp"
@@ -21,12 +23,16 @@
 #include "dsp/Logic.hpp"
 #include "dsp/Lpg.hpp"
 #include "dsp/Master.hpp"
+#include "dsp/Matrix.hpp"
 #include "dsp/Matter.hpp"
 #include "dsp/Memory.hpp"
 #include "dsp/Mixer.hpp"
+#include "dsp/Mult.hpp"
 #include "dsp/Noise.hpp"
+#include "dsp/NoteOut.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
+#include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
 #include "dsp/Scope.hpp"
@@ -55,14 +61,36 @@ struct Rect { float x, y, w, h; std::string tag; };
 
 // mm por caractere do rótulo, no zoom "médio" (fonte de legenda ~9 px,
 // g_s ~2 px/mm). `panel_main.cpp` desenha essa fonte menor pros rótulos.
-constexpr float kCharMM = 2.5f;
+// 2,8 (era 2,5) + folga menor: pega rótulos de jack "colados" que o
+// modelo frouxo deixava passar (passe de ergonomia 2026-09-06).
+constexpr float kCharMM = 2.8f;
 constexpr float kKn = 9.0f;
 constexpr float kTg = 4.4f;
 
-std::vector<Rect> footprints(const Panel& p) {
+std::vector<Rect> footprints(const std::string& type, const Panel& p) {
     std::vector<Rect> v;
+    // MATRIX: os 16 g<jk> NÃO são desenhados como knobs — `panel_main.cpp`
+    // os pula e desenha uma grade 4×4 clicável via `matrixCellMM`
+    // (cx = 27 + k·17, cy = 35 + j·18, 16×17 mm) + um texto-guia
+    // "IN↓ OUT→" em ~(50, 24). Modelar a pegada REAL, não os knobs.
+    const bool matrixGrid = (type == "MATRIX");
+    if (matrixGrid) {
+        for (int j = 0; j < 4; ++j)
+            for (int k = 0; k < 4; ++k) {
+                const float cx = 27.0f + static_cast<float>(k) * 17.0f;
+                const float cy = 35.0f + static_cast<float>(j) * 18.0f;
+                v.push_back({cx - 8.0f, cy - 8.5f, 16.0f, 17.0f,
+                             std::string("cell:g")
+                                 + static_cast<char>('1' + j)
+                                 + static_cast<char>('1' + k)});
+            }
+        v.push_back({50.0f, 16.5f, 11.0f * kCharMM, 4.0f, "rot:matrixhint"});
+    }
     for (const auto& w : p.widgets) {
         const float tw = static_cast<float>(w.label.size()) * kCharMM;
+        if (matrixGrid && w.kind == Widget::Kind::Knob
+            && w.bind.size() == 3 && w.bind[0] == 'g')
+            continue;   // já modelado como célula de grade acima
         switch (w.kind) {
         case Widget::Kind::Knob:
             v.push_back({w.x, w.y, kKn, kKn, "knob:" + w.label});
@@ -86,7 +114,7 @@ std::vector<Rect> footprints(const Panel& p) {
             break;
         case Widget::Kind::Display:
             v.push_back({w.x - 0.5f, w.y,
-                         (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 13.5f, "disp"});
+                         (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 16.5f, "disp"});
             break;
         case Widget::Kind::Label:
             v.push_back({w.x - 0.5f, w.y - 0.5f, tw, 4.0f, "hdr"});
@@ -99,14 +127,19 @@ std::vector<Rect> footprints(const Panel& p) {
 bool isText(const std::string& t) { return t.rfind("rot:", 0) == 0; }
 
 bool overlap(const Rect& a, const Rect& b) {
-    // margem de 0,5 mm — encostar de leve é ok
-    return a.x < b.x + b.w - 0.5f && b.x < a.x + a.w - 0.5f
-        && a.y < b.y + b.h - 0.5f && b.y < a.y + a.h - 0.5f;
+    // folga de 0,3 mm — só um fio de respiro conta como "não colado"
+    return a.x < b.x + b.w - 0.3f && b.x < a.x + a.w - 0.3f
+        && a.y < b.y + b.h - 0.3f && b.y < a.y + a.h - 0.3f;
 }
+
+// Passe de ergonomia 2026-09-06: todos os módulos do catálogo revistos.
+// O modelo apertado (kCharMM 2,8 / folga 0,3) é o gate contra regressão.
+bool ergonomiaPendente(const std::string&) { return false; }
 
 void audit(const char* type, const Panel& p) {
     const float W = static_cast<float>(p.hp) * 5.08f;
-    const auto v = footprints(p);
+    const bool pend = ergonomiaPendente(type);
+    const auto v = footprints(type, p);
     for (std::size_t i = 0; i < v.size(); ++i) {
         if (isText(v[i].tag)
             && (v[i].x < -1.5f || v[i].x + v[i].w > W + 1.5f)) {
@@ -121,9 +154,9 @@ void audit(const char* type, const Panel& p) {
             if (li == lj && !li.empty()) continue;   // knob e o próprio rótulo
             if (!isText(v[i].tag) && !isText(v[j].tag)) continue;
             if (overlap(v[i], v[j])) {
-                std::cerr << "LAYOUT " << type << ": '" << v[i].tag
-                          << "' x '" << v[j].tag << "'\n";
-                ++g_failures;
+                std::cerr << (pend ? "LAYOUT (pendente) " : "LAYOUT ") << type
+                          << ": '" << v[i].tag << "' x '" << v[j].tag << "'\n";
+                if (!pend) ++g_failures;
             }
         }
     }
@@ -163,7 +196,13 @@ int main() {
     mods.emplace_back("SWITCH", std::make_unique<Switch>());
     mods.emplace_back("TRIGSEQ", std::make_unique<TrigSeq>());
     mods.emplace_back("MIXER", std::make_unique<Mixer>());
+    mods.emplace_back("MATRIX", std::make_unique<Matrix>());
+    mods.emplace_back("MULT", std::make_unique<Mult>());
     mods.emplace_back("MASTER", std::make_unique<Master>());
+    mods.emplace_back("PLL", std::make_unique<Pll>());
+    mods.emplace_back("CHAOS", std::make_unique<Chaos>());
+    mods.emplace_back("NOTE-OUT", std::make_unique<NoteOut>());
+    mods.emplace_back("AUDIO-IN", std::make_unique<AudioIn>());
 
     // regra: rótulo de knob/toggle no máximo 5 caracteres
     for (const auto& m : mods) {

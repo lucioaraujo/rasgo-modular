@@ -191,10 +191,12 @@ faz sentido?
 ## 8. Integração e painel
 
 Classe `Drift` (`type()` = `"DRIFT"`), 2 entradas, 6 saídas, 6
-parâmetros. `panel()` próprio (~10 HP): knobs RATE/DEPTH/MOMT/STRD/
-BIAS/ANCHR, jacks ADV/RCV in, A/B/C/D/FLD/EVT out, Display (as 4
-saídas como linhas lentas). Testado isolado (velocidade, momentum,
-correlação, cadência por `advance`, determinismo) antes do patch.
+parâmetros. `panel()` próprio (10 HP): knobs RATE/DEPTH/MOMT/STRD/
+BIAS/ANCHR (2 colunas), display cheio, e **3 fileiras de jacks**
+(passe de ergonomia 2026-09-06): entradas ADV/RATE · 4 saídas de campo
+correlacionadas A/B/C/D · campo bruto FLD + gatilho de virada EVT.
+Testado isolado (velocidade, momentum, correlação, cadência por
+`advance`, determinismo) antes do patch.
 Cadeias canônicas: `DRIFT.a → connectToParameter(FILTER.cutoff)` ·
 `DRIFT.b → SPACE.mix` · `CLOCK → DRIFT.advance`. O `seedPatch` pluga
 2–4 saídas em parâmetros estruturais por caráter — todo patch de seed

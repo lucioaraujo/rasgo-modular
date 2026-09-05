@@ -186,9 +186,13 @@ comportamento estável e musical em vez de estourar?
 
 Classe `Matrix` (`type()` = `"MATRIX"`), 4 entradas, 4 saídas, 21
 parâmetros. `panel()` próprio (~20 HP): grade 4×4 (knobs `11`..`44` no
-`panel()` / grade clicável no painel gráfico), jacks `IN1..4` na coluna
-esquerda (alinhados às linhas), `OUT1..4` na fileira de baixo (alinhados
-às colunas), macros LEVEL/NORM/RING/SAT/DRIFT à direita. Testado isolado (identidade, soma, inversão,
+`panel()` / grade clicável no painel gráfico via `matrixCellMM`, células
+maiores que os knobs — chegam a y≈97,5), jacks `IN1..4` na coluna
+esquerda (alinhados às linhas), `OUT1..4` na fileira de baixo em **y=110**
+(alinhados às colunas — mais baixo que os `IN` porque a grade ocupa o
+rodapé; a y=104 o rótulo "OUT" encostava na última linha, corrigido
+2026-09-05, gate em `test_panel_layout`), macros LEVEL/NORM/RING/SAT/DRIFT
+à direita. Testado isolado (identidade, soma, inversão,
 norm, sat, drift, independência de colunas) antes do patch. Cadeias
 canônicas: `OSC`+`NOISE` → `in1`/`in2`, `out1`/`out2` → 2× `FILTER`
 com mistura cruzada; `LFO`+`ENV` → entradas, `out → *_mod`. Adicionado

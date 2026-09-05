@@ -59,7 +59,7 @@ public:
         Panel p;
         p.hp = 14;
         p.add(Widget::Kind::Label, "ABACUS", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "count", "", 2.5f, 7.0f, 62.0f);
+        p.add(Widget::Kind::Display, "count", "", 2.5f, 6.0f, 66.1f);
         p.add(Widget::Kind::Knob, "OP", "op", 9.0f, 28.0f);
         p.add(Widget::Kind::Knob, "MOD", "modulus", 25.0f, 28.0f);
         p.add(Widget::Kind::Knob, "STEP", "steps", 41.0f, 28.0f);

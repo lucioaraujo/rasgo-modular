@@ -98,6 +98,17 @@ overlay editável do `TRIGSEQ`; modo XY do `SCOPE`; grade N×M na `MATRIX`;
 voz de percussão dedicada; adaptadores `MIDI`/`CV`/`AUDIO-IN`; front-ends
 JUCE + web/WASM.
 
+**Estudo à parte (2026-09-04):** `dossies/ESTUDO_seed_composicao_generativa.md`
+— vocabulário de patch/seed da conversa com o ChatGPT, cruzado com o
+`PatchSeed.hpp` real; aprofunda a limitação apontada pelo autor (o seed
+varia topologia e recebe receitas por caráter, mas não há evolução
+composicional ao vivo — `drift` por módulo é cego ao contexto). Também
+mapeia Patch Genetics (`MUTATE`/`EVOLVE`/`CROSS`/`FREEZE`), `RASGO Score`
+(partitura/registro de eventos) e Learning Engine (hover-learn nos
+widgets, precedente Antitotem/Navalha 2) — esses três **não
+implementados**. O `MotionEngine` (§3 do estudo) ganhou um **protótipo
+de verdade** — ver registro logo abaixo.
+
 ## Continuidade de acervo — proporcional ao desenvolvimento
 
 - [x] **Marco 1 (2026-09-01):** ingresso `ARQ-RSM-001` atualizado
@@ -2468,6 +2479,789 @@ DRIFT anchor.
 
 **Não commitado.**
 
+## Registro da etapa — 2026-09-04: Motion Engine — protótipo de composição generativa
+
+Depois de uma conversa longa do autor com o ChatGPT sobre Seed,
+composição generativa, partitura e pedagogia (documentada em
+`dossies/ESTUDO_seed_composicao_generativa.md`), o autor apontou o ponto
+que doía de verdade: *"os patches mudam, porém as regulagens permanecem
+praticamente as mesmas"* / *"não há muita variação (no sentido de
+composição generativa)"*. Lendo o `PatchSeed.hpp` linha a linha
+confirmou: a espinha do patch recebe receitas por caráter (varia dentro
+de faixas estreitas), o resto do cabeamento sorteia uma vez no reseed, e
+depois disso só resta o `drift` cego de cada módulo — nada orquestra a
+peça a **ir a algum lugar** no tempo.
+
+**Feito — o "menor passo testável" do estudo (§3.5):**
+- **`apps/panel/MotionEngine.hpp`** (novo) — camada de composição FORA
+  do motor (`rasgo_modular_core` continua sem saber o que é
+  "composição"), como o `PatchSeed.hpp`. 3 comportamentos:
+  `Walk` (deriva com alvo, rearmado por probabilidade — diferente do
+  `drift` cego: tem destino), `Oscillate` (varre entre limites),
+  `Attract` (persegue o valor de outro parâmetro, de outro módulo —
+  "coreografia paramétrica"). `tick(graph, dt)` escreve por
+  `setParameterBase()` — a mesma via que um giro de knob usa, então
+  qualquer modulação por cabo já plugada no mesmo parâmetro
+  (`connectToParameter`) continua somando por cima. **É o motor aditivo
+  de hoje cedo (`RM-ENGINE-ADDITIVE-MOD`) que torna isto possível sem
+  brigar consigo mesmo.** Cada `Binding` carrega sua própria seed
+  xorshift → determinístico.
+- **`examples/peca_generativa_4.cpp`** (42 s, novo) — 4 ligações:
+  `WALK` em `filter.resonance`, `OSCILLATE` em `env.curve`, `ATTRACT`
+  em `voice.slope` perseguindo `filter.resonance`, e `WALK` em
+  `filter.spread` **por cima** da modulação já existente por cabo
+  (`lfoSpread → filter.spread`) — prova viva da aditividade.
+- **`tests/test_motion_engine.cpp`** (5 funções, novo) — faixa/
+  visitação do `Walk`, varredura do `Oscillate`, convergência do
+  `Attract`, **a aditividade testada numericamente** (base do Motion +
+  modulação por cabo no mesmo parâmetro = soma exata, nenhuma apaga a
+  outra), determinismo.
+
+**Validação:** som real (RMS varia 0,10→0,20 ao longo da peça, medido em
+janelas de 7 s — não é drone estático); determinístico (2 renders
+byte-idênticos); **36/36 CTest** Debug + Release, 0 warnings; os 4
+renders anteriores continuam byte-idênticos (nenhum usa o
+`MotionEngine`); painel compila (não tocado). `peca_generativa_4.wav`
+entrou em `validation-output/`.
+
+**O que isto NÃO é:** não há `Form Engine`/seções/`tension` ainda; os 4
+`Binding` são fixados à mão no C++ da peça, não gerados pelo `Seed`; não
+está integrado ao painel interativo. Continua sendo prova de
+arquitetura, como o estudo recomendava antes de generalizar — ver
+`ESTUDO_seed_composicao_generativa.md §3.6` pro detalhe completo e os
+próximos passos possíveis (generalizar via Seed, ou integrar ao painel).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: Patch Genetics — MUTATE/EVOLVE/FREEZE (protótipo)
+
+Segundo item da ordem sugerida em `ESTUDO_seed_composicao_generativa.md
+§7` — a extensão do `PatchSeed.hpp` (que só sabe GERAR um patch do zero)
+pra EDITAR um patch que já existe, preservando a topologia.
+
+**Feito:**
+- **`apps/panel/PatchGenetics.hpp`** (novo) — `mutatePatch(graph, seed,
+  fraction, frozen)`: reaplica a mesma ideia do passo genérico de
+  randomização do `seedPatch()` (§2.2 do estudo) — pra cada nó
+  alcançado por cabo (exceto os em `frozen`), reamostra ~`fraction` dos
+  parâmetros não-estruturais na faixa TOTAL, sem tocar em cabo nenhum.
+  Escreve por `setParameterBase()` — aditivo, não apaga modulação por
+  cabo já plugada no mesmo parâmetro (o mesmo motor de hoje cedo,
+  reaproveitado pela terceira vez no dia: engine → MotionEngine →
+  PatchGenetics). `evolvePatch(graph, seed, steps, fractionPerStep,
+  frozen)` = várias `mutatePatch` pequenas em sequência. `FREEZE` não é
+  estado guardado — é só o `unordered_set<size_t>` de nós que quem
+  chama passa em `frozen`.
+- **`tests/test_patch_genetics.cpp`** (6 funções, novo) — nó sem cabo
+  nunca muda; nó cabeado muda dentro da faixa e poupa parâmetros
+  estruturais (`bpm`/`mode`/…); `FREEZE` protege; `EVOLVE` muda algo em
+  N passos; determinismo; **a aditividade testada numericamente** (base
+  mutada + modulação por cabo no mesmo parâmetro = soma exata).
+- **Sonda extra** (não é CTest, `$CLAUDE_JOB_DIR/tmp/mutprobe.cpp`): 30
+  seeds reais do catálogo (34 módulos), 5 `MUTATE` em sequência
+  (fração 0,3) em cima de cada patch já semeado.
+
+**Limitação medida (honesta, não escondida):** **4/30 patches ficaram
+mudos** na sonda — ao contrário do `seedPatch()`, `MUTATE` não tem
+noção de "espinha" (ela só existe em tempo de `seedPatch`, quando a
+topologia está sendo desenhada); uma sequência de mutações pode
+derrubar um nível/mix perto de 0 por acaso. Documentado no cabeçalho do
+`PatchGenetics.hpp` e no estudo (§4) como decisão de design, com
+mitigação recomendada (`FREEZE` nos nós de saída, `fraction` pequena ao
+vivo) — não implementada.
+
+**Validação:** **37/37 CTest** Debug + Release, 0 warnings. Não muda
+nenhum módulo/exemplo existente (função nova, isolada, em
+`apps/panel/`) — os 5 renders seguem byte-idênticos.
+
+**O que isto NÃO é:** não está integrado ao painel (sem botão
+`MUTATE`/`EVOLVE`, sem UI de seleção pra `FREEZE`); `CROSS` continua de
+fora (precisa de alinhamento entre dois grafos, não desenhado).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: RASGO Score — SYSTEM SCORE (protótipo)
+
+Terceiro item da ordem sugerida em `ESTUDO_seed_composicao_generativa.md
+§7`. Só o nível `SYSTEM SCORE` da conversa de origem — conexões,
+modulação por cabo e mudanças de parâmetro. `MUSICAL SCORE` (notas)
+fica de fora: pediria que os módulos anunciassem eventos de disparo de
+forma genérica, um contrato novo que não estava em jogo aqui.
+
+**Feito:**
+- **`apps/panel/ScoreRecorder.hpp`** (novo) — `RasgoEvent` com 3 tipos
+  (`Connection`, `Modulation`, `ParameterChange`); `time` é **sempre**
+  `amostra/sr`, o `ScoreRecorder` nunca lê relógio de parede — quem
+  chama passa o tempo. `toText()` gera um formato de texto próprio (uma
+  linha por evento), não MusicXML/MIDI.
+- **`tests/test_score_recorder.cpp`** (4 funções, novo) — ordem
+  preservada, campos no texto, determinismo do texto (mesmos eventos →
+  mesmo texto byte a byte), `clear()`.
+- **`examples/peca_generativa_4.cpp`** (integrado) — registra as 7
+  conexões/modulação iniciais em `t=0`, e as mudanças de parâmetro do
+  `MotionEngine` **acima de um limiar** (0,03 — senão seria um dump em
+  taxa de controle, ~15 mil linhas por parâmetro, não um registro de
+  eventos legível). Resultado: 68 eventos numa peça de 42 s, salvos em
+  `peca_generativa_4.score.txt` ao lado do `.wav`.
+
+**Validação:** o texto da partitura é **byte-idêntico entre renders**
+(`validation-output/peca_generativa_4.score.txt`) — tão determinístico
+quanto o áudio. **38/38 CTest** Debug + Release, 0 warnings. Os 5
+renders de exemplo (incluindo o `.wav` da peça 4) seguem byte-idênticos
+— gravar a partitura não muda uma amostra sequer do áudio. Painel
+compila.
+
+**O que isto NÃO é:** `MUSICAL SCORE` (notas), export MusicXML/MIDI,
+gravação ao vivo no painel interativo (o gravador de WAV já existe lá,
+`Ctrl+R`; um gravador de eventos seguiria o mesmo padrão mas não foi
+plugado), e o caminho bidirecional (`SCORE → RASGO`) — nenhum dos
+quatro implementado.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: Learning Engine — hover-learn (protótipo)
+
+Quarto e último item da ordem sugerida em
+`ESTUDO_seed_composicao_generativa.md §7` — depois deste, os 4 itens da
+conversa com o ChatGPT (Seed/composição/partitura/pedagogia) têm
+protótipo. Precedente citado pelo autor: Antitotem e Navalha 2 (hover
+sobre controle/jack → explicação).
+
+**Feito:**
+- **`apps/panel/LearnCatalog.hpp`** (novo) — `lookupLearn(moduleType,
+  bind)` devolve `{quick, understand, explore}` ou `nullptr` (sem
+  conteúdo — silencioso, não erro). Conteúdo real preenchido pra
+  `FILTER` e `ENVELOPE` (2 de 34 módulos — prova o mecanismo, o resto é
+  redação incremental).
+- **`tests/test_learn_catalog.cpp`** (4 funções, novo).
+- **`panel_main.cpp`** (integrado) — `[l]` liga/desliga o **modo
+  Learn**, sinalizado na faixa de status; com o modo ligado, hover sobre
+  um knob/jack desenha um tooltip com o texto `quick` (reusa o mesmo
+  hit-test por `footprintPx` do clique). **Silencioso por padrão** — o
+  princípio que o autor marcou como central no Antitotem/Navalha.
+
+**Validação:** **39/39 CTest** Debug + Release, 0 warnings. Painel
+compila (`-Wall -Wextra`). Os 5 renders de exemplo seguem
+byte-idênticos (mudança só de desenho no painel, nenhum módulo/DSP
+tocado). **Não testado visualmente** — o painel gráfico trava a máquina
+do autor ao rodar por aqui; ele confirma rodando
+`.run_rasgo_modular.sh`.
+
+**O que isto NÃO é:** só `quick` é desenhado (`understand`/`explore`
+ficam guardados, sem UI de 2º nível); sem `WHY?`/`WHAT IF?`
+contextuais; conteúdo dos outros 32 módulos não escrito.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: LearnCatalog — conteúdo do rack de partida
+
+Continuação direta do registro acima — conteúdo pra mais 3 módulos:
+`OSC`, `VCA`, `CLOCK` (junto com `FILTER`/`ENVELOPE`, fecha os 5
+primeiros módulos que um usuário novo encontra no rack de partida).
+Texto baseado nos dossiês já escritos (`18_oscilador.md`, `20_vca.md`,
+`05_clock.md`), não inventado — cada linha `quick`/`understand`/
+`explore` descreve o comportamento real daquele parâmetro.
+
+`tests/test_learn_catalog.cpp` ganhou `expectAllDocumented()` (helper)
+e a checagem cobre agora os 5 módulos (widgets reais tirados do
+`panel()` de cada um). **39/39 CTest** Debug + Release, 0 warnings
+(mesma contagem de alvos — conteúdo dentro do teste existente). 5
+renders de exemplo seguem byte-idênticos. Painel compila; **não testado
+visualmente** (mesma ressalva do registro anterior).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: MASTER — volume padrão mais baixo
+
+Correção direta pedida pelo usuário: "o rasgo modular inicia muit alto
+(volume) deixe o master em 50% para não assustar". `50%` lido como
+metade da amplitude linear = **−6 dB** (não 50% da faixa em dB, que
+seria −24 dB — silencioso demais pra ser útil).
+
+**Feito:**
+- `src/dsp/Master.hpp` — default de `gain` mudou de `0,0` dB (unidade)
+  pra **`−6,0` dB**;
+- `apps/panel/PatchSeed.hpp` — a faixa aleatória de `MASTER.gain` num
+  seed novo (quando o patch tem `MASTER`+`MIXER`) mudou de
+  `rng(−1, 3)` pra **`rng(−8, −4)`** (mesmo spread de 4 dB, recentrado
+  em −6 dB) — senão um seed novo continuava perto da unidade e a
+  correção só valeria pra um `MASTER` isolado, não pro caminho normal
+  de início;
+- `~/.local/share/rasgo-modular/session.rmp` — a sessão salva do
+  usuário (carregada automaticamente na próxima abertura, antes de
+  qualquer seed) tinha `gain=1,53` — editado direto pra `gain=−6`, senão
+  a mudança de código não valeria pro próximo lançamento (a sessão salva
+  tem prioridade sobre o default e sobre `RASGO_SEED`).
+
+`tests/test_mix.cpp` tinha 5 funções que assumiam o default antigo
+(`0` dB) implicitamente pra isolar `width`/`mono`/`dc_block`/`limit` —
+cada uma ganhou `m.setParameter("gain", 0.0f)` explícito no topo, pra
+continuar testando só o que diz testar, não o valor do default.
+
+**Validação:** probe de 50 seeds (todo o catálogo de módulos, 15 s cada)
+— **0 mudos**, RMS de pico caiu pra 0,57 (fôlego bem maior antes de
+bater no limitador). **39/39 CTest** Debug + Release. 5 renders de
+exemplo byte-idênticos (os exemplos usam um `Out` local, não passam
+pelo `Master.hpp`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: abertura sempre gera um seed novo
+
+Resposta direta a: "sempre quando abro o instrumento o sequencer está com
+a mesma configuração (posição) [...] precisamos criar algo mais
+inteligente, que varie os timbres, os sons, as histórias, as composições,
+as texturas". Causa: a sessão salva (`session.rmp`) carregava por padrão
+em TODO lançamento — congelando exatamente o mesmo patch, contrariando a
+identidade do instrumento (`project_rasgo_modular_identity`: soa sozinho,
+diferente, desde o load — não é retomar um documento).
+
+**Feito** (`apps/panel/panel_main.cpp`, `.run_rasgo_modular.sh`):
+- lançamento simples agora sorteia um seed novo por padrão (mesmo
+  caminho de `[g]`) — timbre, cabeamento e forma diferentes toda vez;
+- `RASGO_SEED=N`/`--seed N` continuam reproduzindo um seed específico
+  (inalterado);
+- **novo**: `RASGO_RESUME=1`/`--resume` — único caminho que carrega a
+  sessão salva de propósito, pra quem estava num patch feito à mão;
+- `Ctrl+S` (salva sessão) e o banco (`Ctrl+B`) continuam funcionando
+  como antes — só o carregamento AUTOMÁTICO no lançamento mudou.
+
+**Validação:** painel compila; 41/41 CTest Debug + Release (a lógica de
+lançamento não tem alvo de teste dedicado — é I/O de processo, testada
+por leitura de código + smoke da auditoria de painel já existente).
+
+## Registro da etapa — 2026-09-04: excelência de saída — true peak + dither TPDF
+
+Investigação pedida pelo usuário ("ainda acho que a qualidade sonora está
+bem a desejar [...] verifique a saída pra não clipar, o código do
+antitotem e do navalha 2 trabalharam exaustivamente esses pontos"). Antes
+de mexer em código: confirmei que a correção de volume do registro
+anterior ("MASTER — volume padrão mais baixo") estava mesmo compilada e
+ativa no binário que o usuário roda (`build/rasgo_modular_panel`, mtime
+depois da edição; strings do binário contêm o texto novo de `[v]`) — não
+era binário obsoleto. Segui pra auditoria de qualidade.
+
+Lida `NAVALHA2_JUCE/docs/AUDITORIA_ENGENHARIA_SAIDA_AUDIO.md` (achados
+reais, medidos, com correção registrada — código do próprio autor,
+GPLv3/AGPLv3, conceito reaproveitado, não copiado). Dois achados batiam
+com o estado real do RASGO Modular:
+
+**1. `src/dsp/TruePeak.hpp` (novo) — `TruePeakEstimator`.** Estudado de
+`NAVALHA2_JUCE/TruePeakDetector.{h,cpp}` (FIR polifásico 4×,
+Blackman-Harris, ganho DC unitário por fase) — reescrito header-only
+zero-dep. Uma primeira versão tentou economizar (8 taps/fase, 32 no
+total); sonda própria (senoide de amplitude conhecida, várias
+frequências/fases) mediu erro de até 3,7% perto de Nyquist — PIOR que só
+olhar o pico de amostra. Corrigido pra 16 taps/fase (64 no total, igual à
+NAVALHA — o custo é desprezível, uma vez por amostra no estágio MASTER,
+não por voz); erro medido caiu pra <4% em toda a faixa testada (200 Hz a
+15 kHz), sempre do lado seguro (nunca subestima o pico real por mais de
+~10%). **Não é conformidade EBU Tech 3341** — não temos as fixtures
+oficiais pra validar contra elas (a NAVALHA teve HTTP 403 no pacote
+oficial e usou fixtures derivadas matematicamente da especificação); é
+uma estimativa medida e honesta, não uma certificação.
+
+Integrado no `OutputStage` (`src/dsp/Master.hpp`'s dependência): o
+detector do limitador agora usa o MAIOR entre pico de amostra e pico
+verdadeiro. Prova construída (não hipotética): uma senoide de amplitude
+real 0,95 (acima do teto de −1 dBFS = 0,891) cujo pico DE AMOSTRA (8 kHz,
+fase deliberada) fica em ~0,88 — abaixo do teto, invisível pro limitador
+antigo — agora aciona 0,85 dB de redução de ganho e sai a 0,85, dentro do
+teto. Um sinal calmo (220 Hz, amplitude 0,5) permanece transparente (GR ≈
+0) — a correção não deixa o instrumento mais comprimido em uso normal.
+
+**2. `src/io/WavWriter.hpp` — guarda de finitude + arredondamento +
+dither TPDF opcional.** Estudado de `AUDITORIA_ENGENHARIA_SAIDA_AUDIO.md`
+§3.7/P1.1 ("exportação sem dither" — achado real da NAVALHA, corrigido
+lá). O escritor:
+- não tinha guarda de NaN/Inf (o clamp por comparação `> 1.0f`/`< -1.0f`
+  é sempre falso pra NaN — um NaN cru virava lixo indefinido no cast pra
+  int16). Corrigido: `std::isfinite` antes do clamp;
+- truncava (`static_cast<int16_t>`) em vez de arredondar — viés de ~meio
+  LSB pra zero em toda amostra. Corrigido: `std::lround`;
+- **novo parâmetro opcional** `ditherSeed` (padrão `0` = sem dither,
+  bypass explícito — preserva os renders de auditoria/goldens
+  byte-idênticos entre execuções, como os "WAVs dourados" da NAVALHA
+  pedem `none`). Qualquer valor != 0 liga TPDF de ±1 LSB determinístico
+  por esse seed (xorshift64*, mesmo padrão do resto do projeto); L e R
+  nunca compartilham o mesmo par de uniformes. Ligado só na gravação ao
+  vivo do painel (`[Ctrl+R]`), nunca nos renders de exemplo.
+
+**Consequência esperada e aceita:** os 5 renders de referência em
+`validation-output/` mudaram por até **±1 amostra (1 LSB)** — só o
+arredondamento corrigido (truncar→arredondar), não o dither (que fica
+desligado nesses renders) nem o true peak (os exemplos não passam por
+`Master.hpp`). Regenerados nesta etapa; `.score.txt` (texto, não passa
+pelo `WavWriter`) ficou byte-idêntico, confirmando o isolamento.
+
+**Testes novos:** `tests/test_true_peak.cpp` (5 funções — rastreia
+amplitude conhecida dentro de 4%, nunca subestima >10%, pega o caso de
+estouro entre amostras que o pico de amostra sozinho não pegaria,
+transparente em sinal calmo, determinismo) e `tests/test_wav_writer.cpp`
+(5 funções — guarda de finitude, arredonda em vez de truncar, bypass de
+dither é determinístico e byte-idêntico ao padrão anterior, dither muda
+a saída mas é determinístico por seed e nunca cega o silêncio, L/R não
+compartilham ruído). **41/41 CTest** Debug + Release (39→41). 5 renders
+de exemplo com diff de ±1 LSB documentado (não byte-idênticos desta vez,
+de propósito).
+
+**Não verificado ainda** (ficam de fora desta etapa): "3.2 preview fora
+do MASTER" (não identifiquei um caminho de preview separado no painel —
+provavelmente não se aplica aqui); "3.3 medidor oculta overs" (o VU do
+MASTER não tem clip-latch nem escala dBFS — melhoria de painel real,
+não feita); "3.6 loudness não padronizada" (RASGO Modular não expõe
+nenhuma medida de loudness hoje — não se aplica). Módulos "interessantes"
+do ANTITOTEM mencionados pelo usuário: não levantados nesta etapa —
+pedido separado, fica pra quando houver direção específica de quais.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: Motion Engine — integrado ao painel ao vivo
+
+Resposta direta ao feedback: "ainda não há variação de controles (cada
+módulo fica estático com os knobs ou sliders sempre na mesma posição)".
+O `MotionEngine` (§3 do estudo) só existia numa peça de exemplo; agora
+está no `panel_main.cpp` interativo.
+
+**Feito:**
+- `populateMotion()` — pra cada módulo em `shown`, escolhe (hash
+  determinístico tipo+id, sem depender do seed do cabeamento) **no
+  máximo 1** widget `Knob`/`Slider` não-bloqueado
+  (`PatchGenetics::isMutationBlocked` — mesma lista de "não estrutural"
+  já usada por `MUTATE`) e cria um `Binding` `WALK` nele, faixa =
+  min/max real do parâmetro, ritmo ~0,015–0,06 Hz (alvo novo a cada
+  ~15–60 s, deslize proporcional — "respira", não "sacoleja"). Chamada
+  em todo ponto que já chama `buildMods()` (seed novo, carregar sessão/
+  banco, adicionar módulo, remover módulo) — sempre 1 fonte da verdade;
+- `[v]` — liga/desliga a variação ao vivo (ligada por padrão); pausa
+  sozinha enquanto o usuário está com a mão num knob (`drag.active`),
+  pra não brigar com um giro manual;
+- tick a cada iteração do loop principal (~30 fps, mesmo ritmo do
+  redraw), fora de `gmx` — mesma via lock-free que o próprio arrasto de
+  knob já usa (`setParameterBase`), motor aditivo: cabo/qualidade já
+  modulando o parâmetro continua somando por cima, sem conflito.
+
+**Validação:** sonda dedicada (todo o catálogo de módulos, 20 seeds,
+~60 s simulados de variação cada, motor de áudio rodando em paralelo)
+— **0/20 com problema**: sem NaN/Inf, sem silêncio, nenhum binding caiu
+num parâmetro da lista bloqueada. **39/39 CTest** Debug + Release
+(inalterado — a lógica vive só no painel, sem novo alvo de teste ainda).
+5 renders de exemplo byte-idênticos (não passam por `panel_main.cpp`).
+Painel compila; **não testado visualmente** (mesma ressalva dos
+registros anteriores de painel).
+
+Documentado no estudo (`ESTUDO_seed_composicao_generativa.md` §1.1, §7).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: AUDIO-IN — entrada de áudio ao vivo (Módulo 35)
+
+Resposta direta a "como podemos conectar o antitotem no rasgo modular? [...]
+ou vice-versa [...] isso qualquer fonte externa [...] não altere o código
+do antitotem". Investigado sem tocar no ANTITOTEM: nenhum dos dois lados
+tem porta de entrada de áudio hoje (ANTITOTEM: `setAudioChannels(0,2)`;
+RASGO Modular: `AlsaSink` é só playback) — o sistema já roda PipeWire
+(`pw-link` instalado), mas isso só serve pra ligar SAÍDA em ENTRADA, e não
+havia entrada em nenhum dos dois. Decisão: construir só o lado do RASGO
+Modular (ANTITOTEM fica intocado, como pedido) — isso já resolve
+ANTITOTEM→RASGO Modular (e qualquer app→RASGO Modular); o vice-versa
+depende de trabalho no ANTITOTEM, fora deste escopo.
+
+**Feito** — ver `dossies/35_audio_in.md` pro detalhe completo:
+- `src/dsp/AudioIn.hpp` (zero-dep) — nó `Signal`, anel circular SPSC sem
+  alocação em `process()`; sem alimentação = silêncio determinístico
+  (testável sem hardware);
+- `apps/panel/AlsaSource.hpp` — captura ALSA, contraparte de `AlsaSink.hpp`;
+- fiação em `panel_main.cpp`: `syncAudioIn()` (abre a captura só quando o
+  patch tem um `AUDIO-IN` de verdade, fecha quando sai — nunca pega o
+  microfone à toa) numa thread PRÓPRIA (separada da que toca o grafo, pra
+  não arriscar a temporização já delicada da reprodução);
+- catálogo: família SOURCE, `moduleCatalog()`/`makeModule()`;
+  `PatchSeed.hpp` não itera o catálogo às cegas, então `AUDIO-IN` nunca
+  entra num seed aleatório — opcional de verdade.
+
+**Validação:** `tests/test_audio_in.cpp` — 6 funções (silêncio sem
+alimentação, ida-e-volta exata, gain aplicado, underrun não trava/suja,
+estouro resincroniza, determinismo). **42/42 CTest** Debug + Release
+(41→42). 5 renders de exemplo byte-idênticos. Painel compila; a fiação
+ALSA/thread de captura **não pôde ser testada com hardware/PipeWire de
+verdade** (não rodo o painel gráfico — combinado do projeto); só a lógica
+do anel foi verificada.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: paleta — passar o mouse destaca o módulo na case
+
+"Pra facilitar identificar onde está o módulo no painel, ao passar o
+mouse sobre o nome do módulo na coluna da esquerda, há um destaque no
+painel do módulo" (feedback do autor).
+
+**Feito** (`panel_main.cpp`, só desenho — sem estado novo persistido):
+passar o mouse sobre um TIPO na paleta (coluna esquerda) — mesma faixa
+de acerto já usada pelo clique-pra-adicionar — destaca a linha
+(fundo + texto na cor de destaque) e todo módulo daquele tipo hoje
+presente na case ganha o mesmo contorno duplo já usado pro módulo sendo
+arrastado. Útil sobretudo com vários módulos do mesmo tipo ou um rack
+grande/rolado, onde achar "qual é o segundo OSC" a olho é difícil.
+Calculado a cada `redraw()` (~30 fps), mesmo padrão do tooltip do modo
+aprender — nenhum estado guardado entre quadros.
+
+**Validação:** 42/42 CTest Debug + Release (inalterado — é só desenho).
+5 renders de exemplo byte-idênticos. Painel compila; não testado
+visualmente (mesma ressalva de sempre).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: item por item — pendências pequenas
+
+Resposta a "quais outras coisas que não terminou ainda?" seguido de
+"avance item por item" — trabalhando a lista de pendências levantada,
+começando pelas menores/mais seguras. Itens de decisão arquitetural
+grande (`CROSS`, contrato `NOTE` do `MUSICAL SCORE`, gramática explícita
+do `Seed`) ficaram de fora de propósito — sinalizados, não decididos
+sozinho.
+
+**A. `AUDIO-IN` — seleção de dispositivo.** `RASGO_AUDIO_IN_DEVICE` no
+ambiente (mesmo padrão do `RASGO_SEED`) — sem ela, `"default"`
+(inalterado). `apps/panel/AlsaSource.hpp` + `panel_main.cpp`.
+
+**B. MASTER — VU com clip-latch + leitura em dB.** Fecha o achado §3.3
+da auditoria da NAVALHA ("o medidor esconde estouros") que eu mesmo
+tinha listado como pendente. A saída "vu" do `MASTER` agora é uma barra
+de nível real (pico da janela recente / teto de −1 dBFS) com leitura em
+dB, e um indicador que acende quando `gainReductionDb()` (telemetria já
+existente) mostra que o limitador teve que segurar algo — decai depois
+de ~2 s sem novo estouro. Reaproveita telemetria que já existia; nenhum
+estado novo no motor.
+
+**C. RASGO Score — gravação ao vivo no painel.** `[Ctrl+R]` agora grava
+`SYSTEM SCORE` junto do áudio: cabos existentes no início da tomada +
+toda mudança de parâmetro feita à mão (arrastar knob) enquanto grava,
+`t` relativo à tomada (amostras gravadas/sr). Escreve `rec-NN.score.txt`
+ao lado do `.wav`. **Não captura ainda:** mudanças de `MUTATE`/`EVOLVE`/
+Motion Engine durante a gravação, nem links de modulação por cabo (o
+motor não tem enumerador público pra eles hoje) — pendências registradas,
+não escondidas.
+
+**D. `NOISE` — cores extras (azul/violeta/bit).** 3 saídas novas,
+simultâneas às 5 já existentes — ver `dossies/19_ruido.md`. Painel
+alargado de 12 pra 20 HP.
+
+**E. Motion Engine — variedade de comportamento.** `populateMotion()`
+escolhia sempre `WALK`; agora ~27% dos módulos recebem `OSCILLATE`
+(ciclo previsível) em vez de `WALK` (alvo imprevisível), mesma faixa de
+ritmo (~15–60 s), escolha determinística pelo mesmo hash tipo+id de
+sempre. `ATTRACT` continua de fora (pediria relacionar DOIS módulos, não
+dá pra derivar de um hash só).
+
+**F. LearnCatalog — mais 5 módulos.** `NOISE` (incluindo as 3 saídas
+novas do item D), `DRIFT`, `MIXER`, `MASTER`, `WASP` — 5 dos módulos
+mais mexidos nesta sessão, cobrindo a cadeia de saída inteira
+(MIXER→MASTER) além do rack de partida. **10 de 35 módulos** agora
+(antes 5).
+
+**Validação (A–F juntas):** 42/42 CTest Debug + Release (`test_noise`
+ganhou 3 funções pros canais novos; `test_learn_catalog` ganhou uma
+função cobrindo os 5 módulos novos). 5 renders de exemplo
+byte-idênticos. Painel compila; não testado visualmente (mesma
+ressalva de sempre).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: ClockFeel — feel rítmico não-binário no CLOCK
+
+Continuação do "avance item por item" — candidato G do levantamento
+ANTITOTEM (`PESQUISA_MODULOS.md §2.3`).
+
+**Feito** (`src/dsp/EuclidClock.hpp`): parâmetro `feel` (7 posições) —
+reto/tercina/quintina/septina/nonina/undecina (razão 1/3/5/7/9/11,
+multiplica em cima de `MULT`) + `glitch` (sorteia um fator de tempo por
+passo, ~0,7–1,4×, em vez de razão fixa — único modo qualitativamente
+novo). `swing` do Antitotem ficou de fora de propósito: o `CLOCK` já
+tem um `swing` contínuo, duplicar como posição discreta só confundiria.
+
+**Bug pego e corrigido durante a validação:** a primeira versão sorteava
+o fator de glitch em TODA chamada de `advanceStep()`, mesmo com
+`feel≠glitch` — isso consumia o mesmo stream de RNG que `drift` usa
+pros próprios passos aleatórios, deslocando o `drift` de qualquer patch
+que nunca mexeu em `feel`. Achado pelos 5 renders de exemplo terem
+DIFERIDO onde antes eram byte-idênticos (2 deles usam `CLOCK.drift`).
+Corrigido: só sorteia quando `feel` = glitch de verdade
+(`advanceStep(bool glitch)`).
+
+**Validação:** `tests/test_clock.cpp` ganhou 3 funções (tercina/
+quintina escalam ~3x/~5x o passo reto; glitch tem variância de
+intervalo bem maior que reto; determinismo do modo glitch). **42/42
+CTest** Debug + Release. 5 renders de exemplo voltaram a byte-idênticos
+depois da correção do RNG. `LearnCatalog` ganhou a entrada de `feel`
+(CLOCK já era um dos 10 módulos documentados).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: CHAOS — campo caótico de poço duplo (Módulo 36)
+
+Continuação do "avance item por item" — candidato do levantamento
+ANTITOTEM (`PESQUISA_MODULOS.md §2.3`), o segundo mais tratável depois
+do `ClockFeel`.
+
+**Feito:** `src/dsp/Chaos.hpp` — módulo NOVO, família DECISION. Fonte
+genuinamente CAÓTICA (EDO não-linear de poço duplo), diferente de tudo
+que já existia (`DECISION`/`TURING` sorteiam, `DRIFT` soma ruído
+filtrado). `rate` (0,02–400 Hz, CV lenta a áudio), `drive`, `damping`,
+`freeze`, `reseed` (trigger). O chute periódico aleatório é o que deixa
+a trajetória cruzar de um poço pro outro — confirmado por teste, não só
+por leitura do código-fonte do Antitotem.
+
+**Validação:** `tests/test_chaos.cpp` — 7 funções (limitado e finito;
+visita os dois poços; freeze segura exato; reseed diverge de uma
+tomada de controle — comparação de trajetórias inteiras, não só o
+salto instantâneo, que pode calhar pequeno por acaso; determinismo;
+grafo `CHAOS→FILTER`; painel fecha). **43/43 CTest** Debug + Release
+(42→43). 5 renders de exemplo byte-idênticos. Painel 8 HP, 0
+sobreposições. **Não adicionado ao `PatchSeed.hpp`** (só disponível via
+paleta, não em seed aleatório ainda — mesma decisão do `AUDIO-IN`, mas
+aqui por falta de tempo de integração, não por ser opcional-nunca-
+dependência).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: proximidade por oscilador
+
+Continuação do "avance item por item" — terceiro candidato do
+levantamento ANTITOTEM (`PESQUISA_MODULOS.md §2.3`), **só metade**
+implementada de propósito.
+
+**Feito:** `src/dsp/Oscillator.hpp` ganhou `prox` — mistura as 5
+saídas (sine/tri/saw/pulse/sub) com uma versão de si mesmas passada por
+um passa-baixa de 1 polo bem suave (coeficiente 0,06, mesmo valor do
+estudo). `prox=0` é EXATAMENTE a saída crua — mesma convenção de
+`drift=0`, confirmado por teste e pelos 5 renders de exemplo
+continuarem byte-idênticos.
+
+**`órbita` (a outra metade do par proximidade/órbita do Antitotem)
+ficou de fora de propósito, não por falta de tempo**: `órbita` seria um
+LFO de pitch autônomo — e o `OSC` JÁ TEM `drift` fazendo exatamente
+esse papel (passeio lento correlacionado na afinação). Adicionar
+`órbita` duplicaria `drift`, não contribuiria nada novo — decisão
+documentada, não esquecimento.
+
+**Validação:** `tests/test_oscillator.cpp` ganhou 2 funções (`prox=0`
+idêntico byte a byte à saída sem tocar no parâmetro; `prox=1` reduz a
+energia de alta frequência da SAW em bem mais que 60%). **43/43 CTest**
+Debug + Release (inalterado — nenhum alvo novo, conteúdo dentro de
+testes existentes). 5 renders de exemplo byte-idênticos (confirma que
+`prox=0` não mudou nada em nenhum patch que já existia). `LearnCatalog`
+ganhou a entrada de `prox` (OSC já era um dos 10 módulos documentados).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: PLL — oscilador de malha de fase (Módulo 37)
+
+Fecha os 2 últimos candidatos do levantamento ANTITOTEM
+(`PESQUISA_MODULOS.md §2.3` — a lista inteira de 6 candidatos está
+concluída agora). Pedido explícito do autor, depois de eu perguntar
+"modo dentro do OSC ou módulo dedicado?": **"faz o b, porém será um
+oscilador sofisticado, com itens que o primeiro não contém ainda"** —
+"acho bom haver dois osciladores, mais independência, e possibilidades
+de variação".
+
+**Feito:** `src/dsp/Pll.hpp` — módulo NOVO, família SOURCE, 16 HP. Toca
+livre sozinho (FREQ/FINE próprios — é um segundo VCO de verdade, não um
+efeito). Com uma referência de fase plugada (`REF`), a taxa CURVA pra
+perseguir em vez de resetar duro (`OSC.sync_enable` continua sendo hard
+sync, inalterado). Itens que o `OSC` não tem: `shape` (morph contínuo
+seno↔tri↔serra↔quadrada), `ratio` (0,03–8×, trava além de 1:1 — desvio
+Rasgo, o Antitotem só persegue 1:1), `lock_gain` exposto, rede de
+feedback selecionável (6 tipos), saída `ring` (heterodino contra a
+referência), saída `lock` (CV 0..1 de travamento — desvio Rasgo).
+
+**Bug pego e corrigido durante a validação:** o sinal do erro de fase
+estava invertido na primeira versão — a correção puxava a taxa pro lado
+ERRADO (se afastando da referência). Achado porque a sonda de
+travamento não convergia; corrigido pra bater a convenção do estudo
+(`própria fase − esperada`, não o contrário).
+
+**Achado real, documentado, não escondido:** a correção é limitada a
+±0,9 (segurança) — isso dá ao `PLL` um "alcance de captura" limitado,
+igual um PLL analógico de verdade: um descompasso que pediria correção
+além de ±0,9 nunca trava exato, só se aproxima (caça de verdade). Medido
+por sonda dedicada antes de escrever o teste final, com números
+específicos no dossiê.
+
+**Validação:** `tests/test_pll.cpp` — 9 funções (livre sem referência;
+trava dentro do alcance de captura; RATIO=2 trava numa oitava acima;
+LOCK sobe com referência, fica em 0 sem ela; as 6 redes de feedback
+ficam limitadas/finitas; RING precisa de REF; determinismo; grafo
+`OSC.saw→PLL.ref`; painel fecha). **44/44 CTest** Debug + Release
+(43→44). 5 renders de exemplo byte-idênticos. Painel 16 HP, 0
+sobreposições.
+
+**Com isto, os 6 candidatos do levantamento ANTITOTEM
+(`PESQUISA_MODULOS.md §2.3`) estão todos feitos.** Ficam em aberto só
+os itens de decisão arquitetural grande: `CROSS`, o contrato `NOTE` do
+`MUSICAL SCORE`, e a gramática explícita do `Seed` (§1.1).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: CROSS — cruzamento de patches
+
+"A peça mais arriscada da lista" (`ESTUDO_seed_composicao_generativa.md
+§4`) — a única das 3 decisões de arquitetura grande que tinha um
+caminho de implementação claro o bastante pra resolver sem inventar
+nada novo. As outras duas (contrato `NOTE` do `MUSICAL SCORE`, gramática
+explícita do `Seed`) continuam em aberto — pedem decisão de design, não
+só engenharia.
+
+**Alinhamento adotado** (o problema central do `CROSS`: dois grafos de
+seeds diferentes quase nunca têm os mesmos nós nas mesmas posições) —
+por TIPO de módulo: a k-ésima ocorrência de um tipo no ALVO casa com a
+(k mod contagem-no-doador)-ésima ocorrência do MESMO tipo no DOADOR. Um
+nó do alvo sem tipo correspondente no doador fica intocado — nunca caça
+substituto de outro tipo. Mesma simplificação do `MUTATE`: só parâmetro,
+nunca cabo/topologia (crossover de TIMBRE, não de forma).
+
+**Feito:**
+- `apps/panel/PatchGenetics.hpp::crossPatch(target, donor, seed,
+  fraction, frozen)` — reaproveita a MESMA infraestrutura do `MUTATE`
+  (`isMutationBlocked`, `setParameterBase`, nós tocados por cabo,
+  conjunto `frozen`), só troca a FONTE do valor novo (do doador, não de
+  um sorteio);
+- `[c]` no painel — cruza o patch atual com um DOADOR novo (catálogo
+  inteiro semeado com um seed aleatório fresco, igual a um patch de
+  verdade), fração 0,5 (crossover clássico — ~metade de chance por
+  parâmetro elegível), FREEZE automático de `MIXER`/`MASTER` (mesma
+  mitigação do `MUTATE`/`EVOLVE`).
+
+**Validação:** `tests/test_patch_genetics.cpp` ganhou 5 funções
+(fraction=1 iguala exatamente o doador; FREEZE/não-tocado protegem
+igual ao MUTATE; sem tipo correspondente no doador o nó fica intocado;
+2 ocorrências do alvo casam com 1 só do doador, módulo o tamanho;
+determinismo). Sonda dedicada replicando a chamada do painel (FREEZE de
+MIXER/MASTER, 30 seeds, doador = seed diferente) — **0/30 mudos**, mesmo
+resultado do `MUTATE`/`EVOLVE` com freeze. **44/44 CTest** Debug +
+Release (inalterado — conteúdo dentro de alvos existentes). 5 renders
+de exemplo byte-idênticos. Painel compila; não testado visualmente.
+
+**Com isto, dos 3 itens de decisão arquitetural grande sinalizados
+desde o início, só 2 continuam em aberto: o contrato `NOTE` do `MUSICAL
+SCORE` e a gramática explícita do `Seed` (§1.1 do estudo).**
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: NOTE-OUT — contrato NOTE do MUSICAL SCORE (Módulo 38)
+
+Segundo dos 2 itens de decisão arquitetural que sobravam
+(`ESTUDO_seed_composicao_generativa.md §5`/§7). Antes de construir,
+conversei com o autor sobre o desenho ("o que sugere?") — 4 pontos
+combinados: módulo adaptador dedicado (não mudar os módulos
+existentes), pitch em 1V/oct cru (conversão fica pra hora de exportar),
+mesmo `ScoreRecorder` com um tipo de evento novo, e captura primeiro
+(exportação de verdade pra depois). v1 monofônica, decidida e
+documentada, não escondida.
+
+**A reformulação que evitou o risco:** a ideia original era fazer
+`ENVELOPE`/`SEQUENCE`/etc. "anunciarem" eventos de nota de forma
+genérica — mudaria a interface de vários módulos, por isso o item
+ficou em aberto por tanto tempo. Resolvido diferente: `NOTE-OUT`
+(`src/dsp/NoteOut.hpp`, zero-dep, SEM saber o que é `ScoreRecorder`) é
+um OBSERVADOR que você cabeia em GATE+PITCH onde quiser — detecta
+borda de nota-liga/desliga sozinho, expõe a nota completa por
+`takeCompletedNote()`. Nenhum dos outros 37 módulos mudou.
+
+**Achado arquitetural real, verificado por sonda antes de documentar
+como fato:** o motor só processa nós que chegam ao `sink` ativo
+("órfãos não custam DSP por bloco") — um `NOTE-OUT` sem saída nenhuma
+NUNCA seria ancestral do sink, então NUNCA teria `process()` chamado,
+mesmo com gate/pitch plugados. Por isso ganhou `gate_thru`/`pitch_thru`
+(cópia exata das entradas) — precisa ficar EM LINHA
+(`ALGO.gate → NOTE-OUT.gate → NOTE-OUT.gate_thru → ENVELOPE.gate`) pra
+rodar de verdade. Confirmado com uma sonda dedicada (fora de linha:
+`process()` nunca roda; em linha: roda normal) antes de escrever isso
+no dossiê como garantia.
+
+**Feito:**
+- `src/dsp/NoteOut.hpp` — módulo novo, família MIX;
+- `apps/panel/ScoreRecorder.hpp` — `RasgoEvent::Type::Note` +
+  `note(t, node, pitch, velocity, duration, accent)` + linha de texto;
+- `panel_main.cpp` — lê `takeCompletedNote()` de todo `NOTE-OUT` em
+  `shown`, a cada bloco, só enquanto `[Ctrl+R]` grava; `t` = início da
+  nota (conclusão menos duração), relativo à tomada.
+
+**Validação:** `tests/test_note_out.cpp` — 6 funções (sem gate nunca há
+nota; nota-liga/desliga com pitch/duração corretos; velocity/accent
+amostrados no instante certo; thru é cópia exata; determinismo; painel
+fecha). `tests/test_score_recorder.cpp` ganhou 1 função pro evento
+`Note`. **45/45 CTest** Debug + Release (44→45). 5 renders de exemplo
+byte-idênticos. Painel 8 HP, 0 sobreposições.
+
+**Com isto, resta 1 só item de decisão arquitetural grande: a
+gramática explícita do `Seed` (§1.1 do estudo).**
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: MASTER — gain fixo em 30% do slider
+
+Segunda correção de volume no mesmo dia — desta vez um número exato, não
+uma leitura de "50%" minha: "preciso que o instrumento comece com o som
+de saída em 30% do slider (para todos os seeds), subo na mão". `n =
+(v−lo)/(hi−lo)` é como o painel calcula a posição visual do slider
+(`panel_main.cpp`) — pra `gain` (−60..+12 dB), 30% = **−38,4 dB**, fixo
+(não sorteado) em todo seed.
+
+**Feito:**
+- `src/dsp/Master.hpp` — default `gain` → `-38.4f`;
+- `apps/panel/PatchSeed.hpp` — `setT("MASTER","gain", rng(-8,-4))` virou
+  um valor FIXO `-38.4f` (antes era faixa sorteada) — "para todos os
+  seeds" pede o mesmo valor sempre, não uma faixa;
+- sessão salva do usuário — `gain` também ajustado direto pro mesmo
+  valor (a sessão só carrega com `--resume` desde o registro de
+  "abertura sempre gera um seed novo", mas ajustado por consistência).
+
+**Efeito colateral pego e corrigido:** `tests/test_wasp.cpp::testInGraph`
+dependia implicitamente do default antigo do `MASTER.gain` (roteava
+OSC→WASP→`MASTER` sem fixar o gain, checando o pico da SAÍDA do
+`MASTER`) — com −38,4 dB o pico caiu abaixo do limiar do teste.
+Corrigido com `gain=0` explícito no teste (mesma classe de ajuste já
+feita em `test_mix.cpp` no registro de volume anterior).
+
+**Validação:** 50 seeds — 1 "mudo" limítrofe (rms=0,000377, contra o
+limiar de 0,0005 da sonda) — não é um patch realmente silencioso, é o
+efeito esperado de um piso 30 dB mais baixo empurrando um patch já
+quieto pra perto do limiar de medição; RMS máximo caiu pra 0,022 no
+total. **42/42 CTest** Debug + Release. 5 renders de exemplo
+byte-idênticos.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-04: Patch Genetics — MUTATE/EVOLVE no painel ao vivo
+
+Fecha a pendência deixada em aberto desde o registro "Patch Genetics —
+MUTATE/EVOLVE/FREEZE (protótipo)": `PatchGenetics.hpp` existia e tinha
+teste próprio, mas nunca foi ligado ao painel interativo. Resposta a
+"termine esse trabalho que não finalizou".
+
+**Feito** (`apps/panel/panel_main.cpp`):
+- `[m]` — MUTATE uma vez, fração 0,25;
+- `[e]` — EVOLVE, 6 passos de 0,12 cada (a mesma distância, percorrida
+  mais devagar que um MUTATE único);
+- os dois congelam `MIXER`/`MASTER` automaticamente antes de mutar — a
+  mitigação que o `PatchGenetics.hpp` recomendava mas nunca tinha sido
+  aplicada em lugar nenhum. Sob `gmx` (deliberado — MUTATE escreve muitos
+  parâmetros de uma vez, diferente do arrasto de knob que é lock-free);
+- `populateMotion()` roda de novo depois — os alvos do Motion Engine
+  reiniciam coerentes com os valores recém-mutados, em vez de continuar
+  perseguindo uma trajetória de antes da mutação.
+
+**Validação:** sonda dedicada replicando exatamente a chamada do painel
+(FREEZE de MIXER/MASTER, 30 seeds) — **MUTATE 0/30 mudos, EVOLVE 0/30
+mudos** (o baseline documentado sem freeze era 4/30). Comentário do
+`PatchGenetics.hpp` atualizado pra registrar a mitigação implementada.
+**42/42 CTest** Debug + Release (inalterado — lógica só no painel). 5
+renders de exemplo byte-idênticos. Painel compila; não testado
+visualmente (mesma ressalva de sempre).
+
+**Não commitado.**
+
 ## Registro da etapa — 2026-09-02: CONTROL — utilidades de CV (Módulo 21)
 
 Quarto dos essenciais (`PESQUISA_MODULOS.md §2.1`). A "gramática do
@@ -2538,5 +3332,710 @@ Debug + Release. Renders de exemplo byte-idênticos. Painel 10 HP,
 **Rack de partida COMPLETO:** `OSC` · `NOISE` · `VCA` · `CONTROL` ·
 `LOGIC` (+ `FILTER` `ENVELOPE` `FUNCTION` `CLOCK` `SEQUENCE`/`TURING`
 `QUANTIZER` `HARMONY` `MIXER` `MASTER` já existentes). **22 módulos DSP.**
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: SeedGrammar — a gramática de portas do Seed, nomeada
+
+Terceira e última das três decisões arquiteturais sinalizadas nesta
+etapa (`CROSS`, contrato `NOTE`, e esta). Lendo `PatchSeed.hpp::seedPatch()`
+inteiro antes de mexer: a gramática **já existia** — classificação de
+porta (`enum Src`/`Dst` locais) e matriz de compatibilidade fonte×destino
+(`W[6][5]`), só que anônima, embutida em variáveis locais dentro de uma
+função de ~500 linhas, sem nome exposto nem documentação.
+
+**Decisão de escopo (confirmada com o autor, "sim, topo essa leitura"):**
+NÃO reorganizar em torno das 6 categorias literais da conversa
+(`SOURCE→TRANSFORM→CONTROL→MODULATE→FEEDBACK→OUTPUT`) porque (a) seria
+uma REGRESSÃO de precisão — a classificação real é por PORTA, não por
+módulo (`NOISE.smooth` e `NOISE.white` são o mesmo módulo, classes de
+porta diferentes) — e (b) mudaria silenciosamente o que cada
+`RASGO_SEED=N` já produz, sem rede de segurança formal (`find tests
+-iname "*seed*"` → nenhum `test_patch_seed.cpp` existe). Em vez disso:
+extração pura, com o objetivo explícito de **zero mudança de
+comportamento**.
+
+**Feito:** `apps/panel/SeedGrammar.hpp` (novo)
+- `SeedSrc`/`SeedDst` (enums nomeados, mesmos valores/ordem dos antigos
+  `S_*`/`D_*` locais — compatibilidade de índice preservada);
+- `seedClassifyPorts(SignalGraph&, outSrc[6], outDst[5])` — puro, sem
+  RNG, movido byte a byte do loop de classificação original;
+- `seedCompatibilityMatrix(wildness, W[6][5])` — movido byte a byte;
+- `seedIsGateName()`, `seedSrcName()`/`seedDstName()` (nomes legíveis,
+  pra diagnóstico futuro, não usados pela lógica de sorteio);
+- comentário de cabeçalho com a tabela de correspondência pro
+  vocabulário `SOURCE/TRANSFORM/CONTROL/MODULATE/FEEDBACK/OUTPUT`,
+  explicando por que `FEEDBACK` (propriedade do cabo, `reaches()`) e
+  `OUTPUT` (`sink`/`MASTER` fixo) não são classes de porta e continuam
+  em `PatchSeed.hpp`.
+
+`apps/panel/PatchSeed.hpp` — enum/loop/matriz locais removidos,
+substituídos por chamadas a `seedClassifyPorts()`/`seedCompatibilityMatrix()`;
+os dois call-sites que usavam nomes curtos antigos (`D_GATE`/`D_PITCH`/
+`D_AUDIO`/`S_BUS`) atualizados pros nomes qualificados novos.
+
+**Validação — problema real identificado antes de escrever qualquer
+prova:** nenhum dos 5 `examples/*.cpp` chama `seedPatch()`
+(`grep -c "seedPatch" examples/*.cpp` → zero em todos) — o checkout
+padrão desta sessão ("5 renders byte-idênticos") **não cobre este
+código** e não pegaria uma regressão aqui. Sem teste dedicado
+(`test_patch_seed.cpp` não existe). Construída uma prova própria:
+- Congelada uma cópia do `seedPatch()` PRÉ-refactor (capturada verbatim
+  da leitura desta mesma sessão, antes de qualquer edição), renomeada
+  `seedPatchOld`/`rasgo::panel_old`, num header à parte fora do
+  repositório;
+- Sonda (`$CLAUDE_JOB_DIR/tmp/seedverify.cpp`) monta o grafo completo
+  do catálogo (mesmo padrão de `moduleCatalog()`+`makeModule()` do
+  painel), roda `seedPatch()` (novo) e `seedPatchOld()` (congelado) pros
+  seeds 1–200, serializa cada grafo (`SignalGraph::serialize()` — texto
+  determinístico de todo parâmetro de intenção + todo cabo) num arquivo
+  por versão;
+- `diff` entre as duas saídas (200 seeds, 13.163 linhas cada) —
+  **byte a byte idêntico**. O refactor não mudou UMA amostra do que
+  nenhum seed já produzia.
+
+**Validação padrão:** build limpo (inclui `rasgo_modular_panel`, que
+inclui `PatchSeed.hpp`+`SeedGrammar.hpp`). **45/45 CTest** Debug e
+Release (nenhum módulo/teste novo — extração pura, contagem não muda).
+5 renders de exemplo — isolamento de fonte confirmado (nenhum `examples/*.cpp`
+inclui `PatchSeed.hpp`/`SeedGrammar.hpp`, direta ou transitivamente) +
+determinismo confirmado por hash `sha256` em duas rodadas (idêntico).
+
+**Falta:** a reformulação real de `seedPatch()` em torno das 6
+categorias como estrutura de dados variável (não só nomeada) continua
+fora de escopo — ver `ESTUDO_seed_composicao_generativa.md §1.1/§7`.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: LearnCatalog — hover-learn completo pros 37 módulos
+
+Pedido: "agora finalize o learn para todos os controles e jacks". O
+protótipo (`dossies/ESTUDO_seed_composicao_generativa.md §6`) tinha
+conteúdo só pra 10 dos 37 tipos do catálogo (`FILTER`, `ENVELOPE`,
+`OSC`, `VCA`, `CLOCK`, `NOISE`, `DRIFT`, `MIXER`, `MASTER`, `WASP`).
+Faltavam 27: `ABACUS`, `AUDIO-IN`, `CHAOS`, `CHORD`, `CONTROL`,
+`DECISION`, `FUNCTION`, `HARMONY`, `LOGIC`, `LPG`, `MATRIX`, `MATTER`,
+`MEMORY`, `MULT`, `NOTE-OUT`, `PARAMETRIC`, `PLL`, `QUANTIZER`, `SH`,
+`SCOPE`, `SHAPE`, `SPACE`, `SEQUENCE`, `STRING`, `SWITCH`, `TRIGSEQ`,
+`TURING`.
+
+**Feito:** `apps/panel/LearnCatalog.hpp` — lido cada `src/dsp/*.hpp`
+(construtor + `panel()`) pra tirar os binds exatos (nome de parâmetro,
+`in:`/`out:` de porta) direto do código, não de memória; escrito
+`quick` pra TODO knob e TODO jack dos 27 módulos, com `understand`/
+`explore` nos mecanismos que valem explicar (ex.: por que `CLOCK.feel`
+precisava de RNG isolado — já documentado no código, agora também no
+tooltip; o alcance de captura do `PLL`; a assimetria de vactrol do
+`LPG`; a granularidade de porta vs. módulo do `MATRIX`/`SHAPE`) e vazio
+em parâmetros autoexplicativos (ex.: `MIXER.gain2`) — mesmo padrão de
+"não escrever prosa por escrever" do `MODULE_DEVELOPMENT_STANDARD`.
+Comentário de cabeçalho reescrito: de "protótipo, 10 de 35" pra
+"catálogo completo, 37 de 37", com nota sobre a relação `Cable`
+(RingMod/Fold/Difference) ficar de fora por ser propriedade do cabo, não
+um tipo de módulo com painel próprio.
+
+**Validação:** `tests/test_learn_catalog.cpp` ganhou
+`testRemainingCatalogModulesHaveAtLeastQuick()` — resolve `lookupLearn`
+pra cada bind dos 27 módulos novos (mesma lista tirada do `panel()` de
+cada um), pega qualquer erro de digitação no nome do bind (que senão
+falharia silenciosamente — `lookupLearn` devolve `nullptr` sem avisar,
+por design, "sem nota ainda" não é erro). **45/45 CTest** Debug e
+Release. 5 renders de exemplo — hash `sha256` idêntico ao de antes desta
+mudança (confirma o esperado: `LearnCatalog.hpp` é conteúdo textual puro
+de UI, nenhum exemplo/DSP o inclui).
+
+**Falta:** `understand`/`explore` (2º/3º nível) continuam guardados na
+struct mas NÃO desenhados no painel — precisa de um estado de "clique
+pra expandir" ou dwell mais longo em `panel_main.cpp` (arquitetura de
+exibição, não mais conteúdo). `WHY?`/`WHAT IF?` contextuais (dependem do
+que já está cabeado) continuam de fora.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: paleta — módulos em ordem alfabética dentro de cada tema
+
+Pedido: "organize os módulos em cada item da coluna da esquerda por
+ordem alfabética (os temas pode continuar como estão)".
+
+**Cuidado tomado antes de mexer:** `moduleCatalog()`
+(`ModuleCatalog.hpp`) não é só a fonte da paleta — a MESMA ordem de
+iteração monta o rack inicial "um de cada módulo" (`main()`,
+`byType[t] = id`), o grafo doador do `CROSS`, e a auditoria de
+sobreposição. A ordem de instanciação decide o ÍNDICE de cada nó, e
+`seedClassifyPorts` (`SeedGrammar.hpp`) enche `src[]`/`dst[]` na ordem
+dos nós — mudar a ordem do catálogo mudaria em qual posição de cada
+lista um `rnd() % lista.size()` cai, e portanto o que cada
+`RASGO_SEED=N` produz (a mesma classe de regressão que o refactor da
+gramática do Seed evitou por pouco nesta mesma etapa, ver o registro
+"SeedGrammar" acima). `deserialize()` não depende da ordem do catálogo
+(reconstrói cada nó pelo tipo salvo no próprio arquivo `.rmp`), então
+`.rmp` salvos não corriam risco — mas o Seed corria.
+
+**Feito:** `apps/panel/panel_main.cpp` — só o laço que MONTA a lista de
+exibição da paleta (`palette.push_back(...)`) passou a percorrer uma
+CÓPIA ordenada alfabeticamente de `g.types` (`std::sort` com comparação
+de `std::string`); `ModuleCatalog.hpp::moduleCatalog()` em si **não foi
+tocado** — a ordem que monta o grafo, o doador do `CROSS` e a
+classificação de porta do Seed continuam exatamente as mesmas. Os temas
+(famílias) continuam na ordem original, como pedido.
+
+**Validação:** build limpo, **45/45 CTest** Debug e Release, 5 renders
+de exemplo com hash `sha256` idêntico ao de antes (confirma que a
+mudança é 100% cosmética, sem efeito no grafo/DSP/seed).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: MATRIX — sobreposição de elementos no painel
+
+Reporte do autor: "o módulo matrix tá com sobreposição de elementos".
+
+**Causa:** `test_panel_layout` (o gate de regressão de layout) nunca
+cobriu `MATRIX` — nem `MULT`, `PLL`, `CHAOS`, `NOTE-OUT`, `AUDIO-IN`,
+todos adicionados ao catálogo depois do teste. E, no caso do `MATRIX`,
+o teste sozinho não bastaria: os 16 `g<jk>` são declarados como `Knob`
+em `Matrix.hpp` mas `panel_main.cpp` os PULA e desenha a grade 4×4 via
+`matrixCellMM` (cx = 27 + k·17, cy = 35 + j·18, células de 16×17 mm) —
+maiores que os knobs. A grade real chega a y≈97,5; os jacks `OUT` a
+y=104 tinham o rótulo "OUT" (desenhado ACIMA do jack, ~y 97–101)
+encostando na última linha da grade.
+
+**Feito:**
+- `tests/test_panel_layout.cpp` — incluídos os 6 módulos que faltavam
+  (`MATRIX`, `MULT`, `PLL`, `CHAOS`, `NOTE-OUT`, `AUDIO-IN`);
+  `footprints()` ganhou um caso `MATRIX` que modela a pegada REAL
+  (células `matrixCellMM` no lugar dos 16 knobs + o texto-guia
+  "IN↓ OUT→" em ~(50, 24)). Verificado que o teste PEGA a regressão:
+  com os `OUT` em y=104 ele falha com 7 linhas
+  `cell:g4x x rot:OUTx`; com o conserto, passa.
+- `src/dsp/Matrix.hpp` — jacks `OUT` de y=104 → **y=110** (folga de
+  ~5 mm entre o fundo da grade e o rótulo "OUT"; mesma faixa de rodapé
+  que `TRIGSEQ`/`MATTER` já usam). Comentário no código explicando o
+  porquê. Os outros 5 módulos recém-cobertos passaram limpos — só o
+  `MATRIX` tinha o problema.
+
+**Validação:** build limpo, **45/45 CTest** Debug e Release
+(`test_panel_layout` agora cobre 37 módulos), 5 renders de exemplo com
+hash `sha256` idêntico (`panel()` não está no caminho de áudio).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: painel — NOISE mais estreito, rack na ordem da paleta, título UTF-8
+
+Três ajustes de painel pedidos pelo autor em sequência:
+
+**1. NOISE largo demais.** Tinha ido pra 20 HP quando ganhou as 8 saídas
+(branco/rosa/brown/S&H/smooth + azul/violeta/bit) numa fileira só.
+`src/dsp/Noise.hpp` — 8 jacks em **2 fileiras de 4** → volta pra **12 HP**
+(a largura original). `test_panel_layout` cobre.
+
+**2. Rack na ordem da listagem.** `apps/panel/panel_main.cpp` — a paleta
+já estava em ordem alfabética por família; agora o rack inicial (`shown`)
+também. Separei explicitamente as DUAS ordens:
+- instanciação dos nós = ordem de `moduleCatalog()` (índice de nó
+  estável — `seedClassifyPorts`, doador do CROSS dependem disso);
+- exibição (`shown` + paleta) = famílias na ordem do catálogo, módulos
+  alfabéticos dentro da família.
+`shown` já era reordenável arrastando e salvo no `.panel`, então mexer
+na ordem inicial dele é seguro.
+
+**3. Acentuação quebrada no título da janela.** `XStoreName` grava
+`WM_NAME` como STRING (Latin-1); os títulos com "—"/"●"/acento (ao
+apertar `[v]`, `[m]`, `[e]`, `[c]`, salvar, etc.) apareciam como lixo na
+barra do gerenciador de janelas. Adicionado `setTitle()` que grava
+`_NET_WM_NAME` e `_NET_WM_ICON_NAME` como `UTF8_STRING` (o que o WM
+moderno lê), mantendo `XStoreName` só de fallback. Todos os 10 pontos
+que setavam título passaram a usar `setTitle()`. O texto DENTRO do
+painel já era UTF-8 (`Xutf8DrawString` + fontset) — era só o título.
+
+**Validação:** build limpo, **45/45 CTest** Debug e Release, 5 renders
+de exemplo com hash `sha256` idêntico (as três mudanças são de UI, nada
+toca DSP).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: body guard — proteção contra agudo que "incomoda o corpo"
+
+Pedido do autor, depois de ouvir frequências agressivas no painel:
+"gosto de barulhos, mas há alguns que passam do limite, incomodam o
+corpo do ouvinte". Rendi a voz mínima do painel e confirmei que ELA é
+limpa (pico −42 dBFS, nada acima de 3 kHz) — o agudo vem de patches/
+parâmetros. Proposta descrita e aprovada ("ok avance dentro da ideia b
+com body guard"): transparente pra som agressivo, só age quando cruza
+pro território que machuca.
+
+**Feito:** `src/dsp/OutputStage.hpp` (usado pelo `MASTER`)
+- `struct TptSvf2` — SVF TPT (Zavalishin/Cytomic) de 2 polos, estável
+  perto de Nyquist, dá LP e BP de um cálculo só;
+- **guarda ultrassônica** (sempre ligada, não é knob): LP Butterworth 2
+  polos a ~21 kHz. −0,1 dB a 8 kHz, −0,5 dB a 19 kHz, −8 dB a 22 kHz —
+  tira só o ice-pick perto de Nyquist (violeta/`bit` sustentados,
+  aliasing). Filosofia do estágio: como o bloqueio de DC, nunca é
+  escolha musical;
+- **governador de corpo** (`bodyGuard` 0..1, parâmetro `body_guard` no
+  `MASTER`, default 1,0; 0 = bypass EXATO): 2 detectores BP estreitos
+  (Q 3) em 2,8/4,8/7,6 kHz → seguidores lentos (~240 ms ataque) → "gate de
+  concentração" (razão banda/total — tom concentrado dispara, ruído de
+  banda larga não) → high-shelf de 1 polo (corte acima de ~1,4 kHz),
+  alvo `over·2,1` limitado a 0,72 (≈ −9 dB de shelf), subindo/descendo
+  devagar. Telemetria `bodyGuardDb()`;
+- ordem no estágio: finitude → DC → ultrassônica → corpo → pico
+  verdadeiro (agora medido na SAÍDA dos guardas) → limitador → teto.
+- `Master.hpp`: parâmetro `body_guard`, knob "BODY" no painel (8 HP,
+  ao lado do toggle LIMIT), telemetria `bodyGuardDb()` repassada.
+
+**Calibração (sonda `osdiag`):** senoide sustentada de 3,2 kHz —
+−8 dBFS: −0,6 dB; −5 dBFS: ~2 dB; −2,5 dBFS: ~4 dB; −0,9 dBFS: ~5,5 dB.
+Progressão suave, "não some o som". Ruído branco alto (−9 dBFS RMS):
+< 1,5 dB (gate de concentração deixa passar). Rajadas de 3 kHz de 18 ms
+a cada 380 ms (ritmo): ~0 (ataque lento). 8/12/15 kHz: transparentes
+(fora da faixa).
+
+**Validação:** `tests/test_output_stage.cpp` (novo, 9 funções — bypass
+exato em 0, pega tom sustentado, escala com `bodyGuard`, ignora
+transiente e ruído de banda larga, guarda ultrassônica dosada,
+constante passa exata, determinismo). **46/46 CTest** Debug e Release
+(era 45 — +1 alvo). `test_true_peak`/`test_mix` continuam passando
+(margem fina do teste de 8 kHz preservada: guarda ultrassônica é
+−0,1 dB ali). Os 5 renders de exemplo com hash `sha256` idêntico
+(nenhum exemplo usa `MASTER`; a voz mínima do painel não dispara nada —
+confirmado por render). README/RASGO_MODULAR.md/dossiê 17 atualizados.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: Motion Engine janela uniforme, MASTER 50%, seed anti-viés-agudo, body guard até ~8 kHz
+
+Rodada de correções a partir de vários reportes do autor em sequência
+("o 6º slider do SEQUENCE se move muito mais", "ainda escuto frequência
+hiper agudas", "elas se repetem em várias seeds", "melhore o algoritmo
+da seed, ainda está engessado, com padrões de IA limitados", "mude o
+master pra 50%").
+
+**1. Motion Engine — janela de movimento uniforme.**
+`apps/panel/MotionEngine.hpp` + `panel_main.cpp::populateMotion`. O bug:
+a janela era o RANGE INTEIRO do parâmetro, então um `OSCILLATE` varria o
+controle de ponta a ponta (o "6º slider" era o único animado do
+SEQUENCE, e no modo Oscillate) enquanto um `WALK` mal saía do lugar.
+Agora a janela é ±6% do range (`kMotionDepth`, IGUAL pra todo binding),
+centrada no valor atual do knob (`Binding::start`, sentinela NaN =
+compat com quem não seta → `examples/peca_generativa_4.cpp` e
+`test_motion_engine` intocados, render byte-idêntico). Todo controle
+animado "respira" a mesma fração proporcional.
+
+**2. MASTER — default 30% → 50% do slider (−24 dB).**
+`Master.hpp` + `PatchSeed.hpp` (fixo em todo seed). Era −38,4 (30%).
+
+**3. Seed — viés de agudo e colapso de variedade.**
+Sonda espectral (`seedspec`/`seedrms`) sobre 26 seeds achou: (a) a seção
+"vozes soltas → mixer ch2/3/4" jogava `NOISE.white`/`.pink` CRUS direto
+no MASTER a até −2 dB — o "hiper agudo que se repete em várias seeds"
+(banda >10 kHz chegava a 11% da energia em vários seeds, sempre o mesmo
+perfil); (b) ~15% dos seeds colapsavam num punhado de esqueletos quase
+idênticos (`complexity` hard-clampado pra 0,02 → nProc=0, nCables=3).
+`apps/panel/PatchSeed.hpp`:
+- seção de camadas soltas reescrita: no máx 2, BEM baixas (−24..−11 dB),
+  NUNCA saída de `NOISE` crua, prefere fontes já processadas
+  (`SEED_SRC_BUS`);
+- o passeio ponderado não usa mais `MIXER`/`MASTER` como destino (jogava
+  fonte crua no barramento);
+- `voiceOpts[3]` (voz de ruído) só rosa/marrom, nunca branco cru;
+- rede de segurança: voz brilhante que não passou por processador nenhum
+  ganha UM passa-baixa musical à força;
+- `complexity` minimalista agora 0,05..0,20 (varia nProc/nCables) em vez
+  de 0,02 fixo → sem colapso;
+- voz OSC: ~35% em registro médio (era sempre grave), `pw` 0,25..0,75
+  (não vira trem de picos), `freq` NOISE 1..500 (era 3000);
+- voz FILTER auto-osc: `resonance` 0,55..0,9 (era 0,88..0,99, seno puro
+  perfurante), corte-base variado e mais baixo (era travado em ~2,6 kHz);
+- passe genérico de parâmetros: `resonance`/`grit`/`fold`/`drive` em
+  sub-faixa (não vai pro extremo auto-oscilante), `gain` de EQ limitado
+  a −9..+6, `cutoff` a 90..8000.
+Resultado (26 seeds): banda >10 kHz de ~0..0,7% (era 11%+); nenhum par
+de seeds idêntico; a maioria com espectro grave/médio-grave saudável.
+
+**4. Body guard — faixa estendida a ~8 kHz.**
+`OutputStage.hpp`: 3º detector (Q 3) em ~7,6 kHz (eram 2, em 2,8/4,8) —
+os seeds brilhantes restantes concentram energia perto de 8 kHz, acima
+da faixa antiga. `test_output_stage.cpp` ajustado (freqs de
+transparência agora 1/11/14 kHz — 8 kHz agora é faixa protegida).
+
+**Validação:** build limpo, **46/46 CTest** Debug e Release, 5 renders
+de exemplo com hash `sha256` idêntico (nenhum exemplo usa `MASTER` nem
+`seedPatch`; `peca_generativa_4` usa Motion Engine mas via API antiga
+sem `start`). Sondas em `$CLAUDE_JOB_DIR/tmp` (não versionadas).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: clipe nos patches/mutações + P6 do SEQUENCE ainda mexia + Motion só knob
+
+Reportes: "em várias seeds há sons clipando", "algumas variações de
+mutações e evolução também geram clipes", "ainda é o p6 no sequencer que
+vai mais que os outros".
+
+**Clipe.** Causa: o `MIXER` era soma LINEAR pura, sem teto; um patch
+generativo quente (`gain1` do seed ia até +5 dB) ou uma mutação que
+mexia num ganho de canal mandava +5..+10 dB pro `MASTER`, que aí
+limitava demais / bombeava / distorcia.
+- `src/dsp/Mixer.hpp` — joelho `tanh` no barramento: **transparente até
+  1,0 (0 dBFS)** (os testes de soma linear continuam exatos), comprime
+  de leve acima, teto ~1,35. Não é limitador (isso é do MASTER), é só
+  não deixar a soma estourar seco;
+- `apps/panel/PatchSeed.hpp` — `MIXER.gain1` de `rng(-2,+5)` pra
+  `rng(-10,-2)` (mira ~−6 dBFS de barramento, com folga);
+- `apps/panel/PatchGenetics.hpp::isMutationBlocked` — `gain1..4`,
+  `level1`, `level2` entram na lista (mutar nível joga o barramento pra
+  fora). Isso vale pro `MUTATE`/`EVOLVE`/`CROSS` **e** pra Motion Engine
+  (usa a mesma função).
+
+**Motion Engine — P6 e derivas arriscadas.**
+`apps/panel/panel_main.cpp::populateMotion`:
+- só `Widget::Kind::Knob` agora (era Knob+Slider). Slider no Rasgo é "a
+  partitura" (passos do SEQUENCE) ou o fader do MIXER — não é regulagem
+  que deva derivar sozinha. Some o "6º slider se move muito mais";
+- `resonance`/`feedback`/`drive`/`grit`/`fold` fora da Motion — perto do
+  extremo viram fuga/apito intermitente; derivar ali é arriscado.
+
+**Body guard estendido a ~8 kHz** (3º detector Q3 em ~7,6 kHz) — os
+seeds brilhantes restantes concentram energia perto de 8 kHz, acima da
+faixa antiga (2,8/4,8 kHz). `test_output_stage.cpp` ajustado.
+
+**Investigação de agudo residual:** sonda espectral em 26+ seeds — os
+seeds mais brilhantes ainda existentes (ex.: 5, 1) têm um componente
+~8 kHz, mas a −40..−47 dBFS (quase silêncio, nas passagens entre notas).
+Não reproduzi um tom agudo ALTO e persistente. Isolei a cadeia de áudio
+do seed 5 (`OSC.tri → PARAMETRIC → ENVELOPE`) — limpa, dominante em
+125 Hz. Precisa do número do seed do autor pra fechar.
+
+**Validação:** build limpo, **46/46 CTest** Debug e Release, 5 renders
+de exemplo com hash `sha256` idêntico (nenhum exemplo usa `MIXER`/
+`MASTER`/`seedPatch`/Motion via API nova).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: MIXER + MASTER grudados no fim da família MIX
+
+Pedido: "unir mixer e master pra ficarem próximos" → decidido (com o
+autor) fazer **par grudado, sem unir os módulos** — mantém a
+modularidade (MIXER sem MASTER, MASTER sozinho), zero refatoração.
+
+`apps/panel/panel_main.cpp` — `sortFamilyForDisplay()` substitui o
+`std::sort` alfabético cru nos dois pontos (rack inicial `shown` +
+paleta): alfabético dentro da família, mas `MIXER` e `MASTER` recebem
+chave `"~1"`/`"~2"` (o `~` vem depois de A..Z) → sempre no fim, nessa
+ordem. Família MIX passa a exibir `MATRIX, NOTE-OUT, SCOPE, MIXER,
+MASTER`. Só exibição — `moduleCatalog()` (índice de nó, doador do CROSS,
+`seedClassifyPorts`) intocado.
+
+**Validação:** build limpo, 46/46 CTest Debug e Release, 5 renders
+`sha256` idênticos.
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: agudo = oscilador cru no mixer (seed 45932257) + botão SEED cortando
+
+O autor identificou: "o som agudo vem do PLL, canal 2 no mixer" (seed
+45932257) e "o número do seed no botão está cortando".
+
+**Agudo — osciladores crus no barramento.** A seção "camadas soltas →
+mixer" pegava qualquer fonte `SEED_SRC_BUS`/`VOICE` — inclusive
+`PLL.out`, `OSC.saw`, etc. — e cabeava direto no MIXER. Com o passe
+genérico sem teto de `freq`, o `PLL.freq` ia pra alguns kHz → um assobio
+a −2..−14 dB no barramento. `apps/panel/PatchSeed.hpp`:
+- camadas soltas agora **só de fontes JÁ PROCESSADAS**
+  (`FILTER`/`WASP`/`LPG`/`SPACE`/`PARAMETRIC` — `isProcessedBus`); um
+  oscilador cru direto no mixer é drone/assobio brigando com a voz
+  (sugestão do próprio autor);
+- passe genérico: `freq` de nó não-espinha cabeado limitado a
+  40..1200 Hz; `rate` de faixa larga a ≤220 Hz;
+- `QUANTIZER.range` de `rng(1, 3.5)` → `rng(1, 2)` (3,5 oitavas a partir
+  de uma base de ~400 Hz levava o OSC da melodia a ~5–6 kHz);
+- voz OSC "médio" de `rng(190, 520)` → `rng(175, 340)`;
+- `DRIFT` targets: `QUANTIZER.range` (off 2,5 dep 2,0 → off 1,6 dep 0,7)
+  e `FILTER.resonance` (off 0,4 dep 0,5 → off 0,35 dep 0,28, não deriva
+  pra auto-oscilar);
+- `PARAMETRIC` da cadeia: `q2` `rng(0.7, 5)` → `rng(0.6, 2.5)`, `gain2`
+  `rng(-6, 10)` → `rng(-6, 6)` (Q 5 + +9 dB era pico-agulha que
+  assobiava em cada nota).
+Sonda `sweep` — **50 seeds espalhados: 0 ásperos** (nenhum com >4 kHz
+dominando + audível), 1 mudo.
+
+**Botão SEED.** `apps/panel/panel_main.cpp` — largura do botão agora
+acompanha o rótulo (`seedButton()` mede os caracteres; 96..240 px);
+número acima de 10 dígitos abrevia com "…" (`seedLabel()`). O clip da
+faixa de status usa `seedButton()[0]` em vez do `-124` fixo.
+
+**Validação:** build limpo, **46/46 CTest** Debug e Release, 5 renders
+`sha256` idênticos (nenhum exemplo usa `MIXER`/`MASTER`/`seedPatch`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: LEARN — caixa fixa estilo terminal (modelo ANTITOTEM)
+
+Pedido: "pro learn seguir o modelo do ANTITOTEM: uma caixa tipo terminal
+no canto inferior esquerdo (coluna da esquerda) com o texto do learn …
+para evitar que as caixas de texto se sobreponham ao painel". O tooltip
+flutuante antigo tapava justo o módulo que você estava inspecionando.
+
+**Feito:** `apps/panel/panel_main.cpp`
+- `kLearnH` (196 px) — com o modo Learn (`[l]`) ligado, uma caixa fixa
+  ocupa o rodapé da coluna esquerda; a lista de módulos (`palBottom`)
+  encurta pra não sobrepor. Modo desligado = paleta ocupa a coluna toda;
+- a caixa: borda + "LEARN" + regra + título (`TIPO · rótulo`) + os 3
+  níveis empilhados (`quick` claro, `understand` secundário, `explore`
+  com "→", cor de acento), com QUEBRA DE LINHA (`wrapText` mede com
+  `Xutf8TextExtents`). Vazia → "passe o mouse sobre um knob ou jack";
+- hit-test do widget sob o mouse hoisted pro topo do `redraw`
+  (`learnHit`/`learnHitTitle`); o bloco do tooltip flutuante REMOVIDO;
+- clamps de scroll da paleta e o hit-test de clique/roda usam `palBottom`.
+
+**Validação:** compila limpo (`-Wall -Wextra -Werror`), **46/46 CTest**
+Debug e Release, 5 renders `sha256` idênticos. Não testado visualmente
+(o painel gráfico trava a máquina do autor por aqui — ele testa com
+`.run_rasgo_modular.sh`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: caixa Learn menor + ligada por padrão; zoom do rack (Ctrl+=/-/0)
+
+Pedidos, em sequência: "deixe a caixa do learn um pouquinho menor" · "ela
+pode ficar sempre ligada" · "assim não precisa mais a mensagem no
+cabeçalho 'modo aprender…'" ("isso fica pro tutorial") · "precisa ser
+criado um modo redução/ampliação Ctrl+ / Ctrl- como fizemos no antitotem
+— tá difícil de cabear os módulos da primeira linha com os da última".
+
+**Caixa Learn** (`apps/panel/panel_main.cpp`)
+- `kLearnH` 196 → **172 px**;
+- `learnMode` agora **`true` por padrão** (como `motionOn`/`[v]`); `[l]`
+  passou a ser só esconde/mostra (devolve ~170 px de paleta);
+- removida a faixa de status "◆ MODO APRENDER — passe o mouse… · [l] pra
+  sair" (não faz sentido com a caixa sempre presente; é assunto de
+  tutorial). Legenda: "[l] aprender" → "[l] esconde/mostra a caixa
+  aprender".
+
+**Zoom de conteúdo do rack** (`apps/panel/panel_main.cpp`) — precedente
+ANTITOTEM `ZoomableViewport`
+- `kZoomMin/Max/Step` = 0,55 / 1,40 / 0,10; `uiZoom` multiplica `g_s`
+  **depois** do `clamp[kSMin,kSMax]` do `relayout()`, com piso duro
+  `kSMin·0,5` só nesse caminho (reduzir abaixo do regime compacto é o
+  objetivo — ver a 1ª e a última fileira juntas pra cabear);
+- `Ctrl+=` / `Ctrl++` / `Ctrl+KP_Add` ampliam · `Ctrl+-` / `Ctrl+KP_Sub`
+  reduzem · `Ctrl+0` / `Ctrl+KP_0` volta a 100%;
+- `scrollY` reescalado por `g_s_novo / g_s_velho` (âncora no topo);
+- `setTitle("… zoom NN%")` de retorno; legenda ganhou "[Ctrl+=/-/0] zoom";
+- `uiZoom == 1.0` desenha **idêntico** ao anterior (multiplicador no-op).
+- Limite conhecido: o fontset X11 é de tamanho fixo — em zoom-out forte as
+  legendas apertam. É vista de sobrevoo pra rotear, não de ajuste fino;
+  declutter por limiar de `g_s` fica como refino aberto.
+
+Docs: `README.md` (hover-learn), `apps/panel/design.md` §2.10 reescrita +
+§3.2 nova subseção "Zoom de conteúdo",
+`dossies/ESTUDO_seed_composicao_generativa.md` §6.
+
+**Validação:** `rasgo_modular_panel` compila limpo (`-Wall -Wextra
+-Werror`), **46/46 CTest** Debug e Release. Não testado visualmente (o
+painel trava a máquina do autor por aqui; ele roda `.run_rasgo_modular.sh`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: encerramento à prova de trava (janela que "não fechava")
+
+Sintoma relatado: "há um instrumento travado na tela / não fecha / dê o
+kill por aí". Matei o processo (`SIGKILL`, `ps -C` confirmou); a sessão
+tinha sido salva (`session.rmp` 22:25:56, seed 134440676, com nó
+AUDIO-IN). "Não sei o que fiz."
+
+Diagnóstico: **nenhum laço do painel é infinito** — main loop, thread de
+áudio e thread de captura têm iteração limitada e `try_lock` não
+bloqueante. O risco era só o **teardown de saída bloqueante**:
+- `~AlsaSink` fazia `snd_pcm_drain` (espera o buffer tocar até o fim);
+- `stopAudioIn()` → `audioInThread.join()` só volta quando o
+  `snd_pcm_readi` do período corrente retorna — se o PipeWire parou de
+  entregar, pendura;
+- ambos rodam ANTES do `XDestroyWindow` → janela fica na tela.
+(A máquina ainda está com o stack de vídeo nvidia cuspindo erro de EDID a
+cada 10 s — GUI instável por fora do nosso código também.)
+
+**Feito** (`apps/panel/`)
+- `panel_main.cpp`: `XUnmapWindow` + `XFlush` **logo que o loop sai**,
+  antes de qualquer desmonte de áudio — a janela some na hora;
+- `AlsaSink.hpp` `~AlsaSink`: `snd_pcm_drain` → **`snd_pcm_drop`**;
+- `AlsaSource.hpp`: novo `abort()` (`snd_pcm_drop`);
+- `panel_main.cpp` `stopAudioIn()`: `audioInDev->abort()` antes do
+  `join()` — corta um `read()` bloqueado.
+Sem mudança de comportamento com ALSA saudável.
+
+Docs: `apps/panel/design.md` §3.4.
+
+**Validação:** `rasgo_modular_panel` compila limpo, **46/46 CTest**. Não
+dá pra validar a saída rodando o painel aqui — precisa da verificação do
+autor (abrir e fechar com `q` e pelo botão da janela).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: caixa Learn sem toggle (tecla [l] removida)
+
+Pedido: "não precisamos do botão learn, ele estará sempre habilitado …
+a tecla l pode sumir" (no contexto do redesenho do cabeçalho — a caixa
+Learn não vira botão da barra).
+
+**Feito** (`apps/panel/panel_main.cpp`): removidos o estado `learnMode`,
+o handler `XK_l`/`XK_L` e a entrada `[l]` da legenda. A caixa LEARN e o
+hit-test do widget sob o mouse são incondicionais; `palBottom`/`palBot`
+sempre reservam `kLearnH` (172 px) no rodapé da paleta.
+
+Docs: `README.md`, `apps/panel/design.md` §2.10 + §roadmap 1c,
+`dossies/ESTUDO_seed_composicao_generativa.md` §6.
+
+**Validação:** compila limpo, **46/46 CTest**.
+
+**Não commitado.**
+
+---
+
+## Registro da etapa — 2026-09-05: cabeçalho de linha única (modelo RASGO Synth) + i18n do painel
+
+Pedidos, em sequência: cabeçalho seguindo o modelo dos RASGO Synth mas em
+**uma linha**, altura mantida (`kCaseTop = 46`) · a legenda de texto vira
+**botõezinhos** toggle/momentâneo · sem botão `LEARN` (sempre ligado, tecla
+`[l]` removida) · IDIOMA/TUTORIAL/SOBRE **funcionais já** (opção B) · i18n
+traduz **cabeçalho, tutorial, créditos, LEARN**; **não** rótulos de
+parâmetro nem títulos de módulo · **inglês é o padrão** · LEARN traduzido
+**em fases** (infra agora, textos depois, começando pelo rack de partida).
+
+**Feito**
+- `apps/panel/UiLanguage.hpp` (NOVO) — porte sem JUCE do `UiLanguage.h`
+  dos Synth: `enum Lang{en,pt,fr,es}`, `L4{en;pt;fr;es}`, `tr()` com
+  fallback en→pt, `nextLang`/`langLabel`/`langCode`/`langFromCode`,
+  `namespace strings` (cabeçalho + 6 cartões de tutorial + créditos, 4
+  línguas). `tests/test_ui_language.cpp` (NOVO): fallback, ciclo,
+  completude do cabeçalho. **CMake 46→47 alvos.**
+- `apps/panel/panel_main.cpp`:
+  - `uiLang` (padrão `en`) carregado do pref próprio
+    `~/.local/share/rasgo-modular/ui-lang` (não o patch — sobrevive a
+    abrir num seed novo); `saveLangPref()` no `cycleLang`;
+  - **ações hoisted** — `actSeed/actMotion/actMute/actMutate/actEvolve/`
+    `actCross/actBank/actSave/actRec/actZoom(dir)/cycleLang`: uma
+    implementação por comando, chamada pela tecla E pelo clique. O switch
+    de `KeyPress` encolheu de ~150 linhas pra ~40;
+  - **cabeçalho reescrito** (`redraw`): wordmark `RASGO MODULAR` (marca,
+    não traduz) · barra de comandos em botões (`DRIFT`/`MUTE` toggles
+    acendem âmbar; `MUTATE`/`EVOLVE`/`CROSS`/`BANK`/`SAVE` momentâneos
+    piscam ~160 ms via `hdrFlash`; `ZOOM −/+`) · cluster da direita
+    montado da borda pra dentro: `SOBRE` `TUTORIAL` `IDIOMA(EN…)`
+    `● REC`(vermelho gravando) `⚄ SEED n` · pico do MASTER (barra+dB) ·
+    `N mód · M cabos`. Sacrifício por largura: leitura → pico → comandos
+    da direita; SEED/REC/IDIOMA/TUTORIAL/SOBRE nunca somem. `headerHits`
+    (montado no `redraw`, lido no laço de evento) roteia o clique;
+  - **overlay** `tutorial`/`sobre` — card sobreposto, `[Esc]` ou qualquer
+    clique fecha; tutorial com 6 cartões;
+  - removidos o `seedButton()` (a geometria virou parte do cluster) e a
+    faixa de legenda/`● GRAVANDO` (estado agora é o próprio botão).
+- Docs: `README.md`, `RASGO_MODULAR.md` (47 alvos), `apps/panel/design.md`
+  §2.11 (nova).
+
+**Escopo declarado / fase seguinte:** traduzir o `LearnCatalog.hpp` (EN
+canônico + FR + ES) — hoje 100% pt, ~233 textos. `LearnEntry` vira
+`L4`-por-campo quando essa tradução começar; até lá o LEARN mostra o pt.
+
+**Validação:** `rasgo_modular_panel` + `rasgo_modular_ui_language_tests`
+compilam limpos (`-Wall -Wextra -Werror`), **47/47 CTest** Debug e
+Release. Não testado visualmente (o painel trava a máquina do autor por
+aqui; ele roda `.run_rasgo_modular.sh`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-05: ajustes pós-cabeçalho (dwell do LEARN · MUTE isolado · mute no MASTER · AUDIO-IN mais fino)
+
+Pedidos avulsos durante a revisão do cabeçalho:
+
+- **Dwell da caixa LEARN** — "fica mudando o tempo todo quando mexemos o
+  mouse". `panel_main.cpp`: o conteúdo só troca depois de ~2 s parado
+  sobre o MESMO objeto (`learnHoverKey`=`id|bind` + `learnHoverSince`);
+  fora de qualquer widget mantém o último. O laço já repinta a ~30 fps,
+  o dwell resolve sozinho.
+- **Botão `MUTE` isolado no cabeçalho** — "pra evitar clicar nele sem
+  querer e mutar o som". Saiu do bloco de comandos; agora fica no fim da
+  barra, depois do `ZOOM` + um vão de 16 px + régua vertical + 12 px.
+- **`mute` no módulo MASTER** — `src/dsp/Master.hpp`: novo param `mute`
+  (0/1, default 0), rampa de ~8 ms (1 polo) no fader antes da proteção de
+  saída — silêncio sem estalo. Toggle `MUTE` no painel (x24 y42, os
+  outros toggles desceram um passo). `tests/test_mix.cpp::testMasterMute`
+  (rampa não corta seco · silencia os 2 canais em ~80 ms · volta ao
+  desligar). Dossiê `17_master.md` atualizado.
+- **`AUDIO-IN` 6 → 4 HP** — "muito largo". `src/dsp/AudioIn.hpp`: só tem
+  1 knob e 1 jack; display 20 → 16 mm. Era o menor módulo (6); agora 4.
+  `test_panel_layout` (que já cobre AUDIO-IN) passa.
+
+**Em aberto (propostas, aguardando o autor):**
+- renomear o botão `DRIFT`/`DERIVA` do cabeçalho → há um módulo `DRIFT` no
+  rack; o botão é o Motion Engine (`[v]`, "variação ao vivo"). `VARIA` /
+  `VARY` evita a colisão;
+- o `MUTE` do cabeçalho hoje rompe TODOS os cabos (`allRuptured`, = tecla
+  `[espaço]`). Podia em vez disso acionar o `mute` do(s) MASTER — mais
+  limpo pra "mutar o som"; `[espaço]` fica só com o rompe-cabos;
+- osciloscópio no painel do MASTER (além do VU) — `Display` de forma de
+  onda ao lado do VU, ou um 2º `Display`.
+
+**Validação:** build limpo (`-Wall -Wextra -Werror`), **47/47 CTest**
+Debug e Release. Painel não testado visualmente (trava a máquina do
+autor; ele roda `.run_rasgo_modular.sh`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-06: rótulos do cabeçalho, STANDBY, logo, e início do passe de ergonomia de painel
+
+**Cabeçalho** (`apps/panel/`)
+- `DERIVA` → **`VARIA`** (colidia com o módulo `DRIFT`). `MUTA` → **`MUDA`**
+  ("muta = interrompe o som", não é o sentido do MUTATE) — pt/es 3ª pessoa,
+  a tecla `[m]` e o título continuam "MUTATE".
+- o botão `MUTE`/`MUDO` do cabeçalho virou **`STANDBY`**, isolado no fim
+  da barra (vão + régua), e agora aciona o **`mute` do MASTER** (silêncio
+  limpo, rampa) em vez de romper cabos. `[espaço]` continua com o
+  rompe-tudo (`actRupture`). Estado compartilhado com o toggle MUTE do
+  módulo (`masterMuted` lido no `redraw`).
+- **toggles ligados ganham anel de destaque** — `VARIA`/`STANDBY`/`REC`
+  (o `REC` em vermelho); distinto do flash momentâneo de `MUDA`/`EVOLUI`/…
+  (`hdrBtnC(..., onCol)`).
+- **logo RASGO** no wordmark: `apps/panel/assets/rasgo_logo_2026.svg`
+  (cópia da família, de `rasgo-synth-performance/assets/`) →
+  `rasgo_logo.xbm` (1-bit, `regen_logo.sh`, commitado) → `XCopyPlane` na
+  cor de acento + "MODULAR" ao lado.
+
+**Passe de ergonomia de painel — rubrica + 3 primeiros** (`src/dsp/`)
+- Rubrica documentada em `apps/panel/design.md §3.2.1` (margens, display
+  cheio, grade de knobs centrada por HP, jacks espaçados pelo rótulo /
+  quebra em fileiras por função, HP enxuto, agrupamento didático).
+- `footprintMM` do painel + `test_panel_layout` (kCharMM 2,5→2,8, folga
+  0,5→0,3) agora modelam a **largura do rótulo do jack** — o modelo
+  frouxo deixava "FLD/EVT", "XOR/FLIP" etc. passarem.
+- **DRIFT** (10 HP): display cheio, knobs 2 col, **3 fileiras de jacks** —
+  ADV/RATE in · A/B/C/D (saídas de campo correlacionadas) · FLD/EVT.
+- **LOGIC** (10 HP): display cheio, saídas em **2 fileiras** —
+  combinacional AND/OR/XOR · derivadas do clock DIV/FLIP.
+- **FILTER** (10 HP, comentário dizia "12" mas era 10): display cheio,
+  knobs 2×2 centrados, IN + 3 mod-CV numa fileira, LO/CTR/HI/ALL na de
+  baixo.
+- Dossiês `02_filtro.md`, `22_logic.md`, `27_drift.md` atualizados.
+- **Pendentes** (o teste marca `LAYOUT (pendente)`, não falha):
+  `FUNCTION` (RATE/SLOPE/SYNC), `HARMONY` (ROOT/SCALE), `MIXER` (M×1..4),
+  `NOTE-OUT` (GATE/PITCH) + varredura do resto do catálogo. Aguardando OK
+  do padrão pra seguir.
+
+**Validação:** build limpo (`-Wall -Wextra -Werror`), **47/47 CTest**
+Debug e Release. Painel não testado visualmente (trava a máquina do
+autor; ele roda `.run_rasgo_modular.sh`).
+
+**Não commitado.**
+
+## Registro da etapa — 2026-09-06: logo RASGO anti-aliased (estava serrilhada)
+
+O `.xbm` 1-bit deixava a marca serrilhada no tamanho do cabeçalho. Trocado
+por um **mapa de cobertura em tons de cinza** (`assets/rasgo_logo_gray.h`,
+gerado do SVG por `regen_logo.sh` com anti-aliasing) que o painel
+**pré-compõe uma vez** num `Pixmap` — mistura fundo→acento por pixel — e
+depois só faz `XCopyArea` a cada quadro. Sem dependência de imagem no
+build (o `.h` é commitado). `rasgo_logo.xbm` removido.
+
+**Validação:** `rasgo_modular_panel` compila limpo Debug e Release,
+**47/47 CTest**.
 
 **Não commitado.**

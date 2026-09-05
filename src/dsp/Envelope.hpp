@@ -53,7 +53,7 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "ENVELOPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "contour", "", 2.5f, 8.0f, 55.0f);
+        p.add(Widget::Kind::Display, "contour", "", 2.5f, 6.0f, 56.0f);
         p.add(Widget::Kind::Knob, "ATK", "attack", 7.0f, 30.0f);
         p.add(Widget::Kind::Knob, "DEC", "decay", 21.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SUS", "sustain", 35.0f, 30.0f);

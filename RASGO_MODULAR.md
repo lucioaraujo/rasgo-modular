@@ -1074,7 +1074,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 34 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 38 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1171,7 +1171,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 34 módulos DSP
+### 36.3 Os 38 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1195,7 +1195,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 14 | `HARMONY` | DECISION/INFERENCE | movimento harmônico: 6 técnicas reais (Coltrane, sub tritônica, mediante cromática, intercâmbio modal, jazz modal, backdoor ii-V) dirigindo `root`/`scale` do `QUANTIZER` | `RASGO_SYNTH/HarmonicWanderer.hpp` (só a lógica de intervalos = fato musical) |
 | 15 | `SEQUENCE` | SEQUENCE | sequenciador de passos: padrão de 8 passos editável (altura+gate) × 5 modos de leitura (forward/backward/pingpong/random/brownian); `glide`, `eos`. O par escrito do `TURING` | Hexen §119; René/Metropolix; Grids (browniano) |
 | 16 | `MIXER` | MIX | 4 entradas mono → soma; `gain`/`pan`/`mute` por canal, pan de potência constante; saída estéreo; `out_gain` | prática de mesa; pan-law de potência constante (fato público) |
-| 17 | `MASTER` | MIX/METER | barramento de saída: largura mid/side (`width` 0–2), soma `mono`, `gain`, **proteção de saída de excelência** (`src/dsp/OutputStage.hpp`: guarda de finitude + bloqueio de DC + **limitador com look-ahead ~3 ms** que não distorce o transiente + teto suave, teto −1 dBFS, telemetria de GR), saída de VU (`level`) | matriz mid/side (Blumlein); `NAVALHA`/`ANTITOTEM` `OutputStage`+`LookaheadLimiter` (código do autor) |
+| 17 | `MASTER` | MIX/METER | barramento de saída: largura mid/side (`width` 0–2), soma `mono`, `gain`, **proteção de saída de excelência** (`src/dsp/OutputStage.hpp`: finitude + bloqueio de DC + **guarda ultrassônica** + **governador de corpo** (`body_guard`, agudo alto/sustentado/concentrado ~2,5–8 kHz → high-shelf suave) + **limitador look-ahead ~3 ms** por pico verdadeiro + teto suave, teto −1 dBFS, telemetria de GR e de body-guard), saída de VU (`level`) | matriz mid/side (Blumlein); `NAVALHA`/`ANTITOTEM` `OutputStage`+`LookaheadLimiter`+`TruePeakDetector` (código do autor) |
 | 18 | `OSC` | SOURCE | oscilador subtrativo: 5 formas ao mesmo tempo (seno/tri/serra/pulso/sub) antialias PolyBLEP, 1 V/oct, PWM, hard sync, FM linear through-zero, sub-oitava; `drift` | PolyBLEP (Välimäki/Finke); hard sync clássico; TZFM (Buchla 259); sub por divisão (Juno/Moog) |
 | 19 | `NOISE` | SOURCE/UTILITY | ruído branco/rosa/brown + sample-and-hold + tensão que passeia (smooth random); `spread` uniforme→sino (acaso estruturado) | Paul Kellet pink filter (domínio público); S&H clássico; Buchla 266 smooth random |
 | 20 | `VCA` | TRANSFORM/UTILITY | amplificador DUPLO: `in`×ganho; CV atenuvertida SOMA ao knob (porta de verdade — knob vivo); `response` lin→exp; saturação suave; `sum` = mini-mixer; `drift` | VCA lin/exp (Doepfer A-131/132); Quad VCA como mixer; atenuverter (Maths) |
@@ -1213,6 +1213,10 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 32 | `WASP` | TRANSFORM | filtro de 12 dB com GRÃO — o caráter do EDP Wasp (1978), inversores CMOS 4069 como estágios de ganho que ceifam duro e assimétrico. Núcleo SVF TPT (2 polos, igual ao `FILTER`) com ceifador muito mais agressivo no laço + estágio de saída que ceifa DEPOIS do filtro (buzz reedy). `grit` (joelho do ceifador), `bias` (teto assimétrico → harmônicos pares + bloqueador de DC), `mode` (LP↔BP↔HP), `drive` (waveshaper com corte), corte estendido a 24 kHz, `drift`. Auto-oscila perto de `resonance`=1. Núcleo não-linear a 2× (antialias). O contraponto sujo do `FILTER` limpo | circuito do EDP Wasp (análises independentes, René Schmitz/DIY — NÃO Doepfer service manual nem VCV); inversor CMOS 4069 (teoria); SVF TPT não-linear (Zavalishin/Simper-Cytomic) |
 | 33 | `MATRIX` | ROUTE/MIX | matriz de roteamento 4×4 — cada cruzamento fonte×destino é um ganho (atenuversor), como as matrizes de pinos do EMS Synthi / Doepfer A-138m. `out_k = level·sat(Σ_j in_j·g_jk)`. 16 células `g11..g44` (−1..1, padrão identidade = passa-direto); `norm` (nível constante por coluna), `ring` (coluna vira produto = ring-mod de 4 quadrantes), `sat` (matriz segura em laço), `level`, `drift` (desvio lento dos ganhos — a matriz respira). No painel gráfico é uma grade clicável. Patch denso sem espaguete. Determinístico | EMS Synthi / ARP 2500 (matriz de pinos), Doepfer A-138m / Befaco / Erica matrix mixer, Serge/Buchla (norm por coluna), camada matriz do `SignalGraph` (marco 2) |
 | 34 | `MULT` | UTILITY | múltiplo PROCESSADO — no grafo digital o fan-out já é livre, então cada saída tem atenuversor + offset próprios (mini-`CONTROL` por tomada). 1 entrada → 4 saídas, `out_k = slew(scale_k·in + offset_k)`; `scale` ±2 (negativo = inverte), `offset` ±1, `slew` compartilhado. **`dual`** + `in2`: out1/2 ← `in`, out3/4 ← `in2` (A-180-2). Ocioso (sem `in`) vira 4 fontes de tensão manual (`out_k = offset_k`). Sem `drift` (é utilidade de precisão). O distribuidor de CV | múltiplo bufferizado (Doepfer A-180, Intellijel Buff Mult), atenuversor+offset (Maths/Serge), voltage spreader (Frap/Doepfer) |
+| 35 | `AUDIO-IN` | SOURCE | entrada de áudio ao vivo via ALSA (`AlsaSource`, `device` configurável por `RASGO_AUDIO_IN_DEVICE`) — o instrumento ouve o mundo, não só ele mesmo. `gain`, `dc_block` | ALSA PCM capture (padrão do sistema); bloqueio de DC (fato de engenharia de áudio) |
+| 36 | `CHAOS` | DECISION | campo caótico de poço duplo — dois integradores perseguem uma força restauradora não-linear (`x − x³`); `drive`/`damping` decidem se assenta, oscila ou "caça"; chute periódico aleatório (`rate`) é o que deixa o sistema atravessar de um poço pro outro; `freeze`, `reseed` (trigger) | `ANTITOTEM/src/core/ChaosSources.h::ChaosField` — caos de poço duplo (Ian Fritz, 2007) |
+| 37 | `PLL` | SOURCE | segundo oscilador dedicado, sofisticado: detector de fase compara contra referência externa e CURVA a própria taxa (não reseta duro); toca livre sem referência; `ratio` generaliza pra sub/super-harmônicos (0,03–8×, desvio Rasgo), `lock_gain`, alcance de captura ±0,9 medido e documentado (limitação real de PLL, não bug); `shape` (seno↔tri↔serra↔quadrada, PolyBLEP); `feedback_type` (direto/retificado/capacitivo/pulso/"transistor"/refluxo, modula só a fase lida) | `ANTITOTEM/src/core/CmosVoice.h` — OSC5 (detector de fase + `pllLockGain`), `feedbackSample()`/`FeedbackSignal` |
+| 38 | `NOTE-OUT` | MIX | adaptador que captura o contrato `NOTE` do `MUSICAL SCORE` sem mudar a interface de nenhum outro módulo: detector de borda de gate + amostra de pitch, expõe `takeCompletedNote()` (chamado do laço de áudio do painel, nunca de `process()`); `gate_thru`/`pitch_thru` (pass-through, necessário pra alcançabilidade — `setActiveOutput` só processa ancestrais do sink ativo). v1 monofônico (limitação documentada) | desenho próprio — observador/adaptador sobre o contrato `NOTE` descrito em `ESTUDO_seed_composicao_generativa.md §5` |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1224,11 +1228,18 @@ pra o Rasgo Modular o padrão de proteção de saída já codado em
 `NAVALHA2_JUCE` (`OutputStage` + `LookaheadLimiter` + `TruePeakDetector`)
 e `ANTITOTEM` (`OutputStage`): **"saturação criativa é do patch; remoção
 de DC e contenção de pico NÃO são"**. Cadeia: guarda de finitude →
-bloqueio de DC → limitador com look-ahead (~3 ms, reduz o ganho antes do
-pico, não distorce o transiente) → teto suave de 1 amostra → teto −1 dBFS
-+ telemetria de redução de ganho. O `MASTER` (Módulo 17) usa isso.
-Pendente: `TruePeakDetector` 4× polifásico (conformidade inter-amostra
-BS.1770), como na `NAVALHA`.
+bloqueio de DC → **guarda ultrassônica** (LP Butterworth 2 polos ~21 kHz,
+transparente até ~15 kHz, tira só o ice-pick perto de Nyquist) →
+**governador de corpo** (`body_guard`, 2026-09-05 — detecta agudo alto +
+sustentado + concentrado em ~2,5–8 kHz e aplica um high-shelf suave;
+transiente/ritmo/ruído de banda larga passam; só o grito estável é
+contido; 0 = bypass exato; telemetria `bodyGuardDb()`) → limitador com
+look-ahead (~3 ms, orientado por pico verdadeiro) → teto suave de 1
+amostra → teto −1 dBFS + telemetria de redução de ganho. `TruePeakEstimator`
+(`src/dsp/TruePeak.hpp`) já integrado. O `MASTER` (Módulo 17) usa tudo
+isso. Testes: `test_true_peak.cpp` + `test_output_stage.cpp`.
+Pendente: `TruePeakDetector` 4× polifásico plenamente conforme BS.1770,
+como na `NAVALHA`.
 
 ### 36.4 Peças generativas
 
@@ -1241,17 +1252,28 @@ repetem no tempo. Em `validation-output/` (fora do git).
 | `peca_generativa` | 40 s | os 6 módulos do marco 1 + fundação |
 | `peca_generativa_2` | 50 s | os 8 módulos + matriz + **constelação** (MEMORY respira no campo) |
 | `peca_generativa_3` | 55 s | módulos físicos + escala + EQ + **barramento semântico** (Motion→SPACE, Energy→PARAMETRIC) |
+| `peca_generativa_4` | 42 s | protótipo do `MotionEngine` (`apps/panel/MotionEngine.hpp`) — parâmetros com comportamento `WALK`/`OSCILLATE`/`ATTRACT` no tempo, aditivo sobre a modulação por cabo já existente; grava a `SYSTEM SCORE` (`ScoreRecorder.hpp`) ao lado do `.wav`; ver `dossies/ESTUDO_seed_composicao_generativa.md §3.6/§5` |
 
 ### 36.5 Testes e build
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**35 alvos CTest**, 100% verdes em **Debug e Release**
+**47 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham
 `test_mix`), `test_panel_layout` (regressão de sobreposição de rótulos),
-e o `test_graph_engine` legado. As 4 peças de exemplo renderizam
+`test_motion_engine`/`test_patch_genetics`/`test_score_recorder`/
+`test_learn_catalog` (protótipos de composição generativa e pedagogia,
+`dossies/ESTUDO_seed_composicao_generativa.md` — `test_patch_genetics`
+cobre `MUTATE`/`EVOLVE`/`CROSS`), `test_chaos`/`test_pll`/
+`test_note_out`/`test_audio_in` (módulos 35–38), `test_true_peak`/
+`test_output_stage`/`test_wav_writer` (excelência de saída: pico
+verdadeiro, guarda ultrassônica, governador de corpo, dither TPDF), e o
+`test_graph_engine` legado. `PatchSeed.hpp`/`SeedGrammar.hpp` não têm
+alvo CTest dedicado — verificados por comparação byte a byte
+(`serialize()`, seeds 1–200) contra a versão pré-refactor, ver
+`TAREFAS.md` (2026-09-05). As 5 peças de exemplo renderizam
 byte-idênticas às referências em `validation-output/` (checagem manual —
 não é alvo CTest).
 
@@ -1317,9 +1339,21 @@ acoplamento a outros instrumentos / recursos de composição (§36.8) entram
 como módulos-adaptadores no catálogo, nunca como dependência.
 
 **Regra de contribuição de painel:** todo módulo do Rasgo Modular
-descreve seu `panel()` cabendo na **altura padrão** e sem widgets
-sobrepostos (`Panel.hpp` — a checagem do painel de teste avisa
-divergências).
+descreve seu `panel()` cabendo na **altura padrão**, sem widgets
+sobrepostos, e seguindo a **rubrica de layout** de `apps/panel/design.md
+§3.2.1` — margens fixas, display a largura interna cheia, grade de knobs
+centrada por HP, fileiras de jack espaçadas pelo rótulo (quebra em
+fileiras por função quando não cabe), HP enxuto. `tests/test_panel_layout.cpp`
+(modela a largura do rótulo do jack) é o gate contra regressão.
+
+**Cabeçalho + i18n (2026-09-05/06):** cabeçalho de linha única no modelo
+dos RASGO Synth — logo RASGO (anti-aliased) + barra de comandos em botões
+(toggles com anel de destaque) + pico da saída + `SEED`/`REC`/`STANDBY` +
+`IDIOMA`/`TUTORIAL`/`SOBRE`. `apps/panel/UiLanguage.hpp` — EN padrão,
+PT/FR/ES no botão; cabeçalho/tutorial/créditos traduzidos, LEARN em
+fases, rótulos de módulo não. Passe de ergonomia módulo-a-módulo dos 38
+painéis (larguras, displays, colisões de rótulo) — ver `TAREFAS.md`
+2026-09-06.
 
 ### 36.8 Acoplamento — instrumentos e recursos de composição
 

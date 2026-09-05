@@ -49,7 +49,11 @@ public:
 
     ~AlsaSink() {
         if (pcm_) {
-            snd_pcm_drain(pcm_);
+            // `drop` (descarta o que resta na fila), NÃO `drain` (espera
+            // tocar até o fim) — na saída do painel não há por que segurar o
+            // processo esperando ~40 ms de buffer, e sob um PipeWire travado
+            // o `drain` pode pendurar indefinidamente.
+            snd_pcm_drop(pcm_);
             snd_pcm_close(pcm_);
         }
     }

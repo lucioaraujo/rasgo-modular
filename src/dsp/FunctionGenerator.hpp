@@ -53,22 +53,22 @@ public:
     // Layout: 12 HP (1 HP = 4 unidades de grade em x -> 48 unidades).
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
+        // 8 -> 10 HP (passe de ergonomia 2026-09-06): "SLOPE"/"SYNC" (5 e
+        // 4 letras) não cabiam a 12 mm num painel de 40 mm. Display cheio,
+        // knobs 2 col centradas, entradas numa fileira, saídas na de baixo.
         Panel p;
-        p.hp = 8;
+        p.hp = 10;
         p.add(Widget::Kind::Label, "FUNCTION", "", 2.5f, 2.0f);
-        // display da forma (a curva que rate/slope/drift produzem ao vivo)
-        p.add(Widget::Kind::Display, "shape", "", 2.5f, 8.0f, 35.0f);
-        // controles empilhados (2 colunas)
-        p.add(Widget::Kind::Knob, "RATE", "rate", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SLOPE", "slope", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 7.0f, 52.0f);
-        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 24.0f, 54.0f);
-        // entradas de modulação / saídas na faixa inferior
-        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 5.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "SLOPE", "in:slope_mod", 17.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 29.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "UNI", "out:uni", 5.0f, 117.0f);
-        p.add(Widget::Kind::Jack, "BI", "out:bi", 17.0f, 117.0f);
+        p.add(Widget::Kind::Display, "shape", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 11.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "SLOPE", "slope", 31.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 11.0f, 50.0f);
+        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 32.0f, 52.0f);
+        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 8.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "SLOPE", "in:slope_mod", 22.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 38.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "UNI", "out:uni", 8.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "BI", "out:bi", 21.0f, 116.0f);
         return p;
     }
 

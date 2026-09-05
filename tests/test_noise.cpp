@@ -29,7 +29,7 @@ std::vector<float> render(Noise& n, const int outIdx, const int samples,
                           const float trigHz = 0.0f,
                           const bool feedInput = false) {
     n.prepare(kSr, kBlock);
-    std::vector<AudioBlock> out(5, AudioBlock(kSr, 1, kBlock));
+    std::vector<AudioBlock> out(8, AudioBlock(kSr, 1, kBlock));
     AudioBlock tin(kSr, 1, kBlock), sin_(kSr, 1, kBlock);
     std::vector<const AudioBlock*> ins{
         trigHz > 0.0f ? &tin : nullptr,
@@ -132,6 +132,34 @@ void testBrownTilt() {
     const double pkRatio = lowEnergy(pk, 300.0f) / (highEnergy(pk, 2000.0f) + 1e-12);
     check(brRatio > pkRatio * 2.0, "brown cai mais forte que o rosa");
     for (const float v : br) EXPECT(std::isfinite(v) && std::fabs(v) < 1.05f);
+}
+
+void testBlueTilt() {
+    Noise n;
+    const auto bl = render(n, 5, 60000);
+    const auto w = render(n, 0, 60000);
+    check(highEnergy(bl, 4000.0f) > highEnergy(w, 4000.0f),
+          "azul: mais agudo que o branco (diferenciado)");
+    for (const float v : bl) EXPECT(std::isfinite(v) && std::fabs(v) <= 1.0f);
+}
+
+void testVioletBrighterThanBlue() {
+    Noise n;
+    const auto vl = render(n, 6, 60000);
+    const auto bl = render(n, 5, 60000);
+    check(highEnergy(vl, 6000.0f) > highEnergy(bl, 6000.0f) * 0.8,
+          "violeta: ainda mais agudo (ou pelo menos não mais escuro) que o azul");
+    for (const float v : vl) EXPECT(std::isfinite(v) && std::fabs(v) <= 1.0f);
+}
+
+void testBitHardBipolar() {
+    Noise n;
+    const auto b = render(n, 7, 20000);
+    bool onlyBipolar = true;
+    for (const float v : b) if (v != 1.0f && v != -1.0f) onlyBipolar = false;
+    check(onlyBipolar, "bit: só assume +-1, nunca valor intermediário");
+    // troca rápido, a taxa de áudio (não travado no pulso de trigger)
+    check(steps(b, 1000, 19000) > 5000, "bit: alterna rápido, a taxa de áudio");
 }
 
 void testSampleHold() {
@@ -248,6 +276,9 @@ int main() {
     testWhiteFlat();
     testPinkTilt();
     testBrownTilt();
+    testBlueTilt();
+    testVioletBrighterThanBlue();
+    testBitHardBipolar();
     testSampleHold();
     testSHFromInput();
     testSmoothSlew();

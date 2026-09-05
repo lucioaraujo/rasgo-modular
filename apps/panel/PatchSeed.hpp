@@ -29,6 +29,7 @@
 // Específico do painel de teste (não é regra RASGO comum).
 
 #include "core/SignalGraph.hpp"
+#include "panel/SeedGrammar.hpp"
 
 #include <array>
 #include <cstdint>
@@ -65,7 +66,11 @@ inline SeedIdentity seedIdentity(std::uint64_t seed) {
     // complexity: curva pra dar bastante patch simples E bastante complexo
     const float cx = seedUnit(s, 1);
     id.complexity = cx * cx * (0.6f + 0.4f * seedUnit(s, 2));
-    if (seedUnit(s, 3) < 0.15f) id.complexity = 0.02f;        // 15% minimalista
+    // minimalista mas AINDA VARIADO — o hard-clamp pra 0,02 fazia ~15% dos
+    // seeds colapsarem num punhado de esqueletos quase idênticos (nProc=0,
+    // nCables=3); agora fica 0,05..0,20, então nProc/nCables ainda variam.
+    if (seedUnit(s, 3) < 0.13f)
+        id.complexity = 0.05f + 0.15f * seedUnit(s, 15);
     if (seedUnit(s, 3) > 0.9f) id.complexity = 0.8f + 0.2f * cx;  // 10% máximo
     id.wildness = seedUnit(s, 4) * seedUnit(s, 4);
     if (seedUnit(s, 5) < 0.12f) id.wildness = 0.7f + 0.3f * seedUnit(s, 6);
@@ -122,72 +127,23 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         if (hasT(t)) setP(firstT(t), p, v);
     };
 
-    // ---- classificação de portas ----------------------------------
-    enum Src { S_VOICE, S_BUS, S_SLOW, S_RAND, S_GATE, S_PITCH, S_NONE };
-    enum Dst { D_AUDIO, D_FM, D_MOD, D_GATE, D_PITCH, D_NONE };
-    struct Port { std::size_t node, port; };
-    std::vector<Port> src[6];      // por classe Src
-    std::vector<Port> dst[5];      // por classe Dst
+    // ---- classificação de portas -----------------------------------
+    // Movida pra `SeedGrammar.hpp` (nomeada, documentada, mapeada pro
+    // vocabulário SOURCE/TRANSFORM/CONTROL/MODULATE/FEEDBACK/OUTPUT da
+    // conversa de origem — ver o comentário do topo daquele arquivo).
+    // Refactor comprovado: mesma lógica, byte a byte, nenhum seed muda.
+    using Port = SeedPort;
+    std::vector<Port> src[6];      // por classe SeedSrc
+    std::vector<Port> dst[5];      // por classe SeedDst
     std::vector<std::vector<char>> inUsed(N);
     std::vector<char> spine(N, 0);
-
-    auto isGateName = [](const std::string& n) {
-        return n == "gate" || n == "strike" || n == "pluck" || n == "trigger"
-            || n == "clock" || n == "advance" || n == "sync" || n == "reset"
-            || n == "ext_clock" || n == "a" || n == "b";
-    };
-    for (std::size_t n = 0; n < N; ++n) {
-        Signal& node = g.node(n);
-        const std::string t = node.type();
-        inUsed[n].assign(node.inputCount(), 0);
-        const bool clockish = t == "CLOCK" || t == "LOGIC";
-        const bool voiceMod = t == "OSC" || t == "CHORD" || t == "MATTER"
-            || t == "STRING" || t == "MEMORY" || t == "SHAPE";
-        for (std::size_t p = 0; p < node.outputCount(); ++p) {
-            const auto& d = node.outputDescriptor(p);
-            const std::string nm = d.name;
-            Src c = S_NONE;
-            if (d.kind == PortKind::Audio) {
-                if (t == "NOISE" && (nm == "smooth" || nm == "sh")) c = S_RAND;
-                else if (voiceMod || t == "NOISE") c = S_VOICE;
-                else if (t == "QUANTIZER" && (nm == "pitch" || nm == "semitone")) c = S_PITCH;
-                else if (t == "TURING" || (t == "SEQUENCE" && nm == "pitch")) c = S_PITCH;
-                else c = S_BUS;
-            } else {  // Control
-                if (clockish || d.unit == "gate" || d.unit == "trig"
-                    || nm == "euclid" || nm == "accent" || nm == "pulse"
-                    || nm == "eos" || nm == "event" || nm == "change"
-                    || (t == "DECISION" && nm == "gate")
-                    || (t == "QUANTIZER" && nm == "gate")) c = S_GATE;
-                else if (t == "FUNCTION" || t == "DRIFT" || t == "HARMONY"
-                         || (t == "ENVELOPE" && nm == "env")) c = S_SLOW;
-                else c = S_RAND;
-            }
-            if (c != S_NONE) src[c].push_back({n, p});
-        }
-        for (std::size_t p = 0; p < node.inputCount(); ++p) {
-            const auto& d = node.inputDescriptor(p);
-            const std::string nm = d.name;
-            Dst c = D_NONE;
-            if (d.kind == PortKind::Audio) c = (nm == "fm") ? D_FM : D_AUDIO;
-            else if (nm == "pitch" || nm == "freq_mod" || nm == "transpose") c = D_PITCH;
-            else if (isGateName(nm) || d.unit == "trig" || d.unit == "gate") c = D_GATE;
-            else c = D_MOD;   // *_mod, pwm, cv, sweep, amount, etc.
-            if (c != D_NONE) dst[c].push_back({n, p});
-        }
-    }
+    for (std::size_t n = 0; n < N; ++n)
+        inUsed[n].assign(g.node(n).inputCount(), 0);
+    seedClassifyPorts(g, src, dst);
 
     // ---- matriz de compatibilidade + bônus experimental -----------
-    const float wild = id.wildness;
-    float W[6][5] = {
-        //        AUDIO  FM              MOD              GATE  PITCH
-        /*VOICE*/{6.0f,  0.6f + wild * 4.0f, 1.0f + wild * 4.0f, 0.0f, 0.0f},
-        /*BUS  */{4.0f,  0.2f + wild * 2.5f, 1.0f + wild * 2.0f, 0.0f, 0.0f},
-        /*SLOW */{0.4f + wild * 1.5f, 1.0f, 10.0f, 0.4f, 1.2f + wild},
-        /*RAND */{0.4f + wild * 2.0f, 1.5f, 7.0f, 1.2f, 3.5f},
-        /*GATE */{0.0f, 0.0f, 1.5f, 10.0f, wild * 3.0f},
-        /*PITCH*/{0.0f, 1.0f, 1.2f, 0.0f, 8.0f},
-    };
+    float W[6][5];
+    seedCompatibilityMatrix(id.wildness, W);
 
     auto pOut = [&](std::size_t n, const char* nm) -> int {
         Signal& node = g.node(n);
@@ -259,7 +215,10 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // fonte de altura
     setT("QUANTIZER", "scale", static_cast<float>(id.scale));
     setT("QUANTIZER", "root", static_cast<float>(id.root));
-    setT("QUANTIZER", "range", rng(1.0f, 3.5f));
+    // faixa da melodia: 1..2 oitavas. Era 1..3,5 — 3,5 oitavas a partir
+    // de uma base de ~300–500 Hz levava o OSC a ~5–6 kHz nas notas altas:
+    // o "assobio de oscilador" que atormentava.
+    setT("QUANTIZER", "range", rng(1.0f, 2.0f));
     setT("QUANTIZER", "glide", chance(0.4f) ? rng(0.0f, 0.25f) : 0.0f);
     connectByName("CLOCK", "euclid", "QUANTIZER", "trigger");
     bool pitched = false;
@@ -281,11 +240,15 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     struct VC { const char* mod; const char* out; };
     const VC voiceOpts[7][3] = {
         {{"OSC", "saw"}, {"OSC", "pulse"}, {"OSC", "tri"}},
-        {{"MATTER", "out"}, {"STRING", "out"}, {"OSC", "saw"}},
+        {{"MATTER", "out"}, {"STRING", "out"}, {"OSC", "tri"}},
         {{"CHORD", "out"}, {"CHORD", "out"}, {"OSC", "saw"}},
-        {{"NOISE", "pink"}, {"NOISE", "brown"}, {"NOISE", "white"}},
-        {{"MEMORY", "out"}, {"OSC", "saw"}, {"NOISE", "pink"}},
-        {{"SHAPE", "out"}, {"OSC", "saw"}, {"OSC", "tri"}},
+        // ruído SEMPRE rosa/marrom — branco cru como voz é chiado de
+        // banda cheia (~55% da energia acima de 10 kHz), o "hiper agudo
+        // que se repete" reportado pelo autor; e sempre passa por um LP
+        // depois (garantia mais abaixo).
+        {{"NOISE", "pink"}, {"NOISE", "brown"}, {"NOISE", "pink"}},
+        {{"MEMORY", "out"}, {"OSC", "tri"}, {"NOISE", "pink"}},
+        {{"SHAPE", "out"}, {"OSC", "tri"}, {"OSC", "sub"}},
         {{"FILTER", "all"}, {"OSC", "saw"}, {"MATTER", "out"}},   // feedback filter
     };
     VC vc = voiceOpts[id.voiceBias][rnd() % 3];
@@ -295,8 +258,12 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
 
     // parâmetros + excitação da voz
     if (std::string(vc.mod) == "OSC") {
-        setP(voiceNode, "freq", rng(45.0f, 220.0f));
-        setP(voiceNode, "pw", rng(0.05f, 0.95f));
+        // registro variado: ~70% grave, ~30% médio. Teto do médio em
+        // 340 Hz — com +2 oitavas do QUANTIZER a nota mais alta chega a
+        // ~1,4 kHz (musical), não a ~5 kHz.
+        setP(voiceNode, "freq",
+             chance(0.7f) ? rng(38.0f, 175.0f) : rng(175.0f, 340.0f));
+        setP(voiceNode, "pw", rng(0.25f, 0.75f));   // não vira trem de picos
         setP(voiceNode, "drift", rng(0.0f, 0.4f));
         setP(voiceNode, "sub_2", chance(0.4f) ? 1.0f : 0.0f);
         if (pIn(voiceNode, "pitch") >= 0)
@@ -334,7 +301,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             }
         }
     } else if (std::string(vc.mod) == "NOISE") {
-        setP(voiceNode, "rate", rng(1.0f, 3000.0f));
+        setP(voiceNode, "rate", rng(1.0f, 500.0f));   // taxa alta = chiado
         setP(voiceNode, "spread", rng(0.0f, 0.7f));
         setP(voiceNode, "slew", rng(0.0f, 0.6f));
     } else if (std::string(vc.mod) == "MEMORY") {
@@ -356,13 +323,19 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             connectByName("OSC", "tri", "SHAPE", "in");
             if (chance(0.5f)) connectByName("OSC", "sub", "SHAPE", "mod"); }
     } else if (std::string(vc.mod) == "FILTER") {   // feedback / auto-osc
-        setP(voiceNode, "resonance", rng(0.88f, 0.99f));
+        // ressonante e com CARÁTER, sem ser um seno puro perfurante fixo
+        // em ~2,6 kHz (era `resonance 0.88..0.99` + cutoff travado em
+        // 2600 — o "hiper agudo que se repete"). Base de corte variada e
+        // geralmente mais baixa; a melodia do QUANTIZER move junto.
+        setP(voiceNode, "resonance", rng(0.55f, 0.9f));
         setP(voiceNode, "drive", rng(0.1f, 0.6f));
         if (hasT("NOISE")) { setT("NOISE", "rate", rng(0.5f, 8.0f));
             connectByName("NOISE", "brown", "FILTER", "in"); }
+        const float fcBase = rng(110.0f, 900.0f);
+        const float fcDepth = rng(200.0f, 1800.0f);
         try { g.connectToParameter(firstT("QUANTIZER"),
             static_cast<std::size_t>(pOut(firstT("QUANTIZER"), "pitch")),
-            firstT("FILTER"), "cutoff", 2600.0f, 80.0f, true); } catch (...) {}
+            firstT("FILTER"), "cutoff", fcDepth, fcBase, true); } catch (...) {}
     }
 
     // a VOZ é sacrossanta: o passeio não mexe nas entradas dela (senão
@@ -408,8 +381,12 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             connectByName("CLOCK", "euclid", "LPG", "strike");
             bodyOut = "out";
         } else if (std::string(pr) == "PARAMETRIC") {
-            setP(bodyNode, "type2", 3.0f); setP(bodyNode, "freq2", rng(200.0f, 3000.0f));
-            setP(bodyNode, "gain2", rng(-6.0f, 10.0f)); setP(bodyNode, "q2", rng(0.7f, 5.0f));
+            setP(bodyNode, "type2", 3.0f);
+            setP(bodyNode, "freq2", rng(180.0f, 2200.0f));
+            // realce contido: Q até 2,5 e ganho até +6 dB. Q 5 + +9 dB
+            // era um pico-agulha ressonante que "assobiava" em cada nota.
+            setP(bodyNode, "gain2", rng(-6.0f, 6.0f));
+            setP(bodyNode, "q2", rng(0.6f, 2.5f));
             setP(bodyNode, "mix", 1.0f);
             bodyOut = "out";
         } else {  // SPACE
@@ -418,6 +395,31 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             setP(bodyNode, "diffusion", rng(0.3f, 0.95f));
             setP(bodyNode, "mix", rng(0.3f, 0.8f));
             bodyOut = "out";
+        }
+    }
+
+    // REDE DE SEGURANÇA — voz brilhante que NÃO passou por nenhum
+    // processador (nProc=0, comum nos seeds minimalistas) ganha UM
+    // passa-baixa musical à força. Sem isto, um ruído rosa cru ou uma
+    // serra crua vão direto pro MIXER — o "hiper agudo" que se repetia.
+    {
+        const std::string vt = typ(voiceNode);
+        const bool brightRaw = bodyNode == voiceNode
+            && (vt == "NOISE" || vt == "OSC" || vt == "SHAPE"
+                || vt == "FILTER");
+        if (brightRaw && hasT("FILTER") && firstT("FILTER") != voiceNode) {
+            const std::size_t flt = firstT("FILTER");
+            const int ai = pIn(flt, "in");
+            const int so = pOut(bodyNode, bodyOut);
+            if (ai >= 0 && so >= 0
+                && connect({bodyNode, static_cast<std::size_t>(so)},
+                           {flt, static_cast<std::size_t>(ai)})) {
+                setP(flt, "cutoff", rng(400.0f, 3200.0f));
+                setP(flt, "resonance", rng(0.05f, 0.4f));
+                bodyNode = flt;
+                bodyOut = "all";
+                spine[flt] = 1;
+            }
         }
     }
 
@@ -447,7 +449,10 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         if (hasT(st)) spine[firstT(st)] = 1;
 
     // ================ MIXER <- corpo + soltos ; MASTER -> sink =====
-    setT("MIXER", "gain1", rng(-2.0f, 5.0f));
+    // canal da voz mira ~−6 dBFS de barramento — folga pra as camadas,
+    // os cabos do passeio e a modulação. Era rng(-2, +5): +5 dB mandava
+    // o barramento pra +2..+8 dBFS e o MASTER limitava demais (o "clipe").
+    setT("MIXER", "gain1", rng(-10.0f, -2.0f));
     setT("MIXER", "pan1", rng(-0.4f, 0.4f));
     if (hasT("MIXER")) {
         const int ci = pIn(firstT("MIXER"), "ch1"), so = pOut(bodyNode, bodyOut);
@@ -457,7 +462,10 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     }
     if (hasT("MASTER") && hasT("MIXER")) {
         setT("MASTER", "width", rng(0.85f, 1.5f));
-        setT("MASTER", "gain", rng(-1.0f, 3.0f));
+        // fixo (não sorteado) — 50% do slider (faixa -60..+12 -> -24 dB) em
+        // TODO seed, sem exceção; o autor sobe na mão a partir daí.
+        // (era 30% / -38,4 dB; mudado a pedido do autor em 2026-09-05.)
+        setT("MASTER", "gain", -24.0f);
         connectByName("MIXER", "out", "MASTER", "in");
         if (haveSink) {
             const int mo = pOut(firstT("MASTER"), "out");
@@ -475,7 +483,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         // 1) escolhe uma classe de destino, depois um destino livre nela
         float dw[5] = {3.0f, 1.5f, 6.0f, 4.0f, 1.5f};
         // mais cedo prioriza gate/pitch/audio; mais tarde, mod
-        if (c < 4) { dw[D_GATE] = 5.0f; dw[D_PITCH] = 3.0f; dw[D_AUDIO] = 4.0f; }
+        if (c < 4) { dw[SEED_DST_GATE] = 5.0f; dw[SEED_DST_PITCH] = 3.0f; dw[SEED_DST_AUDIO] = 4.0f; }
         float dtot = 0.0f; for (float x : dw) dtot += x;
         float dr = f01() * dtot; int dc = 0;
         for (; dc < 4; ++dc) { if (dr < dw[dc]) break; dr -= dw[dc]; }
@@ -484,6 +492,11 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         for (int tries = 0; tries < 12 && !okD; ++tries) {
             if (dst[dc].empty()) break;
             const Port cand = dst[dc][rnd() % dst[dc].size()];
+            // MIXER/MASTER não são destino do passeio — as camadas
+            // extras entram pela seção controlada abaixo (senão o passeio
+            // joga fonte crua direto no barramento de saída)
+            if (typ(cand.node) == "MIXER" || typ(cand.node) == "MASTER")
+                continue;
             if (cand.node < N && cand.port < inUsed[cand.node].size()
                 && !inUsed[cand.node][cand.port]) { d = cand; okD = true; }
         }
@@ -501,21 +514,33 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         connect(sp, d);
     }
 
-    // ================ vozes soltas -> mixer ch2/3/4 ===============
+    // ================ camadas soltas -> mixer ch2/3 ==============
+    // No máx 2 camadas extras, BEM baixas, e SÓ de fontes JÁ PROCESSADAS
+    // — a saída de um FILTER/WASP/LPG/SPACE/PARAMETRIC. Um oscilador CRU
+    // (OSC/PLL/CHORD/NOISE/FUNCTION/CHAOS) direto no mixer é um
+    // drone/assobio brigando com a voz — o "som do PLL no canal 2"
+    // reportado pelo autor (o `seedPatch` cabeava `PLL.out → MIXER.ch2` e
+    // o passe genérico jogava o `PLL.freq` pra alguns kHz).
+    auto isProcessedBus = [&](std::size_t n) {
+        const std::string t = typ(n);
+        return t == "FILTER" || t == "WASP" || t == "LPG"
+            || t == "SPACE" || t == "PARAMETRIC";
+    };
     if (hasT("MIXER")) {
         std::size_t mx = firstT("MIXER");
-        const char* chs[3] = {"ch2", "ch3", "ch4"};
+        const char* chs[2] = {"ch2", "ch3"};
+        const int nLayers = chance(0.5f) ? (chance(0.35f) ? 2 : 1) : 0;
         int used = 0;
-        for (int sc = 0; sc <= (int)S_BUS && used < 3; ++sc)
+        for (int sc = 0; sc < 6 && used < nLayers; ++sc)
             for (const Port& p : src[sc]) {
-                if (used >= 3) break;
-                if (p.node == bodyNode || typ(p.node) == "MIXER") continue;
+                if (used >= nLayers) break;
+                if (p.node == bodyNode || !isProcessedBus(p.node)) continue;
                 if (reaches(p.node, sink)) continue;      // já chega à saída
                 const int ci = pIn(mx, chs[used]);
                 if (ci < 0 || (ci < (int)inUsed[mx].size() && inUsed[mx][ci])) continue;
                 if (connect(p, {mx, static_cast<std::size_t>(ci)})) {
                     setP(mx, (std::string("gain") + std::to_string(used + 2)).c_str(),
-                         rng(-14.0f, -2.0f));
+                         rng(-24.0f, -11.0f));
                     setP(mx, (std::string("pan") + std::to_string(used + 2)).c_str(),
                          rng(-0.5f, 0.5f));
                     ++used;
@@ -535,16 +560,16 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         // pluga a/b/c/d em parâmetros estruturais aleatórios
         struct PT { const char* mod; const char* par; float depth; float off; };
         const PT tgts[] = {
-            {"FILTER", "cutoff", 3500.0f, 900.0f},
-            {"FILTER", "resonance", 0.5f, 0.4f},
+            {"FILTER", "cutoff", 2200.0f, 700.0f},
+            {"FILTER", "resonance", 0.28f, 0.35f},   // não deriva pra auto-osc
             {"SPACE", "mix", 0.4f, 0.4f},
             {"SPACE", "feedback", 0.4f, 0.45f},
-            {"SHAPE", "fold", 0.5f, 0.4f},
+            {"SHAPE", "fold", 0.45f, 0.35f},
             {"OSC", "pw", 0.4f, 0.5f},
             {"MEMORY", "position", 0.5f, 0.5f},
             {"CHORD", "detune", 0.35f, 0.3f},
             {"MATTER", "structure", 0.5f, 0.4f},
-            {"QUANTIZER", "range", 2.0f, 2.5f},
+            {"QUANTIZER", "range", 0.7f, 1.6f},   // melodia não sobe demais
         };
         const int nDrift = 2 + static_cast<int>(std::lround(id.motion * 2.0f));
         const char* outs[4] = {"a", "b", "c", "d"};
@@ -587,6 +612,26 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             // toggles: 0/1
             if (lo == 0.0f && hi == 1.0f && (nm.find("enable") != std::string::npos
                 || nm == "hold" || nm == "accent_mode")) v = chance(0.5f) ? 1.0f : 0.0f;
+            // parâmetros que geram agudo/aspereza forte: faixa contida
+            // (sorteio de faixa CHEIA levava a auto-oscilação / folding
+            // travado / EQ +24 dB — o viés de agudo reportado). Ainda
+            // varre bastante, só não vai pro extremo perigoso.
+            else if (nm == "resonance") v = rng(lo, lo + 0.72f * (hi - lo));
+            else if (nm == "grit" || nm == "fold")
+                v = rng(lo, lo + 0.6f * (hi - lo));
+            else if (nm == "drive") v = rng(lo, lo + 0.65f * (hi - lo));
+            else if (nm.rfind("gain", 0) == 0 && hi >= 12.0f)
+                v = rng(std::max(lo, -9.0f), std::min(hi, 6.0f));
+            else if (nm == "cutoff")
+                v = rng(std::max(lo, 90.0f), std::min(hi, 8000.0f));
+            // frequência de um oscilador NÃO-espinha cabeado como camada:
+            // faixa musical, não sorteio até 8–12 kHz (era o "assobio de
+            // oscilador"). `freq2..4` do PARAMETRIC são bandas de EQ,
+            // outra coisa — só `freq` puro e `rate` de faixa larga.
+            else if (nm == "freq")
+                v = rng(std::max(lo, 40.0f), std::min(hi, 1200.0f));
+            else if (nm == "rate" && hi > 200.0f)
+                v = rng(lo, std::min(hi, 220.0f));
             else v = rng(lo, hi);
             setP(n, nm.c_str(), v);
         }

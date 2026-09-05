@@ -26,9 +26,38 @@ aditivo** (a modulação soma sobre o knob) + **antialiasing** (helper
 `Oversampler2x` 2× + ADAA) + **displays por módulo no painel** (grade
 clicável da MATRIX, espectro do SCOPE, lanes do TRIGSEQ) + profundidade
 por módulo (op bit a bit, slew assimétrico, voice-leading, ring-mod,
-memória de topologia…). **Rack de partida
-completo**; 34 módulos DSP, 35 alvos CTest verdes (Debug + Release), 4
-peças de exemplo byte-idênticas. Custodiante: Lúcio de Araújo.
+memória de topologia…) + **`MotionEngine`** (`apps/panel/`, protótipo de
+composição generativa — parâmetros com comportamento `WALK`/
+`OSCILLATE`/`ATTRACT` no tempo, aditivo sobre o patch) + **Patch
+Genetics** (`MUTATE`/`EVOLVE`/`CROSS`/`FREEZE`,
+`apps/panel/PatchGenetics.hpp` — edita um patch já existente preservando
+topologia; `CROSS` alinha por tipo de módulo entre dois patches) +
+**`ScoreRecorder`** (`SYSTEM SCORE` — registro determinístico de
+conexões e mudanças de parâmetro, texto byte-idêntico entre renders —
++ `MUSICAL SCORE`, captura de notas via `NOTE-OUT`) + **hover-learn**
+(`apps/panel/LearnCatalog.hpp` — caixa estilo terminal sempre presente
+no rodapé da coluna esquerda, silenciosa; os 37 módulos com texto de 3
+níveis; ver `dossies/ESTUDO_seed_composicao_generativa.md`).
+**(2026-09-05):**
++ `AUDIO-IN` (entrada de áudio ao vivo, ALSA) + `CHAOS` (campo caótico
+de poço duplo) + `PLL` (segundo oscilador, malha de fase + rede de
+feedback selecionável) + `NOTE-OUT` (adaptador que captura o contrato
+`NOTE` do `MUSICAL SCORE`) + gramática do `Seed` nomeada e explícita
+(`apps/panel/SeedGrammar.hpp`, refactor comprovado byte a byte —
+ver `dossies/ESTUDO_seed_composicao_generativa.md §1.1`)
++ **body guard** na saída (`OutputStage.hpp` — governador de agudo
+áspero) + `MASTER.mute` (rampa). **(2026-09-06):**
++ **cabeçalho de linha única** modelo RASGO Synth (logo anti-aliased +
+barra de comandos em botões, toggles com anel · pico da saída ·
+`SEED`/`REC`/`STANDBY` · `IDIOMA`/`TUTORIAL`/`SOBRE`)
++ **i18n do painel** (`apps/panel/UiLanguage.hpp` — EN padrão, PT/FR/ES
+no botão `IDIOMA`; cabeçalho/tutorial/créditos traduzidos; rótulos de
+módulo não; LEARN em fases)
++ **passe de ergonomia** dos 38 painéis (`design.md §3.2.1` — larguras
+enxutas, displays cheios e mais altos, colisões de rótulo de jack
+resolvidas). **Rack de partida completo**; 38 módulos DSP, 47 alvos CTest
+verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
+Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
 (decisão do autor, 2026-09-01: "a mesma que temos usado" → a licença
 habitual da família RASGO). Código de terceiros só entra sob licença
@@ -53,10 +82,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 34 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 38 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
-  `examples/*` = as peças; `apps/panel/` = painel gráfico de teste;
-  `CMakeLists.txt` + `tests/` = 35 alvos CTest.
+  `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
+  (+ `MotionEngine.hpp`, protótipo de composição — ver
+  `dossies/ESTUDO_seed_composicao_generativa.md`);
+  `CMakeLists.txt` + `tests/` = 47 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.

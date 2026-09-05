@@ -1,9 +1,19 @@
 # Dossiê — Módulo 17: Barramento de saída (`MASTER`)
 
 **Família:** MIX / METER
-**Estado:** **implementado — marco 2** (2026-09-02)
+**Estado:** **implementado — marco 2** (2026-09-02); default de `gain`
+fixo em todo seed — **−24 dB (50% do slider)** desde 2026-09-05 (era
+−38,4 / 30% em 2026-09-04) — pedido exato do autor, ver `TAREFAS.md`
+registros "MASTER — volume padrão mais baixo", "MASTER — gain fixo em
+30% do slider" e "painel — NOISE... / MASTER 50%"; limitador
+passou a considerar PICO VERDADEIRO (entre amostras), não só pico de
+amostra, em 2026-09-04 (ver `TAREFAS.md`, registro "excelência de saída
+— true peak + dither TPDF"; `src/dsp/TruePeak.hpp`); **guarda
+ultrassônica + governador de corpo** (`body_guard`) adicionados em
+2026-09-05 (ver `TAREFAS.md`, registro "body guard")
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
-**Arquivos:** `src/dsp/Master.hpp`, `tests/test_mix.cpp`
+**Arquivos:** `src/dsp/Master.hpp`, `src/dsp/OutputStage.hpp`,
+`tests/test_mix.cpp`, `tests/test_output_stage.cpp`
 
 ## Estado da implementação (marco 2)
 
@@ -20,6 +30,21 @@ mais uma saída de controle `level` (VU).
   `ANTITOTEM/OutputStage`, código do autor):
   - **guarda de finitude** — NaN/Inf → 0 (contados);
   - **bloqueio de DC** (`dc_block`) — passa-alta de 1 polo ~5 Hz;
+  - **guarda ultrassônica** (sempre ligada) — LP Butterworth 2 polos a
+    ~21 kHz. Transparente até ~15 kHz (−0,1 dB a 8 kHz), tira só a
+    energia perto de Nyquist (ruído violeta/`bit` sustentados, hash de
+    aliasing). Como o bloqueio de DC: nunca é escolha musical, não mexe
+    no timbre agressivo que você OUVE;
+  - **governador de corpo** (`body_guard`, 0..1, default 1,0; 0 = bypass
+    exato) — 2026-09-05, pedido do autor ("gosto de barulhos, mas há
+    alguns que passam do limite, incomodam o corpo"). TRÊS detectores
+    estreitos (Q 3) em ~2,8 / 4,8 / 7,6 kHz + seguidores LENTOS (~240 ms)
+    + um "gate de concentração" (razão banda/total: tom concentrado
+    dispara, ruído de banda larga não). Quando dispara: high-shelf de 1
+    polo (corte acima de ~1,4 kHz) até ~−9 dB, subindo/descendo devagar.
+    Transiente, ritmo e ruído passam intocados; só o agudo **alto +
+    sustentado + concentrado** em ~2,5–8 kHz é contido. Limiar ~−15 dBFS
+    de banda. Telemetria: `bodyGuardDb()`;
   - **limitador com LOOK-AHEAD** (`limit`) — atraso de ~3 ms; seguidor de
     envelope (ataque ~0,5 ms / release ~120 ms) reduz o ganho **antes** do
     pico chegar → **não distorce o transiente** (o `tanh` instantâneo de
@@ -41,6 +66,8 @@ Grafo mono → a saída é (L+R)/2. Determinístico, sem alocação em
 (L 0,8 / R 0,0 de 0,6/0,2); `mono` → L = R = mid; `gain` −6 dB → metade;
 `dc_block` remove offset de DC (0,3 → ~0 depois de assentar) e sem ele o
 offset passa; `limit` segura ±3 perto de ±1; `level` acompanha o pico;
+**`testMasterMute`:** `mute` usa rampa (1º sample ainda soa), silencia
+os dois canais depois de ~80 ms, e volta ao sinal ao desligar;
 dois renders byte-idênticos; integração no grafo (duas vozes → `MIXER` →
 `MASTER`, L ≠ R); painel fecha. **`testMasterExcellenceGuard`:** seno a
 +8 dB com transiente → **pico de saída ≤ 0,9, zero amostra estoura o
@@ -117,7 +144,10 @@ Reset → estados do DC e `peak_` zerados.
 **Entradas:** `in` (Audio, estéreo — lê canais 0 e 1).
 **Saídas:** `out` (Audio, estéreo), `level` (Control, 0..1 — VU).
 **Parâmetros:** `gain` (−60..+12 dB), `width` (0..2), `mono` (0/1),
-`dc_block` (0/1, default ligado), `limit` (0/1, default ligado).
+`mute` (0/1, default 0 — silencia a saída com rampa de ~8 ms, sem
+estalo; pedido do autor 2026-09-05), `dc_block` (0/1, default ligado),
+`limit` (0/1, default ligado), `body_guard` (0..1, default 1,0 —
+governador de corpo; 0 desliga).
 **Limites:** saída em ~[−1,1] (limitador). CPU: por amostra o mid/side +
 2 passa-altas de 1 polo + 2 `tanh` (só se `limit`). Sem alocação.
 

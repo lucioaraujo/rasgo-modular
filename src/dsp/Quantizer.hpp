@@ -78,7 +78,7 @@ public:
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "QUANTIZER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scale", "", 2.5f, 8.0f, 45.0f);
+        p.add(Widget::Kind::Display, "scale", "", 2.5f, 6.0f, 45.8f);
         p.add(Widget::Kind::Knob, "SCALE", "scale", 8.0f, 30.0f);
         p.add(Widget::Kind::Knob, "ROOT", "root", 23.0f, 30.0f);
         p.add(Widget::Kind::Knob, "RANGE", "range", 38.0f, 30.0f);

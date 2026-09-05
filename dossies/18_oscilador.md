@@ -1,7 +1,9 @@
 # Dossiê — Módulo 18: Oscilador (`OSC`)
 
 **Família:** SOURCE
-**Estado:** **implementado — marco 3** (2026-09-02)
+**Estado:** **implementado — marco 3** (2026-09-02); `prox`
+(profundidade/abafamento) adicionado em 2026-09-05 — ver `TAREFAS.md`,
+registro "proximidade por oscilador"
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/Oscillator.hpp`, `tests/test_oscillator.cpp`
 

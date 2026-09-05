@@ -55,7 +55,7 @@ public:
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "WASP", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "response", "", 2.5f, 8.0f, 45.0f);
+        p.add(Widget::Kind::Display, "response", "", 2.5f, 6.0f, 45.8f);
         p.add(Widget::Kind::Knob, "CUT", "cutoff", 8.0f, 30.0f);
         p.add(Widget::Kind::Knob, "RESO", "resonance", 30.0f, 30.0f);
         p.add(Widget::Kind::Knob, "MODE", "mode", 8.0f, 50.0f);

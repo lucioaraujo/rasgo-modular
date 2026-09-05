@@ -54,11 +54,11 @@ public:
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "MULT", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "taps", "", 2.5f, 7.0f, 44.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 28.0f);
-        p.add(Widget::Kind::Jack, "IN2", "in:in2", 20.0f, 28.0f);
-        p.add(Widget::Kind::Toggle, "DUAL", "dual", 30.0f, 25.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 40.0f, 30.0f);
+        p.add(Widget::Kind::Display, "taps", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 32.0f);
+        p.add(Widget::Kind::Jack, "IN2", "in:in2", 19.0f, 32.0f);
+        p.add(Widget::Kind::Toggle, "DUAL", "dual", 31.0f, 29.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 41.0f, 32.0f);
         for (int k = 0; k < 4; ++k) {
             const float y = 44.0f + static_cast<float>(k) * 16.0f;
             const std::string n = std::to_string(k + 1);

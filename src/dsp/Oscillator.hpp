@@ -34,6 +34,20 @@
 // Anti-aliasing (marco 3): PolyBLEP no wrap da serra e nas duas
 // transições do pulso e do sub. O triângulo tem só quebra de 1ª
 // derivada e alia bem menos — polyBLAMP fica como 2ª camada (dossiê §6).
+//
+// `prox` (2026-09-05) — estudado de `ANTITOTEM/src/core/
+// CmosVoice.h::oscillatorProximity` (código do autor, GPLv3/AGPLv3 —
+// compatível; ver `PESQUISA_MODULOS.md §2.3`): mistura CADA saída com
+// uma versão dela mesma passada por um passa-baixa de 1 polo bem
+// suave — uma "profundidade"/abafamento sem precisar de outro módulo.
+// `prox = 0` é EXATAMENTE a saída crua (no-op determinístico — a
+// mesma convenção de `drift = 0`). Desvio: aqui aplica nas 5 saídas
+// simultâneas do `OSC` (o Antitotem tem 5 osciladores separados, cada
+// um com sua própria PROX; o `OSC` do Rasgo é 1 oscilador com 5
+// formas — 1 PROX afeta todas). `orbit` do Antitotem (LFO de pitch
+// autônomo) ficou de fora: o `OSC` já tem `drift` fazendo
+// exatamente esse papel — duplicar seria redundante, não uma
+// contribuição nova.
 
 namespace rasgo::modular {
 
@@ -56,7 +70,8 @@ public:
                {"fm_amount", 0.0f, 1.0f, 0.0f, ""},
                {"drift", 0.0f, 1.0f, 0.0f, ""},
                {"sub_2", 0.0f, 1.0f, 0.0f, ""},
-               {"sync_enable", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"sync_enable", 0.0f, 1.0f, 0.0f, ""},
+               {"prox", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "OSC"; }
 
@@ -65,7 +80,7 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "OSC", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "wave", "", 2.5f, 8.0f, 55.0f);
+        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 56.0f);
         p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
         p.add(Widget::Kind::Knob, "FINE", "fine", 21.0f, 30.0f);
         p.add(Widget::Kind::Knob, "PW", "pw", 35.0f, 30.0f);
@@ -73,6 +88,7 @@ public:
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 7.0f, 52.0f);
         p.add(Widget::Kind::Toggle, "SUB2", "sub_2", 21.0f, 54.0f);
         p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 35.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "PROX", "prox", 49.0f, 52.0f);
         p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 5.0f, 96.0f);
         p.add(Widget::Kind::Jack, "FM", "in:fm", 17.0f, 96.0f);
         p.add(Widget::Kind::Jack, "PWM", "in:pwm", 29.0f, 96.0f);
@@ -98,6 +114,7 @@ public:
         driftInterval_ =
             static_cast<std::uint32_t>(std::max(1.0f, sampleRate / 40.0f));
         paramCoeff_ = std::exp(-1.0f / (0.005f * std::max(1.0f, sampleRate)));
+        sineLP_ = triLP_ = sawLP_ = pulseLP_ = subLP_ = 0.0f;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -115,6 +132,7 @@ public:
         const float pwParam = parameterValue("pw");
         const float fmAmount = parameterValue("fm_amount");
         const float drift = parameterValue("drift");
+        const float prox = parameterValue("prox");
         const bool sub2 = parameterValue("sub_2") >= 0.5f;
         const bool syncEnabled = parameterValue("sync_enable") >= 0.5f;
         const float driftStep = 0.0006f * drift * drift;
@@ -186,12 +204,27 @@ public:
             sub += static_cast<float>(polyBlep(subPhase_, sdt));
             sub -= static_cast<float>(polyBlep(wrap01(subPhase_ + 0.5), sdt));
 
+            // PROX: mistura com uma versão passada por passa-baixa de
+            // 1 polo bem suave (0,06 -- a mesma constante do estudo).
+            // prox=0 é EXATAMENTE a saída crua, determinístico (a
+            // mesma convenção de drift=0).
+            sineLP_ += (sine - sineLP_) * 0.06f;
+            triLP_ += (tri - triLP_) * 0.06f;
+            sawLP_ += (saw - sawLP_) * 0.06f;
+            pulseLP_ += (pulse - pulseLP_) * 0.06f;
+            subLP_ += (sub - subLP_) * 0.06f;
+            const float sineV = sine * (1.0f - prox) + sineLP_ * prox;
+            const float triV = tri * (1.0f - prox) + triLP_ * prox;
+            const float sawV = saw * (1.0f - prox) + sawLP_ * prox;
+            const float pulseV = pulse * (1.0f - prox) + pulseLP_ * prox;
+            const float subV = sub * (1.0f - prox) + subLP_ * prox;
+
             for (std::size_t channel = 0; channel < channels; ++channel) {
-                sineOut.at(channel, frame) = sine;
-                triOut.at(channel, frame) = tri;
-                sawOut.at(channel, frame) = saw;
-                pulseOut.at(channel, frame) = pulse;
-                subOut.at(channel, frame) = sub;
+                sineOut.at(channel, frame) = sineV;
+                triOut.at(channel, frame) = triV;
+                sawOut.at(channel, frame) = sawV;
+                pulseOut.at(channel, frame) = pulseV;
+                subOut.at(channel, frame) = subV;
             }
 
             phase_ += dp;
@@ -245,6 +278,9 @@ private:
     std::uint32_t driftCounter_ = 0;
     std::uint32_t driftInterval_ = 1200;
     std::uint64_t rngState_ = 0x9E3779B97F4A7C15ULL;
+
+    float sineLP_ = 0.0f, triLP_ = 0.0f, sawLP_ = 0.0f, pulseLP_ = 0.0f,
+        subLP_ = 0.0f;
 };
 
 }  // namespace rasgo::modular

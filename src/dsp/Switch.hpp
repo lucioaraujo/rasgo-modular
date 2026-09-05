@@ -56,12 +56,12 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "SWITCH", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pos", "", 2.5f, 7.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "STEP", "steps", 8.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 28.0f, 26.0f);
+        p.add(Widget::Kind::Display, "pos", "", 2.5f, 6.0f, 56.0f);
+        p.add(Widget::Kind::Knob, "STEP", "steps", 8.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 28.0f, 28.0f);
         p.add(Widget::Kind::Knob, "GLID", "glide", 8.0f, 46.0f);
         p.add(Widget::Kind::Knob, "SLEW", "slew", 28.0f, 46.0f);
-        p.add(Widget::Kind::Toggle, "DEMUX", "dir", 46.0f, 26.0f);
+        p.add(Widget::Kind::Toggle, "DEMUX", "dir", 46.0f, 28.0f);
         p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 66.0f);
         p.add(Widget::Kind::Jack, "B", "in:b", 19.0f, 66.0f);
         p.add(Widget::Kind::Jack, "C", "in:c", 31.0f, 66.0f);

@@ -8,6 +8,8 @@
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
+#include "dsp/AudioIn.hpp"
+#include "dsp/Chaos.hpp"
 #include "dsp/Control.hpp"
 #include "dsp/Decision.hpp"
 #include "dsp/Drift.hpp"
@@ -26,8 +28,10 @@
 #include "dsp/Mixer.hpp"
 #include "dsp/Mult.hpp"
 #include "dsp/Noise.hpp"
+#include "dsp/NoteOut.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
+#include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
 #include "dsp/Scope.hpp"
@@ -50,7 +54,11 @@ namespace rasgo::panel {
 inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) {
     using namespace rasgo::modular;
     if (t == "OSC")        return std::make_unique<Oscillator>();
+    if (t == "AUDIO-IN")   return std::make_unique<AudioIn>();
+    if (t == "CHAOS")      return std::make_unique<Chaos>();
+    if (t == "PLL")        return std::make_unique<Pll>();
     if (t == "NOISE")      return std::make_unique<Noise>();
+    if (t == "NOTE-OUT")   return std::make_unique<NoteOut>();
     if (t == "CHORD")      return std::make_unique<Chord>();
     if (t == "FUNCTION")   return std::make_unique<FunctionGenerator>();
     if (t == "FILTER")     return std::make_unique<Filter>();
@@ -93,15 +101,15 @@ struct CatalogGroup {
 // Agrupado por família (taxonomia do RASGO_MODULAR.md §4).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",      {"OSC", "CHORD", "NOISE", "FUNCTION"}},
+        {"SOURCE",      {"OSC", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
         {"TIME",        {"CLOCK", "LOGIC", "ENVELOPE"}},
-        {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS"}},
+        {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS", "CHAOS"}},
         {"SEQUENCE",    {"TURING", "SEQUENCE", "SWITCH", "TRIGSEQ"}},
         {"TRANSFORM",   {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "CONTROL", "MULT", "SH", "PARAMETRIC"}},
         {"MATTER",      {"MATTER", "STRING"}},
         {"MEMORY",      {"MEMORY"}},
         {"SPACE",       {"SPACE"}},
-        {"MIX",         {"MIXER", "MATRIX", "MASTER", "SCOPE"}},
+        {"MIX",         {"MIXER", "MATRIX", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;
 }

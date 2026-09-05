@@ -258,6 +258,44 @@ void testDrift() {
           "`drift` fica dentro de ~½ semitom");
 }
 
+void testProximityIsNoopAtZero() {
+    Oscillator a, b;
+    a.setParameter("freq", 330.0f);
+    b.setParameter("freq", 330.0f);
+    b.setParameter("prox", 0.0f);  // explícito, devia dar o mesmo que default
+    const auto ra = render(a, 2, 20000);
+    const auto rb = render(b, 2, 20000);
+    bool same = ra.size() == rb.size();
+    for (std::size_t i = 0; same && i < ra.size(); ++i)
+        if (ra[i] != rb[i]) same = false;
+    check(same, "prox=0 e' EXATAMENTE a saida crua (mesma convencao de drift=0)");
+}
+
+void testProximityDarkens() {
+    Oscillator dry, wet;
+    dry.setParameter("freq", 440.0f);
+    wet.setParameter("freq", 440.0f);
+    wet.setParameter("prox", 1.0f);
+    const auto rd = render(dry, 2, 24000);   // saw -- rico em harmonicos
+    const auto rw = render(wet, 2, 24000);
+    // energia de alta frequencia (diferenciador de 1 polo), como em
+    // test_noise.cpp -- prox=1 deve ter BEM menos
+    auto highEnergy = [](const std::vector<float>& v) {
+        const float c = std::exp(-6.2831853f * 3000.0f / kSampleRate);
+        float y = 0.0f, xPrev = 0.0f;
+        double s = 0.0;
+        for (std::size_t i = 0; i < v.size(); ++i) {
+            y = c * (y + v[i] - xPrev);
+            xPrev = v[i];
+            if (i > 2000) s += y * y;
+        }
+        return s;
+    };
+    check(highEnergy(rw) < highEnergy(rd) * 0.4,
+          "prox=1 abafa a saida (bem menos energia de alta frequencia)");
+    for (const float v : rw) EXPECT(std::isfinite(v) && std::fabs(v) <= 1.2f);
+}
+
 void testDeterminism() {
     Oscillator a, b;
     for (Oscillator* o : {&a, &b}) {
@@ -313,6 +351,8 @@ int main() {
     testThroughZeroFm();
     testAntiAlias();
     testDrift();
+    testProximityIsNoopAtZero();
+    testProximityDarkens();
     testDeterminism();
     testInGraph();
     testPanel();

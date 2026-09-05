@@ -30,6 +30,19 @@
 // Avanço: clock interno em `bpm·mult` OU, se `ext_clock` estiver
 // conectado, nas bordas de subida externas (o período é estimado do
 // intervalo entre bordas, pra manter `gate_len`/`swing` coerentes).
+//
+// `feel` (2026-09-05) — estudado de `ANTITOTEM/src/core/
+// SimpleSequencer.h::ClockFeel` (código do autor, GPLv3/AGPLv3 —
+// compatível; ver `PESQUISA_MODULOS.md §2.3`), reduzido: o Antitotem
+// tem 8 posições incluindo `swing` — aqui ficou de fora porque o `CLOCK`
+// já tem um `swing` contínuo próprio (duplicar como posição discreta só
+// confundiria). `feel` escolhe o AGRUPAMENTO em vez da velocidade pura:
+// `mult` continua controlando velocidade fina, `feel` multiplica por
+// 1/3/5/7/9/11 (reto/tercina/quintina/septina/nonina/undecina) —
+// diferente de só girar MULT até 3,0 porque fica quantizado e nomeado
+// (não precisa acertar o número exato de ouvido). `glitch` é o único
+// modo qualitativamente novo: cada passo sorteia um fator de tempo
+// (~0,7–1,4×) — o clock deixa de ser um trem de pulsos regular.
 
 namespace rasgo::modular {
 
@@ -53,7 +66,8 @@ public:
                {"gate_len", 0.05f, 0.95f, 0.5f, ""},
                {"accent_a", 1.0f, 16.0f, 4.0f, ""},
                {"accent_b", 1.0f, 16.0f, 3.0f, ""},
-               {"accent_mode", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"accent_mode", 0.0f, 1.0f, 0.0f, ""},
+               {"feel", 0.0f, 6.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "CLOCK"; }
 
@@ -63,7 +77,7 @@ public:
         Panel p;
         p.hp = 16;
         p.add(Widget::Kind::Label, "CLOCK", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pattern", "", 2.5f, 8.0f, 76.0f);
+        p.add(Widget::Kind::Display, "pattern", "", 2.5f, 6.0f, 76.3f);
         p.add(Widget::Kind::Knob, "BPM", "bpm", 7.0f, 30.0f);
         p.add(Widget::Kind::Knob, "MULT", "mult", 22.0f, 30.0f);
         p.add(Widget::Kind::Knob, "LEN", "length", 37.0f, 30.0f);
@@ -75,6 +89,7 @@ public:
         p.add(Widget::Kind::Knob, "ACC-A", "accent_a", 52.0f, 52.0f);
         p.add(Widget::Kind::Knob, "ACC-B", "accent_b", 67.0f, 52.0f);
         p.add(Widget::Kind::Toggle, "AND", "accent_mode", 7.0f, 76.0f);
+        p.add(Widget::Kind::Knob, "FEEL", "feel", 22.0f, 76.0f);
         p.add(Widget::Kind::Jack, "EXT", "in:ext_clock", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "RST", "in:reset", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "BPM", "in:bpm_mod", 29.0f, 100.0f);
@@ -99,6 +114,7 @@ public:
         driftInterval_ =
             static_cast<std::uint32_t>(std::max(1.0f, sampleRate / 20.0f));
         rngState_ = 0xD1B54A32D192ED03ULL;
+        glitchFactor_ = 1.0f;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -126,6 +142,13 @@ public:
             static_cast<int>(std::lround(parameterValue("accent_b"))), 1, 16);
         const bool accentAnd = parameterValue("accent_mode") >= 0.5f;
         const float driftStep = 0.02f * drift * drift;
+        const int feelIdx = clampi(
+            static_cast<int>(std::lround(parameterValue("feel"))), 0, 6);
+        // reto/tercina/quintina/septina/nonina/undecina/glitch (razão 1,
+        // o glitch usa o fator por passo em vez de multiplicar aqui)
+        static constexpr float kTupletRatio[7] = {1, 3, 5, 7, 9, 11, 1};
+        const float tupletRatio = kTupletRatio[feelIdx];
+        const bool glitch = feelIdx == 6;
 
         const AudioBlock* ext = inputs[0];
         const AudioBlock* reset = inputs[1];
@@ -158,7 +181,7 @@ public:
                         extPeriod_ = extSamples_;
                     extSamples_ = 0.0f;
                     extSeen_ = true;
-                    advanceStep();
+                    advanceStep(glitch);
                     stepped = true;
                 }
                 prevExt_ = e;
@@ -168,13 +191,14 @@ public:
                 const float effBpm =
                     clampf(bpm + (bpmMod ? bpmMod->at(0, frame) : 0.0f),
                            1.0f, 1000.0f);
-                const float stepHz =
-                    effBpm / 60.0f * mult * (1.0f + driftState_);
+                const float glitchMul = glitch ? glitchFactor_ : 1.0f;
+                const float stepHz = effBpm / 60.0f * mult * tupletRatio
+                    * (1.0f + driftState_) * glitchMul;
                 phase_ += static_cast<double>(std::max(0.0001f, stepHz))
                     / sampleRate_;
                 if (phase_ >= 1.0) {
                     phase_ -= 1.0;
-                    advanceStep();
+                    advanceStep(glitch);
                     stepped = true;
                 }
                 phaseInStep_ = static_cast<float>(phase_);
@@ -211,10 +235,14 @@ private:
         return v < lo ? lo : (v > hi ? hi : v);
     }
 
-    void advanceStep() noexcept {
+    void advanceStep(const bool glitch) noexcept {
         ++stepCounter_;
         if (stepCounter_ >= 1000000)
             stepCounter_ = stepCounter_ % 720720;  // ~LCM(1..16), preserva fase
+        // só sorteia quando `feel` = glitch -- nunca consome o stream do
+        // RNG compartilhado com `drift` fora desse modo (senão até um
+        // patch com FEEL sempre reto teria `drift` deslocado)
+        if (glitch) glitchFactor_ = 0.7f + 0.7f * (0.5f + 0.5f * whiteNoise());
     }
 
     // E(k,n) pela fórmula de Bresenham: onset em i sse (i·k) mod n < k.
@@ -261,6 +289,7 @@ private:
     std::uint32_t driftCounter_ = 0;
     std::uint32_t driftInterval_ = 2400;
     std::uint64_t rngState_ = 0xD1B54A32D192ED03ULL;
+    float glitchFactor_ = 1.0f;
 };
 
 }  // namespace rasgo::modular

@@ -1,7 +1,9 @@
 # Dossiê — Módulo 5: Clock euclidiano (`CLOCK` / `EuclidClock`)
 
 **Família:** TIME
-**Estado:** **implementado — marco 1** (2026-09-01)
+**Estado:** **implementado — marco 1** (2026-09-01); `feel` (reto/
+tercina/quintina/septina/nonina/undecina/glitch) adicionado em
+2026-09-05 — ver `TAREFAS.md`, registro "ClockFeel"
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/EuclidClock.hpp` (classe `EuclidClock`, `type()` =
 `"CLOCK"` — o nome de classe evita colisão com o `Clock` legado de

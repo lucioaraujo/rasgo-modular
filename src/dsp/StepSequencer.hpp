@@ -65,7 +65,7 @@ public:
         Panel p;
         p.hp = 20;
         p.add(Widget::Kind::Label, "SEQUENCE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "steps", "", 2.5f, 8.0f, 95.0f);
+        p.add(Widget::Kind::Display, "steps", "", 2.5f, 6.0f, 96.6f);
         for (int i = 0; i < 8; ++i) {
             const std::string n = std::to_string(i + 1);
             const float x = 7.0f + static_cast<float>(i) * 12.0f;

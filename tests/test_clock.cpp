@@ -73,6 +73,88 @@ void testInternalTempo() {
     }
 }
 
+// bordas de subida de `clock`, em índice de amostra (não só contagem) --
+// pra medir a REGULARIDADE dos intervalos (glitch precisa ser irregular).
+std::vector<long> clockEdgeFrames(EuclidClock& c, const float seconds) {
+    c.prepare(kSampleRate, kBlock);
+    std::vector<AudioBlock> out(3, AudioBlock(kSampleRate, 1, kBlock));
+    std::vector<const AudioBlock*> in{nullptr, nullptr, nullptr};
+    std::vector<long> edges;
+    float pc = 0.0f;
+    long frame = 0;
+    const int blocks = static_cast<int>(kSampleRate * seconds) / kBlock;
+    for (int b = 0; b < blocks; ++b) {
+        c.process(in, out);
+        for (std::size_t i = 0; i < kBlock; ++i) {
+            const float vc = out[0].at(0, i);
+            if (pc < 0.5f && vc >= 0.5f) edges.push_back(frame);
+            pc = vc;
+            ++frame;
+        }
+    }
+    return edges;
+}
+
+void testFeelTuplet() {
+    EuclidClock straight, triplet, quintuplet;
+    for (EuclidClock* c : {&straight, &triplet, &quintuplet}) {
+        c->setParameter("bpm", 60.0f);
+        c->setParameter("mult", 1.0f);
+        c->setParameter("fill", 32.0f);
+    }
+    triplet.setParameter("feel", 1.0f);      // tercina, razão 3
+    quintuplet.setParameter("feel", 2.0f);   // quintina, razão 5
+    const Counts ns = runInternal(straight, 8.0f);
+    const Counts nt = runInternal(triplet, 8.0f);
+    const Counts nq = runInternal(quintuplet, 8.0f);
+    // teórico: 60 BPM x mult=1 = 1 passo/s -> 8 passos em 8 s; tercina
+    // (razão 3) e quintina (razão 5) escalam a mesma base
+    check(ns.clock >= 7 && ns.clock <= 9, "reto: ~1 Hz (60 BPM x1)");
+    check(nt.clock >= 22 && nt.clock <= 26, "tercina: ~3x o passo reto (razão 3)");
+    check(nq.clock >= 38 && nq.clock <= 42, "quintina: ~5x o passo reto (razão 5)");
+}
+
+void testFeelGlitchIsIrregular() {
+    EuclidClock straight, glitch;
+    for (EuclidClock* c : {&straight, &glitch}) {
+        c->setParameter("bpm", 120.0f);
+        c->setParameter("mult", 2.0f);
+        c->setParameter("fill", 32.0f);
+    }
+    glitch.setParameter("feel", 6.0f);
+    const auto se = clockEdgeFrames(straight, 6.0f);
+    const auto ge = clockEdgeFrames(glitch, 6.0f);
+    EXPECT(se.size() > 10);
+    EXPECT(ge.size() > 5);
+    auto intervalVariance = [](const std::vector<long>& e) {
+        if (e.size() < 3) return 0.0;
+        std::vector<double> iv;
+        for (std::size_t i = 1; i < e.size(); ++i)
+            iv.push_back(static_cast<double>(e[i] - e[i - 1]));
+        double mean = 0.0;
+        for (const double v : iv) mean += v;
+        mean /= static_cast<double>(iv.size());
+        double var = 0.0;
+        for (const double v : iv) var += (v - mean) * (v - mean);
+        return var / static_cast<double>(iv.size());
+    };
+    check(intervalVariance(ge) > intervalVariance(se) * 5.0,
+          "glitch: intervalo entre passos bem mais irregular que reto");
+}
+
+void testFeelDeterminism() {
+    EuclidClock a, b;
+    for (EuclidClock* c : {&a, &b}) {
+        c->setParameter("bpm", 133.0f);
+        c->setParameter("mult", 1.5f);
+        c->setParameter("fill", 5.0f);
+        c->setParameter("feel", 6.0f);  // glitch -- o caso com RNG
+    }
+    const auto ea = clockEdgeFrames(a, 5.0f);
+    const auto eb = clockEdgeFrames(b, 5.0f);
+    EXPECT(ea == eb);
+}
+
 void testEuclidDensity() {
     EuclidClock c;
     c.setParameter("bpm", 120.0f);
@@ -251,6 +333,9 @@ void testPanel() {
 
 int main() {
     testInternalTempo();
+    testFeelTuplet();
+    testFeelGlitchIsIrregular();
+    testFeelDeterminism();
     testEuclidDensity();
     testAccentAndOr();
     testDriftDeterminism();

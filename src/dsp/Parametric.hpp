@@ -75,7 +75,7 @@ public:
         Panel p;
         p.hp = 22;
         p.add(Widget::Kind::Label, "PARAMETRIC", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "spectrum", "", 2.5f, 8.0f, 106.0f);
+        p.add(Widget::Kind::Display, "spectrum", "", 2.5f, 6.0f, 106.8f);
         const char* rows[4] = {"1", "2", "3", "4"};
         for (int s = 0; s < 4; ++s) {
             const float y = 27.0f + static_cast<float>(s) * 16.0f;
