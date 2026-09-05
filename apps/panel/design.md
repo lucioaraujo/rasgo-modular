@@ -152,6 +152,81 @@ em DSP nem parâmetro):
   editável exigiria uma máscara de passos no módulo (mecânica nova,
   fica pra depois).
 
+### 2.10 Hover-learn — caixa Learn (2026-09-04, revisto 2026-09-05)
+
+Precedente citado pelo autor: Antitotem e Navalha 2 (hover sobre
+controle/jack → explicação). Uma **caixa estilo terminal** fica no
+rodapé da coluna esquerda (a lista de módulos encurta pra caber) — modelo
+do `learnEditor` do ANTITOTEM, pedido do autor pra "evitar que as caixas
+de texto se sobreponham ao painel" (o tooltip flutuante antigo tapava
+justo o módulo que se inspecionava). Passar o mouse sobre um knob/jack
+enche a caixa com `quick` + `understand` + `explore` do
+`apps/panel/LearnCatalog.hpp` — nome+função real daquele parâmetro
+NAQUELE módulo (não genérico), com quebra de linha; parada, mostra só uma
+linha-guia.
+
+**Dwell de ~2 s** (autor 2026-09-05: "o terminal fica mudando o tempo
+todo quando mexemos o mouse"): o conteúdo só troca depois de 2 s parado
+sobre o MESMO objeto (`learnHoverKey` = `id|bind`, `learnHoverSince`). O
+laço já repinta a ~30 fps, então o dwell resolve sozinho. Fora de
+qualquer widget, mantém o último exibido — mais calmo que voltar pra a
+linha-guia a cada relance.
+
+**Sempre presente** (autor 2026-09-05: "ela pode ficar sempre ligada …
+a tecla l pode sumir") — não há mais toggle `[l]` nem estado `learnMode`;
+a paleta simplesmente reserva os ~170 px do rodapé. Continua
+**silenciosa** — nunca fala sozinha, texto só ao passar o mouse; a antiga
+faixa "MODO APRENDER — passe o mouse…" saiu (isso é assunto de tutorial,
+não de cabeçalho).
+
+`LearnCatalog::lookupLearn(moduleType, bind)` devolve `nullptr` quando
+não há conteúdo — silencioso, não é erro. **Catálogo completo desde
+2026-09-05:** os 37 tipos do `moduleCatalog()` têm entrada, todo knob e
+todo jack de todo módulo instanciável (teste dedicado
+`testRemainingCatalogModulesHaveAtLeastQuick`). `quick` preenchido em
+tudo; `understand`/`explore` mais densos onde há mecanismo a explicar,
+vazios em parâmetro autoexplicativo. Os 3 níveis já aparecem na caixa;
+falta a camada contextual (`WHY?`/`WHAT IF?` — precisa saber o que já
+está cabeado). Ver `dossies/ESTUDO_seed_composicao_generativa.md §6`.
+
+### 2.11 Cabeçalho de linha única + i18n (2026-09-05)
+
+O cabeçalho segue o **modelo dos RASGO Synth** (Studio/Performance):
+wordmark à esquerda, cluster de comandos, medidor de pico, e
+IDIOMA/TUTORIAL/SOBRE. Diferença do Modular: **uma única linha**, na
+altura que já existia (`kCaseTop = 46`) — decisão do autor.
+
+Da esquerda pra direita: **`RASGO MODULAR`** (marca, não traduz) · barra
+de comandos em **botões pequenos** (a legenda de texto de antes virou
+botão): `DRIFT` é toggle (acende em âmbar quando ligado),
+`MUTATE`/`EVOLVE`/`CROSS`/`BANK`/`SAVE` são momentâneos (piscam ~160 ms),
+`ZOOM −/+`, e por fim **`MUTE`** — **isolado** no fim da barra, depois de
+um vão largo + régua vertical, "pra não clicar nele sem querer e mutar o
+som" (autor 2026-09-05). À direita, montado da borda pra dentro:
+`SOBRE` · `TUTORIAL`
+· `IDIOMA` (mostra `EN`/`PT`/`FR`/`ES`, cicla) · **`● REC`** (vermelho
+gravando) · **`⚄ SEED n`** (o botão de antes, agora no cluster) · pico da
+saída do MASTER (barra + dB, lê o snapshot dos osciloscópios) · leitura
+`N mód · M cabos`. Quando falta largura, o sacrifício é: leitura → pico →
+os comandos da direita da barra (`SAVE`/`BANK`/…) somem; SEED, REC e
+IDIOMA/TUTORIAL/SOBRE nunca somem. Toda tecla continua funcionando — o
+botão é só o atalho visual, com **uma implementação por ação**
+(`act*` lambdas, chamadas pela tecla e pelo clique).
+
+**TUTORIAL** e **SOBRE** abrem um card sobreposto (`overlay`) — qualquer
+clique ou `[Esc]` fecha. O tutorial tem 6 cartões (cabear, seed, variar,
+mover, zoom, aprender).
+
+**i18n** (`apps/panel/UiLanguage.hpp`, porte sem JUCE do `UiLanguage.h`
+dos Synth): `enum Lang{en,pt,fr,es}`, `L4{en;pt;fr;es}`, `tr()` com
+fallback en→pt. **Inglês é o padrão** (como os Synth). Escopo traduzido
+(decisão do autor): **cabeçalho, tutorial, créditos** e — em passes
+próprios — o **LEARN**. **Não** se traduzem rótulos de parâmetro nem
+títulos de módulo (`cutoff`, `FILTER` — vocabulário técnico neutro). A
+escolha persiste no pref `~/.local/share/rasgo-modular/ui-lang` (arquivo
+próprio, não o patch — sobrevive a abrir num seed novo). Teste:
+`tests/test_ui_language.cpp` (fallback, ciclo, completude do cabeçalho).
+
 ### 2.8 Salvar o patch e gravar (2026-09-02)
 
 O trabalho do músico precisa de um lugar. Diretório de dados do usuário:
@@ -423,6 +498,58 @@ a checagem O(n²) agora opera nas pegadas em mm.
 Nada disso toca o áudio nem o motor: `Panel` continua dado puro, só muda
 a unidade das coordenadas (grade abstrata → mm) e o renderizador.
 
+**Zoom de conteúdo (2026-09-05).** `Ctrl+=` amplia, `Ctrl+-` reduz,
+`Ctrl+0` volta a 100% — estilo navegador, precedente ANTITOTEM
+(`ZoomableViewport`). Um `uiZoom` (passo 0,1; faixa 0,55–1,40) multiplica
+`s` **depois** do `clamp` acima, então `uiZoom == 1.0` desenha idêntico
+ao anterior. O piso duro passa a `s_min · 0,5` só nesse caminho —
+**reduzir abaixo do regime compacto é o objetivo**: pedido do autor
+("tá difícil de cabear os módulos da primeira linha com os da última"),
+o zoom-out mostra a 1ª e a última fileira juntas pra puxar o cabo entre
+elas. O `scrollY` é reescalado pela razão de `s` pra ancorar o conteúdo
+no topo. Rótulos usam fontset X11 de tamanho fixo (não escalam) — em
+zoom-out forte as legendas apertam; é vista de sobrevoo pra rotear, não
+de ajuste fino.
+
+### 3.2.1 Rubrica de layout de painel (passe de ergonomia, 2026-09-06)
+
+Pedido do autor: rever módulo a módulo — espaços, realocação, displays
+alinhados, largura enxuta, rótulos de jack sem colisão. A rubrica que
+todo `panel()` segue (e o `tests/test_panel_layout.cpp` passa a exigir,
+`kCharMM` 2,8 / folga 0,3):
+
+- **margens** — conteúdo em `x ∈ [2,5 ; W−2,5]` (`W = hp·5,08`);
+- **display** — largura interna cheia (`W−5`), em `y = 6`, **16 mm de
+  altura** (era 13 — "osciloscópios um pouco maiores", pedido do autor);
+  a 1ª fileira de knobs desce pra `y ≥ 28` pra caber;
+- **grade de knobs** — colunas centradas: 1 col até 5 HP · 2 col 6–11 HP
+  · 3 col a partir de 12 HP; passo de linha ~20–22 mm;
+- **fileira de jacks** — espaçamento pelo rótulo: 1–2 letras ≈ 9 mm ·
+  3 ≈ 11 · 4 ≈ 13 · 5 ≈ 15. Não cabendo, **quebra em 2+ fileiras
+  agrupadas por função** (entradas de sinal · mod-CV · saídas);
+- **HP** — o mais enxuto que cabe na rubrica: reduz onde sobra (ex.:
+  `AUDIO-IN` 6→4), alarga onde aperta;
+- **agrupamento didático** — controles/tomadas relacionados adjacentes
+  (as 4 saídas correlacionadas do `DRIFT` juntas; combinacional vs
+  clock no `LOGIC`; sinal vs mod-CV nas entradas do `FILTER`).
+
+**Varredura completa (2026-09-06):** os 38 painéis passam pelo modelo
+apertado. Destaques:
+- **colisão de rótulo** resolvida por quebra de fileira ou espaçamento —
+  `DRIFT` (3 fileiras: entradas · a-d · FLD/EVT), `LOGIC` (2 fileiras:
+  AND/OR/XOR · DIV/FLIP), `FILTER`, `FUNCTION`, `HARMONY`, `NOTE-OUT`;
+- **`MIXER`** — o toggle `MUTE` (era "M") subiu, o jack do canal desceu;
+- **largura enxuta** — `AUDIO-IN` 6→4, `CHAOS` 8→7, `NOTE-OUT` 8→7;
+  `FUNCTION` 8→10 (rótulos largos demais pra 8);
+- **`MATRIX`** — sem `Display` (a grade 4×4 + a dica "IN↓ OUT→" já são o
+  mostrador); a dica subiu pra `y 20`;
+- **displays** — todos a `W−5` de largura, `y 6`, 16 mm de altura;
+- **centragem** — `AUDIO-IN` (knob e jack no eixo), colunas de knob
+  aproximadas do centro em vários.
+
+O `test_panel_layout` (kCharMM 2,8 / folga 0,3, agora modelando a
+largura do rótulo do jack) é o gate contra regressão.
+
 ### 3.3 Renderização — sem flicker, texto recortado
 
 - **buffer fora da tela:** todo o quadro é desenhado num `Pixmap` e
@@ -450,6 +577,15 @@ a unidade das coordenadas (grade abstrata → mm) e o renderizador.
   não. O buffer fundo absorve o atraso.
 - O `AudioBlock` do motor tem teto de 256 frames → o painel processa em
   sub-blocos de ≤256 por escrita do ALSA.
+- **Encerramento à prova de trava** (2026-09-05, depois de uma janela que
+  "não fechava"): ao sair, `XUnmapWindow` **antes** de qualquer desmonte
+  de áudio (a janela some na hora, aconteça o que acontecer no ALSA);
+  `~AlsaSink` faz `snd_pcm_drop` em vez de `snd_pcm_drain` (não espera
+  tocar o buffer); `stopAudioIn()` chama `AlsaSource::abort()`
+  (`snd_pcm_drop`) antes do `join()`, pra um `snd_pcm_readi` bloqueado num
+  PipeWire travado não pendurar a thread de captura — e com ela a saída
+  do processo. Nenhum laço do painel é infinito; o risco era só o teardown
+  bloqueante.
 - **Pendente:** mover o `graph.prepare` pra fora do caminho do áudio
   (handoff sem lock); `TruePeakDetector` 4× no `MASTER`.
 
@@ -532,6 +668,10 @@ layout físico. Nada disso é este teste.
 1b. **displays por módulo** (§2.9) — **feito** MATRIX (grade clicável),
    SCOPE (espectro), TRIGSEQ (4 lanes); falta o overlay editável do
    TRIGSEQ (precisa de máscara de passos no módulo) e modo XY do SCOPE;
+1c. **hover-learn** (§2.10) — **feito**: caixa terminal sempre presente
+   no rodapé da paleta, catálogo completo dos 37 módulos, os 3 níveis
+   (`quick`/`understand`/`explore`) desenhados; falta só a camada
+   contextual (`WHY?`/`WHAT IF?`);
 2. **ponto de partida por seed** (`§2.3`) — **feito** (botão `⚄ SEED` /
    `[g]` / `RASGO_SEED=N`); falta navegar pra trás e a "linhagem";
 3. **contrato responsivo** completo (`§4`) no front-end de produção;

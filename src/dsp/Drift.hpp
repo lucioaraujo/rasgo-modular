@@ -45,25 +45,28 @@ public:
 
     std::string type() const override { return "DRIFT"; }
 
+    // Layout revisto 2026-09-06 (passe de ergonomia): 10 HP (W 50,8 mm),
+    // display cheio, 3 fileiras de jacks agrupadas — entradas · 4 saídas
+    // de campo correlacionadas (a-d) · campo bruto + gatilho de virada.
     Panel panel() const override {
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "DRIFT", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "field", "", 2.5f, 7.0f, 40.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 8.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "DEPTH", "depth", 28.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "MOMT", "momentum", 8.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "STRD", "stride", 28.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "BIAS", "bias", 8.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "ANCHR", "anchor", 28.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "ADV", "in:advance", 6.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "RCV", "in:rate_mod", 18.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "A", "out:a", 5.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "B", "out:b", 13.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "C", "out:c", 21.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "D", "out:d", 29.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "FLD", "out:field", 37.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "EVT", "out:event", 45.0f, 110.0f);
+        p.add(Widget::Kind::Display, "field", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "DEPTH", "depth", 30.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "MOMT", "momentum", 9.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "STRD", "stride", 30.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "BIAS", "bias", 9.0f, 70.0f);
+        p.add(Widget::Kind::Knob, "ANCHR", "anchor", 30.0f, 70.0f);
+        p.add(Widget::Kind::Jack, "ADV", "in:advance", 8.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 20.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "A", "out:a", 8.0f, 106.0f);
+        p.add(Widget::Kind::Jack, "B", "out:b", 17.0f, 106.0f);
+        p.add(Widget::Kind::Jack, "C", "out:c", 26.0f, 106.0f);
+        p.add(Widget::Kind::Jack, "D", "out:d", 35.0f, 106.0f);
+        p.add(Widget::Kind::Jack, "FLD", "out:field", 8.0f, 120.0f);
+        p.add(Widget::Kind::Jack, "EVT", "out:event", 21.0f, 120.0f);
         return p;
     }
 

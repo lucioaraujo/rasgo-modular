@@ -16,7 +16,10 @@
 //   - fluxo de sinal legível: módulos numa "case" que ENCHE a largura
 //     (colada na paleta, sem margem vazia) e quebra em LINHAS;
 //   - janela abre no MONITOR PRIMÁRIO, ~88% da área, centrada;
-//   - TEXTO SEMPRE UTF-8 (setlocale + Xutf8DrawString, fallback);
+//   - TEXTO SEMPRE UTF-8: dentro do painel via `setlocale` +
+//     `Xutf8DrawString` (com fallback); o título da janela via
+//     `_NET_WM_NAME`/`UTF8_STRING` (`setTitle()`) — `XStoreName` sozinho
+//     grava STRING/Latin-1 e o WM mostra "—"/"●" como lixo;
 //   - SEM SOBREPOSIÇÃO ACIDENTAL (checagem no arranque, em mm);
 //   - tokens de cor nomeados por função.
 //
@@ -42,9 +45,20 @@
 #include "dsp/Mixer.hpp"
 #include "io/WavWriter.hpp"
 #include "panel/AlsaSink.hpp"
+#include "panel/AlsaSource.hpp"
+#include "panel/LearnCatalog.hpp"
 #include "panel/ModuleCatalog.hpp"
+#include "panel/MotionEngine.hpp"
+#include "panel/PatchGenetics.hpp"
 #include "panel/PatchSeed.hpp"
+#include "panel/ScoreRecorder.hpp"
+#include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"
+
+// marca RASGO — mapa de cobertura (tons de cinza, anti-aliased) gerado do
+// SVG da família (`assets/regen_logo.sh`); commitado, o build não precisa
+// de inkscape/ImageMagick.
+#include "panel/assets/rasgo_logo_gray.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -60,6 +74,7 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <filesystem>
 #include <fstream>
@@ -70,6 +85,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <unordered_set>
 #include <vector>
 
 using namespace rasgo::modular;
@@ -130,6 +146,17 @@ constexpr float kModGapMM = 3.0f;   // folga entre módulos vizinhos
 constexpr int kCaseTop = 46;        // faixa de status no topo (px)
 constexpr int kCasePad = 14;        // px
 constexpr int kPaletteW = 158;      // coluna de módulos disponíveis (px)
+constexpr int kLearnH = 172;        // caixa LEARN no rodapé da coluna esq.
+                                    // (sempre presente — a paleta encurta pra caber)
+
+// zoom de conteúdo do rack, estilo navegador (Ctrl+= amplia, Ctrl+- reduz,
+// Ctrl+0 volta a 100%). Multiplica `g_s` DEPOIS do ajuste-por-altura, então
+// zoom 1.0 desenha idêntico ao de antes. Reduzir é o caso de uso: ver a 1ª
+// e a última linha juntas pra cabear entre elas (pedido do autor 2026-09-05,
+// precedente ANTITOTEM ZoomableViewport).
+constexpr float kZoomMin  = 0.55f;
+constexpr float kZoomMax  = 1.40f;
+constexpr float kZoomStep = 0.10f;
 
 float g_s = 2.0f;                   // px/mm - recalculado no relayout
 int mmpx(float mm) { return static_cast<int>(std::lround(mm * g_s)); }
@@ -145,6 +172,22 @@ float paramVal(Signal& n, const std::string& b) {
 
 struct Rect { int x, y, w, h; };
 
+// Ordem de EXIBIÇÃO dos tipos de uma família (paleta + rack inicial):
+// alfabética, MAS `MIXER` e `MASTER` — o par de saída — sempre grudados
+// e no fim da família, nessa ordem (pedido do autor 2026-09-05: "par
+// grudado sem unir os módulos"). Só exibição; `moduleCatalog()` em si
+// não muda (índice de nó, doador do CROSS, gramática do Seed intactos).
+inline void sortFamilyForDisplay(std::vector<const char*>& types) {
+    auto key = [](const char* t) -> std::string {
+        const std::string s = t;
+        if (s == "MIXER") return "\x7e" "1";   // '~' vem depois de A..Z
+        if (s == "MASTER") return "\x7e" "2";
+        return s;
+    };
+    std::sort(types.begin(), types.end(),
+              [&](const char* a, const char* b) { return key(a) < key(b); });
+}
+
 // pegada do widget em MILÍMETROS (canto sup-esq do painel na origem)
 struct RectMM { float x, y, w, h; };
 RectMM footprintMM(const Widget& w) {
@@ -153,9 +196,15 @@ RectMM footprintMM(const Widget& w) {
     case Widget::Kind::Knob:   return {w.x - 0.5f, w.y - 1.0f, 10.0f, 15.0f};
     case Widget::Kind::Slider: return {w.x - 1.0f, w.y - 1.0f, 10.0f, 36.0f};
     case Widget::Kind::Toggle: return {w.x - 0.5f, w.y - 0.5f, 5.0f + lbl * 1.7f, 6.0f};
-    case Widget::Kind::Jack:   return {w.x - 1.5f, w.y - 5.5f, 6.0f, 11.0f};
+    // o rótulo do jack (fonte cap ~9px, NÃO escala com o zoom) fica
+    // centrado em `w.x`, acima do furo — modelamos a largura dele, senão
+    // rótulos de 3+ letras a ~9 mm de distância se tocam
+    case Widget::Kind::Jack: {
+        const float half = std::max(3.0f, lbl * 1.6f);
+        return {w.x - half, w.y - 7.0f, 2.0f * half, 13.0f};
+    }
     case Widget::Kind::Display: return {w.x - 0.5f, w.y - 0.5f,
-                                       (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 15.0f};
+                                       (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 17.5f};
     case Widget::Kind::Label:  return {w.x - 0.5f, w.y - 0.5f, 2.0f + lbl * 1.9f, 3.5f};
     }
     return {w.x, w.y, 4.0f, 4.0f};
@@ -206,7 +255,18 @@ int main() {
     // ---- grafo (autônomo: toca ao abrir) --------------------------------
     // O instrumento nasce com UM DE CADA MÓDULO no rack (decisão do autor
     // 2026-09-02) — todos silenciosos até serem cabeados, exceto uma voz
-    // mínima ligada pra soar ao abrir. Ordem = ordem do catálogo/paleta.
+    // mínima ligada pra soar ao abrir.
+    //
+    // Duas ordens DIFERENTES de propósito:
+    //  1. instanciação dos nós = ordem de `moduleCatalog()` -> índice de nó
+    //     ESTÁVEL. Mexer nisso mudaria a ordem em que `seedClassifyPorts`
+    //     enche `src[]`/`dst[]` e portanto o que cada `RASGO_SEED=N`
+    //     produz, e a montagem do doador do CROSS (ver `TAREFAS.md`).
+    //  2. ordem de EXIBIÇÃO no rack (`shown`) = ordem da paleta: famílias
+    //     na ordem do catálogo, módulos alfabéticos dentro da família,
+    //     mas `MIXER`+`MASTER` grudados no fim (`sortFamilyForDisplay`).
+    //     Só layout — `shown` já é reordenável arrastando e é salvo no
+    //     `.panel`.
     SignalGraph graph;
     std::vector<std::size_t> shown;
     std::map<std::string, std::size_t> byType;
@@ -214,10 +274,16 @@ int main() {
         for (const char* t : g.types) {
             auto n = rasgo::panel::makeModule(t);
             if (!n) continue;
-            const std::size_t id = graph.add(std::move(n));
-            byType[t] = id;
-            shown.push_back(id);
+            byType[t] = graph.add(std::move(n));
         }
+    for (const auto& g : rasgo::panel::moduleCatalog()) {
+        std::vector<const char*> ordered(g.types.begin(), g.types.end());
+        sortFamilyForDisplay(ordered);
+        for (const char* t : ordered) {
+            const auto it = byType.find(t);
+            if (it != byType.end()) shown.push_back(it->second);
+        }
+    }
     std::size_t sink = graph.add(std::make_unique<Out>());  // não exibido; o
                                      // load de patch pode reencontrar o OUT
     auto at = [&](const char* t) { return byType.at(t); };
@@ -263,6 +329,74 @@ int main() {
     std::atomic<bool> reprepare{false};
     std::mutex gmx;
 
+    // ---- AUDIO-IN — captura ao vivo (adaptador OPCIONAL, nunca
+    // dependência) --------------------------------------------------------
+    // Só abre o dispositivo de captura ALSA quando o patch tem de fato um
+    // nó `AUDIO-IN` -- o painel nunca pega o microfone/entrada de linha à
+    // toa. Thread PRÓPRIA, separada da `audio` (que já toca o grafo) — de
+    // propósito: a pacing da captura de verdade não deve arriscar a
+    // temporização já delicada da reprodução (comentários de `pace()` no
+    // `AlsaSink`). O único acoplamento é `AudioIn::pushSamples()`, que é
+    // lock-free por dentro (SPSC).
+    std::unique_ptr<rasgo::panel::AlsaSource> audioInDev;
+    std::thread audioInThread;
+    std::atomic<bool> audioInRunning{false};
+    auto stopAudioIn = [&] {
+        if (audioInRunning.exchange(false)) {
+            // corta um `read()` bloqueado ANTES do join — senão a thread de
+            // captura só sai quando o PipeWire entregar o próximo período, e
+            // se ele travou o `join()` pendura a janela toda no encerramento.
+            if (audioInDev) audioInDev->abort();
+            if (audioInThread.joinable()) audioInThread.join();
+        }
+        audioInDev.reset();
+    };
+    // chamada em todo ponto que já chama `buildMods()` — mesmo padrão do
+    // `populateMotion()` — pra abrir/fechar a captura sempre que o
+    // conjunto de nós do patch muda.
+    auto syncAudioIn = [&] {
+        bool any = false;
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+            if (graph.node(i).type() == "AUDIO-IN") { any = true; break; }
+        if (any && !audioInRunning.load()) {
+            try {
+                const char* dev = std::getenv("RASGO_AUDIO_IN_DEVICE");
+                audioInDev = std::make_unique<rasgo::panel::AlsaSource>(
+                    static_cast<unsigned>(alsa.rate()), 2, alsa.period(),
+                    dev ? std::string(dev) : std::string("default"));
+            } catch (const std::exception& e) {
+                std::fprintf(stderr, "[audio-in] não abriu captura: %s\n", e.what());
+                audioInDev.reset();
+                return;
+            }
+            audioInRunning.store(true);
+            audioInThread = std::thread([&] {
+                std::vector<float> buf(audioInDev->period() * 2);
+                while (audioInRunning.load(std::memory_order_relaxed)) {
+                    if (!audioInDev->read(buf.data())) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                        continue;
+                    }
+                    // só precisa do `gmx` pra enumerar os nós com segurança
+                    // (a estrutura do grafo pode mudar na UI); o
+                    // `pushSamples` em si não trava. Se a UI está com o
+                    // lock (editando o patch), pula este período em vez de
+                    // esperar — perde um pedaço de captura, nunca trava.
+                    if (gmx.try_lock()) {
+                        for (std::size_t i = 0; i < graph.nodeCount(); ++i) {
+                            if (graph.node(i).type() != "AUDIO-IN") continue;
+                            auto* node = dynamic_cast<rasgo::modular::AudioIn*>(&graph.node(i));
+                            if (node) node->pushSamples(buf.data(), audioInDev->period());
+                        }
+                        gmx.unlock();
+                    }
+                }
+            });
+        } else if (!any && audioInRunning.load()) {
+            stopAudioIn();
+        }
+    };
+
     // gravação: acumula em memória (reservada, ~4 min estéreo) enquanto
     // grava; escreve o .wav ao parar. Cap: auto-para quando a reserva
     // enche. Não é RT-perfeito (o `insert` é memcpy limitado) — pra o
@@ -270,9 +404,28 @@ int main() {
     std::atomic<bool> recording{false};
     std::vector<float> recBuf;
     recBuf.reserve(static_cast<std::size_t>(alsa.rate()) * 2 * 240);
+    // SYSTEM SCORE ao vivo (§5 do estudo) — acompanha a gravação de áudio
+    // ([Ctrl+R]): topologia (cabos) no início da tomada + toda mudança de
+    // parâmetro feita à mão enquanto grava. `t` = amostras já gravadas/sr
+    // (nunca relógio de parede — mesma regra do `ScoreRecorder`), então é
+    // relativo à TOMADA, não ao patch inteiro. Não captura ainda mudanças
+    // de `MUTATE`/`EVOLVE`/Motion Engine durante a gravação (pendência
+    // registrada) nem os links de modulação por cabo (`connectToParameter`
+    // não tem um enumerador público no motor hoje).
+    rasgo::panel::ScoreRecorder score;
 
     std::map<std::size_t, ScopeTrace> scopes;
     for (const auto id : shown) scopes[id];  // pré-aloca (fora do RT)
+
+    // VU do MASTER com clip-latch: "o medidor esconde estouros" (achado
+    // §3.3 da auditoria de saída, NAVALHA 2 — nunca corrigido até agora).
+    // `Master::gainReductionDb()` já é telemetria pública acumulada (pico
+    // de redução desde o último `clearTelemetry()`, nunca chamado hoje) —
+    // então só ler > 0 já diz "o limitador teve que segurar algo", sem
+    // precisar de estado novo no motor. Aqui só guardamos QUANDO foi visto
+    // pela última vez, pra decair o indicador depois de alguns segundos em
+    // vez de ficar aceso pra sempre.
+    std::map<std::size_t, std::chrono::steady_clock::time_point> clipLastSeen;
 
     std::thread audio([&] {
         AudioBlock st(static_cast<float>(alsa.rate()), 2, block);
@@ -305,6 +458,22 @@ int main() {
                                       inter.begin() + period * 2);
                     else
                         recording.store(false);   // reserva cheia -> auto-para
+                    // MUSICAL SCORE — qualquer NOTE-OUT no patch pode ter
+                    // fechado uma nota neste bloco; `t` é o início da
+                    // nota (agora menos a duração), relativo à TOMADA
+                    // (mesma unidade das mudanças de parâmetro já
+                    // gravadas no Ctrl+R).
+                    const double nowElapsed =
+                        static_cast<double>(recBuf.size()) / 2.0 / alsa.rate();
+                    for (const auto id : shown) {
+                        auto* no = dynamic_cast<NoteOut*>(&graph.node(id));
+                        if (!no) continue;
+                        NoteOut::CompletedNote cn;
+                        while (no->takeCompletedNote(cn))
+                            score.note(nowElapsed - cn.durationSeconds, id,
+                                      cn.pitch, cn.velocity, cn.durationSeconds,
+                                      cn.accent);
+                    }
                 }
                 // alimenta os osciloscópios dos módulos exibidos (saída 0)
                 const std::size_t stride =
@@ -338,7 +507,7 @@ int main() {
 
     // ---- janela: monitor primário, ~88% da área, centrada -------------
     Display* dpy = XOpenDisplay(nullptr);
-    if (!dpy) { fprintf(stderr, "sem display X\n"); running = false; audio.join(); return 1; }
+    if (!dpy) { fprintf(stderr, "sem display X\n"); running = false; audio.join(); stopAudioIn(); return 1; }
     const int scr = DefaultScreen(dpy);
     const rasgo::panel::MonitorRect mon = primaryMonitor(dpy);
 
@@ -404,6 +573,8 @@ int main() {
     // Mod::w em px é recalculado no relayout (depende de `g_s`).
     struct Mod { std::size_t id; int col; int w; int hp; };
     std::vector<Mod> mods;
+    rasgo::panel::MotionEngine motion;
+    bool motionOn = true;     // [v] -- variação ao vivo dos knobs, ligada por padrão
     auto buildMods = [&] {
         mods.clear();
         for (const auto id : shown) {
@@ -419,7 +590,105 @@ int main() {
                                 pn.widgets[j].label.c_str());
         }
     };
+
+    // ---- variação ao vivo (Motion Engine, [v]) -------------------------
+    // "cada módulo fica estático" (feedback do usuário, 2026-09-04): sem
+    // isto, o knob que o seed sorteou fica parado pra sempre até alguém
+    // girar a mão. Aqui cada módulo mostrado ganha NO MÁXIMO 1 parâmetro
+    // (knob/slider, nunca toggle/jack) que deriva devagar — WALK (~73%,
+    // alvo imprevisível) ou OSCILLATE (~27%, ciclo previsível, 2026-09-05)
+    // — toque leve (`feedback_generative_design_light_touch`), não uma
+    // orquestra de comportamentos por cima de cada widget. Ver o estudo,
+    // §3. `ATTRACT` (perseguir outro parâmetro) fica de fora — pediria
+    // escolher DOIS módulos relacionados, não dá pra derivar só do hash
+    // de um nó sozinho.
+    //
+    // A JANELA de movimento é uma fração PEQUENA e IGUAL do range de cada
+    // parâmetro (`kMotionDepth`), centrada no valor atual do knob — assim
+    // todo controle animado "respira" a mesma quantidade proporcional
+    // (correção 2026-09-05: antes a janela era o range INTEIRO, então um
+    // OSCILLATE varria o parâmetro de ponta a ponta enquanto um WALK mal
+    // saía do lugar — o "6º slider do SEQUENCE se move muito mais").
+    constexpr float kMotionDepth = 0.12f;   // ±6% do range, uniforme
+    auto populateMotion = [&] {
+        motion.clear();
+        for (const auto id : shown) {
+            auto& node = graph.node(id);
+            const Panel pn = node.panel();
+            std::vector<const Widget*> eligible;
+            for (const auto& w : pn.widgets) {
+                // só KNOB — Slider no Rasgo é "a partitura" (passos do
+                // SEQUENCE) ou o fader do MIXER: não é uma regulagem que
+                // deva derivar sozinha (era o "6º slider do SEQUENCE se
+                // move muito mais").
+                if (w.kind != Widget::Kind::Knob) continue;
+                if (rasgo::panel::isMutationBlocked(w.bind)) continue;
+                // parâmetros que perto do extremo viram fuga/aspereza —
+                // derivar é arriscado (um filtro caminha pra auto-oscilar
+                // e vira apito intermitente)
+                const std::string& b = w.bind;
+                if (b == "resonance" || b == "feedback" || b == "drive"
+                    || b == "grit" || b == "fold")
+                    continue;
+                eligible.push_back(&w);
+            }
+            if (eligible.empty()) continue;
+            // hash FNV-1a (tipo+id) -- escolhe QUAL widget elegível anima
+            // e o ritmo dele; determinístico por módulo, sem depender de
+            // `curSeed` (a Motion Engine é independente do seed que gerou
+            // o cabeamento).
+            std::uint64_t h = 1469598103934665603ULL;
+            for (const char c : node.type()) {
+                h ^= static_cast<unsigned char>(c);
+                h *= 1099511628211ULL;
+            }
+            h ^= static_cast<std::uint64_t>(id) + 0x9E3779B97F4A7C15ULL;
+            h *= 1099511628211ULL;
+            const Widget* w = eligible[h % eligible.size()];
+            const Parameter* found = nullptr;
+            for (const auto& pr : node.parameters())
+                if (pr.descriptor.id == w->bind) { found = &pr; break; }
+            if (!found) continue;
+            const float pmin = found->descriptor.minimum;
+            const float pmax = found->descriptor.maximum;
+            const float prange = pmax - pmin;
+            if (prange <= 0.0f) continue;   // parâmetro sem range: nada a animar
+            rasgo::panel::MotionEngine::Binding b;
+            b.node = id;
+            b.paramId = w->bind;
+            // janela = ±kMotionDepth/2 do range, centrada no valor atual do
+            // knob; encostou numa borda -> desliza pra dentro (mantém a
+            // largura). MESMA fração pra todo binding -> movimento uniforme.
+            const float cur = graph.parameterUserValue(id, w->bind);
+            const float half = 0.5f * kMotionDepth * prange;
+            float c = cur;
+            if (c - half < pmin) c = pmin + half;
+            if (c + half > pmax) c = pmax - half;
+            b.lo = c - half;
+            b.hi = c + half;
+            b.start = cur;
+            std::uint64_t rs = h;
+            rs ^= rs >> 13; rs *= 0xBF58476D1CE4E5B9ULL; rs ^= rs >> 7;
+            // ~0,015..0,06 Hz -- WALK: alvo novo a cada ~15..60 s, deslize
+            // proporcional ("respira", não "sacoleja"); OSCILLATE: ciclo
+            // completo no mesmo intervalo de tempo (~17..67 s) -- mesma
+            // sensação de ritmo lento, comportamento diferente.
+            b.rateHz = 0.015f + 0.045f
+                * (static_cast<float>((rs >> 16) & 0xFFFFu) / 65536.0f);
+            // ~27% dos módulos oscilam (ciclo previsível) em vez de
+            // andar (alvo imprevisível) -- variedade de comportamento
+            // sem virar a maioria previsível demais
+            b.behavior = ((rs >> 32) & 0xFFu) < 70
+                ? rasgo::panel::MotionEngine::Behavior::Oscillate
+                : rasgo::panel::MotionEngine::Behavior::Walk;
+            b.seed = h ^ 0x2545F4914F6CDD1DULL;
+            motion.add(b);
+        }
+    };
+
     buildMods();
+    populateMotion();
+    syncAudioIn();
 
     // auditoria: checa a pegada (em mm) de TODO módulo do catálogo, não só
     // os exibidos - assim o `timeout` de smoke-test cobre os 16 painéis.
@@ -445,6 +714,11 @@ int main() {
     }
 
     // ---- paleta: módulos disponíveis, por família --------------------
+    // Mesma ordem do rack inicial (`shown`, ver acima):
+    // `sortFamilyForDisplay` — alfabético dentro da família, `MIXER`+
+    // `MASTER` grudados no fim. Só EXIBIÇÃO — a ordem de
+    // `ModuleCatalog.hpp::moduleCatalog()` (instanciação de nós, doador do
+    // CROSS, ordem de `seedClassifyPorts`) continua intocada.
     struct PaletteRow { int y; bool header; std::string label; std::string type; };
     std::vector<PaletteRow> palette;
     {
@@ -452,7 +726,9 @@ int main() {
         for (const auto& g : rasgo::panel::moduleCatalog()) {
             palette.push_back({py, true, g.family, ""});
             py += 17;
-            for (const char* t : g.types) {
+            std::vector<const char*> sorted = g.types;
+            sortFamilyForDisplay(sorted);
+            for (const char* t : sorted) {
                 palette.push_back({py, false, std::string("  ") + t, t});
                 py += 15;
             }
@@ -476,7 +752,23 @@ int main() {
 
     Window win = XCreateSimpleWindow(dpy, RootWindow(dpy, scr),
                                      wb.x, wb.y, wb.w, wb.h, 0, T.line, T.bg);
-    XStoreName(dpy, win, "RASGO Modular - painel de teste");
+
+    // Título da janela em UTF-8 (metodologia RASGO: todo texto é UTF-8).
+    // `XStoreName` sozinho grava `WM_NAME` como STRING (Latin-1) — um "—"
+    // ou "●" vira "â€"" na barra de título. O gerenciador de janelas
+    // moderno lê `_NET_WM_NAME` como `UTF8_STRING`; setamos os dois (o
+    // `XStoreName` fica só de fallback pra WM antigo).
+    const Atom aNetWmName = XInternAtom(dpy, "_NET_WM_NAME", False);
+    const Atom aNetWmIconName = XInternAtom(dpy, "_NET_WM_ICON_NAME", False);
+    const Atom aUtf8 = XInternAtom(dpy, "UTF8_STRING", False);
+    auto setTitle = [&](const std::string& s) {
+        const auto* d = reinterpret_cast<const unsigned char*>(s.data());
+        const int n = static_cast<int>(s.size());
+        XChangeProperty(dpy, win, aNetWmName, aUtf8, 8, PropModeReplace, d, n);
+        XChangeProperty(dpy, win, aNetWmIconName, aUtf8, 8, PropModeReplace, d, n);
+        XStoreName(dpy, win, s.c_str());
+    };
+    setTitle("RASGO Modular — painel de teste");
     XSizeHints* sh = XAllocSizeHints();
     sh->flags = PMinSize; sh->min_width = 480; sh->min_height = 320;
     XSetWMNormalHints(dpy, win, sh); XFree(sh);
@@ -489,6 +781,13 @@ int main() {
 
     int winW = wb.w, winH = wb.h, scrollY = 0, caseH = 260, modH = 260;
     int rackX0 = kPaletteW + kCasePad;   // origem da case (recalc no relayout)
+    float uiZoom = 1.0f;                 // Ctrl+= / Ctrl+- / Ctrl+0
+
+    // idioma da UI (cabeçalho/tutorial/créditos) — inglês por padrão, como
+    // os RASGO Synth; botão IDIOMA cicla EN→PT→FR→ES. Carregado do pref
+    // `ui-lang` logo abaixo. `overlay`: 0 nenhum · 1 tutorial · 2 sobre.
+    rasgo::panel::Lang uiLang = rasgo::panel::Lang::en;
+    int overlay = 0;
 
     // recalcula `g_s` pela altura, as larguras px, e distribui os módulos
     // numa case de largura de rack (104 HP), centrada, que quebra em linhas
@@ -497,6 +796,9 @@ int main() {
         const int caseAvailH = std::max(120, winH - kCaseTop - kCasePad);
         g_s = (static_cast<float>(caseAvailH) / kTargetRows - kCasePad) / kMM3U;
         g_s = std::min(kSMax, std::max(kSMin, g_s));
+        // zoom de conteúdo (Ctrl+=/-): no-op em uiZoom==1.0; deixa `g_s` cair
+        // abaixo de kSMin ao reduzir (é o objetivo — panorama pra cabear).
+        g_s = std::min(kSMax * 1.3f, std::max(kSMin * 0.5f, g_s * uiZoom));
         modH = mmpx(kMM3U);
         const int gapPx = mmpx(kModGapMM);
         for (auto& m : mods) m.w = mmpx(static_cast<float>(m.hp) * kMMHP);
@@ -532,6 +834,45 @@ int main() {
                            static_cast<unsigned>(std::max(1, winH)),
                            static_cast<unsigned>(depth));
     };
+
+    // marca RASGO — pré-composta UMA vez num Pixmap: a cobertura em tons
+    // de cinza do SVG (com anti-aliasing) é misturada do fundo pra a cor
+    // de acento, então o desenho a cada quadro é só um XCopyArea. Sem
+    // dependência de imagem — a cobertura vem de `assets/rasgo_logo_gray.h`
+    // (gerado por `regen_logo.sh`).
+    const Pixmap logoPix = XCreatePixmap(
+        dpy, win, static_cast<unsigned>(rasgo_logo_w),
+        static_cast<unsigned>(rasgo_logo_h), static_cast<unsigned>(depth));
+    {
+        // rampa fundo→acento (33 níveis) via o mesmo alocador de cor
+        unsigned long ramp[33];
+        for (int k = 0; k <= 32; ++k) {
+            const float t = static_cast<float>(k) / 32.0f;
+            auto mix = [&](int bg8, int ac8) {
+                return static_cast<unsigned short>(
+                    (bg8 + (ac8 - bg8) * t) * 256.0f);
+            };
+            ramp[k] = C(mix(0x13, 0xff), mix(0x15, 0x9d), mix(0x1a, 0x4c));
+        }
+        XImage* img = XCreateImage(dpy, DefaultVisual(dpy, scr),
+                                   static_cast<unsigned>(depth), ZPixmap, 0,
+                                   nullptr, static_cast<unsigned>(rasgo_logo_w),
+                                   static_cast<unsigned>(rasgo_logo_h), 32, 0);
+        img->data = static_cast<char*>(
+            std::malloc(static_cast<std::size_t>(img->bytes_per_line)
+                        * static_cast<std::size_t>(rasgo_logo_h)));
+        for (int y = 0; y < rasgo_logo_h; ++y)
+            for (int x = 0; x < rasgo_logo_w; ++x) {
+                const int cov = rasgo_logo_gray[y * rasgo_logo_w + x];
+                XPutPixel(img, x, y, ramp[(cov * 32) / 255]);
+            }
+        GC tmp = XCreateGC(dpy, logoPix, 0, nullptr);
+        XPutImage(dpy, logoPix, tmp, img, 0, 0, 0, 0,
+                  static_cast<unsigned>(rasgo_logo_w),
+                  static_cast<unsigned>(rasgo_logo_h));
+        XFreeGC(dpy, tmp);
+        XDestroyImage(img);   // libera img->data também
+    }
 
     auto text = [&](int x, int y, const std::string& s, unsigned long c) {
         XSetForeground(dpy, gc, c);
@@ -661,11 +1002,74 @@ int main() {
 
     std::map<std::size_t, ScopeTrace> scopeSnap;
     std::uint64_t seedNum = 0;
-    // retângulo do botão SEED na faixa de status (recalculado — winW muda)
-    auto seedButton = [&] {
-        const int bw = 96, bh = 26, bx = winW - bw - 12, by = 10;
-        return std::array<int, 4>{bx, by, bw, bh};
+
+    // ---- cabeçalho de linha única (modelo RASGO Synth) ----------------
+    // `redraw` monta `headerHits` a cada quadro; o laço de evento lê a
+    // lista pra rotear o clique pro `act*` certo. `hdrFlash` acende um
+    // botão momentâneo por ~160 ms depois de acionado.
+    enum HdrAct { HA_NONE, HA_SEED, HA_REC, HA_LANG, HA_TUTORIAL, HA_ABOUT,
+                  HA_VARY, HA_STANDBY, HA_MUTATE, HA_EVOLVE, HA_CROSS,
+                  HA_BANK, HA_SAVE, HA_ZOUT, HA_ZIN };
+    struct HdrHit { int x, y, w, h; HdrAct act; };
+    std::vector<HdrHit> headerHits;
+    std::map<int, std::chrono::steady_clock::time_point> hdrFlash;
+
+    // dwell da caixa LEARN — ver o bloco no `redraw`
+    std::string learnHoverKey;
+    std::chrono::steady_clock::time_point learnHoverSince{};
+    const rasgo::panel::LearnEntry* learnShown = nullptr;
+    std::string learnShownTitle;
+    // rótulo do botão SEED (o número pode ter até 9 dígitos no [g], e um
+    // `RASGO_SEED=N` pode ter mais — abrevia com "…" acima de 10 dígitos)
+    auto seedLabel = [&](char* out, const std::size_t n) {
+        if (seedNum == 0) { std::snprintf(out, n, "\xE2\x9A\x84 SEED"); return; }
+        char num[24];
+        std::snprintf(num, sizeof num, "%llu",
+                      static_cast<unsigned long long>(seedNum));
+        if (std::strlen(num) > 10) { num[9] = '\0'; std::strcat(num, "\xE2\x80\xA6"); }
+        std::snprintf(out, n, "\xE2\x9A\x84 SEED %s", num);
     };
+    // quebra `s` (com '\n' respeitados) em linhas que cabem em `maxPx`.
+    auto textW = [&](const std::string& t) -> int {
+        if (t.empty()) return 0;
+        if (fs) {
+            XRectangle ink, logical;
+            return Xutf8TextExtents(fs, t.c_str(),
+                                   static_cast<int>(t.size()), &ink, &logical);
+        }
+        return static_cast<int>(t.size()) * 6;
+    };
+    auto wrapText = [&](const std::string& s, int maxPx) -> std::vector<std::string> {
+        std::vector<std::string> out;
+        std::string para;
+        auto emitPara = [&] {
+            std::string line, word;
+            auto pushWord = [&] {
+                if (word.empty()) return;
+                const std::string cand = line.empty() ? word : line + " " + word;
+                if (!line.empty() && textW(cand) > maxPx) {
+                    out.push_back(line);
+                    line = word;
+                } else {
+                    line = cand;
+                }
+                word.clear();
+            };
+            for (const char c : para) {
+                if (c == ' ') pushWord();
+                else word += c;
+            }
+            pushWord();
+            out.push_back(line);
+        };
+        for (const char c : s) {
+            if (c == '\n') { emitPara(); para.clear(); }
+            else para += c;
+        }
+        emitPara();
+        return out;
+    };
+
     auto redraw = [&] {
         rebuildJacks();
         // snapshot dos osciloscópios SEM bloquear: se o thread de áudio
@@ -675,55 +1079,317 @@ int main() {
         XSetForeground(dpy, gc, T.bg);
         XFillRectangle(dpy, bb, gc, 0, 0, winW, winH);
 
-        // faixa de status (recortada à direita da paleta, sem passar sob o botão)
-        clipTo(kPaletteW, 0, std::max(40, winW - kPaletteW - 124), kCaseTop);
-        text(kPaletteW + kCasePad, 28,
-             "puxe um cabo entre jacks (halo duplo = mesmo tipo de sinal) · "
-             "botão direito tira · arraste o módulo pra mover · [x]/paleta remove "
-             "· [g] seed aleatório · [Ctrl+B] guarda no banco · [Ctrl+S] salva · [Ctrl+R] grava · [q] sai",
-             recording.load() ? T.warning : T.textSecondary);
-        if (recording.load())
-            text(kPaletteW + kCasePad, 42, "● GRAVANDO — [Ctrl+R] pra parar e salvar o .wav",
-                 T.warning);
-        clipOff();
-
-        // botão SEED — gera um cabeamento novo e já toca ([g] faz o mesmo)
+        // ---- LEARN: acha o widget sob o mouse (o texto vai numa caixa
+        // fixa no rodapé da coluna esquerda, estilo terminal — NÃO flutua
+        // sobre o painel; modelo do ANTITOTEM, pedido do autor 2026-09-05)
+        const rasgo::panel::LearnEntry* rawHit = nullptr;
+        std::string rawTitle, rawKey;
         {
-            const auto r = seedButton();
+            for (const auto& m : mods) {
+                const auto [bx, by] = modOrigin(m);
+                if (mouseX < bx || mouseX > bx + m.w
+                    || mouseY < by || mouseY > by + modH) continue;
+                Signal& node = graph.node(m.id);
+                const std::string mt = node.type();
+                for (const auto& w : node.panel().widgets) {
+                    if (w.bind.empty()) continue;
+                    Rect fp = footprintPx(w);
+                    fp.x += bx; fp.y += by;
+                    if (mouseX < fp.x || mouseX > fp.x + fp.w
+                        || mouseY < fp.y || mouseY > fp.y + fp.h) continue;
+                    rawHit = rasgo::panel::lookupLearn(mt, w.bind);
+                    if (rawHit) {
+                        rawTitle = mt + "  \xC2\xB7  " + w.label;
+                        rawKey = std::to_string(m.id) + "|" + w.bind;
+                    }
+                    break;
+                }
+                break;
+            }
+        }
+        // dwell: o conteúdo da caixa LEARN só troca depois de ~2 s parado
+        // sobre o MESMO objeto — senão pisca a cada movimento do mouse
+        // (pedido do autor 2026-09-05). Fora de qualquer widget, mantém o
+        // último — mais calmo que voltar pra a linha-guia a cada relance.
+        {
+            const auto now = std::chrono::steady_clock::now();
+            if (rawKey != learnHoverKey) {
+                learnHoverKey = rawKey;
+                learnHoverSince = now;
+            } else if (!rawKey.empty() && rawHit != learnShown
+                       && now - learnHoverSince >= std::chrono::milliseconds(2000)) {
+                learnShown = rawHit;
+                learnShownTitle = rawTitle;
+            }
+        }
+        const rasgo::panel::LearnEntry* learnHit = learnShown;
+        const std::string& learnHitTitle = learnShownTitle;
+
+        // ==== CABEÇALHO (linha única, altura kCaseTop) =================
+        // modelo dos RASGO Synth: wordmark · barra de comandos ·
+        // leitura de estado · pico · SEED · REC · IDIOMA/TUTORIAL/SOBRE.
+        // Tudo via `tr()` (idioma corrente); rótulos de módulo NÃO.
+        namespace S = rasgo::panel::strings;
+        using rasgo::panel::tr;
+        headerHits.clear();
+        const auto hdrNow = std::chrono::steady_clock::now();
+        auto flashing = [&](int a) {
+            auto it = hdrFlash.find(a);
+            return it != hdrFlash.end()
+                && hdrNow - it->second < std::chrono::milliseconds(160);
+        };
+        const int hbY = 10, hbH = 22, hbBase = hbY + 15;
+        // Um botão do cabeçalho. `active` = TOGGLE ligado (estado que
+        // fica) — ganha ANEL externo, destaque persistente. `flashing` =
+        // clique momentâneo (MUTA/EVOLUI/…) — só um preenchimento de
+        // ~160 ms, SEM anel. `onCol` distingue REC (vermelho) dos demais.
+        auto hdrBtnC = [&](int x, const std::string& label, bool active,
+                           HdrAct act, unsigned long onCol) -> int {
+            const int pad = 7, w = textW(label) + pad * 2;
+            const bool lit = active || flashing(act);
+            if (lit) { XSetForeground(dpy, gc, onCol);
+                       XFillRectangle(dpy, bb, gc, x, hbY, w, hbH); }
+            XSetForeground(dpy, gc, lit ? onCol : T.line);
+            XDrawRectangle(dpy, bb, gc, x, hbY, w, hbH);
+            if (active)   // toggle LIGADO: anel de destaque (idioma do
+                          // realce de módulo arrastado, §case)
+                XDrawRectangle(dpy, bb, gc, x - 2, hbY - 2, w + 3, hbH + 3);
+            text(x + pad, hbBase, label, lit ? T.bg : T.textSecondary);
+            headerHits.push_back({x, hbY, w, hbH, act});
+            return w;
+        };
+        auto hdrBtn = [&](int x, const std::string& label, bool active,
+                          HdrAct act) {
+            return hdrBtnC(x, label, active, act, T.accent);
+        };
+
+        // wordmark: marca RASGO (pré-composta, anti-aliased) + "MODULAR"
+        int hx = kPaletteW + kCasePad;
+        XCopyArea(dpy, logoPix, bb, gc, 0, 0,
+                  static_cast<unsigned>(rasgo_logo_w),
+                  static_cast<unsigned>(rasgo_logo_h),
+                  hx, hbY + (hbH - rasgo_logo_h) / 2);
+        hx += rasgo_logo_w + 7;
+        text(hx, hbBase, "MODULAR", T.textSecondary);
+        hx += textW("MODULAR") + 12;
+        XSetForeground(dpy, gc, T.line);
+        XDrawLine(dpy, bb, gc, hx - 6, hbY, hx - 6, hbY + hbH);
+
+        // ---- cluster da direita, montado da borda pra dentro ----------
+        int rx = winW - 12;
+        auto hdrBtnR = [&](const std::string& label, bool active, HdrAct act,
+                           unsigned long onCol = 0) {
+            if (onCol == 0) onCol = T.accent;
+            const int padL = 7, w = textW(label) + padL * 2;
+            rx -= w;
+            const bool lit = active || flashing(act);
+            if (lit) { XSetForeground(dpy, gc, onCol);
+                       XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH); }
+            XSetForeground(dpy, gc, lit ? onCol : T.line);
+            XDrawRectangle(dpy, bb, gc, rx, hbY, w, hbH);
+            if (active)   // toggle LIGADO: anel de destaque
+                XDrawRectangle(dpy, bb, gc, rx - 2, hbY - 2, w + 3, hbH + 3);
+            text(rx + padL, hbBase, label, lit ? T.bg : T.textSecondary);
+            headerHits.push_back({rx, hbY, w, hbH, act});
+            rx -= 6;
+        };
+        hdrBtnR(tr(S::hdrAbout, uiLang), overlay == 2, HA_ABOUT);
+        hdrBtnR(tr(S::hdrTutorial, uiLang), overlay == 1, HA_TUTORIAL);
+        hdrBtnR(rasgo::panel::langLabel(uiLang), false, HA_LANG);
+        rx -= 8;
+        // REC — toggle vermelho (T.warning), com o mesmo anel de destaque
+        hdrBtnR(std::string("\xE2\x97\x8F ") + tr(S::hdrRec, uiLang),
+                recording.load(), HA_REC, T.warning);
+        rx -= 2;
+        {   // SEED — sempre cheio (cor de acento), como o botão antigo
+            char lab[40]; seedLabel(lab, sizeof lab);
+            const int w = textW(lab) + 16;
+            rx -= w;
             XSetForeground(dpy, gc, T.accent);
-            XFillRectangle(dpy, bb, gc, r[0], r[1], r[2], r[3]);
-            XSetForeground(dpy, gc, T.bg);
-            char lab[40];
-            if (seedNum == 0) std::snprintf(lab, sizeof lab, "\xE2\x9A\x84 SEED");
-            else std::snprintf(lab, sizeof lab, "\xE2\x9A\x84 SEED %llu",
-                               static_cast<unsigned long long>(seedNum));
-            text(r[0] + 10, r[1] + 17, lab, T.bg);
+            XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
+            text(rx + 8, hbBase, lab, T.bg);
+            headerHits.push_back({rx, hbY, w, hbH, HA_SEED});
+            rx -= 10;
+        }
+
+        // pico da saída do MASTER (lê o snapshot dos osciloscópios) e o
+        // estado de STANDBY (= `mute` de algum MASTER — o botão do
+        // cabeçalho e o toggle do módulo compartilham o mesmo estado)
+        float mPeak = 0.0f;
+        bool masterMuted = false;
+        for (const auto& m : mods)
+            if (graph.node(m.id).type() == "MASTER") {
+                if (graph.parameterUserValue(m.id, "mute") >= 0.5f)
+                    masterMuted = true;
+                auto it = scopeSnap.find(m.id);
+                if (it != scopeSnap.end())
+                    for (const float v : it->second.buf)
+                        mPeak = std::max(mPeak, std::fabs(v));
+            }
+        const float mDb = mPeak > 1.0e-4f ? 20.0f * std::log10(mPeak) : -60.0f;
+        {
+            const std::string peakTxt = tr(S::rdPeak, uiLang);
+            char db[16]; std::snprintf(db, sizeof db, "%.0f", mDb);
+            const int mw = 44, mh = 8;
+            const int grpW = textW(peakTxt) + 6 + mw + 6 + textW(db);
+            if (rx - hx > grpW + 44) {
+                rx -= grpW;
+                int gx = rx;
+                text(gx, hbBase, peakTxt, T.textSecondary);
+                gx += textW(peakTxt) + 6;
+                const int my = hbY + (hbH - mh) / 2;
+                const float frac = std::min(1.0f, mPeak / 0.891f);
+                XSetForeground(dpy, gc, T.recessed);
+                XFillRectangle(dpy, bb, gc, gx, my, mw, mh);
+                XSetForeground(dpy, gc, frac < 0.85f ? T.accent : T.warning);
+                if (frac > 0.001f)
+                    XFillRectangle(dpy, bb, gc, gx, my,
+                                   static_cast<int>(frac * mw), mh);
+                gx += mw + 6;
+                text(gx, hbBase, db,
+                     frac < 0.85f ? T.textSecondary : T.warning);
+                rx -= 12;
+            }
+        }
+        {   // leitura N mód · M cabos
+            const std::string rd = std::to_string(mods.size()) + " "
+                + tr(S::rdModules, uiLang) + "  \xC2\xB7  "
+                + std::to_string(graph.cableCount()) + " "
+                + tr(S::rdCables, uiLang);
+            if (rx - hx > textW(rd) + 24) {
+                rx -= textW(rd);
+                text(rx, hbBase, rd, T.textSecondary);
+                rx -= 12;
+            }
+        }
+
+        // ---- barra de comandos ao centro (enche o vão; corta à direita)
+        // `MUTE` fica FORA do bloco — isolado no fim, depois do ZOOM e de
+        // um vão largo, pra não clicar nele sem querer (pedido do autor).
+        struct CmdB { const rasgo::panel::L4* label; bool active; HdrAct act; };
+        const CmdB cmds[] = {
+            {&S::hdrVary,   motionOn,    HA_VARY},
+            {&S::hdrChange, false,       HA_MUTATE},
+            {&S::hdrEvolve, false,       HA_EVOLVE},
+            {&S::hdrCross,  false,       HA_CROSS},
+            {&S::hdrBank,   false,       HA_BANK},
+            {&S::hdrSave,   false,       HA_SAVE},
+        };
+        for (const auto& cb : cmds) {
+            const std::string L = tr(*cb.label, uiLang);
+            if (hx + textW(L) + 14 > rx - 8) break;
+            hx += hdrBtn(hx, L, cb.active, cb.act) + 5;
+        }
+        if (hx + 24 + 40 < rx - 8) {   // ZOOM − / +
+            text(hx, hbBase, "ZOOM", T.textSecondary);
+            hx += textW("ZOOM") + 5;
+            hx += hdrBtn(hx, "\xE2\x88\x92", false, HA_ZOUT) + 3;  // −
+            hx += hdrBtn(hx, "+", false, HA_ZIN) + 5;
+        }
+        {   // STANDBY — isolado: vão largo + régua vertical antes dele.
+            // Aciona o `mute` do MASTER (silêncio limpo, com rampa) — NÃO
+            // rompe cabos; o rompe-tudo continua só na tecla [espaço].
+            const std::string L = tr(S::hdrStandby, uiLang);
+            if (hx + 22 + textW(L) + 14 < rx - 8) {
+                hx += 16;
+                XSetForeground(dpy, gc, T.line);
+                XDrawLine(dpy, bb, gc, hx, hbY + 2, hx, hbY + hbH - 2);
+                hx += 12;
+                hdrBtn(hx, L, masterMuted, HA_STANDBY);
+            }
         }
 
         XSetForeground(dpy, gc, T.line);
         XDrawLine(dpy, bb, gc, 0, kCaseTop - 4, winW, kCaseTop - 4);
 
         // ---- paleta (coluna esquerda) --------------------------------
+        // com o modo Learn ligado, a caixa LEARN ocupa o rodapé da coluna
+        // -> a lista de módulos encurta (não sobrepõe).
+        const int palBottom = winH - kLearnH;
         XSetForeground(dpy, gc, T.recessed);
-        XFillRectangle(dpy, bb, gc, 0, kCaseTop, kPaletteW, winH - kCaseTop);
+        XFillRectangle(dpy, bb, gc, 0, kCaseTop, kPaletteW, palBottom - kCaseTop);
         XSetForeground(dpy, gc, T.line);
         XDrawLine(dpy, bb, gc, kPaletteW, kCaseTop, kPaletteW, winH);
-        clipTo(0, kCaseTop, kPaletteW - 2, winH - kCaseTop);
+        clipTo(0, kCaseTop, kPaletteW - 2, palBottom - kCaseTop);
         text(10, kCaseTop + 2 - paletteScroll + 12, "MÓDULOS", T.textSecondary);
+        // passar o mouse num tipo da paleta destaca onde ele está na case
+        // (mesma faixa de acerto do clique-pra-adicionar, logo abaixo) —
+        // "facilitar identificar onde está o módulo no painel" (feedback
+        // do autor, 2026-09-05).
+        std::string paletteHoverType;
+        if (mouseX < kPaletteW && mouseY < palBottom) {
+            for (const auto& pr : palette) {
+                if (pr.header) continue;
+                const int y = pr.y - paletteScroll + 20;
+                if (mouseY >= y - 12 && mouseY <= y + 3) { paletteHoverType = pr.type; break; }
+            }
+        }
         for (const auto& pr : palette) {
             const int y = pr.y - paletteScroll + 20;
-            if (y < kCaseTop + 8 || y > winH) continue;
+            if (y < kCaseTop + 8 || y > palBottom) continue;
+            if (!pr.header && pr.type == paletteHoverType) {
+                XSetForeground(dpy, gc, T.recessed);
+                XFillRectangle(dpy, bb, gc, 0, y - 12, kPaletteW - 2, 16);
+            }
             text(pr.header ? 8 : 12, y,
                  pr.header ? pr.label : ("· " + pr.type),
-                 pr.header ? T.accent : T.textPrimary);
+                 pr.header ? T.accent
+                 : (pr.type == paletteHoverType ? T.accent : T.textPrimary));
         }
         if (mdrag.active && mouseX < kPaletteW) {   // soltar aqui = remover
             XSetForeground(dpy, gc, T.warning);
             XDrawRectangle(dpy, bb, gc, 2, kCaseTop + 2, kPaletteW - 4,
-                           winH - kCaseTop - 4);
-            text(10, winH / 2, "soltar = remover", T.warning);
+                           palBottom - kCaseTop - 4);
+            text(10, (kCaseTop + palBottom) / 2, "soltar = remover", T.warning);
         }
         clipOff();
+
+        // ---- caixa LEARN (rodapé da coluna esquerda, estilo terminal) --
+        {
+            const int lx = 3, ly = winH - kLearnH + 2;
+            const int lw = kPaletteW - 6, lh = kLearnH - 5;
+            XSetForeground(dpy, gc, T.bg);
+            XFillRectangle(dpy, bb, gc, lx, ly, lw, lh);
+            XSetForeground(dpy, gc, learnHit ? T.accent : T.line);
+            XDrawRectangle(dpy, bb, gc, lx, ly, lw, lh);
+            clipTo(lx + 1, ly + 1, lw - 2, lh - 2);
+            const int tx = lx + 8;
+            int ty = ly + 16;
+            text(tx, ty, "LEARN", T.textSecondary);
+            ty += 6;
+            XSetForeground(dpy, gc, T.line);
+            XDrawLine(dpy, bb, gc, tx, ty, lx + lw - 8, ty);
+            ty += 15;
+            const int wrapPx = lw - 16;
+            if (!learnHit) {
+                for (const auto& ln : wrapText(
+                         "passe o mouse sobre um knob ou jack\n"
+                         "de um módulo do rack.", wrapPx)) {
+                    text(tx, ty, ln, T.textSecondary);
+                    ty += 14;
+                }
+            } else {
+                text(tx, ty, learnHitTitle, T.accent);
+                ty += 17;
+                struct Seg { const std::string& s; unsigned long c; const char* pre; };
+                const Seg segs[] = {
+                    {learnHit->quick, T.textPrimary, ""},
+                    {learnHit->understand, T.textSecondary, ""},
+                    {learnHit->explore, T.accent, "\xE2\x86\x92 "},
+                };
+                for (const auto& seg : segs) {
+                    if (seg.s.empty()) continue;
+                    for (const auto& ln :
+                         wrapText(std::string(seg.pre) + seg.s, wrapPx)) {
+                        if (ty > ly + lh - 6) break;
+                        text(tx, ty, ln, seg.c);
+                        ty += 14;
+                    }
+                    ty += 7;
+                }
+            }
+            clipOff();
+        }
 
         // ---- case: os módulos (cada um recortado à sua caixa) --------
         clipTo(kPaletteW + 1, kCaseTop, winW - kPaletteW, winH - kCaseTop);
@@ -734,11 +1400,12 @@ int main() {
             const Panel pn = node.panel();
             const std::string mtype = node.type();
             const bool dragged = mdrag.active && mdrag.id == m.id;
+            const bool paletteHit = !paletteHoverType.empty() && mtype == paletteHoverType;
             XSetForeground(dpy, gc, T.surface);
             XFillRectangle(dpy, bb, gc, bx, by, m.w, modH);
-            XSetForeground(dpy, gc, dragged ? T.accent : T.line);
+            XSetForeground(dpy, gc, (dragged || paletteHit) ? T.accent : T.line);
             XDrawRectangle(dpy, bb, gc, bx, by, m.w, modH);
-            if (dragged)
+            if (dragged || paletteHit)
                 XDrawRectangle(dpy, bb, gc, bx - 1, by - 1, m.w + 2, modH + 2);
             XSetForeground(dpy, gc, T.line);
             XDrawLine(dpy, bb, gc, bx + 2, by + 3, bx + m.w - 2, by + 3);
@@ -769,7 +1436,9 @@ int main() {
                 case Widget::Kind::Display: {
                     int dw = mmpx(w.span > 1.0f ? w.span : 16.0f);
                     dw = std::min(dw, m.w - mmpx(w.x) - mmpx(2.0f));
-                    const int dh = mmpx(13.0f);
+                    // altura 16 mm (era 13) — osciloscópios/espectros com
+                    // mais respiro (pedido do autor 2026-09-06)
+                    const int dh = mmpx(16.0f);
                     XSetForeground(dpy, gc, T.recessed);
                     XFillRectangle(dpy, bb, gc, wx, wy, dw, dh);
                     XSetForeground(dpy, gc, T.line);
@@ -777,9 +1446,46 @@ int main() {
                     const auto si = scopeSnap.find(m.id);
                     const int view = mtype == "SCOPE" ? scopeView[m.id] : 0;
                     const char* dlabel = w.label.c_str();
+                    char dbTxt[16] = {};  // vida até o text() no fim do case
                     if (si != scopeSnap.end() && dw > 6) {
                         const ScopeTrace& sc = si->second;
-                        if (mtype == "TRIGSEQ") {
+                        if (mtype == "MASTER") {
+                            // VU com clip-latch — "o medidor esconde
+                            // estouros" (achado §3.3 da auditoria de saída,
+                            // NAVALHA 2). Barra = pico da janela recente
+                            // relativo ao teto (−1 dBFS = 0,891); o
+                            // indicador vermelho acende quando o
+                            // LIMITADOR de verdade teve que segurar algo
+                            // (`gainReductionDb()`, telemetria pública já
+                            // existente — não é só o pico bruto passar de
+                            // um número) e decai depois de ~2 s sem novo
+                            // estouro.
+                            dlabel = "vu";
+                            float peak = 0.0f;
+                            for (const float v : sc.buf)
+                                peak = std::max(peak, std::fabs(v));
+                            const float frac = std::min(1.0f, peak / 0.891f);
+                            const int barW = static_cast<int>(frac * (dw - 2));
+                            XSetForeground(dpy, gc, frac < 0.7f ? T.accent : T.warning);
+                            if (barW > 0)
+                                XFillRectangle(dpy, bb, gc, wx + 1, wy + 1,
+                                              barW, dh - 2);
+                            if (auto* mst = dynamic_cast<Master*>(&node))
+                                if (mst->gainReductionDb() > 0.05f)
+                                    clipLastSeen[m.id] = std::chrono::steady_clock::now();
+                            const auto itClip = clipLastSeen.find(m.id);
+                            const bool clipping = itClip != clipLastSeen.end()
+                                && std::chrono::steady_clock::now() - itClip->second
+                                   < std::chrono::seconds(2);
+                            if (clipping) {
+                                XSetForeground(dpy, gc, T.warning);
+                                XFillRectangle(dpy, bb, gc, wx + dw - 7, wy + 1,
+                                              6, dh - 2);
+                            }
+                            std::snprintf(dbTxt, sizeof dbTxt, "%.0fdB",
+                                         20.0f * std::log10(std::max(peak, 1.0e-4f)));
+                            dlabel = dbTxt;
+                        } else if (mtype == "TRIGSEQ") {
                             // 4 lanes de gate (t1-t4) rolando — piano-roll
                             dlabel = "t1-t4";
                             const int nL = static_cast<int>(kLaneLen);
@@ -970,7 +1676,7 @@ int main() {
 
             // ---- MATRIX: grade 4×4 de ganhos, clicável -------------------
             if (mtype == "MATRIX") {
-                capText(bx + mmpx(50.0f), by + mmpx(24.0f),
+                capText(bx + mmpx(50.0f), by + mmpx(20.0f),
                         "IN \xE2\x86\x93   OUT \xE2\x86\x92", T.textSecondary);
                 for (int j = 0; j < 4; ++j) {
                     for (int k = 0; k < 4; ++k) {
@@ -1038,10 +1744,72 @@ int main() {
         }
         clipOff();
 
+        // (o hover-learn agora vai na caixa LEARN fixa do rodapé da
+        // coluna esquerda — desenhada junto da paleta, acima — pra não
+        // flutuar sobre o painel; `learnHit`/`learnHitTitle` no topo do
+        // `redraw`. `dossies/ESTUDO_seed_composicao_generativa.md §6`.)
+
         // fantasma do módulo sendo arrastado do catálogo
         if (!spawnType.empty()) {
             XSetForeground(dpy, gc, T.accent);
             text(spawnX + 8, spawnY, "+ " + spawnType, T.accent);
+        }
+
+        // ==== OVERLAY: tutorial / sobre ================================
+        // qualquer clique (ou [Esc]) fecha — ver o laço de evento.
+        if (overlay) {
+            XSetForeground(dpy, gc, T.recessed);
+            XFillRectangle(dpy, bb, gc, 0, 0, winW, winH);
+            const int cw = std::min(760, winW - 60);
+            const int chh = std::min(winH - 60, overlay == 1 ? 600 : 240);
+            const int cxx = (winW - cw) / 2, cyy = (winH - chh) / 2;
+            XSetForeground(dpy, gc, T.surface);
+            XFillRectangle(dpy, bb, gc, cxx, cyy, cw, chh);
+            XSetForeground(dpy, gc, T.accent);
+            XDrawRectangle(dpy, bb, gc, cxx, cyy, cw, chh);
+            clipTo(cxx + 1, cyy + 1, cw - 2, chh - 2);
+            const int px = cxx + 24, wrapPx = cw - 48;
+            int py = cyy + 30;
+            {   // CLOSE (canto sup. direito do card) — decorativo: o clique
+                // fecha em qualquer lugar
+                const std::string cl = tr(S::close, uiLang);
+                const int w = textW(cl) + 14, bxc = cxx + cw - w - 12,
+                          byc = cyy + 10;
+                XSetForeground(dpy, gc, T.line);
+                XDrawRectangle(dpy, bb, gc, bxc, byc, w, 20);
+                text(bxc + 7, byc + 14, cl, T.textSecondary);
+            }
+            if (overlay == 1) {
+                text(px, py, tr(S::tutTitle, uiLang), T.accent);
+                py += 18;
+                text(px, py, tr(S::tutSubtitle, uiLang), T.textSecondary);
+                py += 26;
+                const rasgo::panel::L4* cards[][2] = {
+                    {&S::tutCableTitle, &S::tutCableBody},
+                    {&S::tutSeedTitle,  &S::tutSeedBody},
+                    {&S::tutVaryTitle,  &S::tutVaryBody},
+                    {&S::tutMoveTitle,  &S::tutMoveBody},
+                    {&S::tutZoomTitle,  &S::tutZoomBody},
+                    {&S::tutLearnTitle, &S::tutLearnBody},
+                };
+                for (auto& c : cards) {
+                    text(px, py, tr(*c[0], uiLang), T.textPrimary);
+                    py += 16;
+                    for (const auto& ln : wrapText(tr(*c[1], uiLang), wrapPx)) {
+                        text(px, py, ln, T.textSecondary);
+                        py += 14;
+                    }
+                    py += 10;
+                }
+            } else {
+                text(px, py, "RASGO MODULAR", T.accent);
+                py += 24;
+                for (const auto& ln : wrapText(tr(S::aboutBody, uiLang), wrapPx)) {
+                    text(px, py, ln, T.textSecondary);
+                    py += 15;
+                }
+            }
+            clipOff();
         }
 
         XCopyArea(dpy, bb, win, gc, 0, 0,
@@ -1084,6 +1852,8 @@ int main() {
         }
         shown.erase(std::remove(shown.begin(), shown.end(), id), shown.end());
         buildMods();
+        populateMotion();
+        syncAudioIn();
         relayout();
     };
 
@@ -1125,6 +1895,20 @@ int main() {
         return d;
     };
     const std::filesystem::path sessionFile = dataDir() / "session.rmp";
+
+    // pref de idioma — arquivo próprio (uma linha, o código), independente
+    // do patch: sobrevive a abrir num seed novo, não só no `--resume`.
+    const std::filesystem::path langPrefFile = dataDir() / "ui-lang";
+    {
+        std::ifstream lf(langPrefFile);
+        std::string code;
+        if (lf && (lf >> code)) uiLang = rasgo::panel::langFromCode(code);
+    }
+    auto saveLangPref = [&] {
+        std::ofstream lf(langPrefFile);
+        if (lf) lf << rasgo::panel::langCode(uiLang) << '\n';
+    };
+
     auto panelFactory = [](const std::string& t) -> std::unique_ptr<Signal> {
         if (t == "OUT") return std::make_unique<Out>();
         return rasgo::panel::makeModule(t);
@@ -1185,6 +1969,8 @@ int main() {
             graph.prepare(sr, 2, block);
             graph.setActiveOutput(sink);  // o move zerou o alvo ativo
             buildMods();
+            populateMotion();
+            syncAudioIn();
             relayout();
             std::fprintf(stderr, "[patch] carregado de %s\n",
                          path.string().c_str());
@@ -1203,11 +1989,20 @@ int main() {
         char name[64];
         std::snprintf(name, sizeof name, "rec-%02d.wav", ++recCount);
         const auto p = dataDir() / name;
+        // dither TPDF ligado (seed != 0) -- gravação real do usuário, não
+        // um render de auditoria/exemplo (ver `src/io/WavWriter.hpp`)
         rasgo::modular::writeWav16(p.string(), copy,
-                                   static_cast<std::uint32_t>(alsa.rate()), 2);
-        std::fprintf(stderr, "[rec] %.1f s -> %s\n",
+                                   static_cast<std::uint32_t>(alsa.rate()), 2,
+                                   static_cast<std::uint64_t>(recCount));
+        char scoreName[64];
+        std::snprintf(scoreName, sizeof scoreName, "rec-%02d.score.txt", recCount);
+        std::ofstream sf(dataDir() / scoreName);
+        std::string scoreText;
+        { std::lock_guard<std::mutex> lk(gmx); scoreText = score.toText(); }
+        sf << scoreText;
+        std::fprintf(stderr, "[rec] %.1f s -> %s (+ %s)\n",
                      static_cast<double>(copy.size()) / 2.0 / alsa.rate(),
-                     p.string().c_str());
+                     p.string().c_str(), scoreName);
         { std::lock_guard<std::mutex> lk(gmx); recBuf.reserve(copy.capacity()); }
     };
 
@@ -1241,22 +2036,181 @@ int main() {
         }
         allRuptured = false;
         buildMods();
+        populateMotion();
+        syncAudioIn();
         relayout();
         char t[64];
         std::snprintf(t, sizeof t, "RASGO Modular — seed %llu",
                       static_cast<unsigned long long>(s));
-        XStoreName(dpy, win, t);
+        setTitle(t);
         redraw();
     };
 
-    // continua de onde parou: carrega a sessão anterior, se houver.
-    // RASGO_SEED=N no ambiente -> abre já num patch de seed (reproduzir /
-    // render por seed); senão, a sessão salva.
+    // ---- ações do cabeçalho -------------------------------------------
+    // Cada comando do cabeçalho tem UMA implementação, chamada tanto pela
+    // tecla quanto pelo clique no botão da barra. (Antes viviam soltas no
+    // switch de KeyPress.)
+    auto actSeed = [&] { seedNum = nextRandomSeed(); applySeed(seedNum); };
+
+    auto actMotion = [&] {
+        motionOn = !motionOn;
+        setTitle(motionOn ? "RASGO Modular — variação ao vivo: ligada"
+                          : "RASGO Modular — variação ao vivo: pausada");
+        redraw();
+    };
+
+    // [espaço] — rompe/reata TODOS os cabos de uma vez (gesto grande)
+    auto actRupture = [&] {
+        std::lock_guard<std::mutex> lk(gmx);
+        allRuptured = !allRuptured;
+        for (std::size_t i = 0; i < graph.cableCount(); ++i) {
+            if (allRuptured) graph.cable(i).rupture();
+            else graph.cable(i).reconnect();
+        }
+        redraw();
+    };
+
+    // STANDBY (botão do cabeçalho) — liga/desliga o `mute` de todo MASTER:
+    // silêncio limpo com rampa, o patch continua rodando por baixo. Mesmo
+    // estado do toggle MUTE no painel do módulo.
+    auto actStandby = [&] {
+        bool anyOn = false;
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+            if (graph.node(i).type() == "MASTER"
+                && graph.parameterUserValue(i, "mute") >= 0.5f) anyOn = true;
+        const float v = anyOn ? 0.0f : 1.0f;
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+            if (graph.node(i).type() == "MASTER")
+                graph.setParameterBase(i, "mute", v);
+        setTitle(v >= 0.5f ? "RASGO Modular — STANDBY (saída em silêncio)"
+                           : "RASGO Modular — saída ativa");
+        redraw();
+    };
+
+    auto freezeMixMaster = [&](std::unordered_set<std::size_t>& frozen) {
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+            if (graph.node(i).type() == "MIXER"
+                || graph.node(i).type() == "MASTER")
+                frozen.insert(i);
+    };
+
+    auto actMutate = [&] {
+        // reamostra ~25% dos parâmetros não-estruturais dos nós alcançados
+        // por cabo, AGORA, uma vez. FREEZE automático em MIXER/MASTER
+        // (mitigação documentada em `PatchGenetics.hpp`).
+        std::unordered_set<std::size_t> frozen;
+        {
+            std::lock_guard<std::mutex> lk(gmx);
+            freezeMixMaster(frozen);
+            rasgo::panel::mutatePatch(graph, nextRandomSeed(), 0.25f, frozen);
+        }
+        populateMotion();  // alvos do Motion Engine reiniciam coerentes
+        setTitle("RASGO Modular — MUTATE");
+        redraw();
+    };
+
+    auto actEvolve = [&] {
+        // o mesmo destino de um MUTATE grande, em 6 passos pequenos (12%
+        // cada) — transição mais gradual que um MUTATE único de 25%.
+        std::unordered_set<std::size_t> frozen;
+        {
+            std::lock_guard<std::mutex> lk(gmx);
+            freezeMixMaster(frozen);
+            rasgo::panel::evolvePatch(graph, nextRandomSeed(), 6, 0.12f, frozen);
+        }
+        populateMotion();
+        setTitle("RASGO Modular — EVOLVE (6 passos)");
+        redraw();
+    };
+
+    auto actCross = [&] {
+        // recombina o patch atual com um DOADOR novo: o catálogo inteiro
+        // semeado com um seed fresco (igual a um patch de verdade), fração
+        // 0,5. Mesmo FREEZE de MIXER/MASTER. O doador é um grafo solto —
+        // nunca processa áudio, só é lido por `crossPatch`.
+        SignalGraph donor;
+        for (const auto& grp : rasgo::panel::moduleCatalog())
+            for (const char* t : grp.types)
+                donor.add(rasgo::panel::makeModule(t));
+        rasgo::panel::seedPatch(donor, nextRandomSeed());
+        std::unordered_set<std::size_t> frozen;
+        {
+            std::lock_guard<std::mutex> lk(gmx);
+            freezeMixMaster(frozen);
+            rasgo::panel::crossPatch(graph, donor, nextRandomSeed(), 0.5f, frozen);
+        }
+        populateMotion();
+        setTitle("RASGO Modular — CROSS");
+        redraw();
+    };
+
+    auto actBank = [&] {
+        const auto bp = bankPatch();
+        setTitle("RASGO Modular — no banco: " + bp.filename().string());
+    };
+
+    auto actSave = [&] {
+        savePatch(sessionFile);
+        setTitle("RASGO Modular — patch salvo");
+    };
+
+    auto actRec = [&] {
+        if (recording.load()) { stopRec(); redraw(); return; }
+        {
+            std::lock_guard<std::mutex> lk(gmx);
+            recBuf.clear();
+            score.clear();
+            for (std::size_t i = 0; i < graph.cableCount(); ++i) {
+                const auto& c = graph.cable(i);
+                score.connection(0.0, c.source().node, c.source().port,
+                                 c.target().node, c.target().port);
+            }
+        }
+        recording.store(true);
+        setTitle("RASGO Modular — ● GRAVANDO");
+        redraw();
+    };
+
+    // dir: -1 reduz · +1 amplia · 0 volta a 100%
+    auto actZoom = [&](const int dir) {
+        const float prev = g_s;
+        if (dir == 0) uiZoom = 1.0f;
+        else if (dir < 0) uiZoom = std::max(kZoomMin, uiZoom - kZoomStep);
+        else uiZoom = std::min(kZoomMax, uiZoom + kZoomStep);
+        relayout();
+        if (prev > 0.0f) {  // âncora: mantém o conteúdo no topo
+            scrollY = static_cast<int>(std::lround(scrollY * (g_s / prev)));
+            relayout();
+        }
+        setTitle("RASGO Modular — zoom "
+            + std::to_string(static_cast<int>(std::lround(uiZoom * 100.0f))) + "%");
+        redraw();
+    };
+
+    auto cycleLang = [&] {
+        uiLang = rasgo::panel::nextLang(uiLang);
+        saveLangPref();
+        redraw();
+    };
+
+    // "sempre quando abro o instrumento está com a mesma configuração"
+    // (feedback do autor, 2026-09-04) — abrir o RASGO Modular é abrir um
+    // INSTRUMENTO GENERATIVO (`project_rasgo_modular_identity`: soa
+    // sozinho, sem entrada, desde o load), não retomar um documento
+    // congelado. Por padrão, todo lançamento sorteia um seed novo — timbre,
+    // cabeamento e forma diferentes cada vez. `RASGO_SEED=N`/`--seed N`
+    // reproduz um específico (som/render determinístico). `RASGO_RESUME=1`/
+    // `--resume` é o único caminho que carrega a sessão salva de propósito
+    // — pra quem estava no meio de um patch feito à mão e quer voltar
+    // exatamente onde parou. `Ctrl+S`/o banco (`Ctrl+B`) continuam sendo
+    // como se guarda um patch de propósito, sem mudar aqui.
     if (const char* sv = std::getenv("RASGO_SEED")) {
         seedNum = std::strtoull(sv, nullptr, 10);
         applySeed(seedNum);
-    } else if (std::filesystem::exists(sessionFile)) {
+    } else if (std::getenv("RASGO_RESUME") && std::filesystem::exists(sessionFile)) {
         loadPatch(sessionFile);
+    } else {
+        applySeed(nextRandomSeed());
     }
 
     redraw();  // primeira pintura (não depende só do Expose)
@@ -1281,29 +2235,22 @@ int main() {
             } else if (ev.type == KeyPress) {
                 const KeySym k = XLookupKeysym(&ev.xkey, 0);
                 const bool ctrl = (ev.xkey.state & ControlMask) != 0;
-                if (k == XK_q || k == XK_Escape) alive = false;
-                else if (ctrl && (k == XK_s || k == XK_S)) {
-                    savePatch(sessionFile);
-                    XStoreName(dpy, win, "RASGO Modular — patch salvo");
-                } else if (ctrl && (k == XK_b || k == XK_B)) {
-                    const auto bp = bankPatch();
-                    std::string t = "RASGO Modular — no banco: " + bp.filename().string();
-                    XStoreName(dpy, win, t.c_str());
-                } else if (ctrl && (k == XK_r || k == XK_R)) {
-                    if (recording.load()) stopRec();
-                    else { { std::lock_guard<std::mutex> lk(gmx); recBuf.clear(); }
-                           recording.store(true);
-                           XStoreName(dpy, win, "RASGO Modular — ● GRAVANDO"); }
-                    redraw();
-                } else if (k == XK_space) {
-                    std::lock_guard<std::mutex> lk(gmx);
-                    allRuptured = !allRuptured;
-                    for (std::size_t i = 0; i < graph.cableCount(); ++i) {
-                        if (allRuptured) graph.cable(i).rupture();
-                        else graph.cable(i).reconnect();
-                    }
-                    redraw();
-                } else if (k == XK_r) reprepare = true;
+                if (k == XK_Escape) {
+                    if (overlay) { overlay = 0; redraw(); }
+                    else alive = false;
+                }
+                else if (k == XK_q) alive = false;
+                else if (ctrl && (k == XK_plus || k == XK_equal || k == XK_KP_Add))
+                    actZoom(+1);
+                else if (ctrl && (k == XK_minus || k == XK_KP_Subtract))
+                    actZoom(-1);
+                else if (ctrl && (k == XK_0 || k == XK_KP_0))
+                    actZoom(0);
+                else if (ctrl && (k == XK_s || k == XK_S)) actSave();
+                else if (ctrl && (k == XK_b || k == XK_B)) actBank();
+                else if (ctrl && (k == XK_r || k == XK_R)) actRec();
+                else if (k == XK_space) actRupture();
+                else if (k == XK_r) reprepare = true;
                 else if (k == XK_s) {
                     // "sugestão": adiciona um módulo do catálogo (rotação
                     // determinística). O ponto-de-partida por seed (como o
@@ -1321,30 +2268,55 @@ int main() {
                         shown.push_back(nid);
                         scopes[nid];
                         graph.prepare(static_cast<float>(alsa.rate()), 2, block);
-                        buildMods(); relayout();
+                        buildMods(); populateMotion(); syncAudioIn(); relayout();
                     }
                     redraw();
                 }
-                else if (k == XK_g || k == XK_G) {
-                    seedNum = nextRandomSeed();
-                    applySeed(seedNum);
-                }
+                else if (k == XK_g || k == XK_G) actSeed();
+                else if (k == XK_v || k == XK_V) actMotion();
+                else if (k == XK_m || k == XK_M) actMutate();
+                else if (k == XK_e || k == XK_E) actEvolve();
+                else if (k == XK_c || k == XK_C) actCross();
                 else if (k == XK_Down) { scrollY += 40; relayout(); redraw(); }
                 else if (k == XK_Up) { scrollY = std::max(0, scrollY - 40); redraw(); }
             } else if (ev.type == ButtonPress) {
                 const int mx = ev.xbutton.x, my = ev.xbutton.y;
-                if (ev.xbutton.button == 1) {
-                    const auto r = seedButton();
-                    if (mx >= r[0] && mx <= r[0] + r[2]
-                        && my >= r[1] && my <= r[1] + r[3]) {
-                        seedNum = nextRandomSeed();
-                        applySeed(seedNum);
-                        continue;
+
+                // ---- overlay (tutorial / sobre): clique fecha ----------
+                if (overlay) {
+                    if (ev.xbutton.button == 1) { overlay = 0; redraw(); }
+                    continue;
+                }
+
+                // ---- cabeçalho: botão da barra? -----------------------
+                if (ev.xbutton.button == 1 && my < kCaseTop) {
+                    HdrAct hit = HA_NONE;
+                    for (const auto& h : headerHits)
+                        if (mx >= h.x && mx <= h.x + h.w
+                            && my >= h.y && my <= h.y + h.h) { hit = h.act; break; }
+                    switch (hit) {
+                    case HA_SEED:   actSeed(); continue;
+                    case HA_REC:    actRec(); continue;
+                    case HA_LANG:   cycleLang(); continue;
+                    case HA_TUTORIAL: overlay = (overlay == 1 ? 0 : 1); redraw(); continue;
+                    case HA_ABOUT:  overlay = (overlay == 2 ? 0 : 2); redraw(); continue;
+                    case HA_VARY:   actMotion(); continue;
+                    case HA_STANDBY: actStandby(); continue;
+                    case HA_MUTATE: hdrFlash[HA_MUTATE] = std::chrono::steady_clock::now(); actMutate(); continue;
+                    case HA_EVOLVE: hdrFlash[HA_EVOLVE] = std::chrono::steady_clock::now(); actEvolve(); continue;
+                    case HA_CROSS:  hdrFlash[HA_CROSS] = std::chrono::steady_clock::now(); actCross(); continue;
+                    case HA_BANK:   hdrFlash[HA_BANK] = std::chrono::steady_clock::now(); actBank(); redraw(); continue;
+                    case HA_SAVE:   hdrFlash[HA_SAVE] = std::chrono::steady_clock::now(); actSave(); redraw(); continue;
+                    case HA_ZOUT:   actZoom(-1); continue;
+                    case HA_ZIN:    actZoom(+1); continue;
+                    case HA_NONE:   break;
                     }
                 }
-                if (mx < kPaletteW) {
+
+                const int palBot = winH - kLearnH;
+                if (mx < kPaletteW && my < palBot) {
                     if (ev.xbutton.button == 4) { paletteScroll = std::max(0, paletteScroll - 40); redraw(); continue; }
-                    if (ev.xbutton.button == 5) { paletteScroll = std::min(std::max(0, paletteH - (winH - kCaseTop) + 30), paletteScroll + 40); redraw(); continue; }
+                    if (ev.xbutton.button == 5) { paletteScroll = std::min(std::max(0, paletteH - (palBot - kCaseTop) + 30), paletteScroll + 40); redraw(); continue; }
                     for (const auto& pr : palette) {
                         if (pr.header) continue;
                         const int y = pr.y - paletteScroll + 20;
@@ -1500,6 +2472,16 @@ int main() {
                 }
                 redraw();
             } else if (ev.type == ButtonRelease) {
+                if (drag.active && recording.load()) {
+                    const float toVal = graph.parameterUserValue(drag.node, drag.bind);
+                    if (toVal != drag.startVal) {
+                        std::lock_guard<std::mutex> lk(gmx);
+                        const double t = static_cast<double>(recBuf.size())
+                            / 2.0 / alsa.rate();
+                        score.parameterChange(t, drag.node, drag.bind,
+                                              drag.startVal, toVal);
+                    }
+                }
                 drag.active = false;
                 if (cdrag.active) {
                     rebuildJacks();
@@ -1540,12 +2522,14 @@ int main() {
                             scopes[id];
                             graph.prepare(static_cast<float>(alsa.rate()), 2, block);
                             buildMods();
+                            populateMotion();
+                            syncAudioIn();
                             relayout();
                         }
                     }
                     spawnType.clear();
                 }
-                XStoreName(dpy, win, "RASGO Modular - painel de teste");
+                setTitle("RASGO Modular — painel de teste");
                 redraw();
             } else if (ev.type == MotionNotify && cdrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
@@ -1581,21 +2565,33 @@ int main() {
                 std::snprintf(title, sizeof title, "%s : %s = %.4g",
                               graph.node(drag.node).type().c_str(),
                               drag.bind.c_str(), v);
-                XStoreName(dpy, win, title);
+                setTitle(title);
                 redraw();
             }
         }
+        // Motion Engine: knobs derivam devagar sozinhos ([v] liga/desliga).
+        // Pausa enquanto a mão do usuário está no knob (`drag.active`) —
+        // não briga com um giro manual. Mesmo ritmo do redraw (~30 fps).
+        if (motionOn && !drag.active) motion.tick(graph, 0.033f);
         // repinta a ~30 fps pra os osciloscópios dos módulos animarem — o
         // buffer fora da tela mantém sem flicker; o áudio é outro thread.
         redraw();
         std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
 
+    // tira a janela da tela JÁ — antes de qualquer desmonte de áudio. Se o
+    // ALSA/PipeWire estiver travado, o teardown abaixo pode demorar; o
+    // usuário não deve ficar olhando pra uma janela que "não fecha".
+    XUnmapWindow(dpy, win);
+    XFlush(dpy);
+
     if (recording.load()) stopRec();
     savePatch(sessionFile);   // continua daqui na próxima sessão
     running = false;
     audio.join();
+    stopAudioIn();   // fecha a captura e devolve o microfone/entrada
     XFreePixmap(dpy, bb);
+    XFreePixmap(dpy, logoPix);
     if (fsCap && fsCap != fs) XFreeFontSet(dpy, fsCap);
     if (fs) XFreeFontSet(dpy, fs);
     if (coreFont) XFreeFont(dpy, coreFont);

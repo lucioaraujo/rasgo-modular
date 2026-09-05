@@ -47,26 +47,28 @@ public:
 
     std::string type() const override { return "LOGIC"; }
 
+    // Layout revisto 2026-09-06 (passe de ergonomia): 10 HP (W 50,8 mm),
+    // display cheio, saídas em 2 fileiras agrupadas por natureza —
+    // combinacional (A op B: AND/OR/XOR) · derivadas do clock (DIV / FLIP).
     Panel panel() const override {
-        // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm.
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "LOGIC", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "state", "", 2.5f, 7.0f, 40.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 8.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "DIV", "divide", 28.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "MULT", "multiply", 8.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 28.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "DELAY", "delay", 8.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "A", "in:a", 18.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "B", "in:b", 30.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 42.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "DIV", "out:div", 6.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "AND", "out:and", 15.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OR", "out:or", 24.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "XOR", "out:xor", 33.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "FLIP", "out:flip", 42.0f, 110.0f);
+        p.add(Widget::Kind::Display, "state", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "DIV", "divide", 30.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "MULT", "multiply", 9.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 30.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "DELAY", "delay", 9.0f, 70.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 8.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "A", "in:a", 20.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "B", "in:b", 30.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 40.0f, 90.0f);
+        p.add(Widget::Kind::Jack, "AND", "out:and", 9.0f, 105.0f);
+        p.add(Widget::Kind::Jack, "OR", "out:or", 21.0f, 105.0f);
+        p.add(Widget::Kind::Jack, "XOR", "out:xor", 33.0f, 105.0f);
+        p.add(Widget::Kind::Jack, "DIV", "out:div", 9.0f, 120.0f);
+        p.add(Widget::Kind::Jack, "FLIP", "out:flip", 24.0f, 120.0f);
         return p;
     }
 

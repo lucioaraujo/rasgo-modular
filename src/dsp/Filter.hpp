@@ -44,26 +44,26 @@ public:
 
     std::string type() const override { return "FILTER"; }
 
-    // Layout: 12 HP.
+    // Layout revisto 2026-09-06 (passe de ergonomia): 10 HP (W 50,8 mm),
+    // display cheio; entradas (sinal + 3 mod-CV) numa fileira, as 4
+    // tomadas do filtro (LO/CTR/HI/ALL) na de baixo.
     Panel panel() const override {
-        // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "FILTER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "response", "", 2.5f, 8.0f, 45.0f);
-        p.add(Widget::Kind::Knob, "CUT", "cutoff", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RESO", "resonance", 30.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 30.0f, 54.0f);
-        // entradas na faixa inferior, saídas abaixo
-        p.add(Widget::Kind::Jack, "IN", "in:in", 5.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "FC", "in:cutoff_mod", 17.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "Q", "in:res_mod", 29.0f, 92.0f);
+        p.add(Widget::Kind::Display, "response", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "CUT", "cutoff", 10.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "RESO", "resonance", 31.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 10.0f, 52.0f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 31.0f, 52.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 92.0f);
+        p.add(Widget::Kind::Jack, "FC", "in:cutoff_mod", 20.0f, 92.0f);
+        p.add(Widget::Kind::Jack, "Q", "in:res_mod", 31.0f, 92.0f);
         p.add(Widget::Kind::Jack, "SPR", "in:spread_mod", 41.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "LO", "out:low", 5.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "CTR", "out:center", 17.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "HI", "out:high", 29.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "ALL", "out:all", 41.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "LO", "out:low", 8.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "CTR", "out:center", 19.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "HI", "out:high", 31.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "ALL", "out:all", 42.0f, 114.0f);
         return p;
     }
 

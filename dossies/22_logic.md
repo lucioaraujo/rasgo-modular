@@ -182,9 +182,10 @@ mudança de seção?
 ## 8. Integração e painel
 
 Classe `Logic` (`type()` = `"LOGIC"`), 4 entradas, 5 saídas, 5
-parâmetros. `panel()` próprio (~10 HP): knobs RATE/DIV/MULT/GATE/DELAY;
-jacks CLK/A/B/RST in, DIV/AND/OR/XOR/FLIP out; Display (estado do
-divisor / flip). Testado isolado (divisão, multiplicação, duty, atraso,
+parâmetros. `panel()` próprio (10 HP): knobs RATE/DIV/MULT/GATE/DELAY,
+display cheio; jacks CLK/A/B/RST in, e as saídas em **2 fileiras**
+(passe de ergonomia 2026-09-06): combinacional AND/OR/XOR · derivadas do
+clock DIV/FLIP. Display (estado do divisor / flip). Testado isolado (divisão, multiplicação, duty, atraso,
 tabela-verdade, flip-flop, reset, autônomo) antes do patch. Cadeias
 canônicas: `CLOCK → LOGIC(÷2) → ENVELOPE.gate`; `SEQUENCE.gate` +
 `TURING` → `LOGIC.a`/`b` → `xor` → gate; `LOGIC.flip → QUANTIZER.root`

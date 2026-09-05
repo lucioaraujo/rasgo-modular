@@ -48,6 +48,10 @@ pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 | 32 | [`32_wasp.md`](32_wasp.md) | `WASP` | TRANSFORM | marco 3 |
 | 33 | [`33_matrix.md`](33_matrix.md) | `MATRIX` | ROUTE / MIX | marco 3 |
 | 34 | [`34_mult.md`](34_mult.md) | `MULT` | UTILITY | marco 3 |
+| 35 | [`35_audio_in.md`](35_audio_in.md) | `AUDIO-IN` | SOURCE | marco 3 |
+| 36 | [`36_chaos.md`](36_chaos.md) | `CHAOS` | DECISION | marco 3 |
+| 37 | [`37_pll.md`](37_pll.md) | `PLL` | SOURCE | marco 3 |
+| 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | MIX | marco 3 |
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação
@@ -59,9 +63,24 @@ saída→parâmetro **aditiva** desde 2026-09-04), `ControlSnapshot`,
 **Peças** (`../examples/`, renders em `../validation-output/`):
 `primeiro_fragmento` (10 s), `peca_generativa` (40 s),
 `peca_generativa_2` (50 s, constelação), `peca_generativa_3` (55 s,
-barramento semântico).
+barramento semântico), `peca_generativa_4` (42 s, protótipo do
+`MotionEngine` + `ScoreRecorder` — ver
+`ESTUDO_seed_composicao_generativa.md §3.6/§5`; a `SYSTEM SCORE`
+também fica salva, `peca_generativa_4.score.txt`).
 
 **Painel gráfico de teste** (`../apps/panel/`, X11 + ALSA + Xrandr):
 case Eurorack que quebra em linhas, coluna de catálogo por família,
 arrastar-para-criar, sugestão de módulo por `[s]`. Decisões de design em
 [`../apps/panel/design.md`](../apps/panel/design.md).
+
+**Estudos à parte:**
+[`ESTUDO_seed_composicao_generativa.md`](ESTUDO_seed_composicao_generativa.md)
+— os 4 itens da conversa (Seed/composição/partitura/pedagogia) têm
+**protótipo**: Motion Engine (`apps/panel/MotionEngine.hpp`), Patch
+Genetics `MUTATE`/`EVOLVE`/`FREEZE` (`apps/panel/PatchGenetics.hpp`),
+`SYSTEM SCORE` (`apps/panel/ScoreRecorder.hpp`) e hover-learn
+(`apps/panel/LearnCatalog.hpp`, `[l]` no painel). Form Engine, `CROSS`,
+`MUSICAL SCORE` e o conteúdo completo do Learning Engine continuam
+mapeados, não construídos;
+[`ESTUDO_audio_sampling.md`](ESTUDO_audio_sampling.md) — `SAMPLER`/
+`TURNTABLE`/`TAPE`.

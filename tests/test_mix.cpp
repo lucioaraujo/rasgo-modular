@@ -109,6 +109,7 @@ Frame masterOnce(Master& m, float l, float r, int blocks = 8) {
 void testMasterWidth() {
     Master m;
     m.setParameter("dc_block", 0.0f);
+    m.setParameter("gain", 0.0f);  // isola width do default de gain (-6 dB)
     // width 1 (normal): passa
     Frame f = masterOnce(m, 0.6f, 0.2f);
     near(f.l, 0.6f); near(f.r, 0.2f);
@@ -125,6 +126,7 @@ void testMasterWidth() {
 void testMasterMonoAndGain() {
     Master m;
     m.setParameter("dc_block", 0.0f);
+    m.setParameter("gain", 0.0f);  // isola mono do default de gain (-6 dB)
     m.setParameter("mono", 1.0f);
     Frame f = masterOnce(m, 0.5f, -0.1f);
     near(f.l, f.r);
@@ -139,6 +141,8 @@ void testMasterDcBlock() {
     Master dc, no;
     dc.setParameter("dc_block", 1.0f);
     no.setParameter("dc_block", 0.0f);
+    dc.setParameter("gain", 0.0f);  // isola dc_block do default de gain (-6 dB)
+    no.setParameter("gain", 0.0f);
     // sinal com offset de DC 0,3 -> depois de assentar, o bloqueio tira o DC
     const Frame fdc = masterOnce(dc, 0.3f, 0.3f, 200);
     const Frame fno = masterOnce(no, 0.3f, 0.3f, 200);
@@ -146,9 +150,39 @@ void testMasterDcBlock() {
     check(std::fabs(fno.l - 0.3f) < 0.02f, "sem dc_block o offset passa");
 }
 
+void testMasterMute() {
+    Master m;
+    m.setParameter("dc_block", 0.0f);
+    m.setParameter("gain", 0.0f);  // 0 dB: saída ~= entrada
+    m.prepare(kSr, 64);
+    std::vector<AudioBlock> out(2, AudioBlock(kSr, 2, 64));
+    AudioBlock in(kSr, 2, 64);
+    for (std::size_t i = 0; i < 64; ++i) { in.at(0, i) = 0.5f; in.at(1, i) = 0.5f; }
+    std::vector<const AudioBlock*> ins{&in};
+
+    for (int k = 0; k < 8; ++k) m.process(ins, out);
+    near(out[0].at(0, 63), 0.5f, 3.0e-3f);   // toca normal
+
+    // aciona o mute: RAMPA, não corte seco — o 1º sample ainda soa
+    m.setParameter("mute", 1.0f);
+    m.process(ins, out);
+    check(std::fabs(out[0].at(0, 0)) > 0.1f, "mute usa rampa (não corta seco)");
+
+    // depois de ~80 ms está em silêncio nos dois canais
+    for (int k = 0; k < 60; ++k) m.process(ins, out);
+    check(std::fabs(out[0].at(0, 63)) < 1.0e-3f, "mute silencia L");
+    check(std::fabs(out[0].at(1, 63)) < 1.0e-3f, "mute silencia R");
+
+    // desliga: volta a tocar
+    m.setParameter("mute", 0.0f);
+    for (int k = 0; k < 60; ++k) m.process(ins, out);
+    near(out[0].at(0, 63), 0.5f, 3.0e-3f);
+}
+
 void testMasterLimitAndLevel() {
     Master m;
     m.setParameter("dc_block", 0.0f);
+    m.setParameter("gain", 0.0f);  // isola limit do default de gain (-6 dB)
     m.setParameter("limit", 1.0f);
     Frame f = masterOnce(m, 3.0f, -3.0f);
     check(std::fabs(f.l) <= 1.01f && std::fabs(f.r) <= 1.01f,
@@ -174,6 +208,7 @@ void testMasterLimitAndLevel() {
 void testMasterExcellenceGuard() {
     Master m;
     m.setParameter("dc_block", 0.0f);
+    m.setParameter("gain", 0.0f);  // isola o limitador do default de gain (-6 dB)
     m.setParameter("limit", 1.0f);
     m.prepare(kSr, 256);
     std::vector<AudioBlock> out(2, AudioBlock(kSr, 2, 256));
@@ -263,6 +298,7 @@ int main() {
     testMasterWidth();
     testMasterMonoAndGain();
     testMasterDcBlock();
+    testMasterMute();
     testMasterLimitAndLevel();
     testMasterExcellenceGuard();
     testInGraphStereo();

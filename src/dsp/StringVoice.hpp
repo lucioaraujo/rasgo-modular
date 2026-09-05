@@ -59,7 +59,7 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "STRING", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "string", "", 2.5f, 8.0f, 55.0f);
+        p.add(Widget::Kind::Display, "string", "", 2.5f, 6.0f, 56.0f);
         p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
         p.add(Widget::Kind::Knob, "DECAY", "decay", 21.0f, 30.0f);
         p.add(Widget::Kind::Knob, "DAMP", "damping", 35.0f, 30.0f);

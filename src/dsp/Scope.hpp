@@ -49,7 +49,7 @@ public:
         Panel p;
         p.hp = 14;
         p.add(Widget::Kind::Label, "SCOPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scope", "", 2.5f, 7.0f, 62.0f);
+        p.add(Widget::Kind::Display, "scope", "", 2.5f, 6.0f, 66.1f);
         p.add(Widget::Kind::Knob, "TRIG", "trigger", 9.0f, 34.0f);
         p.add(Widget::Kind::Knob, "EDGE", "edge", 27.0f, 34.0f);
         p.add(Widget::Kind::Knob, "REJ", "reject", 45.0f, 34.0f);

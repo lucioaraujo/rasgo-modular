@@ -11,8 +11,9 @@
 //
 // A fonte de ACASO CONTÍNUO. `DECISION` decide eventos discretos; `NOISE`
 // dá o piso de ruído (percussão, vento, textura) E as fontes de
-// modulação aleatória que todo patch modular usa: branco / rosa / brown,
-// sample-and-hold e uma tensão que passeia (smooth random).
+// modulação aleatória que todo patch modular usa: branco / rosa / brown /
+// azul / violeta / bit, sample-and-hold e uma tensão que passeia (smooth
+// random) — 8 saídas SIMULTÂNEAS (nunca precisa escolher 1 cor por vez).
 //
 // Ver o dossiê: `RASGO_MODULAR/dossies/19_ruido.md`.
 //
@@ -23,7 +24,18 @@
 //   - Buchla 266 "smooth random" — tensão que desliza entre alvos, não
 //     degraus;
 //   - `DECISION` do Rasgo (`shape`) — uniforme→sino pela média de N
-//     uniformes = acaso estruturado.
+//     uniformes = acaso estruturado;
+//   - `azul`/`violeta`/`bit`: ideia estudada de `ANTITOTEM/src/core/
+//     NoiseFields.h::NoisePalette` (código do autor, GPLv3/AGPLv3 —
+//     compatível; ver `PESQUISA_MODULOS.md §2.3`), fórmula própria —
+//     azul = branco diferenciado 1×, violeta = branco diferenciado 2×
+//     (desvio Rasgo: testado "azul − rosa" como a NAVALHA fazia primeiro,
+//     mas com o filtro de rosa de 7 polos deste projeto isso não deu
+//     violeta mais agudo que azul de forma confiável — dupla
+//     diferenciação é a definição espectral padrão de ruído violeta
+//     (∝ f²) e funciona por construção); bit = 1 bit bipolar do próprio
+//     gerador a taxa de ÁUDIO (textura digital/glitch, diferente do
+//     degrau do S&H que só troca no pulso de `trigger`).
 //
 // Desvio Rasgo: `spread` leva a distribuição do S&H / smooth de uniforme
 // a sino. Determinístico: dois streams xorshift semeados em prepare().
@@ -40,7 +52,10 @@ public:
                {"pink", PortKind::Audio, ""},
                {"brown", PortKind::Audio, ""},
                {"sh", PortKind::Audio, ""},
-               {"smooth", PortKind::Audio, ""}},
+               {"smooth", PortKind::Audio, ""},
+               {"blue", PortKind::Audio, ""},
+               {"violet", PortKind::Audio, ""},
+               {"bit", PortKind::Audio, ""}},
               {{"rate", 0.01f, 2000.0f, 8.0f, "Hz"},
                {"slew", 0.0f, 1.0f, 0.3f, ""},
                {"spread", 0.0f, 1.0f, 0.0f, ""}}) {}
@@ -50,19 +65,23 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
-        p.hp = 12;   // 5 saídas -> precisa de largura pra espaçar os jacks
+        p.hp = 12;   // 8 saídas em 2 fileiras de 4 (era 20 HP numa fileira só)
         p.add(Widget::Kind::Label, "NOISE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "noise", "", 2.5f, 8.0f, 55.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 38.0f, 30.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 5.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 17.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "WHT", "out:white", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PNK", "out:pink", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "BRN", "out:brown", 29.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "S&H", "out:sh", 41.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SMTH", "out:smooth", 53.0f, 116.0f);
+        p.add(Widget::Kind::Display, "noise", "", 2.5f, 6.0f, 56.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 25.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 41.0f, 30.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 9.0f, 60.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 23.0f, 60.0f);
+        // 8 saídas simultâneas, 2 fileiras de 4
+        p.add(Widget::Kind::Jack, "WHT", "out:white", 8.0f, 88.0f);
+        p.add(Widget::Kind::Jack, "PNK", "out:pink", 21.0f, 88.0f);
+        p.add(Widget::Kind::Jack, "BRN", "out:brown", 34.0f, 88.0f);
+        p.add(Widget::Kind::Jack, "S&H", "out:sh", 47.0f, 88.0f);
+        p.add(Widget::Kind::Jack, "SMTH", "out:smooth", 8.0f, 110.0f);
+        p.add(Widget::Kind::Jack, "BLU", "out:blue", 21.0f, 110.0f);
+        p.add(Widget::Kind::Jack, "VLT", "out:violet", 34.0f, 110.0f);
+        p.add(Widget::Kind::Jack, "BIT", "out:bit", 47.0f, 110.0f);
         return p;
     }
 
@@ -75,6 +94,8 @@ public:
         smoothTarget_ = 0.0f;
         phase_ = 0.0;
         prevTrig_ = 0.0f;
+        prevWhite_ = 0.0f;
+        prevBlue_ = 0.0f;
         rngWhite_ = 0x243F6A8885A308D3ULL;
         rngSH_ = 0xB7E151628AED2A6BULL;
     }
@@ -86,6 +107,9 @@ public:
         AudioBlock& brownOut = outputs[2];
         AudioBlock& shOut = outputs[3];
         AudioBlock& smoothOut = outputs[4];
+        AudioBlock& blueOut = outputs[5];
+        AudioBlock& violetOut = outputs[6];
+        AudioBlock& bitOut = outputs[7];
         const std::size_t frames = white.frames();
         const std::size_t channels = white.channels();
 
@@ -121,6 +145,18 @@ public:
             brown_ = 0.99f * brown_ + w * 0.05f;
             const float brownV = clampf(brown_ * 3.8f, -1.0f, 1.0f);
 
+            // azul = branco diferenciado (+3 dB/oitava); violeta = azul
+            // menos rosa (ainda mais agudo) — estudado do `NoisePalette`
+            // do Antitotem, ver o comentário do topo do arquivo
+            const float blueV = clampf((w - prevWhite_) * 0.7f, -1.0f, 1.0f);
+            prevWhite_ = w;
+            const float violetV = clampf((blueV - prevBlue_) * 0.7f, -1.0f, 1.0f);
+            prevBlue_ = blueV;
+            // bit: 1 bit bipolar do próprio estado do gerador, a taxa de
+            // ÁUDIO (textura digital/glitch — troca toda amostra, ao
+            // contrário do S&H que só troca no pulso de `trigger`)
+            const float bitV = (rngWhite_ & 0x1ULL) ? 1.0f : -1.0f;
+
             // pulso: trigger externo OU relógio interno
             bool tick = false;
             if (trig != nullptr) {
@@ -144,6 +180,9 @@ public:
                 brownOut.at(c, frame) = brownV;
                 shOut.at(c, frame) = held_;
                 smoothOut.at(c, frame) = smooth_;
+                blueOut.at(c, frame) = blueV;
+                violetOut.at(c, frame) = violetV;
+                bitOut.at(c, frame) = bitV;
             }
         }
     }
@@ -170,6 +209,8 @@ private:
 
     float b_[7] = {};
     float brown_ = 0.0f;
+    float prevWhite_ = 0.0f;
+    float prevBlue_ = 0.0f;
     float held_ = 0.0f;
     float smooth_ = 0.0f, smoothTarget_ = 0.0f;
     double phase_ = 0.0;

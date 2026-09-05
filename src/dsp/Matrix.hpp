@@ -40,7 +40,8 @@ public:
         Panel p;
         p.hp = 20;
         p.add(Widget::Kind::Label, "MATRIX", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "grid", "", 2.5f, 7.0f, 74.0f);
+        // sem Display: a grade 4x4 (matrixCellMM) + a dica
+        // "IN v OUT >" JA sao o mostrador do modulo.
         // grade 4×4 de knobs
         for (int j = 0; j < 4; ++j) {
             const float y = 30.0f + static_cast<float>(j) * 18.0f;
@@ -52,10 +53,14 @@ public:
             p.add(Widget::Kind::Jack, "IN" + std::to_string(j + 1),
                   "in:in" + std::to_string(j + 1), 8.0f, y + 3.0f);
         }
+        // OUT abaixo de y=110: a grade 4×4 (desenhada por `matrixCellMM`
+        // em `panel_main.cpp`, cy até ~97) chega perto do rodapé; a
+        // y=104 o rótulo "OUT" encostava na última linha da grade
+        // (`test_panel_layout` pega isso).
         for (int k = 0; k < 4; ++k) {
             const float x = 22.0f + static_cast<float>(k) * 17.0f;
             p.add(Widget::Kind::Jack, "OUT" + std::to_string(k + 1),
-                  "out:out" + std::to_string(k + 1), x, 104.0f);
+                  "out:out" + std::to_string(k + 1), x, 110.0f);
         }
         p.add(Widget::Kind::Knob, "LEVEL", "level", 90.0f, 26.0f);
         p.add(Widget::Kind::Knob, "NORM", "norm", 90.0f, 42.0f);

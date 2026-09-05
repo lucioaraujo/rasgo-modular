@@ -314,6 +314,7 @@ void testInGraph() {
     g.node(w).setParameter("cutoff", 900.0f);
     g.node(w).setParameter("resonance", 0.6f);
     const auto mst = g.add(std::make_unique<Master>());
+    g.node(mst).setParameter("gain", 0.0f);  // isola o WASP do default de gain do MASTER
     g.connect(osc, 2, w, 0);       // saw -> WASP.in
     g.connect(w, 0, mst, 0);       // WASP.out -> MASTER
     g.prepare(kSr, 1, kB);

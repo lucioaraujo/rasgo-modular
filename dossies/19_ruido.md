@@ -1,7 +1,10 @@
 # Dossiê — Módulo 19: Ruído e aleatório (`NOISE`)
 
 **Família:** SOURCE + UTILITY
-**Estado:** **implementado — marco 3** (2026-09-02)
+**Estado:** **implementado — marco 3** (2026-09-02); saídas `blue`/
+`violet`/`bit` adicionadas em 2026-09-05 — ver `TAREFAS.md`, registro
+"item por item — pendências pequenas". Painel: 12 HP, com as 8 saídas em
+2 fileiras de 4 (foi a 20 HP numa fileira só, voltou a 12 em 2026-09-05)
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/Noise.hpp`, `tests/test_noise.cpp`
 

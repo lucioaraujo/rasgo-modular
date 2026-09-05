@@ -13,8 +13,9 @@ filtro" a formante; `drive` com sine-shaping pré-filtro; suavização de
 `cutoff` ~5 ms; **auto-oscilação** via `k` empurrado a ligeiramente
 negativo perto de `resonance=1` + **não-linearidade NO LAÇO** (satura o
 estado, não só a saída) → ciclo-limite estável em vez de NaN; limitador
-suave na saída. Painel próprio (12 HP: display de resposta + CUTOFF/RESO/
-SPREAD/DRIVE + 8 jacks).
+suave na saída. Painel próprio (10 HP, revisto no passe de ergonomia
+2026-09-06: display de resposta cheio + CUT/RESO/SPRD/DRIVE em 2×2 +
+entradas IN/FC/Q/SPR numa fileira, saídas LO/CTR/HI/ALL na de baixo).
 
 **Testes (4/4 alvos, 3 configs):** com `spread=0`, `low` = LP e `high` =
 HP do mesmo corte (200 Hz vs 5 kHz > 4×, banda passante ~0 dB); com

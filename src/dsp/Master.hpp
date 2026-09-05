@@ -33,11 +33,17 @@ public:
               {{"in", PortKind::Audio, ""}},
               {{"out", PortKind::Audio, ""},
                {"level", PortKind::Control, ""}},
-              {{"gain", -60.0f, 12.0f, 0.0f, "dB"},
+              {{"gain", -60.0f, 12.0f, -24.0f, "dB"},  // 50% do slider (n=(v-lo)/(hi-lo)); pedido do autor 2026-09-05 (era 30% = −38,4)
                {"width", 0.0f, 2.0f, 1.0f, ""},
                {"mono", 0.0f, 1.0f, 0.0f, ""},
                {"dc_block", 0.0f, 1.0f, 1.0f, ""},
-               {"limit", 0.0f, 1.0f, 1.0f, ""}}) {}
+               {"limit", 0.0f, 1.0f, 1.0f, ""},
+               // silêncio da saída — rampa de ~8 ms pra não estalar
+               // (pedido do autor 2026-09-05). 0 = toca · 1 = mudo.
+               {"mute", 0.0f, 1.0f, 0.0f, ""},
+               // governador de corpo (ver `OutputStage.hpp §4`): só age em
+               // agudo alto + sustentado + concentrado em ~2,5–5 kHz. 0 = off.
+               {"body_guard", 0.0f, 1.0f, 1.0f, ""}}) {}
 
     std::string type() const override { return "MASTER"; }
 
@@ -46,12 +52,14 @@ public:
         Panel p;
         p.hp = 8;
         p.add(Widget::Kind::Label, "MASTER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "vu", "", 2.5f, 8.0f, 35.0f);
+        p.add(Widget::Kind::Display, "vu", "", 2.5f, 6.0f, 35.6f);
         p.add(Widget::Kind::Slider, "GAIN", "gain", 8.0f, 26.0f);
         p.add(Widget::Kind::Knob, "WIDTH", "width", 26.0f, 28.0f);
-        p.add(Widget::Kind::Toggle, "MONO", "mono", 24.0f, 50.0f);
-        p.add(Widget::Kind::Toggle, "DC", "dc_block", 24.0f, 64.0f);
+        p.add(Widget::Kind::Toggle, "MUTE", "mute", 24.0f, 42.0f);
+        p.add(Widget::Kind::Toggle, "MONO", "mono", 24.0f, 54.0f);
+        p.add(Widget::Kind::Toggle, "DC", "dc_block", 24.0f, 66.0f);
         p.add(Widget::Kind::Toggle, "LIMIT", "limit", 24.0f, 78.0f);
+        p.add(Widget::Kind::Knob, "BODY", "body_guard", 9.0f, 78.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 5.0f, 104.0f);
         p.add(Widget::Kind::Jack, "OUT", "out:out", 17.0f, 104.0f);
         p.add(Widget::Kind::Jack, "VU", "out:level", 29.0f, 104.0f);
@@ -61,6 +69,9 @@ public:
     void prepare(const float sampleRate, const std::size_t blockSize) override {
         Signal::prepare(sampleRate, blockSize);
         peak_ = 0.0f;
+        muteGain_ = parameterValue("mute") >= 0.5f ? 0.0f : 1.0f;
+        // rampa de ~8 ms (1 polo) — silêncio sem estalo
+        muteCoef_ = std::exp(-1.0f / (0.008f * std::max(1.0f, sampleRate)));
         // proteção de saída de excelência (look-ahead + teto suave) —
         // padrão RASGO, ver `src/dsp/OutputStage.hpp`
         out_.prepare(sampleRate, -1.0f /*teto dBFS*/, 3.0f /*look-ahead ms*/,
@@ -82,6 +93,8 @@ public:
         const bool mono = parameterValue("mono") >= 0.5f;
         const bool dcBlock = parameterValue("dc_block") >= 0.5f;
         const bool limit = parameterValue("limit") >= 0.5f;
+        const float bodyGuard = parameterValue("body_guard");
+        const float muteTarget = parameterValue("mute") >= 0.5f ? 0.0f : 1.0f;
         const std::size_t inCh = in ? in->channels() : 0;
 
         for (std::size_t frame = 0; frame < frames; ++frame) {
@@ -98,9 +111,14 @@ public:
             l *= gain;
             r *= gain;
 
-            // proteção de saída: guarda de finitude + (DC) + limitador com
-            // look-ahead + teto suave — não distorce o transiente
-            out_.process(l, r, dcBlock, limit);
+            // MUTE — rampa suave no fader, antes da proteção de saída
+            muteGain_ += (muteTarget - muteGain_) * (1.0f - muteCoef_);
+            l *= muteGain_;
+            r *= muteGain_;
+
+            // proteção de saída: finitude + (DC) + guarda ultrassônica +
+            // governador de corpo + limitador look-ahead + teto suave
+            out_.process(l, r, dcBlock, limit, bodyGuard);
 
             const float mag = std::fabs(l) > std::fabs(r)
                 ? std::fabs(l) : std::fabs(r);
@@ -122,6 +140,8 @@ public:
     // telemetria da proteção (leitura não RT-crítica; p/ um medidor de GR
     // no painel ou pra um módulo SEGUIR a própria redução de ganho)
     float gainReductionDb() const noexcept { return out_.gainReductionDb(); }
+    // quanto o governador de corpo está atenuando o agudo (dB de shelf)
+    float bodyGuardDb() const noexcept { return out_.bodyGuardDb(); }
 
 private:
     static float dbToGain(const float db) noexcept {
@@ -131,6 +151,8 @@ private:
     OutputStage out_;
     float peak_ = 0.0f;
     float peakDecay_ = 0.9999f;
+    float muteGain_ = 1.0f;
+    float muteCoef_ = 0.0f;
 };
 
 }  // namespace rasgo::modular

@@ -203,7 +203,57 @@ generativa e o estágio de saída.
 | ~~**`MULT`** — múltiplo bufferizado~~ | UTILITY | **FEITO — marco 3 (2026-09-04), `dossies/34_mult.md`, `src/dsp/Mult.hpp`.** Múltiplo PROCESSADO: 1 entrada → 4 saídas, cada uma com atenuversor (`scale` ±2, negativo = inverte) + `offset` (±1) próprios — o mini-`CONTROL` por tomada que a nota pedia. `slew` compartilhado. **`dual`** + `in2` (2026-09-04): out1/2 ← `in`, out3/4 ← `in2` (A-180-2). Ocioso (sem `in`) → 4 fontes de tensão manual (`out_k = offset_k`). Sem `drift` (utilidade de precisão). Pendências: `slew` por tomada (rise/fall), saída de soma, barras animadas no painel. | múltiplo bufferizado clássico (Doepfer A-180, Intellijel Buff Mult), atenuversor+offset (Maths/Serge), voltage spreader (Frap/Doepfer) |
 | **`SAMPLER` / `TURNTABLE` / `TAPE`** — áudio gravado como matéria | SOURCE / MEMORY / GESTURE | sampler (buffer de disco ou ao vivo, varispeed, slice, `wear`), toca-discos de DJ (prato com inércia, scratch, crossfader), fita cassete (wow&flutter, saturação magnética, `age`, modo echo). **Nó opcional** — o painel abre e soa sem arquivo nenhum. | **Ver o estudo à parte: [`dossies/ESTUDO_audio_sampling.md`](dossies/ESTUDO_audio_sampling.md)** — inclui a decisão de biblioteca (`dr_wav.h`, domínio público/MIT-0, header-only) e o risco de determinismo. |
 | voz de **percussão** | MATTER/SOURCE | `MATTER` + `NOISE` + `ENVELOPE` já montam bumbo/caixa/prato; um módulo dedicado empacota | 909/808, Rings percussivo |
-| **adaptadores** `MIDI`/`CV`/`AUDIO-IN` | INPUT / GESTURE | opcionais, nunca dependência (`§36.8`) | — |
+| ~~**`AUDIO-IN`** — entrada de áudio ao vivo~~ | SOURCE | **FEITO — marco 3 (2026-09-04), `dossies/35_audio_in.md`, `src/dsp/AudioIn.hpp` + `apps/panel/AlsaSource.hpp`.** Nó adaptador OPCIONAL (nunca dependência — `§36.8`): qualquer fonte de áudio externa rodando no sistema (outro instrumento RASGO, entrada de linha, microfone) vira matéria-prima dentro do grafo. Anel circular SPSC lock-free entre a captura ALSA (thread própria, dedicada — não compartilha temporização com a reprodução) e `process()`; sem `AUDIO-IN` no patch, a captura nem abre (nunca pega o microfone à toa); sem alimentação, saída em silêncio (nunca lixo, nunca trava). `gain` (0–2×). Pendências: seleção de dispositivo (hoje só "default"), medidor de nível no painel, mono-sum opcional. | ANTITOTEM/NAVALHA2 (`setAudioChannels`), `AlsaSink.hpp` (mesmo padrão, contraparte de captura); pergunta do autor "como podemos conectar o antitotem no rasgo modular?" |
+| **adaptadores** `MIDI`/`CV` | INPUT / GESTURE | opcionais, nunca dependência (`§36.8`) | — |
+
+### 2.3 Candidatos — levantamento ANTITOTEM (2026-09-04)
+
+Pedido do autor: "o antitotem tem vários módulos interessantes [...]
+precisa vasculhar, o que temos na lista de módulos interessantes que
+ainda não foi feito". Leitura de `ANTITOTEM/src/core/{CmosVoice,
+ChaosSources, NoiseFields, SimpleSequencer}.h` (código do autor,
+GPLv3/AGPLv3 — compatível; conceito, não código, como sempre). Primeiro,
+o que o autor lembrou e **já está feito** — pra não redescobrir:
+
+- **"a parte de deriva é interessante"** → já é o **`DRIFT`** (Módulo 27,
+  `dossies/27_drift.md`), explicitamente derivado de
+  `ANTITOTEM/deriveFromMemory`/`CRI-DRF-001` — momentum, `anchor`
+  (memória de topologia), 4 saídas correlacionadas. **Feito.**
+- **"o noise é rico"** → o `NOISE` do Rasgo já dá branco/rosa/brown
+  **simultâneos** (saídas paralelas, não um seletor de 1 cor como o
+  `NoisePalette` do Antitotem) + S&H + smooth random. Mais rico nesse
+  eixo específico (patcheável, não precisa escolher 1 cor por vez). O
+  que falta ver abaixo (`azul`/`violeta`/`bit`).
+- **scanner direction** (`ScannerDirection`: forward/reverse/pendulum) →
+  já coberto pelo `dir` do `SWITCH` (Módulo 28).
+- **step rules** (`mutate`/`ratchet`) → já cobertos por `TURING.mutate` e
+  `TRIGSEQ.ratchet`/`.chaos`.
+
+O que **não está feito** — candidatos reais:
+
+| Candidato | Família | Ideia | Parte de (a estudar — conceito, não código) |
+|---|---|---|---|
+| ~~**cores de ruído extras** (azul, violeta, bit)~~ | SOURCE | **FEITO (2026-09-05).** `NOISE` ganhou 3 saídas simultâneas a mais: `blue` (branco diferenciado 1×), `violet` (branco diferenciado 2× — testar "azul − rosa" como a NAVALHA fazia primeiro não deu um violeta confiavelmente mais agudo com o filtro de rosa de 7 polos deste projeto; dupla diferenciação funciona por construção), `bit` (1 bit bipolar do gerador a taxa de áudio). Painel alargado de 12 pra 20 HP pra caber os 8 jacks de saída. | `ANTITOTEM/src/core/NoiseFields.h::NoisePalette` (paleta de 6 cores; teoria de ruído colorido é domínio público — diferenciação/integração de ruído branco) |
+| ~~**oscilador PLL / soft-sync**~~ | SOURCE | **FEITO (2026-09-05) — `PLL`, Módulo 37** (não um modo dentro do `OSC` — módulo dedicado, a pedido do autor: "faz o b, porém será um oscilador sofisticado, com itens que o primeiro não contém ainda"). `dossies/37_pll.md`, `src/dsp/Pll.hpp`. Detector de fase compara contra uma referência externa e CURVA a própria taxa em vez de resetar duro; toca livre sem referência (é um segundo VCO de verdade). `ratio` generaliza pra além de 1:1 (desvio Rasgo), `lock_gain` exposto, alcance de captura limitado (±0,9) medido e documentado — mesma limitação de um PLL analógico real. | `ANTITOTEM/src/core/CmosVoice.h` — OSC5, estudo de 4046 PLL/VCO (detector de fase + ganho de malha, `pllLockGain`) |
+| ~~**campo caótico (double-well)**~~ | DECISION | **FEITO (2026-09-05) — `CHAOS`, Módulo 36.** `dossies/36_chaos.md`, `src/dsp/Chaos.hpp`. Dois integradores perseguem uma força restauradora não-linear (`x − x³`) com dois poços estáveis; `drive`/`damping` decidem se assenta, oscila ou "caça"; o chute periódico aleatório é o que deixa o sistema atravessar de um poço pro outro (confirmado por teste: sem ele fica preso). `rate` de CV lenta a textura de áudio, `freeze`, `reseed`. | `ANTITOTEM/src/core/ChaosSources.h::ChaosField` — estudo de caos de poço duplo (Ian Fritz, 2007, `PESQUISA_CMOS_LUNETTA.md` do próprio Antitotem — não é port de circuito, é estudo digital original do autor) |
+| ~~**feel rítmico não-binário**~~ | TIME | **FEITO (2026-09-05).** `CLOCK` ganhou `feel` (reto/tercina/quintina/septina/nonina/undecina/glitch) — multiplica `MULT` por 1/3/5/7/9/11 (quantizado e nomeado; `mult` continua controlando velocidade fina por cima); `glitch` sorteia um fator de tempo por passo (~0,7–1,4×) em vez de multiplicar por um número fixo. `swing` do Antitotem ficou de fora — o `CLOCK` já tem um `swing` contínuo próprio, duplicar como posição discreta só confundiria. | `ANTITOTEM/src/core/SimpleSequencer.h::ClockFeel` (enum) |
+| ~~**proximidade por oscilador**~~ (metade — órbita ficou de fora) | SOURCE (depth) | **FEITO (2026-09-05).** `OSC` ganhou `prox` — mistura as 5 saídas com uma versão passada por passa-baixa de 1 polo bem suave de si mesmas (0,06), `prox=0` é exatamente a saída crua (no-op determinístico, testado). **`órbita` (LFO de pitch autônomo) ficou de fora de propósito**: o `OSC` já tem `drift` fazendo exatamente esse papel (passeio lento correlacionado na afinação) — adicionar `órbita` seria duplicar, não contribuir. | `ANTITOTEM/src/core/CmosVoice.h` — `oscillatorProximity`/`oscillatorOrbit` (Y/Z, comentário explícito: "no-op em 0", "não sincronizado entre osciladores") |
+| ~~**rede de feedback com tipo selecionável**~~ | SOURCE (depth) | **FEITO (2026-09-05) — dentro do `PLL`, Módulo 37**, não do `OSC` (evitou o redesenho do `fm_amount` existente que tinha adiado isso antes). `feedback_type` (6 posições: direto/retificado/capacitivo/pulso/"transistor"/refluxo) modula a FASE antes de ler a forma. | `ANTITOTEM/src/core/CmosVoice.h::feedbackSample()` / `FeedbackSignal` (enum) |
+
+**Atualização (2026-09-05): os 6 candidatos desta lista estão feitos.**
+Ordem em que foram implementados, do mais simples ao mais arriscado:
+cores de ruído extras → feel rítmico não-binário → campo caótico como
+módulo novo → proximidade por oscilador (metade — órbita ficou de fora
+por decisão, não por dificuldade) → PLL/soft-sync + rede de feedback
+selecionável (os dois juntos, dentro do `PLL`, Módulo 37 — um segundo
+oscilador dedicado e sofisticado, não modos bolt-on no `OSC`). As três
+decisões de arquitetura que ficaram de fora desta lista de candidatos de
+módulo — `CROSS` (`PatchGenetics.hpp`, alinhamento por tipo), o
+contrato `NOTE` do `MUSICAL SCORE` (`NOTE-OUT`, Módulo 38, adaptador
+observador sem mudar interface de nenhum outro módulo) e a gramática
+explícita do `Seed` (§1.1 do `ESTUDO_seed_composicao_generativa.md`,
+`apps/panel/SeedGrammar.hpp`) — **também estão feitas, desde
+2026-09-05.**
 
 ---
 

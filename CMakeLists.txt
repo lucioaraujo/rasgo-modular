@@ -173,6 +173,21 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_abacus_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_abacus_tests COMMAND rasgo_modular_abacus_tests)
 
+    add_executable(rasgo_modular_chaos_tests tests/test_chaos.cpp)
+    target_link_libraries(rasgo_modular_chaos_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_chaos_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_chaos_tests COMMAND rasgo_modular_chaos_tests)
+
+    add_executable(rasgo_modular_pll_tests tests/test_pll.cpp)
+    target_link_libraries(rasgo_modular_pll_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_pll_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_pll_tests COMMAND rasgo_modular_pll_tests)
+
+    add_executable(rasgo_modular_note_out_tests tests/test_note_out.cpp)
+    target_link_libraries(rasgo_modular_note_out_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_note_out_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_note_out_tests COMMAND rasgo_modular_note_out_tests)
+
     add_executable(rasgo_modular_wasp_tests tests/test_wasp.cpp)
     target_link_libraries(rasgo_modular_wasp_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wasp_tests PRIVATE ${rasgo_modular_warnings})
@@ -192,6 +207,62 @@ if(BUILD_TESTING)
     target_link_libraries(rasgo_modular_mult_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_mult_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_mult_tests COMMAND rasgo_modular_mult_tests)
+
+    # usa apps/panel/MotionEngine.hpp — include dir extra `apps`, como o
+    # painel gráfico e a peça 4.
+    add_executable(rasgo_modular_motion_engine_tests tests/test_motion_engine.cpp)
+    target_include_directories(rasgo_modular_motion_engine_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_motion_engine_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_motion_engine_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_motion_engine_tests COMMAND rasgo_modular_motion_engine_tests)
+
+    # usa apps/panel/PatchGenetics.hpp
+    add_executable(rasgo_modular_patch_genetics_tests tests/test_patch_genetics.cpp)
+    target_include_directories(rasgo_modular_patch_genetics_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_patch_genetics_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_patch_genetics_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_patch_genetics_tests COMMAND rasgo_modular_patch_genetics_tests)
+
+    # usa apps/panel/ScoreRecorder.hpp (não depende do core; include dir
+    # `apps` mantido pra consistência com os outros protótipos)
+    add_executable(rasgo_modular_score_recorder_tests tests/test_score_recorder.cpp)
+    target_include_directories(rasgo_modular_score_recorder_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_score_recorder_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_score_recorder_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_score_recorder_tests COMMAND rasgo_modular_score_recorder_tests)
+
+    # usa apps/panel/LearnCatalog.hpp
+    add_executable(rasgo_modular_learn_catalog_tests tests/test_learn_catalog.cpp)
+    target_include_directories(rasgo_modular_learn_catalog_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_learn_catalog_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_learn_catalog_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_learn_catalog_tests COMMAND rasgo_modular_learn_catalog_tests)
+
+    # usa apps/panel/UiLanguage.hpp
+    add_executable(rasgo_modular_ui_language_tests tests/test_ui_language.cpp)
+    target_include_directories(rasgo_modular_ui_language_tests PRIVATE src apps)
+    target_compile_options(rasgo_modular_ui_language_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_ui_language_tests COMMAND rasgo_modular_ui_language_tests)
+
+    add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
+    target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_wav_writer_tests COMMAND rasgo_modular_wav_writer_tests)
+
+    add_executable(rasgo_modular_true_peak_tests tests/test_true_peak.cpp)
+    target_link_libraries(rasgo_modular_true_peak_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_true_peak_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_true_peak_tests COMMAND rasgo_modular_true_peak_tests)
+
+    add_executable(rasgo_modular_output_stage_tests tests/test_output_stage.cpp)
+    target_link_libraries(rasgo_modular_output_stage_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_output_stage_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_output_stage_tests COMMAND rasgo_modular_output_stage_tests)
+
+    add_executable(rasgo_modular_audio_in_tests tests/test_audio_in.cpp)
+    target_link_libraries(rasgo_modular_audio_in_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_audio_in_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_audio_in_tests COMMAND rasgo_modular_audio_in_tests)
 endif()
 
 add_executable(rasgo_modular_primeiro_fragmento examples/primeiro_fragmento.cpp)
@@ -216,6 +287,15 @@ add_executable(rasgo_modular_peca_generativa_3 examples/peca_generativa_3.cpp)
 target_link_libraries(rasgo_modular_peca_generativa_3 PRIVATE rasgo_modular_core)
 if(NOT MSVC)
     target_compile_options(rasgo_modular_peca_generativa_3 PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+# usa apps/panel/MotionEngine.hpp (protótipo do Motion Engine, fora do
+# core) — por isso o include dir extra `apps`, como o painel gráfico.
+add_executable(rasgo_modular_peca_generativa_4 examples/peca_generativa_4.cpp)
+target_include_directories(rasgo_modular_peca_generativa_4 PRIVATE src apps)
+target_link_libraries(rasgo_modular_peca_generativa_4 PRIVATE rasgo_modular_core)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_peca_generativa_4 PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # ---------------------------------------------------------------------------

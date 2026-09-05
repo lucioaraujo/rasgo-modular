@@ -59,21 +59,23 @@ public:
 
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
+        // passe de ergonomia 2026-09-06: display cheio; saída "SCALE"
+        // (5 letras) agora com espaço; entradas realinhadas.
         Panel p;
         p.hp = 10;
         p.add(Widget::Kind::Label, "HARMONY", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "keycenter", "", 2.5f, 8.0f, 45.0f);
-        p.add(Widget::Kind::Knob, "MOVE", "movement", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 23.0f, 30.0f);
+        p.add(Widget::Kind::Display, "keycenter", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "MOVE", "movement", 6.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 22.0f, 30.0f);
         p.add(Widget::Kind::Knob, "ROOT", "root_start", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "S-LO", "scale_lo", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "S-HI", "scale_hi", 23.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "S-LO", "scale_lo", 6.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "S-HI", "scale_hi", 22.0f, 54.0f);
         p.add(Widget::Kind::Knob, "HOLD", "hold", 38.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "ADV", "in:advance", 5.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 17.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "ROOT", "out:root", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SCALE", "out:scale", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "CHG", "out:change", 29.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "ADV", "in:advance", 8.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 20.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "ROOT", "out:root", 8.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "SCALE", "out:scale", 22.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "CHG", "out:change", 36.0f, 118.0f);
         return p;
     }
 

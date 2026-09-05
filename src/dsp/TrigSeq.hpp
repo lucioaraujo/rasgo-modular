@@ -64,7 +64,7 @@ public:
         Panel p;
         p.hp = 16;
         p.add(Widget::Kind::Label, "TRIGSEQ", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "grid", "", 2.5f, 7.0f, 72.0f);
+        p.add(Widget::Kind::Display, "grid", "", 2.5f, 6.0f, 76.3f);
         p.add(Widget::Kind::Knob, "LEN", "length", 10.0f, 28.0f);
         p.add(Widget::Kind::Knob, "RATE", "rate", 28.0f, 28.0f);
         p.add(Widget::Kind::Knob, "MAP", "map", 46.0f, 28.0f);
