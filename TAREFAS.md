@@ -4039,3 +4039,24 @@ build (o `.h` é commitado). `rasgo_logo.xbm` removido.
 **47/47 CTest**.
 
 **Não commitado.**
+
+## Registro da etapa — 2026-09-06: variação ao vivo (VARIA) mais viva — ±20% + sliders de volta
+
+Relato: "antes os knobs e sliders variavam mais, sem precisar clicar a
+cada vez num botão". A correção do "6º slider" (2026-09-05) tinha deixado
+a janela em ±6% e só-knob — ficou imperceptível.
+
+**Feito** (`apps/panel/panel_main.cpp`, `populateMotion`)
+- `kMotionDepth` 0,12 → **0,40** (±20% do range, uniforme pra todo binding);
+- `b.rateHz` 0,015–0,06 → **0,03–0,12 Hz** (alvo novo a cada ~8–33 s);
+- **KNOB + SLIDER** elegíveis de novo — mesma janela uniforme (o vício
+  era a janela não-uniforme, não o slider). Inclui os passos do
+  `SEQUENCE` (melodia deriva de leve). `MIXER gain1..4` / `MASTER gain` /
+  `out_gain` seguem bloqueados (`isMutationBlocked`).
+
+`VARIA` (ex-`[v]`) continua ligada por padrão. Doc: `ESTUDO §3.6`.
+
+**Validação:** build limpo, **47/47 CTest**. A afinação vai pelo ouvido do
+autor — se ±20% for demais/de menos, é um número.
+
+**Não commitado.**

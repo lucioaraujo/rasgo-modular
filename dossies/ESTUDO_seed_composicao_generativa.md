@@ -430,11 +430,18 @@ exemplo), então a prova de arquitetura da peça JÁ generalizou pro caso
 **Correção (2026-09-05):** a janela de movimento no painel era o RANGE
 INTEIRO do parâmetro — um `OSCILLATE` varria o controle de ponta a
 ponta, um `WALK` mal saía do lugar (o autor: "o 6º slider do SEQUENCE se
-move muito mais que os outros"). Agora é ±6% do range, IGUAL pra todo
-binding, centrada no valor atual do knob (`Binding::start`). Todo
-controle animado "respira" a mesma fração proporcional. `test_motion_engine`
-e `peca_generativa_4` intocados (usam a API sem `start` → compat). Ver
-`TAREFAS.md`.
+move muito mais que os outros"). Passou a ser uma fração IGUAL do range,
+centrada no valor atual (`Binding::start`) — o vício era a janela
+**não-uniforme**, não o slider em si.
+
+**Ajuste (2026-09-06):** a ±6% ficou imperceptível ("os knobs e sliders
+variavam mais, sem precisar clicar num botão"). Agora **±20%**
+(`kMotionDepth = 0.40`), ritmo ~0,03–0,12 Hz (alvo novo a cada ~8–33 s), e
+**KNOB + SLIDER** de novo elegíveis — com a **mesma** janela uniforme
+(inclui os passos do `SEQUENCE`: a melodia deriva de leve). Faders de
+nível (`MIXER gain1..4`, `MASTER gain`, `out_gain`) seguem em
+`isMutationBlocked`. `test_motion_engine` e `peca_generativa_4` intocados
+(usam a API sem `start` → compat). Ver `TAREFAS.md`.
 
 ---
 

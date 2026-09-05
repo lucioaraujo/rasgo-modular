@@ -574,7 +574,7 @@ int main() {
     struct Mod { std::size_t id; int col; int w; int hp; };
     std::vector<Mod> mods;
     rasgo::panel::MotionEngine motion;
-    bool motionOn = true;     // [v] -- variação ao vivo dos knobs, ligada por padrão
+    bool motionOn = true;     // VARIA / [v] -- variação ao vivo (knobs + sliders), ligada
     auto buildMods = [&] {
         mods.clear();
         for (const auto id : shown) {
@@ -603,13 +603,16 @@ int main() {
     // escolher DOIS módulos relacionados, não dá pra derivar só do hash
     // de um nó sozinho.
     //
-    // A JANELA de movimento é uma fração PEQUENA e IGUAL do range de cada
-    // parâmetro (`kMotionDepth`), centrada no valor atual do knob — assim
-    // todo controle animado "respira" a mesma quantidade proporcional
+    // A JANELA de movimento é uma fração IGUAL do range de cada parâmetro
+    // (`kMotionDepth`), centrada no valor atual do controle — assim todo
+    // controle animado "respira" a mesma quantidade proporcional
     // (correção 2026-09-05: antes a janela era o range INTEIRO, então um
     // OSCILLATE varria o parâmetro de ponta a ponta enquanto um WALK mal
-    // saía do lugar — o "6º slider do SEQUENCE se move muito mais").
-    constexpr float kMotionDepth = 0.12f;   // ±6% do range, uniforme
+    // saía do lugar — o "6º slider do SEQUENCE se move muito mais"; a
+    // fração é a mesma pra KNOB e SLIDER, era isso que o autor pedia).
+    // ±20% do range, IGUAL pra todo binding (autor 2026-09-06: a ±6% de
+    // antes ficou imperceptível — "os knobs e sliders variavam mais").
+    constexpr float kMotionDepth = 0.40f;
     auto populateMotion = [&] {
         motion.clear();
         for (const auto id : shown) {
@@ -617,11 +620,13 @@ int main() {
             const Panel pn = node.panel();
             std::vector<const Widget*> eligible;
             for (const auto& w : pn.widgets) {
-                // só KNOB — Slider no Rasgo é "a partitura" (passos do
-                // SEQUENCE) ou o fader do MIXER: não é uma regulagem que
-                // deva derivar sozinha (era o "6º slider do SEQUENCE se
-                // move muito mais").
-                if (w.kind != Widget::Kind::Knob) continue;
+                // KNOB ou SLIDER — o mesmo comportamento uniforme pros
+                // dois (o "6º slider do SEQUENCE se move mais" era a
+                // janela NÃO-uniforme de antes, não o slider em si). Os
+                // faders de nível (MIXER `gain1..4`, MASTER `gain`) já
+                // caem no `isMutationBlocked` abaixo.
+                if (w.kind != Widget::Kind::Knob
+                    && w.kind != Widget::Kind::Slider) continue;
                 if (rasgo::panel::isMutationBlocked(w.bind)) continue;
                 // parâmetros que perto do extremo viram fuga/aspereza —
                 // derivar é arriscado (um filtro caminha pra auto-oscilar
@@ -669,11 +674,11 @@ int main() {
             b.start = cur;
             std::uint64_t rs = h;
             rs ^= rs >> 13; rs *= 0xBF58476D1CE4E5B9ULL; rs ^= rs >> 7;
-            // ~0,015..0,06 Hz -- WALK: alvo novo a cada ~15..60 s, deslize
+            // ~0,03..0,12 Hz -- WALK: alvo novo a cada ~8..33 s, deslize
             // proporcional ("respira", não "sacoleja"); OSCILLATE: ciclo
-            // completo no mesmo intervalo de tempo (~17..67 s) -- mesma
-            // sensação de ritmo lento, comportamento diferente.
-            b.rateHz = 0.015f + 0.045f
+            // completo no mesmo intervalo -- mesma sensação de ritmo,
+            // comportamento diferente.
+            b.rateHz = 0.03f + 0.09f
                 * (static_cast<float>((rs >> 16) & 0xFFFFu) / 65536.0f);
             // ~27% dos módulos oscilam (ciclo previsível) em vez de
             // andar (alvo imprevisível) -- variedade de comportamento
