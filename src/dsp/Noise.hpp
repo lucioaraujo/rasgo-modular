@@ -38,7 +38,11 @@
 //     degrau do S&H que só troca no pulso de `trigger`).
 //
 // Desvio Rasgo: `spread` leva a distribuição do S&H / smooth de uniforme
-// a sino. Determinístico: dois streams xorshift semeados em prepare().
+// a sino. `poisson` (0–1, +2026-09-06) troca o relógio interno periódico
+// por um processo de POISSON LIVRE (`t = −ln(U)/λ`, λ ~ `rate`) — o S&H /
+// smooth passam a atualizar em tempos aleatórios NÃO presos a um clock
+// (o "contador Geiger"; par do `BOXCAR.geiger`, #51). Ignorado se `TRIG`
+// estiver conectado. Determinístico: streams xorshift semeados em prepare().
 
 namespace rasgo::modular {
 
@@ -58,19 +62,21 @@ public:
                {"bit", PortKind::Audio, ""}},
               {{"rate", 0.01f, 2000.0f, 8.0f, "Hz"},
                {"slew", 0.0f, 1.0f, 0.3f, ""},
-               {"spread", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"spread", 0.0f, 1.0f, 0.0f, ""},
+               {"poisson", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "NOISE"; }
 
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
-        p.hp = 12;   // 8 saídas em 2 fileiras de 4 (era 20 HP numa fileira só)
+        p.hp = 14;   // 8 saídas em 2 fileiras de 4; +POIS 2026-09-06 (era 12)
         p.add(Widget::Kind::Label, "NOISE", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "noise", "", 2.5f, 6.0f, 56.0f);
         p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SLEW", "slew", 25.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SPRD", "spread", 41.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "POIS", "poisson", 55.0f, 30.0f);
         p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 9.0f, 60.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 23.0f, 60.0f);
         // 8 saídas simultâneas, 2 fileiras de 4
@@ -93,11 +99,13 @@ public:
         smooth_ = 0.0f;
         smoothTarget_ = 0.0f;
         phase_ = 0.0;
+        poisCd_ = 0.0;
         prevTrig_ = 0.0f;
         prevWhite_ = 0.0f;
         prevBlue_ = 0.0f;
         rngWhite_ = 0x243F6A8885A308D3ULL;
         rngSH_ = 0xB7E151628AED2A6BULL;
+        rngPois_ = 0x9E3779B97F4A7C15ULL;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -116,6 +124,7 @@ public:
         const float rate = parameterValue("rate");
         const float slew = parameterValue("slew");
         const float spread = parameterValue("spread");
+        const float poisson = parameterValue("poisson");
         // slewCoef: slew=0 -> instantâneo (1.0); slew=1 -> ~2 s de glide
         const float slewSec = slew * slew * 2.0f;
         const float slewCoef = slewSec <= 0.0f
@@ -163,6 +172,20 @@ public:
                 const float t = trig->at(0, frame);
                 if (prevTrig_ < 0.5f && t >= 0.5f) tick = true;
                 prevTrig_ = t;
+            } else if (poisson > 1.0e-4f) {
+                // processo de Poisson livre: intervalo = mistura entre o
+                // período regular e um sorteio exponencial de mesma média
+                poisCd_ -= 1.0;
+                if (poisCd_ <= 0.0) {
+                    tick = true;
+                    const double meanS = 1.0 / std::max(1.0e-9, dp);
+                    double u = static_cast<double>(u01pos(rngPois_));
+                    if (u < 1.0e-12) u = 1.0e-12;
+                    const double interval =
+                        (1.0 - static_cast<double>(poisson)) * meanS
+                        + static_cast<double>(poisson) * (-std::log(u) * meanS);
+                    poisCd_ = interval < 1.0 ? 1.0 : interval;
+                }
             } else {
                 phase_ += dp;
                 if (phase_ >= 1.0) { phase_ -= 1.0; tick = true; }
@@ -198,6 +221,12 @@ private:
             / 2147483648.0f;  // [-1,1)
     }
     float whiteSample() noexcept { return u01(rngWhite_); }
+    // uniforme em (0,1] pro sorteio de intervalo de Poisson
+    static float u01pos(std::uint64_t& s) noexcept {
+        s ^= s >> 12; s ^= s << 25; s ^= s >> 27;
+        const std::uint64_t x = s * 0x2545F4914F6CDD1DULL;
+        return static_cast<float>((x >> 40) + 1u) / 16777216.0f;  // (0,1]
+    }
     // uniforme <-> sino (média de 4) conforme `spread`
     float shapedDraw(const float spread) noexcept {
         const float uni = u01(rngSH_);
@@ -214,9 +243,11 @@ private:
     float held_ = 0.0f;
     float smooth_ = 0.0f, smoothTarget_ = 0.0f;
     double phase_ = 0.0;
+    double poisCd_ = 0.0;
     float prevTrig_ = 0.0f;
     std::uint64_t rngWhite_ = 0x243F6A8885A308D3ULL;
     std::uint64_t rngSH_ = 0xB7E151628AED2A6BULL;
+    std::uint64_t rngPois_ = 0x9E3779B97F4A7C15ULL;
 };
 
 }  // namespace rasgo::modular

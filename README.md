@@ -75,10 +75,14 @@ camada `io/` + `dr_wav`) + `SIGNAL-IN` (Módulo 49 — o `AUDIO-IN` cresceu:
 + `TURNTABLE` (Módulo 50 — o buffer do `SAMPLER` lido por um prato com
 inércia: torque de motor, atrito, mão na CV `scratch`, `wear`
 determinístico; o `TAPE` virou `heads` no `LOOPER`).
-**As 4 ondas do roadmap `§2.4` fechadas.** + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
+**As 4 ondas do roadmap `§2.4` fechadas.** Pós-roadmap: `BOXCAR` (Módulo
+51 — *boxcar averager* / integrador de porta: janela + delay + média de N
+capturas, `scan` reconstrói a onda, `geiger` = trem de Poisson livre;
+inspirado no AI Synthesis AI250 BXR) + o `NOISE` ganhou o modo `poisson`.
++ **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-49 módulos DSP,
-61 alvos CTest
+50 módulos DSP,
+62 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -105,7 +109,7 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 49 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 50 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver

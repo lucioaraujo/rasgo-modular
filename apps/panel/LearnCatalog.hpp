@@ -446,6 +446,15 @@ inline const LearnTable& learnTable() {
                 "uniformes) — afeta SH e SMTH.",
                 "spread=0 é uniforme (cai igual em qualquer valor); "
                 "spread=1 concentra perto de 0.", ""}},
+            {"poisson", {
+                "Troca o relógio interno periódico por um processo de "
+                "Poisson LIVRE — SH/SMTH atualizam em tempos aleatórios, "
+                "não presos a um clock. RATE vira a taxa média.",
+                "Intervalo = mistura entre o período regular e um sorteio "
+                "exponencial (t = −ln(U)/λ); poisson=1 é Poisson puro. "
+                "Ignorado se TRIG estiver conectado.",
+                "É o \"contador Geiger\" — par da saída GEIG do BOXCAR "
+                "(#51). Semeado: dois renders idênticos."}},
             {"in:trigger", {
                 "Trigger externo pro S&H/SMTH — presente, substitui o "
                 "relógio interno (RATE).", "", ""}},
@@ -594,6 +603,76 @@ inline const LearnTable& learnTable() {
             {"in:cutoff_mod", {"CV que soma ao CUT.", "", ""}},
             {"in:res_mod", {"CV que soma a RESO.", "", ""}},
             {"out:out", {"Saída filtrada/ceifada.", "", ""}},
+        }},
+        {"BOXCAR", {
+            {"delay", {
+                "Onde a janela de amostragem abre, como fração do período "
+                "medido pelo TRIG. Gira uma \"cabeça de leitura\" por "
+                "dentro da forma de onda capturada.",
+                "Inspirado no boxcar averager (integrador de porta) — "
+                "equipamento de teste nuclear. O DELAY é o \"aperture "
+                "delay\" do instrumento.", ""}},
+            {"aperture", {
+                "Largura da janela, fração do período. →0 = amostra "
+                "pontual (vira um S&H de fase fixa); larga = a média "
+                "borra um arco da onda.", "", ""}},
+            {"average", {
+                "Profundidade N da média: quantas capturas se empilham "
+                "num mesmo ponto de fase. N alto = o ruído descorrelato "
+                "some (~1/√N), o sinal coerente fica.",
+                "Média corrente com piso 1/min(N, capturas) — as "
+                "primeiras capturas contam mais, depois estabiliza.", ""}},
+            {"scan", {
+                "Velocidade e direção com que o DELAY varre o período "
+                "sozinho. 0 = estático (um ponto só). ≠0 = a janela "
+                "passeia e reconstrói a onda TODA (scanning boxcar).",
+                "Os modos RECONSTRUCT e OSC precisam de SCAN≠0 pra o "
+                "buffer de fase encher.", ""}},
+            {"mode", {
+                "0 FOLLOWER — a saída segura a média da última janela "
+                "(um S&H de janela). 1 RECONSTRUCT — toca a onda "
+                "reconstruída em sincronia com o TRIG. 2 OSC — relê o "
+                "buffer reconstruído a RATE, livre do TRIG.",
+                "No modo 2 a \"wavetable\" é o que o módulo ouviu, "
+                "mediado — a onda vem da própria história (desvio "
+                "Warps/Rings: a relação é o processo).", ""}},
+            {"rate", {
+                "Relógio interno (se TRIG estiver livre) e frequência de "
+                "releitura no modo OSC.", "", ""}},
+            {"thresh", {
+                "Limiar do auto-trigger: sem cabo no TRIG, um cruzamento "
+                "ascendente de IN por este nível é a referência de "
+                "repetição (edge trigger de osciloscópio). O jack THR "
+                "soma CV.", "", ""}},
+            {"geiger", {
+                "Densidade de um trem de gates de POISSON livre na saída "
+                "GEIG — não preso a nenhum clock. 0 = saída muda.",
+                "t = −ln(U)/λ, λ ≈ 0,5 + geiger²·40 ev/s. Semeado "
+                "(xorshift) — dois renders idênticos. É o \"contador "
+                "Geiger\"; o NOISE tem o mesmo modo (POIS).", ""}},
+            {"blend", {
+                "IN ↔ resultado. 0 = passa o seco (bypass); 1 = só o "
+                "processado.", "", ""}},
+            {"in:in", {
+                "Sinal a analisar (áudio ou CV). Desconectado, o módulo "
+                "usa um piso de ruído interno de −34 dB pra ter o que "
+                "reconstruir (soa ao carregar).", "", ""}},
+            {"in:trig", {
+                "Referência de repetição — o evento a que as capturas se "
+                "travam. Sem cabo: cruzamentos do limiar (THRSH) ou o "
+                "relógio interno (RATE).", "", ""}},
+            {"in:sweep", {
+                "CV somada ao DELAY — varre a posição da janela pela "
+                "onda (uma frase de posições vinda de um SEQUENCE).", "",
+                ""}},
+            {"in:thr", {"CV somada ao limiar THRSH do auto-trigger.", "",
+                       ""}},
+            {"out:out", {
+                "O sinal seguido / reconstruído, misturado com o seco "
+                "por BLEND. Clamp de segurança a ±8.", "", ""}},
+            {"out:geiger", {
+                "Trem de gates de Poisson livre (ver GEI). Gate de "
+                "~5 ms.", "", ""}},
         }},
         {"ABACUS", {
             {"op", {

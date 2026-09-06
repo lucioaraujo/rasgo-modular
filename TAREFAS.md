@@ -4823,3 +4823,77 @@ prato para); label do knob `TORQUE` → `TORQ` (5 chars, gate de layout).
 **61/61 CTest em Debug e Release.**
 
 Pendências restantes: teste ao vivo do MIDI (autor); `git push`.
+
+---
+
+## Registro da etapa — 2026-09-06: dossiê-proposta BOXCAR (#51, não implementado)
+
+O autor achou o **AI Synthesis AI250 BXR** interessante (14 HP, Daisy;
+"audio mangler / CV generator / VCO" inspirado no *boxcar averager* —
+equipamento de teste nuclear, ref. Stanford Research SR200 NIM / SR-235).
+Pediu o dossiê-proposta.
+
+**`dossies/51_boxcar.md` (NOVO — proposta, sem código).** Padrão §1–§8
+completo. O boxcar averager: gatilho + delay de abertura + *aperture* +
+média de N capturas; *scanning* do delay reconstrói a forma de onda.
+Reinterpretação musical: revelar sinal enterrado no ruído (verbo
+REPAIR); S&H de janela (mede fatia, não instante); cabeça de leitura
+varrendo a onda capturada; "modo oscilador" que relê o buffer que ele
+mesmo montou (desvio Warps/Rings). Saída secundária `geiger` = trigger
+de Poisson livre (falta no RASGO — todo ritmo aleatório hoje é preso ao
+clock). Modelo por amostra, estados, extremos, testes propostos e painel
+(14 HP, família DECISION, ao lado do `ABACUS`) todos esboçados.
+
+Não é VCO novo (o RASGO já tem OSC/WAVETABLE/ADDITIVE/CHORD). Licença
+OK: boxcar de bancada é domínio público (Wikipedia, manuais SR200); o
+firmware do AI250 publica só o `.bin` — conceito, não código.
+
+**Decisões do autor (2026-09-06 — tomadas):** (1) nome **`BOXCAR`** —
+sem impedimento (termo genérico de DSP; o AI Synthesis usou "BXR", não
+"Boxcar"; regra de licença do RASGO é sobre código, não copiado);
+(2) família **DECISION**; (3) `geiger` **nos dois** — saída secundária
+do `BOXCAR` **e** um modo Poisson livre novo no `NOISE`; (4) modo
+oscilador **na v1** (releitura interpolada do `recon_`); (5) `in`/`out`
+**Audio + Control**.
+
+Dossiê atualizado pra "aprovado — a implementar"; `00_indice.md`
+linha 51 e `PESQUISA §2.4` idem.
+
+---
+
+## Registro da etapa — 2026-09-07: Módulo 51 — BOXCAR + NOISE.poisson
+
+**`src/dsp/Boxcar.hpp` (NOVO), `tests/test_boxcar.cpp` (11 testes).**
+Reinterpretação musical do *boxcar averager*: `trig` trava no evento
+repetitivo, `delay` posiciona uma janela no período MEDIDO, `aperture` a
+largura, o conteúdo é integrado e empilhado com as capturas anteriores
+(`average` = N, EMA com piso 1/min(N,hits)). `scan` varre o `delay` →
+reconstrói a onda toda. `mode`: 0 follower (S&H de janela; `average` alto
+= sem tremor), 1 reconstruct, 2 oscillator (relê o buffer próprio a
+`rate`). Auto-trigger por `thresh` (edge trigger) quando `trig` livre.
+`geiger` = trem de gates de Poisson LIVRE (`t = −ln(U)/λ`, semeado).
+`blend` seco↔processado. `in` livre → piso de ruído interno −34 dB (modo
+autônomo). Família DECISION, 14 HP.
+
+**Ajustes vs. a proposta:** `mode 0` segura `recon_[bin]` (não o `m`
+cru) → a média realmente ajuda o follower; a janela escreve o ARCO de
+bins `[delayPos, delayPos+aperture]` (a abertura É suavização em fase, e
+enche o buffer com menos capturas); `mode` default 0 (sem `scan`, 1/2 só
+enchem uma fatia).
+
+**`src/dsp/Noise.hpp`:** param `poisson` (0–1) — troca o relógio interno
+periódico do S&H/smooth por o mesmo processo de Poisson. Stream xorshift
+`rngPois_` próprio (poisson=0 → byte-idêntico ao anterior). Knob `POIS`,
+painel do `NOISE` de 12 → 14 HP.
+
+Integração: `CMakeLists.txt` (CTest 62), `ModuleCatalog.hpp` (DECISION),
+`LearnCatalog.hpp` (BOXCAR 15 binds + NOISE.poisson), `test_panel_layout`,
+`test_learn_catalog` (NOISE list). Docs: `00_indice`, `51_boxcar.md`,
+`PESQUISA §2.4`, `RASGO_MODULAR.md §4.1`/§36.3/§36.5 + contagens
+(50 módulos, 62 CTest), `README`.
+
+**62/62 CTest em Debug e Release.** Não commitado ainda.
+
+Pendências abertas (não deste módulo): teste ao vivo do MIDI (autor);
+bug do VARIA (knob `pw` do `OSC` treme, `steps` do `DECISION` se move sem
+cabo) — a investigar; `git push`.

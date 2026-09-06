@@ -163,8 +163,10 @@ MODULATE   mover         ENVELOPE FUNCTION DRIFT CHAOS SH
 TIME       marcar tempo  CLOCK LOGIC TURING SEQUENCE TRIGSEQ
   └ clock, lógica de clock, sequenciadores (Patch & Tweak junta
     "Rhythm, Sequencing & Synchronized Modulation")
-DECISION   decidir       QUANTIZER HARMONY ABACUS DECISION
-  └ escolhe um valor — quantiza, harmoniza, calcula, compara
+DECISION   decidir       QUANTIZER HARMONY ABACUS DECISION BOXCAR
+  └ escolhe um valor — quantiza, harmoniza, calcula, compara, promedia
+    (o BOXCAR é o parente construtivo de PERCEPTION: mede uma janela,
+     empilha capturas, reconstrói a onda)
 ROUTE      rotear        SWITCH MATRIX MULT PLANAR
   └ chave, matriz, múltiplo, morph vetorial
 SPACE      espacializar  SPACE LOOPER MEMORY
@@ -1121,7 +1123,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 49 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 50 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1218,7 +1220,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 49 módulos DSP
+### 36.3 Os 50 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1244,7 +1246,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 16 | `MIXER` | OUT | 4 entradas mono → soma; `gain`/`pan`/`mute` por canal, pan de potência constante; saída estéreo; `out_gain` | prática de mesa; pan-law de potência constante (fato público) |
 | 17 | `MASTER` | OUT | barramento de saída: largura mid/side (`width` 0–2), soma `mono`, `gain`, **proteção de saída de excelência** (`src/dsp/OutputStage.hpp`: finitude + bloqueio de DC + **guarda ultrassônica** + **governador de corpo** (`body_guard`, agudo alto/sustentado/concentrado ~2,5–8 kHz → high-shelf suave) + **limitador look-ahead ~3 ms** por pico verdadeiro + teto suave, teto −1 dBFS, telemetria de GR e de body-guard), saída de VU (`level`) | matriz mid/side (Blumlein); `NAVALHA`/`ANTITOTEM` `OutputStage`+`LookaheadLimiter`+`TruePeakDetector` (código do autor) |
 | 18 | `OSC` | SOURCE | oscilador subtrativo: 5 formas ao mesmo tempo (seno/tri/serra/pulso/sub) antialias PolyBLEP, 1 V/oct, PWM, hard sync, FM linear through-zero, sub-oitava; `drift` | PolyBLEP (Välimäki/Finke); hard sync clássico; TZFM (Buchla 259); sub por divisão (Juno/Moog) |
-| 19 | `NOISE` | SOURCE | ruído branco/rosa/brown + sample-and-hold + tensão que passeia (smooth random); `spread` uniforme→sino (acaso estruturado) | Paul Kellet pink filter (domínio público); S&H clássico; Buchla 266 smooth random |
+| 19 | `NOISE` | SOURCE | ruído branco/rosa/brown/azul/violeta/bit + sample-and-hold + tensão que passeia (smooth random); `spread` uniforme→sino (acaso estruturado); `poisson` (+2026-09-06) troca o relógio interno do S&H/smooth por um processo de POISSON LIVRE (`t = −ln(U)/λ`) — atualização em tempos aleatórios não presos a clock (o "contador Geiger"; par do `BOXCAR.geiger` #51) | Paul Kellet pink filter (domínio público); S&H clássico; Buchla 266 smooth random; processo de Poisson (teoria pública) |
 | 20 | `VCA` | TRANSFORM | amplificador DUPLO: `in`×ganho; CV atenuvertida SOMA ao knob (porta de verdade — knob vivo); `response` lin→exp; saturação suave; `sum` = mini-mixer; `drift` | VCA lin/exp (Doepfer A-131/132); Quad VCA como mixer; atenuverter (Maths) |
 | 21 | `CONTROL` | TRANSFORM | utilidades de CV DUPLAS: `scale` (atenuversor −2..2), `offset`, `rectify` contínuo (`lerp(x,\|x\|)`), `slew`+`curve` (linear↔RC), saída `sum` (soma/média); `scale=0` = fonte de tensão; `rectify`+`slew` = seguidor de envelope; `drift` opt-in | Maths (atenuversor/offset/slew/somador); Serge DUSG; seguidor de envelope RC |
 | 22 | `LOGIC` | TIME | recombina o tempo: divisor ÷1–32 + multiplicador ×1–8 (período medido); `and`/`or`/`xor` simultâneos de dois gates; flip-flop T; `gate_len` (duty) + `delay` (anel 0–200 ms); `rate` = relógio interno se `clock` livre. Fecha o rack de partida | Pamela's (÷/×); Kinks/Boolean (lógica); flip-flop T; A-160 (contador módulo-N) |
@@ -1276,6 +1278,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 48 | `SAMPLER` | SPACE | matéria gravada como VOZ — o toca-fatias (MPC/Akai) que o `MEMORY` (granular) e o `LOOPER` (delay) não são. `trig` → um golpe de um trecho: gravado ao vivo (gate `rec` grava `in`, ~8 s) ou de arquivo (painel → `setBuffer()`; o `dr_wav` fica na camada `io/`, o core segue sem dependência). `start`; `speed` (−1..1 → varispeed ±0,25×–±4×, negativo = reverso); `slices` (1–16) + CV `pos` = o *chop*; `repitch` (0 = transposição via velocidade/fita, 1 = via pitch-shifter com duração preservada); `wear` (desvio Rasgo — desgaste **por disparo**: jitter de início + redução de taxa + bit-crush, **determinístico**, xorshift semeado no disparo); `loop`. De-click adaptativo nas bordas (`clamp(dur·0,24, 0,5–5 ms)`). **Porte** do `NAVALHA2_JUCE` — `SlicePlayer` + `HeritagePitch`/`PitchShift.hpp` (= `G09.pitchshift.pd`), GPL-3.0-or-later, crédito Glerm Soares + Lúcio Araújo (`§29.1`) | Navalha 2 (`NAVALHA2_JUCE/src/core/SlicePlayer.cpp` — porte); `G09.pitchshift.pd` (Puckette, domínio público); Akai S-series / E-mu (varispeed); MPC (chop); `dossies/ESTUDO_audio_sampling.md` (`PESQUISA §2.4` Onda D) |
 | 49 | `SIGNAL-IN` | SOURCE | o `AUDIO-IN` (#35) cresceu: **áudio + MIDI num adaptador só** (decisão do autor 2026-09-06 — não `MIDI-IN`/`CV-IN` separados). Anel SPSC de áudio (do `AUDIO-IN`) + anel de MIDI (`pushMidi(status,d1,d2)`, 1024 eventos); `process()` drena por bloco e resolve uma voz MONOFÔNICA last-note (pilha de 16 — solta a de cima, volta a de baixo). Saídas: `out`/`r` (áudio L/R × `gain`), `pitch` (1 V/oct, nota 60 = 0 V, + pitch-bend × `bend` em semitons), `gate` (rampa de 1 ms), `vel`, `cc` (o Control Change nº `cc_num`). Contraparte de ENTRADA do `NOTE-OUT` (#38). `type()` = "SIGNAL-IN"; `makeModule("AUDIO-IN")` é alias de migração e re-salvar um `.rmp` antigo escreve "SIGNAL-IN"; `src/dsp/AudioIn.hpp` = `using AudioIn = SignalIn`. Nada alimentando → silêncio determinístico (testável sem hardware). Thread ALSA-seq no painel: `apps/panel/AlsaMidi.hpp` (porta virtual "RASGO Modular : IN", `aconnect` liga o teclado) — falta só validar ao vivo | `AUDIO-IN` (#35 — o anel de áudio, reusado); ALSA sequencer (`snd_seq` — I/O MIDI padrão do Linux); voz mono last-note (Minimoog / MS-20 — fato de design); `NOTE-OUT` (#38 — a contraparte) (`PESQUISA §2.4` Onda D) |
 | 50 | `TURNTABLE` | SPACE | o mesmo buffer do `SAMPLER` (gravado ao vivo via gate `rec`, ou de arquivo via `setBuffer()`) lido por um **prato com massa**: `readPos` é a integral de uma velocidade angular com **inércia** (EDO de 1ª ordem), não um incremento fixo. `speed` (−1..1 → alvo ±0,5×–±2×, negativo = disco pra trás); `torque` (0–1, força do motor → quão rápido o prato atinge a velocidade — baixo dá o *wow* de partida ~1 s); `friction` (0–1, coasting no `brake` + retorno pós-scratch); `grab` (0–1, firmeza da mão na CV `scratch` — `scratch` pequeno = pitch-bend de beatmatch, grande e oscilando = scratch); `start` (onde a agulha cai no `trig`); `wear` (desvio Rasgo — estalos de vinil + micro-instabilidade de rotação, **determinístico**, xorshift semeado); `loop` (groove travado ↔ o disco "acaba" e trava). `trig` põe a agulha (`readPos = start·len`, rampa de ~5 ms) e **liga o motor**. Acoplamento AC de 1 polo na saída (prato parado → a amostra congelada some em ~40 ms, sem degrau de DC). Não toca enquanto grava (igual ao `SAMPLER`). **Desvio Rasgo** (`dossies/ESTUDO_audio_sampling.md §4.2`): o Navalha 2 rejeita a metáfora de DJ; aqui diverge, mas com o modelo físico do prato e **SEM quantização de BPM** (beatmatch é gesto). O `TAPE` NÃO virou módulo — virou `heads` no `LOOPER` (#41) | Technics SL-1200 (referência funcional — motor/torque/rampa, nenhum circuito); técnica de scratch de DJ (baby/chirp/transformer — documentação pública); `SAMPLER` (#48 — o buffer, a gravação, a camada `io/`); mecânica clássica (EDO de 1ª ordem, domínio público) (`PESQUISA §2.4` Onda D) |
+| 51 | `BOXCAR` | DECISION | reinterpretação musical do *boxcar averager* (integrador de porta — equipamento de teste nuclear, ref. Stanford Research SR200 NIM / SR-235): `trig` trava no evento repetitivo, `delay` posiciona uma janela num ponto do período medido, `aperture` diz a largura, o conteúdo é integrado (média) e EMPILHADO com as capturas anteriores (`average` = N, EMA com piso 1/min(N,hits)). `scan` (−1..1) varre o `delay` pelo período → reconstrói a onda TODA (o ruído descorrelato → 0, o coerente emerge). `mode`: 0 follower (S&H de janela; `average` alto = S&H sem tremor — segura `recon_[bin]`), 1 reconstruct (toca a onda reconstruída em sincronia), 2 oscillator (relê o buffer a `rate`, livre do `trig` — a wavetable é "o que ele ouviu, mediado"). Auto-trigger por limiar (`thresh` + CV `thr`) quando `trig` livre (edge trigger de osciloscópio). Saída `geiger` = trem de gates de **Poisson LIVRE** (`t = −ln(U)/λ`, `λ ≈ 0,5 + geiger²·40`, xorshift semeado). `blend` seco↔processado. `in`/`out` Audio+Control; `in` livre → piso de ruído interno de −34 dB (modo autônomo). Período medido normaliza os `K = 2048` bins → reconstrói mesmo em rubato. **Desvio Rasgo:** (a) o `scan` que vira oscilador relendo o buffer próprio; (b) `geiger` livre no grafo; (c) SEM quantização de BPM. **O `NOISE` (#19) ganhou o param `poisson`** — o mesmo processo no relógio interno do S&H/smooth. `process()` não aloca; determinístico | AI Synthesis AI250 BXR (referência funcional — 14 HP, Daisy; firmware publica só `.bin`); *boxcar averager* de bancada (domínio público — Wikipedia, manuais Stanford Research SR200/SR250); edge trigger de osciloscópio; processo de Poisson (teoria pública); `SH`/`SCOPE`/`ABACUS` do Rasgo |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1317,7 +1320,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**61 alvos CTest**, 100% verdes em **Debug e Release**
+**62 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

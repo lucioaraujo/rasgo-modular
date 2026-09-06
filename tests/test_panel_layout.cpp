@@ -10,6 +10,7 @@
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
 #include "dsp/Additive.hpp"
+#include "dsp/Boxcar.hpp"
 #include "dsp/SignalIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Chord.hpp"
@@ -200,6 +201,7 @@ int main() {
     mods.emplace_back("DRIFT", std::make_unique<Drift>());
     mods.emplace_back("DRUM", std::make_unique<Drum>());
     mods.emplace_back("ABACUS", std::make_unique<Abacus>());
+    mods.emplace_back("BOXCAR", std::make_unique<Boxcar>());
     mods.emplace_back("CLOCK", std::make_unique<EuclidClock>());
     mods.emplace_back("ENVELOPE", std::make_unique<Envelope>());
     mods.emplace_back("LOGIC", std::make_unique<Logic>());

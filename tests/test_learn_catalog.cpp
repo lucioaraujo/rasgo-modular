@@ -90,7 +90,7 @@ void testEveryRackDePartidaParamHasAtLeastQuick() {
 
 void testEveryOutputChainAndDeepDiveParamHasAtLeastQuick() {
     expectAllDocumented("NOISE", {
-        "rate", "slew", "spread", "in:trigger", "in:in",
+        "rate", "slew", "spread", "poisson", "in:trigger", "in:in",
         "out:white", "out:pink", "out:brown", "out:sh", "out:smooth",
         "out:blue", "out:violet", "out:bit",
     });
