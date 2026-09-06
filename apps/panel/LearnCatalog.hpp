@@ -1499,6 +1499,53 @@ inline const LearnTable& learnTable() {
             {"out:r", {"Canal direito (linhas ímpares) — descorrelacionado "
                       "do L pra a imagem ficar larga.", "", ""}},
         }},
+        {"SAMPLER", {
+            {"start", {
+                "Ponto de partida da reprodução, dentro da fatia "
+                "selecionada (0 = começo, 1 = fim).", "", ""}},
+            {"speed", {
+                "Varispeed bipolar: sinal·2^(|speed|·2) → ±0,25× a ±4×. "
+                "Negativo = tocar de trás pra frente.",
+                "Sem REPIT, a velocidade e a altura andam juntas (como um "
+                "toca-fitas). 2× mais rápido = uma oitava acima.",
+                "Cabeie SEQUENCE → PIT e toque a mesma fatia em várias "
+                "alturas."}},
+            {"slices", {
+                "Divide o buffer gravado em N fatias iguais (1–16). O CV "
+                "de POS escolhe qual disparar.",
+                "É o 'chop' do MPC — grava um compasso, corta em 8, "
+                "dispara as fatias fora de ordem por um TRIGSEQ.", ""}},
+            {"repitch", {
+                "0 = a transposição (PIT) muda a velocidade (varispeed). "
+                "1 = a velocidade fica solta e a altura vem de um "
+                "pitch-shifter (a duração da fatia é preservada).",
+                "O pitch-shifter é o do G09.pitchshift.pd do Pure Data, "
+                "portado do Navalha 2 (crédito: Glerm Soares / Lúcio "
+                "Araújo).", ""}},
+            {"wear", {
+                "Desgaste por disparo: jitter no ponto de início, redução "
+                "de taxa de amostragem e bit-crush que crescem com o "
+                "knob. Cada disparo soa um pouco diferente.",
+                "Determinístico — um xorshift semeado NO disparo, então a "
+                "mesma sequência de triggers dá o mesmo áudio.", ""}},
+            {"loop", {
+                "One-shot (desligado) ↔ loop da fatia (ligado). O ponto "
+                "de loop não tem crossfade ainda — pode estalar em fatia "
+                "muito curta.", "", ""}},
+            {"in:trig", {"Dispara a fatia atual.", "", ""}},
+            {"in:in", {"Áudio a gravar (enquanto REC estiver alto).",
+                      "", ""}},
+            {"in:rec", {
+                "Gate: enquanto alto, grava IN no buffer (até ~8 s). Na "
+                "descida, congela o comprimento gravado.",
+                "Sem gravar e sem arquivo carregado pelo painel, o "
+                "SAMPLER fica em silêncio.", ""}},
+            {"in:pos", {"CV (0–1) que escolhe a fatia.", "", ""}},
+            {"in:pitch", {"CV 1 V/oct — transposição (via velocidade ou "
+                         "pitch-shifter, conforme REPIT).", "", ""}},
+            {"out:out", {"A fatia tocada, com de-click adaptativo nas "
+                        "bordas.", "", ""}},
+        }},
         {"LOOPER", {
             {"time", {
                 "Comprimento do atraso — de eco curto a laço de 2 s.",

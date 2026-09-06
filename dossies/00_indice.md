@@ -67,17 +67,21 @@ propriedade do cabo, não um módulo do catálogo.
 | 45 | [`45_formant.md`](45_formant.md) | `FORMANT` | TRANSFORM | Onda B (2026-09-06) |
 | 46 | [`46_hall.md`](46_hall.md) | `HALL` | SPACE | Onda C (2026-09-06) |
 | 47 | [`47_drum.md`](47_drum.md) | `DRUM` | SOURCE | Onda C (2026-09-06) |
+| 48 | [`48_sampler.md`](48_sampler.md) | `SAMPLER` | SPACE | Onda D (2026-09-06) |
 
-**47 módulos feitos.** Ondas A, B e C completas. Próxima leva (dossiê
-antes do código): `PESQUISA_MODULOS.md §2.4` — Onda D `SAMPLER` (base de
-porte Navalha 2) / `SIGNAL-IN`.
+**48 módulos feitos.** Ondas A, B, C completas; Onda D em curso
+(`SAMPLER` feito — + camada `io/`/`dr_wav` e `dsp/PitchShift.hpp`
+portado do Navalha 2). Falta `SIGNAL-IN` (#49).
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação
 saída→parâmetro **aditiva** desde 2026-09-04), `ControlSnapshot`,
 `Panel`/`AsciiPanel`, `WavWriter`, `Oversampler2x` (`src/dsp/Oversampler.hpp`
 — 2× meia-banda compartilhado por `SHAPE`/`WASP`); modelo de conexão de
-3 camadas (matriz, constelação, semântico); serialização do patch.
+3 camadas (matriz, constelação, semântico); serialização do patch;
+`src/dsp/PitchShift.hpp` (pitch-shifter `G09.pitchshift.pd` portado do
+Navalha 2 — `RASGO_MODULAR.md §29.1`); `src/io/AudioFile.hpp` +
+`third_party/dr_wav` (leitura de WAV, camada `io/` fora do core).
 
 **Peças** (`../examples/`, renders em `../validation-output/`):
 `primeiro_fragmento` (10 s), `peca_generativa` (40 s),
