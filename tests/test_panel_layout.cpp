@@ -19,6 +19,7 @@
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
 #include "dsp/FunctionGenerator.hpp"
+#include "dsp/Wavetable.hpp"
 #include "dsp/Glide.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
@@ -168,6 +169,7 @@ void audit(const char* type, const Panel& p) {
 int main() {
     std::vector<std::pair<std::string, std::unique_ptr<Signal>>> mods;
     mods.emplace_back("OSC", std::make_unique<Oscillator>());
+    mods.emplace_back("WAVETABLE", std::make_unique<Wavetable>());
     mods.emplace_back("NOISE", std::make_unique<Noise>());
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());
