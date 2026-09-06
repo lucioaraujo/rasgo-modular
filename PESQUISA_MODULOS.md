@@ -262,13 +262,13 @@ Cruzando os 38 módulos feitos com esta pesquisa (§2.2 aberto, §6 Polivoks,
 contemplado**, em ondas do mais seguro/completador ao mais arriscado/novo.
 Cada um vira dossiê antes do código (método §1).
 
-**Onda A — fecha lacunas óbvias do rack (baixo risco):**
+**Onda A — fecha lacunas óbvias do rack (baixo risco): COMPLETA (2026-09-06).**
 
 | # | Módulo | Família | Ideia | Parte de (conceito público) |
 |---|---|---|---|---|
 | ~~39~~ | ~~**`GLIDE`**~~ — portamento por nota | TRANSFORM / PITCH | **FEITO — 2026-09-06, `dossies/39_glide.md`, `src/dsp/Glide.hpp`.** 3 modos (sempre / slide-gated 303 / legato), `time` de subida + `fall` (assimetria descida = `time·6^fall`), `curve` linear↔RC, saídas `moving`/`done`. | TB-303 slide, portamento MS-20/Minimoog (rate const.) vs RC, Bela Gliss / EMW glide processor |
 | ~~40~~ | ~~**`WAVETABLE`**~~ — oscilador de tabela | SOURCE | **FEITO — 2026-09-06, `dossies/40_wavetable.md`, `src/dsp/Wavetable.hpp`.** 16 quadros procedurais (serra→quadrada→formante→seno, SEM arquivo — opção A), 10 mip-maps band-limited; `warp` = distorção de fase CZ / WAVE CUT; **captura de ciclo ao vivo** (`capture`+`grab`) — tabela do que o `AUDIO-IN` ouve. `drift` = varredura autônoma. | tutorial JUCE, WolfSound; **EMW WAVE-6** (hardware do autor); Casio CZ phase distortion; série de Fourier band-limited |
-| 41 | **`LOOPER`** — delay com HOLD / REVERSE / tape | SPACE / MEMORY | delay de linha com `hold` (congela e repete infinito), `reverse` (lê pra trás), e caráter de fita/BBD: companding, wow&flutter suave, saturação magnética por `age`. Distinto do `SPACE` (reverb) e do `MEMORY` (granular). | §6 (tape/digital delay com hold e reverse; BBD/flanger); 4ms DLD / Tapographic; Make Noise Mimeophon |
+| ~~41~~ | ~~**`LOOPER`**~~ — delay com HOLD / REVERSE / tape | SPACE | **FEITO — 2026-09-06, `dossies/41_looper.md`, `src/dsp/Looper.hpp`.** Delay de linha (buffer ~2,2 s) com `hold` (ancora a janela e repete infinito, sem realimentação nova), `reverse` (2 grãos Hann em crossfade — sem clique) e caráter de fita/BBD num knob `age` (passa-baixa no laço + wow&flutter ~0,9/6,5 Hz + tanh + chiado semeado). Gates `freeze`/`rev`. Distinto do `SPACE` (reverb) e do `MEMORY` (granular). | §6 (tape/digital delay com hold e reverse; BBD/flanger); 4ms DLD / Tapographic; Make Noise Mimeophon |
 | — | **`peca_generativa_5`** — peça que exercita a Onda A | — | melodia acid (SEQUENCE→QUANTIZER→OSC→FILTER com GLIDE) + LOOPER congelando frases | — |
 
 **Onda B — territórios de síntese novos (risco médio):**

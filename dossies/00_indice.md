@@ -54,9 +54,10 @@ pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 | 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | MIX | marco 3 |
 | 39 | [`39_glide.md`](39_glide.md) | `GLIDE` | TRANSFORM / PITCH | Onda A (2026-09-06) |
 | 40 | [`40_wavetable.md`](40_wavetable.md) | `WAVETABLE` | SOURCE | Onda A (2026-09-06) |
+| 41 | [`41_looper.md`](41_looper.md) | `LOOPER` | SPACE | Onda A (2026-09-06) |
 
-**40 módulos feitos.** Próxima leva (dossiê antes do código):
-`PESQUISA_MODULOS.md §2.4` — Onda A `LOOPER` (`GLIDE`/`WAVETABLE` feitos),
+**41 módulos feitos.** Onda A completa (`GLIDE`/`WAVETABLE`/`LOOPER`).
+Próxima leva (dossiê antes do código): `PESQUISA_MODULOS.md §2.4` —
 Onda B `ADDITIVE`/`PLANAR`/`OPERATOR`/`FORMANT`, Onda C reverb FDN/`DRUM`,
 Onda D `SAMPLER`/`SIGNAL-IN`.
 
