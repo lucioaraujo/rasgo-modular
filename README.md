@@ -68,10 +68,11 @@ sem clique e caráter de fita/BBD num knob `age`). Onda B (completa):
 — 5 passa-faixas paralelos, morph de vogais A→E→I→O→U). Onda C (completa):
 `HALL` (Módulo 46 — reverb FDN de 8 linhas + matriz de Householder,
 `freeze`, estéreo) + `DRUM` (Módulo 47 — voz de percussão, corpo com
-pitch-sweep + estalo, mapa 808↔909↔acústico, `roll`). Onda D em curso:
+pitch-sweep + estalo, mapa 808↔909↔acústico, `roll`). Onda D (completa):
 `SAMPLER` (Módulo 48 — toca-fatias com varispeed/reverse/repitch/wear;
-camada `io/` + `dr_wav` pra carregar WAV; pitch-shifter portado do
-Navalha 2). + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
+camada `io/` + `dr_wav`) + `SIGNAL-IN` (Módulo 49 — o `AUDIO-IN` cresceu:
+áudio + MIDI num adaptador, voz mono last-note, saídas pitch/gate/vel/cc).
+**As 4 ondas do roadmap `§2.4` fechadas.** + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
 48 módulos DSP,
 60 alvos CTest

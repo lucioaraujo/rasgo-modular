@@ -360,7 +360,7 @@ int main() {
     auto syncAudioIn = [&] {
         bool any = false;
         for (std::size_t i = 0; i < graph.nodeCount(); ++i)
-            if (graph.node(i).type() == "AUDIO-IN") { any = true; break; }
+            if (graph.node(i).type() == "SIGNAL-IN") { any = true; break; }
         if (any && !audioInRunning.load()) {
             try {
                 const char* dev = std::getenv("RASGO_AUDIO_IN_DEVICE");
@@ -387,8 +387,8 @@ int main() {
                     // esperar — perde um pedaço de captura, nunca trava.
                     if (gmx.try_lock()) {
                         for (std::size_t i = 0; i < graph.nodeCount(); ++i) {
-                            if (graph.node(i).type() != "AUDIO-IN") continue;
-                            auto* node = dynamic_cast<rasgo::modular::AudioIn*>(&graph.node(i));
+                            if (graph.node(i).type() != "SIGNAL-IN") continue;
+                            auto* node = dynamic_cast<rasgo::modular::SignalIn*>(&graph.node(i));
                             if (node) node->pushSamples(buf.data(), audioInDev->period());
                         }
                         gmx.unlock();

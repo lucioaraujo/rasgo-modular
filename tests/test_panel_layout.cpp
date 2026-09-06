@@ -10,7 +10,7 @@
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
 #include "dsp/Additive.hpp"
-#include "dsp/AudioIn.hpp"
+#include "dsp/SignalIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Chord.hpp"
 #include "dsp/Control.hpp"
@@ -222,7 +222,7 @@ int main() {
     mods.emplace_back("PLL", std::make_unique<Pll>());
     mods.emplace_back("CHAOS", std::make_unique<Chaos>());
     mods.emplace_back("NOTE-OUT", std::make_unique<NoteOut>());
-    mods.emplace_back("AUDIO-IN", std::make_unique<AudioIn>());
+    mods.emplace_back("SIGNAL-IN", std::make_unique<SignalIn>());
 
     // regra: rótulo de knob/toggle no máximo 5 caracteres
     for (const auto& m : mods) {

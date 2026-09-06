@@ -124,7 +124,10 @@ void testRemainingCatalogModulesHaveAtLeastQuick() {
         "in:a", "in:b", "in:clock", "in:reset",
         "out:math", "out:quant", "out:rect", "out:p1", "out:p2", "out:carry",
     });
-    expectAllDocumented("AUDIO-IN", {"gain", "out:out"});
+    expectAllDocumented("SIGNAL-IN", {
+        "gain", "bend", "cc_num",
+        "out:out", "out:r", "out:pitch", "out:gate", "out:vel", "out:cc",
+    });
     expectAllDocumented("CHAOS", {
         "rate", "drive", "damping", "freeze",
         "in:reseed", "in:rate_mod", "out:out",
