@@ -4778,3 +4778,48 @@ Docs: `dossies/49_signal_in.md`, `RASGO_MODULAR.md §36.3` + `§4.2`,
 
 Pendências restantes: `TAPE`/`TURNTABLE` (precisa de decisão do autor —
 `ESTUDO_audio_sampling §4`); teste ao vivo do MIDI; `git push`.
+
+---
+
+## Registro da etapa — 2026-09-06: TAPE (→ `heads` no LOOPER) + Módulo 50 — TURNTABLE
+
+Decisão do autor: **"TAPE: avance como sugeriu; TURNTABLE a"**.
+
+**TAPE — NÃO virou módulo.** Entrou como param **`heads` (1–4)** no
+`LOOPER` (#41): eco de fita multi-cabeça (Roland RE-201 / Space Echo). 1 =
+eco simples; 2–4 cabeças leem frações do `time` (`{1; 0,75; 0,5;
+0,25}×`), somadas (÷ nº de cabeças); a realimentação regenera todas →
+Frippertronics denso com `feedback` perto de 1 + `time` longo. Só no modo
+forward. Painel: knob `HEADS` em (24,54), toggles `HOLD`/`REV` movidos.
+Commit `3a9eabc`.
+
+**Módulo 50 — `TURNTABLE`** (família SPACE). O mesmo buffer do `SAMPLER`
+lido por um **prato com massa**: `readPos` é a integral de uma velocidade
+angular com inércia (EDO de 1ª ordem). Params: `speed` (alvo ±0,5×–±2×,
+neg = reverso), `torque` (força do motor → *wow* de partida), `friction`
+(coasting no `brake` + retorno pós-scratch), `grab` (firmeza da mão na CV
+`scratch`), `start`, `wear` (estalos determinísticos + micro-wobble),
+`loop`. `trig` põe a agulha e **liga o motor** (com `torque` baixo, a
+nota nasce grave e sobe). Acoplamento AC de 1 polo na saída (prato parado
+→ a amostra congelada some em ~40 ms, sem degrau de DC). Não toca
+enquanto grava (igual ao `SAMPLER`). **Desvio Rasgo:** o Navalha 2
+rejeita a metáfora de DJ; aqui diverge, mas com o modelo físico e SEM
+quantização de BPM. `dr_wav` fica na camada `io/`, o core segue sem
+dependência.
+
+Arquivos: `src/dsp/Turntable.hpp`, `tests/test_turntable.cpp` (11
+testes), `dossies/50_turntable.md`. Integração: `CMakeLists.txt`
+(`rasgo_modular_turntable_tests`), `apps/panel/ModuleCatalog.hpp`,
+`apps/panel/LearnCatalog.hpp` (13 binds), `tests/test_panel_layout.cpp`.
+Docs: `00_indice.md` (+ contagem 49), `PESQUISA §2.4`,
+`ESTUDO_audio_sampling §4.2`/§5, `RASGO_MODULAR.md §36.3`/§36.5/§29.1 +
+contagens (49 módulos, 61 CTest), `README.md`.
+
+Ajustes durante o desenvolvimento: `dragIdle = friction·0,00003` (o servo
+segura a rotação — o `0,0006` inicial deixava o prato em ~0,9×); DC
+blocker na saída (o vinil não tem DC — e resolve o "degrau" quando o
+prato para); label do knob `TORQUE` → `TORQ` (5 chars, gate de layout).
+
+**61/61 CTest em Debug e Release.**
+
+Pendências restantes: teste ao vivo do MIDI (autor); `git push`.

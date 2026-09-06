@@ -235,6 +235,16 @@ divergir do Navalha — mas então tem que ser o modelo físico do prato
 1ª ordem (já sabemos — ver `platter` ≈ o `drift` integrado do `CLOCK`);
 técnica de scratch (baby, chirp, transformer = o crossfader cortando).
 
+**FEITO (2026-09-06): `TURNTABLE` #50.** `dossies/50_turntable.md`,
+`src/dsp/Turntable.hpp`, `tests/test_turntable.cpp` (11 testes).
+Entregue o modelo físico do prato (EDO de 1ª ordem: `torque` = força do
+motor, `friction` = atrito/coasting, `grab` = firmeza da mão na CV
+`scratch`); `trig` põe a agulha e liga o motor (dá o *wow* de partida com
+`torque` baixo); acoplamento AC na saída; `wear` determinístico. SEM
+quantização de BPM (beatmatch é gesto). `crossfader`/`cue`/dois decks,
+`start`/`brake` como rampas de tempo separadas, *slipmat* e `pitch` fino
+±8% ficaram como pendências do dossiê §"Pendências".
+
 ### 4.3 `TAPE` — mecanismo de fita cassete (TRANSFORM / MEMORY)
 
 Delay/looper a fita + as **imperfeições como timbre**:
@@ -262,20 +272,16 @@ Dropouts / *saturation* separada de `age` ficam como pendências do
 (topologia cabeça/motor/feedback), wow & flutter (DIN/IEC), *gap loss*
 da cabeça.
 
-## 5. Ordem sugerida
+## 5. Ordem sugerida — **toda executada (2026-09-06)**
 
-1. **`src/io/AudioFile.hpp`** + vendor `dr_wav` + `PROVENANCE.md` +
+1. ✅ **`src/io/AudioFile.hpp`** + vendor `dr_wav` + `PROVENANCE.md` +
    teste de round-trip (`writeWav16` → `loadAudioFile` → compara).
-2. **Portar `SlicePlayer` + `HeritagePitch` do `NAVALHA2_JUCE`** pro
-   idioma `src/dsp/` (header-only, `noexcept`, sem exceções em RT — o
-   Navalha lança em `prepare`/`trigger`, trocar por retorno/clamp) +
-   `CREDITS`/`THIRD_PARTY_NOTICES` (§2.1).
-3. **`SAMPLER`** — menor salto (é o `MEMORY` + `SlicePlayer` + carga de
-   disco); valida a camada `io/` e o porte.
-4. **`TAPE`** — só se passar no teste de §4.3 (ir além do `LOOPER`).
-   Reusa `OutputStage` sat, `NOISE` wow/hiss, `SPACE` eco.
-5. **`TURNTABLE`** — o mais "instrumento novo"; precisa do modelo de
-   inércia do prato bem resolvido pra não ser gimmick.
+2. ✅ **Portar `SlicePlayer` + `HeritagePitch` do `NAVALHA2_JUCE`** pro
+   idioma `src/dsp/` (`dsp/PitchShift.hpp`, header-only, `noexcept`, sem
+   exceções em RT) + `RASGO_MODULAR.md §29.1`.
+3. ✅ **`SAMPLER`** (#48).
+4. ✅ **`TAPE`** — reprovado como módulo; virou `heads` no `LOOPER` (§4.3).
+5. ✅ **`TURNTABLE`** (#50) — modelo de inércia do prato entregue.
 
 Tudo **depois** do rack de partida e sempre como **nó opcional** — o
 painel continua abrindo e soando sem nenhum arquivo carregado.

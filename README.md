@@ -71,11 +71,14 @@ sem clique e caráter de fita/BBD num knob `age`). Onda B (completa):
 pitch-sweep + estalo, mapa 808↔909↔acústico, `roll`). Onda D (completa):
 `SAMPLER` (Módulo 48 — toca-fatias com varispeed/reverse/repitch/wear;
 camada `io/` + `dr_wav`) + `SIGNAL-IN` (Módulo 49 — o `AUDIO-IN` cresceu:
-áudio + MIDI num adaptador, voz mono last-note, saídas pitch/gate/vel/cc).
+áudio + MIDI num adaptador, voz mono last-note, saídas pitch/gate/vel/cc)
++ `TURNTABLE` (Módulo 50 — o buffer do `SAMPLER` lido por um prato com
+inércia: torque de motor, atrito, mão na CV `scratch`, `wear`
+determinístico; o `TAPE` virou `heads` no `LOOPER`).
 **As 4 ondas do roadmap `§2.4` fechadas.** + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-48 módulos DSP,
-60 alvos CTest
+49 módulos DSP,
+61 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -102,7 +105,7 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 48 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 49 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver

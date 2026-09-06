@@ -1617,6 +1617,73 @@ inline const LearnTable& learnTable() {
             {"out:out", {"Seco + molhado, misturados por MIX.", "", ""}},
             {"out:wet", {"Só o laço, sem o seco.", "", ""}},
         }},
+        {"TURNTABLE", {
+            {"speed", {
+                "Velocidade alvo do prato: sinal·2^|speed| → ±0,5× a ±2× "
+                "(33⅓ ↔ 45 ↔ lento). Negativo = disco girando pra trás.",
+                "É só o ALVO — o prato tem massa e leva tempo pra chegar "
+                "lá (ver TORQ).",
+                "Negativo + BRK: o disco desacelera de −2× até parar, "
+                "'subindo' de afinação no caminho."}},
+            {"torque", {
+                "Força do motor: quão rápido o prato ATINGE a velocidade. "
+                "Baixo = 'wow' longo de partida (~1 s); alto = quase "
+                "instantâneo.",
+                "Constante de tempo de um sistema de 1ª ordem: "
+                "motorCoef = 0,00002 + torque²·0,0022.",
+                "TORQ no mínimo: o motor mal puxa — o prato só anda se a "
+                "mão (SCR) empurrar. Modo 'vinil sem motor'."}},
+            {"friction", {
+                "Atrito: quão rápido o prato para no BRK (coasting curto "
+                "ou longo) e quanto ele 'volta' sozinho depois de um "
+                "scratch.", "", ""}},
+            {"grab", {
+                "Firmeza da mão: quanto a CV SCR joga o prato. SCR "
+                "pequeno = pitch-bend (empurrãozinho pra beatmatch); SCR "
+                "grande e oscilando = scratch de verdade.",
+                "grip = clamp01(|scratch|·5)·grab; a mão puxa a "
+                "velocidade pra scratch·4 com acoplamento ·0,3.",
+                "A mão age mesmo com o motor parado — LFO → SCR faz o "
+                "disco scratchear no compasso sem nenhum trig."}},
+            {"start", {
+                "Onde a agulha cai (posição no disco) na borda de "
+                "subida do TRIG.", "", ""}},
+            {"wear", {
+                "Desgaste do vinil: estalos/clicks que crescem + leve "
+                "instabilidade de rotação + queda mínima de nível.",
+                "Determinístico — xorshift semeado; wear=0 zera o termo. "
+                "Dois renders com os mesmos parâmetros são "
+                "byte-idênticos.", ""}},
+            {"loop", {
+                "One-shot (o disco 'acaba' e trava na última amostra) ↔ "
+                "groove travado (a leitura dá a volta no buffer).", "", ""}},
+            {"in:trig", {
+                "Põe a agulha: readPos = START·comprimento, rampa de "
+                "~5 ms (sem clique) e LIGA o motor. Depois do 1º trig o "
+                "motor fica ligado.", "", ""}},
+            {"in:in", {"Áudio a gravar (enquanto REC estiver alto).",
+                      "", ""}},
+            {"in:rec", {
+                "Gate: enquanto alto, grava IN no buffer (até ~8 s). Na "
+                "descida, congela o comprimento — não dá pra tocar e "
+                "gravar ao mesmo tempo.",
+                "Sem gravar e sem arquivo carregado pelo painel, o "
+                "TURNTABLE fica em silêncio.", ""}},
+            {"in:scratch", {
+                "A mão, como CV bipolar. Um LFO e uma mão de DJ são "
+                "intercambiáveis aqui.",
+                "handTgt = scratch·4 (±4× a velocidade); a firmeza vem "
+                "de GRAB.",
+                "SEQUENCE → SCR: uma frase de scratch rítmica. "
+                "ENVELOPE → BRK: um tape-stop na virada."}},
+            {"in:brake", {
+                "Gate: enquanto alto, o motor solta e o prato para "
+                "(coasting governado por FRIC). Solto o gate, o motor "
+                "puxa de volta.", "", ""}},
+            {"out:out", {
+                "O material gravado lido pelo prato, com acoplamento AC "
+                "(sem degrau de DC quando o prato para).", "", ""}},
+        }},
         {"SEQUENCE", {
             {"length", {"Quantos dos 8 passos entram no padrão.", "", ""}},
             {"mode", {

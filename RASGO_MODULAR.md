@@ -819,7 +819,7 @@ proprietário ou non-commercial
 
 | O quê | Origem / autor | Licença | Arquivo(s) | Uso |
 |---|---|---|---|---|
-| **dr_wav** v0.14.6 | dr_libs — David Reid (github.com/mackron) | domínio público **ou** MIT-0 (**VERDE**) | `third_party/dr_wav/dr_wav.h` (+ `PROVENANCE.md`), impl. só em `src/io/AudioFile.cpp` | leitura de WAV na camada `io/` (fora do core); `SAMPLER` (#48) — carregar arquivo é gesto de UI |
+| **dr_wav** v0.14.6 | dr_libs — David Reid (github.com/mackron) | domínio público **ou** MIT-0 (**VERDE**) | `third_party/dr_wav/dr_wav.h` (+ `PROVENANCE.md`), impl. só em `src/io/AudioFile.cpp` | leitura de WAV na camada `io/` (fora do core); `SAMPLER` (#48) e `TURNTABLE` (#50) — carregar arquivo é gesto de UI |
 | **DelayPitchShifter** (porte) | algoritmo: `G09.pitchshift.pd` do Pure Data (Miller Puckette, domínio público); implementação C++: `NAVALHA2_JUCE/src/core/HeritagePitch.cpp` — Navalha de **Glerm Soares**, reescrita Navalha 2 de **Lúcio Araújo** | GPL-3.0-or-later (**AMARELO — decisão consciente**, compatível com AGPLv3-or-later) | `src/dsp/PitchShift.hpp` | `SAMPLER.repitch` (#48). Alteração: `setSemitones(int)` → `setRatio(float)` contínuo; mesmo núcleo. Ver `dossies/ESTUDO_audio_sampling.md §2` |
 | **SlicePlayer** (conceito + trechos) | `NAVALHA2_JUCE/src/core/SlicePlayer.cpp` — Glerm Soares / Lúcio Araújo | GPL-3.0-or-later (AMARELO) | `src/dsp/Sampler.hpp` | de-click adaptativo (`clamp(dur·0,24, 0,5–5 ms)`), varispeed, reverso — reescritos no idioma `Signal` |
 
@@ -1121,7 +1121,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 48 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 49 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1218,7 +1218,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 48 módulos DSP
+### 36.3 Os 49 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1275,6 +1275,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 47 | `DRUM` | SOURCE | voz de percussão — um gate → um golpe; empacota o que `MATTER`+`NOISE`+`ENVELOPE` fariam à mão. 3 camadas: CORPO (senóide com envelope de altura — o pitch-sweep que dá peso ao bumbo 808; `map` mistura o corpo com `tanh(corpo·3)` → clique do 909), ESTALO (ruído branco por passa-alta cujo corte sobe com `map` — 808 surdo → acústico brilhante — com envelope próprio bem curto; `snap` é a dose), ENVELOPE de amplitude exponencial (`decay` ~20 ms a ~2 s). `tone` (20–1000 Hz, +CV 1 V/oct), `bend` (profundidade do sweep), `drive` (saturação `tanh`+makeup — crunch do 909), `roll` (auto-disparo interno ~2–40 Hz — rufo/buzz e o modo autônomo), `drift` (humanização por golpe de um xorshift **semeado NO disparo** — cada golpe varia mas mesmos gates → mesmo áudio). `accent` CV escala nível/brilho. Corpo modal via `MATTER` fica como pendência | TR-808/909 (topologia da voz de bumbo — bridged-T do 808, híbrido do 909; circuitos documentados no DIY); percussão sintética clássica (Roads, *Computer Music Tutorial*; Dodge & Jerse); vpme QD ★ (`PESQUISA §7 #24`); `PESQUISA §2.2` (`PESQUISA §2.4` Onda C) |
 | 48 | `SAMPLER` | SPACE | matéria gravada como VOZ — o toca-fatias (MPC/Akai) que o `MEMORY` (granular) e o `LOOPER` (delay) não são. `trig` → um golpe de um trecho: gravado ao vivo (gate `rec` grava `in`, ~8 s) ou de arquivo (painel → `setBuffer()`; o `dr_wav` fica na camada `io/`, o core segue sem dependência). `start`; `speed` (−1..1 → varispeed ±0,25×–±4×, negativo = reverso); `slices` (1–16) + CV `pos` = o *chop*; `repitch` (0 = transposição via velocidade/fita, 1 = via pitch-shifter com duração preservada); `wear` (desvio Rasgo — desgaste **por disparo**: jitter de início + redução de taxa + bit-crush, **determinístico**, xorshift semeado no disparo); `loop`. De-click adaptativo nas bordas (`clamp(dur·0,24, 0,5–5 ms)`). **Porte** do `NAVALHA2_JUCE` — `SlicePlayer` + `HeritagePitch`/`PitchShift.hpp` (= `G09.pitchshift.pd`), GPL-3.0-or-later, crédito Glerm Soares + Lúcio Araújo (`§29.1`) | Navalha 2 (`NAVALHA2_JUCE/src/core/SlicePlayer.cpp` — porte); `G09.pitchshift.pd` (Puckette, domínio público); Akai S-series / E-mu (varispeed); MPC (chop); `dossies/ESTUDO_audio_sampling.md` (`PESQUISA §2.4` Onda D) |
 | 49 | `SIGNAL-IN` | SOURCE | o `AUDIO-IN` (#35) cresceu: **áudio + MIDI num adaptador só** (decisão do autor 2026-09-06 — não `MIDI-IN`/`CV-IN` separados). Anel SPSC de áudio (do `AUDIO-IN`) + anel de MIDI (`pushMidi(status,d1,d2)`, 1024 eventos); `process()` drena por bloco e resolve uma voz MONOFÔNICA last-note (pilha de 16 — solta a de cima, volta a de baixo). Saídas: `out`/`r` (áudio L/R × `gain`), `pitch` (1 V/oct, nota 60 = 0 V, + pitch-bend × `bend` em semitons), `gate` (rampa de 1 ms), `vel`, `cc` (o Control Change nº `cc_num`). Contraparte de ENTRADA do `NOTE-OUT` (#38). `type()` = "SIGNAL-IN"; `makeModule("AUDIO-IN")` é alias de migração e re-salvar um `.rmp` antigo escreve "SIGNAL-IN"; `src/dsp/AudioIn.hpp` = `using AudioIn = SignalIn`. Nada alimentando → silêncio determinístico (testável sem hardware). Thread ALSA-seq no painel: `apps/panel/AlsaMidi.hpp` (porta virtual "RASGO Modular : IN", `aconnect` liga o teclado) — falta só validar ao vivo | `AUDIO-IN` (#35 — o anel de áudio, reusado); ALSA sequencer (`snd_seq` — I/O MIDI padrão do Linux); voz mono last-note (Minimoog / MS-20 — fato de design); `NOTE-OUT` (#38 — a contraparte) (`PESQUISA §2.4` Onda D) |
+| 50 | `TURNTABLE` | SPACE | o mesmo buffer do `SAMPLER` (gravado ao vivo via gate `rec`, ou de arquivo via `setBuffer()`) lido por um **prato com massa**: `readPos` é a integral de uma velocidade angular com **inércia** (EDO de 1ª ordem), não um incremento fixo. `speed` (−1..1 → alvo ±0,5×–±2×, negativo = disco pra trás); `torque` (0–1, força do motor → quão rápido o prato atinge a velocidade — baixo dá o *wow* de partida ~1 s); `friction` (0–1, coasting no `brake` + retorno pós-scratch); `grab` (0–1, firmeza da mão na CV `scratch` — `scratch` pequeno = pitch-bend de beatmatch, grande e oscilando = scratch); `start` (onde a agulha cai no `trig`); `wear` (desvio Rasgo — estalos de vinil + micro-instabilidade de rotação, **determinístico**, xorshift semeado); `loop` (groove travado ↔ o disco "acaba" e trava). `trig` põe a agulha (`readPos = start·len`, rampa de ~5 ms) e **liga o motor**. Acoplamento AC de 1 polo na saída (prato parado → a amostra congelada some em ~40 ms, sem degrau de DC). Não toca enquanto grava (igual ao `SAMPLER`). **Desvio Rasgo** (`dossies/ESTUDO_audio_sampling.md §4.2`): o Navalha 2 rejeita a metáfora de DJ; aqui diverge, mas com o modelo físico do prato e **SEM quantização de BPM** (beatmatch é gesto). O `TAPE` NÃO virou módulo — virou `heads` no `LOOPER` (#41) | Technics SL-1200 (referência funcional — motor/torque/rampa, nenhum circuito); técnica de scratch de DJ (baby/chirp/transformer — documentação pública); `SAMPLER` (#48 — o buffer, a gravação, a camada `io/`); mecânica clássica (EDO de 1ª ordem, domínio público) (`PESQUISA §2.4` Onda D) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1316,7 +1317,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**60 alvos CTest**, 100% verdes em **Debug e Release**
+**61 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

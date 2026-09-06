@@ -69,8 +69,9 @@ propriedade do cabo, não um módulo do catálogo.
 | 47 | [`47_drum.md`](47_drum.md) | `DRUM` | SOURCE | Onda C (2026-09-06) |
 | 48 | [`48_sampler.md`](48_sampler.md) | `SAMPLER` | SPACE | Onda D (2026-09-06) |
 | 49 | [`49_signal_in.md`](49_signal_in.md) | `SIGNAL-IN` (ex-`AUDIO-IN`) | SOURCE | Onda D (2026-09-06) |
+| 50 | [`50_turntable.md`](50_turntable.md) | `TURNTABLE` | SPACE | Onda D (2026-09-06) |
 
-**48 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+**49 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
 módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
 Pendência do #49: a thread ALSA-seq de MIDI no painel.
 
