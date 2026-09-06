@@ -36,6 +36,7 @@
 #include "dsp/NoteOut.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
+#include "dsp/Planar.hpp"
 #include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
@@ -199,6 +200,7 @@ int main() {
     mods.emplace_back("STRING", std::make_unique<StringVoice>());
     mods.emplace_back("QUANTIZER", std::make_unique<Quantizer>());
     mods.emplace_back("PARAMETRIC", std::make_unique<Parametric>());
+    mods.emplace_back("PLANAR", std::make_unique<Planar>());
     mods.emplace_back("HARMONY", std::make_unique<Harmony>());
     mods.emplace_back("SEQUENCE", std::make_unique<StepSequencer>());
     mods.emplace_back("SWITCH", std::make_unique<Switch>());

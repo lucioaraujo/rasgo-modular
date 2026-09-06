@@ -873,6 +873,52 @@ inline const LearnTable& learnTable() {
             {"out:out3", {"Soma ponderada da coluna 3.", "", ""}},
             {"out:out4", {"Soma ponderada da coluna 4.", "", ""}},
         }},
+        {"PLANAR", {
+            {"x", {
+                "Posição horizontal do ponto no quadrado (0 = lado A/C, "
+                "1 = lado B/D). Soma com a CV de X.",
+                "Com um gesto tocando, o knob vira nudge bipolar: 0,5 = "
+                "sem desvio, <0,5 empurra pra esquerda.", ""}},
+            {"y", {
+                "Posição vertical (0 = lado A/B de cima, 1 = lado C/D de "
+                "baixo). Soma com a CV de Y.", "", ""}},
+            {"curve", {
+                "Linear (0) ↔ potência constante (1). Linear: os pesos "
+                "somam 1 — o morph honesto pra CV. Potência constante: "
+                "escala os pesos por 1/√Σw² pra a saída de ÁUDIO não "
+                "afundar ~6 dB no centro do quadrado.", "", ""}},
+            {"smooth", {
+                "Glide de 1 polo no ponto — τ de ~1 ms a ~0,5 s. "
+                "De resposta imediata a slew que arrasta a trajetória.",
+                "", ""}},
+            {"rate", {
+                "Velocidade do loop do gesto E da deriva. 0,5 = 1×; "
+                "2^((rate−0,5)·4), então 1/16× a 16×.", "", ""}},
+            {"drift", {
+                "Passeio 2D autônomo do ponto quando não há gesto — "
+                "Lissajous de três senos lentos incomensuráveis. "
+                "Determinístico, sem RNG. 0 = ponto parado.", "", ""}},
+            {"in:a", {"Fonte do canto superior-esquerdo.", "", ""}},
+            {"in:b", {"Fonte do canto superior-direito.", "", ""}},
+            {"in:c", {"Fonte do canto inferior-esquerdo.", "", ""}},
+            {"in:d", {"Fonte do canto inferior-direito.", "", ""}},
+            {"in:x", {"CV somada em X (LFO, envelope, outro x_out…).", "", ""}},
+            {"in:y", {"CV somada em Y.", "", ""}},
+            {"in:gesture", {
+                "Gate: enquanto alto, GRAVA a trajetória do ponto "
+                "(decimada 32×, até ~4 s).",
+                "Na descida, se gravou o bastante, o gesto passa a tocar "
+                "em loop. Toque curto (<~2 ms) = limpa, volta ao ao vivo.",
+                ""}},
+            {"out:out", {
+                "A mistura bilinear das 4 fontes, com softclip de "
+                "segurança.", "", ""}},
+            {"out:x_out", {
+                "A posição X efetiva (já suavizada) como CV — cabeie no "
+                "cutoff de um FILTER, no pos de um WAVETABLE… o gesto "
+                "dirige o patch.", "", ""}},
+            {"out:y_out", {"A posição Y efetiva como CV.", "", ""}},
+        }},
         {"MATTER", {
             {"freq", {"Frequência fundamental do banco de modos.", "", ""}},
             {"structure", {

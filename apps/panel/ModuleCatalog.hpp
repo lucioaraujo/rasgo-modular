@@ -35,6 +35,7 @@
 #include "dsp/NoteOut.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
+#include "dsp/Planar.hpp"
 #include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
@@ -98,6 +99,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "MASTER")     return std::make_unique<Master>();
     if (t == "MATRIX")     return std::make_unique<Matrix>();
     if (t == "MULT")       return std::make_unique<Mult>();
+    if (t == "PLANAR")     return std::make_unique<Planar>();
     return nullptr;
 }
 
@@ -117,7 +119,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"MATTER",      {"MATTER", "STRING"}},
         {"MEMORY",      {"MEMORY"}},
         {"SPACE",       {"SPACE", "LOOPER"}},
-        {"MIX",         {"MIXER", "MATRIX", "MASTER", "SCOPE", "NOTE-OUT"}},
+        {"MIX",         {"MIXER", "MATRIX", "PLANAR", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;
 }
