@@ -61,9 +61,11 @@ Onda A (completa): `GLIDE` (Módulo 39 — portamento por nota: slide 303,
 legato, `fall` assimétrico) + `WAVETABLE` (Módulo 40 — oscilador de
 tabela procedural, `warp` tipo WAVE CUT, captura de ciclo ao vivo do
 `AUDIO-IN`) + `LOOPER` (Módulo 41 — delay de linha com HOLD/REVERSE
-sem clique e caráter de fita/BBD num knob `age`). **Rack de partida
-completo**; 41 módulos DSP,
-50 alvos CTest
+sem clique e caráter de fita/BBD num knob `age`). Onda B em curso:
+`ADDITIVE` (Módulo 42 — oscilador aditivo, 64 parciais, envelope
+espectral por `tilt`/`odd`/`stretch`/`comb`). **Rack de partida
+completo**; 42 módulos DSP,
+51 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -90,12 +92,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 41 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 42 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 50 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 51 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
