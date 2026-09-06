@@ -44,6 +44,7 @@
 #include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
+#include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
@@ -189,6 +190,7 @@ int main() {
     mods.emplace_back("CONTROL", std::make_unique<Control>());
     mods.emplace_back("GLIDE", std::make_unique<Glide>());
     mods.emplace_back("SH", std::make_unique<SampleHold>());
+    mods.emplace_back("SAMPLER", std::make_unique<Sampler>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("LPG", std::make_unique<Lpg>());

@@ -814,6 +814,14 @@ proprietário ou non-commercial
 → referência apenas
 ```
 
+### 29.1 Código de terceiros incorporado
+
+| O quê | Origem / autor | Licença | Arquivo(s) | Uso |
+|---|---|---|---|---|
+| **dr_wav** v0.14.6 | dr_libs — David Reid (github.com/mackron) | domínio público **ou** MIT-0 (**VERDE**) | `third_party/dr_wav/dr_wav.h` (+ `PROVENANCE.md`), impl. só em `src/io/AudioFile.cpp` | leitura de WAV na camada `io/` (fora do core); `SAMPLER` (#48) — carregar arquivo é gesto de UI |
+| **DelayPitchShifter** (porte) | algoritmo: `G09.pitchshift.pd` do Pure Data (Miller Puckette, domínio público); implementação C++: `NAVALHA2_JUCE/src/core/HeritagePitch.cpp` — Navalha de **Glerm Soares**, reescrita Navalha 2 de **Lúcio Araújo** | GPL-3.0-or-later (**AMARELO — decisão consciente**, compatível com AGPLv3-or-later) | `src/dsp/PitchShift.hpp` | `SAMPLER.repitch` (#48). Alteração: `setSemitones(int)` → `setRatio(float)` contínuo; mesmo núcleo. Ver `dossies/ESTUDO_audio_sampling.md §2` |
+| **SlicePlayer** (conceito + trechos) | `NAVALHA2_JUCE/src/core/SlicePlayer.cpp` — Glerm Soares / Lúcio Araújo | GPL-3.0-or-later (AMARELO) | `src/dsp/Sampler.hpp` | de-click adaptativo (`clamp(dur·0,24, 0,5–5 ms)`), varispeed, reverso — reescritos no idioma `Signal` |
+
 ---
 
 ## 30. Fontes técnicas prioritárias
@@ -1112,7 +1120,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 47 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 48 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1209,7 +1217,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 47 módulos DSP
+### 36.3 Os 48 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1264,6 +1272,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 45 | `FORMANT` | TRANSFORM | ressoador espectral: 5 passa-faixas em PARALELO (SVF TPT, não-linearidade NO laço, mesmo do `FILTER`/`WASP`) — o oposto do `PARAMETRIC` (EQ estático em série). `vowel` (0–1, +CV) varre a sequência A→E→I→O→U: cada vogal tem 5 formantes (frequência interpolada em log, ganho em dB, banda linear — dados fonéticos de voz de baixo, `constexpr`, das tabelas Csound/Fant). `shift` (−1..1) = escala TODAS as frequências (`2^(shift·1,5)` ≈ 0,35×–2,8×) — comprimento do trato vocal. `res` (0–1) = estreita as bandas (`bw / (1 + res·8)`) — de coloração sutil a bandas que cantam/apitam. `mix` seco↔ressoado (0 = passa-direto bit-exato). `drift` = wobble determinístico por formante. Sem entrada → silêncio (é TRANSFORM); modo "voz que fala" = `res` alto + excitação do patch + `vowel` de um LFO. Determinístico | Fant, *Acoustic Theory of Speech Production* (1960 — teoria fonte-filtro, pública); tabelas de formante de vogais cantadas (Csound `fof`/`fmnt` — fato fonético); Frap Tools Fumana ★ (`PESQUISA §7 #19` — conceito, é fechado); Random*Source Serge Resonant EQ ★ (`PESQUISA §7 #51`); 4ms SMR (`PESQUISA §2.4` Onda B) |
 | 46 | `HALL` | SPACE | reverberação FDN — a rede de atraso realimentada que o `SPACE` (comb+allpass) não é. 8 linhas de atraso + **matriz de Householder** (`y_i = s_i − (2/N)·Σs`, uma reflexão ortogonal → sem perda, difusão máxima por 1 subtração/linha; a rede é estável pra `g_i ≤ 1`, nunca cresce). `size` escala as 8 linhas (0,3×–1,7×, ~8–88 ms); `decay` = RT60 `0,2·75^decay` (0,2 s–15 s) → `g_i = 10^(−3·d_i/RT60)`; `damp` = passa-baixa de 1 polo NO laço de cada linha (agudo decai antes do grave); `mod` = modulação determinística do ponto de leitura (chorus na cauda, quebra o ringing — senóides, sem RNG); `pre` = pré-atraso (0–120 ms); `mix`. Gate `freeze` → `g_i = 1` (cauda infinita, Householder preserva energia) + rampa da entrada a 0. Saídas estéreo `l`/`r` (combinações descorrelacionadas das linhas). Módulo NOVO, não modo do `SPACE` (que fica intocado). Determinístico | Jot & Chaigne, "Digital delay networks for designing artificial reverberators" (1991 — o FDN, teoria pública); matriz de Householder/Hadamard (DSP clássico); Dattorro 1997 (damping no laço); NE Desmodus Versio ★ (`PESQUISA §7 #72`), Strymon StarLab ★ (`PESQUISA §7 #95`) (`PESQUISA §2.4` Onda C) |
 | 47 | `DRUM` | SOURCE | voz de percussão — um gate → um golpe; empacota o que `MATTER`+`NOISE`+`ENVELOPE` fariam à mão. 3 camadas: CORPO (senóide com envelope de altura — o pitch-sweep que dá peso ao bumbo 808; `map` mistura o corpo com `tanh(corpo·3)` → clique do 909), ESTALO (ruído branco por passa-alta cujo corte sobe com `map` — 808 surdo → acústico brilhante — com envelope próprio bem curto; `snap` é a dose), ENVELOPE de amplitude exponencial (`decay` ~20 ms a ~2 s). `tone` (20–1000 Hz, +CV 1 V/oct), `bend` (profundidade do sweep), `drive` (saturação `tanh`+makeup — crunch do 909), `roll` (auto-disparo interno ~2–40 Hz — rufo/buzz e o modo autônomo), `drift` (humanização por golpe de um xorshift **semeado NO disparo** — cada golpe varia mas mesmos gates → mesmo áudio). `accent` CV escala nível/brilho. Corpo modal via `MATTER` fica como pendência | TR-808/909 (topologia da voz de bumbo — bridged-T do 808, híbrido do 909; circuitos documentados no DIY); percussão sintética clássica (Roads, *Computer Music Tutorial*; Dodge & Jerse); vpme QD ★ (`PESQUISA §7 #24`); `PESQUISA §2.2` (`PESQUISA §2.4` Onda C) |
+| 48 | `SAMPLER` | SPACE | matéria gravada como VOZ — o toca-fatias (MPC/Akai) que o `MEMORY` (granular) e o `LOOPER` (delay) não são. `trig` → um golpe de um trecho: gravado ao vivo (gate `rec` grava `in`, ~8 s) ou de arquivo (painel → `setBuffer()`; o `dr_wav` fica na camada `io/`, o core segue sem dependência). `start`; `speed` (−1..1 → varispeed ±0,25×–±4×, negativo = reverso); `slices` (1–16) + CV `pos` = o *chop*; `repitch` (0 = transposição via velocidade/fita, 1 = via pitch-shifter com duração preservada); `wear` (desvio Rasgo — desgaste **por disparo**: jitter de início + redução de taxa + bit-crush, **determinístico**, xorshift semeado no disparo); `loop`. De-click adaptativo nas bordas (`clamp(dur·0,24, 0,5–5 ms)`). **Porte** do `NAVALHA2_JUCE` — `SlicePlayer` + `HeritagePitch`/`PitchShift.hpp` (= `G09.pitchshift.pd`), GPL-3.0-or-later, crédito Glerm Soares + Lúcio Araújo (`§29.1`) | Navalha 2 (`NAVALHA2_JUCE/src/core/SlicePlayer.cpp` — porte); `G09.pitchshift.pd` (Puckette, domínio público); Akai S-series / E-mu (varispeed); MPC (chop); `dossies/ESTUDO_audio_sampling.md` (`PESQUISA §2.4` Onda D) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1305,7 +1314,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**57 alvos CTest**, 100% verdes em **Debug e Release**
+**60 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

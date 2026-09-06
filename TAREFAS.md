@@ -4620,7 +4620,54 @@ arquivo inexistente → `{}`. 58/58 CTest Debug e Release.
 O `SAMPLER` (Módulo 48) vai receber um `std::vector<float>` — não conhece
 `dr_wav`; carregar arquivo é gesto de UI (painel linka `rasgo_modular_io`).
 
-**Não commitado ainda.**
+Commitado (`c592423`).
 
-**Onda D:** falta portar o `PitchShift` (Navalha 2), o `SAMPLER` (#48) e
-o `SIGNAL-IN` (#49).
+## Registro da etapa — 2026-09-06: PitchShift portado + Módulo 48 — SAMPLER (Onda D — 1/2)
+
+`PESQUISA §2.4` Onda D, #48 (após "avance a Onda D").
+
+**`src/dsp/PitchShift.hpp` — `DelayPitchShifter`** (`tests/
+test_pitch_shift.cpp` — 6 funções). **Porte** do `HeritagePitch`/
+`LegacyPitchChannel` do `NAVALHA2_JUCE` (algoritmo = `G09.pitchshift.pd`
+do Pd, Puckette, domínio público; implementação C++ = Navalha de Glerm
+Soares / Navalha 2 de Lúcio Araújo, GPL-3.0-or-later). Duas leituras de
+uma linha de 10 ms janeladas por `sin`, defasadas meia fase, interpolação
+`vd~` de 4 pontos, passa-alta de 5 Hz. Adaptação: `setSemitones(int)` →
+`setRatio(float)` contínuo (RASGO quer oitavas/cents). **Núcleo em
+`double`** — o passeio de fase acumula por horas; `float` degradava a
+janela e virava ruído (bug pego: `float` dava espectro espalhado, `double`
+dá razão de saída linear e exata em [0,25; 4]).
+
+**`src/dsp/Sampler.hpp` — SAMPLER** (`tests/test_sampler.cpp` — 10
+funções). Família SPACE. Toca-fatias: `trig` → um golpe de um trecho.
+
+- Gravação ao vivo (gate `rec` grava `in`, buffer de 8 s) OU arquivo
+  (`setBuffer(mono, srcRate)` — só do painel, fora do RT; arquivo tem
+  prioridade). Sem buffer → silêncio.
+- `start`; `speed` (−1..1 → `sinal·2^(|speed|·2)` = ±0,25×–±4×, negativo
+  = reverso); `slices` (1–16) + CV `pos`; `repitch` (0 varispeed / 1
+  pitch-shifter, duração preservada); `wear` (jitter de início + hold +
+  bit-crush, **por disparo**, xorshift **semeado no disparo** —
+  determinístico); `loop`.
+- De-click adaptativo (`clamp(dur·0,24, 0,5–5 ms)` — do `SlicePlayer` do
+  Navalha 2). Bug pego: em `loop`, `rendered_ >= total_` matava a voz e o
+  `declick` aplicava release → separado `envUp_` (só ataque) e o fim de
+  fatia em loop não mexe no envelope.
+- Crédito registrado em `RASGO_MODULAR.md §29.1` (nova tabela de código
+  de terceiros: dr_wav VERDE, PitchShift/SlicePlayer AMARELO).
+
+Integrado: `ModuleCatalog` (SPACE, após SH — seed-safe),
+`test_panel_layout` (14 HP), `LearnCatalog` (12 binds). Docs: `00_indice`,
+`PESQUISA §2.4`, `RASGO_MODULAR.md §36.3` + `§29.1`, `README`.
+
+**Validação:** build limpo, **60/60 CTest** Debug e Release. Testes:
+grava 200 Hz → toca 200 Hz; `speed=0,5` → 400 Hz; `slices=2` + `pos` →
+fatia certa; `repitch=1` + oitava → 400 Hz com fatia durando o dobro;
+`loop` sustenta; `wear=1` → piso de bit-crush 2×+, limitado; determinismo
+byte a byte; `setBuffer` toca o arquivo; sem buffer → silêncio absoluto.
+
+**Não commitado ainda** → commit a seguir.
+
+**Onda D:** falta só `SIGNAL-IN` (#49) — evolução do `AUDIO-IN` com
+MIDI/CV (trabalho de ALSA-seq + migração no desserializador, mais painel
+que DSP).
