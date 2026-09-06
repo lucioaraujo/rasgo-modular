@@ -12,51 +12,57 @@ Visão geral e estado do projeto: [`../RASGO_MODULAR.md §36`](../RASGO_MODULAR.
 log operacional: [`../TAREFAS.md`](../TAREFAS.md); ordem de execução e
 pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 
+Coluna **Família**: as 8 famílias de trabalho de
+[`../RASGO_MODULAR.md §4.1`](../RASGO_MODULAR.md) (SOURCE / TRANSFORM /
+MODULATE / TIME / DECISION / ROUTE / SPACE / OUT — consolidadas
+2026-09-06, cruzadas com a literatura Eurorack). `RELATION` (#3) é
+propriedade do cabo, não um módulo do catálogo.
+
 | # | Dossiê | Módulo | Família | Estado |
 |---|---|---|---|---|
-| 1 | [`01_gerador_de_funcao.md`](01_gerador_de_funcao.md) | `FUNCTION` | SOURCE / TIME | marco 1 |
+| 1 | [`01_gerador_de_funcao.md`](01_gerador_de_funcao.md) | `FUNCTION` | MODULATE | marco 1 |
 | 2 | [`02_filtro.md`](02_filtro.md) | `FILTER` | TRANSFORM | marco 1 |
 | 3 | [`03_relacao_de_cabo.md`](03_relacao_de_cabo.md) | relação de `Cable` | RELATION | marco 1 |
 | 4 | [`04_decisao.md`](04_decisao.md) | `DECISION` | DECISION | marco 1 |
 | 5 | [`05_clock.md`](05_clock.md) | `CLOCK` (`EuclidClock`) | TIME | marco 1 |
-| 6 | [`06_envelope.md`](06_envelope.md) | `ENVELOPE` | UTILITY / TIME | marco 1 |
-| 7 | [`07_memory.md`](07_memory.md) | `MEMORY` | MEMORY | marco 2 |
-| 8 | [`08_turing.md`](08_turing.md) | `TURING` (`TuringLoop`) | SEQUENCE | marco 2 |
-| 9 | [`09_matter.md`](09_matter.md) | `MATTER` | MATTER | marco 2 |
+| 6 | [`06_envelope.md`](06_envelope.md) | `ENVELOPE` | MODULATE | marco 1 |
+| 7 | [`07_memory.md`](07_memory.md) | `MEMORY` | SPACE | marco 2 |
+| 8 | [`08_turing.md`](08_turing.md) | `TURING` (`TuringLoop`) | TIME | marco 2 |
+| 9 | [`09_matter.md`](09_matter.md) | `MATTER` | SOURCE | marco 2 |
 | 10 | [`10_space.md`](10_space.md) | `SPACE` | SPACE | marco 2 |
-| 11 | [`11_string.md`](11_string.md) | `STRING` (`StringVoice`) | MATTER | marco 2 |
-| 12 | [`12_quantizer.md`](12_quantizer.md) | `QUANTIZER` | DECISION / PERCEPTION | marco 2 |
-| 13 | [`13_parametric.md`](13_parametric.md) | `PARAMETRIC` | TRANSFORM / UTILITY | marco 2 |
-| 14 | [`14_harmony.md`](14_harmony.md) | `HARMONY` | DECISION / INFERENCE | marco 2 |
-| 15 | [`15_sequence.md`](15_sequence.md) | `SEQUENCE` (`StepSequencer`) | SEQUENCE | marco 2 |
-| 16 | [`16_mixer.md`](16_mixer.md) | `MIXER` | MIX | marco 2 |
-| 17 | [`17_master.md`](17_master.md) | `MASTER` | MIX / METER | marco 2 |
+| 11 | [`11_string.md`](11_string.md) | `STRING` (`StringVoice`) | SOURCE | marco 2 |
+| 12 | [`12_quantizer.md`](12_quantizer.md) | `QUANTIZER` | DECISION | marco 2 |
+| 13 | [`13_parametric.md`](13_parametric.md) | `PARAMETRIC` | TRANSFORM | marco 2 |
+| 14 | [`14_harmony.md`](14_harmony.md) | `HARMONY` | DECISION | marco 2 |
+| 15 | [`15_sequence.md`](15_sequence.md) | `SEQUENCE` (`StepSequencer`) | TIME | marco 2 |
+| 16 | [`16_mixer.md`](16_mixer.md) | `MIXER` | OUT | marco 2 |
+| 17 | [`17_master.md`](17_master.md) | `MASTER` | OUT | marco 2 |
 | 18 | [`18_oscilador.md`](18_oscilador.md) | `OSC` | SOURCE | marco 3 |
-| 19 | [`19_ruido.md`](19_ruido.md) | `NOISE` | SOURCE / UTILITY | marco 3 |
-| 20 | [`20_vca.md`](20_vca.md) | `VCA` | TRANSFORM / UTILITY | marco 3 |
-| 21 | [`21_control.md`](21_control.md) | `CONTROL` | UTILITY | marco 3 |
-| 22 | [`22_logic.md`](22_logic.md) | `LOGIC` | TIME / UTILITY | marco 3 |
-| 23 | [`23_sample_hold.md`](23_sample_hold.md) | `SH` | UTILITY | marco 3 |
+| 19 | [`19_ruido.md`](19_ruido.md) | `NOISE` | SOURCE | marco 3 |
+| 20 | [`20_vca.md`](20_vca.md) | `VCA` | TRANSFORM | marco 3 |
+| 21 | [`21_control.md`](21_control.md) | `CONTROL` | TRANSFORM | marco 3 |
+| 22 | [`22_logic.md`](22_logic.md) | `LOGIC` | TIME | marco 3 |
+| 23 | [`23_sample_hold.md`](23_sample_hold.md) | `SH` | MODULATE | marco 3 |
 | 24 | [`24_shape.md`](24_shape.md) | `SHAPE` | TRANSFORM | marco 3 |
-| 25 | [`25_lpg.md`](25_lpg.md) | `LPG` | TRANSFORM / UTILITY | marco 3 |
+| 25 | [`25_lpg.md`](25_lpg.md) | `LPG` | TRANSFORM | marco 3 |
 | 26 | [`26_chord.md`](26_chord.md) | `CHORD` | SOURCE | marco 3 |
-| 27 | [`27_drift.md`](27_drift.md) | `DRIFT` | DECISION / UTILITY | marco 3 |
-| 28 | [`28_switch.md`](28_switch.md) | `SWITCH` | ROUTE / UTILITY | marco 3 |
-| 29 | [`29_scope.md`](29_scope.md) | `SCOPE` | METER / UTILITY | marco 3 |
-| 30 | [`30_trigseq.md`](30_trigseq.md) | `TRIGSEQ` | SEQUENCE / TIME | marco 3 |
-| 31 | [`31_abacus.md`](31_abacus.md) | `ABACUS` | LOGIC / UTILITY | marco 3 |
+| 27 | [`27_drift.md`](27_drift.md) | `DRIFT` | MODULATE | marco 3 |
+| 28 | [`28_switch.md`](28_switch.md) | `SWITCH` | ROUTE | marco 3 |
+| 29 | [`29_scope.md`](29_scope.md) | `SCOPE` | OUT | marco 3 |
+| 30 | [`30_trigseq.md`](30_trigseq.md) | `TRIGSEQ` | TIME | marco 3 |
+| 31 | [`31_abacus.md`](31_abacus.md) | `ABACUS` | DECISION | marco 3 |
 | 32 | [`32_wasp.md`](32_wasp.md) | `WASP` | TRANSFORM | marco 3 |
-| 33 | [`33_matrix.md`](33_matrix.md) | `MATRIX` | ROUTE / MIX | marco 3 |
-| 34 | [`34_mult.md`](34_mult.md) | `MULT` | UTILITY | marco 3 |
+| 33 | [`33_matrix.md`](33_matrix.md) | `MATRIX` | ROUTE | marco 3 |
+| 34 | [`34_mult.md`](34_mult.md) | `MULT` | ROUTE | marco 3 |
 | 35 | [`35_audio_in.md`](35_audio_in.md) | `AUDIO-IN` | SOURCE | marco 3 |
-| 36 | [`36_chaos.md`](36_chaos.md) | `CHAOS` | DECISION | marco 3 |
+| 36 | [`36_chaos.md`](36_chaos.md) | `CHAOS` | MODULATE | marco 3 |
 | 37 | [`37_pll.md`](37_pll.md) | `PLL` | SOURCE | marco 3 |
-| 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | MIX | marco 3 |
-| 39 | [`39_glide.md`](39_glide.md) | `GLIDE` | TRANSFORM / PITCH | Onda A (2026-09-06) |
+| 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | OUT | marco 3 |
+| 39 | [`39_glide.md`](39_glide.md) | `GLIDE` | TRANSFORM | Onda A (2026-09-06) |
 | 40 | [`40_wavetable.md`](40_wavetable.md) | `WAVETABLE` | SOURCE | Onda A (2026-09-06) |
 | 41 | [`41_looper.md`](41_looper.md) | `LOOPER` | SPACE | Onda A (2026-09-06) |
 | 42 | [`42_additive.md`](42_additive.md) | `ADDITIVE` | SOURCE | Onda B (2026-09-06) |
-| 43 | [`43_planar.md`](43_planar.md) | `PLANAR` | MIX (morph) | Onda B (2026-09-06) |
+| 43 | [`43_planar.md`](43_planar.md) | `PLANAR` | ROUTE / MORPH | Onda B (2026-09-06) |
 
 **43 módulos feitos.** Onda A completa (`GLIDE`/`WAVETABLE`/`LOOPER`);
 Onda B em curso (`ADDITIVE`/`PLANAR` feitos). Próxima leva (dossiê antes

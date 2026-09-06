@@ -175,8 +175,8 @@ struct Rect { int x, y, w, h; };
 // Ordem de EXIBIÇÃO dos tipos de uma família (paleta + rack inicial):
 // alfabética, MAS `MIXER` e `MASTER` — o par de saída — sempre grudados
 // e no fim da família, nessa ordem (pedido do autor 2026-09-05: "par
-// grudado sem unir os módulos"). Só exibição; `moduleCatalog()` em si
-// não muda (índice de nó, doador do CROSS, gramática do Seed intactos).
+// grudado sem unir os módulos"). Só exibição — não mexe na ordem de
+// `moduleCatalog()`.
 inline void sortFamilyForDisplay(std::vector<const char*>& types) {
     auto key = [](const char* t) -> std::string {
         const std::string s = t;
@@ -258,10 +258,13 @@ int main() {
     // mínima ligada pra soar ao abrir.
     //
     // Duas ordens DIFERENTES de propósito:
-    //  1. instanciação dos nós = ordem de `moduleCatalog()` -> índice de nó
-    //     ESTÁVEL. Mexer nisso mudaria a ordem em que `seedClassifyPorts`
-    //     enche `src[]`/`dst[]` e portanto o que cada `RASGO_SEED=N`
-    //     produz, e a montagem do doador do CROSS (ver `TAREFAS.md`).
+    //  1. instanciação dos nós = ordem de `moduleCatalog()` -> índice de
+    //     nó. A taxonomia foi consolidada e a ordem reordenada em
+    //     2026-09-06; `tests/test_seed_patch.cpp` confirmou que
+    //     `RASGO_SEED=N` e o CROSS saem BYTE-IDÊNTICOS antes/depois — o
+    //     `seedPatch` cabeia a espinha por NOME de tipo (`firstT`), não
+    //     por posição do passeio. Ainda assim: mexer aqui pede re-rodar
+    //     esse teste.
     //  2. ordem de EXIBIÇÃO no rack (`shown`) = ordem da paleta: famílias
     //     na ordem do catálogo, módulos alfabéticos dentro da família,
     //     mas `MIXER`+`MASTER` grudados no fim (`sortFamilyForDisplay`).
@@ -731,7 +734,7 @@ int main() {
     // `sortFamilyForDisplay` — alfabético dentro da família, `MIXER`+
     // `MASTER` grudados no fim. Só EXIBIÇÃO — a ordem de
     // `ModuleCatalog.hpp::moduleCatalog()` (instanciação de nós, doador do
-    // CROSS, ordem de `seedClassifyPorts`) continua intocada.
+    // CROSS) segue sua própria ordem — ver o comentário do bloco do grafo.
     struct PaletteRow { int y; bool header; std::string label; std::string type; };
     std::vector<PaletteRow> palette;
     {

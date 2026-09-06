@@ -128,49 +128,80 @@ Pergunta principal:
 
 > **“o que quero fazer com o fluxo agora?”**
 
+**Revisão 2026-09-06** — cruzada com a literatura Eurorack (as *function
+tags* do ModularGrid — lista plana de ~60, `Oscillator`/`Filter`/`VCA`/
+`LFO`/`Envelope`/`Sequencer`/`Quantizer`/`Logic`/`Switch`/`Multiple`/
+`Mixer`/`Looper`/`Low Pass Gate`/`Resonator`/…; a organização do *Patch &
+Tweak* de Kim Bjørn — Sound Sources / Audio Modifiers / Modulation & CV /
+Rhythm-Sequencing / Utilities / Effects; e o Doepfer A-100 — Sound
+Sources / Sound Modifiers / Modulation & Controllers / Utilities /
+Clock-Trigger / Effects). A árvore original de 18 verbos tinha ~5
+famílias-fantasma (0–1 módulo). Consolidada em **8 famílias de trabalho**
+(§4) — os verbos que sobraram viram território reservado, não gaveta
+vazia na paleta.
+
 ---
 
-## 4. Taxonomia inicial
+## 4. Taxonomia
+
+### 4.1 Famílias de trabalho (2026-09-06)
+
+As **8 famílias** que a paleta do painel usa (`ModuleCatalog.hpp::
+moduleCatalog()`) e nas quais todo módulo novo entra. A ordem também é a
+ordem de instanciação dos nós (o que cada `RASGO_SEED=N` produz — ver
+`tests/test_seed_patch.cpp`).
 
 ```text
-RASGO MODULE TAXONOMY
-│
-├── SOURCE
-│
-├── INPUT / GESTURE
-│
-├── TIME
-│
-├── DECISION
-│
-├── SEQUENCE
-│
-├── TRANSFORM
-│
-├── ROUTE
-│
-├── MEMORY
-│
-├── DAMAGE
-│
-├── REPAIR
-│
-├── RELATION
-│
-├── MATTER
-│
-├── SPACE
-│
-├── PERCEPTION
-│
-├── INFERENCE
-│
-├── UTILITY
-│
-├── MIX
-│
-└── METER
+SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE
+                         MATTER STRING AUDIO-IN
+  └ inclui as vozes de modelagem física (o mundo Eurorack marca
+    "Synth Voice"/"Resonator"; o Patch & Tweak as põe em Sound Sources)
+TRANSFORM  transformar   FILTER WASP LPG VCA SHAPE PARAMETRIC GLIDE CONTROL
+  └ modifica um sinal que PASSA (áudio ou CV)
+MODULATE   mover         ENVELOPE FUNCTION DRIFT CHAOS SH
+  └ GERA um sinal de controle
+TIME       marcar tempo  CLOCK LOGIC TURING SEQUENCE TRIGSEQ
+  └ clock, lógica de clock, sequenciadores (Patch & Tweak junta
+    "Rhythm, Sequencing & Synchronized Modulation")
+DECISION   decidir       QUANTIZER HARMONY ABACUS DECISION
+  └ escolhe um valor — quantiza, harmoniza, calcula, compara
+ROUTE      rotear        SWITCH MATRIX MULT PLANAR
+  └ chave, matriz, múltiplo, morph vetorial
+SPACE      espacializar  SPACE LOOPER MEMORY
+           / lembrar       └ delay, reverb, granular
+OUT        misturar      MIXER MASTER SCOPE NOTE-OUT
+           / medir / enviar
 ```
+
+### 4.2 Território reservado (verbos sem módulo próprio ainda)
+
+Da árvore original de 18 verbos, estes ficam como **direção conceitual**,
+não como gaveta na paleta — um módulo aqui, quando existir, escolhe uma
+das 8 acima OU justifica reabrir a família:
+
+- **DANIFICAR / REPARAR** (DAMAGE/REPAIR) — degradação e recuperação como
+  processo (`§14`, cicatriz do `Cable`); hoje distribuído em `age`/`wear`/
+  `drift` dentro de outros módulos.
+- **RELACIONAR** (RELATION) — a relação de `Cable` (RingMod/Fold/
+  Difference) é propriedade do CABO, não um tipo do catálogo.
+- **PERCEBER / INFERIR** (PERCEPTION/INFERENCE) — o `SCOPE` já mede e
+  devolve como CV; `QUANTIZER`/`HARMONY` já inferem. Um "Learning/Form
+  Engine" dedicado continua mapeado (`ESTUDO_seed_composicao_generativa`).
+- **GESTO / ENTRADA** (INPUT/GESTURE) — `AUDIO-IN` está em SOURCE; os
+  adaptadores MIDI/CV entram lá também (`SIGNAL-IN`, `PESQUISA §2.4`).
+
+### 4.3 Correspondência com a literatura
+
+| RASGO | ModularGrid (function tags) | Patch & Tweak | Doepfer A-100 |
+|---|---|---|---|
+| SOURCE | Oscillator, Noise, Synth Voice, Resonator | Sound Sources | Sound Sources |
+| TRANSFORM | Filter, VCA, Low Pass Gate, Waveshaper, Slew Limiter | Audio Modifiers | Sound Modifiers |
+| MODULATE | Envelope Generator, LFO, Function Generator, Random, Sample and Hold | Modulation & CV | Modulation Sources & Controllers |
+| TIME | Clock Generator/Modulator, Logic, Sequencer, Shift Register | Rhythm & Sequencing | Clock-Trigger |
+| DECISION | Quantizer, Comparator, Precision Adder | (dentro de CV / Sequencing) | (Utilities) |
+| ROUTE | Switch, Multiple, Matrix Mixer | Utilities | Utilities |
+| SPACE | Delay, Reverb, Looper, Granular | Effects | Effects |
+| OUT | Mixer, Panning, Tuner, Output | (Utilities / Output) | Utilities |
 
 ---
 
@@ -849,6 +880,13 @@ MEDIR
 MISTURAR
 ```
 
+**Atualização 2026-09-06:** com 42 módulos, esses 18 verbos foram
+consolidados nas **8 famílias de trabalho** de `§4.1` (cruzadas com a
+literatura Eurorack em `§3` e `§4.3`) — MOVER virou `MODULATE`, SEQUENCIAR
+entrou em `TIME`, MATERIALIZAR/LEMBRAR entraram em `SOURCE`/`SPACE`, e
+DANIFICAR/REPARAR/RELACIONAR/PERCEBER/INFERIR viraram território reservado
+(`§4.2`). O princípio — pensar no verbo, não no circuito — continua.
+
 ---
 
 ## 32. Prioridade inicial de implementação
@@ -1179,49 +1217,49 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 
 | # | Módulo | Família | Essência | Parte de (estudado, não copiado) |
 |---|---|---|---|---|
-| 1 | `FUNCTION` | SOURCE/TIME | rampa que é envelope/LFO/oscilador conforme a taxa; `drift` | Tides/Stages, PolyBLEP |
+| 1 | `FUNCTION` | MODULATE | rampa que é envelope/LFO/oscilador conforme a taxa; `drift` | Tides/Stages, PolyBLEP |
 | 2 | `FILTER` | TRANSFORM | 3× SVF TPT na mesma frequência; `spread` (relação = formante); auto-oscila | Cytomic/Simper, Three Sisters |
 | 3 | relação de `Cable` | RELATION | RingMod/Fold/Difference na conexão | Warps |
 | 4 | `DECISION` | DECISION | gate de Bernoulli + CV uniforme→sino + déjà-vu (loop-lock) | Branches, Marbles, Sapèl |
 | 5 | `CLOCK` (`EuclidClock`) | TIME | euclidiano O(1) + acento AND/OR de divisores + drift no andamento | Toussaint/Bjorklund, vpme, Pamela's |
-| 6 | `ENVELOPE` | UTILITY/TIME | A/D/(S)/R + VCA embutido; curva côncava↔convexa | Maths, Just Friends, Contour |
-| 7 | `MEMORY` | MEMORY | buffer granular de 3 s + freeze (a cicatriz do `Cable` como módulo) | Clouds, arbhar, Roads |
-| 8 | `TURING` (`TuringLoop`) | SEQUENCE | registrador de deslocamento; `lock` = acaso → laço travado | Music Thing Turing Machine |
-| 9 | `MATTER` | MATTER | 24 modos ressonantes; `structure` corda→sino, `position` = onde bate | Rings/Elements, Cook/Smith |
+| 6 | `ENVELOPE` | MODULATE | A/D/(S)/R + VCA embutido; curva côncava↔convexa | Maths, Just Friends, Contour |
+| 7 | `MEMORY` | SPACE | buffer granular de 3 s + freeze (a cicatriz do `Cable` como módulo) | Clouds, arbhar, Roads |
+| 8 | `TURING` (`TuringLoop`) | TIME | registrador de deslocamento; `lock` = acaso → laço travado | Music Thing Turing Machine |
+| 9 | `MATTER` | SOURCE | 24 modos ressonantes; `structure` corda→sino, `position` = onde bate | Rings/Elements, Cook/Smith |
 | 10 | `SPACE` | SPACE | atraso multitap + difusão all-pass; de eco a cauda | Schroeder/Moorer/Dattorro, Rainmaker |
-| 11 | `STRING` (`StringVoice`) | MATTER | corda por guia-de-onda (Karplus-Strong); `tanh` no laço → arco estável | KS, Jaffe & Smith, J.O. Smith |
-| 12 | `QUANTIZER` | DECISION/PERCEPTION | CV → alturas de escala (12 escalas curadas); histerese; glide | RBJ… não: `RASGO_SYNTH/Scales.hpp` (só intervalos), theremin |
-| 13 | `PARAMETRIC` | TRANSFORM/UTILITY | EQ paramétrico de 4 estágios (fórmulas RBJ); `sweep` move as bandas como grupo | RBJ Audio EQ Cookbook; VCV Parametra (ficha, código fechado não consultado) |
-| 14 | `HARMONY` | DECISION/INFERENCE | movimento harmônico: 6 técnicas reais (Coltrane, sub tritônica, mediante cromática, intercâmbio modal, jazz modal, backdoor ii-V) dirigindo `root`/`scale` do `QUANTIZER` | `RASGO_SYNTH/HarmonicWanderer.hpp` (só a lógica de intervalos = fato musical) |
-| 15 | `SEQUENCE` | SEQUENCE | sequenciador de passos: padrão de 8 passos editável (altura+gate) × 5 modos de leitura (forward/backward/pingpong/random/brownian); `glide`, `eos`. O par escrito do `TURING` | Hexen §119; René/Metropolix; Grids (browniano) |
-| 16 | `MIXER` | MIX | 4 entradas mono → soma; `gain`/`pan`/`mute` por canal, pan de potência constante; saída estéreo; `out_gain` | prática de mesa; pan-law de potência constante (fato público) |
-| 17 | `MASTER` | MIX/METER | barramento de saída: largura mid/side (`width` 0–2), soma `mono`, `gain`, **proteção de saída de excelência** (`src/dsp/OutputStage.hpp`: finitude + bloqueio de DC + **guarda ultrassônica** + **governador de corpo** (`body_guard`, agudo alto/sustentado/concentrado ~2,5–8 kHz → high-shelf suave) + **limitador look-ahead ~3 ms** por pico verdadeiro + teto suave, teto −1 dBFS, telemetria de GR e de body-guard), saída de VU (`level`) | matriz mid/side (Blumlein); `NAVALHA`/`ANTITOTEM` `OutputStage`+`LookaheadLimiter`+`TruePeakDetector` (código do autor) |
+| 11 | `STRING` (`StringVoice`) | SOURCE | corda por guia-de-onda (Karplus-Strong); `tanh` no laço → arco estável | KS, Jaffe & Smith, J.O. Smith |
+| 12 | `QUANTIZER` | DECISION | CV → alturas de escala (12 escalas curadas); histerese; glide | RBJ… não: `RASGO_SYNTH/Scales.hpp` (só intervalos), theremin |
+| 13 | `PARAMETRIC` | TRANSFORM | EQ paramétrico de 4 estágios (fórmulas RBJ); `sweep` move as bandas como grupo | RBJ Audio EQ Cookbook; VCV Parametra (ficha, código fechado não consultado) |
+| 14 | `HARMONY` | DECISION | movimento harmônico: 6 técnicas reais (Coltrane, sub tritônica, mediante cromática, intercâmbio modal, jazz modal, backdoor ii-V) dirigindo `root`/`scale` do `QUANTIZER` | `RASGO_SYNTH/HarmonicWanderer.hpp` (só a lógica de intervalos = fato musical) |
+| 15 | `SEQUENCE` | TIME | sequenciador de passos: padrão de 8 passos editável (altura+gate) × 5 modos de leitura (forward/backward/pingpong/random/brownian); `glide`, `eos`. O par escrito do `TURING` | Hexen §119; René/Metropolix; Grids (browniano) |
+| 16 | `MIXER` | OUT | 4 entradas mono → soma; `gain`/`pan`/`mute` por canal, pan de potência constante; saída estéreo; `out_gain` | prática de mesa; pan-law de potência constante (fato público) |
+| 17 | `MASTER` | OUT | barramento de saída: largura mid/side (`width` 0–2), soma `mono`, `gain`, **proteção de saída de excelência** (`src/dsp/OutputStage.hpp`: finitude + bloqueio de DC + **guarda ultrassônica** + **governador de corpo** (`body_guard`, agudo alto/sustentado/concentrado ~2,5–8 kHz → high-shelf suave) + **limitador look-ahead ~3 ms** por pico verdadeiro + teto suave, teto −1 dBFS, telemetria de GR e de body-guard), saída de VU (`level`) | matriz mid/side (Blumlein); `NAVALHA`/`ANTITOTEM` `OutputStage`+`LookaheadLimiter`+`TruePeakDetector` (código do autor) |
 | 18 | `OSC` | SOURCE | oscilador subtrativo: 5 formas ao mesmo tempo (seno/tri/serra/pulso/sub) antialias PolyBLEP, 1 V/oct, PWM, hard sync, FM linear through-zero, sub-oitava; `drift` | PolyBLEP (Välimäki/Finke); hard sync clássico; TZFM (Buchla 259); sub por divisão (Juno/Moog) |
-| 19 | `NOISE` | SOURCE/UTILITY | ruído branco/rosa/brown + sample-and-hold + tensão que passeia (smooth random); `spread` uniforme→sino (acaso estruturado) | Paul Kellet pink filter (domínio público); S&H clássico; Buchla 266 smooth random |
-| 20 | `VCA` | TRANSFORM/UTILITY | amplificador DUPLO: `in`×ganho; CV atenuvertida SOMA ao knob (porta de verdade — knob vivo); `response` lin→exp; saturação suave; `sum` = mini-mixer; `drift` | VCA lin/exp (Doepfer A-131/132); Quad VCA como mixer; atenuverter (Maths) |
-| 21 | `CONTROL` | UTILITY | utilidades de CV DUPLAS: `scale` (atenuversor −2..2), `offset`, `rectify` contínuo (`lerp(x,\|x\|)`), `slew`+`curve` (linear↔RC), saída `sum` (soma/média); `scale=0` = fonte de tensão; `rectify`+`slew` = seguidor de envelope; `drift` opt-in | Maths (atenuversor/offset/slew/somador); Serge DUSG; seguidor de envelope RC |
-| 22 | `LOGIC` | TIME/UTILITY | recombina o tempo: divisor ÷1–32 + multiplicador ×1–8 (período medido); `and`/`or`/`xor` simultâneos de dois gates; flip-flop T; `gate_len` (duty) + `delay` (anel 0–200 ms); `rate` = relógio interno se `clock` livre. Fecha o rack de partida | Pamela's (÷/×); Kinks/Boolean (lógica); flip-flop T; A-160 (contador módulo-N) |
-| 23 | `SH` | UTILITY | sample & hold DUPLO: cada canal segura `inN` (ou o acaso interno) no pulso de `trigN`/relógio interno; `trackN` (track & hold), `slewN` (glide Buchla 266), **`slope`** (−1..1 — subida ≠ descida do slew), `spread` (uniforme→sino), **`correlation`** −1..1 entre os acasos internos (gêmeos↔espelho). Par de CVs aleatórias relacionadas | S&H clássico (Buchla 265/266, Doepfer A-148); smooth random (266); Marbles `X`/spread; `shape` do `DECISION` |
+| 19 | `NOISE` | SOURCE | ruído branco/rosa/brown + sample-and-hold + tensão que passeia (smooth random); `spread` uniforme→sino (acaso estruturado) | Paul Kellet pink filter (domínio público); S&H clássico; Buchla 266 smooth random |
+| 20 | `VCA` | TRANSFORM | amplificador DUPLO: `in`×ganho; CV atenuvertida SOMA ao knob (porta de verdade — knob vivo); `response` lin→exp; saturação suave; `sum` = mini-mixer; `drift` | VCA lin/exp (Doepfer A-131/132); Quad VCA como mixer; atenuverter (Maths) |
+| 21 | `CONTROL` | TRANSFORM | utilidades de CV DUPLAS: `scale` (atenuversor −2..2), `offset`, `rectify` contínuo (`lerp(x,\|x\|)`), `slew`+`curve` (linear↔RC), saída `sum` (soma/média); `scale=0` = fonte de tensão; `rectify`+`slew` = seguidor de envelope; `drift` opt-in | Maths (atenuversor/offset/slew/somador); Serge DUSG; seguidor de envelope RC |
+| 22 | `LOGIC` | TIME | recombina o tempo: divisor ÷1–32 + multiplicador ×1–8 (período medido); `and`/`or`/`xor` simultâneos de dois gates; flip-flop T; `gate_len` (duty) + `delay` (anel 0–200 ms); `rate` = relógio interno se `clock` livre. Fecha o rack de partida | Pamela's (÷/×); Kinks/Boolean (lógica); flip-flop T; A-160 (contador módulo-N) |
+| 23 | `SH` | MODULATE | sample & hold DUPLO: cada canal segura `inN` (ou o acaso interno) no pulso de `trigN`/relógio interno; `trackN` (track & hold), `slewN` (glide Buchla 266), **`slope`** (−1..1 — subida ≠ descida do slew), `spread` (uniforme→sino), **`correlation`** −1..1 entre os acasos internos (gêmeos↔espelho). Par de CVs aleatórias relacionadas | S&H clássico (Buchla 265/266, Doepfer A-148); smooth random (266); Marbles `X`/spread; `shape` do `DECISION` |
 | 24 | `SHAPE` | TRANSFORM | modelador de timbre em cadeia: ring-mod (`x·mod`) → wavefolder triangular fechado (`fold`) + `symmetry` (bias = harmônicos pares) → `wrap` (dobra suave ↔ wrap-around seco) → `sat` (tanh) → VCA (`level`); desvio `drift` no drive da dobra. Síntese por distorção da costa oeste como módulo. Antialias: núcleo a 2× + ADAA de 1ª ordem (`src/dsp/Oversampler.hpp`) | Buchla 259/258 "Timbre" (fold+symmetry); Serge Wave Multipliers; ring-mod de 4 quadrantes; dobra triangular fechada |
-| 27 | `DRIFT` | DECISION/UTILITY | campo de deriva: uma fonte de CV que se move em escala de MINUTOS, com memória (momentum acumula e retroalimenta a intensidade — ANTITOTEM `CRI-DRF-001`) e correlação (LFSR compartilhado, 4 saídas = leituras ponderadas DIFERENTES dos mesmos bits + LFO próprio — AQUORBIUM `BiomaBrain`). `stride` (juntas↔separadas), `anchor` (memória de topologia — a deriva orbita marcos gravados), `advance` (cadência por compasso). Faz o patch de seed EVOLUIR sozinho | ANTITOTEM `deriveFromMemory`/`CRI-DRF-001`; AQUORBIUM `BiomaBrain::correlatedValues`; Buchla 266 smooth random; random walk limitado |
+| 27 | `DRIFT` | MODULATE | campo de deriva: uma fonte de CV que se move em escala de MINUTOS, com memória (momentum acumula e retroalimenta a intensidade — ANTITOTEM `CRI-DRF-001`) e correlação (LFSR compartilhado, 4 saídas = leituras ponderadas DIFERENTES dos mesmos bits + LFO próprio — AQUORBIUM `BiomaBrain`). `stride` (juntas↔separadas), `anchor` (memória de topologia — a deriva orbita marcos gravados), `advance` (cadência por compasso). Faz o patch de seed EVOLUIR sozinho | ANTITOTEM `deriveFromMemory`/`CRI-DRF-001`; AQUORBIUM `BiomaBrain::correlatedValues`; Buchla 266 smooth random; random walk limitado |
 | 26 | `CHORD` | SOURCE | VCO parafônico: 2–4 vozes empilhadas de uma base 1 V/oct; tabela de 10 formatos de acorde (uníssono/oitavas/quinta/maior/menor/sus4/maj7/min7/dim/add9) por `chord` ou `chord_cv`; `inversion` (sobe as n graves uma oitava), `voicing` (condução de vozes na troca de acorde — mínimo movimento + glide), `detune` (±0,25 st = coro), `wave` (serra→pulso→tri, PolyBLEP na descontinuidade); `fm`. Soma `1/√vozes`. Desvio `drift` por voz. Casável com `HARMONY` → progressões | Plaits (modelo "chord"); Harmonaig; super-saw (JP-8000); PolyBLEP; tabelas de acorde (fato musical) |
 | 25 | `LPG` | TRANSFORM/UTILITY | low-pass gate a vactrol: um seguidor não-linear assimétrico (sobe ~2 ms, desce com cauda que freia perto de 0 — a "memória" do LDR) controla um filtro de 2 polos **e** um VCA juntos. `mode` 0..1 = crossfade filtro↔VCA (0.5 = os dois totalmente ativos), `response` (tempo da cauda ~30 ms–2,5 s), `offset` (abertura de repouso), `resonance`, **`bounce`** (overshoot do vactrol pós-golpe); `strike` + `cv`. Desvio `drift`. O timbre *plucky* da costa oeste | Buchla 292 / série 200 LPG; Make Noise Optomix (crossfade); Mannequins Three Sisters (modo LPG); modelo de fotocélula (LDR) |
-| 28 | `SWITCH` | ROUTE/UTILITY | chave sequencial: `dir` 0 = mux N→1 (`a`/`b`/`c`/`d` → `out`), `dir` 1 = **demux 1→N** (`a` → `out`/`out_b`/`out_c`/`out_d` conforme o passo); o endereço avança no `clock` (borda ↑), zera no `reset`, ou vem direto da CV `addr` (se conectada, manda); `steps` 2–4, `mode` (forward/pingpong/random semeado/só-`addr`), `glide` (crossfade no ponto de troca) + slew de 1 ms anti-clique; saída `step` segue a posição. O roteador controlado — faz a variação de roteamento virar parte do fluxo autônomo | Doepfer A-151/A-152 (chave sequencial/endereçada); 4ms SISM (slew na troca); multiplexador CD4051 (teoria); `mode` de leitura do `SEQUENCE` do Rasgo |
-| 29 | `SCOPE` | METER/UTILITY | osciloscópio + análise cujas medições SAEM COMO CV (desvio Rasgo — num scope de hardware a tela é beco sem saída): `in`→`thru` limpo (a saída 0 = o que o painel desenha); `trig` = comparador com histerese (`reject`) contra `trigger`, borda `edge` (trigger do scope + disparador utilitário); `level` (seguidor de pico); `bright` (centroide espectral pelo diferenciador — `f_c≈(sr/2π)√(E[Δx²]/E[x²])`, sem FFT); `pitch` (v/oct, período entre cruzamentos de zero, trava após 3 períodos consistentes — ruído fica em 0); `hold` congela as leituras. O instrumento que escuta a si mesmo | osciloscópio de bancada (trigger nível/borda/histerese); Mordax DATA / ALM MUM M8 (scope de rack); centroide espectral por Parseval (resultado público); ZCR (detecção de pitch por período) |
-| 30 | `TRIGSEQ` | SEQUENCE/TIME | grade de trigs de percussão — 4 linhas de gate on/off (bumbo/caixa/chimbal/perc) tocando juntas. NÃO é editor de passos: é GERADOR (identidade RASGO "soa ao carregar"). `map` (0–1) morfa entre 4 caracteres (straight/broken/shuffle/sparse) interpolando os pesos de cada passo; `density1..4` = limiar sobre o peso (à la Grids); `swing` atrasa passos ímpares; `chaos` = notas-fantasma/quedas por probabilidade (não flip cru); `ratchet` = rajada de 3 no passo; `fill` (entrada) + `fill_amt` = viradas; `drift` = passeio lento do groove. Saídas `t1..t4` + `accent` (≥2 linhas coincidem) + `any` (OR). `length` recorta, `rate` = relógio interno. Determinístico (xorshift semeado) | Mutable Grids (mapa rítmico + limiar de densidade — conceito, tabelas próprias); TR-808/909 (grade + acento derivado); Pamela's / randomRHYTHM (prob./fill); modo browniano do `SEQUENCE` |
-| 31 | `ABACUS` | LOGIC/UTILITY | aritmética da CV como NÚMERO: `math` = `a` ⊕ `b` por `op` 0–7 (soma/subtração/multiplicação/**resto** · **bit a bit** AND/OR/XOR/NAND sobre inteiros de 5 bits — Lunetta); `quant` = fonte encaixada em `steps` degraus iguais, com `slew`; `rect` = retificador dedicado (meia-onda +/− · onda completa `|a|` · **sinal** `±range`/0). Contador binário: cada `clock` soma `count_step` (pode ser negativo); `c = count mod modulus` → `p1` (bit `bitA`, divisor limpo), `p2` (`bitA` XOR `bitA+1`, sincopado), `carry` (pulso no overflow — ritmo). **Sem `a` conectado → a fonte é a rampa do contador** (toca melodia + ritmo sozinho). Determinístico, sem RNG | Noise Engineering Numeric Repetitor (contador + máscara → ritmo); retificador clássico (meia/onda-completa); aritmética modular (teoria); divisor binário / Gray code (teoria) |
+| 28 | `SWITCH` | ROUTE | chave sequencial: `dir` 0 = mux N→1 (`a`/`b`/`c`/`d` → `out`), `dir` 1 = **demux 1→N** (`a` → `out`/`out_b`/`out_c`/`out_d` conforme o passo); o endereço avança no `clock` (borda ↑), zera no `reset`, ou vem direto da CV `addr` (se conectada, manda); `steps` 2–4, `mode` (forward/pingpong/random semeado/só-`addr`), `glide` (crossfade no ponto de troca) + slew de 1 ms anti-clique; saída `step` segue a posição. O roteador controlado — faz a variação de roteamento virar parte do fluxo autônomo | Doepfer A-151/A-152 (chave sequencial/endereçada); 4ms SISM (slew na troca); multiplexador CD4051 (teoria); `mode` de leitura do `SEQUENCE` do Rasgo |
+| 29 | `SCOPE` | OUT | osciloscópio + análise cujas medições SAEM COMO CV (desvio Rasgo — num scope de hardware a tela é beco sem saída): `in`→`thru` limpo (a saída 0 = o que o painel desenha); `trig` = comparador com histerese (`reject`) contra `trigger`, borda `edge` (trigger do scope + disparador utilitário); `level` (seguidor de pico); `bright` (centroide espectral pelo diferenciador — `f_c≈(sr/2π)√(E[Δx²]/E[x²])`, sem FFT); `pitch` (v/oct, período entre cruzamentos de zero, trava após 3 períodos consistentes — ruído fica em 0); `hold` congela as leituras. O instrumento que escuta a si mesmo | osciloscópio de bancada (trigger nível/borda/histerese); Mordax DATA / ALM MUM M8 (scope de rack); centroide espectral por Parseval (resultado público); ZCR (detecção de pitch por período) |
+| 30 | `TRIGSEQ` | TIME | grade de trigs de percussão — 4 linhas de gate on/off (bumbo/caixa/chimbal/perc) tocando juntas. NÃO é editor de passos: é GERADOR (identidade RASGO "soa ao carregar"). `map` (0–1) morfa entre 4 caracteres (straight/broken/shuffle/sparse) interpolando os pesos de cada passo; `density1..4` = limiar sobre o peso (à la Grids); `swing` atrasa passos ímpares; `chaos` = notas-fantasma/quedas por probabilidade (não flip cru); `ratchet` = rajada de 3 no passo; `fill` (entrada) + `fill_amt` = viradas; `drift` = passeio lento do groove. Saídas `t1..t4` + `accent` (≥2 linhas coincidem) + `any` (OR). `length` recorta, `rate` = relógio interno. Determinístico (xorshift semeado) | Mutable Grids (mapa rítmico + limiar de densidade — conceito, tabelas próprias); TR-808/909 (grade + acento derivado); Pamela's / randomRHYTHM (prob./fill); modo browniano do `SEQUENCE` |
+| 31 | `ABACUS` | DECISION | aritmética da CV como NÚMERO: `math` = `a` ⊕ `b` por `op` 0–7 (soma/subtração/multiplicação/**resto** · **bit a bit** AND/OR/XOR/NAND sobre inteiros de 5 bits — Lunetta); `quant` = fonte encaixada em `steps` degraus iguais, com `slew`; `rect` = retificador dedicado (meia-onda +/− · onda completa `|a|` · **sinal** `±range`/0). Contador binário: cada `clock` soma `count_step` (pode ser negativo); `c = count mod modulus` → `p1` (bit `bitA`, divisor limpo), `p2` (`bitA` XOR `bitA+1`, sincopado), `carry` (pulso no overflow — ritmo). **Sem `a` conectado → a fonte é a rampa do contador** (toca melodia + ritmo sozinho). Determinístico, sem RNG | Noise Engineering Numeric Repetitor (contador + máscara → ritmo); retificador clássico (meia/onda-completa); aritmética modular (teoria); divisor binário / Gray code (teoria) |
 | 32 | `WASP` | TRANSFORM | filtro de 12 dB com GRÃO — o caráter do EDP Wasp (1978), inversores CMOS 4069 como estágios de ganho que ceifam duro e assimétrico. Núcleo SVF TPT (2 polos, igual ao `FILTER`) com ceifador muito mais agressivo no laço + estágio de saída que ceifa DEPOIS do filtro (buzz reedy). `grit` (joelho do ceifador), `bias` (teto assimétrico → harmônicos pares + bloqueador de DC), `mode` (LP↔BP↔HP), `drive` (waveshaper com corte), corte estendido a 24 kHz, `drift`. Auto-oscila perto de `resonance`=1. Núcleo não-linear a 2× (antialias). O contraponto sujo do `FILTER` limpo | circuito do EDP Wasp (análises independentes, René Schmitz/DIY — NÃO Doepfer service manual nem VCV); inversor CMOS 4069 (teoria); SVF TPT não-linear (Zavalishin/Simper-Cytomic) |
-| 33 | `MATRIX` | ROUTE/MIX | matriz de roteamento 4×4 — cada cruzamento fonte×destino é um ganho (atenuversor), como as matrizes de pinos do EMS Synthi / Doepfer A-138m. `out_k = level·sat(Σ_j in_j·g_jk)`. 16 células `g11..g44` (−1..1, padrão identidade = passa-direto); `norm` (nível constante por coluna), `ring` (coluna vira produto = ring-mod de 4 quadrantes), `sat` (matriz segura em laço), `level`, `drift` (desvio lento dos ganhos — a matriz respira). No painel gráfico é uma grade clicável. Patch denso sem espaguete. Determinístico | EMS Synthi / ARP 2500 (matriz de pinos), Doepfer A-138m / Befaco / Erica matrix mixer, Serge/Buchla (norm por coluna), camada matriz do `SignalGraph` (marco 2) |
-| 34 | `MULT` | UTILITY | múltiplo PROCESSADO — no grafo digital o fan-out já é livre, então cada saída tem atenuversor + offset próprios (mini-`CONTROL` por tomada). 1 entrada → 4 saídas, `out_k = slew(scale_k·in + offset_k)`; `scale` ±2 (negativo = inverte), `offset` ±1, `slew` compartilhado. **`dual`** + `in2`: out1/2 ← `in`, out3/4 ← `in2` (A-180-2). Ocioso (sem `in`) vira 4 fontes de tensão manual (`out_k = offset_k`). Sem `drift` (é utilidade de precisão). O distribuidor de CV | múltiplo bufferizado (Doepfer A-180, Intellijel Buff Mult), atenuversor+offset (Maths/Serge), voltage spreader (Frap/Doepfer) |
+| 33 | `MATRIX` | ROUTE | matriz de roteamento 4×4 — cada cruzamento fonte×destino é um ganho (atenuversor), como as matrizes de pinos do EMS Synthi / Doepfer A-138m. `out_k = level·sat(Σ_j in_j·g_jk)`. 16 células `g11..g44` (−1..1, padrão identidade = passa-direto); `norm` (nível constante por coluna), `ring` (coluna vira produto = ring-mod de 4 quadrantes), `sat` (matriz segura em laço), `level`, `drift` (desvio lento dos ganhos — a matriz respira). No painel gráfico é uma grade clicável. Patch denso sem espaguete. Determinístico | EMS Synthi / ARP 2500 (matriz de pinos), Doepfer A-138m / Befaco / Erica matrix mixer, Serge/Buchla (norm por coluna), camada matriz do `SignalGraph` (marco 2) |
+| 34 | `MULT` | ROUTE | múltiplo PROCESSADO — no grafo digital o fan-out já é livre, então cada saída tem atenuversor + offset próprios (mini-`CONTROL` por tomada). 1 entrada → 4 saídas, `out_k = slew(scale_k·in + offset_k)`; `scale` ±2 (negativo = inverte), `offset` ±1, `slew` compartilhado. **`dual`** + `in2`: out1/2 ← `in`, out3/4 ← `in2` (A-180-2). Ocioso (sem `in`) vira 4 fontes de tensão manual (`out_k = offset_k`). Sem `drift` (é utilidade de precisão). O distribuidor de CV | múltiplo bufferizado (Doepfer A-180, Intellijel Buff Mult), atenuversor+offset (Maths/Serge), voltage spreader (Frap/Doepfer) |
 | 35 | `AUDIO-IN` | SOURCE | entrada de áudio ao vivo via ALSA (`AlsaSource`, `device` configurável por `RASGO_AUDIO_IN_DEVICE`) — o instrumento ouve o mundo, não só ele mesmo. `gain`, `dc_block` | ALSA PCM capture (padrão do sistema); bloqueio de DC (fato de engenharia de áudio) |
-| 36 | `CHAOS` | DECISION | campo caótico de poço duplo — dois integradores perseguem uma força restauradora não-linear (`x − x³`); `drive`/`damping` decidem se assenta, oscila ou "caça"; chute periódico aleatório (`rate`) é o que deixa o sistema atravessar de um poço pro outro; `freeze`, `reseed` (trigger) | `ANTITOTEM/src/core/ChaosSources.h::ChaosField` — caos de poço duplo (Ian Fritz, 2007) |
+| 36 | `CHAOS` | MODULATE | campo caótico de poço duplo — dois integradores perseguem uma força restauradora não-linear (`x − x³`); `drive`/`damping` decidem se assenta, oscila ou "caça"; chute periódico aleatório (`rate`) é o que deixa o sistema atravessar de um poço pro outro; `freeze`, `reseed` (trigger) | `ANTITOTEM/src/core/ChaosSources.h::ChaosField` — caos de poço duplo (Ian Fritz, 2007) |
 | 37 | `PLL` | SOURCE | segundo oscilador dedicado, sofisticado: detector de fase compara contra referência externa e CURVA a própria taxa (não reseta duro); toca livre sem referência; `ratio` generaliza pra sub/super-harmônicos (0,03–8×, desvio Rasgo), `lock_gain`, alcance de captura ±0,9 medido e documentado (limitação real de PLL, não bug); `shape` (seno↔tri↔serra↔quadrada, PolyBLEP); `feedback_type` (direto/retificado/capacitivo/pulso/"transistor"/refluxo, modula só a fase lida) | `ANTITOTEM/src/core/CmosVoice.h` — OSC5 (detector de fase + `pllLockGain`), `feedbackSample()`/`FeedbackSignal` |
-| 38 | `NOTE-OUT` | MIX | adaptador que captura o contrato `NOTE` do `MUSICAL SCORE` sem mudar a interface de nenhum outro módulo: detector de borda de gate + amostra de pitch, expõe `takeCompletedNote()` (chamado do laço de áudio do painel, nunca de `process()`); `gate_thru`/`pitch_thru` (pass-through, necessário pra alcançabilidade — `setActiveOutput` só processa ancestrais do sink ativo). v1 monofônico (limitação documentada) | desenho próprio — observador/adaptador sobre o contrato `NOTE` descrito em `ESTUDO_seed_composicao_generativa.md §5` |
-| 39 | `GLIDE` | TRANSFORM / PITCH | portamento POR NOTA (o primitivo que faltava pro baixo acid): `mode` 0 sempre / 1 slide-gated (o *slide* do TB-303, `slide` alto habilita) / 2 legato (só se `gate` segue alto na troca); `time` de subida + `fall` (assimetria — descida = `time·6^fall`); `curve` linear (rate constante, MS-20) ↔ RC; saídas `moving` (gate) e `done` (pulso na chegada). Sem `drift` (é régua de afinação) | TB-303 slide, portamento MS-20/Minimoog vs glide RC, Bela Gliss / EMW glide processor (`PESQUISA §2.4` Onda A) |
+| 38 | `NOTE-OUT` | OUT | adaptador que captura o contrato `NOTE` do `MUSICAL SCORE` sem mudar a interface de nenhum outro módulo: detector de borda de gate + amostra de pitch, expõe `takeCompletedNote()` (chamado do laço de áudio do painel, nunca de `process()`); `gate_thru`/`pitch_thru` (pass-through, necessário pra alcançabilidade — `setActiveOutput` só processa ancestrais do sink ativo). v1 monofônico (limitação documentada) | desenho próprio — observador/adaptador sobre o contrato `NOTE` descrito em `ESTUDO_seed_composicao_generativa.md §5` |
+| 39 | `GLIDE` | TRANSFORM | portamento POR NOTA (o primitivo que faltava pro baixo acid): `mode` 0 sempre / 1 slide-gated (o *slide* do TB-303, `slide` alto habilita) / 2 legato (só se `gate` segue alto na troca); `time` de subida + `fall` (assimetria — descida = `time·6^fall`); `curve` linear (rate constante, MS-20) ↔ RC; saídas `moving` (gate) e `done` (pulso na chegada). Sem `drift` (é régua de afinação) | TB-303 slide, portamento MS-20/Minimoog vs glide RC, Bela Gliss / EMW glide processor (`PESQUISA §2.4` Onda A) |
 | 40 | `WAVETABLE` | SOURCE | oscilador de tabela — o eixo de FORMA que o `OSC` subtrativo não cobre. 16 quadros GERADOS no `prepare()` por receita espectral fixa (serra→quadrada→formante→seno — **sem arquivo de dados**, opção A do §2.4), 10 mip-maps band-limited pra o antialiasing seguir a afinação; `pos` (+ CV + `drift`) varre a forma; `warp` = distorção de fase Casio CZ / WAVE CUT do EMW WAVE-6. **Captura ao vivo:** `capture` (áudio) + `grab` (trigger) → 1024 amostras viram o quadro do topo de `pos` — tabela do que o `AUDIO-IN` (ou outra voz) ouve. `drift=0` + sem captura → determinístico | tutorial JUCE wavetable, WolfSound; EMW WAVE-6 (hardware do autor); Casio CZ phase distortion; série de Fourier band-limited (`PESQUISA §2.4` Onda A) |
 | 41 | `LOOPER` | SPACE | delay de LINHA (não reverb como o `SPACE`, não granular como o `MEMORY`) com os três gestos do `PESQUISA §6`: `hold` (ancora a janela na posição de escrita e a repete infinito, sem realimentação nova — via toggle ou gate `freeze`), `reverse` (dois grãos Hann defasados meia volta em crossfade — vira o buffer sem clique; toggle ou gate `rev`) e caráter de FITA/BBD num knob `age` (passa-baixa dentro do laço escurece a cada volta + wow&flutter ~0,9/6,5 Hz + `tanh` de compressão + chiado semeado). Buffer ~2,2 s pré-alocado; `feedback` até 1,1 auto-oscila; `age=0` sem `hold`/`reverse` → delay digital limpo | `PESQUISA §6` (tape/digital delay com hold e reverse; BBD); Echoplex/RE-201; 4ms DLD / Mimeophon; reverse granular (Roads) (`PESQUISA §2.4` Onda A) |
 | 42 | `ADDITIVE` | SOURCE | oscilador aditivo — o timbre CONSTRUÍDO parcial a parcial, o oposto do subtrativo. 64 parciais (acumuladores de fase + LUT de seno, sem `sin` no laço); envelope espectral por 4 knobs endereçáveis por CV: `tilt` (brilho — inclinação `k^-e`, `e` de 2,6 a 0,15), `odd` (−1..1 — balanço ímpar/par: quadrada ↔ oco), `stretch` (−1..1 — inarmonicidade `razão_k = k + stretch·0,004·k·(k−1)`, monotônica pra o corte de Nyquist por `break` valer), `comb` (0–1 — pente `cos` sobre o índice de parcial). Corte de Nyquist por parcial com fade nos últimos 15 %. `drift` = cintilância **determinística** (micro-desafino + respiração de amplitude de senóides incomensuráveis — sem RNG, reprodutível). Seguidor de ganho (rápido↓/lento↑) + `tanh` na saída (a soma aditiva é pontuda) | Xaoc Odessa ★★ (`PESQUISA §7 #85` — só o conceito dos macros tilt/comb/stretch; é fechado); síntese aditiva clássica (Fourier, órgão, Kawai K5, Synclavier — domínio público); inarmonicidade de cordas/barras (acústica) (`PESQUISA §2.4` Onda B) |
-| 43 | `PLANAR` | MIX (morph) | morph vetorial: 4 fontes de áudio nos cantos de um quadrado, ponto `x`/`y` interpola por peso bilinear (o que o `MIXER` faz numa linha, num plano). `curve` = linear (pesos somam 1, morph de CV) ↔ potência constante (`1/√Σw²`, áudio não afunda no centro); `smooth` = glide de 1 polo no ponto (τ de ~0 a ~0,5 s); `rate` = velocidade do loop do gesto e da deriva. **GESTO:** gate `gesture` alto grava a trajetória do ponto (decimada 32×, ~4 s); na descida vira loop (knob ignorado, CV = nudge); toque curto limpa. **Desvio Rasgo:** a posição efetiva SAI em `x_out`/`y_out` como CV — o gesto desenhado dirige o resto do patch. `drift` = passeio 2D determinístico (Lissajous de 3 senos incomensuráveis, sem RNG). Morph linear de fontes ≤ 1 é bit-exato; só a potência constante estoura, aí `softclip` (assíntota ±1,5) | Intellijel Planar 2 ★ (`PESQUISA §7 #33` — só o conjunto de gestos gravar/reproduzir/emitir; é fechado); Buchla 208 joystick; síntese vetorial Prophet VS / Korg Wavestation (domínio público, anos 80); pan law de potência constante (`PESQUISA §2.4` Onda B) |
+| 43 | `PLANAR` | ROUTE / MORPH | morph vetorial: 4 fontes de áudio nos cantos de um quadrado, ponto `x`/`y` interpola por peso bilinear (o que o `MIXER` faz numa linha, num plano). `curve` = linear (pesos somam 1, morph de CV) ↔ potência constante (`1/√Σw²`, áudio não afunda no centro); `smooth` = glide de 1 polo no ponto (τ de ~0 a ~0,5 s); `rate` = velocidade do loop do gesto e da deriva. **GESTO:** gate `gesture` alto grava a trajetória do ponto (decimada 32×, ~4 s); na descida vira loop (knob ignorado, CV = nudge); toque curto limpa. **Desvio Rasgo:** a posição efetiva SAI em `x_out`/`y_out` como CV — o gesto desenhado dirige o resto do patch. `drift` = passeio 2D determinístico (Lissajous de 3 senos incomensuráveis, sem RNG). Morph linear de fontes ≤ 1 é bit-exato; só a potência constante estoura, aí `softclip` (assíntota ±1,5) | Intellijel Planar 2 ★ (`PESQUISA §7 #33` — só o conjunto de gestos gravar/reproduzir/emitir; é fechado); Buchla 208 joystick; síntese vetorial Prophet VS / Korg Wavestation (domínio público, anos 80); pan law de potência constante (`PESQUISA §2.4` Onda B) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);

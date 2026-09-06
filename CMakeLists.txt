@@ -256,6 +256,12 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_score_recorder_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_score_recorder_tests COMMAND rasgo_modular_score_recorder_tests)
 
+    add_executable(rasgo_modular_seed_patch_tests tests/test_seed_patch.cpp)
+    target_include_directories(rasgo_modular_seed_patch_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_seed_patch_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_seed_patch_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_seed_patch_tests COMMAND rasgo_modular_seed_patch_tests)
+
     # usa apps/panel/LearnCatalog.hpp
     add_executable(rasgo_modular_learn_catalog_tests tests/test_learn_catalog.cpp)
     target_include_directories(rasgo_modular_learn_catalog_tests PRIVATE src apps)
