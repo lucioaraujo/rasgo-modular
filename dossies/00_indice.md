@@ -92,4 +92,5 @@ módulos (`apps/panel/LearnCatalog.hpp`, sempre presente no rodapé da
 paleta) — **feitos**. Form Engine e a camada contextual do Learning
 Engine (`WHY?`/`WHAT IF?`) continuam mapeados, não construídos;
 [`ESTUDO_audio_sampling.md`](ESTUDO_audio_sampling.md) — `SAMPLER`/
-`TURNTABLE`/`TAPE`.
+`TURNTABLE`/`TAPE` (revisto 2026-09-06: §2 mapeia o **Navalha 2** como
+prior art — `SlicePlayer`/`HeritagePitch`/`SliceBank` portáveis).
