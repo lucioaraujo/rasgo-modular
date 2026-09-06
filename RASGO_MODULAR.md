@@ -1112,7 +1112,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 45 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 46 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1209,7 +1209,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 45 módulos DSP
+### 36.3 Os 46 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1262,6 +1262,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 43 | `PLANAR` | ROUTE / MORPH | morph vetorial: 4 fontes de áudio nos cantos de um quadrado, ponto `x`/`y` interpola por peso bilinear (o que o `MIXER` faz numa linha, num plano). `curve` = linear (pesos somam 1, morph de CV) ↔ potência constante (`1/√Σw²`, áudio não afunda no centro); `smooth` = glide de 1 polo no ponto (τ de ~0 a ~0,5 s); `rate` = velocidade do loop do gesto e da deriva. **GESTO:** gate `gesture` alto grava a trajetória do ponto (decimada 32×, ~4 s); na descida vira loop (knob ignorado, CV = nudge); toque curto limpa. **Desvio Rasgo:** a posição efetiva SAI em `x_out`/`y_out` como CV — o gesto desenhado dirige o resto do patch. `drift` = passeio 2D determinístico (Lissajous de 3 senos incomensuráveis, sem RNG). Morph linear de fontes ≤ 1 é bit-exato; só a potência constante estoura, aí `softclip` (assíntota ±1,5) | Intellijel Planar 2 ★ (`PESQUISA §7 #33` — só o conjunto de gestos gravar/reproduzir/emitir; é fechado); Buchla 208 joystick; síntese vetorial Prophet VS / Korg Wavestation (domínio público, anos 80); pan law de potência constante (`PESQUISA §2.4` Onda B) |
 | 44 | `OPERATOR` | SOURCE | voz FM de 4 operadores (senóides) — o `OSC` tem TZFM de UM par, isto é FM de verdade. `algo` (0–7): de A→B→C→D em série (mais "FM") a A,B,C,D em paralelo (aditivo/órgão); ordem A→B→C→D fixa, nenhum algoritmo tem laço entre operadores. `ratio_b/c/d` (0–9) = razão de B/C/D vs A **quantizada** à tabela `{0,5;1;1,5;2;2,5;3;4;5;7;9}` (inteira = harmônico, quebrada = sino/metal). `index` (0–1, +CV) = profundidade global de modulação (bandas laterais de Bessel/Chowning). `feedback` (0–1) = A modula a própria fase (média de 2 amostras à la DX7 → dente-de-serra). `drift` = micro-desafino determinístico por operador. Sem EGs por operador nesta v1 (`ENVELOPE → index` cobre o ataque FM); aliasing de banda lateral aceito (como no DX). Determinístico | John Chowning, "The Synthesis of Complex Audio Spectra by Means of FM" (1973 — teoria pública); Yamaha DX7/DX21/TX81Z (4-op + 8 algoritmos — conceito, patente expirada); Akemie's Castle / YM2151 OPM (`PESQUISA §7 #88`); Bastl Pizza (`PESQUISA §7 #98`) (`PESQUISA §2.4` Onda B) |
 | 45 | `FORMANT` | TRANSFORM | ressoador espectral: 5 passa-faixas em PARALELO (SVF TPT, não-linearidade NO laço, mesmo do `FILTER`/`WASP`) — o oposto do `PARAMETRIC` (EQ estático em série). `vowel` (0–1, +CV) varre a sequência A→E→I→O→U: cada vogal tem 5 formantes (frequência interpolada em log, ganho em dB, banda linear — dados fonéticos de voz de baixo, `constexpr`, das tabelas Csound/Fant). `shift` (−1..1) = escala TODAS as frequências (`2^(shift·1,5)` ≈ 0,35×–2,8×) — comprimento do trato vocal. `res` (0–1) = estreita as bandas (`bw / (1 + res·8)`) — de coloração sutil a bandas que cantam/apitam. `mix` seco↔ressoado (0 = passa-direto bit-exato). `drift` = wobble determinístico por formante. Sem entrada → silêncio (é TRANSFORM); modo "voz que fala" = `res` alto + excitação do patch + `vowel` de um LFO. Determinístico | Fant, *Acoustic Theory of Speech Production* (1960 — teoria fonte-filtro, pública); tabelas de formante de vogais cantadas (Csound `fof`/`fmnt` — fato fonético); Frap Tools Fumana ★ (`PESQUISA §7 #19` — conceito, é fechado); Random*Source Serge Resonant EQ ★ (`PESQUISA §7 #51`); 4ms SMR (`PESQUISA §2.4` Onda B) |
+| 46 | `HALL` | SPACE | reverberação FDN — a rede de atraso realimentada que o `SPACE` (comb+allpass) não é. 8 linhas de atraso + **matriz de Householder** (`y_i = s_i − (2/N)·Σs`, uma reflexão ortogonal → sem perda, difusão máxima por 1 subtração/linha; a rede é estável pra `g_i ≤ 1`, nunca cresce). `size` escala as 8 linhas (0,3×–1,7×, ~8–88 ms); `decay` = RT60 `0,2·75^decay` (0,2 s–15 s) → `g_i = 10^(−3·d_i/RT60)`; `damp` = passa-baixa de 1 polo NO laço de cada linha (agudo decai antes do grave); `mod` = modulação determinística do ponto de leitura (chorus na cauda, quebra o ringing — senóides, sem RNG); `pre` = pré-atraso (0–120 ms); `mix`. Gate `freeze` → `g_i = 1` (cauda infinita, Householder preserva energia) + rampa da entrada a 0. Saídas estéreo `l`/`r` (combinações descorrelacionadas das linhas). Módulo NOVO, não modo do `SPACE` (que fica intocado). Determinístico | Jot & Chaigne, "Digital delay networks for designing artificial reverberators" (1991 — o FDN, teoria pública); matriz de Householder/Hadamard (DSP clássico); Dattorro 1997 (damping no laço); NE Desmodus Versio ★ (`PESQUISA §7 #72`), Strymon StarLab ★ (`PESQUISA §7 #95`) (`PESQUISA §2.4` Onda C) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1303,7 +1304,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**55 alvos CTest**, 100% verdes em **Debug e Release**
+**56 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

@@ -65,11 +65,11 @@ propriedade do cabo, não um módulo do catálogo.
 | 43 | [`43_planar.md`](43_planar.md) | `PLANAR` | ROUTE / MORPH | Onda B (2026-09-06) |
 | 44 | [`44_operator.md`](44_operator.md) | `OPERATOR` | SOURCE | Onda B (2026-09-06) |
 | 45 | [`45_formant.md`](45_formant.md) | `FORMANT` | TRANSFORM | Onda B (2026-09-06) |
+| 46 | [`46_hall.md`](46_hall.md) | `HALL` | SPACE | Onda C (2026-09-06) |
 
-**45 módulos feitos.** Ondas A e B completas (`GLIDE`/`WAVETABLE`/
-`LOOPER` · `ADDITIVE`/`PLANAR`/`OPERATOR`/`FORMANT`). Próxima leva
-(dossiê antes do código): `PESQUISA_MODULOS.md §2.4` — Onda C reverb
-FDN/`DRUM`, Onda D `SAMPLER`/`SIGNAL-IN`.
+**46 módulos feitos.** Ondas A e B completas; Onda C em curso (`HALL`
+feito). Próxima leva (dossiê antes do código): `PESQUISA_MODULOS.md §2.4`
+— Onda C `DRUM`, Onda D `SAMPLER`/`SIGNAL-IN`.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação
