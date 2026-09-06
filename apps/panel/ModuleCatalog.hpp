@@ -22,6 +22,7 @@
 #include "dsp/Glide.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
+#include "dsp/Looper.hpp"
 #include "dsp/Lpg.hpp"
 #include "dsp/Master.hpp"
 #include "dsp/Matrix.hpp"
@@ -78,6 +79,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "ENVELOPE")   return std::make_unique<Envelope>();
     if (t == "LOGIC")      return std::make_unique<Logic>();
     if (t == "MEMORY")     return std::make_unique<Memory>();
+    if (t == "LOOPER")     return std::make_unique<Looper>();
     if (t == "TURING")     return std::make_unique<TuringLoop>();
     if (t == "MATTER")     return std::make_unique<Matter>();
     if (t == "SPACE")      return std::make_unique<Space>();
@@ -112,7 +114,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"TRANSFORM",   {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "CONTROL", "MULT", "SH", "GLIDE", "PARAMETRIC"}},
         {"MATTER",      {"MATTER", "STRING"}},
         {"MEMORY",      {"MEMORY"}},
-        {"SPACE",       {"SPACE"}},
+        {"SPACE",       {"SPACE", "LOOPER"}},
         {"MIX",         {"MIXER", "MATRIX", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;

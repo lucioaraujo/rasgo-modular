@@ -1239,6 +1239,52 @@ inline const LearnTable& learnTable() {
                 "útil pra rotear o espaço separado do sinal direto.",
                 "", ""}},
         }},
+        {"LOOPER", {
+            {"time", {
+                "Comprimento do atraso — de eco curto a laço de 2 s.",
+                "É a distância entre a cabeça de escrita e a de leitura no "
+                "buffer circular; muda suavizada pra não estalar.",
+                "Com FBK alto, gire TIME devagar: o laço 'estica' e "
+                "'encolhe' como fita puxada à mão."}},
+            {"feedback", {
+                "Quanto da saída volta pro laço — acima de 1 auto-oscila.",
+                "O sinal realimentado passa pelo filtro de AGE e por um "
+                "tanh que segura o nível antes de somar de volta.",
+                "Ponha em ~1.05 sem entrada: o laço se sustenta e o AGE "
+                "vira o timbre da cauda."}},
+            {"age", {
+                "Caráter de fita/BBD: perda de agudo no laço, wow & "
+                "flutter, saturação e chiado.",
+                "Um passa-baixa dentro da realimentação escurece a cada "
+                "volta; dois LFOs lentos (~0,9 e ~6,5 Hz) modulam a "
+                "leitura; ruído semeado soma no laço.",
+                "Segure com HOLD e suba o AGE: cada repetição fica um "
+                "pouco mais escura e trêmula, como cópia de cópia."}},
+            {"mix", {"Seco ↔ molhado na saída OUT.", "", ""}},
+            {"hold", {
+                "Congela o laço: para de escrever e repete a janela atual "
+                "pra sempre.",
+                "Na borda de subida ancora a janela na posição de escrita "
+                "atual; a leitura passa a circular só nesse trecho, sem "
+                "realimentação nova.",
+                "Toque uma frase, ligue HOLD no fim dela e improvise por "
+                "cima — o trecho vira base."}},
+            {"reverse", {
+                "Lê o laço de trás pra frente, sem clique.",
+                "Duas leituras em janela de Hann defasadas meia volta se "
+                "cruzam (crossfade), então a virada no fim do buffer não "
+                "estala.",
+                "Combine REV + HOLD: um trecho fixo tocando ao contrário "
+                "em loop."}},
+            {"in:in", {"Entrada de áudio.", "", ""}},
+            {"in:time", {"CV que soma a TIME (em segundos).", "", ""}},
+            {"in:freeze", {"Gate: enquanto alto, equivale a HOLD ligado.",
+                          "", ""}},
+            {"in:rev", {"Gate: enquanto alto, equivale a REV ligado.",
+                       "", ""}},
+            {"out:out", {"Seco + molhado, misturados por MIX.", "", ""}},
+            {"out:wet", {"Só o laço, sem o seco.", "", ""}},
+        }},
         {"SEQUENCE", {
             {"length", {"Quantos dos 8 passos entram no padrão.", "", ""}},
             {"mode", {

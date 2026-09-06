@@ -4180,4 +4180,41 @@ Integrado: `ModuleCatalog` (SOURCE, após OSC), `test_panel_layout`,
 Debug e Release. Renders de exemplo estáveis (WAVETABLE não entra em
 nenhum).
 
-**Não commitado.**
+Commitado (`e675fda`).
+
+## Registro da etapa — 2026-09-06: Módulo 41 — LOOPER (Onda A — completa)
+
+`PESQUISA §2.4` Onda A, #41 — o último da onda.
+
+**`LOOPER` — delay de linha com HOLD / REVERSE / fita** (`src/dsp/Looper.hpp`,
+`dossies/41_looper.md`, `tests/test_looper.cpp` — 8 funções). Família SPACE.
+
+- Delay de linha (buffer circular ~2,2 s, pré-alocado no `prepare()`;
+  `process()` não aloca). Distinto do `SPACE` (reverb) e do `MEMORY`
+  (granular): aqui é a LINHA de atraso com os três gestos do `§6`.
+- `hold` (toggle ou gate `freeze`): na borda de subida ancora a janela
+  na posição de escrita e a repete infinito — para de escrever, sem
+  realimentação nova. `reverse` (toggle ou gate `rev`): dois grãos Hann
+  defasados meia volta em crossfade — vira o buffer sem clique.
+- `age` = caráter de fita/BBD num knob: passa-baixa dentro do laço
+  escurece a cada volta + wow&flutter (~0,9 e ~6,5 Hz) + `tanh` de
+  compressão + chiado semeado (determinístico — reprodutível).
+- `feedback` até 1,1 auto-oscila; `time` suavizada; `mix` seco↔molhado;
+  saídas `out` (misturado) e `wet` (só o laço). `age=0` sem
+  `hold`/`reverse` → delay digital limpo.
+
+Bug encontrado e corrigido durante os testes: `prepare()` inicializava
+`dSmooth_` com `0.3f * sr_` fixo em vez de ler o parâmetro `time` —
+o tempo de atraso demorava demais a convergir. Corrigido para
+`clampf(parameterValue("time") * sr_, 4, n-4)`.
+
+Integrado: `ModuleCatalog` (SPACE, após SPACE), `test_panel_layout`,
+`LearnCatalog` (12 binds). Docs: `00_indice`, `PESQUISA §2.4`,
+`RASGO_MODULAR.md §36.3`, `README.md`.
+
+**Validação:** build limpo (`-Wall -Wextra -Werror`), **50/50 CTest**
+Debug e Release. Renders de exemplo estáveis (LOOPER não entra em
+nenhum).
+
+**Onda A completa** (GLIDE, WAVETABLE, LOOPER). Próxima: Onda B
+(ADDITIVE / PLANAR / OPERATOR / FORMANT) — aguarda direção do autor.
