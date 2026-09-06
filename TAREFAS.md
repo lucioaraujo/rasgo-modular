@@ -4312,3 +4312,56 @@ sozinho. Renders de exemplo estáveis (ADDITIVE não entra em nenhum).
 **Não commitado ainda** → commit a seguir.
 
 **Onda B:** falta `PLANAR` (#43), `OPERATOR` (#44), `FORMANT` (#45).
+
+## Registro da etapa — 2026-09-06: Módulo 43 — PLANAR (Onda B — 2/4)
+
+`PESQUISA §2.4` Onda B, #43 (após "avance").
+
+**`PLANAR` — morph vetorial XY** (`src/dsp/Planar.hpp`,
+`tests/test_planar.cpp` — 12 funções). Família MIX (morph). O que o
+`MIXER` faz numa linha, num plano: 4 fontes de áudio nos cantos de um
+quadrado, um ponto `x`/`y` interpola por peso bilinear.
+
+- **`curve`** linear (pesos somam 1 — morph honesto de CV) ↔ potência
+  constante (`1/√Σw²` — áudio não afunda ~6 dB no centro).
+- **`smooth`** = glide de 1 polo no ponto (τ de ~0 a ~0,5 s);
+  **`rate`** (0,5 = 1×, `2^((r−0,5)·4)`) = velocidade do loop do gesto
+  E da deriva.
+- **GESTO:** gate `gesture` alto grava a trajetória do ponto (decimada
+  32×, buffer ~4 s); na descida ≥ 3 quadros → toca em loop (knob
+  ignorado, CV vira nudge); toque curto = limpa.
+- **Desvio Rasgo:** a posição efetiva (suavizada) SAI em `x_out`/`y_out`
+  como CV — o gesto desenhado num `PLANAR` de áudio dirige `cutoff`,
+  `pos`, outro `PLANAR`… "a relação é o processo".
+- **`drift`** = passeio 2D determinístico (Lissajous de 3 senos
+  incomensuráveis, sem RNG — não fecha em < ~6 min).
+- **Saída:** morph linear de fontes ≤ 1 é combinação convexa → bit-exato,
+  nunca passa de |1|. Só a potência constante estoura (~2× no centro);
+  aí `softclip` (`tanh` acima de |1|, assíntota ±1,5).
+
+Determinístico sempre. `prepare()` aloca ~48 KB (2 buffers de gesto);
+`process()` não aloca.
+
+**Bugs pegos nos testes:** (1) `τ` mínimo do smooth era 1 ms — subi pra
+60 µs pra `smooth=0` ser realmente instantâneo; (2) `softclip` prendia
+em 1,0f exato com 4 fontes de amplitude 1 em fase — retopologizado pra
+transparente até |1| e assíntota ±1,5 (o morph linear nunca precisa de
+clip); (3) nudge do knob durante playback deslocava o gesto inteiro —
+agora o knob é ignorado com gesto tocando, só a CV dá nudge.
+
+Integrado: `ModuleCatalog` (MIX, após MATRIX), `test_panel_layout`
+(12 HP), `LearnCatalog` (16 binds). Docs: `00_indice`, `PESQUISA §2.4`,
+`RASGO_MODULAR.md §36.3`, `README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**52/52 CTest** Debug e Release. Testes: canto puro → só A; centro
+`curve=0` → −6 dB, `curve=1` → ~0 dB (potência constante); varredura
+A→B linear; `smooth` transforma degrau em rampa e chega; deriva move /
+para com `drift`; grava um gesto e `x_out` reproduz em loop; toque curto
+não deixa gesto; `x_out`/`y_out` seguem o ponto; determinismo byte a
+byte com `drift` + gesto; limites; soa sozinho. Renders de exemplo
+estáveis (PLANAR não entra em nenhum).
+
+**Não commitado ainda** → commit a seguir.
+
+**Onda B:** falta `OPERATOR` (#44), `FORMANT` (#45).
