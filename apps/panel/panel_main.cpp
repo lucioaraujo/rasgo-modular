@@ -56,6 +56,12 @@
 #include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"
 
+// carimbo de build (git hash + data) — o CMake passa via -D; fallback pra
+// um build fora do CMake.
+#ifndef RASGO_MODULAR_BUILD
+#define RASGO_MODULAR_BUILD "dev"
+#endif
+
 // marca RASGO — mapa de cobertura (tons de cinza, anti-aliased) gerado do
 // SVG da família (`assets/regen_logo.sh`); commitado, o build não precisa
 // de inkscape/ImageMagick.
@@ -806,6 +812,14 @@ int main() {
                            static_cast<unsigned>(depth));
     };
 
+    // véu semi-transparente pros overlays (tutorial / sobre) — um stipple
+    // de ~62% deixa os módulos VISÍVEIS por trás, só escurecidos, em vez
+    // de sumirem (pedido do autor 2026-09-07). X11 puro não tem alfa.
+    static const char kDimBits[8] = { '\x6D', '\xB6', '\xDB', '\x6D',
+                                      '\xB6', '\xDB', '\x6D', '\xB6' };
+    const Pixmap dimStipple =
+        XCreateBitmapFromData(dpy, win, kDimBits, 8, 8);
+
     // marca RASGO — pré-composta UMA vez num Pixmap: a cobertura em tons
     // de cinza do SVG (com anti-aliasing) é misturada do fundo pra a cor
     // de acento, então o desenho a cada quadro é só um XCopyArea. Sem
@@ -1419,6 +1433,13 @@ int main() {
 
         // ---- case: os módulos (cada um recortado à sua caixa) --------
         clipTo(kPaletteW + 1, kCaseTop, winW - kPaletteW, winH - kCaseTop);
+        // frase de crédito da família, na faixa vazia acima da 1ª fileira
+        // (pedido do autor 2026-09-07 — os módulos ficam onde estão) —
+        // com ano (na frase) + versão (o carimbo de build)
+        capText(kPaletteW + (winW - kPaletteW) / 2, kCaseTop + 11,
+                tr(S::footerCredit, uiLang)
+                    + std::string(RASGO_MODULAR_BUILD),
+                T.textSecondary);
         for (const auto& m : mods) {
             const auto [bx, by] = modOrigin(m);
             if (by + modH < kCaseTop || by > winH) continue;
@@ -1784,10 +1805,14 @@ int main() {
         // ==== OVERLAY: tutorial / sobre ================================
         // qualquer clique (ou [Esc]) fecha — ver o laço de evento.
         if (overlay) {
-            XSetForeground(dpy, gc, T.recessed);
+            // véu escuro semi-transparente — os módulos continuam à vista
+            XSetForeground(dpy, gc, T.bg);
+            XSetStipple(dpy, gc, dimStipple);
+            XSetFillStyle(dpy, gc, FillStippled);
             XFillRectangle(dpy, bb, gc, 0, 0, winW, winH);
+            XSetFillStyle(dpy, gc, FillSolid);
             const int cw = std::min(760, winW - 60);
-            const int chh = std::min(winH - 60, overlay == 1 ? 600 : 240);
+            const int chh = std::min(winH - 60, overlay == 1 ? 600 : 285);
             const int cxx = (winW - cw) / 2, cyy = (winH - chh) / 2;
             XSetForeground(dpy, gc, T.surface);
             XFillRectangle(dpy, bb, gc, cxx, cyy, cw, chh);
@@ -1829,7 +1854,12 @@ int main() {
                 }
             } else {
                 text(px, py, "RASGO MODULAR", T.accent);
-                py += 24;
+                py += 16;
+                text(px, py,
+                     std::string("build ") + RASGO_MODULAR_BUILD
+                         + "  ·  compilado " __DATE__ " " __TIME__,
+                     T.textSecondary);
+                py += 20;
                 for (const auto& ln : wrapText(tr(S::aboutBody, uiLang), wrapPx)) {
                     text(px, py, ln, T.textSecondary);
                     py += 15;

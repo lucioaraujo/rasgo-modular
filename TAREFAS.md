@@ -4973,4 +4973,43 @@ módulo (`rawTitle = tipo`, `rawKey = id + "|\x01mod"`).
 **Dwell 2 s → 1 s** — `panel_main.cpp` `std::chrono::milliseconds(1000)`.
 
 Docs: `ESTUDO §6`, `RASGO_MODULAR.md §36.7`. **62/62 CTest Debug +
-Release.** Painel builds limpo. Não commitado ainda.
+Release.** Painel builds limpo.
+
+---
+
+## Registro da etapa — 2026-09-07: Motion Engine v3 afinada + carimbo de build + véu dos overlays
+
+Depois do autor ver `pw`/`reso`/`fold` "frenéticos" no painel:
+- **`MotionField.hpp`/`MotionEngine.hpp`** — quente ±9%→±4%, livre
+  ±22%→±15%, estrutural ±3%→±1,2%; easing bem mais lento; campo de Thomas
+  mais devagar; **`freq`/`pitch`/`tune`/`transpose`/`note`/`key` →
+  estrutural** (afinação = composição — o range 8–8000 Hz do OSC estava
+  varrendo demais); **janela relativa ao valor atual** (param de range
+  enorme e escala log respira em torno de onde está); ousadia só nos
+  livres. Commit `012e851`.
+
+**Carimbo de build no SOBRE** (o autor não sabia qual versão rodava —
+"ainda não há versão no sobre"). `CMakeLists.txt` captura
+`git rev-parse --short HEAD` + data (fallback só a data) →
+`-DRASGO_MODULAR_BUILD=`; o SOBRE mostra `build <hash> · <data>  ·
+compilado <__DATE__ __TIME__>`. `CMAKE_CONFIGURE_DEPENDS` no
+`.git/HEAD` pra o hash não ficar velho.
+
+**Véu semi-transparente nos overlays** (tutorial e SOBRE) — o autor:
+"quando abre a aba sobre desaparece os módulos no fundo". X11 puro não
+tem alfa → um `dimStipple` de 8×8 (~62% coberto) sobre o back-buffer já
+desenhado deixa os módulos VISÍVEIS por trás, só escurecidos.
+
+**Frase de crédito da família** (`UiLanguage.hpp::footerCredit`, 4
+idiomas — padrão Antitotem/Rasgo Synth) na **faixa vazia acima da 1ª
+fileira de módulos** (não no rodapé — pedido do autor), com **ano na
+frase + versão** (o carimbo de build anexado):
+`© LÚCIO DE ARAÚJO · RASGO MODULAR 2026 · LICENÇA AGPLv3+ · build <hash> · <data>`.
+Os módulos ficam onde estavam (`capText` na faixa `kCaseTop+11`).
+
+Painel builds limpo, 62/62 CTest. Não commitado ainda.
+
+Pendências: o CLIP reportado (seeds 597512815, 625938148) — render
+headless de 90 s dá pico −34 dBFS, ZERO clip; falta o autor dizer se é
+com VARIA on/off e se o PICO do cabeçalho acende. Confirmar de ouvido a
+mão calma. `git push`.
