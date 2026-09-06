@@ -217,6 +217,51 @@ inline const LearnTable& learnTable() {
                 "A soma das 64 parciais, com seguidor de ganho + tanh "
                 "pra não estourar.", "", ""}},
         }},
+        {"OPERATOR", {
+            {"freq", {
+                "Frequência do operador A. 1 V/oct pela entrada 1V/O.",
+                "", ""}},
+            {"fine", {"Afinação fina em cents (±100).", "", ""}},
+            {"algo", {
+                "Qual operador modula qual — 8 algoritmos, de 0 (A→B→C→D, "
+                "o mais 'FM') a 7 (A,B,C,D em paralelo, aditivo/órgão).",
+                "A ordem é sempre A→B→C→D e só A tem feedback, então não "
+                "há laço entre operadores — o cálculo é uma passada.",
+                "Comece no 0 com INDEX médio e gire ALGO devagar: o "
+                "espectro se reorganiza a cada passo."}},
+            {"ratio_b", {
+                "Razão de frequência do operador B em relação a A, "
+                "QUANTIZADA: 0,5 / 1 / 1,5 / 2 / 2,5 / 3 / 4 / 5 / 7 / 9.",
+                "Inteira = harmônico (timbre musical); quebrada (2,5) = "
+                "inarmônico (sino, metal). É o QUANTIZER da altura, mas "
+                "pro timbre.", ""}},
+            {"ratio_c", {"Razão do operador C (mesma tabela).", "", ""}},
+            {"ratio_d", {"Razão do operador D (mesma tabela).", "", ""}},
+            {"index", {
+                "Profundidade de modulação global. 0 = os 4 operadores "
+                "são senóides puras; 1 ≈ 6 ciclos de desvio de fase "
+                "(bem brilhante).",
+                "Na FM, o índice controla quantas bandas laterais "
+                "aparecem e com que força (as funções de Bessel de "
+                "Chowning).",
+                "Cabeie ENVELOPE.env → IDX: o ataque brilhante que "
+                "escurece na cauda — o 'som DX'."}},
+            {"feedback", {
+                "O operador A modula a própria fase (média das 2 últimas "
+                "amostras, à la DX7).",
+                "Sozinho já leva a senóide de A a um dente-de-serra — "
+                "uma fonte de harmônicos sem precisar de outro operador.",
+                ""}},
+            {"drift", {
+                "Micro-desafino lento e independente por operador. "
+                "Determinístico (soma de senos, sem RNG). 0 = sem "
+                "desafino.", "", ""}},
+            {"in:pitch", {"CV 1 V/oct.", "", ""}},
+            {"in:index", {"CV somada em INDEX.", "", ""}},
+            {"out:out", {
+                "A soma das portadoras do algoritmo, ÷ nº de portadoras "
+                "+ softclip.", "", ""}},
+        }},
         {"OSC", {
             {"freq", {
                 "Frequência base do oscilador.",

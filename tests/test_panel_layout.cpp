@@ -34,6 +34,7 @@
 #include "dsp/Mult.hpp"
 #include "dsp/Noise.hpp"
 #include "dsp/NoteOut.hpp"
+#include "dsp/Operator.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
 #include "dsp/Planar.hpp"
@@ -174,6 +175,7 @@ int main() {
     mods.emplace_back("OSC", std::make_unique<Oscillator>());
     mods.emplace_back("WAVETABLE", std::make_unique<Wavetable>());
     mods.emplace_back("ADDITIVE", std::make_unique<Additive>());
+    mods.emplace_back("OPERATOR", std::make_unique<Operator>());
     mods.emplace_back("NOISE", std::make_unique<Noise>());
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());

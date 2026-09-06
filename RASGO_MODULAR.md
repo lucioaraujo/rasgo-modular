@@ -1112,7 +1112,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 43 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 44 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1209,7 +1209,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 43 módulos DSP
+### 36.3 Os 44 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1260,6 +1260,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 41 | `LOOPER` | SPACE | delay de LINHA (não reverb como o `SPACE`, não granular como o `MEMORY`) com os três gestos do `PESQUISA §6`: `hold` (ancora a janela na posição de escrita e a repete infinito, sem realimentação nova — via toggle ou gate `freeze`), `reverse` (dois grãos Hann defasados meia volta em crossfade — vira o buffer sem clique; toggle ou gate `rev`) e caráter de FITA/BBD num knob `age` (passa-baixa dentro do laço escurece a cada volta + wow&flutter ~0,9/6,5 Hz + `tanh` de compressão + chiado semeado). Buffer ~2,2 s pré-alocado; `feedback` até 1,1 auto-oscila; `age=0` sem `hold`/`reverse` → delay digital limpo | `PESQUISA §6` (tape/digital delay com hold e reverse; BBD); Echoplex/RE-201; 4ms DLD / Mimeophon; reverse granular (Roads) (`PESQUISA §2.4` Onda A) |
 | 42 | `ADDITIVE` | SOURCE | oscilador aditivo — o timbre CONSTRUÍDO parcial a parcial, o oposto do subtrativo. 64 parciais (acumuladores de fase + LUT de seno, sem `sin` no laço); envelope espectral por 4 knobs endereçáveis por CV: `tilt` (brilho — inclinação `k^-e`, `e` de 2,6 a 0,15), `odd` (−1..1 — balanço ímpar/par: quadrada ↔ oco), `stretch` (−1..1 — inarmonicidade `razão_k = k + stretch·0,004·k·(k−1)`, monotônica pra o corte de Nyquist por `break` valer), `comb` (0–1 — pente `cos` sobre o índice de parcial). Corte de Nyquist por parcial com fade nos últimos 15 %. `drift` = cintilância **determinística** (micro-desafino + respiração de amplitude de senóides incomensuráveis — sem RNG, reprodutível). Seguidor de ganho (rápido↓/lento↑) + `tanh` na saída (a soma aditiva é pontuda) | Xaoc Odessa ★★ (`PESQUISA §7 #85` — só o conceito dos macros tilt/comb/stretch; é fechado); síntese aditiva clássica (Fourier, órgão, Kawai K5, Synclavier — domínio público); inarmonicidade de cordas/barras (acústica) (`PESQUISA §2.4` Onda B) |
 | 43 | `PLANAR` | ROUTE / MORPH | morph vetorial: 4 fontes de áudio nos cantos de um quadrado, ponto `x`/`y` interpola por peso bilinear (o que o `MIXER` faz numa linha, num plano). `curve` = linear (pesos somam 1, morph de CV) ↔ potência constante (`1/√Σw²`, áudio não afunda no centro); `smooth` = glide de 1 polo no ponto (τ de ~0 a ~0,5 s); `rate` = velocidade do loop do gesto e da deriva. **GESTO:** gate `gesture` alto grava a trajetória do ponto (decimada 32×, ~4 s); na descida vira loop (knob ignorado, CV = nudge); toque curto limpa. **Desvio Rasgo:** a posição efetiva SAI em `x_out`/`y_out` como CV — o gesto desenhado dirige o resto do patch. `drift` = passeio 2D determinístico (Lissajous de 3 senos incomensuráveis, sem RNG). Morph linear de fontes ≤ 1 é bit-exato; só a potência constante estoura, aí `softclip` (assíntota ±1,5) | Intellijel Planar 2 ★ (`PESQUISA §7 #33` — só o conjunto de gestos gravar/reproduzir/emitir; é fechado); Buchla 208 joystick; síntese vetorial Prophet VS / Korg Wavestation (domínio público, anos 80); pan law de potência constante (`PESQUISA §2.4` Onda B) |
+| 44 | `OPERATOR` | SOURCE | voz FM de 4 operadores (senóides) — o `OSC` tem TZFM de UM par, isto é FM de verdade. `algo` (0–7): de A→B→C→D em série (mais "FM") a A,B,C,D em paralelo (aditivo/órgão); ordem A→B→C→D fixa, nenhum algoritmo tem laço entre operadores. `ratio_b/c/d` (0–9) = razão de B/C/D vs A **quantizada** à tabela `{0,5;1;1,5;2;2,5;3;4;5;7;9}` (inteira = harmônico, quebrada = sino/metal). `index` (0–1, +CV) = profundidade global de modulação (bandas laterais de Bessel/Chowning). `feedback` (0–1) = A modula a própria fase (média de 2 amostras à la DX7 → dente-de-serra). `drift` = micro-desafino determinístico por operador. Sem EGs por operador nesta v1 (`ENVELOPE → index` cobre o ataque FM); aliasing de banda lateral aceito (como no DX). Determinístico | John Chowning, "The Synthesis of Complex Audio Spectra by Means of FM" (1973 — teoria pública); Yamaha DX7/DX21/TX81Z (4-op + 8 algoritmos — conceito, patente expirada); Akemie's Castle / YM2151 OPM (`PESQUISA §7 #88`); Bastl Pizza (`PESQUISA §7 #98`) (`PESQUISA §2.4` Onda B) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1301,7 +1302,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**52 alvos CTest**, 100% verdes em **Debug e Release**
+**54 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

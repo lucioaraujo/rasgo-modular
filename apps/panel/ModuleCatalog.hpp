@@ -33,6 +33,7 @@
 #include "dsp/Mult.hpp"
 #include "dsp/Noise.hpp"
 #include "dsp/NoteOut.hpp"
+#include "dsp/Operator.hpp"
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
 #include "dsp/Planar.hpp"
@@ -61,6 +62,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "OSC")        return std::make_unique<Oscillator>();
     if (t == "WAVETABLE")  return std::make_unique<Wavetable>();
     if (t == "ADDITIVE")   return std::make_unique<Additive>();
+    if (t == "OPERATOR")   return std::make_unique<Operator>();
     if (t == "AUDIO-IN")   return std::make_unique<AudioIn>();
     if (t == "CHAOS")      return std::make_unique<Chaos>();
     if (t == "PLL")        return std::make_unique<Pll>();
@@ -125,7 +127,7 @@ struct CatalogGroup {
 // saída finita).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "AUDIO-IN"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "AUDIO-IN"}},
         {"TRANSFORM", {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
