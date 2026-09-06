@@ -4596,7 +4596,31 @@ extremos limitados. Renders de exemplo estáveis.
 **Não commitado ainda** → commit a seguir.
 
 **Ondas A, B e C COMPLETAS** (9 módulos: GLIDE, WAVETABLE, LOOPER,
-ADDITIVE, PLANAR, OPERATOR, FORMANT, HALL, DRUM). Falta só a **Onda D**:
-`SAMPLER` (base de porte Navalha 2 — `ESTUDO_audio_sampling §2`) e
-`SIGNAL-IN` (evolução do `AUDIO-IN` com MIDI/CV). Aguarda direção — e
-`git push` (18 commits à frente de origin/main).
+ADDITIVE, PLANAR, OPERATOR, FORMANT, HALL, DRUM).
+
+## Registro da etapa — 2026-09-06: Onda D — camada io/ + dr_wav (infra pro SAMPLER)
+
+Autor: "avance a Onda D" (com o "sim" à dependência de leitura de áudio).
+
+**dr_wav vendorizado** — `third_party/dr_wav/dr_wav.h` (v0.14.6, commit
+`dfe8377`, domínio público / MIT-0 — compatível AGPLv3) +
+`third_party/dr_wav/PROVENANCE.md`. Verbatim, sem alteração.
+
+**`src/io/AudioFile.hpp` + `.cpp`** (camada `io/`, FORA do
+`rasgo_modular_core` — que segue sem dependência): `struct AudioFile
+{samples, channels, sampleRate}`, `loadAudioFile(path)` (WAV 8/16/24/32
++ float via dr_wav), `toMono()`. Nova biblioteca estática CMake
+`rasgo_modular_io` (compilada com `-w` — o header do dr_wav tem warnings
+próprios; o resto do projeto continua `-Werror`).
+
+**`tests/test_audio_file.cpp`** — round-trip `writeWav16` (WavWriter) →
+`loadAudioFile`: mono e estéreo dentro de ±1 LSB de 16 bits; `toMono`;
+arquivo inexistente → `{}`. 58/58 CTest Debug e Release.
+
+O `SAMPLER` (Módulo 48) vai receber um `std::vector<float>` — não conhece
+`dr_wav`; carregar arquivo é gesto de UI (painel linka `rasgo_modular_io`).
+
+**Não commitado ainda.**
+
+**Onda D:** falta portar o `PitchShift` (Navalha 2), o `SAMPLER` (#48) e
+o `SIGNAL-IN` (#49).
