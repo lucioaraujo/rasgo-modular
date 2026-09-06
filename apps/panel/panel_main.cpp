@@ -1856,7 +1856,7 @@ int main() {
                 text(px, py, "RASGO MODULAR", T.accent);
                 py += 16;
                 text(px, py,
-                     std::string("build ") + RASGO_MODULAR_BUILD
+                     std::string(RASGO_MODULAR_BUILD)
                          + "  ·  compilado " __DATE__ " " __TIME__,
                      T.textSecondary);
                 py += 20;
