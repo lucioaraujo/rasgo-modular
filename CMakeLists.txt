@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RasgoModularPrototype LANGUAGES CXX)
+project(RasgoModularPrototype VERSION 0.1.0 LANGUAGES CXX)
 
 include(CTest)
 
@@ -405,9 +405,9 @@ if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
     endif()
     string(TIMESTAMP RASGO_BUILD_DATE "%Y-%m-%d")
     if(RASGO_GIT_HASH)
-        set(RASGO_BUILD_STAMP "${RASGO_GIT_HASH} · ${RASGO_BUILD_DATE}")
+        set(RASGO_BUILD_STAMP "v${PROJECT_VERSION} · ${RASGO_GIT_HASH} · ${RASGO_BUILD_DATE}")
     else()
-        set(RASGO_BUILD_STAMP "${RASGO_BUILD_DATE}")
+        set(RASGO_BUILD_STAMP "v${PROJECT_VERSION} · ${RASGO_BUILD_DATE}")
     endif()
     add_executable(rasgo_modular_panel apps/panel/panel_main.cpp)
     target_compile_definitions(rasgo_modular_panel

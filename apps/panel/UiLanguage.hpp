@@ -156,10 +156,10 @@ inline const L4 aboutBody {
 // módulos, não no rodapé (pedido do autor 2026-09-07). O `panel_main`
 // acrescenta " · <build>" (hash do git + data) ao fim.
 inline const L4 footerCredit {
-    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  AGPLv3+ LICENSE  ·  build ",
-    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENÇA AGPLv3+  ·  build ",
-    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCE AGPLv3+  ·  build ",
-    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCIA AGPLv3+  ·  build "};
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  AGPLv3+ LICENSE  ·  ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENÇA AGPLv3+  ·  ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCE AGPLv3+  ·  ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCIA AGPLv3+  ·  "};
 
 }  // namespace strings
 }  // namespace rasgo::panel
