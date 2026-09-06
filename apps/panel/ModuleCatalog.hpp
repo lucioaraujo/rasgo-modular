@@ -14,6 +14,7 @@
 #include "dsp/Control.hpp"
 #include "dsp/Decision.hpp"
 #include "dsp/Drift.hpp"
+#include "dsp/Drum.hpp"
 #include "dsp/Envelope.hpp"
 #include "dsp/Chord.hpp"
 #include "dsp/EuclidClock.hpp"
@@ -90,6 +91,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "LOOPER")     return std::make_unique<Looper>();
     if (t == "TURING")     return std::make_unique<TuringLoop>();
     if (t == "MATTER")     return std::make_unique<Matter>();
+    if (t == "DRUM")       return std::make_unique<Drum>();
     if (t == "SPACE")      return std::make_unique<Space>();
     if (t == "HALL")       return std::make_unique<Hall>();
     if (t == "STRING")     return std::make_unique<StringVoice>();
@@ -131,7 +133,7 @@ struct CatalogGroup {
 // saída finita).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "AUDIO-IN"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "AUDIO-IN"}},
         {"TRANSFORM", {"FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},

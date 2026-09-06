@@ -248,6 +248,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_hall_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_hall_tests COMMAND rasgo_modular_hall_tests)
 
+    add_executable(rasgo_modular_drum_tests tests/test_drum.cpp)
+    target_link_libraries(rasgo_modular_drum_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_drum_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_drum_tests COMMAND rasgo_modular_drum_tests)
+
     # usa apps/panel/MotionEngine.hpp — include dir extra `apps`, como o
     # painel gráfico e a peça 4.
     add_executable(rasgo_modular_motion_engine_tests tests/test_motion_engine.cpp)
