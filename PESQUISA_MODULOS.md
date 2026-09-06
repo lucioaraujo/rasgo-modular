@@ -284,7 +284,7 @@ Cada um vira dossiê antes do código (método §1).
 
 | # | Módulo | Família | Ideia | Parte de |
 |---|---|---|---|---|
-| 46 | **reverb FDN** (modo do `SPACE` ou `HALL` novo) | SPACE | rede de atraso realimentada (matriz de Householder), decaimento dependente da frequência, modulação nas linhas. A pendência anotada do §2. | §2 nota; Dattorro FDN, NE Desmodus Versio ★ (§7 #72), Strymon StarLab ★ (§7 #95) |
+| ~~46~~ | ~~**`HALL`** — reverb FDN~~ | SPACE | **FEITO — 2026-09-06, `dossies/46_hall.md`, `src/dsp/Hall.hpp`.** Módulo NOVO (não modo do `SPACE` — topologia diferente, `SPACE` já entregue). 8 linhas de atraso + **matriz de Householder** (`y = x − (2/N)Σx`, ortogonal → estável pra g≤1). `size` escala as linhas (0,3×–1,7×), `decay` = RT60 `0,2·75^decay` (g por linha), `damp` = passa-baixa de 1 polo no laço, `mod` = modulação determinística das linhas (chorus, quebra o ringing), `pre` = pré-atraso, `mix`. Gate `freeze` → g=1 (cauda infinita, *lossless*) + entrada→0. Saídas estéreo `l`/`r` descorrelacionadas. | Jot & Chaigne 1991 (FDN — teoria pública); Householder/Hadamard (DSP clássico); Dattorro 1997 (damping no laço); NE Desmodus Versio ★ (§7 #72), Strymon StarLab ★ (§7 #95) |
 | 47 | **`DRUM`** — voz de percussão | MATTER / SOURCE | empacota `MATTER`+`NOISE`+`ENVELOPE` num gesto: `tone`/`snap`/`decay`/`drive`, mapa 808↔909↔acústico. Um gate → um golpe. | §2.2 (voz de percussão); TR-808/909, Rings percussivo, vpme QD ★ (§7 #24) |
 
 **Onda D — grande / opt-in / arriscado:**

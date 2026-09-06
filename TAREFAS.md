@@ -4511,3 +4511,49 @@ exemplo estáveis (FORMANT não entra em nenhum).
 **Ondas A e B COMPLETAS** (7 módulos: GLIDE, WAVETABLE, LOOPER, ADDITIVE,
 PLANAR, OPERATOR, FORMANT). Próximas: Onda C (reverb FDN, DRUM), Onda D
 (SAMPLER — base de porte Navalha 2, SIGNAL-IN) — aguardam direção.
+
+## Registro da etapa — 2026-09-06: Módulo 46 — HALL (Onda C — 1/2)
+
+`PESQUISA §2.4` Onda C, #46 (após "avance").
+
+**`HALL` — reverberação FDN** (`src/dsp/Hall.hpp`, `tests/test_hall.cpp`
+— 11 funções). Família SPACE. **Decisão:** módulo NOVO, não modo do
+`SPACE` — a topologia FDN não encaixa no objeto multitap+allpass do
+`SPACE` sem reescrevê-lo, e o `SPACE` está entregue e testado.
+
+- **8 linhas de atraso** (comprimentos primos entre si ~26–52 ms base) +
+  **matriz de Householder** (`y_i = s_i − (2/N)·Σs` — reflexão
+  ortogonal, `I − (2/N)11ᵀ` = Householder com `v = 1/√N`; sem perda,
+  difusão máxima por 1 subtração/linha). Rede estável pra `g_i ≤ 1`,
+  nunca cresce.
+- `size` (+CV) escala as linhas (0,3×–1,7×). `decay` (+CV) = RT60
+  `0,2·75^decay` (0,2 s–15 s) → `g_i = 10^(−3·d_i/RT60)`. `damp` =
+  passa-baixa de 1 polo NO laço de cada linha. `mod` = modulação
+  determinística do ponto de leitura (senóides ~0,5–1,4 Hz, fases
+  distintas — chorus, quebra o ringing). `pre` = pré-atraso (0–120 ms).
+  `mix`.
+- Gate `freeze` → `g_i = 1` (cauda infinita, Householder preserva
+  energia) + rampa de ~10 ms da entrada a 0.
+- Estéreo: entrada mono → 8 linhas por vetor `{+,+,+,+,−,−,−,−}`; `l` =
+  linhas pares com sinais alternados, `r` = ímpares → descorrelacionadas.
+- `softLimit` na saída (o mesmo do `FILTER`) + flush de denormais.
+
+Bug pego: `parameterValue("freeze")` lançava (`freeze` é PORTA, não
+parâmetro) — só o gate da porta.
+
+Integrado: `ModuleCatalog` (SPACE, após SPACE — seed-safe),
+`test_panel_layout` (14 HP), `LearnCatalog` (12 binds). Docs:
+`00_indice`, `PESQUISA §2.4`, `RASGO_MODULAR.md §36.3`, `README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**56/56 CTest** Debug e Release. Testes: impulso → cauda que decai
+monotônica; `decay` maior → cauda 4×+ mais longa; `damp` alto → agudo
+decai mais rápido (HF/total cai 40 %+); `freeze` → RMS estável por
+segundos (não decai nem cresce); `mix=0` = passa-direto bit-exato;
+`l`/`r` descorrelacionados (|corr| < 0,9); `pre` atrasa o molhado;
+determinismo byte a byte com `mod`; extremos limitados; `decay=0,95`
+sem freeze ainda decai (g < 1). Renders de exemplo estáveis.
+
+**Não commitado ainda** → commit a seguir.
+
+**Onda C:** falta `DRUM` (#47).

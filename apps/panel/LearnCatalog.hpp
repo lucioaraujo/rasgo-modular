@@ -1412,6 +1412,47 @@ inline const LearnTable& learnTable() {
                 "útil pra rotear o espaço separado do sinal direto.",
                 "", ""}},
         }},
+        {"HALL", {
+            {"size", {
+                "Tamanho do espaço — escala os 8 comprimentos de linha "
+                "de ~8 ms (sala) a ~88 ms (hall).",
+                "É uma rede de atraso realimentada (FDN): 8 linhas + uma "
+                "matriz de Householder (sem perda) as recombina a cada "
+                "volta. O SPACE é comb+allpass; isto é a rede.",
+                "Cabeie um LFO lento em SIZE: a sala 'respira' e desafina "
+                "a cauda (efeito de fita)."}},
+            {"decay", {
+                "Tempo de cauda (RT60): 0,2 s a 15 s. Perto do máximo a "
+                "cauda quase não decai.",
+                "O ganho de cada linha sai de RT60: g = 10^(−3·tempo/"
+                "RT60). Householder é ortogonal, então g < 1 sempre "
+                "decai, nunca explode.", ""}},
+            {"damp", {
+                "Passa-baixa dentro do laço de cada linha — o agudo decai "
+                "antes do grave, como numa sala real. 0 = brilhante, "
+                "1 = escuro.", "", ""}},
+            {"mod", {
+                "Profundidade da modulação do ponto de leitura de cada "
+                "linha (LFOs lentos, fases distintas) — chorus na cauda, "
+                "quebra o 'apito' metálico. Determinístico, sem RNG.",
+                "", ""}},
+            {"pre", {
+                "Pré-atraso: 0 a ~120 ms antes da rede. Separa o som "
+                "direto da reverberação — o que define o tamanho "
+                "percebido.", "", ""}},
+            {"mix", {"Seco ↔ molhado. 0 = passa-direto.", "", ""}},
+            {"in:in", {"Áudio a reverberar (somado mono).", "", ""}},
+            {"in:size", {"CV somada em SIZE.", "", ""}},
+            {"in:decay", {"CV somada em DECAY.", "", ""}},
+            {"in:freeze", {
+                "Gate: enquanto alto, a cauda vira infinita (g = 1, a "
+                "rede preserva energia) e a entrada nova para de entrar — "
+                "como o HOLD do LOOPER, mas pro espaço.", "", ""}},
+            {"out:l", {"Canal esquerdo (combinação das linhas pares).",
+                      "", ""}},
+            {"out:r", {"Canal direito (linhas ímpares) — descorrelacionado "
+                      "do L pra a imagem ficar larga.", "", ""}},
+        }},
         {"LOOPER", {
             {"time", {
                 "Comprimento do atraso — de eco curto a laço de 2 s.",

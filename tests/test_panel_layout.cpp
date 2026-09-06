@@ -23,6 +23,7 @@
 #include "dsp/FunctionGenerator.hpp"
 #include "dsp/Wavetable.hpp"
 #include "dsp/Glide.hpp"
+#include "dsp/Hall.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
 #include "dsp/Looper.hpp"
@@ -200,6 +201,7 @@ int main() {
     mods.emplace_back("TURING", std::make_unique<TuringLoop>());
     mods.emplace_back("MATTER", std::make_unique<Matter>());
     mods.emplace_back("SPACE", std::make_unique<Space>());
+    mods.emplace_back("HALL", std::make_unique<Hall>());
     mods.emplace_back("LOOPER", std::make_unique<Looper>());
     mods.emplace_back("STRING", std::make_unique<StringVoice>());
     mods.emplace_back("QUANTIZER", std::make_unique<Quantizer>());

@@ -22,6 +22,7 @@
 #include "dsp/FunctionGenerator.hpp"
 #include "dsp/Wavetable.hpp"
 #include "dsp/Glide.hpp"
+#include "dsp/Hall.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
 #include "dsp/Looper.hpp"
@@ -90,6 +91,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "TURING")     return std::make_unique<TuringLoop>();
     if (t == "MATTER")     return std::make_unique<Matter>();
     if (t == "SPACE")      return std::make_unique<Space>();
+    if (t == "HALL")       return std::make_unique<Hall>();
     if (t == "STRING")     return std::make_unique<StringVoice>();
     if (t == "QUANTIZER")  return std::make_unique<Quantizer>();
     if (t == "PARAMETRIC") return std::make_unique<Parametric>();
@@ -135,7 +137,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
-        {"SPACE",     {"SPACE", "LOOPER", "MEMORY"}},
+        {"SPACE",     {"SPACE", "HALL", "LOOPER", "MEMORY"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;
