@@ -175,14 +175,13 @@ public:
         // ousadia: de tempos em tempos uma fibra estica a excursão
         boldCd_ -= dt;
         if (boldCd_ <= 0.0f) {
-            boldCd_ = 14.0f + 26.0f * bu01();
+            boldCd_ = 22.0f + 34.0f * bu01();
             if (!fibers_.empty()) {
                 const std::size_t i = static_cast<std::size_t>(
                     bu01() * static_cast<float>(fibers_.size())) % fibers_.size();
-                if (fibers_[i].reach == MotionReach::Free
-                    || fibers_[i].reach == MotionReach::Hot) {
+                if (fibers_[i].reach == MotionReach::Free) {   // só os livres ousam
                     boldFiber_ = static_cast<long>(i);
-                    boldLeft_ = 3.5f + 6.0f * bu01();
+                    boldLeft_ = 4.0f + 7.0f * bu01();
                 }
             }
         }
@@ -199,8 +198,8 @@ public:
             Fiber& f = fibers_[i];
             const float goalBold = (boldLeft_ > 0.0f
                                     && boldFiber_ == static_cast<long>(i))
-                ? 2.6f : 1.0f;
-            f.boldMul += (goalBold - f.boldMul) * (1.0f - std::exp(-dt / 1.5f));
+                ? 2.0f : 1.0f;
+            f.boldMul += (goalBold - f.boldMul) * (1.0f - std::exp(-dt / 2.5f));
 
             float raw = f.wx * static_cast<float>(fx)
                       + f.wy * static_cast<float>(fy)
@@ -228,9 +227,14 @@ public:
                 continue;
             }
 
-            float target = f.center + raw * effAmp * range * cableK;
-            // não deixa fugir da janela (mesmo com ousadia)
-            const float win = std::min(range, effAmp * range * 1.4f + 1e-4f);
+            // janela RELATIVA ao valor atual, limitada pela fração do
+            // range — assim um param de range enorme e escala log
+            // (freq 8–8000, cutoff 20–20000) respira em torno de onde
+            // está, não varre milhares de Hz.
+            const float relWin = std::max(std::fabs(f.center), 1e-3f) * 4.0f;
+            const float win = std::min(range,
+                std::min(effAmp * range, effAmp * relWin) * 1.4f + 1e-4f);
+            float target = f.center + raw * (win / 1.4f) * cableK;
             target = clampf(target, f.center - win, f.center + win);
             target = clampf(target, f.pmin, f.pmax);
             // duck protetor: perto do clip, converge pro centro

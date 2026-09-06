@@ -40,7 +40,9 @@ inline MotionReach motionReach(const std::string& id) {
         || has("voices") || has("pattern") || has("heads") || has("modulus")
         || has("octave") || has("_div") || has("count") || has("bits")
         || has("mode") || has("algo") || has("wave") || has("map")
-        || has("quant") || has("degree") || has("interval"))
+        || has("quant") || has("degree") || has("interval")
+        || s == "freq" || has("pitch") || has("tune") || has("transpose")
+        || has("note") || has("key"))
         return MotionReach::Structural;
     // ganho de barramento — clamp duro, quase não mexe
     if (has("gain") || has("level") || has("output") || has("master")
@@ -55,28 +57,29 @@ inline MotionReach motionReach(const std::string& id) {
     return MotionReach::Free;
 }
 
-// amplitude como fração do range do parâmetro. Fase de abertura
-// (autor 2026-09-07: "testar com mais abertura, depois limitar o que não
-// funciona") — valores generosos; afina de ouvido.
+// amplitude como fração do range do parâmetro. Afinação 2026-09-07 (2ª):
+// o autor viu `pw`/`reso`/`fold` "frenéticos" — os QUENTES têm efeito
+// perceptual enorme por unidade de knob, então ±3–4% já é bastante.
 inline float motionAmplitude(const MotionReach r) {
     switch (r) {
-        case MotionReach::Structural: return 0.030f;
-        case MotionReach::Level:      return 0.040f;
-        case MotionReach::Hot:        return 0.090f;
-        case MotionReach::Free:       return 0.220f;
+        case MotionReach::Structural: return 0.012f;
+        case MotionReach::Level:      return 0.030f;
+        case MotionReach::Hot:        return 0.040f;
+        case MotionReach::Free:       return 0.150f;
     }
-    return 0.10f;
+    return 0.08f;
 }
 
-// tempo de easing (s) — quanto o alvo demora a ser alcançado
+// tempo de easing (s) — quanto o alvo demora a ser alcançado (maior =
+// mais lento/suave)
 inline float motionTau(const MotionReach r) {
     switch (r) {
-        case MotionReach::Structural: return 5.0f;
-        case MotionReach::Level:      return 2.5f;
-        case MotionReach::Hot:        return 1.6f;
-        case MotionReach::Free:       return 0.9f;
+        case MotionReach::Structural: return 8.0f;
+        case MotionReach::Level:      return 4.0f;
+        case MotionReach::Hot:        return 3.5f;
+        case MotionReach::Free:       return 1.8f;
     }
-    return 1.5f;
+    return 2.5f;
 }
 
 // ---- o campo caótico -------------------------------------------------------
@@ -103,9 +106,9 @@ struct MotionField {
 
     // avança `dt` s; `energy` (0..1) do som acelera/desacelera a mão
     void step(const double dt, const double energy) noexcept {
-        const double tgt = 0.45 + 1.35 * clamp01(energy);
-        speed += (tgt - speed) * (1.0 - std::exp(-dt * 0.25));
-        const double h = dt * 0.85 * speed;      // passo do integrador
+        const double tgt = 0.35 + 0.9 * clamp01(energy);
+        speed += (tgt - speed) * (1.0 - std::exp(-dt * 0.20));
+        const double h = dt * 0.45 * speed;      // passo do integrador (lento)
         const double b = 0.1899;                 // Thomas — caótico (< ~0.208)
         const double nx = x + h * (std::sin(y) - b * x);
         const double ny = y + h * (std::sin(z) - b * y);
