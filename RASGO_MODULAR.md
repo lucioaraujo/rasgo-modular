@@ -1417,6 +1417,15 @@ fases, rótulos de módulo não. Passe de ergonomia módulo-a-módulo dos 38
 painéis (larguras, displays, colisões de rótulo) — ver `TAREFAS.md`
 2026-09-06.
 
+**Coluna esquerda (2026-09-07):** **barra de scroll discreta** na paleta
+de módulos — só aparece quando a lista transborda (trilho de 2 px +
+cursor de 4 px na borda direita da coluna); roda do mouse, arraste do
+cursor, ou clique no trilho pra paginar. O **LEARN** ganhou a
+**definição de módulo no hover do corpo/título** (`lookupLearnModule`,
+`apps/panel/LearnCatalog.hpp` — um `LearnEntry` por tipo do catálogo:
+o que é / o lugar dele / uma cadeia pra experimentar) e o **dwell caiu de
+2 s → 1 s**.
+
 ### 36.8 Acoplamento — instrumentos e recursos de composição
 
 Autônomo **não** quer dizer fechado. Além de soar sozinho (§35.4.1), o

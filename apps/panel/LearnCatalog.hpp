@@ -1973,4 +1973,252 @@ inline const LearnEntry* lookupLearn(const std::string& moduleType,
     return &pi->second;
 }
 
+namespace detail {
+
+// Definição de cada MÓDULO — o LEARN mostra isto quando o mouse está
+// sobre o corpo/título de um módulo do rack (não sobre um knob).
+// `quick` = o que é; `understand` = o lugar dele / como difere dos
+// vizinhos; `explore` = uma cadeia pra experimentar.
+inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
+    static const std::unordered_map<std::string, LearnEntry> table = {
+        {"OSC", {
+            "Oscilador subtrativo — a voz de partida. Dente/quadrada/"
+            "triângulo/seno com PW e drift orgânico; toca em 1 V/oct.",
+            "É a fonte 'clássica'; o WAVETABLE varre tabelas, o ADDITIVE "
+            "soma parciais, o OPERATOR faz FM.",
+            "OSC → FILTER → VCA com um ENVELOPE no gate: a cadeia mínima "
+            "de um sintetizador."}},
+        {"WAVETABLE", {
+            "Oscilador de tabela — um POS varre um banco de formas de "
+            "onda, de suave a espectral, com anti-aliasing.", "",
+            "LFO lento → POS: o timbre 'respira' entre as ondas."}},
+        {"ADDITIVE", {
+            "Oscilador aditivo — soma até 64 parciais; TILT/ODD-EVEN/"
+            "STRETCH esculpem o espectro direto.",
+            "Constrói o timbre somando senos, o oposto do FILTER (que "
+            "tira de um som rico).", ""}},
+        {"OPERATOR", {
+            "FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — "
+            "metais, sinos, baixos que o subtrativo não faz.", "",
+            "RATIO inteiro = harmônico; quebrado = inarmônico (sino)."}},
+        {"PLL", {
+            "Phase-locked loop — trava a fase num sinal de entrada e "
+            "gera divisões/multiplicações dele; solto, auto-oscila.",
+            "É oscilador E extrator de clock — segue o que ouve dentro "
+            "de uma janela de captura.", ""}},
+        {"CHORD", {
+            "Voz de acorde — 3–4 osciladores afinados por um intervalo/"
+            "inversão; uma nota entra, um acorde sai.", "", ""}},
+        {"NOISE", {
+            "Ruído e acaso contínuo — branco/rosa/brown/azul/violeta/bit "
+            "+ S&H + tensão que passeia, 8 saídas ao mesmo tempo.",
+            "O DECISION decide eventos; o NOISE dá o piso e as CVs "
+            "aleatórias. POIS troca o clock interno por Poisson livre.",
+            ""}},
+        {"MATTER", {
+            "Voz de modelagem física — matéria excitada (sopro/atrito/"
+            "impacto) ressoando; rigidez/tensão/desgaste como knobs.",
+            "", ""}},
+        {"STRING", {
+            "Corda Karplus-Strong estendida — pluck/bow/hammer numa "
+            "linha de atraso com amortecimento e material.", "", ""}},
+        {"DRUM", {
+            "Voz de percussão — corpo com pitch-sweep + estalo de ataque; "
+            "um mapa 808 ↔ 909 ↔ acústico e ROLL.", "", ""}},
+        {"SIGNAL-IN", {
+            "Entrada do mundo — áudio ao vivo (ALSA) + MIDI num adaptador "
+            "só; voz monofônica last-note com saídas pitch/gate/vel/cc.",
+            "É a contraparte de ENTRADA do NOTE-OUT. Sem nada ligado, "
+            "silêncio determinístico.", ""}},
+        {"FILTER", {
+            "Filtro multimodo ressonante — LP/BP/HP, com a ressonância "
+            "chegando à auto-oscilação (vira senoide).",
+            "Tira energia de um som rico (subtrativo); o WASP distorce "
+            "no caminho, o LPG fecha com vactrol.",
+            "ENVELOPE → cutoff_mod: o 'wah' clássico. RES perto do talo "
+            "+ cutoff baixo = uma voz de seno afinável."}},
+        {"FORMANT", {
+            "Banco de 5 passa-faixas paralelos — as ressonâncias de "
+            "vogais; VOWEL faz o morph A→E→I→O→U.", "",
+            "Num ruído/pulso: fala sintética. Num acorde: coro."}},
+        {"WASP", {
+            "Filtro-distorção — o caráter sujo/gritado do EDP Wasp; a "
+            "não-linearidade fica NO caminho do filtro.", "", ""}},
+        {"LPG", {
+            "Low-pass gate — filtro + VCA num controle só, com a "
+            "assimetria de vactrol (ataque rápido, cauda lenta). O 'bongô' "
+            "Buchla.", "",
+            "Ping com um trigger curto: o LPG dá o corpo e o decaimento "
+            "de uma vez."}},
+        {"VCA", {
+            "Amplificador controlado por tensão — o volume/nível como CV; "
+            "resposta linear ou exponencial.", "", ""}},
+        {"CONTROL", {
+            "Utilidades de CV contínua — atenuversor, offset, retificação "
+            "como lerp, slew. O canivete do sinal de controle.", "", ""}},
+        {"GLIDE", {
+            "Portamento/slew — desliza entre valores em vez de saltar; "
+            "tempo separado pra subida e descida, modo constante ou "
+            "proporcional.", "", ""}},
+        {"SHAPE", {
+            "Waveshaper — dobra/satura/retifica a forma de onda pra criar "
+            "harmônicos; de calor sutil a destruição.", "", ""}},
+        {"PARAMETRIC", {
+            "EQ paramétrico — bandas de sino/shelf pra esculpir o "
+            "espectro cirurgicamente, sem ressonância de filtro.", "", ""}},
+        {"ENVELOPE", {
+            "Gerador de envelope — AD/ADSR/AR e laços; a forma da "
+            "amplitude (ou de qualquer CV) no tempo, disparada por gate.",
+            "", "ENVELOPE → VCA + ENVELOPE → cutoff: o contorno do som."}},
+        {"FUNCTION", {
+            "Gerador de função tipo Maths — rampa/envelope/LFO deformável "
+            "com saídas derivadas; soma, integra, dispara.",
+            "É envelope E LFO E slew, tudo na curva. O DRIFT é passeio "
+            "lento; o CHAOS é caótico de verdade.", ""}},
+        {"DRIFT", {
+            "Campo de deriva orgânica — várias CVs correlacionadas que "
+            "passeiam devagar (escala de minutos), com momentum e "
+            "âncora a marcos gravados.",
+            "Dá VIDA sem direção — nada fica estático. Determinístico "
+            "(semeado).", ""}},
+        {"CHAOS", {
+            "Campo caótico de poço duplo — EDO determinística que assenta "
+            "num poço, oscila entre dois, ou 'caça' imprevisível.",
+            "Genuinamente caótico, não pseudo-aleatório (DECISION/TURING) "
+            "nem passeio filtrado (DRIFT).", ""}},
+        {"SH", {
+            "Sample & hold duplo — segura um valor no pulso; 2 canais "
+            "com CORRELATION (gêmeos ↔ espelho ↔ independentes) e slew.",
+            "", "CLOCK → SH · out1 → pitch · out2 → cutoff: melodia e "
+            "timbre que 'combinam'."}},
+        {"CLOCK", {
+            "Relógio mestre euclidiano — pulso com divisões, fill "
+            "euclidiano, swing e drift; a batida de todo o patch.",
+            "", "CLOCK → tudo que tem gate/trig. FILL espalha os pulsos "
+            "pelo compasso (padrões de Toussaint)."}},
+        {"LOGIC", {
+            "Lógica de clock — divide/multiplica, AND/OR/XOR de gates, "
+            "atraso; recombina o TEMPO.",
+            "O par do ABACUS (que faz aritmética de CV). Aqui é só "
+            "gate/trigger.", ""}},
+        {"TURING", {
+            "Registrador de deslocamento aleatório (Turing Machine) — um "
+            "laço de bits que LOCK trava, MUTATE reembaralha; melodia/"
+            "ritmo que se repete com variação.", "", ""}},
+        {"SEQUENCE", {
+            "Sequenciador de 8 passos — sliders de altura + direção "
+            "(frente/trás/ping-pong/aleatório/browniano), gate por passo.",
+            "", "Os sliders são a partitura — a Motion Engine mal os "
+            "toca. Use MUTATE/EVOLVE pra reembaralhar de propósito."}},
+        {"TRIGSEQ", {
+            "Sequenciador de TRIGGERS — 4 faixas de densidade euclidiana "
+            "com chaos/ratchet/fill/swing; a percussão generativa.", "",
+            ""}},
+        {"QUANTIZER", {
+            "Quantizador de escala — encaixa uma CV nos graus de uma "
+            "escala/tom; slew e histerese pra não tremular na borda.", "",
+            "SH/TURING/DRIFT → QUANTIZER → pitch: passeio aleatório vira "
+            "melodia na escala."}},
+        {"HARMONY", {
+            "Harmonizador — de uma nota gera intervalos/acordes coerentes "
+            "com uma tonalidade e uma condução de voz.", "", ""}},
+        {"ABACUS", {
+            "Aritmética de CV — soma/subtrai/multiplica/resto e AND/OR/"
+            "XOR bit a bit entre dois sinais + um contador binário cujos "
+            "bits viram ritmo (Numeric Repetitor).",
+            "O par do LOGIC (que recombina tempo). Sozinho, o contador já "
+            "toca uma sequência + um ritmo.", ""}},
+        {"DECISION", {
+            "Fonte de acaso ESTRUTURADO tipo Marbles — distribuição "
+            "(bias/spread/shape), déjà-vu (repete o padrão), steps e "
+            "slew; gera CV e gate com 'intenção'.", "", ""}},
+        {"BOXCAR", {
+            "Averager de porta (boxcar averager) — uma janela amostra um "
+            "ponto do período, a média de N capturas revela o sinal no "
+            "ruído; SCAN reconstrói a onda; GEIG = gates de Poisson.",
+            "É o SCOPE ao contrário: mede pra CONSTRUIR uma onda. mode 0 "
+            "= S&H de janela, 1 = reconstrói, 2 = relê o buffer próprio "
+            "como oscilador.",
+            "Ruído + um tom fraco sincronizado ao TRIG, mode 1, SCAN alto: "
+            "o tom 'se desenha' ao longo de segundos."}},
+        {"SWITCH", {
+            "Chave/roteador — N entradas → 1 saída (ou 1 → N), por passo "
+            "de clock, CV ou aleatório; sequencia FONTES em vez de notas.",
+            "", ""}},
+        {"MATRIX", {
+            "Matriz de roteamento 4×4 — qualquer entrada pra qualquer "
+            "saída com ganho por célula; um mixer de CV/áudio programável.",
+            "", ""}},
+        {"MULT", {
+            "Múltiplo com buffer — copia um sinal pra vários destinos sem "
+            "queda de nível; modo dual e slew opcional.", "", ""}},
+        {"PLANAR", {
+            "Morph vetorial XY — desliza entre 4 fontes num plano; o "
+            "gesto (o caminho no plano) é gravável e reproduzível.", "",
+            ""}},
+        {"SPACE", {
+            "Reverberação — rede de Schroeder/Dattorro multitap, de "
+            "ambiente curto a cauda longa; pre-delay e amortecimento.",
+            "O SPACE é o reverb 'clássico'; o HALL é FDN de 8 linhas "
+            "(mais denso, estéreo); o MEMORY é granular.", ""}},
+        {"HALL", {
+            "Reverb FDN de 8 linhas + matriz de Householder — cauda densa "
+            "e estéreo, com FREEZE (congela infinito) e pre-delay.", "",
+            ""}},
+        {"LOOPER", {
+            "Delay de linha com HOLD (congela e repete), REVERSE (lê pra "
+            "trás sem clique), AGE (caráter de fita/BBD) e HEADS (eco "
+            "multi-cabeça tipo Space Echo).",
+            "O 'TAPE' virou este HEADS. FBK perto de 1 + TIME longo + "
+            "várias cabeças = Frippertronics.", ""}},
+        {"MEMORY", {
+            "Granular — buffer picado em grãos (grão/nuvem/spray), com "
+            "posição, tamanho, densidade e FREEZE; texturas e time-stretch.",
+            "", ""}},
+        {"SAMPLER", {
+            "Toca-fatias (MPC/Akai) — TRIG dispara um trecho gravado ao "
+            "vivo (gate REC) ou de arquivo; varispeed, slices + POS, "
+            "repitch, wear.",
+            "O SAMPLER salta a posição de leitura (fatia); o TURNTABLE "
+            "lê contínuo com inércia; o MEMORY é granular.", ""}},
+        {"TURNTABLE", {
+            "Toca-discos de prato com massa — o buffer do SAMPLER lido por "
+            "uma velocidade angular com INÉRCIA: o motor puxa devagar "
+            "(TORQ), a mão empurra (SCR), o freio faz coasting (BRK).",
+            "SEM quantização de BPM — beatmatch é gesto, como no vinil.",
+            "LFO → SCR: o disco scratcheia no compasso. ENVELOPE → BRK: "
+            "um tape-stop na virada."}},
+        {"MIXER", {
+            "Mixer de 4 canais — nível (slider), pan e mute por canal + "
+            "saída geral. Onde o músico faz o balanço.",
+            "Isento da Motion Engine — os pans e níveis são teus.", ""}},
+        {"MASTER", {
+            "Estágio de saída estéreo — largura, guarda de corpo e "
+            "limitador true-peak; o teto do patch.",
+            "Isento da Motion Engine. O botão STANDBY do cabeçalho é o "
+            "mute deste módulo.", ""}},
+        {"SCOPE", {
+            "Osciloscópio + medidor que DEVOLVE como CV — pitch detectado, "
+            "envelope, centroide espectral; o patch se ouve.",
+            "É o SCOPE que mede pra reduzir (→ escalar); o BOXCAR mede "
+            "pra reconstruir (→ onda).", ""}},
+        {"NOTE-OUT", {
+            "Saída MIDI — converte gate + 1 V/oct em note on/off, com "
+            "canal, velocidade e um registro de partitura.",
+            "A contraparte de SAÍDA do SIGNAL-IN.", ""}},
+    };
+    return table;
+}
+
+}  // namespace detail
+
+// Definição do módulo (hover sobre o corpo/título). nullptr se não há.
+inline const LearnEntry* lookupLearnModule(const std::string& moduleType) {
+    const std::string key =
+        (moduleType == "AUDIO-IN") ? std::string("SIGNAL-IN") : moduleType;
+    const auto& table = detail::moduleLearnTable();
+    const auto it = table.find(key);
+    return it == table.end() ? nullptr : &it->second;
+}
+
 }  // namespace rasgo::panel
