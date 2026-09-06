@@ -4467,6 +4467,47 @@ vira serra (centroide ×3); 1 V/oct; os 8 algoritmos finitos e < 1,5;
 determinismo byte a byte com `drift`; extremos limitados. Renders de
 exemplo estáveis (OPERATOR não entra em nenhum).
 
+Commitado (`2e8ec5a`).
+
+## Registro da etapa — 2026-09-06: Módulo 45 — FORMANT (Onda B — 4/4, COMPLETA)
+
+`PESQUISA §2.4` Onda B, #45 — o último da onda (após "avance").
+
+**`FORMANT` — ressoador espectral multibanda** (`src/dsp/Formant.hpp`,
+`tests/test_formant.cpp` — 9 funções). Família TRANSFORM. O oposto do
+`PARAMETRIC` (EQ estático em série): 5 passa-faixas em PARALELO cujas
+frequências/bandas/ganhos seguem uma tabela de vogais e são varridos por
+um knob — o espectro FALA.
+
+- **5× SVF TPT** (Simper/Cytomic), não-linearidade NO laço — mesmo núcleo
+  do `FILTER`/`WASP`. Saída de banda `v1` × `k` (normaliza o pico ≈ 1/k)
+  × ganho da vogal, somada, `softLimit` no fim.
+- **`vowel`** (0–1, +CV) varre A→E→I→O→U. 5 formantes/vogal: frequência
+  interpolada em log, ganho em dB, banda linear. Dados fonéticos de voz
+  de baixo (tabelas Csound `fof`/Fant 1960 — fato, `constexpr`, sem I/O).
+- **`shift`** (−1..1) = `2^(shift·1,5)` sobre todas as frequências —
+  comprimento do trato vocal.
+- **`res`** (0–1) = `bw / (1 + res·8)` — de coloração sutil a bandas que
+  cantam/apitam.
+- **`mix`** (0–1) seco↔ressoado (0 = passa-direto bit-exato).
+- **`drift`** = wobble determinístico por formante (senos, sem RNG).
+- Sem entrada → silêncio (é TRANSFORM). Sem excitador interno nesta v1
+  (pendência: modo vocoder, buzz glotal).
+
+Integrado: `ModuleCatalog` (TRANSFORM, após FILTER — seed-safe),
+`test_panel_layout` (14 HP), `LearnCatalog` (9 binds). Docs: `00_indice`,
+`PESQUISA §2.4`, `RASGO_MODULAR.md §36.3`, `README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**55/55 CTest** Debug e Release. Testes: vogal A → picos em ~600/1040 Hz;
+o pico de F2 sobe A(1020)→E(1600)→I(1720) monotônico (== dados fonéticos);
+`shift` sobe o espectro; `res` alto estreita os picos (vale/pico cai
+30 %+); `mix=0` = passa-direto bit-exato; entrada em silêncio → saída 0;
+determinismo byte a byte com `drift`; extremos limitados. Renders de
+exemplo estáveis (FORMANT não entra em nenhum).
+
 **Não commitado ainda** → commit a seguir.
 
-**Onda B:** falta só `FORMANT` (#45).
+**Ondas A e B COMPLETAS** (7 módulos: GLIDE, WAVETABLE, LOOPER, ADDITIVE,
+PLANAR, OPERATOR, FORMANT). Próximas: Onda C (reverb FDN, DRUM), Onda D
+(SAMPLER — base de porte Navalha 2, SIGNAL-IN) — aguardam direção.

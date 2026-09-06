@@ -55,6 +55,42 @@ using LearnTable =
 
 inline const LearnTable& learnTable() {
     static const LearnTable table = {
+        {"FORMANT", {
+            {"vowel", {
+                "Posição na sequência de vogais A → E → I → O → U. "
+                "Cada vogal é um conjunto de 5 formantes (picos "
+                "espectrais); o knob interpola entre as vizinhas.",
+                "Teoria fonte-filtro (Fant): a voz é uma fonte × o filtro "
+                "do trato vocal; a vogal é onde os 5 formantes estão. "
+                "Dados fonéticos de voz de baixo.",
+                "Cabeie SEQUENCE → VOW: uma melodia de vogais sobre um "
+                "drone."}},
+            {"shift", {
+                "Escala TODAS as frequências de formante (2^(shift·1,5), "
+                "≈ 0,35× a 2,8×) — o comprimento do trato vocal: pra baixo "
+                "= voz grande/grave, pra cima = voz pequena/aguda.",
+                "É o formant shift — muda o timbre da voz sem mudar a "
+                "altura da fonte.", ""}},
+            {"res", {
+                "Estreita as 5 bandas (largura ÷ (1 + res·8)). 0 = "
+                "coloração sutil; 1 = bandas que cantam/apitam.",
+                "Q = frequência ÷ largura de banda. Com res alto e ruído "
+                "na entrada, cada vogal vira 5 tons senoidais.",
+                "ENVELOPE → RES: a voz 'aperta' no ataque e relaxa."}},
+            {"mix", {"Seco ↔ ressoado. 0 = passa-direto.", "", ""}},
+            {"drift", {
+                "Cada formante ganha um wobble lento e independente "
+                "(±drift·3 %) — a voz respira. Determinístico (senos, "
+                "sem RNG). 0 = estático.", "", ""}},
+            {"in:in", {"Áudio a ressoar (um OSC, NOISE, qualquer voz).",
+                      "", ""}},
+            {"in:vowel", {"CV somada em VOWEL (LFO, SEQUENCE, envelope…).",
+                         "", ""}},
+            {"in:shift", {"CV somada em SHIFT.", "", ""}},
+            {"out:out", {
+                "Seco + as 5 bandas, misturados por MIX, com limitador "
+                "suave.", "", ""}},
+        }},
         {"FILTER", {
             {"cutoff", {
                 "Frequência de corte — acima dela, o som é atenuado.",

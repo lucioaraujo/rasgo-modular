@@ -66,10 +66,12 @@ sem clique e caráter de fita/BBD num knob `age`). Onda B em curso:
 espectral por `tilt`/`odd`/`stretch`/`comb`) + `PLANAR` (Módulo 43 —
 morph vetorial XY de 4 fontes, gesto gravável em loop, saídas de
 posição como CV) + `OPERATOR` (Módulo 44 — voz FM de 4 operadores,
-8 algoritmos, razões quantizadas, feedback estilo DX7) + **taxonomia
-consolidada** (18 verbos → 8 famílias, cruzada com a literatura
-Eurorack). **Rack de partida completo**; 44 módulos DSP,
-54 alvos CTest
+8 algoritmos, razões quantizadas, feedback estilo DX7) + `FORMANT`
+(Módulo 45 — 5 passa-faixas paralelos, morph de vogais A→E→I→O→U,
+`shift` de trato vocal) + **taxonomia consolidada** (18 verbos →
+8 famílias, cruzada com a literatura Eurorack). **Rack de partida
+completo**; 45 módulos DSP,
+55 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -96,12 +98,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 44 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 45 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 54 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 55 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
