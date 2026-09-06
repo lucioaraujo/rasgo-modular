@@ -119,6 +119,14 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
             }
             if (c != SEED_SRC_NONE) outSrc[c].push_back({n, p});
         }
+        // O CLOCK é a espinha de tempo — o `seedPatch` cabeia as SAÍDAS
+        // dele (euclid/clock) explicitamente. Deixar o passeio semeado
+        // cabear um trigger qualquer em `CLOCK.reset`/`ext`/`bpm_mod`
+        // ESTOLA o relógio (reset a cada amostra → `phase_` nunca anda →
+        // tudo que depende do euclid fica mudo). Achado 2026-09-06 (seed
+        // 18). As entradas do CLOCK ficam FORA dos destinos do passeio.
+        if (t == "CLOCK") continue;
+
         for (std::size_t p = 0; p < node.inputCount(); ++p) {
             const auto& d = node.inputDescriptor(p);
             const std::string nm = d.name;

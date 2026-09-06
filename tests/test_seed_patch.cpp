@@ -98,7 +98,10 @@ void testSeedsAudibleAndBounded() {
         // garantia: o passeio cabeou algo
         check(g.cableCount() >= 2, "seed cabeou o rack");
 
-        const RunResult r = renderGraph(g, sink, 400);   // ~1 s (envelopes/clocks)
+        // ~5,3 s: seeds lentos (o `bpm` do `seedIdentity` desce a ~46) só
+        // produzem o 1º evento do euclid depois de ~1,3 s — 400 blocos
+        // não bastavam.
+        const RunResult r = renderGraph(g, sink, 2000);
         check(r.finite, "saída do seed finita");
         check(r.peak < 12.0, "saída do seed limitada");   // MASTER limita; folga
         if (r.rms < 1e-4) {
@@ -107,13 +110,11 @@ void testSeedsAudibleAndBounded() {
                       << ", " << g.cableCount() << " cabos)\n";
         }
     }
-    // A garantia do dossiê é "sempre audível". Na prática ~3 em 24 saem
-    // quase-mudos (a espinha voz→MASTER→sink é cabeada mas o gatilho não
-    // dispara na janela) — limitação PRÉ-EXISTENTE do `seedPatch`, idêntica
-    // antes e depois da reordenação do catálogo de 2026-09-06 (verificado
-    // byte a byte). O gate aqui pega uma REGRESSÃO GROSSA (reordenar quebrar
-    // metade dos seeds), não a cauda conhecida.
-    EXPECT(silent <= 5);
+    // A garantia do dossiê é "sempre audível". Depois do fix de 2026-09-06
+    // (`SeedGrammar`: entradas do CLOCK fora do passeio — um trigger em
+    // `CLOCK.reset` estolava o relógio, seed 18), só 1 em 24 sai muito
+    // quieto (seed 1, ~−63 dBFS — patch legítimo baixo, não estol).
+    EXPECT(silent <= 2);
 }
 
 void testCrossKeepsItBounded() {
