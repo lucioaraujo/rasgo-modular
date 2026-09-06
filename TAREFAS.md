@@ -4418,4 +4418,55 @@ do `seedPatch`, não deste trabalho.
 
 **Validação:** **53/53 CTest** Debug + Release. Build limpo.
 
+Commitado (`918b62e`).
+
+## Registro da etapa — 2026-09-06: Módulo 44 — OPERATOR (Onda B — 3/4)
+
+`PESQUISA §2.4` Onda B, #44 (após "avance").
+
+**`OPERATOR` — voz FM multi-operador** (`src/dsp/Operator.hpp`,
+`tests/test_operator.cpp` — 9 funções, DFT com janela de Hann). Família
+SOURCE. O `OSC` faz TZFM de um par; isto é FM de verdade.
+
+- **4 operadores** (senóides via LUT de 2048), **8 algoritmos** (de
+  A→B→C→D em série a A,B,C,D em paralelo/aditivo). Ordem A→B→C→D FIXA —
+  nenhum algoritmo tem laço entre operadores, só A tem feedback → o
+  cálculo é uma passada, sem topo-sort.
+- **`ratio_b/c/d`** (0–9) quantizadas à tabela musical
+  `{0,5;1;1,5;2;2,5;3;4;5;7;9}` — inteira = harmônico, quebrada =
+  inarmônico (sino/metal). É o `QUANTIZER` da altura, mas pro timbre.
+- **`index`** (0–1, +CV, mapeado ao quadrado) = profundidade global de
+  modulação (bandas laterais de Bessel/Chowning). 0 = 4 senóides.
+- **`feedback`** (0–1) = A modula a própria fase (média das 2 últimas
+  amostras, à la DX7 — estabiliza o laço). Sozinho leva A a
+  dente-de-serra.
+- **`drift`** = micro-desafino lento e independente por operador,
+  DETERMINÍSTICO (soma de senos, sem RNG).
+- **Sem EGs por operador** nesta v1 (fica pra `OPERATOR+`); `ENVELOPE →
+  index` cobre o ataque FM. Aliasing de banda lateral aceito (como no DX).
+- **Saída:** soma das portadoras ÷ nº de portadoras (senóides → |·| ≤ 1)
+  + `softclip` (assíntota ±1,5). Aditivo de 4 fica ~12 dB abaixo de 1
+  portadora — `VCA`/`MIXER` normalizam; seguidor de ganho faria o nível
+  bombear com `index`.
+
+**Calibração de teste** (não bug do módulo): a interpolação linear da LUT
++ o vazamento espectral da DFT retangular davam centroide 1,5 pra uma
+senóide pura → janela de Hann na `magAt` do teste, centroide clean → 1,00.
+
+Integrado: `ModuleCatalog` (SOURCE, após ADDITIVE — seed-safe, ver
+`test_seed_patch`), `test_panel_layout` (14 HP), `LearnCatalog`
+(12 binds). Docs: `00_indice`, `PESQUISA §2.4`, `RASGO_MODULAR.md §36.3`,
+`README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**54/54 CTest** Debug e Release. Testes: aditivo (razões 1/2/3 → pilha
+harmônica, nada entre parciais); cadeia (índice 0 → portadora pura,
+centroide 1,0; índice 0,8 → centroide 12); `index` sobe o centroide
+monotônico; razão 2,5 → energia inarmônica em 2,5·f0; `feedback` → A
+vira serra (centroide ×3); 1 V/oct; os 8 algoritmos finitos e < 1,5;
+determinismo byte a byte com `drift`; extremos limitados. Renders de
+exemplo estáveis (OPERATOR não entra em nenhum).
+
 **Não commitado ainda** → commit a seguir.
+
+**Onda B:** falta só `FORMANT` (#45).

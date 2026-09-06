@@ -76,8 +76,11 @@ RunResult renderGraph(SignalGraph& g, std::size_t sink, int blocks) {
 void testCatalogInstantiates() {
     SignalGraph g;
     const std::size_t sink = buildRack(g);
-    // 42 módulos do catálogo + 1 sink
-    EXPECT(g.nodeCount() == 43);
+    // todos os módulos do catálogo + 1 sink
+    std::size_t catN = 0;
+    for (const auto& grp : rasgo::panel::moduleCatalog()) catN += grp.types.size();
+    EXPECT(catN >= 40);
+    EXPECT(g.nodeCount() == catN + 1);
     EXPECT(g.node(sink).type() == "OUT");
 }
 
