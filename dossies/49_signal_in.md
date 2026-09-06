@@ -2,9 +2,9 @@
 
 **Família:** SOURCE (adaptador — na taxonomia §4.2, o verbo GESTO/ENTRADA
 vive em SOURCE)
-**Estado:** **implementado — Onda D** (2026-09-06) — módulo pronto; a
-thread ALSA-seq do painel é o passo seguinte (como o `AlsaSource` foi pro
-`AUDIO-IN`)
+**Estado:** **implementado — Onda D** (2026-09-06). Módulo + a thread
+ALSA-seq do painel (`apps/panel/AlsaMidi.hpp`) prontos; falta só o
+teste ao vivo com um teclado.
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/SignalIn.hpp`, `src/dsp/AudioIn.hpp` (alias),
 `tests/test_signal_in.cpp`
@@ -53,15 +53,21 @@ sobe `gate`/`pitch`/`vel`; last-note priority (C4, G4 por cima, solta G4
 determinismo byte a byte com áudio + 3 eventos MIDI; `type() ==
 "SIGNAL-IN"`.
 
+**Thread ALSA-seq (feito 2026-09-06):** `apps/panel/AlsaMidi.hpp` abre
+uma porta virtual **"RASGO Modular : IN"** (`snd_seq`, NONBLOCK); o
+painel roda uma thread de polling que chama `pushMidi()` nos nós
+`SIGNAL-IN` (sob `gmx.try_lock()`, mesmo padrão da captura de áudio).
+O usuário conecta o teclado por `aconnect` ou um patchbay
+(qpwgraph/Helvum). Abre/fecha junto com a captura de áudio em
+`syncSignalIn`. Falta só validar ao vivo com hardware.
+
 **Pendências:**
-- **thread ALSA-seq no painel** — abrir uma porta `snd_seq` de entrada,
-  numa thread dedicada (como o `AlsaSource` do `AUDIO-IN`), e chamar
-  `pushMidi()`. É o único pedaço que falta pra o MIDI funcionar ao vivo;
-  precisa de um teclado pra validar.
+- **teste ao vivo** com um teclado MIDI (a thread e o parsing estão
+  testados; a ponta ALSA-seq → hardware não dá pra cobrir headless).
 - **CV bruto** — a "interface DC-coupled" (canais de áudio extras como
   CV) fica pra quando houver caso; hoje `SIGNAL-IN` é áudio + MIDI.
-- polifonia (v1 é mono); saída de aftertouch / clock MIDI;
-  `bend`/`glide`/`retrig` como no `GLIDE`.
+- polifonia (v1 é mono); aftertouch / clock MIDI; `bend`/`glide`/`retrig`
+  como no `GLIDE`; renomear `RASGO_AUDIO_IN_DEVICE` → algo genérico.
 
 ---
 
@@ -163,10 +169,11 @@ escritas + a rampa do gate. `prepare` aloca o anel de áudio (~0,5 MB) +
 6 HP, família **SOURCE**. Display do nível de entrada. Knobs `GAIN`/
 `BEND`/`CC#`; jacks `L`/`R` (áudio) + `1V/O`/`GATE`/`VEL`/`CC` (MIDI→CV).
 
-No painel: `syncAudioIn` (renomear pra `syncSignalIn` — pendência
-cosmética) já abre o `AlsaSource` quando há um nó `SIGNAL-IN`. Falta a
-thread `snd_seq` que chama `pushMidi()` — mesmo padrão da thread de
-áudio. `ModuleCatalog::makeModule` aceita `"AUDIO-IN"` como alias.
+No painel: `syncSignalIn` abre o `AlsaSource` (áudio) **e** o `AlsaMidi`
+(`snd_seq`) quando há um nó `SIGNAL-IN`, cada um na sua thread; fecha
+quando o nó some. `ModuleCatalog::makeModule` aceita `"AUDIO-IN"` como
+alias. Conectar um teclado: `aconnect -l` pra listar,
+`aconnect <src> "RASGO Modular"`.
 
 Cadeias canônicas: `SIGNAL-IN.pitch → OSC.1V/O`,
 `SIGNAL-IN.gate → ENVELOPE.gate`, `SIGNAL-IN.cc → FILTER.cutoff`;
