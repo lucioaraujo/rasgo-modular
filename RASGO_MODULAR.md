@@ -1074,7 +1074,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 39 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 40 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1171,7 +1171,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 39 módulos DSP
+### 36.3 Os 40 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1218,6 +1218,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 37 | `PLL` | SOURCE | segundo oscilador dedicado, sofisticado: detector de fase compara contra referência externa e CURVA a própria taxa (não reseta duro); toca livre sem referência; `ratio` generaliza pra sub/super-harmônicos (0,03–8×, desvio Rasgo), `lock_gain`, alcance de captura ±0,9 medido e documentado (limitação real de PLL, não bug); `shape` (seno↔tri↔serra↔quadrada, PolyBLEP); `feedback_type` (direto/retificado/capacitivo/pulso/"transistor"/refluxo, modula só a fase lida) | `ANTITOTEM/src/core/CmosVoice.h` — OSC5 (detector de fase + `pllLockGain`), `feedbackSample()`/`FeedbackSignal` |
 | 38 | `NOTE-OUT` | MIX | adaptador que captura o contrato `NOTE` do `MUSICAL SCORE` sem mudar a interface de nenhum outro módulo: detector de borda de gate + amostra de pitch, expõe `takeCompletedNote()` (chamado do laço de áudio do painel, nunca de `process()`); `gate_thru`/`pitch_thru` (pass-through, necessário pra alcançabilidade — `setActiveOutput` só processa ancestrais do sink ativo). v1 monofônico (limitação documentada) | desenho próprio — observador/adaptador sobre o contrato `NOTE` descrito em `ESTUDO_seed_composicao_generativa.md §5` |
 | 39 | `GLIDE` | TRANSFORM / PITCH | portamento POR NOTA (o primitivo que faltava pro baixo acid): `mode` 0 sempre / 1 slide-gated (o *slide* do TB-303, `slide` alto habilita) / 2 legato (só se `gate` segue alto na troca); `time` de subida + `fall` (assimetria — descida = `time·6^fall`); `curve` linear (rate constante, MS-20) ↔ RC; saídas `moving` (gate) e `done` (pulso na chegada). Sem `drift` (é régua de afinação) | TB-303 slide, portamento MS-20/Minimoog vs glide RC, Bela Gliss / EMW glide processor (`PESQUISA §2.4` Onda A) |
+| 40 | `WAVETABLE` | SOURCE | oscilador de tabela — o eixo de FORMA que o `OSC` subtrativo não cobre. 16 quadros GERADOS no `prepare()` por receita espectral fixa (serra→quadrada→formante→seno — **sem arquivo de dados**, opção A do §2.4), 10 mip-maps band-limited pra o antialiasing seguir a afinação; `pos` (+ CV + `drift`) varre a forma; `warp` = distorção de fase Casio CZ / WAVE CUT do EMW WAVE-6. **Captura ao vivo:** `capture` (áudio) + `grab` (trigger) → 1024 amostras viram o quadro do topo de `pos` — tabela do que o `AUDIO-IN` (ou outra voz) ouve. `drift=0` + sem captura → determinístico | tutorial JUCE wavetable, WolfSound; EMW WAVE-6 (hardware do autor); Casio CZ phase distortion; série de Fourier band-limited (`PESQUISA §2.4` Onda A) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1259,7 +1260,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**48 alvos CTest**, 100% verdes em **Debug e Release**
+**49 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

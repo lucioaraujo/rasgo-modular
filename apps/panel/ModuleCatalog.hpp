@@ -18,6 +18,7 @@
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
 #include "dsp/FunctionGenerator.hpp"
+#include "dsp/Wavetable.hpp"
 #include "dsp/Glide.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
@@ -55,6 +56,7 @@ namespace rasgo::panel {
 inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) {
     using namespace rasgo::modular;
     if (t == "OSC")        return std::make_unique<Oscillator>();
+    if (t == "WAVETABLE")  return std::make_unique<Wavetable>();
     if (t == "AUDIO-IN")   return std::make_unique<AudioIn>();
     if (t == "CHAOS")      return std::make_unique<Chaos>();
     if (t == "PLL")        return std::make_unique<Pll>();
@@ -103,7 +105,7 @@ struct CatalogGroup {
 // Agrupado por família (taxonomia do RASGO_MODULAR.md §4).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",      {"OSC", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
+        {"SOURCE",      {"OSC", "WAVETABLE", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
         {"TIME",        {"CLOCK", "LOGIC", "ENVELOPE"}},
         {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS", "CHAOS"}},
         {"SEQUENCE",    {"TURING", "SEQUENCE", "SWITCH", "TRIGSEQ"}},

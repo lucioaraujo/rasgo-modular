@@ -133,6 +133,44 @@ inline const LearnTable& learnTable() {
                 "O contorno em si, como CV — patcheável pra modular outro "
                 "parâmetro (ex.: FILTER.cutoff).", "", ""}},
         }},
+        {"WAVETABLE", {
+            {"freq", {
+                "Frequência base. 1 V/oct pela entrada 1V/O.", "", ""}},
+            {"fine", {"Afinação fina em cents (±100).", "", ""}},
+            {"pos", {
+                "Posição no eixo de FORMA: 0 = serra, ⅓ = quadrada, ⅔ = "
+                "formante (vogal), 1 = seno. Soma com a CV de POS e o DRIFT.",
+                "As 16 tabelas são geradas por uma receita espectral fixa "
+                "no prepare() — sem arquivo de dados; band-limited em 10 "
+                "mip-maps pra não aliasar em afinação alta.",
+                "Cabeie ENVELOPE.env → POS: a forma abre junto com a nota."}},
+            {"warp", {
+                "Distorção de fase (Casio CZ / WAVE CUT do WAVE-6): "
+                "comprime a primeira metade do ciclo numa janela que "
+                "encolhe — de identidade (0) a quase-pulso brilhante (1).",
+                "Não muda a tabela, só como a fase percorre ela — cria "
+                "harmônicas altas de graça.", ""}},
+            {"fm_amount", {"Profundidade da FM linear da entrada FM.", "", ""}},
+            {"drift", {
+                "Varredura lenta autônoma de POS — a wavetable respira. "
+                "0 = determinístico.", "", ""}},
+            {"in:pitch", {"CV 1 V/oct.", "", ""}},
+            {"in:pos", {"CV somada em POS (LFO, envelope, DRIFT…).", "", ""}},
+            {"in:fm", {"Áudio pra FM linear (× FM_AMOUNT).", "", ""}},
+            {"in:capture", {
+                "Áudio a capturar como tabela — de um AUDIO-IN, um OSC, "
+                "qualquer saída de áudio do grafo.",
+                "Sem cabo aqui, GRAB não faz nada e POS=1 é o seno "
+                "procedural.", ""}},
+            {"in:grab", {
+                "Trigger: na borda de subida, pega 1024 amostras de "
+                "CAPTURE (DC removido + normalizado) — vira o quadro no "
+                "topo de POS (crossfade de ~0,9 a 1,0). Sem detecção de "
+                "pitch: afine a fonte de ouvido.",
+                "Cabeie CLOCK → GRAB: a tabela se renova a cada compasso.",
+                ""}},
+            {"out:out", {"A forma de onda varrida.", "", ""}},
+        }},
         {"OSC", {
             {"freq", {
                 "Frequência base do oscilador.",

@@ -4146,3 +4146,38 @@ ModularGrid (o §9 estava desatualizado).
 Debug e Release. Renders de exemplo estáveis (GLIDE não entra em nenhum).
 
 **Não commitado.**
+
+## Registro da etapa — 2026-09-06: Módulo 40 — WAVETABLE (Onda A)
+
+`PESQUISA §2.4` Onda A, #40. Decisão do autor: opção **A** (tabelas
+procedurais, sem arquivo de dados).
+
+**`WAVETABLE` — oscilador de tabela procedural** (`src/dsp/Wavetable.hpp`,
+`dossies/40_wavetable.md`, `tests/test_wavetable.cpp` — 10 funções, DFT
+ponto a ponto). Família SOURCE.
+
+- 16 quadros gerados no `prepare()` por receita espectral fixa
+  (serra→quadrada→formante→seno); 10 mip-maps band-limited (maxH 512..1)
+  escolhidos pela fundamental → antialiasing por construção. ~1 MB/inst.
+- `pos` (+ CV + `drift`) varre a forma; `warp` = distorção de fase Casio
+  CZ / "WAVE CUT" do EMW WAVE-6; `freq`/`fine`/1V-oct/`fm` linear.
+- **Captura ao vivo** (resposta a "se houver fonte no AUDIO-IN…"):
+  `capture` (áudio) + `grab` (trigger) → 1024 amostras (DC removido +
+  normalizadas) viram o quadro do topo de `pos` (crossfade ~0,9–1,0).
+  Standalone = procedural (determinístico com `drift=0`); com
+  `AUDIO-IN`/`OSC`/… no `capture` = tabela viva. Quadro capturado sem
+  band-limit (aliasing em afinação alta = caráter aceito, anotado).
+
+Geração das tabelas: sinLUT indexada por `(h·s) mod kLen` + snapshot
+band-limited nos `h` potência de 2 → `kFrames·kLen·kMaxH` ≈ 8 M ops no
+`prepare` (não RT).
+
+Integrado: `ModuleCatalog` (SOURCE, após OSC), `test_panel_layout`,
+`LearnCatalog` (13 binds). Docs: `00_indice`, `PESQUISA §2.4`,
+`RASGO_MODULAR.md §36.3`, `README.md`.
+
+**Validação:** build limpo (`-Wall -Wextra -Werror`), **49/49 CTest**
+Debug e Release. Renders de exemplo estáveis (WAVETABLE não entra em
+nenhum).
+
+**Não commitado.**

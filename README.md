@@ -56,10 +56,12 @@ módulo não; LEARN em fases)
 + **passe de ergonomia** dos 38 painéis (`design.md §3.2.1` — larguras
 enxutas, displays cheios e mais altos, colisões de rótulo de jack
 resolvidas)
-+ roadmap de continuidade (`PESQUISA_MODULOS.md §2.4`, 4 ondas) e o
-1º dela: `GLIDE` (Módulo 39 — portamento por nota: slide 303, legato,
-`fall` assimétrico). **Rack de partida completo**; 39 módulos DSP,
-48 alvos CTest
++ roadmap de continuidade (`PESQUISA_MODULOS.md §2.4`, 4 ondas) e a
+Onda A: `GLIDE` (Módulo 39 — portamento por nota: slide 303, legato,
+`fall` assimétrico) + `WAVETABLE` (Módulo 40 — oscilador de tabela
+procedural, `warp` tipo WAVE CUT, captura de ciclo ao vivo do
+`AUDIO-IN`). **Rack de partida completo**; 40 módulos DSP,
+49 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -86,12 +88,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 39 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 40 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 48 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 49 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
