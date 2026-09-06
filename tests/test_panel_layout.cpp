@@ -16,6 +16,7 @@
 #include "dsp/Control.hpp"
 #include "dsp/Decision.hpp"
 #include "dsp/Drift.hpp"
+#include "dsp/Drum.hpp"
 #include "dsp/Envelope.hpp"
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
@@ -193,6 +194,7 @@ int main() {
     mods.emplace_back("LPG", std::make_unique<Lpg>());
     mods.emplace_back("DECISION", std::make_unique<Decision>());
     mods.emplace_back("DRIFT", std::make_unique<Drift>());
+    mods.emplace_back("DRUM", std::make_unique<Drum>());
     mods.emplace_back("ABACUS", std::make_unique<Abacus>());
     mods.emplace_back("CLOCK", std::make_unique<EuclidClock>());
     mods.emplace_back("ENVELOPE", std::make_unique<Envelope>());

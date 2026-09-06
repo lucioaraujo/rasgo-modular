@@ -4554,6 +4554,49 @@ segundos (não decai nem cresce); `mix=0` = passa-direto bit-exato;
 determinismo byte a byte com `mod`; extremos limitados; `decay=0,95`
 sem freeze ainda decai (g < 1). Renders de exemplo estáveis.
 
+Commitado (`bcf41ed`).
+
+## Registro da etapa — 2026-09-06: Módulo 47 — DRUM (Onda C — 2/2, COMPLETA)
+
+`PESQUISA §2.4` Onda C, #47 — o último da onda (após "avance").
+
+**`DRUM` — voz de percussão** (`src/dsp/Drum.hpp`, `tests/test_drum.cpp`
+— 11 funções). Família SOURCE. Um gate → um golpe. Empacota o que
+`MATTER`+`NOISE`+`ENVELOPE` fariam à mão.
+
+- **3 camadas:** CORPO (senóide com envelope de altura — o pitch-sweep
+  do 808; `map` mistura com `tanh(corpo·3)` → clique do 909), ESTALO
+  (ruído branco por passa-alta cujo corte sobe com `map` — 808 surdo →
+  acústico brilhante — envelope próprio bem curto; `snap` é a dose),
+  ENVELOPE de amplitude exponencial (`decay` ~20 ms a ~2 s).
+- `tone` (20–1000 Hz, +CV 1 V/oct), `bend` (profundidade do sweep),
+  `drive` (`tanh` + makeup — crunch do 909), `roll` (auto-disparo
+  interno ~2–40 Hz = rufo/buzz e o modo autônomo), `drift` (humanização
+  por golpe — xorshift **semeado NO disparo**, determinístico dada a
+  sequência de gates). `accent` CV.
+- Corpo modal via `MATTER` fica como pendência.
+
+**Calibração de teste:** o `hfEnergy` de 1 polo do teste ainda passava
+~7 % da fundamental de 200 Hz → virou 2 polos + o teste de `drive` usa
+`magAt` (DFT janelada) pras harmônicas ímpares.
+
+Integrado: `ModuleCatalog` (SOURCE, após MATTER — seed-safe),
+`test_panel_layout` (14 HP), `LearnCatalog` (12 binds). Docs:
+`00_indice`, `PESQUISA §2.4`, `RASGO_MODULAR.md §36.3`, `README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**57/57 CTest** Debug e Release. Testes: gate → um golpe (silêncio
+antes, decai depois); `decay` maior → cauda 5×+ mais longa; `bend` alto
+→ a altura varre pra baixo (ZCR cai ao longo do golpe); `snap` → +3× de
+energia de ruído; `map` sobe o brilho; `drive` → harmônicas ímpares ×4+
+e saída limitada; `roll` > 0 sem gate → golpes periódicos; `accent`
+alto → +50 % de nível; determinismo byte a byte com `drift`/`roll`;
+extremos limitados. Renders de exemplo estáveis.
+
 **Não commitado ainda** → commit a seguir.
 
-**Onda C:** falta `DRUM` (#47).
+**Ondas A, B e C COMPLETAS** (9 módulos: GLIDE, WAVETABLE, LOOPER,
+ADDITIVE, PLANAR, OPERATOR, FORMANT, HALL, DRUM). Falta só a **Onda D**:
+`SAMPLER` (base de porte Navalha 2 — `ESTUDO_audio_sampling §2`) e
+`SIGNAL-IN` (evolução do `AUDIO-IN` com MIDI/CV). Aguarda direção — e
+`git push` (18 commits à frente de origin/main).

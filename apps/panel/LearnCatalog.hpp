@@ -1000,6 +1000,52 @@ inline const LearnTable& learnTable() {
                 "dirige o patch.", "", ""}},
             {"out:y_out", {"A posição Y efetiva como CV.", "", ""}},
         }},
+        {"DRUM", {
+            {"tone", {
+                "Altura do corpo (20–1000 Hz). Grave = bumbo, médio = "
+                "tom/caixa, agudo = clave. 1 V/oct pela entrada PIT.",
+                "O corpo é uma senóide com envelope de altura — no golpe "
+                "a frequência salta e cai de volta a TONE (o 'pow' do "
+                "808).", ""}},
+            {"bend", {
+                "Profundidade do envelope de altura. 0 = tonal (a "
+                "frequência fica em TONE); 1 = varredura de bumbo (salta "
+                "6× e desce).",
+                "É o pitch-sweep clássico da voz de bumbo — o que dá o "
+                "transiente com peso.", ""}},
+            {"decay", {
+                "Tempo de decaimento geral (~20 ms a ~2 s). Curto = "
+                "click/laser; longo = sub que sustenta.", "", ""}},
+            {"snap", {
+                "Dose da rajada de ruído de ataque — o 'estalo' da caixa, "
+                "o chiado do chimbal, o click do bumbo.",
+                "Ruído branco por um passa-alta cujo corte sobe com MAP "
+                "(808 surdo → acústico brilhante), com envelope próprio "
+                "bem curto.", ""}},
+            {"map", {
+                "Caráter 808 → 909 → acústico. Sobe: o corpo ganha clique "
+                "(tanh), o ruído fica mais agudo, entra um pouco de "
+                "drive.", "", ""}},
+            {"drive", {"Saturação de saída (tanh + makeup) — o crunch do "
+                      "909.", "", ""}},
+            {"roll", {
+                "Auto-disparo interno. 0 = só o gate externo; acima disso "
+                "a voz se retriga a ~2–40 Hz — rufo, buzz, e o modo que "
+                "toca sozinho.", "", ""}},
+            {"drift", {
+                "Humanização: cada golpe varia levemente altura/decay/"
+                "nível. De um xorshift semeado avançado NO disparo — "
+                "mesmos gates → mesmo áudio. 0 = golpes idênticos.",
+                "", ""}},
+            {"in:gate", {"Trigger — um pulso, um golpe.", "", ""}},
+            {"in:accent", {
+                "CV de acento: escala o nível (e o brilho) do golpe. "
+                "Cabeie TRIGSEQ.accent aqui.", "", ""}},
+            {"in:tone", {"CV 1 V/oct somada sobre o knob TONE (toms "
+                        "afinados de um SEQUENCE).", "", ""}},
+            {"out:out", {"A voz — corpo + estalo, saturada por DRIVE.",
+                        "", ""}},
+        }},
         {"MATTER", {
             {"freq", {"Frequência fundamental do banco de modos.", "", ""}},
             {"structure", {
