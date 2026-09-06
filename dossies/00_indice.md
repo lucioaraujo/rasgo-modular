@@ -53,6 +53,11 @@ pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 | 37 | [`37_pll.md`](37_pll.md) | `PLL` | SOURCE | marco 3 |
 | 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | MIX | marco 3 |
 
+**38 módulos feitos.** Próxima leva (dossiê antes do código):
+`PESQUISA_MODULOS.md §2.4` — Onda A `GLIDE`/`WAVETABLE`/`LOOPER`, Onda B
+`ADDITIVE`/`PLANAR`/`OPERATOR`/`FORMANT`, Onda C reverb FDN/`DRUM`, Onda D
+`SAMPLER`/adaptadores MIDI-CV.
+
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação
 saída→parâmetro **aditiva** desde 2026-09-04), `ControlSnapshot`,
@@ -75,12 +80,13 @@ arrastar-para-criar, sugestão de módulo por `[s]`. Decisões de design em
 
 **Estudos à parte:**
 [`ESTUDO_seed_composicao_generativa.md`](ESTUDO_seed_composicao_generativa.md)
-— os 4 itens da conversa (Seed/composição/partitura/pedagogia) têm
-**protótipo**: Motion Engine (`apps/panel/MotionEngine.hpp`), Patch
-Genetics `MUTATE`/`EVOLVE`/`FREEZE` (`apps/panel/PatchGenetics.hpp`),
-`SYSTEM SCORE` (`apps/panel/ScoreRecorder.hpp`) e hover-learn
-(`apps/panel/LearnCatalog.hpp`, `[l]` no painel). Form Engine, `CROSS`,
-`MUSICAL SCORE` e o conteúdo completo do Learning Engine continuam
-mapeados, não construídos;
+— os 4 itens da conversa (Seed/composição/partitura/pedagogia): Motion
+Engine (`apps/panel/MotionEngine.hpp`), Patch Genetics `MUTATE`/`EVOLVE`/
+`CROSS`/`FREEZE` (`apps/panel/PatchGenetics.hpp`), `SYSTEM SCORE` +
+`MUSICAL SCORE` (`apps/panel/ScoreRecorder.hpp`, `NOTE-OUT`), gramática
+explícita do `Seed` (`apps/panel/SeedGrammar.hpp`) e a caixa LEARN dos 37
+módulos (`apps/panel/LearnCatalog.hpp`, sempre presente no rodapé da
+paleta) — **feitos**. Form Engine e a camada contextual do Learning
+Engine (`WHY?`/`WHAT IF?`) continuam mapeados, não construídos;
 [`ESTUDO_audio_sampling.md`](ESTUDO_audio_sampling.md) — `SAMPLER`/
 `TURNTABLE`/`TAPE`.
