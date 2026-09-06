@@ -4666,8 +4666,60 @@ fatia certa; `repitch=1` + oitava → 400 Hz com fatia durando o dobro;
 `loop` sustenta; `wear=1` → piso de bit-crush 2×+, limitado; determinismo
 byte a byte; `setBuffer` toca o arquivo; sem buffer → silêncio absoluto.
 
+Commitado (`38b7de8`).
+
+## Registro da etapa — 2026-09-06: Módulo 49 — SIGNAL-IN (Onda D — 2/2, roadmap FECHADO)
+
+`PESQUISA §2.4` Onda D, #49 (após "avance a Onda D").
+
+**`SIGNAL-IN` — o `AUDIO-IN` cresceu** (`src/dsp/SignalIn.hpp`,
+`src/dsp/AudioIn.hpp` = alias, `tests/test_signal_in.cpp` — 12 funções,
+ex-`test_audio_in.cpp`). Família SOURCE. Decisão do autor: áudio + MIDI
+num adaptador só (não `MIDI-IN`/`CV-IN` separados).
+
+- **Anel de áudio** = o do `AUDIO-IN`, tal e qual (resync em estouro,
+  silêncio em underrun).
+- **Anel de MIDI** (`pushMidi(status,d1,d2)`, 1024 eventos) → `process()`
+  drena por bloco e resolve **voz monofônica last-note** (pilha de 16).
+  note-on/off, note-on vel 0 = off, CC (`cc_num`), pitch-bend.
+- **6 saídas:** `out` (áudio L — nome preservado pra compat de `.rmp`),
+  `r`, `pitch` (1 V/oct, nota 60 = 0 V + bend × `bend` st), `gate`
+  (rampa 1 ms), `vel`, `cc`.
+- **Migração:** `type()` = "SIGNAL-IN"; `makeModule("AUDIO-IN")` alias;
+  `using AudioIn = SignalIn`; `moduleCatalog()` lista `SIGNAL-IN`;
+  `panel_main` procura `"SIGNAL-IN"` (2 pontos); `LearnCatalog` e o
+  `test_learn_catalog` migrados.
+- Contraparte de ENTRADA do `NOTE-OUT` (#38).
+
+**Pendência:** a thread `snd_seq` no painel que chama `pushMidi()` (mesmo
+padrão do `AlsaSource` do áudio) — o módulo está pronto, mas o MIDI ao
+vivo precisa desse pedaço + um teclado pra validar. CV bruto DC-coupled
+fica pra quando houver caso.
+
+Integrado: `ModuleCatalog` (SOURCE, `AUDIO-IN`→`SIGNAL-IN` — seed-safe),
+`test_panel_layout` (6 HP), `LearnCatalog` (9 binds), `panel_main`.
+Docs: `00_indice` (#35 aponta pra #49), `PESQUISA §2.4`,
+`RASGO_MODULAR.md §36.3`, `README`. Contagem: **48 módulos** (o rename
+não conta 2×).
+
+**Validação:** build limpo (painel incluído), **60/60 CTest** Debug e
+Release. Testes: áudio herdados do `AUDIO-IN`; MIDI — gate/pitch/vel no
+note-on; last-note priority (C4→G4→solta G4→volta C4); vel 0 = off;
+pitch-bend ±0,5 fundo de escala × `bend`; `cc` só segue `cc_num`;
+determinismo byte a byte; `type()` correto.
+
 **Não commitado ainda** → commit a seguir.
 
-**Onda D:** falta só `SIGNAL-IN` (#49) — evolução do `AUDIO-IN` com
-MIDI/CV (trabalho de ALSA-seq + migração no desserializador, mais painel
-que DSP).
+---
+
+## ROADMAP §2.4 FECHADO (2026-09-06)
+
+As 4 ondas de continuidade completas — **11 módulos** nesta sessão
+(GLIDE, WAVETABLE, LOOPER · ADDITIVE, PLANAR, OPERATOR, FORMANT · HALL,
+DRUM · SAMPLER, SIGNAL-IN) + a taxonomia consolidada (18→8 famílias) +
+a camada `io/`/`dr_wav` + `PitchShift.hpp` (porte Navalha 2). **48
+módulos**, 60 alvos CTest verdes em Debug e Release.
+
+Pendências abertas: thread ALSA-seq de MIDI no painel (#49); `TAPE`/
+`TURNTABLE` (`ESTUDO_audio_sampling §4`); as reservas da taxonomia
+(`§4.2`); `git push` (22 commits à frente de origin/main).

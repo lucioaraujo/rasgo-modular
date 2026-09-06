@@ -645,18 +645,35 @@ inline const LearnTable& learnTable() {
                 "Pulso curto sempre que o contador cruza um múltiplo de "
                 "MOD — a \"virada\" do ritmo.", "", ""}},
         }},
-        {"AUDIO-IN", {
+        {"SIGNAL-IN", {
             {"gain", {"Ganho aplicado à entrada de áudio ao vivo.", "", ""}},
+            {"bend", {
+                "Alcance do pitch-bend do MIDI, em semitons (0–24). "
+                "Afeta a saída 1V/O.", "", ""}},
+            {"cc_num", {
+                "Qual Control Change do MIDI a saída CC segue (1 = mod "
+                "wheel).", "", ""}},
             {"out:out", {
-                "O que estiver tocando na entrada de áudio do sistema, ao "
-                "vivo — sem nada capturando, fica em silêncio (nunca "
-                "trava, nunca lê lixo).",
-                "Lado receptor de um anel circular SPSC alimentado por uma "
-                "thread de captura externa (`AlsaSource`) — o núcleo "
-                "`rasgo_modular_core` não sabe o que é ALSA, só lê o anel.",
-                "Rode outro instrumento (ou um microfone) e ligue OUT num "
-                "FILTER ou SHAPE — o Rasgo passa a processar áudio de "
-                "fora, não só ele mesmo."}},
+                "Áudio da entrada do sistema, canal esquerdo — sem nada "
+                "capturando, silêncio (nunca trava, nunca lê lixo).",
+                "Lado receptor de um anel SPSC alimentado por uma thread "
+                "de captura externa (`AlsaSource`); o núcleo "
+                "`rasgo_modular_core` não sabe o que é ALSA.",
+                "Rode outro instrumento e ligue L num FILTER — o Rasgo "
+                "passa a processar áudio de fora."}},
+            {"out:r", {"Áudio da entrada, canal direito.", "", ""}},
+            {"out:pitch", {
+                "Altura da nota MIDI tocada, como CV 1 V/oct (nota 60 = "
+                "0 V), com o pitch-bend somado (× BEND).",
+                "Voz MONOFÔNICA com pilha de notas (last-note priority): "
+                "solte a nota de cima e a de baixo volta a soar. É a "
+                "contraparte de entrada do NOTE-OUT.", ""}},
+            {"out:gate", {
+                "Alto enquanto alguma tecla está pressionada (rampa de "
+                "1 ms anti-clique).", "", ""}},
+            {"out:vel", {"Velocity da última nota (0–1), segurada.",
+                        "", ""}},
+            {"out:cc", {"O valor do CC nº CC# (0–1), segurado.", "", ""}},
         }},
         {"CHAOS", {
             {"rate", {

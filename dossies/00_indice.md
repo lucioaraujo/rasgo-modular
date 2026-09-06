@@ -54,7 +54,7 @@ propriedade do cabo, não um módulo do catálogo.
 | 32 | [`32_wasp.md`](32_wasp.md) | `WASP` | TRANSFORM | marco 3 |
 | 33 | [`33_matrix.md`](33_matrix.md) | `MATRIX` | ROUTE | marco 3 |
 | 34 | [`34_mult.md`](34_mult.md) | `MULT` | ROUTE | marco 3 |
-| 35 | [`35_audio_in.md`](35_audio_in.md) | `AUDIO-IN` | SOURCE | marco 3 |
+| 35 | [`35_audio_in.md`](35_audio_in.md) | `AUDIO-IN` → ver #49 | SOURCE | marco 3 |
 | 36 | [`36_chaos.md`](36_chaos.md) | `CHAOS` | MODULATE | marco 3 |
 | 37 | [`37_pll.md`](37_pll.md) | `PLL` | SOURCE | marco 3 |
 | 38 | [`38_note_out.md`](38_note_out.md) | `NOTE-OUT` | OUT | marco 3 |
@@ -68,10 +68,11 @@ propriedade do cabo, não um módulo do catálogo.
 | 46 | [`46_hall.md`](46_hall.md) | `HALL` | SPACE | Onda C (2026-09-06) |
 | 47 | [`47_drum.md`](47_drum.md) | `DRUM` | SOURCE | Onda C (2026-09-06) |
 | 48 | [`48_sampler.md`](48_sampler.md) | `SAMPLER` | SPACE | Onda D (2026-09-06) |
+| 49 | [`49_signal_in.md`](49_signal_in.md) | `SIGNAL-IN` (ex-`AUDIO-IN`) | SOURCE | Onda D (2026-09-06) |
 
-**48 módulos feitos.** Ondas A, B, C completas; Onda D em curso
-(`SAMPLER` feito — + camada `io/`/`dr_wav` e `dsp/PitchShift.hpp`
-portado do Navalha 2). Falta `SIGNAL-IN` (#49).
+**48 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
+Pendência do #49: a thread ALSA-seq de MIDI no painel.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação
