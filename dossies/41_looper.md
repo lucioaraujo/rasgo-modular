@@ -24,6 +24,12 @@ fita/BBD** num knob.
 - **`age`** (0–1) = "quão gasto": um knob que combina perda de agudo no
   laço (passa-baixa 1 polo), **wow & flutter** (modulação lenta + rápida
   do ponto de leitura), saturação suave e um fio de ruído;
+- **`heads`** (1–4, +2026-09-06) = **eco de fita multi-cabeça** (Roland
+  Space Echo / RE-201). 1 = eco simples. 2–4 = cabeças extras leem
+  frações do `time` — `{1; 0,75; 0,5; 0,25}×` — e somam (÷ nº de
+  cabeças); a realimentação regenera todas → eco denso e rítmico. `FBK`
+  perto de 1 + `time` longo + várias cabeças = **Frippertronics** denso.
+  Só no modo forward (não com `hold`/`reverse`);
 - **`mix`** (0–1) = seco/molhado; saída extra **`wet`** (100% molhado).
 
 `age = 0`, `feedback` moderado, sem `hold`/`reverse` → delay digital
@@ -40,11 +46,19 @@ entrada nova é ignorada; `reverse` → um sweep ascendente sai descendente
 (cruzamentos de zero espelhados) sem clique; `age` alto → o eco perde
 agudo a cada volta (energia acima de 4 kHz cai) e ganha um pouco de wow
 (desvio do período de eco); `mix = 0` → só o seco; `wet` = 100% molhado;
-tudo finito; determinismo com `age` fixo.
+`heads = 3` → ecos extras em `time·{0,5; 0,75}` além do principal, e
+`heads = 1` não tem nada antes do 1º eco; tudo finito; determinismo com
+`age` fixo.
 
 **Pendências (candidatos):** `mod` dedicado (chorus) separado do wow;
 crossfade de `time` grande (hoje suaviza, um salto brusco ainda desliza);
-tap múltiplo (ritmo do eco); `duck` (o eco abaixa quando entra sinal).
+`duck` (o eco abaixa quando entra sinal); combos de cabeça selecionáveis
+(o RE-201 tem 12); `heads` também no `reverse`.
+
+**Decisão de 2026-09-06 (`ESTUDO_audio_sampling §4`):** `TAPE` NÃO vira
+módulo — seria 80% duplicata do `LOOPER`. O que faltava (eco multi-cabeça
+tipo Space Echo, Frippertronics) entrou aqui como `heads` + `feedback`
+longo.
 
 ---
 
@@ -144,9 +158,10 @@ amostra 2–3 interpolações + 1 `tanh` + 1 polo + 2 `sin` (wow).
 ## 7. Integração e painel
 
 12 HP, família **SPACE**. Display da saída (o osciloscópio já mostra).
-Knobs `TIME`/`FBK`/`AGE`/`MIX` + toggles `HOLD`/`REV`; jacks `IN`/`TIME`/
-`FRZ`/`REV` + `OUT`/`WET`.
+Knobs `TIME`/`FBK`/`AGE` (linha 1), `MIX`/`HEADS` (linha 2) + toggles
+`HOLD`/`REV`; jacks `IN`/`TIME`/`FRZ`/`REV` + `OUT`/`WET`.
 
 Cadeias canônicas: `voz → LOOPER → MASTER` (eco); `DRIFT → LOOPER.time`
 (andamento derivando); `TRIGSEQ.t1 → LOOPER.freeze` (congela no compasso);
-`LOOPER.wet → SHAPE` (só o eco distorcido).
+`LOOPER.wet → SHAPE` (só o eco distorcido); `HEADS = 3` + `AGE` alto +
+`FBK` ~0,8 = Space Echo.

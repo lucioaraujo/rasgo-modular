@@ -250,15 +250,17 @@ Delay/looper a fita + as **imperfeições como timbre**:
 - modo **echo** (cabeça de repro atrasada, feedback — vira Space Echo)
   e modo **loop** (Frippertronics / dois gravadores).
 
-Sobreposição com o **`LOOPER`** (Módulo 41 — já feito): o `LOOPER` já
-tem o knob `age` (passa-baixa no laço + wow&flutter + `tanh` + chiado),
-`hold` e `reverse`. O `TAPE` só se justifica se for além: varispeed de
-fita, dropouts, modo Frippertronics de dois cabeçotes, `saturation`
-separada de `age`. Reavaliar se `TAPE` vira módulo próprio ou se é o
-`LOOPER` + um `SAMPLER` com `wear`. Estudo: Roland Space Echo RE-201
-(topologia cabeça/motor/feedback), Mellotron (uma fita por tecla),
-teoria de wow & flutter (norma DIN/IEC), *gap loss* da cabeça (passa-baixa
-dependente da velocidade).
+**DECIDIDO (2026-09-06): `TAPE` NÃO vira módulo.** O `LOOPER` (#41) já
+tem `age` (passa-baixa no laço + wow&flutter + `tanh` + chiado), `hold`
+e `reverse` — um `TAPE` seria ~80% duplicata. O que faltava — **eco de
+fita multi-cabeça** (Space Echo) e **Frippertronics** — entrou no
+`LOOPER` como o knob **`heads`** (1–4 cabeças lendo `time·{0,75; 0,5;
+0,25}×`, somadas, realimentação regenera todas) + `feedback` perto de 1.
+Dropouts / *saturation* separada de `age` ficam como pendências do
+`LOOPER`, não de um módulo novo. O varispeed de fita está no `SAMPLER`
+(#48, `speed` bipolar + `wear`). Estudo que embasou: Roland RE-201
+(topologia cabeça/motor/feedback), wow & flutter (DIN/IEC), *gap loss*
+da cabeça.
 
 ## 5. Ordem sugerida
 
