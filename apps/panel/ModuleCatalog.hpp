@@ -108,18 +108,31 @@ struct CatalogGroup {
     std::vector<const char*> types;
 };
 
-// Agrupado por família (taxonomia do RASGO_MODULAR.md §4).
+// Agrupado por família (taxonomia consolidada — `RASGO_MODULAR.md §4`,
+// revisão 2026-09-06). 8 famílias de trabalho, cruzadas com a literatura
+// Eurorack (ModularGrid function tags, Patch & Tweak, Doepfer A-100):
+//   SOURCE     gerar        (inclui vozes de modelagem física — MATTER/STRING)
+//   TRANSFORM  transformar  (modifica um sinal que passa — áudio ou CV)
+//   MODULATE   mover        (GERA um sinal de controle)
+//   TIME       marcar tempo (clock, lógica de clock, sequenciadores)
+//   DECISION   decidir      (escolhe um valor — quantiza, harmoniza, calcula)
+//   ROUTE      rotear       (chave, matriz, múltiplo, morph)
+//   SPACE      espacializar/lembrar (delay, reverb, granular)
+//   OUT        misturar/medir/enviar
+// A ORDEM aqui é a ordem de instanciação dos nós no painel → o que cada
+// `RASGO_SEED=N` produz e o doador do CROSS. Reordenada nesta revisão;
+// `tests/test_seed_patch.cpp` revalida (caminho audível, sem exceção,
+// saída finita).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",      {"OSC", "WAVETABLE", "ADDITIVE", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
-        {"TIME",        {"CLOCK", "LOGIC", "ENVELOPE"}},
-        {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS", "CHAOS"}},
-        {"SEQUENCE",    {"TURING", "SEQUENCE", "SWITCH", "TRIGSEQ"}},
-        {"TRANSFORM",   {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "CONTROL", "MULT", "SH", "GLIDE", "PARAMETRIC"}},
-        {"MATTER",      {"MATTER", "STRING"}},
-        {"MEMORY",      {"MEMORY"}},
-        {"SPACE",       {"SPACE", "LOOPER"}},
-        {"MIX",         {"MIXER", "MATRIX", "PLANAR", "MASTER", "SCOPE", "NOTE-OUT"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "AUDIO-IN"}},
+        {"TRANSFORM", {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC", "GLIDE", "CONTROL"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION"}},
+        {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
+        {"SPACE",     {"SPACE", "LOOPER", "MEMORY"}},
+        {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;
 }

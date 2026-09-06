@@ -4365,3 +4365,57 @@ estáveis (PLANAR não entra em nenhum).
 **Não commitado ainda** → commit a seguir.
 
 **Onda B:** falta `OPERATOR` (#44), `FORMANT` (#45).
+
+## Registro da etapa — 2026-09-06: taxonomia consolidada (18 verbos → 8 famílias)
+
+Pergunta do autor: a classificação de famílias veio do Hexen, mas já
+temos mais módulos que o Hexen — "verificar na literatura dos euroracks
+como eles costumam classificar". Autor escolheu **fazer a consolidação**
+(reordenar `moduleCatalog()`, atualizar §3/§4/§36.3, revalidar seeds/CROSS).
+
+**Pesquisa** (`WebSearch` + `WebFetch` ModularGrid):
+- **ModularGrid** — lista PLANA de ~60 *function tags* (1ª + 2ª por
+  módulo), por tecnologia/comportamento (Oscillator/Filter/VCA/LFO/
+  Sequencer/Quantizer/Logic/Switch/Multiple/Mixer/Looper/Low Pass Gate/
+  Resonator/…). Sem tag "Additive" nem "Physical Modeling".
+- **Patch & Tweak** (Kim Bjørn) — Sound Sources / Audio Modifiers /
+  Modulation & CV / Rhythm-Sequencing / Utilities / Effects.
+- **Doepfer A-100** — Sound Sources / Sound Modifiers / Modulation &
+  Controllers / Utilities / Clock-Trigger / Effects.
+
+**Diagnóstico:** a árvore de 18 verbos tinha ~5 famílias-fantasma
+(DAMAGE/REPAIR/RELATION/INFERENCE/PERCEPTION, 0–1 módulo); a paleta já
+tinha colapsado pra 9 grupos ad-hoc (SWITCH em SEQUENCE, MATRIX/MULT em
+MIX, sem ROUTE).
+
+**Feito:**
+- `ModuleCatalog.hpp::moduleCatalog()` reordenado nas **8 famílias de
+  trabalho**: SOURCE (+MATTER/STRING), TRANSFORM, MODULATE (novo —
+  ENVELOPE/FUNCTION/DRIFT/CHAOS/SH), TIME (+TURING/SEQUENCE/TRIGSEQ),
+  DECISION (só os que escolhem valor), ROUTE (novo — SWITCH/MATRIX/MULT/
+  PLANAR), SPACE (+MEMORY), OUT (ex-MIX).
+- `RASGO_MODULAR.md`: §3 (nota da revisão + as 3 fontes), §4 reescrita
+  (§4.1 famílias de trabalho, §4.2 território reservado, §4.3
+  correspondência com ModularGrid/Patch&Tweak/Doepfer), §31 (nota),
+  §36.3 coluna Família (22 linhas).
+- `dossies/00_indice.md` coluna Família (29 linhas) + ponteiro pra §4.1.
+- `dossies/43_planar.md` família → ROUTE.
+- `panel_main.cpp`: comentários de "não reordenar o catálogo" corrigidos.
+
+**`tests/test_seed_patch.cpp` (NOVO):** monta o rack completo do catálogo
++ sink como o painel, roda `seedPatch` (seeds 1–24) e `crossPatch`,
+confere: instancia (43 nós), sem exceção, caminho audível, saída finita
+e < 12, determinismo byte a byte. **Revalidação: a reordenação do
+catálogo NÃO muda o que `RASGO_SEED=N` produz** — verificado byte a byte
+com a ordem antiga vs nova (o `seedPatch` cabeia a espinha por NOME de
+tipo, não por posição do passeio). O comentário antigo do `panel_main`
+que dizia o contrário era conservador demais.
+
+Achado à parte (pré-existente, não regressão): ~1–3 seeds em 24 saem
+quase-mudos (seed 18 = silêncio total com 22 cabos) — a espinha
+voz→MASTER→sink é cabeada mas o gatilho não dispara. Fica como pendência
+do `seedPatch`, não deste trabalho.
+
+**Validação:** **53/53 CTest** Debug + Release. Build limpo.
+
+**Não commitado ainda** → commit a seguir.

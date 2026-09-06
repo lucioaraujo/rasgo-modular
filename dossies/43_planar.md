@@ -1,6 +1,7 @@
 # Dossiê — Módulo 43: Morph vetorial XY (`PLANAR`)
 
-**Família:** MIX (roteamento / morph)
+**Família:** ROUTE / MORPH (grupo ROUTE na paleta, junto de `SWITCH`/
+`MATRIX`/`MULT` — `RASGO_MODULAR.md §4.1`)
 **Estado:** **implementado — Onda B** (2026-09-06)
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/Planar.hpp`, `tests/test_planar.cpp`
@@ -186,7 +187,7 @@ floats (~48 KB).
 
 ## 7. Integração e painel
 
-12 HP, família **MIX** (junto de `MIXER`/`MATRIX`/`SWITCH`). Display do
+12 HP, família **ROUTE** (junto de `SWITCH`/`MATRIX`/`MULT`). Display do
 quadrado com o ponto (o painel gráfico pode desenhar a trajetória do
 gesto). Knobs `X`/`Y`/`CURVE` (linha 1), `SMTH`/`RATE`/`DRIFT` (linha 2);
 jacks `A`/`B`/`C`/`D` (cantos), `X`/`Y`/`GST` (controle), `OUT`/`X'`/`Y'`.
