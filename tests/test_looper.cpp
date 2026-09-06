@@ -91,6 +91,35 @@ void testSimpleEcho() {
     EXPECT(p2 > 0.05 && p2 < p1);
 }
 
+void testMultiHead() {
+    auto impulse = [](std::size_t f) { return f == 100 ? 1.0f : 0.0f; };
+    auto peakIn = [](const std::vector<float>& x, std::size_t a, std::size_t b) {
+        double p = 0.0;
+        for (std::size_t i = a; i < b && i < x.size(); ++i)
+            p = std::max(p, (double)std::fabs(x[i]));
+        return p;
+    };
+    Looper one;
+    one.setParameter("time", 0.05f); one.setParameter("feedback", 0.3f);
+    one.setParameter("age", 0.0f); one.setParameter("mix", 1.0f);
+    one.setParameter("heads", 1.0f);
+    const auto r1 = run(one, 30, impulse);
+
+    Looper three;
+    three.setParameter("time", 0.05f); three.setParameter("feedback", 0.3f);
+    three.setParameter("age", 0.0f); three.setParameter("mix", 1.0f);
+    three.setParameter("heads", 3.0f);
+    const auto r3 = run(three, 30, impulse);
+
+    // 1 cabeça: nada entre o impulso (100) e o 1º eco (~2500).
+    // 3 cabeças: leem 1,0/0,75/0,5·time → ecos extras em 100 + 2400·{0,5;
+    // 0,75} ≈ 1300 e 1900, além do principal em ~2500.
+    EXPECT(peakIn(r1.out, 500, 2200) < 0.02);
+    EXPECT(peakIn(r3.out, 1150, 1450) > 0.05);  // cabeça a 0,5·time
+    EXPECT(peakIn(r3.out, 1750, 2050) > 0.05);  // cabeça a 0,75·time
+    EXPECT(peakIn(r3.out, 2350, 2650) > 0.05);  // cabeça principal
+}
+
 void testFeedbackBounded() {
     Looper lp;
     lp.setParameter("time", 0.02f);
@@ -217,6 +246,7 @@ void testPanel() {
 
 int main() {
     testSimpleEcho();
+    testMultiHead();
     testFeedbackBounded();
     testHoldLoops();
     testReverseNoClick();

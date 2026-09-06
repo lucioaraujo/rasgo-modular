@@ -39,7 +39,8 @@ public:
                {"age", 0.0f, 1.0f, 0.2f, ""},
                {"mix", 0.0f, 1.0f, 0.5f, ""},
                {"hold", 0.0f, 1.0f, 0.0f, ""},
-               {"reverse", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"reverse", 0.0f, 1.0f, 0.0f, ""},
+               {"heads", 1.0f, 4.0f, 1.0f, ""}}) {}
 
     std::string type() const override { return "LOOPER"; }
 
@@ -52,8 +53,9 @@ public:
         p.add(Widget::Kind::Knob, "FBK", "feedback", 24.0f, 30.0f);
         p.add(Widget::Kind::Knob, "AGE", "age", 40.0f, 30.0f);
         p.add(Widget::Kind::Knob, "MIX", "mix", 8.0f, 54.0f);
-        p.add(Widget::Kind::Toggle, "HOLD", "hold", 26.0f, 56.0f);
-        p.add(Widget::Kind::Toggle, "REV", "reverse", 40.0f, 56.0f);
+        p.add(Widget::Kind::Knob, "HEADS", "heads", 24.0f, 54.0f);
+        p.add(Widget::Kind::Toggle, "HOLD", "hold", 40.0f, 56.0f);
+        p.add(Widget::Kind::Toggle, "REV", "reverse", 52.0f, 56.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 94.0f);
         p.add(Widget::Kind::Jack, "TIME", "in:time", 21.0f, 94.0f);
         p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 34.0f, 94.0f);
@@ -96,6 +98,11 @@ public:
         const float mix = clamp01(parameterValue("mix"));
         const bool holdP = parameterValue("hold") >= 0.5f;
         const bool revP = parameterValue("reverse") >= 0.5f;
+        // 1 cabeça = eco simples; 2–4 = eco de fita multi-cabeça (Space
+        // Echo). As cabeças extras leem FRAÇÕES do `time` (0,75/0,5/0,25×),
+        // como as cabeças de repro do RE-201 antes da de apagar.
+        const int heads = static_cast<int>(std::lround(
+            clampf(parameterValue("heads"), 1.0f, 4.0f)));
 
         const AudioBlock* in = inputs[0];
         const AudioBlock* timeIn = inputs[1];
@@ -155,8 +162,15 @@ public:
                     std::fmod(static_cast<float>(holdCount_), std::max(1.0f, d));
                 wet = readBuf(static_cast<double>(holdAnchor_) - d
                               + static_cast<double>(ph));
-            } else {
+            } else if (heads == 1) {
                 wet = readBuf(wRef - static_cast<double>(dSmooth_ * (1.0f + wow)));
+            } else {
+                static constexpr float kHeadRatio[4] = {1.0f, 0.75f, 0.5f, 0.25f};
+                float acc = 0.0f;
+                for (int h = 0; h < heads; ++h)
+                    acc += readBuf(wRef - static_cast<double>(
+                        dSmooth_ * kHeadRatio[h] * (1.0f + wow)));
+                wet = acc / static_cast<float>(heads);
             }
 
             // ---- caráter de fita no laço ----

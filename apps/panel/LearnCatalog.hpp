@@ -1600,6 +1600,14 @@ inline const LearnTable& learnTable() {
                 "estala.",
                 "Combine REV + HOLD: um trecho fixo tocando ao contrário "
                 "em loop."}},
+            {"heads", {
+                "1 cabeça = eco simples. 2–4 = eco de fita MULTI-CABEÇA "
+                "(Space Echo): as cabeças extras leem frações do TIME "
+                "(0,75 / 0,5 / 0,25×) e somam — eco denso e rítmico.",
+                "Como as cabeças de reprodução do Roland RE-201 antes da "
+                "cabeça de apagar; a realimentação regenera todas.",
+                "FBK perto de 1 + TIME longo + várias cabeças = "
+                "Frippertronics denso."}},
             {"in:in", {"Entrada de áudio.", "", ""}},
             {"in:time", {"CV que soma a TIME (em segundos).", "", ""}},
             {"in:freeze", {"Gate: enquanto alto, equivale a HOLD ligado.",
