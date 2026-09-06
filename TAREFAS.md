@@ -4218,3 +4218,47 @@ nenhum).
 
 **Onda A completa** (GLIDE, WAVETABLE, LOOPER). Próxima: Onda B
 (ADDITIVE / PLANAR / OPERATOR / FORMANT) — aguarda direção do autor.
+
+## Registro da etapa — 2026-09-06: ESTUDO_audio_sampling revisto — Navalha 2 como prior art
+
+Pergunta do autor: *"chegou a verificar no Navalha 2 o que temos já de
+conceitos e códigos para o trabalho de sampler e afins?"* — não; o
+`dossies/ESTUDO_audio_sampling.md` (do pedido de 2026-09-02) citava só
+referências genéricas (Akai, Clouds, Space Echo) e **não mencionava o
+Navalha 2**. Varredura feita agora nos dois: `RASGO/NAVALHA2_PD`
+(referência Pd/web v0.28.1) e `RASGO/NAVALHA2_JUCE` (reescrita C++).
+**Nenhum arquivo do Navalha 2 tocado — só leitura.**
+
+Achados incorporados ao estudo (nova §2):
+
+- **Licença:** GPL-3.0-or-later (Glerm Soares autorizou 07/2026),
+  compatível com o default AGPLv3-or-later da família. Porte exige
+  crédito nominal a Glerm Soares + Lúcio Araújo + nota do
+  `G09.pitchshift.pd` (Puckette). Não é caso de "conceito→origem
+  pública→desvio" — código livre, dá pra portar de fato.
+- **Conceito já articulado:** "matéria gravada pra corte/fragmentação/
+  recombinação, não DJ" (`CONCEPT_DECONSTRUCTION`, `DUAL_MATERIAL`);
+  vocabulário GAP/STUTTER/BURST/MICROSLICE/MEMORY/MUTATION/EROSION/
+  DECONSTRUCT.
+- **Código C++ portável** (`NAVALHA2_JUCE/src/core/`): `SlicePlayer`
+  (~240 ln — voz de sampler quase pronta: varispeed, reverse, envelope
+  A/R, de-click adaptativo, stop-fade), `HeritagePitch`/`LegacyPitchChannel`
+  (~117 ln — pitch-shift do G09 com interpolação `vd~` de 4 pontos),
+  `SliceBank` (region/BLADE/`appendMicroSlices`), orquestração
+  round-robin 2 vozes/fonte com crossfade, source mixer (level/pan/
+  width mid-side/mute/solo).
+- **Abstrações Pd** (`NAVALHA2_PD/core/`): `navalha_player`,
+  `navalha_reverse_reader~`, `navalha_pitchshift_legacy~`,
+  `navalha_voice~`, `navalha_source_mixer~`.
+- **Loop de re-alimentação** (`RESAMPLE_FEEDBACK_LOOP`): performance
+  gravada vira SOURCE — mesmo espírito da captura ao vivo do `WAVETABLE`.
+
+Também revisto no estudo: §4.1 `SAMPLER` agora aponta o porte concreto
+(não mais "o mesmo grão do MEMORY"); §4.3 `TAPE` marcado como
+sobreposto ao `LOOPER` (#41) — só vira módulo se for além; §5 ordem
+inclui o passo de portar `SlicePlayer`+`HeritagePitch`.
+
+Ponteiros atualizados: `00_indice.md` (linha do estudo), `PESQUISA §2.2`
+(linha SAMPLER/TURNTABLE/TAPE) e `PESQUISA §2.4` Onda D #48.
+
+**Só documentação — sem código, sem build.**
