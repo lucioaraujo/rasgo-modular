@@ -4750,4 +4750,31 @@ o 1º evento do euclid depois de ~1,3 s) e o gate é `silent <= 2`.
 
 **60/60 CTest** Debug e Release. Painel builds.
 
+## Registro da etapa — 2026-09-06: pendências (2, 3) — thread ALSA-seq de MIDI + rename
+
+**`apps/panel/AlsaMidi.hpp` (NOVO)** — porta de entrada MIDI via ALSA
+sequencer. Cria uma porta virtual **"RASGO Modular : IN"** (`snd_seq`,
+NONBLOCK); `poll(fn)` drena os eventos e chama `fn(status, d1, d2)`
+(note on/off, CC, pitch-bend → 14-bit d1/d2). Header-only, fora do core.
+
+**`panel_main.cpp`:** o `syncAudioIn` virou **`syncSignalIn`** (renomeado
+nas 7 chamadas) e agora abre/fecha o `AlsaMidi` **e** o `AlsaSource`
+quando um nó `SIGNAL-IN` aparece/some — cada um na sua thread. A thread
+de MIDI faz `gmx.try_lock()` (como a de áudio), `midiIn->poll(...)` →
+`node->pushMidi()` em cada `SIGNAL-IN`, sleep de 2 ms. `stopMidiIn()` no
+encerramento.
+
+Smoke test: `AlsaMidi` abre a porta virtual OK neste sistema, `poll()`
+volta limpo (0 eventos). O end-to-end com um teclado (`aconnect <src>
+"RASGO Modular"`) é do autor pra validar — não dá pra cobrir headless.
+
+**Pendência (4) — taxonomia §4.2:** conferida; o bullet GESTO/ENTRADA
+atualizado ("resolvido: o `SIGNAL-IN` #49"). O resto já estava certo.
+
+Docs: `dossies/49_signal_in.md`, `RASGO_MODULAR.md §36.3` + `§4.2`,
+`PESQUISA §2.4`. **60/60 CTest**, painel builds limpo.
+
 **Não commitado ainda.**
+
+Pendências restantes: `TAPE`/`TURNTABLE` (precisa de decisão do autor —
+`ESTUDO_audio_sampling §4`); teste ao vivo do MIDI; `git push`.

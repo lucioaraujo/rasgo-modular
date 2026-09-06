@@ -46,6 +46,7 @@
 #include "io/WavWriter.hpp"
 #include "panel/AlsaSink.hpp"
 #include "panel/AlsaSource.hpp"
+#include "panel/AlsaMidi.hpp"
 #include "panel/LearnCatalog.hpp"
 #include "panel/ModuleCatalog.hpp"
 #include "panel/MotionEngine.hpp"
@@ -354,13 +355,63 @@ int main() {
         }
         audioInDev.reset();
     };
+
+    // ---- SIGNAL-IN — entrada MIDI (ALSA sequencer) ----------------------
+    // Abre uma porta virtual "RASGO Modular : IN" quando o patch tem um
+    // `SIGNAL-IN`; o usuário conecta um teclado por `aconnect`/patchbay.
+    // Thread de polling própria (não bloqueia; `SignalIn::pushMidi` é SPSC
+    // lock-free). Falha em abrir → log e segue sem MIDI, como a captura.
+    std::unique_ptr<rasgo::panel::AlsaMidi> midiIn;
+    std::thread midiInThread;
+    std::atomic<bool> midiInRunning{false};
+    auto stopMidiIn = [&] {
+        if (midiInRunning.exchange(false)) {
+            if (midiInThread.joinable()) midiInThread.join();
+        }
+        midiIn.reset();
+    };
+
     // chamada em todo ponto que já chama `buildMods()` — mesmo padrão do
     // `populateMotion()` — pra abrir/fechar a captura sempre que o
     // conjunto de nós do patch muda.
-    auto syncAudioIn = [&] {
+    auto syncSignalIn = [&] {
         bool any = false;
         for (std::size_t i = 0; i < graph.nodeCount(); ++i)
             if (graph.node(i).type() == "SIGNAL-IN") { any = true; break; }
+
+        // ---- MIDI ----
+        if (any && !midiInRunning.load()) {
+            try {
+                midiIn = std::make_unique<rasgo::panel::AlsaMidi>();
+            } catch (const std::exception& e) {
+                std::fprintf(stderr, "[signal-in] sem MIDI: %s\n", e.what());
+                midiIn.reset();
+            }
+            if (midiIn) {
+                midiInRunning.store(true);
+                midiInThread = std::thread([&] {
+                    while (midiInRunning.load(std::memory_order_relaxed)) {
+                        if (gmx.try_lock()) {
+                            midiIn->poll([&](std::uint8_t st, std::uint8_t d1,
+                                             std::uint8_t d2) {
+                                for (std::size_t i = 0; i < graph.nodeCount(); ++i) {
+                                    if (graph.node(i).type() != "SIGNAL-IN") continue;
+                                    auto* n = dynamic_cast<rasgo::modular::SignalIn*>(
+                                        &graph.node(i));
+                                    if (n) n->pushMidi(st, d1, d2);
+                                }
+                            });
+                            gmx.unlock();
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                    }
+                });
+            }
+        } else if (!any && midiInRunning.load()) {
+            stopMidiIn();
+        }
+
+        // ---- ÁUDIO ----
         if (any && !audioInRunning.load()) {
             try {
                 const char* dev = std::getenv("RASGO_AUDIO_IN_DEVICE");
@@ -510,7 +561,7 @@ int main() {
 
     // ---- janela: monitor primário, ~88% da área, centrada -------------
     Display* dpy = XOpenDisplay(nullptr);
-    if (!dpy) { fprintf(stderr, "sem display X\n"); running = false; audio.join(); stopAudioIn(); return 1; }
+    if (!dpy) { fprintf(stderr, "sem display X\n"); running = false; audio.join(); stopAudioIn(); stopMidiIn(); return 1; }
     const int scr = DefaultScreen(dpy);
     const rasgo::panel::MonitorRect mon = primaryMonitor(dpy);
 
@@ -704,7 +755,7 @@ int main() {
 
     buildMods();
     populateMotion();
-    syncAudioIn();
+    syncSignalIn();
 
     // auditoria: checa a pegada (em mm) de TODO módulo do catálogo, não só
     // os exibidos - assim o `timeout` de smoke-test cobre os 16 painéis.
@@ -1879,7 +1930,7 @@ int main() {
         shown.erase(std::remove(shown.begin(), shown.end(), id), shown.end());
         buildMods();
         populateMotion();
-        syncAudioIn();
+        syncSignalIn();
         relayout();
     };
 
@@ -1995,7 +2046,7 @@ int main() {
             graph.setActiveOutput(sink);  // o move zerou o alvo ativo
             buildMods();
             populateMotion();
-            syncAudioIn();
+            syncSignalIn();
             relayout();
             std::fprintf(stderr, "[patch] carregado de %s\n",
                          path.string().c_str());
@@ -2062,7 +2113,7 @@ int main() {
         allRuptured = false;
         buildMods();
         populateMotion();
-        syncAudioIn();
+        syncSignalIn();
         relayout();
         char t[64];
         std::snprintf(t, sizeof t, "RASGO Modular — seed %llu",
@@ -2293,7 +2344,7 @@ int main() {
                         shown.push_back(nid);
                         scopes[nid];
                         graph.prepare(static_cast<float>(alsa.rate()), 2, block);
-                        buildMods(); populateMotion(); syncAudioIn(); relayout();
+                        buildMods(); populateMotion(); syncSignalIn(); relayout();
                     }
                     redraw();
                 }
@@ -2548,7 +2599,7 @@ int main() {
                             graph.prepare(static_cast<float>(alsa.rate()), 2, block);
                             buildMods();
                             populateMotion();
-                            syncAudioIn();
+                            syncSignalIn();
                             relayout();
                         }
                     }
@@ -2615,6 +2666,7 @@ int main() {
     running = false;
     audio.join();
     stopAudioIn();   // fecha a captura e devolve o microfone/entrada
+    stopMidiIn();     // fecha a porta MIDI virtual
     XFreePixmap(dpy, bb);
     XFreePixmap(dpy, logoPix);
     if (fsCap && fsCap != fs) XFreeFontSet(dpy, fsCap);
