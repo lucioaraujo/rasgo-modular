@@ -1074,7 +1074,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 41 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 42 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1171,7 +1171,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 41 módulos DSP
+### 36.3 Os 42 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1220,6 +1220,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 39 | `GLIDE` | TRANSFORM / PITCH | portamento POR NOTA (o primitivo que faltava pro baixo acid): `mode` 0 sempre / 1 slide-gated (o *slide* do TB-303, `slide` alto habilita) / 2 legato (só se `gate` segue alto na troca); `time` de subida + `fall` (assimetria — descida = `time·6^fall`); `curve` linear (rate constante, MS-20) ↔ RC; saídas `moving` (gate) e `done` (pulso na chegada). Sem `drift` (é régua de afinação) | TB-303 slide, portamento MS-20/Minimoog vs glide RC, Bela Gliss / EMW glide processor (`PESQUISA §2.4` Onda A) |
 | 40 | `WAVETABLE` | SOURCE | oscilador de tabela — o eixo de FORMA que o `OSC` subtrativo não cobre. 16 quadros GERADOS no `prepare()` por receita espectral fixa (serra→quadrada→formante→seno — **sem arquivo de dados**, opção A do §2.4), 10 mip-maps band-limited pra o antialiasing seguir a afinação; `pos` (+ CV + `drift`) varre a forma; `warp` = distorção de fase Casio CZ / WAVE CUT do EMW WAVE-6. **Captura ao vivo:** `capture` (áudio) + `grab` (trigger) → 1024 amostras viram o quadro do topo de `pos` — tabela do que o `AUDIO-IN` (ou outra voz) ouve. `drift=0` + sem captura → determinístico | tutorial JUCE wavetable, WolfSound; EMW WAVE-6 (hardware do autor); Casio CZ phase distortion; série de Fourier band-limited (`PESQUISA §2.4` Onda A) |
 | 41 | `LOOPER` | SPACE | delay de LINHA (não reverb como o `SPACE`, não granular como o `MEMORY`) com os três gestos do `PESQUISA §6`: `hold` (ancora a janela na posição de escrita e a repete infinito, sem realimentação nova — via toggle ou gate `freeze`), `reverse` (dois grãos Hann defasados meia volta em crossfade — vira o buffer sem clique; toggle ou gate `rev`) e caráter de FITA/BBD num knob `age` (passa-baixa dentro do laço escurece a cada volta + wow&flutter ~0,9/6,5 Hz + `tanh` de compressão + chiado semeado). Buffer ~2,2 s pré-alocado; `feedback` até 1,1 auto-oscila; `age=0` sem `hold`/`reverse` → delay digital limpo | `PESQUISA §6` (tape/digital delay com hold e reverse; BBD); Echoplex/RE-201; 4ms DLD / Mimeophon; reverse granular (Roads) (`PESQUISA §2.4` Onda A) |
+| 42 | `ADDITIVE` | SOURCE | oscilador aditivo — o timbre CONSTRUÍDO parcial a parcial, o oposto do subtrativo. 64 parciais (acumuladores de fase + LUT de seno, sem `sin` no laço); envelope espectral por 4 knobs endereçáveis por CV: `tilt` (brilho — inclinação `k^-e`, `e` de 2,6 a 0,15), `odd` (−1..1 — balanço ímpar/par: quadrada ↔ oco), `stretch` (−1..1 — inarmonicidade `razão_k = k + stretch·0,004·k·(k−1)`, monotônica pra o corte de Nyquist por `break` valer), `comb` (0–1 — pente `cos` sobre o índice de parcial). Corte de Nyquist por parcial com fade nos últimos 15 %. `drift` = cintilância **determinística** (micro-desafino + respiração de amplitude de senóides incomensuráveis — sem RNG, reprodutível). Seguidor de ganho (rápido↓/lento↑) + `tanh` na saída (a soma aditiva é pontuda) | Xaoc Odessa ★★ (`PESQUISA §7 #85` — só o conceito dos macros tilt/comb/stretch; é fechado); síntese aditiva clássica (Fourier, órgão, Kawai K5, Synclavier — domínio público); inarmonicidade de cordas/barras (acústica) (`PESQUISA §2.4` Onda B) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1261,7 +1262,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**50 alvos CTest**, 100% verdes em **Debug e Release**
+**51 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

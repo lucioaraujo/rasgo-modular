@@ -8,6 +8,7 @@
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
+#include "dsp/Additive.hpp"
 #include "dsp/AudioIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Control.hpp"
@@ -58,6 +59,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     using namespace rasgo::modular;
     if (t == "OSC")        return std::make_unique<Oscillator>();
     if (t == "WAVETABLE")  return std::make_unique<Wavetable>();
+    if (t == "ADDITIVE")   return std::make_unique<Additive>();
     if (t == "AUDIO-IN")   return std::make_unique<AudioIn>();
     if (t == "CHAOS")      return std::make_unique<Chaos>();
     if (t == "PLL")        return std::make_unique<Pll>();
@@ -107,7 +109,7 @@ struct CatalogGroup {
 // Agrupado por família (taxonomia do RASGO_MODULAR.md §4).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",      {"OSC", "WAVETABLE", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
+        {"SOURCE",      {"OSC", "WAVETABLE", "ADDITIVE", "PLL", "CHORD", "NOISE", "FUNCTION", "AUDIO-IN"}},
         {"TIME",        {"CLOCK", "LOGIC", "ENVELOPE"}},
         {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS", "CHAOS"}},
         {"SEQUENCE",    {"TURING", "SEQUENCE", "SWITCH", "TRIGSEQ"}},

@@ -171,6 +171,52 @@ inline const LearnTable& learnTable() {
                 ""}},
             {"out:out", {"A forma de onda varrida.", "", ""}},
         }},
+        {"ADDITIVE", {
+            {"freq", {
+                "Frequência base. 1 V/oct pela entrada 1V/O.", "", ""}},
+            {"fine", {"Afinação fina em cents (±100).", "", ""}},
+            {"tilt", {
+                "Brilho — a inclinação do espectro. 0 = escuro (harmônicas "
+                "caem rápido, ~k^-2,6); 1 = quase plano (todas as 64 "
+                "parciais fortes).",
+                "É o oposto de um filtro: em vez de cortar agudo, você "
+                "escolhe quanta energia cada parcial recebe na construção.",
+                "Cabeie ENVELOPE.env → TILT: o timbre abre o brilho junto "
+                "com a nota."}},
+            {"odd", {
+                "Balanço ímpar/par das parciais. 0 = série cheia; +1 = só "
+                "ímpares (quadrada, clarinete, oco brilhante); −1 = só "
+                "pares (uma oitava acima, som anasalado).", "", ""}},
+            {"stretch", {
+                "Inarmonicidade — estica ou comprime as parciais. 0 = "
+                "harmônico (razão k); +1 = esticado (sino, metal, piano "
+                "agudo); −1 = comprimido (parciais juntas, batimento "
+                "denso).",
+                "razão_k = k + stretch·0,004·k·(k−1) — o efeito é "
+                "quadrático: quase nada nas primeiras parciais, forte nas "
+                "de cima.",
+                "Module STRCH com um LFO lento: o som metaliza e volta."}},
+            {"comb", {
+                "Pente espectral: cava vales no espectro. 0 = plano; 1 = "
+                "12 dentes, vales fundos — formante grosseiro ou efeito de "
+                "filtro em pente, sem filtrar nada.",
+                "g_k = (1−comb) + comb·(0,5 + 0,5·cos(2π·dentes·k/64)), "
+                "dentes = 1 + 11·comb.", ""}},
+            {"fm_amount", {"Profundidade da FM linear da entrada FM.", "", ""}},
+            {"drift", {
+                "Cintilância — cada parcial ganha um micro-desafino e uma "
+                "respiração de amplitude de senóides lentas. 0 = "
+                "determinístico.",
+                "Sem RNG: é a soma de senóides incomensuráveis, então o "
+                "percurso não repete mas o render é reprodutível.", ""}},
+            {"in:pitch", {"CV 1 V/oct.", "", ""}},
+            {"in:tilt", {"CV somada em TILT.", "", ""}},
+            {"in:stretch", {"CV somada em STRCH.", "", ""}},
+            {"in:fm", {"Áudio pra FM linear (× FM_AMOUNT).", "", ""}},
+            {"out:out", {
+                "A soma das 64 parciais, com seguidor de ganho + tanh "
+                "pra não estourar.", "", ""}},
+        }},
         {"OSC", {
             {"freq", {
                 "Frequência base do oscilador.",

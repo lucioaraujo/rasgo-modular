@@ -9,6 +9,7 @@
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
+#include "dsp/Additive.hpp"
 #include "dsp/AudioIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Chord.hpp"
@@ -171,6 +172,7 @@ int main() {
     std::vector<std::pair<std::string, std::unique_ptr<Signal>>> mods;
     mods.emplace_back("OSC", std::make_unique<Oscillator>());
     mods.emplace_back("WAVETABLE", std::make_unique<Wavetable>());
+    mods.emplace_back("ADDITIVE", std::make_unique<Additive>());
     mods.emplace_back("NOISE", std::make_unique<Noise>());
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());

@@ -55,11 +55,12 @@ pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 | 39 | [`39_glide.md`](39_glide.md) | `GLIDE` | TRANSFORM / PITCH | Onda A (2026-09-06) |
 | 40 | [`40_wavetable.md`](40_wavetable.md) | `WAVETABLE` | SOURCE | Onda A (2026-09-06) |
 | 41 | [`41_looper.md`](41_looper.md) | `LOOPER` | SPACE | Onda A (2026-09-06) |
+| 42 | [`42_additive.md`](42_additive.md) | `ADDITIVE` | SOURCE | Onda B (2026-09-06) |
 
-**41 módulos feitos.** Onda A completa (`GLIDE`/`WAVETABLE`/`LOOPER`).
-Próxima leva (dossiê antes do código): `PESQUISA_MODULOS.md §2.4` —
-Onda B `ADDITIVE`/`PLANAR`/`OPERATOR`/`FORMANT`, Onda C reverb FDN/`DRUM`,
-Onda D `SAMPLER`/`SIGNAL-IN`.
+**42 módulos feitos.** Onda A completa (`GLIDE`/`WAVETABLE`/`LOOPER`);
+Onda B em curso (`ADDITIVE` feito). Próxima leva (dossiê antes do
+código): `PESQUISA_MODULOS.md §2.4` — Onda B `PLANAR`/`OPERATOR`/
+`FORMANT`, Onda C reverb FDN/`DRUM`, Onda D `SAMPLER`/`SIGNAL-IN`.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação

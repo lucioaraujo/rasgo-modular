@@ -4262,3 +4262,53 @@ Ponteiros atualizados: `00_indice.md` (linha do estudo), `PESQUISA §2.2`
 (linha SAMPLER/TURNTABLE/TAPE) e `PESQUISA §2.4` Onda D #48.
 
 **Só documentação — sem código, sem build.**
+
+## Registro da etapa — 2026-09-06: Módulo 42 — ADDITIVE (Onda B — 1/4)
+
+`PESQUISA §2.4` Onda B, #42 — primeiro dos quatro (após "avance").
+
+**`ADDITIVE` — oscilador aditivo / espectral** (`src/dsp/Additive.hpp`,
+`tests/test_additive.cpp` — 13 funções, DFT ponto a ponto). Família
+SOURCE. O timbre CONSTRUÍDO parcial a parcial — o oposto do subtrativo
+do `OSC` e do eixo-de-forma do `WAVETABLE`.
+
+- **64 parciais** somados por acumuladores de fase + LUT de seno de 2048
+  (sem `std::sin` no laço). Razões/amplitudes recalculadas 1× por bloco
+  (params mudam devagar, com suavização de 1 polo pra não zipar na
+  borda de bloco); o laço por amostra só acumula.
+- **Corte de Nyquist por parcial:** o `k`-ésimo entra só enquanto
+  `f0·razão_k < 0,98·Nyquist`, com fade nos últimos 15 % pra não sumir
+  com clique quando a afinação varre.
+- Envelope espectral por 4 knobs (todos com CV): `tilt` (brilho,
+  `a_k = k^-e`, `e` de 2,6 a 0,15), `odd` (−1..1, ímpar/par: quadrada ↔
+  oco), `stretch` (−1..1, inarmonicidade `razão_k = k + s·0,004·k(k−1)`
+  — linearizada de propósito pra ficar monotônica em `k` e o corte por
+  `break` valer), `comb` (0–1, pente `cos` sobre o índice: até 12
+  dentes).
+- `drift` (0–1) = cintilância **determinística**: micro-desafino
+  (±0,6 %) + respiração de amplitude (±12 %) de senóides lentas (~0,05 e
+  ~0,035 Hz) defasadas por `k` no ângulo áureo. Sem RNG — soma de
+  senóides incomensuráveis (percurso não-repetitivo, render
+  reprodutível). `drift=0` remove o termo.
+- **Segurança de saída:** seguidor de ganho de 1 polo (rápido ↓ / lento
+  ↑) mira `0,9/pico_do_bloco` + `tanh` no fim. Saída sempre em
+  ~[−0,95; 0,95].
+
+Determinístico sempre. `prepare()` aloca ~8 KB; `process()` não aloca.
+
+Integrado: `ModuleCatalog` (SOURCE, após WAVETABLE), `test_panel_layout`
+(12 HP, layout espelha o `WAVETABLE`), `LearnCatalog` (13 binds). Docs:
+`00_indice`, `PESQUISA §2.4`, `RASGO_MODULAR.md §36.3`, `README`.
+
+**Validação:** build limpo (`-Wall -Wextra -Wpedantic -Werror`),
+**51/51 CTest** Debug e Release. Testes cobrem: série harmônica
+decrescente; `tilt` achata o espectro (harmônica 8 relativa ×3+);
+`odd=±1` zera pares/ímpares (<5 %); `stretch=1` move a parcial 16 pra
+cima de 16,5·f0; `comb=1` cava a parcial 8 (<15 %); 1 V/oct; sem
+componente acima de Nyquist audível em `freq` alto; `fm` linear;
+determinismo byte a byte com `drift>0`; limites nos extremos; soa
+sozinho. Renders de exemplo estáveis (ADDITIVE não entra em nenhum).
+
+**Não commitado ainda** → commit a seguir.
+
+**Onda B:** falta `PLANAR` (#43), `OPERATOR` (#44), `FORMANT` (#45).
