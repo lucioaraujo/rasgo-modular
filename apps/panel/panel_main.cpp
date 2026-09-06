@@ -647,110 +647,14 @@ int main() {
     };
 
     // ---- variação ao vivo (Motion Engine, [v]) -------------------------
-    // "cada módulo fica estático" (feedback do usuário, 2026-09-04): sem
-    // isto, o knob que o seed sorteou fica parado pra sempre até alguém
-    // girar a mão. Aqui cada módulo mostrado ganha NO MÁXIMO 1 parâmetro
-    // (knob/slider, nunca toggle/jack) que deriva devagar — WALK (~73%,
-    // alvo imprevisível) ou OSCILLATE (~27%, ciclo previsível, 2026-09-05)
-    // — toque leve (`feedback_generative_design_light_touch`), não uma
-    // orquestra de comportamentos por cima de cada widget. Ver o estudo,
-    // §3. `ATTRACT` (perseguir outro parâmetro) fica de fora — pediria
-    // escolher DOIS módulos relacionados, não dá pra derivar só do hash
-    // de um nó sozinho.
-    //
-    // A JANELA de movimento é uma fração IGUAL do range de cada parâmetro
-    // (`kMotionDepth`), centrada no valor atual do knob — assim todo
-    // knob animado "respira" a mesma quantidade proporcional
-    // (correção 2026-09-05: antes a janela era o range INTEIRO, então um
-    // OSCILLATE varria o parâmetro de ponta a ponta enquanto um WALK mal
-    // saía do lugar — o "6º slider do SEQUENCE se move muito mais").
-    // ±20% do range, IGUAL pra todo binding (autor 2026-09-06: a ±6% de
-    // antes ficou imperceptível — "os knobs e sliders variavam mais").
-    constexpr float kMotionDepth = 0.40f;
+    // "instrumento de composição, não de regras prontas" (autor,
+    // 2026-09-07). A engine v3 (`ESTUDO §3.7`) é uma MÃO CAÓTICA: um campo
+    // de Thomas move TODAS as fibras (knob/slider/toggle de todo módulo,
+    // menos MIXER/MASTER) em relação; a velocidade do campo segue a
+    // energia do som. "Gosto" = só a amplitude por fibra, de 4 pistas de
+    // palavra. Ver `MotionEngine::inhabit()` / `MotionField.hpp`.
     auto populateMotion = [&] {
-        motion.clear();
-        for (const auto id : shown) {
-            auto& node = graph.node(id);
-            const std::string ntype = node.type();
-            // módulos de PARTITURA — a Motion Engine mexe no timbre/textura,
-            // NUNCA nas notas. O "6º slider do SEQUENCE" era isto: a escolha
-            // determinística por módulo (abaixo) sempre caía no mesmo passo,
-            // e um passo derivando reafina a melodia. Nem knob de sequência
-            // (range/rate) deve andar sozinho.
-            if (ntype == "SEQUENCE" || ntype == "TRIGSEQ"
-                || ntype == "TURING" || ntype == "HARMONY"
-                || ntype == "QUANTIZER")
-                continue;
-            const Panel pn = node.panel();
-            std::vector<const Widget*> eligible;
-            for (const auto& w : pn.widgets) {
-                // só KNOB — sliders são fader de nível (MIXER/MASTER) ou a
-                // própria partitura, nunca uma regulagem que derive sozinha
-                if (w.kind != Widget::Kind::Knob) continue;
-                if (rasgo::panel::isMutationBlocked(w.bind)) continue;
-                // parâmetros que perto do extremo viram fuga/aspereza —
-                // derivar é arriscado (um filtro caminha pra auto-oscilar
-                // e vira apito intermitente)
-                const std::string& b = w.bind;
-                if (b == "resonance" || b == "feedback" || b == "drive"
-                    || b == "grit" || b == "fold")
-                    continue;
-                eligible.push_back(&w);
-            }
-            if (eligible.empty()) continue;
-            // hash FNV-1a (tipo + id + seed) -- escolhe QUAL widget elegível
-            // anima e o ritmo dele. Mistura `curSeed`: cada patch generativo
-            // "respira" por um controle diferente — nenhum vira "o que
-            // sempre mexe". (Editado à mão, `curSeed == 0`: estável.)
-            std::uint64_t h = 1469598103934665603ULL;
-            for (const char c : ntype) {
-                h ^= static_cast<unsigned char>(c);
-                h *= 1099511628211ULL;
-            }
-            h ^= static_cast<std::uint64_t>(id) + 0x9E3779B97F4A7C15ULL;
-            h *= 1099511628211ULL;
-            h ^= curSeed + 0xD1B54A32D192ED03ULL;
-            h *= 1099511628211ULL;
-            const Widget* w = eligible[h % eligible.size()];
-            const Parameter* found = nullptr;
-            for (const auto& pr : node.parameters())
-                if (pr.descriptor.id == w->bind) { found = &pr; break; }
-            if (!found) continue;
-            const float pmin = found->descriptor.minimum;
-            const float pmax = found->descriptor.maximum;
-            const float prange = pmax - pmin;
-            if (prange <= 0.0f) continue;   // parâmetro sem range: nada a animar
-            rasgo::panel::MotionEngine::Binding b;
-            b.node = id;
-            b.paramId = w->bind;
-            // janela = ±kMotionDepth/2 do range, centrada no valor atual do
-            // knob; encostou numa borda -> desliza pra dentro (mantém a
-            // largura). MESMA fração pra todo binding -> movimento uniforme.
-            const float cur = graph.parameterUserValue(id, w->bind);
-            const float half = 0.5f * kMotionDepth * prange;
-            float c = cur;
-            if (c - half < pmin) c = pmin + half;
-            if (c + half > pmax) c = pmax - half;
-            b.lo = c - half;
-            b.hi = c + half;
-            b.start = cur;
-            std::uint64_t rs = h;
-            rs ^= rs >> 13; rs *= 0xBF58476D1CE4E5B9ULL; rs ^= rs >> 7;
-            // ~0,03..0,12 Hz -- WALK: alvo novo a cada ~8..33 s, deslize
-            // proporcional ("respira", não "sacoleja"); OSCILLATE: ciclo
-            // completo no mesmo intervalo -- mesma sensação de ritmo,
-            // comportamento diferente.
-            b.rateHz = 0.03f + 0.09f
-                * (static_cast<float>((rs >> 16) & 0xFFFFu) / 65536.0f);
-            // ~27% dos módulos oscilam (ciclo previsível) em vez de
-            // andar (alvo imprevisível) -- variedade de comportamento
-            // sem virar a maioria previsível demais
-            b.behavior = ((rs >> 32) & 0xFFu) < 70
-                ? rasgo::panel::MotionEngine::Behavior::Oscillate
-                : rasgo::panel::MotionEngine::Behavior::Walk;
-            b.seed = h ^ 0x2545F4914F6CDD1DULL;
-            motion.add(b);
-        }
+        motion.inhabit(graph, curSeed, shown);
     };
 
     buildMods();
@@ -2645,10 +2549,22 @@ int main() {
                 redraw();
             }
         }
-        // Motion Engine: knobs derivam devagar sozinhos ([v] liga/desliga).
-        // Pausa enquanto a mão do usuário está no knob (`drag.active`) —
-        // não briga com um giro manual. Mesmo ritmo do redraw (~30 fps).
-        if (motionOn && !drag.active) motion.tick(graph, 0.033f);
+        // Motion Engine: a mão caótica move as fibras ([v] liga/desliga).
+        // Pausa enquanto a mão do usuário está num controle (`drag.active`).
+        // A energia do som (RMS do MASTER) acelera a mão e, perto do teto,
+        // puxa tudo pro centro (duck protetor — evita o clip com [v] on).
+        if (motionOn && !drag.active) {
+            float eRms = 0.0f;
+            for (const auto& kv : scopeSnap) {
+                if (graph.node(kv.first).type() != "MASTER") continue;
+                double sq = 0.0; std::size_t n = 0;
+                for (const float v : kv.second.buf) { sq += (double)v * v; ++n; }
+                if (n) eRms = std::max(eRms,
+                                       (float)std::sqrt(sq / (double)n));
+            }
+            const float energy = std::min(1.0f, eRms * 2.2f);
+            motion.tick(graph, 0.033f, energy);
+        }
         // repinta a ~30 fps pra os osciloscópios dos módulos animarem — o
         // buffer fora da tela mantém sem flicker; o áudio é outro thread.
         redraw();

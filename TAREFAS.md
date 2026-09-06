@@ -4892,8 +4892,57 @@ Integração: `CMakeLists.txt` (CTest 62), `ModuleCatalog.hpp` (DECISION),
 `PESQUISA §2.4`, `RASGO_MODULAR.md §4.1`/§36.3/§36.5 + contagens
 (50 módulos, 62 CTest), `README`.
 
-**62/62 CTest em Debug e Release.** Não commitado ainda.
+**62/62 CTest em Debug e Release.**
 
-Pendências abertas (não deste módulo): teste ao vivo do MIDI (autor);
-bug do VARIA (knob `pw` do `OSC` treme, `steps` do `DECISION` se move sem
-cabo) — a investigar; `git push`.
+---
+
+## Registro da etapa — 2026-09-07: Motion Engine v3 — a mão caótica
+
+O autor reportou o VARIA mexendo `OSC.pw` "freneticamente" e
+`DECISION.steps` "sem nada cabeado", e pediu uma revisão de fundo:
+*"instrumento de composição, não de regras prontas, de determinismos
+congelados, de padrões limitados de IA. Um instrumento que busca a
+excelência de composição, o inaudito, o bom gosto musical, a
+experimentação."* Rejeitou duas propostas baseadas em tabela (matriz
+`param→qualidade`; máquina de estados de intenções).
+
+**Modelo aceito (`ESTUDO §3.7` reescrito):** uma **MÃO CAÓTICA**.
+- **`apps/panel/MotionField.hpp` (NOVO)** — atrator de Thomas (3 vars,
+  ciclicamente simétrico, `b = 0.19` → caótico). Nunca repete, nunca
+  congela; semeado → reproduzível, período longo demais pra o ouvido
+  pegar um ciclo. A velocidade do campo segue a `energy` do som.
+  `motionReach(id)` — 4 pistas de palavra (estrutural/nível/quente/livre)
+  que decidem só a AMPLITUDE.
+- **`apps/panel/MotionEngine.hpp`** — o `Binding` manual-only FICA
+  (`peca_generativa_4`, testes). Adicionado: `Fiber` + `inhabit(graph,
+  seed, shown)` — varre o grafo, monta uma fibra por knob/slider/toggle
+  (só `MIXER`/`MASTER` de fora — o músico mistura e panora na mão). Cada
+  fibra: vetor de projeção semeado sobre o campo → os controles se movem
+  EM RELAÇÃO (coerente por construção), cada um por um caminho seu.
+  `tick(graph, dt, energy)` avança o campo, faz a ousadia (1 fibra
+  estica a excursão por alguns s), e um **duck protetor** (som perto do
+  teto → puxa tudo pro centro — responde ao clip que o autor reportou).
+  Toggle = histerese + dwell mínimo. Estrutural = amplitude ínfima +
+  quantizado. Cabo já plugado → amplitude pela metade.
+- **`src/core/SignalGraph.hpp`** — `parameterIsModulated(node, id)`
+  (accessor const; a Motion Engine usa pra não brigar com a fiação).
+- **`apps/panel/panel_main.cpp`** — `populateMotion` (110 linhas de
+  hash + lista de bloqueio) → `motion.inhabit(graph, curSeed, shown)`.
+  No `tick`: `energy` = RMS do scope do `MASTER`.
+- **`tests/test_motion_engine.cpp`** — 5 testes novos: a mão move e fica
+  são; estrutural mal se move (quantizado); MIXER/MASTER isentos;
+  determinismo do `inhabit`; quente respira, não varre.
+
+Abertura primeiro (autor: "testar com mais abertura, depois limitar o
+que não funciona") — knob + slider + toggle, tudo menos MIXER/MASTER.
+
+**Evolução registrada:** camada de arco/`morceau` por cima (Form Engine,
+`ESTUDO §3.7` "Evolução") — caminhada de Markov intro/subida/clímax/
+queda/coda + gramáticas Freytag/Kishōtenketsu + accel/ritardando, prior
+art no `RASGO_SYNTH/rasgo-synth-performance` (read-only).
+
+**62/62 CTest Debug + Release.** Não commitado ainda.
+
+Pendências abertas: confirmar de ouvido que o v3 resolve o pw/steps e o
+clip (seed 625938148); barra de scroll da coluna esquerda; LEARN no
+hover do título do módulo; teste ao vivo do MIDI; `git push`.

@@ -520,6 +520,18 @@ public:
         return nodes_[node]->parameterValue(id);
     }
 
+    // Um parâmetro tem modulação entrando (link de parâmetro ou follower
+    // de qualidade)? Consumidor: a Motion Engine (`apps/panel/`), pra não
+    // brigar com a fiação do músico / do seed.
+    bool parameterIsModulated(const std::size_t node,
+                              const std::string& id) const noexcept {
+        for (const auto& link : parameterLinks_)
+            if (link.targetNode == node && link.parameterId == id) return true;
+        for (const auto& f : followers_)
+            if (f.targetNode == node && f.parameterId == id) return true;
+        return false;
+    }
+
     std::size_t cableCount() const noexcept { return connections_.size(); }
     Cable& cable(const std::size_t index) { return *connections_.at(index); }
     std::size_t nodeCount() const noexcept { return nodes_.size(); }
