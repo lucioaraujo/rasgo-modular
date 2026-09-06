@@ -390,7 +390,28 @@ find_library(RASGO_X11 X11)
 find_library(RASGO_ASOUND asound)
 find_library(RASGO_XRANDR Xrandr)
 if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
+    # carimbo de build pro "SOBRE" — hash curto do git + data (fallback: só a data)
+    execute_process(
+        COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --short HEAD
+        OUTPUT_VARIABLE RASGO_GIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
+    execute_process(
+        COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --git-path HEAD
+        OUTPUT_VARIABLE RASGO_GIT_HEAD_FILE OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
+    if(RASGO_GIT_HEAD_FILE AND EXISTS "${RASGO_GIT_HEAD_FILE}")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+            "${RASGO_GIT_HEAD_FILE}")
+    endif()
+    string(TIMESTAMP RASGO_BUILD_DATE "%Y-%m-%d")
+    if(RASGO_GIT_HASH)
+        set(RASGO_BUILD_STAMP "${RASGO_GIT_HASH} · ${RASGO_BUILD_DATE}")
+    else()
+        set(RASGO_BUILD_STAMP "${RASGO_BUILD_DATE}")
+    endif()
     add_executable(rasgo_modular_panel apps/panel/panel_main.cpp)
+    target_compile_definitions(rasgo_modular_panel
+        PRIVATE RASGO_MODULAR_BUILD="${RASGO_BUILD_STAMP}")
     target_include_directories(rasgo_modular_panel PRIVATE src apps)
     target_link_libraries(rasgo_modular_panel
         PRIVATE rasgo_modular_core Threads::Threads

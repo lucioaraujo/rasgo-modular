@@ -151,5 +151,15 @@ inline const L4 aboutBody {
     "RASGO Modular — l’environnement modulaire génératif de la famille RASGO. Il sonne au démarrage, sans MIDI ni entrée audio ; MIDI, audio et couplage d’instrument sont des nœuds adaptateurs optionnels.\n\nLucio de Araujo — 2026\nGNU AGPLv3 ou ultérieure.",
     "RASGO Modular — el entorno modular generativo de la familia RASGO. Suena al arrancar, sin MIDI ni entrada de audio; MIDI, audio y acoplamiento de instrumento son nodos adaptadores opcionales.\n\nLucio de Araujo — 2026\nGNU AGPLv3 o posterior."};
 
+// frase de crédito do rodapé — padrão da família RASGO (cf. Antitotem,
+// Rasgo Synth). No RASGO Modular ela vai na faixa acima da 1ª fileira de
+// módulos, não no rodapé (pedido do autor 2026-09-07). O `panel_main`
+// acrescenta " · <build>" (hash do git + data) ao fim.
+inline const L4 footerCredit {
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  AGPLv3+ LICENSE  ·  build ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENÇA AGPLv3+  ·  build ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCE AGPLv3+  ·  build ",
+    "© LÚCIO DE ARAÚJO  ·  RASGO MODULAR 2026  ·  LICENCIA AGPLv3+  ·  build "};
+
 }  // namespace strings
 }  // namespace rasgo::panel
