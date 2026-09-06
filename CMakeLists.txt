@@ -10,6 +10,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(rasgo_modular_core INTERFACE)
 target_include_directories(rasgo_modular_core INTERFACE src)
 
+# camada io/ com dependência de terceiro (dr_wav) — FORA do core.
+# Compilada sem -Werror (o header do dr_wav tem warnings próprios).
+add_library(rasgo_modular_io STATIC src/io/AudioFile.cpp)
+target_include_directories(rasgo_modular_io PUBLIC src PRIVATE third_party)
+if(NOT MSVC)
+    target_compile_options(rasgo_modular_io PRIVATE -w)
+endif()
+
 find_package(Threads REQUIRED)
 
 if(BUILD_TESTING)
@@ -252,6 +260,11 @@ if(BUILD_TESTING)
     target_link_libraries(rasgo_modular_drum_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_drum_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_drum_tests COMMAND rasgo_modular_drum_tests)
+
+    add_executable(rasgo_modular_audio_file_tests tests/test_audio_file.cpp)
+    target_link_libraries(rasgo_modular_audio_file_tests PRIVATE rasgo_modular_core rasgo_modular_io)
+    target_compile_options(rasgo_modular_audio_file_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_audio_file_tests COMMAND rasgo_modular_audio_file_tests)
 
     # usa apps/panel/MotionEngine.hpp — include dir extra `apps`, como o
     # painel gráfico e a peça 4.
