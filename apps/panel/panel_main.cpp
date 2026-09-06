@@ -574,7 +574,8 @@ int main() {
     struct Mod { std::size_t id; int col; int w; int hp; };
     std::vector<Mod> mods;
     rasgo::panel::MotionEngine motion;
-    bool motionOn = true;     // VARIA / [v] -- variação ao vivo (knobs + sliders), ligada
+    bool motionOn = true;     // VARIA / [v] -- variação ao vivo dos knobs (±20%), ligada
+    std::uint64_t curSeed = 0;   // seed do patch atual (0 = editado à mão)
     auto buildMods = [&] {
         mods.clear();
         for (const auto id : shown) {
@@ -604,12 +605,11 @@ int main() {
     // de um nó sozinho.
     //
     // A JANELA de movimento é uma fração IGUAL do range de cada parâmetro
-    // (`kMotionDepth`), centrada no valor atual do controle — assim todo
-    // controle animado "respira" a mesma quantidade proporcional
+    // (`kMotionDepth`), centrada no valor atual do knob — assim todo
+    // knob animado "respira" a mesma quantidade proporcional
     // (correção 2026-09-05: antes a janela era o range INTEIRO, então um
     // OSCILLATE varria o parâmetro de ponta a ponta enquanto um WALK mal
-    // saía do lugar — o "6º slider do SEQUENCE se move muito mais"; a
-    // fração é a mesma pra KNOB e SLIDER, era isso que o autor pedia).
+    // saía do lugar — o "6º slider do SEQUENCE se move muito mais").
     // ±20% do range, IGUAL pra todo binding (autor 2026-09-06: a ±6% de
     // antes ficou imperceptível — "os knobs e sliders variavam mais").
     constexpr float kMotionDepth = 0.40f;
@@ -617,16 +617,22 @@ int main() {
         motion.clear();
         for (const auto id : shown) {
             auto& node = graph.node(id);
+            const std::string ntype = node.type();
+            // módulos de PARTITURA — a Motion Engine mexe no timbre/textura,
+            // NUNCA nas notas. O "6º slider do SEQUENCE" era isto: a escolha
+            // determinística por módulo (abaixo) sempre caía no mesmo passo,
+            // e um passo derivando reafina a melodia. Nem knob de sequência
+            // (range/rate) deve andar sozinho.
+            if (ntype == "SEQUENCE" || ntype == "TRIGSEQ"
+                || ntype == "TURING" || ntype == "HARMONY"
+                || ntype == "QUANTIZER")
+                continue;
             const Panel pn = node.panel();
             std::vector<const Widget*> eligible;
             for (const auto& w : pn.widgets) {
-                // KNOB ou SLIDER — o mesmo comportamento uniforme pros
-                // dois (o "6º slider do SEQUENCE se move mais" era a
-                // janela NÃO-uniforme de antes, não o slider em si). Os
-                // faders de nível (MIXER `gain1..4`, MASTER `gain`) já
-                // caem no `isMutationBlocked` abaixo.
-                if (w.kind != Widget::Kind::Knob
-                    && w.kind != Widget::Kind::Slider) continue;
+                // só KNOB — sliders são fader de nível (MIXER/MASTER) ou a
+                // própria partitura, nunca uma regulagem que derive sozinha
+                if (w.kind != Widget::Kind::Knob) continue;
                 if (rasgo::panel::isMutationBlocked(w.bind)) continue;
                 // parâmetros que perto do extremo viram fuga/aspereza —
                 // derivar é arriscado (um filtro caminha pra auto-oscilar
@@ -638,16 +644,18 @@ int main() {
                 eligible.push_back(&w);
             }
             if (eligible.empty()) continue;
-            // hash FNV-1a (tipo+id) -- escolhe QUAL widget elegível anima
-            // e o ritmo dele; determinístico por módulo, sem depender de
-            // `curSeed` (a Motion Engine é independente do seed que gerou
-            // o cabeamento).
+            // hash FNV-1a (tipo + id + seed) -- escolhe QUAL widget elegível
+            // anima e o ritmo dele. Mistura `curSeed`: cada patch generativo
+            // "respira" por um controle diferente — nenhum vira "o que
+            // sempre mexe". (Editado à mão, `curSeed == 0`: estável.)
             std::uint64_t h = 1469598103934665603ULL;
-            for (const char c : node.type()) {
+            for (const char c : ntype) {
                 h ^= static_cast<unsigned char>(c);
                 h *= 1099511628211ULL;
             }
             h ^= static_cast<std::uint64_t>(id) + 0x9E3779B97F4A7C15ULL;
+            h *= 1099511628211ULL;
+            h ^= curSeed + 0xD1B54A32D192ED03ULL;
             h *= 1099511628211ULL;
             const Widget* w = eligible[h % eligible.size()];
             const Parameter* found = nullptr;
@@ -859,24 +867,34 @@ int main() {
             };
             ramp[k] = C(mix(0x13, 0xff), mix(0x15, 0x9d), mix(0x1a, 0x4c));
         }
+        GC tmp = XCreateGC(dpy, logoPix, 0, nullptr);
         XImage* img = XCreateImage(dpy, DefaultVisual(dpy, scr),
                                    static_cast<unsigned>(depth), ZPixmap, 0,
                                    nullptr, static_cast<unsigned>(rasgo_logo_w),
                                    static_cast<unsigned>(rasgo_logo_h), 32, 0);
-        img->data = static_cast<char*>(
-            std::malloc(static_cast<std::size_t>(img->bytes_per_line)
-                        * static_cast<std::size_t>(rasgo_logo_h)));
-        for (int y = 0; y < rasgo_logo_h; ++y)
-            for (int x = 0; x < rasgo_logo_w; ++x) {
-                const int cov = rasgo_logo_gray[y * rasgo_logo_w + x];
-                XPutPixel(img, x, y, ramp[(cov * 32) / 255]);
-            }
-        GC tmp = XCreateGC(dpy, logoPix, 0, nullptr);
-        XPutImage(dpy, logoPix, tmp, img, 0, 0, 0, 0,
-                  static_cast<unsigned>(rasgo_logo_w),
-                  static_cast<unsigned>(rasgo_logo_h));
+        char* buf = img ? static_cast<char*>(std::malloc(
+            static_cast<std::size_t>(img->bytes_per_line)
+            * static_cast<std::size_t>(rasgo_logo_h))) : nullptr;
+        if (img && buf) {
+            img->data = buf;
+            for (int y = 0; y < rasgo_logo_h; ++y)
+                for (int x = 0; x < rasgo_logo_w; ++x) {
+                    const int cov = rasgo_logo_gray[y * rasgo_logo_w + x];
+                    XPutPixel(img, x, y, ramp[(cov * 32) / 255]);
+                }
+            XPutImage(dpy, logoPix, tmp, img, 0, 0, 0, 0,
+                      static_cast<unsigned>(rasgo_logo_w),
+                      static_cast<unsigned>(rasgo_logo_h));
+            XDestroyImage(img);   // libera img->data também
+        } else {
+            // fallback improvável (XCreateImage/malloc falhou): só o fundo
+            if (img) XDestroyImage(img);
+            XSetForeground(dpy, gc, T.bg);
+            XFillRectangle(dpy, logoPix, gc, 0, 0,
+                           static_cast<unsigned>(rasgo_logo_w),
+                           static_cast<unsigned>(rasgo_logo_h));
+        }
         XFreeGC(dpy, tmp);
-        XDestroyImage(img);   // libera img->data também
     }
 
     auto text = [&](int x, int y, const std::string& s, unsigned long c) {
@@ -1918,7 +1936,6 @@ int main() {
         if (t == "OUT") return std::make_unique<Out>();
         return rasgo::panel::makeModule(t);
     };
-    std::uint64_t curSeed = 0;   // seed do patch atual (0 = editado à mão)
     auto savePatch = [&](const std::filesystem::path& path) {
         std::lock_guard<std::mutex> lk(gmx);
         std::ofstream f(path);

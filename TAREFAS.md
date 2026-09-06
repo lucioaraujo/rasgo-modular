@@ -4060,3 +4060,31 @@ a janela em ±6% e só-knob — ficou imperceptível.
 autor — se ±20% for demais/de menos, é um número.
 
 **Não commitado.**
+
+## Registro da etapa — 2026-09-06: "6º slider do SEQUENCE" — bug de fundo na Motion Engine
+
+O autor apontou que o `p6` do SEQUENCE voltou a "mexer mais que os demais"
+e suspeitou de bug de código. **Era bug mesmo:** `populateMotion` escolhe
+QUAL controle de cada módulo anima por um hash de `tipo + id do nó`. Como
+`PatchSeed` instancia o catálogo INTEIRO pra todo patch, o `id` de cada
+módulo é fixo → o hash é constante → **sempre o mesmo controle anima**, em
+todo seed. Pro SEQUENCE o hash caía sempre no mesmo passo, e um passo
+derivando = melodia reafinada.
+
+**Feito** (`apps/panel/panel_main.cpp`, `populateMotion`)
+- o hash passa a misturar **`curSeed`** (declaração de `curSeed` subiu pra
+  perto de `motionOn`) — cada patch respira por um controle diferente;
+  editado à mão (`curSeed == 0`) fica estável;
+- **`SEQUENCE`/`TRIGSEQ`/`TURING`/`HARMONY`/`QUANTIZER` fora da Motion
+  Engine** — a camada mexe em timbre/textura, nunca nas notas;
+- **de volta a só KNOB** (revertido o slider de +2026-09-06 09:xx — os
+  sliders são a partitura ou fader de nível).
+- guard no `XImage` da logo (fallback se `XCreateImage`/`malloc` falhar).
+
+Doc: `ESTUDO §3.6`.
+
+**Validação:** build limpo, **47/47 CTest**, 5 renders de exemplo geram
+checksum estável (só código do painel mudou; `peca_generativa_4` usa
+`MotionEngine` direto).
+
+**Não commitado.**

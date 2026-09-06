@@ -436,12 +436,26 @@ centrada no valor atual (`Binding::start`) — o vício era a janela
 
 **Ajuste (2026-09-06):** a ±6% ficou imperceptível ("os knobs e sliders
 variavam mais, sem precisar clicar num botão"). Agora **±20%**
-(`kMotionDepth = 0.40`), ritmo ~0,03–0,12 Hz (alvo novo a cada ~8–33 s), e
-**KNOB + SLIDER** de novo elegíveis — com a **mesma** janela uniforme
-(inclui os passos do `SEQUENCE`: a melodia deriva de leve). Faders de
-nível (`MIXER gain1..4`, `MASTER gain`, `out_gain`) seguem em
-`isMutationBlocked`. `test_motion_engine` e `peca_generativa_4` intocados
-(usam a API sem `start` → compat). Ver `TAREFAS.md`.
+(`kMotionDepth = 0.40`), ritmo ~0,03–0,12 Hz (alvo novo a cada ~8–33 s).
+
+**Bug de fundo, mesmo dia:** a escolha de QUAL controle anima por módulo
+era um hash de `tipo + id` — e como o catálogo é instanciado inteiro pra
+todo patch, o `id` de cada módulo é fixo → **sempre o mesmo controle**
+animava, em todo seed. Pro `SEQUENCE` isso era o "6º slider": o hash
+caía sempre no mesmo passo e um passo derivando reafina a melodia.
+Correções:
+- o hash passa a misturar **`curSeed`** — cada patch generativo respira
+  por um controle diferente, nenhum vira "o que sempre mexe" (editado à
+  mão, `curSeed == 0` → estável);
+- **módulos de partitura fora da Motion Engine**: `SEQUENCE`, `TRIGSEQ`,
+  `TURING`, `HARMONY`, `QUANTIZER` — a camada mexe no timbre/textura,
+  nunca nas notas. `MUTATE`/`EVOLVE` continuam reembaralhando a partitura
+  sob demanda;
+- **volta a ser só KNOB** (os sliders são a partitura ou fader de nível).
+
+`test_motion_engine` e `peca_generativa_4` intocados (usam `MotionEngine`
+direto, não `populateMotion` → compat, renders byte-idênticos). Ver
+`TAREFAS.md`.
 
 ---
 
