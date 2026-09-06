@@ -167,6 +167,128 @@ void testMotionAdditiveWithCableModulation() {
     }
 }
 
+// ---- modo 2: a mão caótica (`inhabit`, §3.7) --------------------------
+
+class Voice final : public Signal {
+public:
+    Voice()
+        : Signal({{"in", PortKind::Audio, ""}}, {{"out", PortKind::Audio, ""}},
+                 {{"cutoff", 20.0f, 20000.0f, 800.0f, "Hz"},
+                  {"resonance", 0.0f, 1.0f, 0.3f, ""},
+                  {"steps", 1.0f, 16.0f, 8.0f, ""},
+                  {"hold", 0.0f, 1.0f, 0.0f, ""},
+                  {"blend", 0.0f, 1.0f, 0.5f, ""}}) {}
+    std::string type() const override { return "TEST.VOICE"; }
+    Panel panel() const override {
+        Panel p; p.hp = 10;
+        p.add(Widget::Kind::Knob, "CUT", "cutoff", 5.0f, 20.0f);
+        p.add(Widget::Kind::Knob, "RES", "resonance", 20.0f, 20.0f);
+        p.add(Widget::Kind::Knob, "STEP", "steps", 35.0f, 20.0f);
+        p.add(Widget::Kind::Toggle, "HLD", "hold", 5.0f, 40.0f);
+        p.add(Widget::Kind::Slider, "BLN", "blend", 20.0f, 40.0f);
+        return p;
+    }
+    void process(const std::vector<const AudioBlock*>&,
+                 std::vector<AudioBlock>&) noexcept override {}
+};
+
+class FakeMixer final : public Signal {
+public:
+    FakeMixer() : Signal({}, {}, {{"pan1", -1.0f, 1.0f, 0.0f, ""}}) {}
+    std::string type() const override { return "MIXER"; }
+    Panel panel() const override {
+        Panel p; p.hp = 6;
+        p.add(Widget::Kind::Knob, "PAN", "pan1", 5.0f, 20.0f);
+        return p;
+    }
+    void process(const std::vector<const AudioBlock*>&,
+                 std::vector<AudioBlock>&) noexcept override {}
+};
+
+void testInhabitMovesAndStaysSane() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.inhabit(g, 12345ULL, {v});
+    EXPECT(m.fiberCount() == 5);
+
+    float clo = 1e9f, chi = -1e9f;
+    for (int i = 0; i < 6000; ++i) {
+        m.tick(g, 0.033f, 0.4f);
+        const float c = g.parameterUserValue(v, "cutoff");
+        check(std::isfinite(c) && c >= 20.0f && c <= 20000.0f, "cutoff são");
+        clo = std::min(clo, c); chi = std::max(chi, c);
+    }
+    check(chi - clo > 300.0f, "a mão move o cutoff ao longo do tempo");
+    check(chi - clo < 12000.0f, "mas dentro de uma janela em torno do seed");
+}
+
+void testStructuralBarelyMoves() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.inhabit(g, 777ULL, {v});
+    for (int i = 0; i < 8000; ++i) {
+        m.tick(g, 0.033f, 0.5f);
+        const float s = g.parameterUserValue(v, "steps");
+        check(std::fabs(s - std::round(s)) < 1e-4f, "steps quantizado a inteiro");
+        check(std::fabs(s - 8.0f) <= 2.0f, "steps mal se move (perto do seed)");
+    }
+}
+
+void testMixerMasterExempt() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    const auto mx = g.add(std::make_unique<FakeMixer>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.inhabit(g, 42ULL, {v, mx});
+    EXPECT(m.fiberCount() == 5);   // só as 5 fibras do Voice, nada do MIXER
+    for (int i = 0; i < 2000; ++i) m.tick(g, 0.033f, 0.5f);
+    check(g.parameterUserValue(mx, "pan1") == 0.0f, "MIXER.pan1 intocado");
+}
+
+void testInhabitDeterminism() {
+    auto run = [] {
+        SignalGraph g;
+        const auto v = g.add(std::make_unique<Voice>());
+        g.prepare(48000.0f, 1, 64);
+        MotionEngine m;
+        m.inhabit(g, 99887766ULL, {v});
+        std::vector<float> tr;
+        for (int i = 0; i < 4000; ++i) {
+            m.tick(g, 0.033f, 0.45f);
+            tr.push_back(g.parameterUserValue(v, "cutoff"));
+            tr.push_back(g.parameterUserValue(v, "resonance"));
+        }
+        return tr;
+    };
+    const auto a = run(), b = run();
+    bool same = a.size() == b.size();
+    for (std::size_t i = 0; same && i < a.size(); ++i) if (a[i] != b[i]) same = false;
+    EXPECT(same);
+}
+
+void testHotStaysGentle() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.inhabit(g, 5ULL, {v});
+    float rlo = 2.0f, rhi = -2.0f;
+    for (int i = 0; i < 8000; ++i) {
+        m.tick(g, 0.033f, 0.4f);
+        const float r = g.parameterUserValue(v, "resonance");
+        check(r >= 0.0f && r <= 1.0f, "resonance na faixa");
+        rlo = std::min(rlo, r); rhi = std::max(rhi, r);
+    }
+    // quente: respira, não varre — janela pequena em torno de 0,3
+    check(rhi - rlo > 0.01f, "resonance ainda se move");
+    check(rhi - rlo < 0.45f, "resonance não varre o range (é 'quente')");
+}
+
 void testDeterminism() {
     auto run = [](int steps) {
         SignalGraph g;
@@ -201,6 +323,11 @@ int main() {
     testAttractChasesOtherParameter();
     testMotionAdditiveWithCableModulation();
     testDeterminism();
+    testInhabitMovesAndStaysSane();
+    testStructuralBarelyMoves();
+    testMixerMasterExempt();
+    testInhabitDeterminism();
+    testHotStaysGentle();
     if (g_failures == 0) {
         std::cout << "RASGO Modular motion engine tests passed\n";
         return 0;

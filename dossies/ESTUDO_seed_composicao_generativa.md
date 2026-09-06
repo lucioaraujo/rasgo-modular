@@ -457,6 +457,148 @@ Correções:
 direto, não `populateMotion` → compat, renders byte-idênticos). Ver
 `TAREFAS.md`.
 
+### 3.7 Motion Engine v3 — a mão caótica que toca o patch (spec, 2026-09-07)
+
+**Motivação (feedback do autor):** o `populateMotion` de v2 (§3.6) anima
+**1 knob por módulo**, sorteado por hash, com janela fixa de ±20%. É
+conservador demais (a maioria dos knobs fica congelada pra sempre) *e*
+quando sorteia mal cai num `pw` (PWM largo demais → "frenético") ou num
+`DECISION.steps` (estrutural → "se move sem nada cabeado"). O autor
+quer: **versátil** ("a princípio pode ser qualquer controle"), que
+**saiba o que está fazendo**, com **uma razão pra alterar o que altera**
+— "desde que seja musical".
+
+**Direção do autor (2026-09-07), depois de rejeitar duas versões
+baseadas em tabela:** *"é um instrumento de composição, não de regras
+prontas, de determinismos congelados, de padrões limitados de IA. Um
+instrumento que busca a excelência de composição, o inaudito, o bom
+gosto musical, a experimentação. Sei que alguns itens são subjetivos,
+mas é necessário encontrar um caminho."*
+
+Ou seja: **nada de lista de intenções + matriz de qualidades + camadas
+de substring.** Isso é rulebook. O caminho é um instrumento que
+**explora** — determinístico a partir do seed (o render tem que ser
+reproduzível) mas de trajetória **longa e não-óbvia**, que nunca vira um
+loop audível nem congela.
+
+#### 3.7.1 O modelo — a "mão" caótica que toca o patch
+
+**Estado:** um sistema caótico pequeno de baixa dimensão (a matemática do
+`CHAOS` — integrador de 1ª ordem tipo Rössler/Thomas, 3–4 variáveis
+acopladas). Ele NUNCA repete, NUNCA para, é levemente imprevisível.
+Semeado → reproduzível; mas o período é longo demais pra o ouvido pegar
+um ciclo.
+
+**Acoplamento aos knobs:** cada parâmetro animável ganha um **vetor de
+projeção** próprio (pesos semeados) sobre as variáveis do estado caótico
+→ `alvo(param) = centro + Σ wᵢ·estadoᵢ · amplitude`. Fonte compartilhada
+→ os knobs se movem em **relação** (sai coerente por construção); projeção
+distinta → cada um traça um caminho seu. Não há "agora está clareando"
+previsível — há um gesto contínuo que vai a algum lugar interessante.
+
+**Realimentação (o "ouve o que sai"):** a velocidade global do estado
+caótico é modulada pela **energia/tensão medida do som** (o barramento
+semântico `Quality`, já bottom-up hoje — `Energy`, `Tension`, `Motion`).
+Música intensifica → a mão se move mais; acalma → recua. É o loop
+fechado: o *inaudito* vem daí — do patch reagindo à própria
+não-linearidade, não de um script.
+
+**Gosto = amplitude (a única "regra", e é mínima).** 4 pistas de palavra
+no `id` decidem só QUANTO cada knob pode andar:
+- `step`/`length`/`slice`/`scale`/`root`/`bpm`/`mult`/`ratio`/`voices`/
+  `pattern`/`heads` → **estrutural**: passo pequeno, quantizado ao
+  descriptor, e RARO (a projeção quase não o toca);
+- `gain`/`level`/`output`/`master` → **nível**: ±3%, clamp duro;
+- `res`/`feedback`/`drive`/`fold`/`grit`/`crush`/`fm_amount`/`pw`/
+  `index` → **quente**: ±5–8% (respira, não varre);
+- resto → **livre**: ±15–25%.
+Nenhum é proibido. `id` desconhecido → livre com metade da amplitude.
+A janela é sempre em torno do valor ATUAL do knob (o que o seed/o músico
+deixou); as bordas do `ParameterDescriptor` são limite absoluto.
+
+**Únicos módulos isentos (decisão do autor, 2026-09-07): `MIXER` e
+`MASTER`.** São o estágio de mistura/saída — o músico controla balanço e
+pans na mão. Todo o resto entra. Além disso: só **KNOB** é animado —
+sliders são partitura (notas do `SEQUENCE`) ou fader de nível, nunca uma
+regulagem que derive sozinha.
+
+**Ousadia (a experimentação):** de tempos em tempos (Poisson semeado,
+raro) a projeção de UM parâmetro é amplificada por alguns segundos — um
+alcance maior, uma tentativa — e depois relaxa. Sem avaliação
+automática de "ficou bom" na v1 (isso é subjetivo demais); a aposta é
+que a mão caótica + a realimentação já produzem material que vale ouvir,
+e o músico corta com `[v]` ou com `MUTATE` se não gostar.
+
+#### 3.7.2 Sabe do patch
+
+- **param já com cabo/modulação entrando** → amplitude pela metade (não
+  briga com a fiação do seed/do músico; não apaga — `setParameterBase` é
+  aditivo);
+- **módulo que não chega ao `Out` ativo** → amplitude zero (não adianta
+  mexer no que não soa) — se a API de alcançabilidade não existir ainda,
+  fica como pendência e anima tudo por ora.
+
+#### 3.7.3 Musical / seguro por construção
+
+- **coerência:** um estado caótico → todos os knobs em relação; o ouvido
+  lê um gesto, não 30 tremores;
+- **sem deriva acumulada:** a janela é sempre em torno do valor do seed,
+  com limite do descriptor — não "foge" com o tempo;
+- **estrutura protegida:** `steps`/`scale`/`bpm` mal se movem, e
+  quantizados; `MUTATE`/`EVOLVE` seguem sendo o jeito deliberado de
+  reembaralhar a partitura;
+- **determinístico:** o estado caótico + as projeções + o RNG da ousadia
+  são semeados; `dt` fixo do chamador → 2 sessões = a mesma trajetória
+  (renders de exemplo byte-idênticos);
+- **light-touch** (`feedback_generative_design_light_touch`): ~4 pistas
+  de palavra e um integrador de 3–4 linhas. O resto é a dinâmica.
+
+#### 3.7.4 Forma / escopo
+
+`apps/panel/MotionEngine.hpp` — o `Binding` manual-only FICA
+(`peca_generativa_4`, `test_motion_engine` usam direto). Adiciona-se:
+`MotionField` (o estado caótico + realimentação) e
+`MotionEngine::inhabit(graph, seed, shown)` — varre o grafo, monta uma
+projeção por knob com a amplitude da pista de palavra. `tick()` avança o
+`MotionField` e escreve os alvos. `populateMotion` do `panel_main.cpp`
+vira `motion.inhabit(...)`. Pista-de-palavra + a montagem da projeção
+num header testável (`apps/panel/MotionField.hpp`?).
+`tests/test_motion_engine.cpp` cresce: a trajetória não repete numa
+janela longa; estrutural mal se move; não briga com cabo; 2 renders
+byte-idênticos. `rasgo_modular_core` intocado.
+
+**Evolução — o `morceau` (autor, 2026-09-07):** *"boa parte dos
+instrumentos RASGO já pensa num formato final de música (morceau) — com
+início, desenvolvimento (várias etapas) e coda. O VARIA poderia
+encontrar seu sentido original nisso."* O caminho é uma **camada de arco
+por cima da mão caótica** (o Form Engine da §3.4), na linha do que o
+`RASGO_SYNTH/rasgo-synth-performance` já coda:
+
+- **caminhada de Markov sobre papéis estruturais** — `intro / subida /
+  clímax / queda / coda`, a `coda` como estado ABSORVENTE (a peça só
+  termina nela); a duração total é consequência da caminhada, não um
+  valor a priori (`RASGO_SYNTH/docs/pt/_catalogo_mecanismos.md`,
+  "Tempo discreto com ritardando real na coda"; Doc. de Referência §4.2);
+- **gramáticas plugáveis** — Dramatic (pirâmide de Freytag) e
+  Kishōtenketsu;
+- **andamento** — saltos discretos (salto-e-espera) nas transições de
+  arco; **accelerando** exponencial real rumo ao 1º clímax, **ritardando**
+  exponencial real na coda (sinalizar chegada/fechamento);
+- **cortes secos** em transições específicas (sem interpolação).
+
+No RASGO_MODULAR isso vira: o papel do arco define a INTENÇÃO macro
+(subida → a mão puxa brilho/tensão/densidade pra cima e acelera; queda →
+o oposto; coda → `ASSENTAR` + ritardando de qualquer `CLOCK`/`rate`), e a
+mão caótica segue sendo o detalhe/textura por baixo. O `RASGO_MODULAR`
+**não precisa** da camada de álbum (conjunto de morceaux) — só do
+morceau. Prior art a estudar (não copiar código; `RASGO_SYNTH` é
+read-only): a caminhada de Markov + as duas gramáticas + o
+accelerando/ritardando exponencial.
+
+**Outras evoluções:** avaliação do material ("ficou bom?") via as
+`Quality` medidas — manter a excursão que melhorou a direção pretendida,
+reverter a que não; `ATTRACT`/`REPEL` entre params.
+
 ---
 
 ## 4. Patch Genetics — `MUTATE` / `EVOLVE` / `CROSS` / `FREEZE`
