@@ -51,6 +51,7 @@
 #include "dsp/StringVoice.hpp"
 #include "dsp/Switch.hpp"
 #include "dsp/TrigSeq.hpp"
+#include "dsp/Turntable.hpp"
 #include "dsp/TuringLoop.hpp"
 #include "dsp/Vca.hpp"
 #include "dsp/Wasp.hpp"
@@ -82,6 +83,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "CONTROL")    return std::make_unique<Control>();
     if (t == "SH")         return std::make_unique<SampleHold>();
     if (t == "SAMPLER")    return std::make_unique<Sampler>();
+    if (t == "TURNTABLE")  return std::make_unique<Turntable>();
     if (t == "SCOPE")      return std::make_unique<Scope>();
     if (t == "SHAPE")      return std::make_unique<Shape>();
     if (t == "LPG")        return std::make_unique<Lpg>();
@@ -142,7 +144,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
-        {"SPACE",     {"SPACE", "HALL", "LOOPER", "MEMORY", "SAMPLER"}},
+        {"SPACE",     {"SPACE", "HALL", "LOOPER", "MEMORY", "SAMPLER", "TURNTABLE"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;

@@ -52,6 +52,7 @@
 #include "dsp/StringVoice.hpp"
 #include "dsp/Switch.hpp"
 #include "dsp/TrigSeq.hpp"
+#include "dsp/Turntable.hpp"
 #include "dsp/TuringLoop.hpp"
 #include "dsp/Vca.hpp"
 #include "dsp/Wasp.hpp"
@@ -191,6 +192,7 @@ int main() {
     mods.emplace_back("GLIDE", std::make_unique<Glide>());
     mods.emplace_back("SH", std::make_unique<SampleHold>());
     mods.emplace_back("SAMPLER", std::make_unique<Sampler>());
+    mods.emplace_back("TURNTABLE", std::make_unique<Turntable>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("LPG", std::make_unique<Lpg>());
