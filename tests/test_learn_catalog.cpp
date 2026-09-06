@@ -258,6 +258,32 @@ void testRemainingCatalogModulesHaveAtLeastQuick() {
     });
 }
 
+// cada tipo do `moduleCatalog()` tem uma DEFINIÇÃO de módulo (o LEARN no
+// hover do corpo/título — 2026-09-07), com `quick` preenchido.
+void testEveryCatalogModuleHasBlurb() {
+    const char* types[] = {
+        "OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE",
+        "MATTER", "STRING", "DRUM", "SIGNAL-IN",
+        "FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC",
+        "GLIDE", "CONTROL",
+        "ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH",
+        "CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ",
+        "QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR",
+        "SWITCH", "MATRIX", "MULT", "PLANAR",
+        "SPACE", "HALL", "LOOPER", "MEMORY", "SAMPLER", "TURNTABLE",
+        "MIXER", "MASTER", "SCOPE", "NOTE-OUT",
+    };
+    for (const char* t : types) {
+        const auto* e = lookupLearnModule(t);
+        check(e != nullptr && !e->quick.empty(),
+              "módulo tem definição (quick não vazio)");
+    }
+    check(lookupLearnModule("AUDIO-IN") == lookupLearnModule("SIGNAL-IN"),
+          "AUDIO-IN reusa a definição do SIGNAL-IN");
+    check(lookupLearnModule("NAO_EXISTE") == nullptr,
+          "módulo desconhecido -> nullptr");
+}
+
 }  // namespace
 
 int main() {
@@ -267,6 +293,7 @@ int main() {
     testEveryRackDePartidaParamHasAtLeastQuick();
     testEveryOutputChainAndDeepDiveParamHasAtLeastQuick();
     testRemainingCatalogModulesHaveAtLeastQuick();
+    testEveryCatalogModuleHasBlurb();
     if (g_failures == 0) {
         std::cout << "RASGO Modular learn catalog tests passed\n";
         return 0;

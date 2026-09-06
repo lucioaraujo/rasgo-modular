@@ -758,6 +758,15 @@ funções) + integrado em `panel_main.cpp`:
   em parâmetros autoexplicativos — o mesmo padrão de "não escrever
   prosa por escrever" do `MODULE_DEVELOPMENT_STANDARD`.
 
+**Definição de MÓDULO no hover do corpo/título (2026-09-07):** passar o
+mouse sobre o corpo de um módulo do rack (não sobre um knob) mostra na
+caixa LEARN o que o MÓDULO É — `lookupLearnModule(type)` →
+`LearnEntry{quick = o que é, understand = o lugar dele / como difere dos
+vizinhos, explore = uma cadeia pra experimentar}`. Um por tipo do
+`moduleCatalog()` (`AUDIO-IN` reusa `SIGNAL-IN`); gate de regressão em
+`testEveryCatalogModuleHasBlurb`. **Dwell encurtado de 2 s → 1 s** (mesmo
+pedido).
+
 **O que ainda falta:** `WHY?`/`WHAT IF?` contextuais (precisam saber o
 que já está cabeado, não só o parâmetro isolado) — os 3 níveis
 (`quick`/`understand`/`explore`) já aparecem na caixa. Conteúdo e

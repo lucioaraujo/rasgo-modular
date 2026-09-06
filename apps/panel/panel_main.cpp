@@ -905,6 +905,24 @@ int main() {
     } cdrag;
     bool allRuptured = false;
     struct ModDrag { bool active = false; std::size_t id = 0; } mdrag;
+    struct { bool active = false; int grabOff = 0; } palBarDrag;
+    // geometria da barra de scroll da paleta (nulo se a lista cabe toda)
+    auto palBar = [&](int& trkY, int& trkH, int& thY, int& thH) -> bool {
+        const int viewH = winH - kLearnH - kCaseTop;
+        const int contentH = paletteH + 30;   // +30 = folga do clamp do wheel
+        if (contentH <= viewH + 4) return false;
+        trkY = kCaseTop + 3;
+        trkH = viewH - 6;
+        const int palMax = std::max(1, contentH - viewH);
+        thH = std::max(18, trkH * viewH / contentH);
+        if (thH > trkH) thH = trkH;
+        thY = trkY + (trkH - thH)
+            * std::min(std::max(0, paletteScroll), palMax) / palMax;
+        return true;
+    };
+    auto palMaxScroll = [&] {
+        return std::max(0, paletteH - (winH - kLearnH - kCaseTop) + 30);
+    };
 
     auto modOrigin = [&](const Mod& m) {
         const int rowIdx = m.col >> 20;
@@ -1072,33 +1090,45 @@ int main() {
                     || mouseY < by || mouseY > by + modH) continue;
                 Signal& node = graph.node(m.id);
                 const std::string mt = node.type();
+                bool widgetHit = false;
                 for (const auto& w : node.panel().widgets) {
                     if (w.bind.empty()) continue;
                     Rect fp = footprintPx(w);
                     fp.x += bx; fp.y += by;
                     if (mouseX < fp.x || mouseX > fp.x + fp.w
                         || mouseY < fp.y || mouseY > fp.y + fp.h) continue;
-                    rawHit = rasgo::panel::lookupLearn(mt, w.bind);
-                    if (rawHit) {
+                    if (const auto* e = rasgo::panel::lookupLearn(mt, w.bind)) {
+                        rawHit = e;
                         rawTitle = mt + "  \xC2\xB7  " + w.label;
                         rawKey = std::to_string(m.id) + "|" + w.bind;
+                        widgetHit = true;
                     }
                     break;
+                }
+                // sobre o CORPO do módulo (não num controle) — inclui o
+                // título: o LEARN mostra o que o MÓDULO é (pedido do autor
+                // 2026-09-07).
+                if (!widgetHit) {
+                    if (const auto* e = rasgo::panel::lookupLearnModule(mt)) {
+                        rawHit = e;
+                        rawTitle = mt;
+                        rawKey = std::to_string(m.id) + "|\x01mod";
+                    }
                 }
                 break;
             }
         }
-        // dwell: o conteúdo da caixa LEARN só troca depois de ~2 s parado
+        // dwell: o conteúdo da caixa LEARN só troca depois de ~1 s parado
         // sobre o MESMO objeto — senão pisca a cada movimento do mouse
-        // (pedido do autor 2026-09-05). Fora de qualquer widget, mantém o
-        // último — mais calmo que voltar pra a linha-guia a cada relance.
+        // (autor 2026-09-05; encurtado de 2 s pra 1 s em 2026-09-07). Fora
+        // de qualquer objeto, mantém o último.
         {
             const auto now = std::chrono::steady_clock::now();
             if (rawKey != learnHoverKey) {
                 learnHoverKey = rawKey;
                 learnHoverSince = now;
             } else if (!rawKey.empty() && rawHit != learnShown
-                       && now - learnHoverSince >= std::chrono::milliseconds(2000)) {
+                       && now - learnHoverSince >= std::chrono::milliseconds(1000)) {
                 learnShown = rawHit;
                 learnShownTitle = rawTitle;
             }
@@ -1324,6 +1354,21 @@ int main() {
             text(10, (kCaseTop + palBottom) / 2, "soltar = remover", T.warning);
         }
         clipOff();
+
+        // ---- barra de scroll discreta (só quando a lista transborda) --
+        {
+            int trkY, trkH, thY, thH;
+            if (palBar(trkY, trkH, thY, thH)) {
+                const int trkX = kPaletteW - 4;
+                const bool over = mouseX >= trkX - 3 && mouseX <= kPaletteW
+                    && mouseY >= kCaseTop && mouseY <= palBottom;
+                XSetForeground(dpy, gc, T.line);
+                XFillRectangle(dpy, bb, gc, trkX, trkY, 2, trkH);
+                XSetForeground(dpy, gc, (over || palBarDrag.active)
+                                            ? T.accent : T.textSecondary);
+                XFillRectangle(dpy, bb, gc, trkX - 1, thY, 4, thH);
+            }
+        }
 
         // ---- caixa LEARN (rodapé da coluna esquerda, estilo terminal) --
         {
@@ -2296,7 +2341,23 @@ int main() {
                 const int palBot = winH - kLearnH;
                 if (mx < kPaletteW && my < palBot) {
                     if (ev.xbutton.button == 4) { paletteScroll = std::max(0, paletteScroll - 40); redraw(); continue; }
-                    if (ev.xbutton.button == 5) { paletteScroll = std::min(std::max(0, paletteH - (palBot - kCaseTop) + 30), paletteScroll + 40); redraw(); continue; }
+                    if (ev.xbutton.button == 5) { paletteScroll = std::min(palMaxScroll(), paletteScroll + 40); redraw(); continue; }
+                    // barra de scroll: pega o cursor, ou pagina até o clique
+                    if (ev.xbutton.button == 1 && mx >= kPaletteW - 8) {
+                        int trkY, trkH, thY, thH;
+                        if (palBar(trkY, trkH, thY, thH)) {
+                            if (my >= thY && my <= thY + thH) {
+                                palBarDrag.active = true;
+                                palBarDrag.grabOff = my - thY;
+                            } else {
+                                const int page = std::max(60, trkH - thH);
+                                paletteScroll = std::min(palMaxScroll(),
+                                    std::max(0, paletteScroll
+                                        + (my < thY ? -page : page)));
+                            }
+                            redraw(); continue;
+                        }
+                    }
                     for (const auto& pr : palette) {
                         if (pr.header) continue;
                         const int y = pr.y - paletteScroll + 20;
@@ -2452,6 +2513,7 @@ int main() {
                 }
                 redraw();
             } else if (ev.type == ButtonRelease) {
+                palBarDrag.active = false;
                 if (drag.active && recording.load()) {
                     const float toVal = graph.parameterUserValue(drag.node, drag.bind);
                     if (toVal != drag.startVal) {
@@ -2510,6 +2572,15 @@ int main() {
                     spawnType.clear();
                 }
                 setTitle("RASGO Modular — painel de teste");
+                redraw();
+            } else if (ev.type == MotionNotify && palBarDrag.active) {
+                mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
+                int trkY, trkH, thY, thH;
+                if (palBar(trkY, trkH, thY, thH) && trkH > thH) {
+                    const int rel = mouseY - palBarDrag.grabOff - trkY;
+                    paletteScroll = std::min(palMaxScroll(), std::max(0,
+                        rel * palMaxScroll() / (trkH - thH)));
+                }
                 redraw();
             } else if (ev.type == MotionNotify && cdrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;

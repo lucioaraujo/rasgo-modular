@@ -4944,5 +4944,33 @@ art no `RASGO_SYNTH/rasgo-synth-performance` (read-only).
 **62/62 CTest Debug + Release.** Não commitado ainda.
 
 Pendências abertas: confirmar de ouvido que o v3 resolve o pw/steps e o
-clip (seed 625938148); barra de scroll da coluna esquerda; LEARN no
-hover do título do módulo; teste ao vivo do MIDI; `git push`.
+clip (seed 625938148); teste ao vivo do MIDI; `git push`.
+
+---
+
+## Registro da etapa — 2026-09-07: barra de scroll da paleta + LEARN de módulo + dwell 1 s
+
+Três pedidos do autor.
+
+**Barra de scroll discreta** na coluna esquerda (`apps/panel/panel_main.cpp`)
+— `palBar()` calcula a geometria (trilho `kCaseTop+3 .. palBottom-3` na
+borda direita da coluna; cursor proporcional a `viewH/contentH`), só
+desenha quando `contentH > viewH+4`. Trilho de 2 px (`T.line`), cursor de
+4 px (`T.textSecondary`, `T.accent` no hover/arraste). Interação: roda do
+mouse (já existia; passou a usar `palMaxScroll()`), **arraste do cursor**
+(`palBarDrag`, MotionNotify mapeia `my` → `paletteScroll`), **clique no
+trilho** pagina. `ButtonRelease` solta.
+
+**LEARN — definição de módulo no hover do corpo/título**
+(`apps/panel/LearnCatalog.hpp`): `moduleLearnTable()` + `lookupLearnModule(type)`
+— um `LearnEntry` por tipo do `moduleCatalog()` (`quick` = o que é,
+`understand` = o lugar dele / vizinhos, `explore` = uma cadeia).
+`AUDIO-IN` reusa `SIGNAL-IN`. No `panel_main.cpp`: se o mouse está no
+corpo do módulo mas **não** num widget bound → mostra a definição do
+módulo (`rawTitle = tipo`, `rawKey = id + "|\x01mod"`).
+`testEveryCatalogModuleHasBlurb` (novo, `test_learn_catalog`) é o gate.
+
+**Dwell 2 s → 1 s** — `panel_main.cpp` `std::chrono::milliseconds(1000)`.
+
+Docs: `ESTUDO §6`, `RASGO_MODULAR.md §36.7`. **62/62 CTest Debug +
+Release.** Painel builds limpo. Não commitado ainda.
