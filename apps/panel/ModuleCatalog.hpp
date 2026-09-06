@@ -18,6 +18,7 @@
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
 #include "dsp/FunctionGenerator.hpp"
+#include "dsp/Glide.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
 #include "dsp/Lpg.hpp"
@@ -62,6 +63,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "CHORD")      return std::make_unique<Chord>();
     if (t == "FUNCTION")   return std::make_unique<FunctionGenerator>();
     if (t == "FILTER")     return std::make_unique<Filter>();
+    if (t == "GLIDE")      return std::make_unique<Glide>();
     if (t == "VCA")        return std::make_unique<Vca>();
     if (t == "CONTROL")    return std::make_unique<Control>();
     if (t == "SH")         return std::make_unique<SampleHold>();
@@ -105,7 +107,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"TIME",        {"CLOCK", "LOGIC", "ENVELOPE"}},
         {"DECISION",    {"DECISION", "DRIFT", "QUANTIZER", "HARMONY", "ABACUS", "CHAOS"}},
         {"SEQUENCE",    {"TURING", "SEQUENCE", "SWITCH", "TRIGSEQ"}},
-        {"TRANSFORM",   {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "CONTROL", "MULT", "SH", "PARAMETRIC"}},
+        {"TRANSFORM",   {"FILTER", "WASP", "LPG", "VCA", "SHAPE", "CONTROL", "MULT", "SH", "GLIDE", "PARAMETRIC"}},
         {"MATTER",      {"MATTER", "STRING"}},
         {"MEMORY",      {"MEMORY"}},
         {"SPACE",       {"SPACE"}},

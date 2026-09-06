@@ -266,7 +266,7 @@ Cada um vira dossiê antes do código (método §1).
 
 | # | Módulo | Família | Ideia | Parte de (conceito público) |
 |---|---|---|---|---|
-| 39 | **`GLIDE`** — portamento por nota | UTILITY / PITCH | slew disparado: `slide` só enquanto um gate está alto (a nota "escorrega" pra a próxima), `time` rise≠fall, modo legato. O primitivo que falta pra o baixo acid e pra qualquer melodia com condução. | TB-303 slide, Bela Gliss, glide processor (EMW), Serge slew |
+| ~~39~~ | ~~**`GLIDE`**~~ — portamento por nota | TRANSFORM / PITCH | **FEITO — 2026-09-06, `dossies/39_glide.md`, `src/dsp/Glide.hpp`.** 3 modos (sempre / slide-gated 303 / legato), `time` de subida + `fall` (assimetria descida = `time·6^fall`), `curve` linear↔RC, saídas `moving`/`done`. | TB-303 slide, portamento MS-20/Minimoog (rate const.) vs RC, Bela Gliss / EMW glide processor |
 | 40 | **`WAVETABLE`** — oscilador de tabela | SOURCE | varredura de tabela + interpolação linear entre quadros; `pos` (posição na tabela, CV), `warp` (PWM-like / fold), 1 V/oct, antialias por mip/2×. Territorio inteiro que o `OSC` (subtrativo) não cobre. | tutorial JUCE `tutorial_wavetable_synth`, WolfSound; **EMW WAVE-6** (hardware do autor, §9 §12); Piston Honda MK III (§7 #49) |
 | 41 | **`LOOPER`** — delay com HOLD / REVERSE / tape | SPACE / MEMORY | delay de linha com `hold` (congela e repete infinito), `reverse` (lê pra trás), e caráter de fita/BBD: companding, wow&flutter suave, saturação magnética por `age`. Distinto do `SPACE` (reverb) e do `MEMORY` (granular). | §6 (tape/digital delay com hold e reverse; BBD/flanger); 4ms DLD / Tapographic; Make Noise Mimeophon |
 | — | **`peca_generativa_5`** — peça que exercita a Onda A | — | melodia acid (SEQUENCE→QUANTIZER→OSC→FILTER com GLIDE) + LOOPER congelando frases | — |
@@ -292,7 +292,7 @@ Cada um vira dossiê antes do código (método §1).
 | # | Módulo | Família | Ideia | Parte de |
 |---|---|---|---|---|
 | 48 | **`SAMPLER` / `TAPE` / `TURNTABLE`** | SOURCE / MEMORY / GESTURE | áudio de arquivo ou captura ao vivo como matéria: varispeed, slice, `wear`; prato com inércia + scratch; fita com `age`/echo. **Nó opcional** — o painel abre e soa sem arquivo. | **`dossies/ESTUDO_audio_sampling.md`** (decisão `dr_wav.h` domínio público, risco de determinismo) |
-| 49 | **adaptadores `MIDI` / `CV`** | INPUT / GESTURE | entrada de nota/gesto externo; nunca dependência (§36.8). Contraparte de entrada do `NOTE-OUT`. | ANTITOTEM `setAudioChannels`; contrato `NOTE` já existente |
+| 49 | **`SIGNAL-IN`** — evolução do `AUDIO-IN` | INPUT / GESTURE | **decisão do autor 2026-09-06:** em vez de módulos `MIDI-IN` e `CV-IN` separados, o `AUDIO-IN` cresce pra um adaptador único — **áudio + MIDI + CV** num só. Saídas: os canais de áudio existentes + `pitch`/`gate`/`vel`/`cc` (do MIDI, como CV) + canais CV brutos (interface DC-coupled). Nunca dependência (§36.8); contraparte de entrada do `NOTE-OUT`. Renomear quebra patch salvo → migração de tipo no desserializador (`AUDIO-IN` → `SIGNAL-IN` com alias). | ANTITOTEM `setAudioChannels`, contrato `NOTE`; ALSA seq (MIDI) |
 
 **Fora de onda — conceitual, decidir se vira módulo:**
 - **síntese pulsar** (`BiomaPulsar`, §4) — pode ser modo do `ADDITIVE` ou voz própria;
@@ -300,8 +300,10 @@ Cada um vira dossiê antes do código (método §1).
 - **memória de estados / keyframes** (Frames, §3) — é **feature de painel** (navegar entre snapshots do patch), não módulo DSP;
 - **plataforma polimórfica** (Ornament & Crime, §6) — ambicioso demais pra agora; o espírito já vive no `SWITCH`/`MATRIX`.
 
-**Antes de começar a Onda A:** conferir a wishlist/rack na conta
-ModularGrid do autor (server-side, §9) — pode reordenar as prioridades.
+> **Nota (2026-09-06):** o autor **não tem conta no ModularGrid** — a
+> triagem do §7/§9 saiu de um fetch analisado na época, não de uma
+> wishlist pessoal. Não há entrada externa pendente; a fila abaixo segue
+> como está até nova pesquisa dirigida.
 
 ---
 
@@ -581,5 +583,6 @@ Outras fontes: `AQUORBIUM/biome.odt` (técnicas, seção 5) ·
 
 **A fazer:** quando um módulo do Rasgo Modular partir de um item dessas
 seções, copiar pra cá só a linha *módulo → conceito/ficha* + o desvio
-Rasgo (não as apropriações Aquorbium). Conferir também se há rack/wishlist
-na conta ModularGrid do autor (server-side).
+Rasgo (não as apropriações Aquorbium). ~~Conferir se há rack/wishlist na
+conta ModularGrid do autor~~ — **o autor não tem conta no ModularGrid**
+(2026-09-06); a triagem do Top-100 saiu de um fetch analisado na época.

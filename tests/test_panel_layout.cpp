@@ -19,6 +19,7 @@
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
 #include "dsp/FunctionGenerator.hpp"
+#include "dsp/Glide.hpp"
 #include "dsp/Harmony.hpp"
 #include "dsp/Logic.hpp"
 #include "dsp/Lpg.hpp"
@@ -174,6 +175,7 @@ int main() {
     mods.emplace_back("WASP", std::make_unique<Wasp>());
     mods.emplace_back("VCA", std::make_unique<Vca>());
     mods.emplace_back("CONTROL", std::make_unique<Control>());
+    mods.emplace_back("GLIDE", std::make_unique<Glide>());
     mods.emplace_back("SH", std::make_unique<SampleHold>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
