@@ -4722,4 +4722,32 @@ módulos**, 60 alvos CTest verdes em Debug e Release.
 
 Pendências abertas: thread ALSA-seq de MIDI no painel (#49); `TAPE`/
 `TURNTABLE` (`ESTUDO_audio_sampling §4`); as reservas da taxonomia
-(`§4.2`); `git push` (22 commits à frente de origin/main).
+(`§4.2`); `git push`.
+
+## Registro da etapa — 2026-09-06: pendências (1) — bug dos seeds quase-mudos
+
+**Diagnóstico:** seed 18 saía com peak EXATAMENTE 0,0 por > 10 s. Trace
+por nó: o `CLOCK[0]` (pulso) ficava travado em 1,0 e o `CLOCK[1]`
+(euclid) nunca disparava → tudo que depende do euclid (LPG.strike,
+ENVELOPE.gate, MATTER.pluck) ficava mudo.
+
+**Causa:** o passeio semeado cabeou `TRIGSEQ.any → CLOCK.reset`. O
+`CLOCK.reset` é edge-triggered (`stepCounter_ = 0; phase_ = 0`); um
+trigger que pulsa mais rápido que o passo do relógio zera a fase de
+`phase_` a cada pulso → o relógio nunca anda. O `seedPatch` cabeia as
+SAÍDAS do CLOCK explicitamente (espinha); deixar o passeio mexer nas
+ENTRADAS dele é quase sempre estol.
+
+**Fix:** `apps/panel/SeedGrammar.hpp` — `seedClassifyPorts` pula as
+entradas do `CLOCK` (`if (t == "CLOCK") continue;`). As entradas nunca
+entram em `outDst[]`, o passeio não as escolhe. Muda os seeds (arrays de
+classificação diferentes) — deliberado, `test_seed_patch` revalida.
+
+**Resultado:** dos ~3 seeds quase-mudos em 24 → **1** (seed 1, ~−63 dBFS
+— patch legítimo baixo, não estol; peak 7e-4, som real). O `test_seed_patch`
+agora renderiza 2000 blocos (~5,3 s — seeds lentos a ~46 BPM só produzem
+o 1º evento do euclid depois de ~1,3 s) e o gate é `silent <= 2`.
+
+**60/60 CTest** Debug e Release. Painel builds.
+
+**Não commitado ainda.**
