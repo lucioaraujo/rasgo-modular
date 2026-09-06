@@ -19,6 +19,7 @@
 #include "dsp/Envelope.hpp"
 #include "dsp/EuclidClock.hpp"
 #include "dsp/Filter.hpp"
+#include "dsp/Formant.hpp"
 #include "dsp/FunctionGenerator.hpp"
 #include "dsp/Wavetable.hpp"
 #include "dsp/Glide.hpp"
@@ -180,6 +181,7 @@ int main() {
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());
     mods.emplace_back("FILTER", std::make_unique<Filter>());
+    mods.emplace_back("FORMANT", std::make_unique<Formant>());
     mods.emplace_back("WASP", std::make_unique<Wasp>());
     mods.emplace_back("VCA", std::make_unique<Vca>());
     mods.emplace_back("CONTROL", std::make_unique<Control>());
