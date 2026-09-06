@@ -4088,3 +4088,33 @@ checksum estável (só código do painel mudou; `peca_generativa_4` usa
 `MotionEngine` direto).
 
 **Não commitado.**
+
+## Registro da etapa — 2026-09-06: roadmap de continuidade (PESQUISA §2.4)
+
+Pedido: "verifique quais módulos da lista de interessantes não
+contemplamos ainda" + "uma boa lista para darmos continuidade".
+
+Cruzei os 38 módulos feitos com `PESQUISA_MODULOS.md` (§2.2 aberto, §6
+Polivoks, §7 Top-100 ★, §4 Aquorbium, §5 técnicas). Escrito em
+**`PESQUISA_MODULOS.md §2.4`** — 4 ondas, do completador ao arriscado:
+
+- **A** (baixo risco, fecha o rack): `GLIDE` (portamento por nota — o
+  primitivo que falta pro acid), `WAVETABLE` (oscilador de tabela — EMW
+  WAVE-6, hardware do autor), `LOOPER` (delay HOLD/REVERSE/fita) +
+  `peca_generativa_5`;
+- **B** (territórios novos): `ADDITIVE` (Odessa), `PLANAR` (morph vetorial
+  XY), `OPERATOR` (FM multi-op — Akemie's), `FORMANT` (Fumana/SMR);
+- **C** (espaço/caráter): reverb FDN (modo do `SPACE` ou `HALL`), `DRUM`
+  (empacota MATTER+NOISE+ENVELOPE);
+- **D** (grande/opt-in): `SAMPLER`/`TAPE`/`TURNTABLE`
+  (`ESTUDO_audio_sampling.md`), adaptadores `MIDI`/`CV`.
+
+Fora de onda: pulsar (modo do ADDITIVE?), LFO múltiplo (modo do FUNCTION?),
+keyframes de estado (feature de painel), plataforma polimórfica (adiado).
+
+**Antes da Onda A:** conferir wishlist/rack ModularGrid do autor (§9).
+`dossies/00_indice.md` atualizado (38 feitos + ponteiro pra §2.4; texto
+de estudos à parte destravado — `CROSS`/`MUSICAL SCORE`/SeedGrammar/LEARN
+estão feitos).
+
+**Docs só. Não commitado ainda.**

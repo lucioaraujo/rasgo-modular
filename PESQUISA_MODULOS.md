@@ -255,6 +255,54 @@ explícita do `Seed` (§1.1 do `ESTUDO_seed_composicao_generativa.md`,
 `apps/panel/SeedGrammar.hpp`) — **também estão feitas, desde
 2026-09-05.**
 
+### 2.4 Próxima leva — roadmap de continuidade (2026-09-06)
+
+Cruzando os 38 módulos feitos com esta pesquisa (§2.2 aberto, §6 Polivoks,
+§7 Top-100 ★, §4 Aquorbium, §5 técnicas): o que **ainda não foi
+contemplado**, em ondas do mais seguro/completador ao mais arriscado/novo.
+Cada um vira dossiê antes do código (método §1).
+
+**Onda A — fecha lacunas óbvias do rack (baixo risco):**
+
+| # | Módulo | Família | Ideia | Parte de (conceito público) |
+|---|---|---|---|---|
+| 39 | **`GLIDE`** — portamento por nota | UTILITY / PITCH | slew disparado: `slide` só enquanto um gate está alto (a nota "escorrega" pra a próxima), `time` rise≠fall, modo legato. O primitivo que falta pra o baixo acid e pra qualquer melodia com condução. | TB-303 slide, Bela Gliss, glide processor (EMW), Serge slew |
+| 40 | **`WAVETABLE`** — oscilador de tabela | SOURCE | varredura de tabela + interpolação linear entre quadros; `pos` (posição na tabela, CV), `warp` (PWM-like / fold), 1 V/oct, antialias por mip/2×. Territorio inteiro que o `OSC` (subtrativo) não cobre. | tutorial JUCE `tutorial_wavetable_synth`, WolfSound; **EMW WAVE-6** (hardware do autor, §9 §12); Piston Honda MK III (§7 #49) |
+| 41 | **`LOOPER`** — delay com HOLD / REVERSE / tape | SPACE / MEMORY | delay de linha com `hold` (congela e repete infinito), `reverse` (lê pra trás), e caráter de fita/BBD: companding, wow&flutter suave, saturação magnética por `age`. Distinto do `SPACE` (reverb) e do `MEMORY` (granular). | §6 (tape/digital delay com hold e reverse; BBD/flanger); 4ms DLD / Tapographic; Make Noise Mimeophon |
+| — | **`peca_generativa_5`** — peça que exercita a Onda A | — | melodia acid (SEQUENCE→QUANTIZER→OSC→FILTER com GLIDE) + LOOPER congelando frases | — |
+
+**Onda B — territórios de síntese novos (risco médio):**
+
+| # | Módulo | Família | Ideia | Parte de |
+|---|---|---|---|---|
+| 42 | **`ADDITIVE`** — oscilador aditivo / espectral | SOURCE | banco de N parciais (32–64) com envelope espectral: `tilt` (brilho), `odd/even`, `stretch` (inarmonicidade), `comb`. O oposto do subtrativo. | Xaoc Odessa ★★ (§7 #85), síntese aditiva clássica (§5 wavetable/aditivo) |
+| 43 | **`PLANAR`** — morph vetorial XY | ROUTE / MOD | interpola 4 fontes por um ponto `x`/`y` (CV ou "gravação" de gesto que reproduz em loop). Casa com a identidade RASGO ("a relação é o processo"). | Intellijel Planar 2 ★ (§7 #33), Buchla 208 joystick, vector synthesis (Prophet VS) |
+| 44 | **`OPERATOR`** — voz FM multi-operador | SOURCE | 4 operadores, ~8 algoritmos, razões de frequência quantizadas, feedback no operador. O `OSC` tem TZFM linear de 1 par; isto é FM de verdade. | Akemie's Castle / YM2151 ★ (§7 #88), DX7 (teoria), Bastl Pizza (§7 #98) |
+| 45 | **`FORMANT`** — ressoador espectral multibanda | TRANSFORM | 4–6 bandpasses com CV de frequência/Q/ganho + morph entre "vogais". Anima o espectro, o que o `PARAMETRIC` (EQ estático) não faz. | Frap Fumana ★ (§7 #19), 4ms SMR, Random*Source Serge ResEQ ★ (§7 #51) |
+
+**Onda C — espaço / caráter (risco médio):**
+
+| # | Módulo | Família | Ideia | Parte de |
+|---|---|---|---|---|
+| 46 | **reverb FDN** (modo do `SPACE` ou `HALL` novo) | SPACE | rede de atraso realimentada (matriz de Householder), decaimento dependente da frequência, modulação nas linhas. A pendência anotada do §2. | §2 nota; Dattorro FDN, NE Desmodus Versio ★ (§7 #72), Strymon StarLab ★ (§7 #95) |
+| 47 | **`DRUM`** — voz de percussão | MATTER / SOURCE | empacota `MATTER`+`NOISE`+`ENVELOPE` num gesto: `tone`/`snap`/`decay`/`drive`, mapa 808↔909↔acústico. Um gate → um golpe. | §2.2 (voz de percussão); TR-808/909, Rings percussivo, vpme QD ★ (§7 #24) |
+
+**Onda D — grande / opt-in / arriscado:**
+
+| # | Módulo | Família | Ideia | Parte de |
+|---|---|---|---|---|
+| 48 | **`SAMPLER` / `TAPE` / `TURNTABLE`** | SOURCE / MEMORY / GESTURE | áudio de arquivo ou captura ao vivo como matéria: varispeed, slice, `wear`; prato com inércia + scratch; fita com `age`/echo. **Nó opcional** — o painel abre e soa sem arquivo. | **`dossies/ESTUDO_audio_sampling.md`** (decisão `dr_wav.h` domínio público, risco de determinismo) |
+| 49 | **adaptadores `MIDI` / `CV`** | INPUT / GESTURE | entrada de nota/gesto externo; nunca dependência (§36.8). Contraparte de entrada do `NOTE-OUT`. | ANTITOTEM `setAudioChannels`; contrato `NOTE` já existente |
+
+**Fora de onda — conceitual, decidir se vira módulo:**
+- **síntese pulsar** (`BiomaPulsar`, §4) — pode ser modo do `ADDITIVE` ou voz própria;
+- **LFO múltiplo livre** (Batumi/ochd, §7 #61/#31) — talvez modo do `FUNCTION` (N saídas defasadas) em vez de módulo;
+- **memória de estados / keyframes** (Frames, §3) — é **feature de painel** (navegar entre snapshots do patch), não módulo DSP;
+- **plataforma polimórfica** (Ornament & Crime, §6) — ambicioso demais pra agora; o espírito já vive no `SWITCH`/`MATRIX`.
+
+**Antes de começar a Onda A:** conferir a wishlist/rack na conta
+ModularGrid do autor (server-side, §9) — pode reordenar as prioridades.
+
 ---
 
 ## 3. Matriz Mutable Instruments → Rasgo (Atlas §36)
