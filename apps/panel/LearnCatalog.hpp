@@ -882,6 +882,41 @@ inline const LearnTable& learnTable() {
             {"out:out3", {"Saída 3: SCALE3·entrada + OFFSET3.", "", ""}},
             {"out:out4", {"Saída 4: SCALE4·entrada + OFFSET4.", "", ""}},
         }},
+        {"GLIDE", {
+            {"time", {
+                "Tempo do escorregão na SUBIDA — para uma mudança de 1,0 "
+                "(uma oitava). 0 = salto seco.",
+                "É a base; a descida sai daqui multiplicada por FALL.", ""}},
+            {"fall", {
+                "Assimetria: tempo de descida = TIME·6^FALL. −1 = descida "
+                "6× mais rápida que a subida; +1 = 6× mais lenta; 0 = "
+                "simétrico.", "", ""}},
+            {"curve", {
+                "Formato do escorregão: 0 = linear (velocidade constante, "
+                "chega no tempo exato — MS-20/Minimoog); 1 = exponencial "
+                "(RC, arrasta na chegada).",
+                "Mesma inclinação no começo; a exponencial desacelera e "
+                "só encosta no alvo depois de ~3 TIME.", ""}},
+            {"mode", {
+                "0 = sempre desliza (portamento clássico); 1 = só enquanto "
+                "SLIDE está alto (o slide do TB-303, cada passo decide); "
+                "2 = legato (desliza só se GATE segue alto na troca; um "
+                "gate novo salta).", "", ""}},
+            {"in:pitch", {
+                "CV de nota a conduzir (1 V/oct ou qualquer). Sem cabo, a "
+                "saída congela no último valor.", "", ""}},
+            {"in:slide", {
+                "Gate que habilita o escorregão no MODE 1 — venha de uma "
+                "linha do TRIGSEQ/TURING pra ter slide generativo.", "", ""}},
+            {"in:gate", {
+                "Gate da nota, pro MODE 2 (legato): borda de subida = "
+                "ataque destacado (salta); sustentado = desliza.", "", ""}},
+            {"out:out", {"A CV de nota, agora conduzida.", "", ""}},
+            {"out:moving", {"Alto enquanto está escorregando.", "", ""}},
+            {"out:done", {
+                "Pulso de ~2 ms quando chega ao alvo — pra um acento, "
+                "ratchet ou mudança de timbre reagir a \"chegou\".", "", ""}},
+        }},
         {"NOTE-OUT", {
             {"in:gate", {
                 "Gate/trigger da voz a capturar — a borda de descida "

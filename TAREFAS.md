@@ -4118,3 +4118,31 @@ de estudos à parte destravado — `CROSS`/`MUSICAL SCORE`/SeedGrammar/LEARN
 estão feitos).
 
 **Docs só. Não commitado ainda.**
+
+## Registro da etapa — 2026-09-06: Módulo 39 — GLIDE (Onda A do roadmap)
+
+Pedido: "avance os outros itens" (o roadmap §2.4). Onda A, #39.
+
+**`GLIDE` — portamento por nota** (`src/dsp/Glide.hpp`, `dossies/39_glide.md`,
+`tests/test_glide.cpp` — 10 funções). Família TRANSFORM/PITCH.
+
+O `CONTROL.slew` é lag RC sempre ligado — não serve pra condução de
+melodia. `GLIDE` decide por nota se escorrega ou salta:
+- `mode` 0 sempre · 1 slide-gated (o *slide* do TB-303: `slide` alto
+  habilita) · 2 legato (`gate` sustentado desliza, borda de subida salta);
+- `time` de subida (0–2 s) + `fall` (−1..1: descida = `time·6^fall`);
+- `curve` linear (rate constante, MS-20/Minimoog) ↔ exponencial (RC);
+- saídas `moving` (gate) e `done` (pulso ~2 ms na chegada).
+Sem `drift` (é régua de afinação). Determinístico, sem alocação.
+
+Integrado: `ModuleCatalog` (família TRANSFORM, entre SH e PARAMETRIC),
+`test_panel_layout`, `LearnCatalog` (11 binds). Docs: `00_indice.md`,
+`PESQUISA §2.4` (marcado feito), `RASGO_MODULAR.md §36.3`, `README.md`.
+Também anotado em §2.4: `SIGNAL-IN` (evolução do `AUDIO-IN` agregando
+MIDI-IN/CV-IN num só, decisão do autor) e que o autor não tem conta
+ModularGrid (o §9 estava desatualizado).
+
+**Validação:** build limpo (`-Wall -Wextra -Werror`), **48/48 CTest**
+Debug e Release. Renders de exemplo estáveis (GLIDE não entra em nenhum).
+
+**Não commitado.**
