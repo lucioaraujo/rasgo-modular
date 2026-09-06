@@ -9,6 +9,7 @@
 #include "core/SignalGraph.hpp"
 #include "dsp/Abacus.hpp"
 #include "dsp/Additive.hpp"
+#include "dsp/Boxcar.hpp"
 #include "dsp/SignalIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Control.hpp"
@@ -88,6 +89,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "SHAPE")      return std::make_unique<Shape>();
     if (t == "LPG")        return std::make_unique<Lpg>();
     if (t == "DECISION")   return std::make_unique<Decision>();
+    if (t == "BOXCAR")     return std::make_unique<Boxcar>();
     if (t == "DRIFT")      return std::make_unique<Drift>();
     if (t == "CLOCK")      return std::make_unique<EuclidClock>();
     if (t == "ENVELOPE")   return std::make_unique<Envelope>();
@@ -142,7 +144,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"TRANSFORM", {"FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
         {"SPACE",     {"SPACE", "HALL", "LOOPER", "MEMORY", "SAMPLER", "TURNTABLE"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
