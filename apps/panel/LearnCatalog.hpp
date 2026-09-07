@@ -547,6 +547,46 @@ inline const LearnTable& learnTable() {
             {"out:sum", {"out1 + out2, com teto suave — mini-mixer de 2 "
                         "canais de brinde.", "", ""}},
         }},
+        {"VCA4", {
+            {"level1", {
+                "Ganho manual do canal 1 (o knob que a CV1 soma — "
+                "modulação por PORTA, o knob fica vivo).",
+                "Banco de 4 VCAs + um mixer — Mutable Veils / Intellijel "
+                "Quad VCA. O `VCA` (#20) é duplo; este é o banco pra "
+                "patch grande.", ""}},
+            {"level2", {"Ganho manual do canal 2.", "", ""}},
+            {"level3", {"Ganho manual do canal 3.", "", ""}},
+            {"level4", {"Ganho manual do canal 4.", "", ""}},
+            {"cv1_amt", {"Atenuversor da CV1 (−1..1) — soma ao LVL1. "
+                        "Negativo INVERTE a ação da CV.", "", ""}},
+            {"cv2_amt", {"Atenuversor da CV2.", "", ""}},
+            {"cv3_amt", {"Atenuversor da CV3.", "", ""}},
+            {"cv4_amt", {"Atenuversor da CV4.", "", ""}},
+            {"curve", {
+                "COMPARTILHADO: 0 = linear (bom pra somar CV), 1 = "
+                "exponencial (dB-linear, bom pra volume percebido de "
+                "áudio). `ganho^(1+3·curve)`.", "", ""}},
+            {"mix_gain", {
+                "Ganho da saída MIX (0–2×) — a soma dos 4 canais com teto "
+                "suave. Um mixer de 4 canais de brinde.", "", ""}},
+            {"drift", {
+                "Oscilação lenta e SEMEADA nos 4 ganhos (±~3 %) — o banco "
+                "respira. Determinístico. 0 = estático.", "", ""}},
+            {"in:in1", {"Áudio (ou CV) do canal 1.", "", ""}},
+            {"in:in2", {"Áudio do canal 2.", "", ""}},
+            {"in:in3", {"Áudio do canal 3.", "", ""}},
+            {"in:in4", {"Áudio do canal 4.", "", ""}},
+            {"in:cv1", {"CV do ganho do canal 1.", "", ""}},
+            {"in:cv2", {"CV do ganho do canal 2.", "", ""}},
+            {"in:cv3", {"CV do ganho do canal 3.", "", ""}},
+            {"in:cv4", {"CV do ganho do canal 4.", "", ""}},
+            {"out:out1", {"Saída do canal 1.", "", ""}},
+            {"out:out2", {"Saída do canal 2.", "", ""}},
+            {"out:out3", {"Saída do canal 3.", "", ""}},
+            {"out:out4", {"Saída do canal 4.", "", ""}},
+            {"out:mix", {"Soma dos 4 canais × MIXG, com teto suave.",
+                        "", ""}},
+        }},
         {"CLOCK", {
             {"bpm", {
                 "Andamento em batidas por minuto.", "", ""}},
@@ -2438,6 +2478,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"VCA", {
             "Amplificador controlado por tensão — o volume/nível como CV; "
             "resposta linear ou exponencial.", "", ""}},
+        {"VCA4", {
+            "Banco de 4 VCAs + um mixer somado (MIX). O `VCA` (#20) é "
+            "duplo; este é o banco pra patch grande — Mutable Veils / "
+            "Intellijel Quad VCA.",
+            "CURVE linear/exp é COMPARTILHADA. Cada canal: LVL + CV "
+            "atenuvertida (soma por porta). MIXG dá o ganho da soma.",
+            "As 3 saídas low/mid/high do RESONATOR/FILTER em 3 canais + "
+            "um envelope em cada CV = um espectro que se move; a MIX "
+            "junta tudo."}},
         {"CONTROL", {
             "Utilidades de CV contínua — atenuversor, offset, retificação "
             "como lerp, slew. O canivete do sinal de controle.", "", ""}},

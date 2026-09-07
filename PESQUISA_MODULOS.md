@@ -402,7 +402,7 @@ adiante, vira dossiê antes do código (método `§1`). Nomes provisórios.
 
 | Cand. | Onde | O que é / por que | Parte de |
 |---|---|---|---|
-| **banco de VCA de 4 canais** (`VCA4`, MÓDULO próprio) | novo — o `VCA` duplo fica | Veils / Intellijel Quad VCA estão no topo da popularidade — VCA em quantidade é a utilidade nº 1 do formato. Com `CHORD` parafônico e as saídas `low/mid/high` do `RESONATOR`/`FILTER`, 4 canais com CV + um mix somado na saída é uma lacuna concreta. Módulo próprio (não estender o `VCA` — mexer nas portas dele quebra a ordem de índice de patches existentes). `mode` linear/exp por canal. | Doepfer A-130/131/132 (VCA linear/exp — teoria pública); Mutable Veils (curva de resposta — ficha pública) |
+| ~~**banco de VCA de 4 canais** (`VCA4`)~~ | MÓDULO próprio | **FEITO — 2026-09-07, `dossies/59_vca4.md`, `src/dsp/Vca4.hpp` (Módulo 59).** 4 canais (`levelN` + `cvN_amt` atenuvertido), `curve` linear/exp **compartilhado**, `mix_gain` (0–2 — a soma dos 4 com teto suave), `drift` semeado nos 4 ganhos. Entradas `in1..4`/`cv1..4`, saídas `out1..4` + `mix`. Mesmo núcleo do `VCA` (ganho suavizado + `softSat`). Módulo próprio — o `VCA` #20 continua duplo. 8 testes. | Doepfer A-131/132 (VCA exp/linear — teoria pública); Mutable Veils (curva — ficha pública); Quad VCA como mixer (Intellijel/4ms) |
 
 **O ranking de popularidade RE-CONFIRMA candidatos do `§2.5`:**
 
@@ -422,11 +422,9 @@ sends/mutes/cue (fora do escopo de instrumento de composição por ora).
 
 **Ordem sugerida, se virar "Onda F":** `SPECTRA` → `SHIFTER` (ou `mode`
 do `SHAPE`) → vocoder (`mode` do `FORMANT`) → VCA 4ch. `SPECTRA` é o mais
-rico e o único genuinamente novo no catálogo. **Onda F: `SPECTRA` ✓
-(Módulo 57) · `SHIFTER` ✓ (Módulo 58, virou módulo próprio) · vocoder ✓
-(`mode` do `FORMANT` #45, 2026-09-07).** Segue só o VCA 4 canais (vai
-ser módulo próprio `VCA4`, não estender o `VCA` duplo — decisão do autor
-pra não quebrar a ordem de portas).
+rico e o único genuinamente novo no catálogo. **Onda F COMPLETA
+(2026-09-07): `SPECTRA` ✓ (#57) · `SHIFTER` ✓ (#58, módulo próprio) ·
+vocoder ✓ (`mode` do `FORMANT` #45) · `VCA4` ✓ (#59, módulo próprio).**
 
 ---
 

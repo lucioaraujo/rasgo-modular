@@ -5483,3 +5483,36 @@ teste — só ganhou 1 knob + 1 jack, cabe nos 14 HP). Sem novo alvo CTest
 
 **70/70 CTest Debug + Release.** Onda F: SPECTRA ✓ SHIFTER ✓ vocoder ✓ |
 só `VCA4` (4 canais, módulo próprio) pendente.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda F — Módulo 59 VCA4 (banco de 4 VCAs) — Onda F COMPLETA
+
+**`src/dsp/Vca4.hpp` (NOVO), `tests/test_vca4.cpp` (8 testes).** O `VCA`
+(#20) é duplo; um patch grande precisa de VCA em quantidade (Veils /
+Quad VCA — a utilidade nº 1 do formato). Módulo próprio, **não** estender
+o `VCA` — mexer nas portas dele quebra a ordem de índice de patches
+salvos (decisão do autor).
+
+4 canais: `levelN` (0–1, +`cvN` atenuvertida por `cvN_amt` −1..1, soma
+por porta). `curve` (0–1, **compartilhado** — 0 linear pra somar CV, 1
+exp `g^(1+3c)`), `mix_gain` (0–2 — ganho da saída `mix`, soma dos 4 com
+`softSat`), `drift` (**desvio Rasgo** SEMEADO nos 4 ganhos). Entradas
+`in1..4`/`cv1..4` (8); saídas `out1..4` + `mix` (5). Mesmo núcleo do
+`VCA`: ganho suavizado ~1,5 ms + `softSat` por canal e na soma.
+Família **TRANSFORM** (após o `VCA`). Painel 18 HP (4 tiras + CURVE/MIXG/
+DRIFT + jack MIX à direita — a 1ª versão colidia `O4`×`MIX`, resolvido
+alargando de 16 pra 18 HP e separando as colunas).
+
+`makeInputs()/makeOutputs()/makeParams()` geram os descritores em loop
+(8 portas de entrada, 5 de saída, 11 params) — o construtor do `Signal`
+aceita `std::vector`.
+
+Integração: CMake (CTest 71), ModuleCatalog (TRANSFORM, após VCA),
+LearnCatalog (21 binds + def. de módulo), test_panel_layout,
+test_learn_catalog. Docs: 00_indice, 59_vca4.md, PESQUISA §2.6,
+RASGO_MODULAR.md §4.1/§36.3, README; contagens 59 módulos / 71 alvos
+CTest.
+
+**71/71 CTest Debug + Release. ONDA F COMPLETA:** SPECTRA ✓ SHIFTER ✓
+vocoder (mode do FORMANT) ✓ VCA4 ✓.

@@ -264,7 +264,7 @@ void testEveryCatalogModuleHasBlurb() {
     const char* types[] = {
         "OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE",
         "MATTER", "STRING", "DRUM", "SIGNAL-IN",
-        "FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "SHIFTER", "PARAMETRIC",
+        "FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "PARAMETRIC",
         "GLIDE", "CONTROL", "CRUSH",
         "ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH",
         "CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ",
