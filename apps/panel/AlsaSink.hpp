@@ -35,10 +35,11 @@ public:
         snd_pcm_uframes_t p = period;
         int dir = 0;
         snd_pcm_hw_params_set_period_size_near(pcm_, hw, &p, &dir);
-        // buffer fundo de 8 períodos: folga contra xrun quando o thread de
-        // desenho / re-prepare atrasa. (Voltou pra 8 — 4 era estreito
-        // demais na camada ALSA do PipeWire e recorria o "rachado".)
-        unsigned periods = 8;
+        // buffer fundo de 16 períodos: folga contra xrun quando o thread de
+        // desenho / re-prepare atrasa. (8 ainda recorria o "rachado" numa
+        // máquina carregada; 16 ≈ 85 ms @ 256/48k — latência irrelevante
+        // pra um painel de teste, e o jitter da UI cabe folgado.)
+        unsigned periods = 16;
         snd_pcm_hw_params_set_periods_near(pcm_, hw, &periods, nullptr);
         if (snd_pcm_hw_params(pcm_, hw) < 0)
             throw std::runtime_error("ALSA: parâmetros de hardware recusados");

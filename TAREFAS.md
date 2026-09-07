@@ -5611,3 +5611,50 @@ README, PESQUISA §2.6.
 **72/72 CTest Debug + Release.** Pendências restantes do §2.6: FFT real /
 partial tracking no SPECTRA; rede all-pass IIR de banda larga no
 SHIFTER — mudanças grandes de caráter, ficam pra quando o autor pedir.
+
+---
+
+## Registro da etapa — 2026-09-08: painel — cliques de reprodução + copiar seed
+
+Investigação dos cliques com o VARIA (seeds 944390523, 173504473,
+181161106). **Sonda headless nova** (`click_probe`, reconstrói o grafo
+exato do painel + seedPatch + `motion.tick` a cada 33 ms) mede
+DESCONTINUIDADE (`|x[n]-x[n-1]|`), não só clip:
+
+- seed 944390523, VARIA ON, −24 a +12 dB: pico 0,007→0,58, **zero
+  clips, maxΔ escala LINEAR com o ganho** (−56 a −20 dBFS) — é a forma
+  de onda, não um degrau. Nenhum passo > 0,2 em 30 s.
+- seed 173504473 e 625938148: idem, limpos com e sem VARIA.
+- a ordem de "volume" que o autor percebe (944 estala, 625 não) é o
+  INVERSO do nível real → não é o DSP.
+
+**Conclusão:** os cliques são xrun de reprodução (ALSA/PipeWire sob
+carga), agravados por dois pontos do painel — corrigidos:
+
+1. **`panel_main.cpp`** — quando a UI está com o `gmx`, o thread de
+   áudio emitia um período de ZERO DURO (degrau na forma de onda = um
+   estalo a cada mexida). Agora reemite o último período renderizado
+   com um fade (`starveGain *= 0.86`) — quase inaudível, some ao soltar
+   o lock.
+2. **`AlsaSink.hpp`** — buffer fundo 8 → 16 períodos (~85 ms @ 256/48k):
+   folga maior contra o jitter da UI numa máquina carregada.
+3. **`panel_main.cpp`** — `motion.tick`/`refreshCables` agora rodam sob
+   o `gmx` (era corrida com o thread de áudio — leitura rasgada de
+   float podia dar um coeficiente absurdo por um bloco).
+
+**Copiar o número do seed** (`panel_main.cpp`) — não funcionava:
+- `seedCopy` tomava a posse da seleção com o timestamp do evento; alguns
+  servidores recusam um timestamp "velho" e a posse não grudava. Agora
+  usa `CurrentTime` + `XFlush` + confere `XGetSelectionOwner`.
+- o handler de `SelectionRequest` não dava `XFlush` (a resposta ficava
+  presa no buffer até o próximo evento — 33 ms — e o requestor já tinha
+  desistido); agora dá. Serve também `TEXT`, `text/plain`,
+  `text/plain;charset=utf-8` além de `UTF8_STRING`/`STRING`; `TARGETS`
+  lista todos.
+- `SelectionClear` não apaga mais `seedClipOut` (um gestor de clipboard
+  toma a posse depois de copiar; a 2ª colagem falhava).
+- `Ctrl+V` na caixa: se o dono do clipboard não tem `UTF8_STRING`,
+  tenta `STRING`.
+
+**72/72 CTest Debug + Release.** Falta confirmação do autor: os cliques
+sumiram? o copiar/colar do seed funciona agora?
