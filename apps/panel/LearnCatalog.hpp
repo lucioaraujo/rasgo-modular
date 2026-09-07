@@ -345,6 +345,60 @@ inline const LearnTable& learnTable() {
                 "A soma das portadoras do algoritmo, ÷ nº de portadoras "
                 "+ softclip.", "", ""}},
         }},
+        {"SPECTRA", {
+            {"voices", {
+                "Quantas senóides o banco de re-síntese usa (2–24). Poucas "
+                "= caricatura do espectro; muitas = re-síntese fiel. Cada "
+                "voz herda um dos parciais mais fortes que a análise achou.",
+                "Resíntese espectral (Panharmonium / phase vocoder): o "
+                "módulo OUVE `in`, acha os picos do espectro de curto "
+                "prazo e re-oscila. O `ADDITIVE` constrói do zero; aqui o "
+                "material é o som que entra.",
+                "VOICE baixo + STRETCH = uma sombra inarmônica do som. "
+                "OSC/ADDITIVE → IN, VOICE alto = quase um clone."}},
+            {"blur", {
+                "Quão RÁPIDO cada voz persegue o parcial que herdou: 0 = "
+                "trava no som (transientes passam), 1 = arrasta ~0,6 s "
+                "(borra, coro fantasma, o som 'derrete').",
+                "É a constante de tempo do deslize freq/amp das vozes — "
+                "sem zíper em qualquer posição.", ""}},
+            {"shift", {
+                "Transpõe a RE-SÍNTESE (±2 oitavas, +CV 1 V/oct em PIT) "
+                "sem tocar na análise — pitch-shift de espectro, formante "
+                "junto.", "", "LFO → PIT: o espectro sobe e desce inteiro."}},
+            {"stretch", {
+                "Afasta/junta os parciais da re-síntese em torno do meio "
+                "→ inarmônico (sino, metal) sem mexer na altura percebida.",
+                "", ""}},
+            {"tone", {
+                "Inclinação espectral da saída: <0 abafa os agudos das "
+                "vozes, >0 realça. 0 = fiel à análise.", "", ""}},
+            {"jitter", {
+                "Wobble lento e SEMEADO na frequência de cada voz "
+                "(±3 %·jitter) — a re-síntese 'respira', nunca idêntica. "
+                "Determinístico. 0 = estático.", "", ""}},
+            {"freeze", {
+                "Congela os alvos das vozes: a análise para, o banco "
+                "continua oscilando no último espectro. Pad infinito a "
+                "partir de qualquer som.",
+                "É o *spectral freeze* clássico. Tire a entrada depois de "
+                "congelar e a nota fica.", "FRZ ← gate do CLOCK: janelas "
+                "de espectro fixo alternando com o som vivo."}},
+            {"mix", {"Seco (o que entra em IN) ↔ ressintetizado. 0 = "
+                    "bypass. Sem IN, só o molhado importa.", "", ""}},
+            {"in:in", {
+                "O som a ANALISAR — qualquer voz, um DRUM, uma gravação. "
+                "Livre → um ruído interno de −30 dB com dois parciais que "
+                "derivam devagar (semeados) alimenta a análise: SPECTRA "
+                "sozinho é um drone tonal que evolui.", "", ""}},
+            {"in:pitch", {"CV 1 V/oct somada a SHIFT.", "", ""}},
+            {"in:freeze", {"Gate: enquanto alto, congela (= o toggle "
+                          "FRZ).", "", ""}},
+            {"out:out", {"Canal esquerdo do banco re-sintetizado + MIX.",
+                        "", ""}},
+            {"out:r", {"Canal direito — vozes ímpares/pares "
+                      "panoramizadas.", "", ""}},
+        }},
         {"PULSAR", {
             {"freq", {
                 "Taxa de repetição dos pulsarets = a ALTURA (20–2000 Hz, "
@@ -2242,6 +2296,17 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — "
             "metais, sinos, baixos que o subtrativo não faz.", "",
             "RATIO inteiro = harmônico; quebrado = inarmônico (sino)."}},
+        {"SPECTRA", {
+            "Resíntese espectral — OUVE um som, acha os parciais mais "
+            "fortes e re-oscila como um banco de senóides que o segue. A "
+            "ponte análise → síntese (Panharmonium / phase vocoder).",
+            "O ADDITIVE constrói o espectro do zero; o MEMORY grão no "
+            "tempo; aqui o material é o espectro de curto prazo da "
+            "entrada. FREEZE = pad infinito de qualquer som. Sem IN, um "
+            "ruído semeado alimenta a análise → drone que evolui sozinho.",
+            "DRUM → IN, VOICE baixo, STRETCH = uma sombra sineira do "
+            "ritmo; FRZ ← gate = espectro congelado alternando com o "
+            "vivo."}},
         {"PULSAR", {
             "Síntese pulsar (Curtis Roads) — trem de pulsarets (grão + "
             "silêncio) com DUAS frequências independentes: FREQ = a "

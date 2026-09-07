@@ -46,6 +46,7 @@
 #include "dsp/Pulsar.hpp"
 #include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
+#include "dsp/Spectra.hpp"
 #include "dsp/SampleHold.hpp"
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
@@ -188,6 +189,7 @@ int main() {
     mods.emplace_back("ADDITIVE", std::make_unique<Additive>());
     mods.emplace_back("OPERATOR", std::make_unique<Operator>());
     mods.emplace_back("PULSAR", std::make_unique<Pulsar>());
+    mods.emplace_back("SPECTRA", std::make_unique<Spectra>());
     mods.emplace_back("NOISE", std::make_unique<Noise>());
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());
