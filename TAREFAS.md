@@ -5312,3 +5312,26 @@ direto. Toggles do Motion Engine: descartado como causa (só ~1% dos
 eventos; e o DSP não clica de qualquer forma).
 
 **68/68 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: caixa de número de seed no cabeçalho (copia/cola)
+
+O número do seed vivia no rótulo do botão `SEED` — num painel X11 cru não
+dá pra selecionar/copiar. Agora:
+
+- Botão `SEED` = só `⚄ SEED` (sorteia, como antes).
+- **Caixa rebaixada à esquerda do botão** com o número atual (ou `—` se o
+  patch foi editado à mão).
+- **Clique na caixa** → foca + copia o número pro clipboard do X11
+  (CLIPBOARD + PRIMARY), flash "COPIADO"/"COPIED"/… (i18n `seedCopied`).
+- Focada: dígitos / Backspace / **Enter** carrega o seed / **Esc**
+  cancela / **Ctrl+C** copia / **Ctrl+V** cola. Atalhos de letra do
+  cabeçalho (g/v/m/s/c/e) suspensos enquanto focada. Clique fora tira o
+  foco.
+- Protocolo de seleção do X11 implementado (`SelectionRequest` serve a
+  string; `SelectionClear`; `SelectionNotify` recebe o paste) — primeira
+  vez nesse painel. Átomos `CLIPBOARD`/`TARGETS`/`RASGO_SEED_PASTE` +
+  `UTF8_STRING` (já existia). `#include <X11/Xatom.h>`.
+
+Só painel — sem alvo CTest; **68/68** continua verde.

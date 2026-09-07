@@ -74,6 +74,7 @@ inline const L4 hdrBank    {"BANK",    "BANCO",    "BANQUE",   "BANCO"};
 inline const L4 hdrSave    {"SAVE",    "SALVA",    "ENREG.",   "GUARDA"};
 inline const L4 hdrRec     {"REC",     "REC",      "REC",      "REC"};
 inline const L4 hdrSeed    {"SEED",    "SEED",     "SEED",     "SEED"};
+inline const L4 seedCopied {"COPIED",  "COPIADO",  "COPIÉ",    "COPIADO"};
 
 // ---- cabeçalho: navegação -----------------------------------------------
 inline const L4 hdrTutorial{"TUTORIAL", "TUTORIAL", "TUTORIEL",   "TUTORIAL"};

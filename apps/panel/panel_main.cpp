@@ -69,6 +69,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/keysym.h>
 #include <X11/extensions/Xrandr.h>
 
@@ -756,6 +757,10 @@ int main() {
     const Atom aNetWmName = XInternAtom(dpy, "_NET_WM_NAME", False);
     const Atom aNetWmIconName = XInternAtom(dpy, "_NET_WM_ICON_NAME", False);
     const Atom aUtf8 = XInternAtom(dpy, "UTF8_STRING", False);
+    // seleção X11 pra copiar/colar o número do seed (caixa do cabeçalho)
+    const Atom aClipboard = XInternAtom(dpy, "CLIPBOARD", False);
+    const Atom aTargets = XInternAtom(dpy, "TARGETS", False);
+    const Atom aSeedPaste = XInternAtom(dpy, "RASGO_SEED_PASTE", False);
     auto setTitle = [&](const std::string& s) {
         const auto* d = reinterpret_cast<const unsigned char*>(s.data());
         const int n = static_cast<int>(s.size());
@@ -1050,12 +1055,19 @@ int main() {
     std::map<std::size_t, ScopeTrace> scopeSnap;
     std::uint64_t seedNum = 0;
 
+    // caixa de número de seed no cabeçalho — editável, copia/cola pelo
+    // clipboard do X11. `seedBoxFocus` suspende os atalhos de letra.
+    bool seedBoxFocus = false;
+    std::string seedBoxText;             // buffer editado quando focado
+    std::string seedClipOut;             // string servida numa SelectionRequest
+    std::chrono::steady_clock::time_point seedCopyFlash{};
+
     // ---- cabeçalho de linha única (modelo RASGO Synth) ----------------
     // `redraw` monta `headerHits` a cada quadro; o laço de evento lê a
     // lista pra rotear o clique pro `act*` certo. `hdrFlash` acende um
     // botão momentâneo por ~160 ms depois de acionado.
-    enum HdrAct { HA_NONE, HA_SEED, HA_REC, HA_LANG, HA_TUTORIAL, HA_ABOUT,
-                  HA_VARY, HA_STANDBY, HA_MUTATE, HA_EVOLVE, HA_CROSS,
+    enum HdrAct { HA_NONE, HA_SEED, HA_SEEDBOX, HA_REC, HA_LANG, HA_TUTORIAL,
+                  HA_ABOUT, HA_VARY, HA_STANDBY, HA_MUTATE, HA_EVOLVE, HA_CROSS,
                   HA_BANK, HA_SAVE, HA_ZOUT, HA_ZIN };
     struct HdrHit { int x, y, w, h; HdrAct act; };
     std::vector<HdrHit> headerHits;
@@ -1066,15 +1078,10 @@ int main() {
     std::chrono::steady_clock::time_point learnHoverSince{};
     const rasgo::panel::LearnEntry* learnShown = nullptr;
     std::string learnShownTitle;
-    // rótulo do botão SEED (o número pode ter até 9 dígitos no [g], e um
-    // `RASGO_SEED=N` pode ter mais — abrevia com "…" acima de 10 dígitos)
+    // rótulo do botão SEED — só o ícone + palavra; o número vive na
+    // caixa editável à esquerda (copiável/colável).
     auto seedLabel = [&](char* out, const std::size_t n) {
-        if (seedNum == 0) { std::snprintf(out, n, "\xE2\x9A\x84 SEED"); return; }
-        char num[24];
-        std::snprintf(num, sizeof num, "%llu",
-                      static_cast<unsigned long long>(seedNum));
-        if (std::strlen(num) > 10) { num[9] = '\0'; std::strcat(num, "\xE2\x80\xA6"); }
-        std::snprintf(out, n, "\xE2\x9A\x84 SEED %s", num);
+        std::snprintf(out, n, "\xE2\x9A\x84 SEED");
     };
     // quebra `s` (com '\n' respeitados) em linhas que cabem em `maxPx`.
     auto textW = [&](const std::string& t) -> int {
@@ -1260,7 +1267,7 @@ int main() {
         hdrBtnR(std::string("\xE2\x97\x8F ") + tr(S::hdrRec, uiLang),
                 recording.load(), HA_REC, T.warning);
         rx -= 2;
-        {   // SEED — sempre cheio (cor de acento), como o botão antigo
+        {   // SEED — botão de sortear (só ícone+palavra; nº vai na caixa)
             char lab[40]; seedLabel(lab, sizeof lab);
             const int w = textW(lab) + 16;
             rx -= w;
@@ -1268,6 +1275,31 @@ int main() {
             XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
             text(rx + 8, hbBase, lab, T.bg);
             headerHits.push_back({rx, hbY, w, hbH, HA_SEED});
+            rx -= 4;
+        }
+        {   // caixa de número de seed — rebaixada, editável, copia/cola
+            const bool flashCopied =
+                hdrNow - seedCopyFlash < std::chrono::milliseconds(900);
+            const std::string shown = seedBoxFocus
+                ? seedBoxText
+                : (seedNum ? std::to_string(
+                                 static_cast<unsigned long long>(seedNum))
+                           : std::string("\xE2\x80\x94"));   // "—"
+            const int w = std::max(textW("999999999"), textW(shown)) + 16;
+            rx -= w;
+            XSetForeground(dpy, gc, flashCopied ? T.accent : T.recessed);
+            XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
+            XSetForeground(dpy, gc, seedBoxFocus ? T.accent : T.line);
+            XDrawRectangle(dpy, bb, gc, rx, hbY, w, hbH);
+            const unsigned long tc = flashCopied ? T.bg : T.textPrimary;
+            text(rx + 8, hbBase,
+                 flashCopied ? tr(S::seedCopied, uiLang) : shown, tc);
+            if (seedBoxFocus && !flashCopied) {   // cursor no fim
+                const int cx = rx + 8 + textW(shown);
+                XSetForeground(dpy, gc, T.accent);
+                XFillRectangle(dpy, bb, gc, cx + 1, hbY + 4, 2, hbH - 8);
+            }
+            headerHits.push_back({rx, hbY, w, hbH, HA_SEEDBOX});
             rx -= 10;
         }
 
@@ -2142,6 +2174,32 @@ int main() {
     // switch de KeyPress.)
     auto actSeed = [&] { seedNum = nextRandomSeed(); applySeed(seedNum); };
 
+    // copia `s` pro clipboard do X11 (CLIPBOARD + PRIMARY) — protocolo
+    // servido nos eventos SelectionRequest lá embaixo.
+    auto seedCopy = [&](const std::string& s, Time when) {
+        if (s.empty()) return;
+        seedClipOut = s;
+        XSetSelectionOwner(dpy, win, aClipboard, when);
+        XSetSelectionOwner(dpy, win, XA_PRIMARY, when);
+        seedCopyFlash = std::chrono::steady_clock::now();
+        redraw();
+    };
+    auto seedBoxOpen = [&] {
+        seedBoxFocus = true;
+        seedBoxText = seedNum
+            ? std::to_string(static_cast<unsigned long long>(seedNum))
+            : std::string();
+    };
+    auto seedBoxCommit = [&] {
+        if (!seedBoxText.empty()) {
+            const std::uint64_t s = std::strtoull(seedBoxText.c_str(),
+                                                  nullptr, 10);
+            if (s) { seedNum = s; applySeed(s); }
+        }
+        seedBoxFocus = false;
+        redraw();
+    };
+
     auto actMotion = [&] {
         motionOn = !motionOn;
         setTitle(motionOn ? "RASGO Modular — variação ao vivo: ligada"
@@ -2323,9 +2381,90 @@ int main() {
                 }
             } else if (ev.type == Expose) {
                 if (ev.xexpose.count == 0) redraw();
+            } else if (ev.type == SelectionRequest) {
+                // outro app pediu o número do seed que copiamos
+                const XSelectionRequestEvent& rq = ev.xselectionrequest;
+                XSelectionEvent se{};
+                se.type = SelectionNotify;
+                se.display = rq.display;
+                se.requestor = rq.requestor;
+                se.selection = rq.selection;
+                se.target = rq.target;
+                se.property = rq.property;
+                se.time = rq.time;
+                if (rq.property == None) se.property = rq.target;
+                if (rq.target == aTargets) {
+                    Atom list[2] = {aUtf8, XA_STRING};
+                    XChangeProperty(dpy, rq.requestor, se.property, XA_ATOM, 32,
+                                    PropModeReplace,
+                                    reinterpret_cast<unsigned char*>(list), 2);
+                } else if ((rq.target == aUtf8 || rq.target == XA_STRING)
+                           && !seedClipOut.empty()) {
+                    XChangeProperty(dpy, rq.requestor, se.property, rq.target, 8,
+                                    PropModeReplace,
+                                    reinterpret_cast<const unsigned char*>(
+                                        seedClipOut.data()),
+                                    static_cast<int>(seedClipOut.size()));
+                } else {
+                    se.property = None;
+                }
+                XSendEvent(dpy, rq.requestor, True, NoEventMask,
+                           reinterpret_cast<XEvent*>(&se));
+            } else if (ev.type == SelectionClear) {
+                seedClipOut.clear();   // perdemos a posse do clipboard
+            } else if (ev.type == SelectionNotify) {
+                // resultado de um Ctrl+V na caixa
+                const XSelectionEvent& sn = ev.xselection;
+                if (sn.property != None && seedBoxFocus) {
+                    Atom ty; int fmt; unsigned long nItems, after;
+                    unsigned char* data = nullptr;
+                    if (XGetWindowProperty(dpy, win, sn.property, 0, 64, True,
+                                           AnyPropertyType, &ty, &fmt, &nItems,
+                                           &after, &data) == Success
+                        && data) {
+                        for (unsigned long i = 0;
+                             i < nItems && seedBoxText.size() < 19; ++i)
+                            if (data[i] >= '0' && data[i] <= '9')
+                                seedBoxText.push_back(
+                                    static_cast<char>(data[i]));
+                        XFree(data);
+                        redraw();
+                    }
+                }
             } else if (ev.type == KeyPress) {
                 const KeySym k = XLookupKeysym(&ev.xkey, 0);
                 const bool ctrl = (ev.xkey.state & ControlMask) != 0;
+
+                // caixa de seed focada: captura o teclado (atalhos de
+                // letra ficam suspensos) — dígitos / Backspace / Enter /
+                // Esc / Ctrl+C copia / Ctrl+V cola
+                if (seedBoxFocus) {
+                    if (k == XK_Escape) { seedBoxFocus = false; redraw(); }
+                    else if (k == XK_Return || k == XK_KP_Enter) seedBoxCommit();
+                    else if (k == XK_BackSpace) {
+                        if (!seedBoxText.empty()) seedBoxText.pop_back();
+                        redraw();
+                    }
+                    else if (ctrl && (k == XK_c || k == XK_C || k == XK_a
+                                      || k == XK_A))
+                        seedCopy(seedBoxText, ev.xkey.time);
+                    else if (ctrl && (k == XK_v || k == XK_V))
+                        XConvertSelection(dpy, aClipboard, aUtf8, aSeedPaste,
+                                          win, ev.xkey.time);
+                    else {
+                        char buf[16] = {0};
+                        KeySym ks;
+                        const int n = XLookupString(&ev.xkey, buf,
+                                                    sizeof buf - 1, &ks, nullptr);
+                        for (int i = 0; i < n; ++i)
+                            if (buf[i] >= '0' && buf[i] <= '9'
+                                && seedBoxText.size() < 19)
+                                seedBoxText.push_back(buf[i]);
+                        redraw();
+                    }
+                    continue;
+                }
+
                 if (k == XK_Escape) {
                     if (overlay) { overlay = 0; redraw(); }
                     else alive = false;
@@ -2373,6 +2512,11 @@ int main() {
             } else if (ev.type == ButtonPress) {
                 const int mx = ev.xbutton.x, my = ev.xbutton.y;
 
+                // clique fora do cabeçalho tira o foco da caixa de seed
+                if (my >= kCaseTop && seedBoxFocus) {
+                    seedBoxFocus = false; redraw();
+                }
+
                 // ---- overlay (tutorial / sobre): clique fecha ----------
                 if (overlay) {
                     if (ev.xbutton.button == 1) { overlay = 0; redraw(); }
@@ -2385,8 +2529,20 @@ int main() {
                     for (const auto& h : headerHits)
                         if (mx >= h.x && mx <= h.x + h.w
                             && my >= h.y && my <= h.y + h.h) { hit = h.act; break; }
+                    if (hit != HA_SEEDBOX && seedBoxFocus) {
+                        seedBoxFocus = false; redraw();
+                    }
                     switch (hit) {
                     case HA_SEED:   actSeed(); continue;
+                    case HA_SEEDBOX:
+                        // clique na caixa: foca, seleciona tudo e copia
+                        seedBoxOpen();
+                        seedCopy(seedNum ? std::to_string(
+                                     static_cast<unsigned long long>(seedNum))
+                                         : std::string(),
+                                 ev.xbutton.time);
+                        redraw();
+                        continue;
                     case HA_REC:    actRec(); continue;
                     case HA_LANG:   cycleLang(); continue;
                     case HA_TUTORIAL: overlay = (overlay == 1 ? 0 : 1); redraw(); continue;
