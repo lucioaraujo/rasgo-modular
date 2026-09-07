@@ -5234,3 +5234,43 @@ a lógica do `SIGNAL-IN` (note-on/off, last-note, vel 0) já é coberta por
 `gmx.try_lock()`.
 
 **68/68 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: cliques com VARIA — correções C + A no painel
+
+O autor confirmou: **são cliques** (não crepitação contínua nem distorção
+sustentada) com o VARIA ligado. Aprovou C + A ("se não funcionar fazemos
+o B também").
+
+**C — baratear o `motion.tick` (`panel_main.cpp`):** `motion.refreshCables()`
+rodava a cada frame (33 ms) varrendo todos os cabos por fibra. A fiação
+quase nunca muda entre frames (só muda via `populateMotion`, que já
+reconstrói as fibras) — o único caso que o `refreshCables` do tick pega é
+um desligamento por botão-direito sem `populateMotion`. Agora roda ~1×/s
+(`motionCableThrottle`, 30 frames). Corta o custo de CPU do VARIA e alivia
+o xrun do ALSA (o thread de áudio emite silêncio = clique quando não
+acompanha).
+
+**A — energia real pra a mão caótica (`panel_main.cpp`):** a v3 lia a
+energia do anel de osciloscópio DECIMADO do MASTER (`stride = block/44`,
+220 amostras), copiado por `try_lock` que defasa/falha sob carga — o duck
+protetor ficava cego. Agora o thread de áudio mantém um
+`std::atomic<float> gOutRms` (seguidor de RMS da saída real, τ ≈ 25 ms,
+escrito por chunk) e o `motion.tick` lê esse átomo. Sem lock, sem
+decimação, sem defasagem. O escalonamento `× 2,2` e o limiar do duck
+(`energy > 0,82`) ficam iguais.
+
+Ambas são correção técnica (custo de CPU + sinal de realimentação
+quebrado); o COMPORTAMENTO da mão quando o som está calmo é idêntico.
+
+**Pendente de decisão do autor:** os cliques são muito provavelmente
+**flips de toggle** do Motion Engine (`sub_2`, `sync_enable`, `reverse`,
+`freeze`, `dir` … ~15 toggles no rack, virados em timers de dwell de
+5–25 s). Um toggle é binário — não dá pra fazer slew; virar no meio do
+som sempre estala. C + A NÃO resolvem isso. Proposta: a mão caótica
+para de dirigir toggles (mexe só em knobs/sliders — contínuos,
+interpoláveis). Reverte o "os toggles também" do autor, mas está dentro
+do "limitaremos o que não funciona". Aguarda OK.
+
+**68/68 CTest Debug + Release.**
