@@ -36,25 +36,28 @@ public:
                {"trig", PortKind::Control, "gate"},
                {"level", PortKind::Control, ""},
                {"bright", PortKind::Control, ""},
-               {"pitch", PortKind::Control, "v/oct"}},
+               {"pitch", PortKind::Control, "v/oct"},
+               {"onset", PortKind::Control, "gate"}},
               {{"trigger", -1.0f, 1.0f, 0.0f, ""},
                {"edge", 0.0f, 1.0f, 0.0f, ""},
                {"reject", 0.0f, 1.0f, 0.1f, ""},
                {"response", 0.0f, 1.0f, 0.3f, ""},
-               {"hold", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"hold", 0.0f, 1.0f, 0.0f, ""},
+               {"sens", 0.0f, 1.0f, 0.4f, ""}}) {}
 
     std::string type() const override { return "SCOPE"; }
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        p.hp = 15;
         p.add(Widget::Kind::Label, "SCOPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scope", "", 2.5f, 6.0f, 66.1f);
+        p.add(Widget::Kind::Display, "scope", "", 2.5f, 6.0f, 68.0f);
         p.add(Widget::Kind::Knob, "TRIG", "trigger", 9.0f, 34.0f);
         p.add(Widget::Kind::Knob, "EDGE", "edge", 27.0f, 34.0f);
         p.add(Widget::Kind::Knob, "REJ", "reject", 45.0f, 34.0f);
         p.add(Widget::Kind::Knob, "RESP", "response", 9.0f, 56.0f);
         p.add(Widget::Kind::Knob, "HOLD", "hold", 27.0f, 56.0f);
+        p.add(Widget::Kind::Knob, "SENS", "sens", 45.0f, 56.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 82.0f);
         p.add(Widget::Kind::Jack, "EXT", "in:ext", 19.0f, 82.0f);
         p.add(Widget::Kind::Jack, "THRU", "out:thru", 7.0f, 106.0f);
@@ -62,6 +65,7 @@ public:
         p.add(Widget::Kind::Jack, "LVL", "out:level", 31.0f, 106.0f);
         p.add(Widget::Kind::Jack, "BRT", "out:bright", 43.0f, 106.0f);
         p.add(Widget::Kind::Jack, "PIT", "out:pitch", 55.0f, 106.0f);
+        p.add(Widget::Kind::Jack, "ONS", "out:onset", 67.0f, 106.0f);
         return p;
     }
 
@@ -89,6 +93,14 @@ public:
         lockCount_ = 0;
         armed_ = false;
         trigCd_ = 0;
+        // detector de onset/transiente (envelope rápido vs lento)
+        envFast_ = envSlow_ = 0.0f;
+        onFastAtk_ = 1.0f - std::exp(-1.0f / (0.0008f * sr_));
+        onFastRel_ = 1.0f - std::exp(-1.0f / (0.030f * sr_));
+        onSlowAtk_ = 1.0f - std::exp(-1.0f / (0.015f * sr_));
+        onSlowRel_ = 1.0f - std::exp(-1.0f / (0.070f * sr_));
+        onsetCd_ = 0;
+        onsetLock_ = 0;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -178,12 +190,30 @@ public:
             const float trg = trigCd_ > 0 ? 1.0f : 0.0f;
             if (trigCd_ > 0) --trigCd_;
 
+            // ---- onset: envelope rápido dispara acima do lento ----
+            const float ax = std::fabs(x);
+            envFast_ += (ax - envFast_)
+                      * (ax > envFast_ ? onFastAtk_ : onFastRel_);
+            envSlow_ += (ax - envSlow_)
+                      * (ax > envSlow_ ? onSlowAtk_ : onSlowRel_);
+            const float sens = clamp01(parameterValue("sens"));
+            const float ratioThr = 1.2f + (1.0f - sens) * 1.8f;
+            if (onsetLock_ > 0) --onsetLock_;
+            if (onsetLock_ == 0 && lvl_ > 0.01f
+                && envFast_ > envSlow_ * ratioThr + 0.004f) {
+                onsetCd_ = static_cast<int>(0.002f * sr_) + 1;
+                onsetLock_ = static_cast<int>(0.030f * sr_);
+            }
+            const float ons = onsetCd_ > 0 ? 1.0f : 0.0f;
+            if (onsetCd_ > 0) --onsetCd_;
+
             for (std::size_t c = 0; c < channels; ++c) {
                 outputs[0].at(c, f) = x;         // thru — limpo
                 outputs[1].at(c, f) = trg;
                 outputs[2].at(c, f) = lvl_;
                 outputs[3].at(c, f) = bright_;
                 outputs[4].at(c, f) = pitchOct_;
+                outputs[5].at(c, f) = ons;
             }
         }
     }
@@ -282,6 +312,12 @@ private:
 
     bool armed_ = false;
     int trigCd_ = 0;
+
+    // onset / transiente
+    float envFast_ = 0.0f, envSlow_ = 0.0f;
+    float onFastAtk_ = 0.02f, onFastRel_ = 0.001f;
+    float onSlowAtk_ = 0.001f, onSlowRel_ = 0.0002f;
+    int onsetCd_ = 0, onsetLock_ = 0;
 };
 
 }  // namespace rasgo::modular

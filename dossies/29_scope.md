@@ -38,16 +38,23 @@ corte do filtro, altura → oscilador, nível → VCA, disparo → envelope).
   nesses casos). Faixa útil ~53–1000 Hz; sai em **oitavas relativas a
   110 Hz** (o `freq` padrão do `OSC` — `SCOPE.pitch → OSC.pitch`
   rastreia direto); 0 quando não há período claro (ruído, silêncio);
+- **`onset`** (CV gate, +2026-09-07) — pulso de ~2 ms a cada **ataque /
+  transiente**: dois seguidores de envelope no `|in|` (rápido ~0,8 ms /
+  lento ~15 ms de ataque); quando `envRápido > envLento · limiar`
+  (limiar de `1,2` a `3,0` conforme `sens`) e fora de um *cooldown* de
+  ~30 ms, dispara. Tom estável não dispara; ruído estável não dispara.
+  O detector de transiente pra ÁUDIO que faltava (Maths ch2/3 é pra CV).
 - **`hold`** (0/1) — congela `level`/`bright`/`pitch` no último valor
-  (o `trig` continua vivo).
+  (o `trig` e o `onset` continuam vivos).
 
 Params: `trigger` (−1..1), `edge` (0 subida / 1 descida), `reject`
 (0..1 → banda de histerese 0..~0,5), `response` (0..1 → ~2 ms..~800 ms,
-quadrático), `hold` (0/1).
+quadrático), `hold` (0/1), **`sens`** (0..1 — sensibilidade do `onset`;
+alto = qualquer subida, baixo = só ataques fortes).
 
 Sem RNG (100 % determinístico), sem alocação/lock/IO em `process()`.
 
-**Testes (13 funções, Debug + Release):** `thru` == `in` amostra a
+**Testes (16 funções, Debug + Release):** `thru` == `in` amostra a
 amostra (passa limpo); `trig` dispara 1×/ciclo numa senoide cruzando o
 nível subindo, 0× se `edge`=descida no mesmo ponto; `reject` alto mata
 disparo em sinal ruidoso perto do nível; `ext` conectada = fonte do
@@ -55,9 +62,11 @@ trigger (ignora `in`); `level` sobe rápido e cai devagar com `response`
 alto; `bright` de uma senoide 100 Hz << `bright` de uma senoide 4 kHz <<
 `bright` de ruído branco; `bright` monotônico varrendo a frequência;
 `pitch` de senoide 110 Hz ≈ 0 v/oct, de 220 Hz ≈ +1, de 440 Hz ≈ +2
-(±0,05); `pitch` = 0 pra ruído; `hold` congela as três leituras;
+(±0,06); `pitch` = 0 pra ruído; **`onset` dispara ~1×/ataque numa série
+de bursts e 0× num tom estável; `sens` alto dispara ≥ `sens` baixo;
+`onset` é gate 0/1**; `hold` congela as leituras (`onset` continua);
 `SCOPE.pitch → OSC.pitch` faz o `OSC` rastrear a altura de entrada no
-grafo; tudo finito; dois renders byte-idênticos; painel 14 HP sem
+grafo; tudo finito; dois renders byte-idênticos; painel 15 HP sem
 sobreposição.
 
 **Pendências (candidatos):** o **espectro desenhado** (barras FFT janela
@@ -188,13 +197,16 @@ holdoff curto).
 **Entradas:** `in` (Audio), `ext` (Control — fonte alternativa do
 trigger).
 **Saídas:** `thru` (Audio), `trig` (Control, gate), `level` (Control),
-`bright` (Control), `pitch` (Control, v/oct).
+`bright` (Control), `pitch` (Control, v/oct), `onset` (Control, gate —
+apenso 2026-09-07, índice 5).
 **Parâmetros:** `trigger` (−1..1, def 0), `edge` (0..1, def 0),
 `reject` (0..1, def 0,1), `response` (0..1, def 0,3), `hold` (0..1,
-def 0).
+def 0), `sens` (0..1, def 0,4 — aposto 2026-09-07).
 **Limites:** `thru` não é tocado (nem clampado — passa o que entra).
-`bright`/`level` em [0,1]; `pitch` livre (tipicamente −2,5..+5,5).
-CPU: 1 `exp` por bloco + 1 `sqrt`/`log2` por janela (512) + aritmética
+`bright`/`level` em [0,1]; `pitch` livre (tipicamente −2,5..+5,5);
+`onset`/`trig` são gates 0/1.
+CPU: pitch YIN ~2–4 % de um núcleo; 2 seguidores extra pro `onset`;
+1 `sqrt`/`log2` por janela (512) + aritmética
 por amostra. Sem alocação.
 
 ## 6. Alternativas descartadas

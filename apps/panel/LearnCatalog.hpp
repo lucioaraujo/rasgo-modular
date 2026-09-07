@@ -1732,6 +1732,10 @@ inline const LearnTable& learnTable() {
                 "Velocidade dos seguidores de LVL/BRT/PIT — ataque sempre "
                 "bem mais rápido que o release.", "", ""}},
             {"hold", {"Congela LVL/BRT/PIT no valor atual.", "", ""}},
+            {"sens", {
+                "Sensibilidade do detector de ONSET (ataque): alto = "
+                "dispara em qualquer subida de amplitude; baixo = só nos "
+                "ataques fortes. Envelope rápido vs lento.", "", ""}},
             {"in:in", {"Sinal a analisar/exibir.", "", ""}},
             {"in:ext", {"Fonte externa de disparo — sem cabo, TRIG usa o "
                        "próprio IN.", "", ""}},
@@ -1750,9 +1754,21 @@ inline const LearnTable& learnTable() {
                 "derivada / energia do sinal, Parseval) — sem FFT, "
                 "RT-seguro.", ""}},
             {"out:pitch", {
-                "Altura detectada por período entre cruzamentos de zero, "
-                "em 1 V/oct — só trava depois de 3 períodos consistentes "
-                "(ruído nunca trava, fica em 0).", "", ""}},
+                "Altura detectada em 1 V/oct — autocorrelação (YIN) num "
+                "sinal decimado, robusta a harmônicos (serra, acorde). "
+                "Faixa ~53–1000 Hz; ruído → 0.",
+                "O ZCR anterior reportava a oitava errada em som rico; o "
+                "YIN acha o período pela diferença acumulada normalizada.",
+                "SCOPE.pitch → OSC.pitch: um segundo oscilador afina pela "
+                "altura da entrada."}},
+            {"out:onset", {
+                "Pulso a cada ATAQUE/transiente do sinal (envelope rápido "
+                "> lento × SENS). Um gate de ~2 ms; não dispara em tom "
+                "estável.",
+                "É o detector de transiente clássico (Maths ch2/3 pra "
+                "áudio). Ruído estável não dispara.",
+                "SCOPE.onset ← uma linha de bateria → dispara ENVELOPE/LPG "
+                "no compasso do áudio; ou re-dispara o SAMPLER."}},
         }},
         {"CRUSH", {
             {"rate", {
@@ -2668,10 +2684,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Isento da Motion Engine. O botão STANDBY do cabeçalho é o "
             "mute deste módulo.", ""}},
         {"SCOPE", {
-            "Osciloscópio + medidor que DEVOLVE como CV — pitch detectado, "
-            "envelope, centroide espectral; o patch se ouve.",
+            "Osciloscópio + medidor que DEVOLVE como CV — pitch (YIN), "
+            "envelope, centroide espectral, ONSET (pulso no ataque); o "
+            "patch se ouve.",
             "É o SCOPE que mede pra reduzir (→ escalar); o BOXCAR mede "
-            "pra reconstruir (→ onda).", ""}},
+            "pra reconstruir (→ onda).",
+            "SCOPE.onset ← bateria → dispara ENVELOPE no compasso do "
+            "áudio; SCOPE.pitch → OSC.pitch afina pelo que entra."}},
         {"NOTE-OUT", {
             "Saída MIDI — converte gate + 1 V/oct em note on/off, com "
             "canal, velocidade e um registro de partitura.",
