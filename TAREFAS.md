@@ -5692,3 +5692,32 @@ interno de ~0,3 quando o VARIA varre o `time` (delay teleporta) mas ele
 reprodução (xrun), não do DSP.
 
 **72/72 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-08: caixa de seed — seleção + clipboard ICCCM completo
+
+O autor: "não consigo selecionar o número do seed com o mouse". Duas
+coisas:
+
+1. **Testei o mecanismo de clipboard no ambiente dele** (`clip_test.c`,
+   réplica do handler): X11/Cinnamon com `csd-clipboard`. Um dono de
+   seleção com handler ICCCM completo funciona — `xclip -o` pega o valor,
+   e **continua pegando depois do dono sair** (o csd-clipboard cacheia).
+   O mecanismo é são; o handler do painel é que estava incompleto/quebrado.
+
+2. **Correções no painel** (`panel_main.cpp`):
+   - `seedCopy` agora pega um **timestamp real do servidor** (truque do
+     PropertyNotify de 0 byte) em vez de `CurrentTime` — ICCCM exige, e o
+     gestor de clipboard precisa dele pra cachear.
+   - Handler de `SelectionRequest` reescrito: `TARGETS` completo
+     (+ TIMESTAMP, MULTIPLE, text/plain…), alvo **TIMESTAMP**, alvo
+     **MULTIPLE** (ATOM_PAIR). Antes só respondia TARGETS/UTF8/STRING.
+   - `PropertyChangeMask` no `XSelectInput`.
+   - Clicar na caixa volta a **copiar** (o commit anterior tinha tirado a
+     cópia ao clicar sem pôr nada no lugar) e agora **realça o número
+     inteiro** ("selecionado") — digitar/Backspace substitui a seleção,
+     Ctrl+A re-seleciona, Ctrl+C copia, botão do meio cola.
+   - O número segue saindo no terminal a cada troca, como reserva.
+
+**72/72 CTest Debug + Release.**
