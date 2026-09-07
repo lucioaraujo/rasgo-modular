@@ -1746,6 +1746,45 @@ inline const LearnTable& learnTable() {
             {"out:out", {"O sinal destruído, misturado com o seco por "
                         "MIX. Clamp de segurança a ±4.", "", ""}},
         }},
+        {"SHIFTER", {
+            {"shift", {
+                "Move o espectro INTEIRO por tantos HERTZ (−2000..2000, "
+                "+CV em SFT: 1 unidade = 1000 Hz). 0 = passa-direto. "
+                "Como o deslocamento é em Hz e não em razão, os parciais "
+                "deixam de ser harmônicos → metálico, sineiro.",
+                "Deslocador de frequência (SSB — single sideband): "
+                "diferente do ring-mod do SHAPE, que dá as DUAS bandas "
+                "(soma e diferença) simétricas. Aqui `up` = espectro + "
+                "shift, `down` = espectro − shift, cada um em sua saída.",
+                "Δf pequeno (5–20 Hz) = um 'fase' que nunca fecha (as duas "
+                "cópias batem devagar). Δf grande = clangor inarmônico."}},
+            {"feedback", {
+                "Parte da saída `up` volta pra entrada → o espectro sobe "
+                "de novo, e de novo: glissando infinito (o 'barber pole' / "
+                "shimmer de Shepard). `feedback` negativo puxa de `down` "
+                "(desce sem parar). `tanh` no laço — nunca explode.", "",
+                "SHIFT ~8 Hz + FEEDBACK ~0,8 = a corda de Risset que sobe "
+                "eternamente."}},
+            {"tone", {
+                "Inclina o molhado (1 polo): <0 abafa o agudo do sinal "
+                "deslocado, >0 realça. 0 = neutro.", "", ""}},
+            {"drift", {
+                "Wobble lento e SEMEADO no Δf (±drift·50 %) — o "
+                "deslocamento 'respira', nunca fixo. Determinístico. "
+                "0 = estático.", "", ""}},
+            {"mix", {"Seco (IN) ↔ deslocado, nas DUAS saídas. 0 = bypass.",
+                    "", ""}},
+            {"in:in", {"O som a deslocar — uma voz, um acorde, um pad.",
+                      "", ""}},
+            {"in:shift_mod", {"CV somada em SHIFT, em Hz (1 unidade = "
+                             "1000 Hz). LFO → um vibrato de espectro.",
+                             "", ""}},
+            {"out:up", {"Espectro + SHIFT (a banda lateral superior).",
+                       "", ""}},
+            {"out:down", {"Espectro − SHIFT (a banda inferior). Cabeie as "
+                         "duas em destinos diferentes — a relação entre "
+                         "elas é o processo.", "", ""}},
+        }},
         {"SHAPE", {
             {"ring", {"Mistura IN com IN×MOD (ring-mod de 4 quadrantes).",
                      "", ""}},
@@ -2387,6 +2426,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"SHAPE", {
             "Waveshaper — dobra/satura/retifica a forma de onda pra criar "
             "harmônicos; de calor sutil a destruição.", "", ""}},
+        {"SHIFTER", {
+            "Deslocador de frequência — move o espectro INTEIRO por tantos "
+            "Hz (não por razão). Os parciais deixam de ser harmônicos → "
+            "metálico, sineiro. SSB: saídas `up` (+Δf) e `down` (−Δf).",
+            "O ring-mod do SHAPE dá as DUAS bandas simétricas; o SHIFTER "
+            "dá uma só por saída. FEEDBACK = o 'barber pole' de Risset "
+            "(glissando infinito). Bode/Moog frequency shifter.",
+            "SHIFT ~8 Hz = fase que nunca fecha; SHIFT grande + FEEDBACK "
+            "= a espiral de Shepard; `up`/`down` em destinos diferentes."}},
         {"CRUSH", {
             "Destruidor lo-fi / decimador — o lixo DIGITAL: redução de "
             "taxa (aliasing), de bits, transbordo que enrola, glitch "

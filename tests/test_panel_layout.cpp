@@ -52,6 +52,7 @@
 #include "dsp/Scope.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
+#include "dsp/Shifter.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
 #include "dsp/Stages.hpp"
@@ -205,6 +206,7 @@ int main() {
     mods.emplace_back("TURNTABLE", std::make_unique<Turntable>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
+    mods.emplace_back("SHIFTER", std::make_unique<Shifter>());
     mods.emplace_back("CRUSH", std::make_unique<Crush>());
     mods.emplace_back("LPG", std::make_unique<Lpg>());
     mods.emplace_back("DECISION", std::make_unique<Decision>());

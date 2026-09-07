@@ -5404,3 +5404,47 @@ CTest.
 
 **69/69 CTest Debug + Release.** Onda F: SPECTRA ✓ | SHIFTER, vocoder
 (mode do FORMANT), VCA 4ch pendentes.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda F — Módulo 58 SHIFTER (deslocador de frequência)
+
+**`src/dsp/Shifter.hpp` (NOVO), `tests/test_shifter.cpp` (13 testes).**
+Deslocador de frequência SSB (`PESQUISA §2.6` Tier 1). Virou MÓDULO
+próprio, não `mode` do `SHAPE` — o conceito (mover o espectro por Δf
+fixo em Hz, banda única) é distinto do waveshaper. O `SHAPE` faz
+ring-mod (bandas soma **e** diferença simétricas); o `SHIFTER` entrega
+**uma** por saída: `up` (espectro + Δf) e `down` (espectro − Δf) —
+a relação entre elas é o processo (Three Sisters). Como o deslocamento é
+aditivo em Hz, os parciais deixam de ser harmônicos → metálico/sineiro.
+
+`shift` (−2000..2000 Hz, +CV `shift_mod` ×1000 Hz), **`feedback`**
+(−0,95..0,95 — a saída `up` volta pra entrada → glissando infinito, o
+*barber pole* de Risset-Shepard; `tanh` no laço, `fb` negativo puxa de
+`down`), `tone` (−1..1), `drift` (**desvio Rasgo** SEMEADO no Δf),
+`mix`. Família **TRANSFORM**.
+
+DSP: SSB por transformada de Hilbert — FIR de 255 taps (kernel `2/(πk)`
+ímpar, janela de Blackman) para a componente imaginária + linha de
+atraso casada de 127 amostras (~2,6 ms) para a real → modulação em
+quadratura `re·cos ∓ im·sin`. Rejeição de imagem > 50 dB acima de
+~250 Hz; abaixo tende ao ring-mod (o FIR curto não faz Hilbert no
+grave — mesma limitação do hardware). softclip de segurança ±0,8 na
+saída (feedback + tone altos podem passar da unidade). `process()` não
+aloca; `drift=0` → determinístico.
+
+Ajuste no desenvolvimento: a 1ª tentativa usou rede all-pass IIR
+polyphase (Niemitalo 4+4) — a quadratura só ficava boa numa faixa
+estreita (corr ~1,0 no grave, ~0 só perto de 1 kHz). Trocado por FIR de
+255 taps, que dá quadratura perfeita e > 50 dB de rejeição na faixa
+útil. E o feedback passou a realimentar SÓ a saída `up` (não up+down,
+que se cancelavam) → o barber pole funciona.
+
+Integração: CMake (CTest 70), ModuleCatalog (TRANSFORM, após SHAPE),
+LearnCatalog (9 binds + def. de módulo), test_panel_layout,
+test_learn_catalog. Docs: 00_indice, 58_shifter.md, PESQUISA §2.6,
+RASGO_MODULAR.md §4.1/§36.3, README; contagens 58 módulos / 70 alvos
+CTest.
+
+**70/70 CTest Debug + Release.** Onda F: SPECTRA ✓ SHIFTER ✓ | vocoder
+(mode do FORMANT), VCA 4ch pendentes.
