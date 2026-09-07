@@ -316,7 +316,12 @@ se for adiante, vira dossiê antes do código (método §1). Ordenado por
 "tapa um buraco real do rack" → "amplia alcance" → "provável modo, não
 módulo".
 
-**Tier 1 — buracos reais na paleta de efeitos/utilidade:**
+**Tier 1 — buracos reais na paleta de efeitos/utilidade.** O que JÁ
+existe: reverb (`SPACE` multitap + `HALL` FDN), delay de linha (`LOOPER`
+com hold/reverse/fita/multi-cabeça), eco granular (`MEMORY`),
+distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
+(`FUNCTION`, 0,01 Hz–12 kHz). O que FALTA: a família de **modulação**
+(atrasos CURTOS modulados) e um destruidor lo-fi dedicado.
 
 | Cand. | Família | O que é / por que falta | Parte de (conceito público) |
 |---|---|---|---|
@@ -351,7 +356,7 @@ módulo".
 - **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
 
 **Recomendação de ordem, se o autor quiser uma "Onda E":**
-`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. Os três primeiros fecham a paleta de efeitos (hoje só há reverb/delay/distorção-de-fold); `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. `SWIRL`/`PHASER` abrem a família de MODULAÇÃO que ainda não existe (chorus/flanger/phaser — distinta do delay de linha do `LOOPER` e dos reverbs `SPACE`/`HALL`); `CRUSH` dá casa ao verbo DAMAGE; `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
 
 ---
 
