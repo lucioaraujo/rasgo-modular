@@ -5356,3 +5356,51 @@ muito mais porta livre. Subido pra `·40` ≈ 43. Distribuição real
 10–19 cabos); só o topo ficou mais denso. `id.complexity` inalterado.
 
 **68/68 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: Onda F — Módulo 57 SPECTRA (resíntese espectral)
+
+**`src/dsp/Spectra.hpp` (NOVO), `tests/test_spectra.cpp` (11 testes).**
+A lacuna análise → síntese (`PESQUISA §2.6` Tier 1). Nenhum módulo RASGO
+ouvia um som e o re-sintetizava — o `ADDITIVE` constrói do zero, o
+`MEMORY` faz grão no tempo. `SPECTRA` analisa o espectro de curto prazo
+de `in` e re-oscila como um banco de senóides que **segue** o som
+(Panharmonium / phase vocoder no idioma RASGO).
+
+**Análise:** 64 passa-faixas ressonantes de 2 polos (numerador
+`x−x[-2]`, pico ~unitário), log-espaçados 35 Hz–14 kHz, BW ~1/9 oitava
+(sobrepostas) + seguidor de pico (atk 3 ms / rel 60 ms). A cada ~6 ms
+(hop): máximos locais > −40 dB do maior, ordenados por força, os
+`voices` primeiros; interpolação parabólica de `ln(env)` em log-freq
+entre as 3 bandas vizinhas refina cada frequência.
+
+**Síntese:** `voices` (2–24) senóides de fase contínua; cada uma DESLIZA
+(sem zíper — a lição do zíper desta sessão) para a freq/amp do pico
+herdado, constante de tempo = `blur` (0 ~5 ms ↔ 1 ~600 ms). `shift`
+(±2 oct, +CV 1V/oct em `pitch`) e `stretch` (−1..1 inarmônico) transpõem
+a re-síntese SEM tocar na análise; `tone` inclina; `jitter` (**desvio
+Rasgo**) = wobble SEMEADO por voz; **`freeze`** (toggle + gate) para a
+análise → *spectral freeze* / pad infinito de qualquer som; `mix`.
+Saídas `out`/`r` (L/R, vozes ímpares/pares panoramizadas). Família
+**SOURCE**.
+
+**`in` livre → fonte autônoma:** ruído interno de −30 dB + 2 parciais
+fantasma (180/430 Hz) que derivam devagar (semeados) → drone tonal que
+evolui. `process()` não aloca; `jitter=0` → determinístico (com e sem
+entrada).
+
+Ajuste no desenvolvimento: a 1ª versão usava ressoador all-pole (ganho
+ressonante ~500×) e Q altíssimo com 48 bandas esparsas → um parcial
+entre bandas não era detectado e a saída saturava. Corrigido: BP
+normalizado `b0(x−x[-2])`, 64 bandas, BW alargada pra as bandas se
+sobreporem.
+
+Integração: CMake (CTest 69), ModuleCatalog (SOURCE, após PULSAR),
+LearnCatalog (12 binds + def. de módulo), test_panel_layout,
+test_learn_catalog. Docs: 00_indice, 57_spectra.md, PESQUISA §2.6,
+RASGO_MODULAR.md §4.1/§36.3, README; contagens 57 módulos / 69 alvos
+CTest.
+
+**69/69 CTest Debug + Release.** Onda F: SPECTRA ✓ | SHIFTER, vocoder
+(mode do FORMANT), VCA 4ch pendentes.

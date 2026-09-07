@@ -262,7 +262,7 @@ void testRemainingCatalogModulesHaveAtLeastQuick() {
 // hover do corpo/título — 2026-09-07), com `quick` preenchido.
 void testEveryCatalogModuleHasBlurb() {
     const char* types[] = {
-        "OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "PLL", "CHORD", "NOISE",
+        "OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE",
         "MATTER", "STRING", "DRUM", "SIGNAL-IN",
         "FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC",
         "GLIDE", "CONTROL", "CRUSH",

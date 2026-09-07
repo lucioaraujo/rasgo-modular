@@ -50,6 +50,7 @@
 #include "dsp/Scope.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
+#include "dsp/Spectra.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
 #include "dsp/Stages.hpp"
@@ -75,6 +76,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "ADDITIVE")   return std::make_unique<Additive>();
     if (t == "OPERATOR")   return std::make_unique<Operator>();
     if (t == "PULSAR")     return std::make_unique<Pulsar>();
+    if (t == "SPECTRA")    return std::make_unique<Spectra>();
     if (t == "SIGNAL-IN" || t == "AUDIO-IN")
         return std::make_unique<SignalIn>();   // AUDIO-IN = alias de migração
     if (t == "CHAOS")      return std::make_unique<Chaos>();
@@ -150,7 +152,7 @@ struct CatalogGroup {
 // saída finita).
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
