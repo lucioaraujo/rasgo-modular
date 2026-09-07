@@ -92,7 +92,7 @@ independentes; masking e jitter semeados).
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
 56 módulos DSP,
-67 alvos CTest
+68 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -124,7 +124,7 @@ conceitual, não como um projeto separado.
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 67 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 68 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.

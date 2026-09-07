@@ -319,6 +319,14 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_motion_engine_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_motion_engine_tests COMMAND rasgo_modular_motion_engine_tests)
 
+    # regressão: o Motion Engine nunca clipa a saída (usa ModuleCatalog +
+    # PatchSeed + MotionEngine — mesmo include dir `apps` do painel).
+    add_executable(rasgo_modular_motion_no_clip_tests tests/test_motion_no_clip.cpp)
+    target_include_directories(rasgo_modular_motion_no_clip_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_motion_no_clip_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_motion_no_clip_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_motion_no_clip_tests COMMAND rasgo_modular_motion_no_clip_tests)
+
     # usa apps/panel/PatchGenetics.hpp
     add_executable(rasgo_modular_patch_genetics_tests tests/test_patch_genetics.cpp)
     target_include_directories(rasgo_modular_patch_genetics_tests PRIVATE src apps)
