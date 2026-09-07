@@ -5013,3 +5013,28 @@ Pendências: o CLIP reportado (seeds 597512815, 625938148) — render
 headless de 90 s dá pico −34 dBFS, ZERO clip; falta o autor dizer se é
 com VARIA on/off e se o PICO do cabeçalho acende. Confirmar de ouvido a
 mão calma. `git push`.
+
+---
+
+## Registro da etapa — 2026-09-07: o músico continua no comando com VARIA ligado
+
+O autor: "mesmo o VARIA ligado deve ser possível modificar os controles
+na mão — faço isso e o controle volta pra posição que estava"; e "o
+cabeamento também".
+
+- **`MotionEngine::tick`** — no topo do laço de fibras, se
+  `parameterUserValue(node, param)` divergiu do que a engine escreveu por
+  último (> 1,2% do range), é a mão do músico → a fibra **re-ancora**:
+  `center = value = valor do músico`. A mão passa a respirar em torno do
+  novo valor, não volta pro anterior. (Toggle idem, zera o dwell.)
+- **`MotionEngine::refreshCables(graph)`** — re-lê `parameterIsModulated`
+  de todas as fibras; a fibra de um param recém-cabeado cai pra 45% de
+  amplitude (não briga com o LFO/env plugado). Chamada 1×/frame no painel
+  (barato) — pega qualquer via de mudança de cabo.
+- **`panel_main.cpp`** — o `tick` também pausa com `cdrag.active` (arraste
+  de cabo), não só `drag.active`.
+- **`test_motion_engine`** — `testHandEditWins` (11ª função): com a mão
+  ligada, `setParameterBase(cutoff, 5000)` → a fibra segue em torno de
+  5000, não volta pros ~800 do seed.
+
+62/62 CTest Debug + Release.

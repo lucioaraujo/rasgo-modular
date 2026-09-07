@@ -271,6 +271,29 @@ void testInhabitDeterminism() {
     EXPECT(same);
 }
 
+void testHandEditWins() {
+    // com a mão caótica LIGADA, o músico mexe num knob -> a fibra
+    // re-ancora ali, não volta pro valor anterior.
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.inhabit(g, 314159ULL, {v});
+    for (int i = 0; i < 200; ++i) m.tick(g, 0.033f, 0.4f);   // deixa respirar
+
+    // o músico gira CUTOFF pra 5000 Hz (setParameterBase = mesma via do knob)
+    g.setParameterBase(v, "cutoff", 5000.0f);
+    float lo = 1e9f, hi = -1e9f;
+    for (int i = 0; i < 400; ++i) {
+        m.tick(g, 0.033f, 0.4f);   // ~13 s
+        const float c = g.parameterUserValue(v, "cutoff");
+        lo = std::min(lo, c); hi = std::max(hi, c);
+    }
+    // segue respirando em torno de 5000, NÃO voltou pros ~800 do seed
+    check(lo > 2500.0f, "a fibra re-ancorou onde o músico deixou (não caiu pros ~800)");
+    check(hi < 8500.0f, "e não disparou pra longe");
+}
+
 void testHotStaysGentle() {
     SignalGraph g;
     const auto v = g.add(std::make_unique<Voice>());
@@ -327,6 +350,7 @@ int main() {
     testStructuralBarelyMoves();
     testMixerMasterExempt();
     testInhabitDeterminism();
+    testHandEditWins();
     testHotStaysGentle();
     if (g_failures == 0) {
         std::cout << "RASGO Modular motion engine tests passed\n";

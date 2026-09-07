@@ -74,6 +74,15 @@ public:
     std::size_t bindingCount() const noexcept { return bindings_.size(); }
     std::size_t fiberCount() const noexcept { return fibers_.size(); }
 
+    // o músico mexeu na FIAÇÃO — re-lê quais params têm modulação entrando
+    // (a fibra de um param recém-cabeado passa a mexer bem menos, pra não
+    // brigar com o LFO/env que ele plugou). Não reseeda o campo nem mexe
+    // no que já está respirando.
+    void refreshCables(rasgo::modular::SignalGraph& graph) noexcept {
+        for (auto& f : fibers_)
+            f.cabled = graph.parameterIsModulated(f.node, f.paramId);
+    }
+
     // ---- modo 2: a mão caótica ------------------------------------------
     struct Fiber {
         std::size_t node = 0;
@@ -196,6 +205,20 @@ public:
         const double fx = field_.nx(), fy = field_.ny(), fz = field_.nz();
         for (std::size_t i = 0; i < fibers_.size(); ++i) {
             Fiber& f = fibers_[i];
+            const float range = f.pmax - f.pmin;
+
+            // o MÚSICO mandou: se o valor de intenção do param mudou pra
+            // longe do que a engine escreveu por último, é a mão dele —
+            // re-ancora a fibra ali (a mão passa a respirar em torno do
+            // novo valor, não volta pro anterior).
+            const float userVal = graph.parameterUserValue(f.node, f.paramId);
+            if (std::fabs(userVal - f.value)
+                > 0.012f * std::max(1e-4f, range) + 1e-5f) {
+                f.center = clampf(userVal, f.pmin, f.pmax);
+                f.value = f.center;
+                if (f.kind == 2) f.toggleDwell = 0.0f;
+            }
+
             const float goalBold = (boldLeft_ > 0.0f
                                     && boldFiber_ == static_cast<long>(i))
                 ? 2.0f : 1.0f;
@@ -206,7 +229,6 @@ public:
                       + f.wz * static_cast<float>(fz);
             raw = std::tanh(raw);                       // [-1,1]
 
-            const float range = f.pmax - f.pmin;
             const float effAmp = std::min(0.48f, f.amp * f.boldMul);
             const float cableK = f.cabled ? 0.45f : 1.0f;
 
