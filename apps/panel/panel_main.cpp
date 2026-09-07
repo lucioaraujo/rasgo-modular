@@ -90,6 +90,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -2135,10 +2136,23 @@ int main() {
     // próximo seed ALEATÓRIO (o espaço é ~10^19; `[g]` sorteia de verdade,
     // não incrementa). `RASGO_SEED=N` / `--seed N` reproduzem um específico.
     auto nextRandomSeed = [&]() -> std::uint64_t {
-        std::uint64_t x = static_cast<std::uint64_t>(
+        // entropia de VÁRIAS fontes independentes — /dev/urandom (o
+        // random_device), os dois relógios e o seed anterior — depois
+        // splitmix64 (mistura forte). O `steady_clock` sozinho podia
+        // repetir entre lançamentos rápidos (mistura fraca de 1 rodada).
+        static std::random_device rd;
+        std::uint64_t x =
+            (static_cast<std::uint64_t>(rd()) << 32) ^ rd();
+        x ^= static_cast<std::uint64_t>(
             std::chrono::steady_clock::now().time_since_epoch().count());
+        x ^= static_cast<std::uint64_t>(
+            std::chrono::system_clock::now().time_since_epoch().count()) * 2654435761ULL;
         x ^= 0x9E3779B97F4A7C15ULL * (seedNum + 1);
-        x ^= x << 13; x ^= x >> 7; x ^= x << 17;
+        // splitmix64
+        x += 0x9E3779B97F4A7C15ULL;
+        x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
+        x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
+        x ^= x >> 31;
         return (x % 999999999ULL) + 1;
     };
     auto applySeed = [&](const std::uint64_t s) {

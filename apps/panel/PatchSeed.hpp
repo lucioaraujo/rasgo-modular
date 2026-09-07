@@ -16,7 +16,8 @@
 //
 // GARANTIAS: sempre há um caminho voz → ... → MASTER → sink (audível); o
 // CLOCK sempre tica; detector de ciclo liga como feedback. Do mínimo
-// (3 cabos) à teia densa (28) conforme `complexity`.
+// (3 cabos) à teia densa (~43 no passeio + espinha ≈ 60) conforme
+// `complexity`.
 //
 // Genes (poucos, via SplitMix64 — stream separado por decisão): complexity,
 // wildness, energy, space, motion, voiceBias, root/scale, bpm. O resto
@@ -39,7 +40,7 @@
 namespace rasgo::panel {
 
 struct SeedIdentity {
-    float complexity = 0.4f;  // 0 = mínimo (3 cabos) .. 1 = denso (28)
+    float complexity = 0.4f;  // 0 = mínimo (3 cabos) .. 1 = denso (~43)
     float wildness = 0.3f;    // 0 = convencional .. 1 = experimental
     float energy = 0.5f;      // alvo de dinâmica
     float space = 0.3f;       // quantidade de reverb
@@ -478,7 +479,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     }
 
     // ================ PASSEIO PONDERADO (o coração) ================
-    const int nCables = 3 + static_cast<int>(std::lround(id.complexity * 25.0f));
+    // teto por passeio: 3 → ~43 tentativas (era ×25 = ~28, com 42 módulos;
+    // com 56 há mais portas livres, o rack aguenta mais relação).
+    const int nCables = 3 + static_cast<int>(std::lround(id.complexity * 40.0f));
     for (int c = 0; c < nCables; ++c) {
         // 1) escolhe uma classe de destino, depois um destino livre nela
         float dw[5] = {3.0f, 1.5f, 6.0f, 4.0f, 1.5f};
