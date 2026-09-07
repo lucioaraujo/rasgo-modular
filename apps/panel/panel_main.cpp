@@ -325,7 +325,8 @@ int main() {
     graph.node(at("ENVELOPE")).setParameter("mode", 1.0f);
     graph.node(at("ENVELOPE")).setParameter("attack", 0.006f);
     graph.node(at("ENVELOPE")).setParameter("decay", 0.30f);
-    graph.node(at("MIXER")).setParameter("pan1", -0.35f);
+    graph.node(at("MIXER")).setParameter("pan1", 0.0f);   // pan sempre no
+                                     // centro; o músico abre o palco à mão
     graph.connect(at("CLOCK"), 1, at("ENVELOPE"), 1);   // euclid -> gate
     graph.connect(at("OSC"), 2, at("FILTER"), 0);       // saw -> filtro
     graph.connect(at("FILTER"), 3, at("ENVELOPE"), 0);  // all -> VCA
@@ -989,6 +990,8 @@ int main() {
         int ax = 0, ay = 0;
     } cdrag;
     bool allRuptured = false;
+    // botão do meio (ou meio enquanto cabeia): paneia o rack na vertical
+    struct { bool active = false; int startY = 0; int startScrollY = 0; } panDrag;
     struct ModDrag { bool active = false; std::size_t id = 0; } mdrag;
     struct { bool active = false; int grabOff = 0; } palBarDrag;
     // geometria da barra de scroll da paleta (nulo se a lista cabe toda)
@@ -1092,7 +1095,6 @@ int main() {
     bool seedBoxFocus = false;
     std::string seedBoxText;             // buffer editado quando focado
     std::string seedClipOut;             // string servida numa SelectionRequest
-    std::chrono::steady_clock::time_point seedCopyFlash{};
 
     // ---- cabeçalho de linha única (modelo RASGO Synth) ----------------
     // `redraw` monta `headerHits` a cada quadro; o laço de evento lê a
@@ -1309,9 +1311,10 @@ int main() {
             headerHits.push_back({rx, hbY, w, hbH, HA_SEED});
             rx -= 4;
         }
-        {   // caixa de número de seed — rebaixada, editável, copia/cola
-            const bool flashCopied =
-                hdrNow - seedCopyFlash < std::chrono::milliseconds(900);
+        {   // caixa de número de seed — rebaixada, editável (digitar/colar
+            // um seed). O número também sai no terminal a cada troca, pra
+            // copiar de lá (a seleção X11 não é confiável no ambiente do
+            // autor). Sem "copiar ao clicar" nem destaque COPIÉ.
             const std::string shown = seedBoxFocus
                 ? seedBoxText
                 : (seedNum ? std::to_string(
@@ -1319,14 +1322,12 @@ int main() {
                            : std::string("\xE2\x80\x94"));   // "—"
             const int w = std::max(textW("999999999"), textW(shown)) + 16;
             rx -= w;
-            XSetForeground(dpy, gc, flashCopied ? T.accent : T.recessed);
+            XSetForeground(dpy, gc, T.recessed);
             XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
             XSetForeground(dpy, gc, seedBoxFocus ? T.accent : T.line);
             XDrawRectangle(dpy, bb, gc, rx, hbY, w, hbH);
-            const unsigned long tc = flashCopied ? T.bg : T.textPrimary;
-            text(rx + 8, hbBase,
-                 flashCopied ? tr(S::seedCopied, uiLang) : shown, tc);
-            if (seedBoxFocus && !flashCopied) {   // cursor no fim
+            text(rx + 8, hbBase, shown, T.textPrimary);
+            if (seedBoxFocus) {   // cursor no fim
                 const int cx = rx + 8 + textW(shown);
                 XSetForeground(dpy, gc, T.accent);
                 XFillRectangle(dpy, bb, gc, cx + 1, hbY + 4, 2, hbH - 8);
@@ -2210,6 +2211,9 @@ int main() {
         std::snprintf(t, sizeof t, "RASGO Modular — seed %llu",
                       static_cast<unsigned long long>(s));
         setTitle(t);
+        // o número no terminal — pra copiar de lá (linha limpa, greppável)
+        std::printf("seed %llu\n", static_cast<unsigned long long>(s));
+        std::fflush(stdout);
         redraw();
     };
 
@@ -2233,8 +2237,8 @@ int main() {
         XSetSelectionOwner(dpy, win, XA_PRIMARY, CurrentTime);
         XFlush(dpy);
         if (XGetSelectionOwner(dpy, aClipboard) != win)
-            std::fprintf(stderr, "[seed] não consegui a posse do CLIPBOARD\n");
-        seedCopyFlash = std::chrono::steady_clock::now();
+            std::fprintf(stderr, "[seed] não consegui a posse do CLIPBOARD; "
+                                 "copie o número do terminal\n");
         redraw();
     };
     auto seedBoxOpen = [&] {
@@ -2598,6 +2602,13 @@ int main() {
                     continue;
                 }
 
+                // ---- botão do meio: paneia o rack (também durante o
+                // cabeamento — não cancela o `cdrag`) --------------------
+                if (ev.xbutton.button == 2 && my >= kCaseTop) {
+                    panDrag = {true, my, scrollY};
+                    continue;
+                }
+
                 // ---- cabeçalho: botão da barra? -----------------------
                 if (ev.xbutton.button == 1 && my < kCaseTop) {
                     HdrAct hit = HA_NONE;
@@ -2610,12 +2621,9 @@ int main() {
                     switch (hit) {
                     case HA_SEED:   actSeed(); continue;
                     case HA_SEEDBOX:
-                        // clique na caixa: foca, seleciona tudo e copia
+                        // clique na caixa: só foca pra digitar/colar um seed
+                        // (o número pra copiar sai no terminal a cada troca)
                         seedBoxOpen();
-                        seedCopy(seedNum ? std::to_string(
-                                     static_cast<unsigned long long>(seedNum))
-                                         : std::string(),
-                                 ev.xbutton.time);
                         redraw();
                         continue;
                     case HA_REC:    actRec(); continue;
@@ -2810,6 +2818,9 @@ int main() {
                 }
                 redraw();
             } else if (ev.type == ButtonRelease) {
+                // soltar o botão do meio só encerra o pan — não mexe num
+                // cabeamento em curso (o esquerdo ainda está pressionado)
+                if (ev.xbutton.button == 2) { panDrag.active = false; continue; }
                 palBarDrag.active = false;
                 if (drag.active && recording.load()) {
                     const float toVal = graph.parameterUserValue(drag.node, drag.bind);
@@ -2881,7 +2892,26 @@ int main() {
                 redraw();
             } else if (ev.type == MotionNotify && cdrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
+                // arrastar o cabo pra perto da borda do rack rola o painel
+                // (o loop principal continua rolando enquanto fica lá) — o
+                // botão do meio também paneia (ver MotionNotify + Button2).
+                const int rackBot = winH - kLearnH;
+                int before = scrollY;
+                if (mouseY < kCaseTop + 52) scrollY = std::max(0, scrollY - 26);
+                else if (mouseY > rackBot - 52) scrollY += 26;
+                if (scrollY != before) {
+                    cdrag.ay -= (scrollY - before);   // âncora segue o jack
+                    relayout();
+                }
                 redraw();
+            } else if (ev.type == MotionNotify && panDrag.active) {
+                // botão do meio (ou meio enquanto cabeia): paneia o rack
+                const int dy = panDrag.startScrollY
+                             + (panDrag.startY - ev.xmotion.y);
+                int before = scrollY;
+                scrollY = std::max(0, dy);
+                if (cdrag.active) cdrag.ay -= (scrollY - before);
+                relayout(); redraw();
             } else if (ev.type == MotionNotify && mdrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
                 if (mouseX >= kPaletteW)   // reordena ao vivo (cabos seguem)
@@ -2949,6 +2979,15 @@ int main() {
             const float energy = std::min(1.0f, std::max(
                 gOutRms.load(std::memory_order_relaxed) * 2.2f, grDb * 0.18f));
             motion.tick(graph, 0.033f, energy);
+        }
+        // cabo parado perto da borda do rack: continua rolando (sem isto
+        // só rolava enquanto o mouse se movia)
+        if (cdrag.active && !panDrag.active) {
+            const int rackBot = winH - kLearnH;
+            const int before = scrollY;
+            if (mouseY < kCaseTop + 52) scrollY = std::max(0, scrollY - 18);
+            else if (mouseY > rackBot - 52) scrollY += 18;
+            if (scrollY != before) { cdrag.ay -= (scrollY - before); relayout(); }
         }
         // repinta a ~30 fps pra os osciloscópios dos módulos animarem — o
         // buffer fora da tela mantém sem flicker; o áudio é outro thread.

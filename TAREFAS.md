@@ -5658,3 +5658,37 @@ carga), agravados por dois pontos do painel — corrigidos:
 
 **72/72 CTest Debug + Release.** Falta confirmação do autor: os cliques
 sumiram? o copiar/colar do seed funciona agora?
+
+---
+
+## Registro da etapa — 2026-09-08: painel — seed no terminal, pans no centro, densidade, scroll ao cabear
+
+Pedidos do autor, em sequência:
+
+- **Número do seed no terminal.** A seleção X11 não é confiável no
+  ambiente dele (Cinnamon/PipeWire); copiar do clipboard não funciona.
+  `applySeed` agora imprime `seed <N>\n` no stdout a cada troca — copia
+  de lá. Removido o "copiar ao clicar na caixa" e o destaque COPIÉ; a
+  caixa só foca pra digitar/colar um seed. `Ctrl+C` na caixa ainda
+  tenta o clipboard (inócuo).
+- **Pans do MIXER sempre no centro** em todo seed (`PatchSeed.hpp`:
+  `pan1`, `pan2`, `pan3` = 0). O autor abre o palco à mão. Base do
+  painel idem.
+- **Teto de cabeamento ×40 → ×75** (`PatchSeed.hpp`). Mínimo inalterado
+  (3). Seeds densos pra testar vários módulos de uma vez — ex. seed
+  944390523 passou de 53 → 79 cabos, ainda sem clip (peak 0,10 @ 0 dB).
+- **Scroll ao cabear** (`panel_main.cpp`): arrastar um cabo pra perto da
+  borda de cima/baixo do rack rola o painel (contínuo enquanto fica
+  lá); a âncora do cabo acompanha o jack. **Botão do meio** paneia o
+  rack na vertical a qualquer momento — inclusive com o esquerdo
+  pressionado (não cancela o cabeamento).
+
+Cliques no seed 944390523 (continuação): sonda v2 (`click_probe2`) com
+topologia + localização por módulo + jitter de tick simulando a UI
+carregada — **60 s, ganhos até +24 dB, limitador engajado: zero
+candidatos a clique** no áudio renderizado. O `SPACE` tem um salto
+interno de ~0,3 quando o VARIA varre o `time` (delay teleporta) mas ele
+é filtrado antes da saída. A conclusão se mantém: o estalo é de
+reprodução (xrun), não do DSP.
+
+**72/72 CTest Debug + Release.**
