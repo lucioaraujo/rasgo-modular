@@ -84,11 +84,13 @@ phaser, a família de MODULAÇÃO que faltava) + `CRUSH` (Módulo 53 —
 destruidor lo-fi: redução de taxa/bits, wrap de inteiro, glitch, jitter;
 o verbo DAMAGE) + `STAGES` (Módulo 54 — gerador de N segmentos
 configuráveis: envelope, LFO ou sequência conforme a fiação; Mutable
-Stages / Rossum Control Forge).
+Stages / Rossum Control Forge) + `RESONATOR` (Módulo 55 — banco de modos
+afinados excitado por sinal externo, saídas low/mid/high que se cruzam;
+Rings/Elements + Three Sisters).
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-53 módulos DSP,
-65 alvos CTest
+54 módulos DSP,
+66 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -115,12 +117,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 53 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 54 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 65 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 66 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.

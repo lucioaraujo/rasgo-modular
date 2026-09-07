@@ -47,6 +47,7 @@
 #include "dsp/SampleHold.hpp"
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
+#include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
@@ -82,6 +83,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "FUNCTION")   return std::make_unique<FunctionGenerator>();
     if (t == "FILTER")     return std::make_unique<Filter>();
     if (t == "FORMANT")    return std::make_unique<Formant>();
+    if (t == "RESONATOR")  return std::make_unique<Resonator>();
     if (t == "GLIDE")      return std::make_unique<Glide>();
     if (t == "VCA")        return std::make_unique<Vca>();
     if (t == "CONTROL")    return std::make_unique<Control>();
@@ -147,7 +149,7 @@ struct CatalogGroup {
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
-        {"TRANSFORM", {"FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
+        {"TRANSFORM", {"FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},

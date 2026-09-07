@@ -55,6 +55,53 @@ using LearnTable =
 
 inline const LearnTable& learnTable() {
     static const LearnTable table = {
+        {"RESONATOR", {
+            {"freq", {
+                "Fundamental do banco de modos (20–5000 Hz, +CV 1 V/oct). "
+                "Os parciais são múltiplos disso (esticados por STRC).",
+                "", ""}},
+            {"structure", {
+                "As razões dos parciais: 0 harmônico exato (1, 2, 3…), "
+                "até 1 esticado/inarmônico (k·√(1+B·k²) — rigidez de "
+                "barra/sino/corda grossa).",
+                "Mesma fórmula de esticamento do ADDITIVE.stretch.", ""}},
+            {"partials", {"Quantos modos no banco (1–24). 1 = quase um "
+                         "FILTER BP muito ressonante.", "", ""}},
+            {"decay", {
+                "Tempo de anel (Q dos ressoadores): curto = pluck, longo "
+                "= arco/drone. Nunca auto-oscila (pólos < 1).", "", ""}},
+            {"damp", {
+                "Amortecimento dos AGUDOS no anel — os parciais altos "
+                "decaem antes dos graves (corda de verdade: ataque "
+                "brilhante, cauda escura).", "", ""}},
+            {"tilt", {
+                "Inclinação espectral das amplitudes: <0 grave forte (a "
+                "saída LOW domina), >0 agudo forte (HIGH domina), 0 "
+                "plano. **Varrer TILT cruza LOW↔HIGH** — a relação entre "
+                "as saídas é o processo (Three Sisters).", "",
+                "RESONATOR.low → MIXER e .high → SWIRL; varra TILT e ouça "
+                "a energia migrar entre os destinos."}},
+            {"position", {
+                "Onde a excitação 'bate' — um pente sobre a entrada que "
+                "zera alguns parciais (o ponto de pluck de uma corda; "
+                "0,5 = sem harmônicos pares).", "", ""}},
+            {"mix", {"Seco (a excitação crua) ↔ ressoado. 0 = bypass "
+                    "exato.", "", ""}},
+            {"in:in", {
+                "A EXCITAÇÃO — bata com o que quiser (DRUM, NOISE, uma "
+                "voz). Livre → um ruído interno de −36 dB arqueia o banco "
+                "(modo autônomo — canto de taça).", "", ""}},
+            {"in:strike", {
+                "Exciter embutido: cada borda de subida injeta uma "
+                "rajada de ruído de ~3 ms (um maço). TRIGSEQ → STRK = o "
+                "banco toca um ritmo.", "", ""}},
+            {"in:freq_mod", {"CV 1 V/oct somada a FREQ.", "", ""}},
+            {"out:low", {"Soma do 1/3 grave dos parciais (com MIX).", "",
+                        ""}},
+            {"out:mid", {"O 1/3 do meio.", "", ""}},
+            {"out:high", {"O 1/3 agudo — cruza com LOW quando você varre "
+                         "TILT.", "", ""}},
+        }},
         {"FORMANT", {
             {"vowel", {
                 "Posição na sequência de vogais A → E → I → O → U. "
@@ -2186,6 +2233,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Banco de 5 passa-faixas paralelos — as ressonâncias de "
             "vogais; VOWEL faz o morph A→E→I→O→U.", "",
             "Num ruído/pulso: fala sintética. Num acorde: coro."}},
+        {"RESONATOR", {
+            "Banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal "
+            "EXTERNO (você bate com o que quiser). Rings/Elements no modo "
+            "ressoador.",
+            "O MATTER é voz fechada (exciter próprio); aqui você traz a "
+            "excitação. As 3 saídas LOW/MID/HIGH se CRUZAM quando você "
+            "varre TILT — a relação entre elas é o processo (Three Sisters).",
+            "DRUM → IN (uma marimba tocada pelo bumbo); TRIGSEQ → STRK; "
+            "RESONATOR.low e .high em destinos diferentes."}},
         {"WASP", {
             "Filtro-distorção — o caráter sujo/gritado do EDP Wasp; a "
             "não-linearidade fica NO caminho do filtro.", "", ""}},
