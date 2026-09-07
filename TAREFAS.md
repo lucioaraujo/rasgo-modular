@@ -5038,3 +5038,34 @@ cabeamento também".
   5000, não volta pros ~800 do seed.
 
 62/62 CTest Debug + Release.
+
+---
+
+## Registro da etapa — 2026-09-07: revisão da lista + Onda E começou — Módulo 52 SWIRL
+
+Autor pediu a revisão dos módulos potenciais ainda não codados.
+`PESQUISA §2.5` — cruzamento dos 51 feitos contra §2.2/§3/§4/§6/§7/§8.
+Tier 1: **SWIRL** (chorus/flanger/ensemble/phaser — o RASGO não tinha
+NENHUM efeito de modulação), CRUSH (destruidor lo-fi — verbo DAMAGE sem
+casa), STAGES (gerador de segmentos configuráveis), + PHASER (entrou no
+SWIRL). Tier 2: RESONATOR, PULSAR, SWARM. Ordem sugerida da "Onda E":
+SWIRL → CRUSH → PHASER(no SWIRL) → STAGES → RESONATOR → PULSAR.
+
+**`src/dsp/Swirl.hpp` (NOVO), `tests/test_swirl.cpp` (11 testes).**
+`type` (0 chorus · 1 flanger · 2 ensemble · 3 phaser): os três primeiros
+= atrasos CURTOS modulados por LFO triangular (linha de ~50 ms/canal);
+o phaser = **6 all-pass de 1ª ordem TPT** varridos pelo LFO. `rate`
+(0,02–8 Hz, +CV), `depth`, `feedback` (−1..1; a escala do flanger é 1,08
+→ auto-oscila passando da unidade), `spread` (LFO de R defasado → estéreo
++ desafino), `tone` (1 polo no molhado, <0 LP / >0 HP), `age` (**desvio
+Rasgo** — companding BBD `|x|^(1∓0,25·age)` + ruído semeado + wobble; daí
+a auto-oscilação sem entrada), `mix` (+CV). `mix=0` bypass exato;
+`age=0` determinístico puro. Família **SPACE** (a gaveta de efeitos).
+
+Integração: `CMakeLists.txt` (CTest 63), `ModuleCatalog.hpp` (SPACE),
+`LearnCatalog.hpp` (SWIRL — 12 binds + definição de módulo),
+`test_panel_layout`, `test_learn_catalog`. Docs: `00_indice`,
+`52_swirl.md`, `PESQUISA §2.5`, `RASGO_MODULAR.md §4.1`/§36.3/§36.5 +
+contagens (51 módulos, 63 CTest), `README`.
+
+**63/63 CTest Debug + Release.**

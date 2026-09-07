@@ -270,7 +270,7 @@ void testEveryCatalogModuleHasBlurb() {
         "CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ",
         "QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR",
         "SWITCH", "MATRIX", "MULT", "PLANAR",
-        "SPACE", "HALL", "LOOPER", "MEMORY", "SAMPLER", "TURNTABLE",
+        "SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE",
         "MIXER", "MASTER", "SCOPE", "NOTE-OUT",
     };
     for (const char* t : types) {

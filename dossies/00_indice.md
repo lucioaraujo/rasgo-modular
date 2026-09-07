@@ -71,12 +71,15 @@ propriedade do cabo, não um módulo do catálogo.
 | 49 | [`49_signal_in.md`](49_signal_in.md) | `SIGNAL-IN` (ex-`AUDIO-IN`) | SOURCE | Onda D (2026-09-06) |
 | 50 | [`50_turntable.md`](50_turntable.md) | `TURNTABLE` | SPACE | Onda D (2026-09-06) |
 | 51 | [`51_boxcar.md`](51_boxcar.md) | `BOXCAR` | DECISION | **implementado** (2026-09-06) |
+| 52 | [`52_swirl.md`](52_swirl.md) | `SWIRL` (chorus/flanger/ensemble/phaser) | SPACE | **implementado** (2026-09-07) |
 
-**50 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+**51 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
 módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
 O #51 (`BOXCAR`) veio depois do roadmap, a partir do interesse do autor
 no AI Synthesis AI250 BXR; junto dele o `NOISE` (#19) ganhou o modo
-`poisson`. Pendência do #49: a thread ALSA-seq de MIDI no painel.
+`poisson`. O #52 (`SWIRL`) abre a **Onda E** (`PESQUISA §2.5`) — a
+família de MODULAÇÃO (chorus/flanger/ensemble/phaser) que faltava.
+Pendência do #49: a thread ALSA-seq de MIDI no painel.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):
 `SignalGraph` (grafo de áudio, `Signal`, `Cable`; modulação

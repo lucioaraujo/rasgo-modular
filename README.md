@@ -79,10 +79,12 @@ determinístico; o `TAPE` virou `heads` no `LOOPER`).
 51 — *boxcar averager* / integrador de porta: janela + delay + média de N
 capturas, `scan` reconstrói a onda, `geiger` = trem de Poisson livre;
 inspirado no AI Synthesis AI250 BXR) + o `NOISE` ganhou o modo `poisson`.
+**Onda E** (`§2.5`) começou: `SWIRL` (Módulo 52 — chorus/flanger/ensemble/
+phaser, a família de MODULAÇÃO que faltava).
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-50 módulos DSP,
-62 alvos CTest
+51 módulos DSP,
+63 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -109,12 +111,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 50 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 51 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 60 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 63 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
