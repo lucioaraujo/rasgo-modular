@@ -99,6 +99,8 @@ public:
         preWr_ = 0;
         inRamp_ = 1.0f;
         prevFreeze_ = false;
+        ctlPrimed_ = false;
+        ctlSmooth_ = 1.0f - std::exp(-1.0f / (0.01f * sr_));  // ~10 ms
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -121,8 +123,13 @@ public:
         const float mix = clamp01(parameterValue("mix"));
 
         const float fcHz = 18000.0f - damp * 16000.0f;
-        const float dampCoef = 1.0f - std::exp(-6.28318530718f * fcHz / sr_);
+        const float dampCoefT = 1.0f - std::exp(-6.28318530718f * fcHz / sr_);
         const float modDepth = mod * 18.0f;
+        if (!ctlPrimed_) {
+            sDampCoef_ = dampCoefT; sMix_ = mix;
+            sDmul_ = 0.3f + clamp01(sizeKnob) * 1.4f;
+            ctlPrimed_ = true;
+        }
         const float preSamp = pre * 0.12f * sr_;
         const float rampCoef = 1.0f - std::exp(-1.0f / (0.01f * sr_));
 
@@ -139,7 +146,12 @@ public:
             const float decEff = clamp01(decKnob
                 + (decIn ? decIn->at(0, f) : 0.0f));
             const float rt60 = 0.2f * std::pow(75.0f, decEff);
-            const float dmul = 0.3f + sizeEff * 1.4f;
+            // deslize por amostra — sem estalo quando size/damp/mix movem
+            sDmul_ += ((0.3f + sizeEff * 1.4f) - sDmul_) * ctlSmooth_;
+            sDampCoef_ += (dampCoefT - sDampCoef_) * ctlSmooth_;
+            sMix_ += (mix - sMix_) * ctlSmooth_;
+            const float dmul = sDmul_;
+            const float dampCoef = sDampCoef_;
 
             // rampa de entrada (freeze)
             const float rampTarget = frz ? 0.0f : 1.0f;
@@ -184,8 +196,8 @@ public:
             // --- saídas estéreo descorrelacionadas ---
             const float wetL = lineOut_[0] - lineOut_[2] + lineOut_[4] - lineOut_[6];
             const float wetR = lineOut_[1] - lineOut_[3] + lineOut_[5] - lineOut_[7];
-            const float yL = softLimit(dry * (1.0f - mix) + wetL * mix * 0.6f);
-            const float yR = softLimit(dry * (1.0f - mix) + wetR * mix * 0.6f);
+            const float yL = softLimit(dry * (1.0f - sMix_) + wetL * sMix_ * 0.6f);
+            const float yR = softLimit(dry * (1.0f - sMix_) + wetR * sMix_ * 0.6f);
 
             for (std::size_t c = 0; c < channels; ++c) {
                 outL.at(c, f) = yL;
@@ -248,6 +260,10 @@ private:
     float dt_ = 1.0f / 48000.0f;
     float inRamp_ = 1.0f;
     bool prevFreeze_ = false;
+    // controles deslizados por amostra (anti-zíper)
+    bool ctlPrimed_ = false;
+    float ctlSmooth_ = 1.0f;
+    float sDmul_ = 1.0f, sDampCoef_ = 0.5f, sMix_ = 0.3f;
 };
 
 }  // namespace rasgo::modular

@@ -79,6 +79,11 @@ public:
         driftInterval_ = static_cast<std::uint32_t>(
             std::max(1.0f, std::max(1.0f, sampleRate) / 8.0f));
         rng_ = 0x100000001B3ULL;
+        // deslize por amostra dos controles (~5 ms) — o shaper é sem
+        // memória, então um degrau em fold/sym/wrap/sat/level saltava a
+        // curva de transferência e estalava com knob/CV/Motion Engine.
+        ctlSmooth_ = 1.0f - std::exp(-1.0f / (0.005f * std::max(1.0f, sampleRate)));
+        ctlPrimed_ = false;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -87,13 +92,19 @@ public:
         const std::size_t frames = out.frames();
         const std::size_t channels = out.channels();
 
-        const float ring = clamp01(parameterValue("ring"));
-        const float foldP = clamp01(parameterValue("fold"));
-        const float sym = clampf(parameterValue("symmetry"), -1.0f, 1.0f);
-        const float wrap = clamp01(parameterValue("wrap"));
-        const float sat = clamp01(parameterValue("sat"));
-        const float level = clamp01(parameterValue("level"));
+        const float ringT = clamp01(parameterValue("ring"));
+        const float foldT = clamp01(parameterValue("fold"));
+        const float symT = clampf(parameterValue("symmetry"), -1.0f, 1.0f);
+        const float wrapT = clamp01(parameterValue("wrap"));
+        const float satT = clamp01(parameterValue("sat"));
+        const float levelT = clamp01(parameterValue("level"));
         const float drift = clamp01(parameterValue("drift"));
+
+        if (!ctlPrimed_) {
+            sRing_ = ringT; sFold_ = foldT; sSym_ = symT;
+            sWrap_ = wrapT; sSat_ = satT; sLevel_ = levelT;
+            ctlPrimed_ = true;
+        }
 
         const AudioBlock* in = inputs[0];
         const AudioBlock* mod = inputs[1];
@@ -101,6 +112,14 @@ public:
         const float driftAmp = 0.04f * drift;
 
         for (std::size_t f = 0; f < frames; ++f) {
+            sRing_  += (ringT  - sRing_)  * ctlSmooth_;
+            sFold_  += (foldT  - sFold_)  * ctlSmooth_;
+            sSym_   += (symT   - sSym_)   * ctlSmooth_;
+            sWrap_  += (wrapT  - sWrap_)  * ctlSmooth_;
+            sSat_   += (satT   - sSat_)   * ctlSmooth_;
+            sLevel_ += (levelT - sLevel_) * ctlSmooth_;
+            const float ring = sRing_, sym = sSym_, wrap = sWrap_;
+            const float sat = sSat_, level = sLevel_;
             if (drift > 0.0f && ++driftCounter_ >= driftInterval_) {
                 driftCounter_ = 0;
                 driftTgt_ = noise() * driftAmp;
@@ -115,7 +134,7 @@ public:
             x += sym * 0.5f;
 
             const float foldCv = fcv != nullptr ? fcv->at(0, f) : 0.0f;
-            const float foldAmt = clamp01(foldP + foldCv);
+            const float foldAmt = clamp01(sFold_ + foldCv);
             const float drive = 1.0f + foldAmt * 6.0f * (1.0f + driftCur_);
 
             // núcleo sem memória (dobra ⊕ wrap com ADAA de 1ª ordem, depois
@@ -179,6 +198,11 @@ private:
     std::uint32_t driftInterval_ = 6000;
     std::uint64_t rng_ = 0x100000001B3ULL;
     Oversampler2x os_{};
+    // controles deslizados por amostra (anti-zíper)
+    float ctlSmooth_ = 1.0f;
+    bool ctlPrimed_ = false;
+    float sRing_ = 0.0f, sFold_ = 0.0f, sSym_ = 0.0f,
+          sWrap_ = 0.0f, sSat_ = 0.0f, sLevel_ = 1.0f;
 };
 
 }  // namespace rasgo::modular

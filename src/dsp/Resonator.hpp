@@ -89,6 +89,7 @@ public:
         strikeEnv_ = 0.0f;
         rng_ = 0x5E50A70DE1A1C0FFULL;
         cP_ = -1;
+        coefPrimed_ = false;
         rebuild(12, 220.0f, 0.0f, 0.5f, 0.3f, 0.0f, 0.3f);
     }
 
@@ -120,6 +121,16 @@ public:
             || decay != cDecay_ || damp != cDamp_ || tilt != cTilt_
             || position != cPos_)
             rebuild(P, freq, structure, decay, damp, tilt, position);
+        if (!coefPrimed_) {
+            for (int k = 0; k < kMax; ++k) {
+                a1_[k] = ta1_[k]; a2_[k] = ta2_[k];
+                b0_[k] = tb0_[k]; g_[k] = tg_[k];
+            }
+            coefPrimed_ = true;
+        }
+        // ~8 ms de deslize por amostra pros coeficientes modais — sem
+        // chirp/estalo quando freq/estrutura/decay movem ao vivo
+        const float cs = 1.0f - std::exp(-1.0f / (0.008f * sr_));
 
         const int loEnd = std::max(1, P / 3);
         const int miEnd = std::max(loEnd + 1, (2 * P) / 3);
@@ -143,6 +154,10 @@ public:
 
             float bl = 0.0f, bm = 0.0f, bh = 0.0f;
             for (int k = 0; k < P; ++k) {
+                a1_[k] += (ta1_[k] - a1_[k]) * cs;
+                a2_[k] += (ta2_[k] - a2_[k]) * cs;
+                b0_[k] += (tb0_[k] - b0_[k]) * cs;
+                g_[k]  += (tg_[k]  - g_[k])  * cs;
                 const float y = a1_[k] * y1_[k] + a2_[k] * y2_[k]
                               + b0_[k] * x;
                 y2_[k] = y1_[k];
@@ -196,20 +211,24 @@ private:
                 * (1.0f - damp * (1.0f - 1.0f / std::sqrt(ki)));
             const float r = std::exp(-1.0f / std::max(1.0e-4f, tK * sr_));
             const float w = 6.2831853f * fk / sr_;
-            a1_[k] = 2.0f * r * std::cos(w);
-            a2_[k] = -r * r;
+            ta1_[k] = 2.0f * r * std::cos(w);
+            ta2_[k] = -r * r;
             float amp = std::pow(ki, -0.5f + tilt * 1.2f);
             amp *= std::fabs(std::sin(3.14159265f * ki * position));
             // normaliza pra o GANHO EM REGIME (excitação contínua) do modo
             // ser ~amp — assim `tilt` controla a amplitude direto, sem o
             // pólo perto de 1 dando um boost enorme aos graves
-            b0_[k] = amp;
-            g_[k] = (1.0f - r) * 2.0f * std::sin(w) * fade;   // 1/ganho ressonante
+            tb0_[k] = amp;
+            tg_[k] = (1.0f - r) * 2.0f * std::sin(w) * fade;   // 1/ganho ressonante
         }
     }
 
     float y1_[kMax] = {}, y2_[kMax] = {};
     float a1_[kMax] = {}, a2_[kMax] = {}, b0_[kMax] = {}, g_[kMax] = {};
+    // alvos dos coeficientes (recalc na mudança de param); os de cima
+    // deslizam por amostra pra cá — anti-zíper
+    float ta1_[kMax] = {}, ta2_[kMax] = {}, tb0_[kMax] = {}, tg_[kMax] = {};
+    bool coefPrimed_ = false;
     float prevStrike_ = 0.0f;
     float strikeEnv_ = 0.0f;
     std::uint64_t rng_ = 0x5E50A70DE1A1C0FFULL;
