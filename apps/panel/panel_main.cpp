@@ -335,7 +335,7 @@ int main() {
     graph.connect(at("ENVELOPE"), 1, at("FILTER"), 1, /*feedback=*/true);
 
     // ---- áudio (estéreo) ----------------------------------------------
-    // período de 256 (limite do AudioBlock) mas com um BUFFER FUNDO (8
+    // período de 256 (limite do AudioBlock) mas com um BUFFER FUNDO (16
     // períodos) = folga contra xrun (o "estalo" que soa como clip)
     // enquanto a UI e o re-prepare do grafo disputam a CPU
     rasgo::panel::AlsaSink alsa(48000, 2, 256);
@@ -511,18 +511,30 @@ int main() {
     std::thread audio([&] {
         AudioBlock st(static_cast<float>(alsa.rate()), 2, block);
         std::vector<float> inter(chunks * block * 2);
+        // último período REALMENTE renderizado — reemitido (com decaimento)
+        // quando a UI está com o `gmx`. Zerar duro nesses instantes era um
+        // degrau na forma de onda = um "clique" audível a cada mexida na
+        // interface; repetir o último período com um leve fade é quase
+        // inaudível e some assim que o lock é liberado.
+        std::vector<float> lastInter(chunks * block * 2, 0.0f);
+        float starveGain = 1.0f;
         while (running.load(std::memory_order_relaxed)) {
             // PRIORIDADE À UI: se o thread de desenho / evento está com o
             // `gmx` (editando o grafo, salvando, etc.), o áudio NÃO espera —
-            // emite um período de silêncio e tenta de novo. Uma edição de
-            // patch custa alguns ms de silêncio; nunca custa a janela travar.
+            // reemite o último período (decaindo) e tenta de novo. Uma
+            // edição de patch custa alguns ms de áudio repetido; nunca
+            // custa a janela travar nem um estalo.
             std::unique_lock<std::mutex> lk(gmx, std::try_to_lock);
             if (!lk) {
-                std::fill(inter.begin(), inter.end(), 0.0f);
+                starveGain *= 0.86f;   // fade se a disputa se arrasta
+                if (starveGain < 1e-4f) starveGain = 0.0f;
+                for (std::size_t i = 0; i < inter.size(); ++i)
+                    inter[i] = lastInter[i] * starveGain;
                 if (!alsa.write(inter.data()))
                     std::this_thread::sleep_for(std::chrono::milliseconds(5));
                 continue;
             }
+            starveGain = 1.0f;
             {
                 if (reprepare.exchange(false))
                     graph.prepare(static_cast<float>(alsa.rate()), 2, block);
@@ -592,6 +604,7 @@ int main() {
                 }
             }
             lk.unlock();   // a escrita ALSA (bloqueante) fica FORA do lock
+            lastInter.assign(inter.begin(), inter.end());   // p/ starve-fill
             if (!alsa.write(inter.data()))
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
@@ -775,6 +788,11 @@ int main() {
     const Atom aClipboard = XInternAtom(dpy, "CLIPBOARD", False);
     const Atom aTargets = XInternAtom(dpy, "TARGETS", False);
     const Atom aSeedPaste = XInternAtom(dpy, "RASGO_SEED_PASTE", False);
+    // alvos-texto que apps variados pedem numa colagem
+    const Atom aText = XInternAtom(dpy, "TEXT", False);
+    const Atom aTextPlain = XInternAtom(dpy, "text/plain", False);
+    const Atom aTextPlainU8 =
+        XInternAtom(dpy, "text/plain;charset=utf-8", False);
     auto setTitle = [&](const std::string& s) {
         const auto* d = reinterpret_cast<const unsigned char*>(s.data());
         const int n = static_cast<int>(s.size());
@@ -2206,8 +2224,16 @@ int main() {
     auto seedCopy = [&](const std::string& s, Time when) {
         if (s.empty()) return;
         seedClipOut = s;
-        XSetSelectionOwner(dpy, win, aClipboard, when);
-        XSetSelectionOwner(dpy, win, XA_PRIMARY, when);
+        // `CurrentTime` (0) é aceito sempre; alguns servidores recusam um
+        // timestamp de evento já "velho" e a posse não gruda em silêncio —
+        // era o motivo de "não consigo copiar". Toma a posse com
+        // CurrentTime e confirma.
+        (void)when;
+        XSetSelectionOwner(dpy, win, aClipboard, CurrentTime);
+        XSetSelectionOwner(dpy, win, XA_PRIMARY, CurrentTime);
+        XFlush(dpy);
+        if (XGetSelectionOwner(dpy, aClipboard) != win)
+            std::fprintf(stderr, "[seed] não consegui a posse do CLIPBOARD\n");
         seedCopyFlash = std::chrono::steady_clock::now();
         redraw();
     };
@@ -2421,18 +2447,24 @@ int main() {
                 se.property = rq.property;
                 se.time = rq.time;
                 const Atom prop = rq.property != None ? rq.property : rq.target;
+                const bool strTarget =
+                    rq.target == aUtf8 || rq.target == XA_STRING
+                    || rq.target == aText || rq.target == aTextPlain
+                    || rq.target == aTextPlainU8;
                 if (rq.requestor == 0) {
                     // requestor inválido — ignora
                 } else if (rq.target == aTargets) {
-                    Atom list[2] = {aUtf8, XA_STRING};
+                    Atom list[5] = {aTargets, aUtf8, XA_STRING, aText,
+                                    aTextPlainU8};
                     XChangeProperty(dpy, rq.requestor, prop, XA_ATOM, 32,
                                     PropModeReplace,
-                                    reinterpret_cast<unsigned char*>(list), 2);
+                                    reinterpret_cast<unsigned char*>(list), 5);
                     se.property = prop;
                     XSendEvent(dpy, rq.requestor, False, 0L, &reply);
-                } else if ((rq.target == aUtf8 || rq.target == XA_STRING)
-                           && !seedClipOut.empty()) {
-                    XChangeProperty(dpy, rq.requestor, prop, rq.target, 8,
+                } else if (strTarget && !seedClipOut.empty()) {
+                    const Atom reportType =
+                        (rq.target == XA_STRING) ? XA_STRING : aUtf8;
+                    XChangeProperty(dpy, rq.requestor, prop, reportType, 8,
                                     PropModeReplace,
                                     reinterpret_cast<const unsigned char*>(
                                         seedClipOut.data()),
@@ -2443,12 +2475,22 @@ int main() {
                     se.property = None;   // recusa
                     XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 }
+                XFlush(dpy);   // não deixa a resposta presa no buffer até o
+                               // próximo evento (o requestor tem timeout)
             } else if (ev.type == SelectionClear) {
-                seedClipOut.clear();   // perdemos a posse do clipboard
+                // NÃO limpa `seedClipOut`: um gestor de área de transferência
+                // (klipper etc.) toma a posse logo depois de copiar os dados;
+                // se a gente esquece a string, uma segunda colagem falha.
             } else if (ev.type == SelectionNotify) {
                 // resultado de um Ctrl+V na caixa
                 const XSelectionEvent& sn = ev.xselection;
-                if (sn.property != None && seedBoxFocus) {
+                if (sn.property == None && seedBoxFocus
+                    && sn.target == aUtf8) {
+                    // o dono do clipboard não tem UTF8_STRING — tenta STRING
+                    XConvertSelection(dpy, aClipboard, XA_STRING, aSeedPaste,
+                                      win, CurrentTime);
+                    XFlush(dpy);
+                } else if (sn.property != None && seedBoxFocus) {
                     Atom ty; int fmt; unsigned long nItems, after;
                     unsigned char* data = nullptr;
                     if (XGetWindowProperty(dpy, win, sn.property, 0, 64, True,
@@ -2885,6 +2927,12 @@ int main() {
         // `refreshCables` roda ~1x/s (a fiação quase nunca muda entre
         // frames; alívio de CPU pra não estourar o buffer de áudio).
         if (motionOn && !drag.active && !cdrag.active) {
+            // sob o `gmx`: `motion.tick` escreve as bases de parâmetro que o
+            // thread de áudio lê no mesmo instante — sem o lock era uma
+            // corrida (leitura rasgada de float → coeficiente absurdo por
+            // um bloco = estalo). `tick` é da ordem de microssegundos, não
+            // rouba tempo audível do lock.
+            std::lock_guard<std::mutex> lk(gmx);
             if (++motionCableThrottle >= 30) {
                 motionCableThrottle = 0;
                 motion.refreshCables(graph);
