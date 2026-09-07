@@ -48,6 +48,7 @@
 #include "dsp/SampleHold.hpp"
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
+#include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
@@ -190,6 +191,7 @@ int main() {
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());
     mods.emplace_back("FILTER", std::make_unique<Filter>());
     mods.emplace_back("FORMANT", std::make_unique<Formant>());
+    mods.emplace_back("RESONATOR", std::make_unique<Resonator>());
     mods.emplace_back("WASP", std::make_unique<Wasp>());
     mods.emplace_back("VCA", std::make_unique<Vca>());
     mods.emplace_back("CONTROL", std::make_unique<Control>());

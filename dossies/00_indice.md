@@ -74,16 +74,18 @@ propriedade do cabo, não um módulo do catálogo.
 | 52 | [`52_swirl.md`](52_swirl.md) | `SWIRL` (chorus/flanger/ensemble/phaser) | SPACE | **implementado** (2026-09-07) |
 | 53 | [`53_crush.md`](53_crush.md) | `CRUSH` (destruidor lo-fi) | TRANSFORM | **implementado** (2026-09-07) |
 | 54 | [`54_stages.md`](54_stages.md) | `STAGES` (segmentos configuráveis) | MODULATE | **implementado** (2026-09-07) |
+| 55 | [`55_resonator.md`](55_resonator.md) | `RESONATOR` (ressoador modal externo) | TRANSFORM | **implementado** (2026-09-07) |
 
-**53 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+**54 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
 módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
 O #51 (`BOXCAR`) veio depois do roadmap, a partir do interesse do autor
 no AI Synthesis AI250 BXR; junto dele o `NOISE` (#19) ganhou o modo
 `poisson`. O #52 (`SWIRL`) abre a **Onda E** (`PESQUISA §2.5`) — a
 família de MODULAÇÃO (chorus/flanger/ensemble/phaser) que faltava; o #53
 (`CRUSH`) dá casa ao verbo DAMAGE; o #54 (`STAGES`) é o gerador de
-segmentos configuráveis (Mutable Stages / Control Forge — envelope, LFO
-ou sequência conforme a fiação).
+segmentos configuráveis; o #55 (`RESONATOR`) é o Rings/Elements no modo
+ressoador (banco de modos afinados excitado de fora; saídas low/mid/high
+que se cruzam — Three Sisters).
 Pendência do #49: a thread ALSA-seq de MIDI no painel.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):

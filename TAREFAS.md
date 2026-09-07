@@ -5123,3 +5123,32 @@ Docs: 00_indice, 54_stages.md, PESQUISA §2.5, RASGO_MODULAR.md §4.1/
 
 **65/65 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ STAGES ✓ |
 RESONATOR, PULSAR pendentes.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda E — Módulo 55 RESONATOR (ressoador modal externo)
+
+**`src/dsp/Resonator.hpp` (NOVO), `tests/test_resonator.cpp` (11
+testes).** O `MATTER` é voz AUTO-CONTIDA; o `RESONATOR` é o Rings/
+Elements no modo "ressoador" — banco de ≤ 24 modos afinados que um sinal
+EXTERNO bate/arqueia (DRUM, NOISE, uma voz). `freq` (20–5000 Hz, +CV
+1V/oct), `structure` (harmônico↔esticado `k·√(1+B·k²)` — a mesma do
+`ADDITIVE`), `partials` (1–24), `decay` (Q; pólos < 1), `damp` (agudos
+decaem antes), **`tilt`** (−1..1 — inclinação espectral; **varrer cruza
+`low`↔`high`** — Three Sisters), `position` (pente de pluck), `mix`
+(0 = bypass). 3 saídas `low`/`mid`/`high` (1/3 grave/médio/agudo dos
+parciais). `strike` = exciter embutido (rajada de ruído ~3 ms). `in`
+livre → ruído interno de −36 dB (modo autônomo). Família **TRANSFORM**.
+
+Ajuste no desenvolvimento: a normalização do ganho ressonante — `b0=amp`
++ `g_[k] = (1−r)·2·sin(w)` (1/ganho ressonante) aplicado na saída de
+cada modo → `tilt` controla a amplitude direto sem o pólo perto de 1
+dando um boost enorme aos graves. Ganho de banda 26/√count + `tanh`.
+
+Integração: CMake (CTest 66), ModuleCatalog (TRANSFORM), LearnCatalog
+(14 binds + def. de módulo), test_panel_layout, test_learn_catalog.
+Docs: 00_indice, 55_resonator.md, PESQUISA §2.5, RASGO_MODULAR.md
+§4.1/§36.3, README; contagens 54 módulos / 66 alvos CTest.
+
+**66/66 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ STAGES ✓
+RESONATOR ✓ | só PULSAR pendente.

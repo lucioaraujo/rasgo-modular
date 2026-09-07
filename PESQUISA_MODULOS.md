@@ -333,7 +333,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 
 | Cand. | Família | O que é / por que | Parte de |
 |---|---|---|---|
-| **`RESONATOR`** | TRANSFORM / MATTER | Banco de ressonadores modais afinados, **excitados por sinal EXTERNO** (o `in` bate/arqueia as cordas). O `MATTER` é voz auto-contida; isto é o Rings/Elements no modo "ressoador" — você toca com o que quiser. A relação entre as saídas (grave/médio/agudo que se cruzam) pode ser o processo. | Mutable Rings/Elements (MIT — conceito, §3); Mannequins Three Sisters ★★ (§7 #50); 4ms SMR (§8); `BiomaModalResonator` (§4) |
+| ~~**`RESONATOR`**~~ | TRANSFORM | **FEITO — 2026-09-07, `dossies/55_resonator.md`, `src/dsp/Resonator.hpp` (Módulo 55).** Banco de ≤ 24 modos afinados, excitado de fora; `structure` harmônico↔esticado, `tilt` cruza as saídas `low`/`high` (Three Sisters), `strike` = exciter embutido, modo autônomo por ruído interno. Distinto do `MATTER` (voz fechada). | Mutable Rings/Elements (MIT — conceito, §3); Mannequins Three Sisters ★★ (§7 #50); `BiomaModalResonator` (§4) |
 | **`PULSAR`** | SOURCE | Síntese pulsar (Curtis Roads): um trem de *pulsarets* (grão curto) + silêncio; a razão grão/silêncio controla o **formante independente da altura**. Nem o `ADDITIVE` nem o `OPERATOR` nem o `MEMORY` fazem isso — é grão a taxa de nota, entre a síntese granular e a de formante. | Curtis Roads, *Microsound* (teoria pública); `BiomaPulsar` (§4) |
 | **`SWARM`** (multi-LFO orgânico) | MODULATE | N (4–8) LFOs com relação de fase e uma "dispersão orgânica" — do quad travado (Batumi) ao cardume que deriva junto mas nunca idêntico (ochd). O `DRIFT` é escala de MINUTOS; o `FUNCTION` é um. Isto é sub-áudio, várias saídas, para animar um patch inteiro. **Forte candidato a `mode` do `FUNCTION`** (N saídas defasadas) em vez de módulo — decisão do autor. | DivKid ochd ★ (§7 #31); Xaoc Batumi ★ (§7 #61); IME Kermit ★ (§7 #70) |
 
@@ -355,7 +355,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 - **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
 
 **Recomendação de ordem, se o autor quiser uma "Onda E":**
-`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL`, `CRUSH` e `STAGES` FEITOS (2026-09-07).** Segue: `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL`, `CRUSH`, `STAGES` e `RESONATOR` FEITOS (2026-09-07).** Segue só `PULSAR`. `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
 
 ---
 
