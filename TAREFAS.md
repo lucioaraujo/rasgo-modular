@@ -5152,3 +5152,44 @@ Docs: 00_indice, 55_resonator.md, PESQUISA §2.5, RASGO_MODULAR.md
 
 **66/66 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ STAGES ✓
 RESONATOR ✓ | só PULSAR pendente.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda E — Módulo 56 PULSAR (síntese pulsar) — Onda E COMPLETA
+
+**`src/dsp/Pulsar.hpp` (NOVO), `tests/test_pulsar.cpp` (10 testes).**
+Síntese pulsar de Curtis Roads (*Microsound*): um trem de PULSARETS —
+grão curto seguido de silêncio, período total `p`. DUAS frequências
+INDEPENDENTES: `freq` (20–2000 Hz, +CV 1V/oct) = 1/`p` = a ALTURA;
+`formant` (0,1–8×, +CV) = 1/duração-do-pulsaret = o TIMBRE, **sem
+desafinar** — o pente harmônico fica preso a múltiplos de `freq`,
+`formant` só desliza o envelope espectral. `shape` (0–1 — 1 ciclo de
+seno → 2–3 + harmônico agudo), `window` (0 ≈ retangular/brilhante →
+0,4 Hann → 1 expodec percussivo; janela de Tukey→Hann→expodec),
+`jitter` (**desvio Rasgo** SEMEADO no período/amplitude), `mask` (0–1 —
+probabilidade de PULAR um pulsaret; o *masking* de Roads — padrões
+rítmicos por subtração), `spread` (pulsarets alternados L/R — estéreo
+por granulação), `level` (softclip `tanh`). Saídas `out`/`r` (L/R).
+Pool de 4 vozes de grão; `process()` não aloca. Fonte autônoma — soa ao
+carregar; `jitter=mask=0` → trem periódico determinístico. Família
+**SOURCE** (depois do OPERATOR).
+
+Ajustes no desenvolvimento: a `windowFn` virou Tukey (platô + bordas
+raised-cosine curtas, SEMPRE 0 nas pontas) para w<0,4 e Hann→expodec
+(ataque `1−e^{−40t}` + cauda `e^{−4t}·(1−t)`) para w≥0,4 — a versão
+antiga deixava a janela em ~0,2/0,17 nas pontas, criando descontinuidade
+entre pulsarets e vazando banda larga. Testes de espectro afrouxados
+para o modelo real do pulsaret de 1 ciclo: o centróide sobe ~4× (não 2×)
+de formante 1→5; a fundamental enfraquece com formante alto mas o pente
+harmônico carrega a altura; monotonia de brilho verificada a partir de
+formante 2 (em formante≈1 o pulsaret preenche o período — caso
+degenerado); `mask` 0,85 → RMS < 0,55×.
+
+Integração: CMake (CTest 67), ModuleCatalog (SOURCE, após OPERATOR),
+LearnCatalog (12 binds + def. de módulo), test_panel_layout,
+test_learn_catalog. Docs: 00_indice, 56_pulsar.md, PESQUISA §2.5,
+RASGO_MODULAR.md §4.1/§36.3, README; contagens 56 módulos / 67 alvos
+CTest.
+
+**67/67 CTest Debug + Release.** **Onda E COMPLETA:** SWIRL ✓ CRUSH ✓
+STAGES ✓ RESONATOR ✓ PULSAR ✓ (o PHASER entrou no SWIRL).

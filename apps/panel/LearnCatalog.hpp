@@ -345,6 +345,55 @@ inline const LearnTable& learnTable() {
                 "A soma das portadoras do algoritmo, ÷ nº de portadoras "
                 "+ softclip.", "", ""}},
         }},
+        {"PULSAR", {
+            {"freq", {
+                "Taxa de repetição dos pulsarets = a ALTURA (20–2000 Hz, "
+                "+CV 1 V/oct). Cada disparo lança um grão; o silêncio "
+                "entre eles é o que define a nota.",
+                "Síntese pulsar (Curtis Roads): um trem de pulsarets — "
+                "grão curto + silêncio, período total p. freq = 1/p.",
+                "SEQUENCE.pitch → PIT: uma melodia. Abaixe até ~30 Hz e "
+                "cada pulsaret vira um evento separado (ritmo)."}},
+            {"formant", {
+                "Frequência interna do pulsaret = o TIMBRE, INDEPENDENTE "
+                "da altura (0,1–8×, +CV). Baixo = oco/formântico; alto = "
+                "brilhante/nasal. NÃO desafina.",
+                "É a segunda frequência da síntese pulsar: formant = 1/d "
+                "(d = duração do pulsaret). O pente harmônico fica em "
+                "múltiplos de freq; formant só move o ENVELOPE espectral.",
+                "LFO → FQM: um 'wah' sem filtro. Em formante≈1 o pulsaret "
+                "preenche o período todo (duty 100 %)."}},
+            {"shape", {
+                "Forma do pulsaret: 0 = 1 ciclo de seno; até 1 = 2–3 "
+                "ciclos + um harmônico agudo (pulso mais estreito e "
+                "rico).", "", ""}},
+            {"window", {
+                "Envelope do grão: 0 ≈ retangular (transientes duros, "
+                "brilhante), 0,4 = Hann (limpo), 1 = expodec (ataque "
+                "rápido + cauda — percussivo).",
+                "A janela do grão granular. Retangular vaza banda larga "
+                "nas bordas; Hann/expodec suavizam.", ""}},
+            {"jitter", {
+                "Desvio Rasgo SEMEADO no período e na amplitude de cada "
+                "pulsaret — de trem rígido a nuvem irregular. "
+                "Determinístico (reproduz com o seed).", "", ""}},
+            {"mask", {
+                "Probabilidade de PULAR um pulsaret (Roads): 0 = trem "
+                "cheio, 1 = quase tudo silêncio. Rareia a textura sem "
+                "mudar a altura.",
+                "O masking da síntese pulsar — cria padrões rítmicos "
+                "burlescos por subtração.", ""}},
+            {"spread", {
+                "Pulsarets alternados jogados para L/R (± spread) — "
+                "largura estéreo por granulação. 0 = mono.", "", ""}},
+            {"level", {"Saída, com softclip (tanh) antes.", "", ""}},
+            {"in:pitch", {"CV 1 V/oct somada a FREQ.", "", ""}},
+            {"in:formant_mod", {
+                "CV (em oitavas) somada a FORMANT — move o timbre sem "
+                "tocar na altura.", "", ""}},
+            {"out:out", {"Canal esquerdo (mono se SPREAD=0).", "", ""}},
+            {"out:r", {"Canal direito.", "", ""}},
+        }},
         {"OSC", {
             {"freq", {
                 "Frequência base do oscilador.",
@@ -2193,6 +2242,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — "
             "metais, sinos, baixos que o subtrativo não faz.", "",
             "RATIO inteiro = harmônico; quebrado = inarmônico (sino)."}},
+        {"PULSAR", {
+            "Síntese pulsar (Curtis Roads) — trem de pulsarets (grão + "
+            "silêncio) com DUAS frequências independentes: FREQ = a "
+            "altura, FORMANT = o timbre. Entre a granular e a de formante.",
+            "O OPERATOR/ADDITIVE fixam o espectro na altura; aqui FORMANT "
+            "desliza o envelope espectral SEM desafinar. MASK/JITTER "
+            "rareiam e desalinham o trem (padrões burlescos, semeados).",
+            "LFO → FQM: 'wah' sem filtro. MASK ~0,7 + JITTER ~0,4 = uma "
+            "nuvem rítmica irregular sobre a mesma nota."}},
         {"PLL", {
             "Phase-locked loop — trava a fase num sinal de entrada e "
             "gera divisões/multiplicações dele; solto, auto-oscila.",
