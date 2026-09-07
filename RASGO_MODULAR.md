@@ -158,7 +158,7 @@ SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE
     "Synth Voice"/"Resonator"; o Patch & Tweak as põe em Sound Sources)
 TRANSFORM  transformar   FILTER WASP LPG VCA SHAPE CRUSH PARAMETRIC GLIDE CONTROL
   └ modifica um sinal que PASSA (áudio ou CV)
-MODULATE   mover         ENVELOPE FUNCTION DRIFT CHAOS SH
+MODULATE   mover         ENVELOPE FUNCTION STAGES DRIFT CHAOS SH
   └ GERA um sinal de controle
 TIME       marcar tempo  CLOCK LOGIC TURING SEQUENCE TRIGSEQ
   └ clock, lógica de clock, sequenciadores (Patch & Tweak junta
@@ -1123,7 +1123,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 52 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 53 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1220,7 +1220,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 52 módulos DSP
+### 36.3 Os 53 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1281,6 +1281,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 51 | `BOXCAR` | DECISION | reinterpretação musical do *boxcar averager* (integrador de porta — equipamento de teste nuclear, ref. Stanford Research SR200 NIM / SR-235): `trig` trava no evento repetitivo, `delay` posiciona uma janela num ponto do período medido, `aperture` diz a largura, o conteúdo é integrado (média) e EMPILHADO com as capturas anteriores (`average` = N, EMA com piso 1/min(N,hits)). `scan` (−1..1) varre o `delay` pelo período → reconstrói a onda TODA (o ruído descorrelato → 0, o coerente emerge). `mode`: 0 follower (S&H de janela; `average` alto = S&H sem tremor — segura `recon_[bin]`), 1 reconstruct (toca a onda reconstruída em sincronia), 2 oscillator (relê o buffer a `rate`, livre do `trig` — a wavetable é "o que ele ouviu, mediado"). Auto-trigger por limiar (`thresh` + CV `thr`) quando `trig` livre (edge trigger de osciloscópio). Saída `geiger` = trem de gates de **Poisson LIVRE** (`t = −ln(U)/λ`, `λ ≈ 0,5 + geiger²·40`, xorshift semeado). `blend` seco↔processado. `in`/`out` Audio+Control; `in` livre → piso de ruído interno de −34 dB (modo autônomo). Período medido normaliza os `K = 2048` bins → reconstrói mesmo em rubato. **Desvio Rasgo:** (a) o `scan` que vira oscilador relendo o buffer próprio; (b) `geiger` livre no grafo; (c) SEM quantização de BPM. **O `NOISE` (#19) ganhou o param `poisson`** — o mesmo processo no relógio interno do S&H/smooth. `process()` não aloca; determinístico | AI Synthesis AI250 BXR (referência funcional — 14 HP, Daisy; firmware publica só `.bin`); *boxcar averager* de bancada (domínio público — Wikipedia, manuais Stanford Research SR200/SR250); edge trigger de osciloscópio; processo de Poisson (teoria pública); `SH`/`SCOPE`/`ABACUS` do Rasgo |
 | 52 | `SWIRL` | SPACE | **efeitos de MODULAÇÃO — o RASGO não tinha nenhum.** Chorus/flanger/ensemble/phaser num módulo (`type` 0–3). Os três primeiros são atrasos CURTOS modulados por um LFO triangular (chorus ~12 ms 2 vozes; flanger ~1,2 ms + realimentação; ensemble ~11 ms 3 vozes com LFOs incomensuráveis); o phaser troca a linha de atraso por **6 all-pass de 1ª ordem TPT** varridos pelo LFO (notch móvel — timbre oco, ≠ do pente metálico). `rate` (0,02–8 Hz, +CV), `depth`, `feedback` (−1..1 — `tanh` no laço; o flanger com escala 1,08 auto-oscila passando da unidade, como um flanger de verdade), `spread` (LFO de R defasado de spread·¼ ciclo → imagem estéreo), `tone` (1 polo no molhado: <0 LP "aveludado" BBD, >0 HP), `age` (**desvio Rasgo** — caráter BBD: companding `|x|^(1∓0,25·age)` antes/depois da linha + ruído semeado + wobble; é daí que o flanger canta sozinho sem entrada), `mix` (+CV). `mix=0` → bypass exato; `age=0` → determinístico puro. Buffer ~50 ms/canal. Distinto do `LOOPER` (delay de LINHA, ecos audíveis) e do reverb (`SPACE`/`HALL`) | Roland Dimension D / CE-1, MXR (chorus/flanger — teoria de linha de atraso + LFO, domínio público); BBD/bucket-brigade (companding + banda — teoria); Juno-60 / Solina (ensemble); Bode / EHX Small Stone / MXR Phase 90 (phaser — all-pass, Zölzer DAFX); all-pass TPT (Zavalishin); 4ms Ensemble Osc / Roland Dimension (referência funcional); `LOOPER` do Rasgo (leitura de linha, `age`, `tanh` no laço) (`PESQUISA §2.5` Onda E) |
 | 53 | `CRUSH` | TRANSFORM | **destruidor lo-fi / decimador — é aqui que mora o verbo DAMAGE** (o `wear` estava espalhado em `SAMPLER`/`TURNTABLE`/`LOOPER`). Cinco vetores de dano DIGITAL num módulo: `rate` (S&H interno 100 Hz–24 kHz, +CV — **sem** anti-alias, o aliasing É o som), `bits` (quantização a 2^bits níveis), `drive` (ganho antes da quantização → empurra pro transbordo), `wrap` (0 clipa · 1 **enrola** `mod(x+1,2)−1` — o estouro de inteiro, dente de serra brutal · blend entre os dois), `glitch` (probabilidade por hold de amostra travada / dropout / repique — a "conexão digital ruim"), `jitter` (passeio lento no clock do S&H → o "wow" digital), `tone` (1 polo na saída), `mix` (+CV). Tudo **semeado** → dano REPRODUTÍVEL (ao contrário de um bug). `in` livre + `mix=1` → o S&H amostra o próprio ruído = fonte lo-fi/glitch. `mix=0` bypass exato. Distinto do `SHAPE`/`WASP` (distorção ANALÓGICA — fold, tanh) e do `wear` do `SAMPLER` (por disparo). `process()` não aloca (sem buffer) | decimação sem anti-alias + quantização uniforme (teoria de amostragem, domínio público); overflow de complemento de dois (wrap); dropout de S/PDIF / CD arranhado (fenômeno, reescrito); jitter de conversor; Schlappi 100 Grit ★ (`§7 #13`), OTO Biscuit, µBraids (referência funcional); `wear` do Rasgo (`SAMPLER`/`TURNTABLE`) (`PESQUISA §2.5` Onda E) |
+| 54 | `STAGES` | MODULATE | **gerador de N segmentos reconfiguráveis — a FUNÇÃO EMERGE de como se encadeiam** (Mutable Stages / Rossum Control Forge / Blukač Fractalist). O `FUNCTION` é UMA rampa; o `STAGES` é a forma COMPOSTA. `segments` (2–8), `rate` (0,02–20 Hz, +CV — velocidade da volta no modo loop), `contour` (0–1 — a forma dos níveis-alvo: 0 escada subindo · 0,5 arco · 1 descendo, blend), `curve` (−1..1 — transição exp/lin/log por segmento), **`hold`** (0 desliza suave = rampa/envelope/LFO · 1 salta e segura = degrau/S&H/sequência — o knob que faz o módulo virar env OU seq sem trocar de tipo), `tilt` (−1..1 — distorção das durações: attack lento ↔ release lento), `jitter` (**desvio Rasgo** — passeio lento SEMEADO nos níveis/durações; a forma respira mas o render é reprodutível), `loop` (corre livre = LFO complexo ↔ um disparo = envelope, precisa do `gate`). Saídas `out` + `eoc` (pulso no fim da volta — encadeia com o `reset` de outra instância) + `step` (pulso por fronteira de segmento — `step → ENVELOPE.gate` encadeia). Desenhado por macros (gerador, não editor de breakpoints — identidade RASGO). `jitter=0` → determinístico puro. `process()` não aloca (os níveis/durações são pré-computados) | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (`§7 #43`); Blukač Fractalist ★ (`§7 #4`); envelope de segmentos (Serge/Buchla 281 — teoria pública); curva exp/log de segmento (`ENVELOPE.curve` do Rasgo) (`PESQUISA §2.5` Onda E) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1322,7 +1323,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**64 alvos CTest**, 100% verdes em **Debug e Release**
+**65 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

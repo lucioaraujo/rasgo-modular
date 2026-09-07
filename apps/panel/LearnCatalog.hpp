@@ -878,6 +878,55 @@ inline const LearnTable& learnTable() {
                 "Gate de Bernoulli — dispara com probabilidade BIAS a cada "
                 "passo.", "", ""}},
         }},
+        {"STAGES", {
+            {"segments", {
+                "Quantos degraus/rampas na volta (2–8). Mais segmentos = "
+                "mais resolução na forma.", "", ""}},
+            {"rate", {
+                "Velocidade da volta no modo LOOP (0,02–20 Hz, +CV). Cada "
+                "segmento leva (1/rate)/segments, ajustado por TILT.", "",
+                ""}},
+            {"contour", {
+                "A FORMA dos níveis-alvo: 0 escada subindo (0→1), 0,5 "
+                "arco (0→1→0), 1 escada descendo — blend contínuo. É o "
+                "'desenho' da função.",
+                "Gerador, não editor de breakpoints (identidade RASGO): "
+                "você esculpe a forma com macros.", ""}},
+            {"curve", {
+                "Curva de transição de cada segmento: <0 exponencial "
+                "(rápido→lento), 0 linear, >0 logarítmica (devagar→"
+                "rápido). Não faz nada com HOLD=1 (não há transição).",
+                "", ""}},
+            {"hold", {
+                "0 = cada segmento DESLIZA suave até o próximo nível "
+                "(rampa — envelope/LFO); 1 = SALTA e segura (degrau — "
+                "S&H/sequência); entre, rampa parte e segura o resto.",
+                "É o knob que faz o STAGES virar envelope OU sequenciador "
+                "sem trocar de módulo.", ""}},
+            {"tilt", {
+                "Distorção das durações: <0 os segmentos do começo mais "
+                "longos (attack lento), >0 os do fim (release lento).",
+                "", ""}},
+            {"jitter", {
+                "Passeio lento SEMEADO nos níveis e durações — a forma "
+                "'respira' sem deixar de ser reprodutível (jitter=0 → "
+                "sem termo, byte-idêntico).", "", ""}},
+            {"loop", {
+                "Corre livre (LFO complexo de N segmentos) ↔ um disparo "
+                "(envelope — precisa do GATE; congela no último nível até "
+                "o próximo gate).", "", ""}},
+            {"in:gate", {
+                "Modo one-shot (LOOP off): a borda de subida inicia uma "
+                "passagem. Ignorado no modo loop.", "", ""}},
+            {"in:reset", {"Volta ao segmento 0.", "", ""}},
+            {"in:rate_mod", {"CV somada a RATE.", "", ""}},
+            {"out:out", {"A função — o contorno dos N segmentos.", "", ""}},
+            {"out:eoc", {"Pulso no fim da volta (end-of-cycle) — encadeia "
+                        "com o RESET de outra instância.", "", ""}},
+            {"out:step", {"Pulso em cada fronteira de segmento — STEP → "
+                         "ENVELOPE.gate encadeia um AD por segmento.", "",
+                         ""}},
+        }},
         {"FUNCTION", {
             {"rate", {
                 "Velocidade da rampa — de LFO (0,01 Hz) a oscilador de "
@@ -2180,6 +2229,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "com saídas derivadas; soma, integra, dispara.",
             "É envelope E LFO E slew, tudo na curva. O DRIFT é passeio "
             "lento; o CHAOS é caótico de verdade.", ""}},
+        {"STAGES", {
+            "Gerador de N segmentos configuráveis (2–8) cuja FUNÇÃO "
+            "EMERGE de como se encadeiam: rampas → envelope/LFO, degraus "
+            "→ sequência de CV. Mutable Stages / Rossum Control Forge.",
+            "O FUNCTION é UMA rampa; o STAGES é a forma COMPOSTA, "
+            "esculpida por CONTOUR/TILT/HOLD (gerador, não editor). "
+            "HOLD=0 desliza (env), HOLD=1 salta (seq); LOOP corre ↔ dispara.",
+            "STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = envelope; "
+            "STAGES.step → ENVELOPE.gate encadeia."}},
         {"DRIFT", {
             "Campo de deriva orgânica — várias CVs correlacionadas que "
             "passeiam devagar (escala de minutos), com momentum e "
