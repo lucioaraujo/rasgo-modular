@@ -49,6 +49,7 @@
 #include "dsp/Scope.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
+#include "dsp/Swirl.hpp"
 #include "dsp/StepSequencer.hpp"
 #include "dsp/StringVoice.hpp"
 #include "dsp/Switch.hpp"
@@ -209,6 +210,7 @@ int main() {
     mods.emplace_back("TURING", std::make_unique<TuringLoop>());
     mods.emplace_back("MATTER", std::make_unique<Matter>());
     mods.emplace_back("SPACE", std::make_unique<Space>());
+    mods.emplace_back("SWIRL", std::make_unique<Swirl>());
     mods.emplace_back("HALL", std::make_unique<Hall>());
     mods.emplace_back("LOOPER", std::make_unique<Looper>());
     mods.emplace_back("STRING", std::make_unique<StringVoice>());

@@ -325,8 +325,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 
 | Cand. | Família | O que é / por que falta | Parte de (conceito público) |
 |---|---|---|---|
-| **`SWIRL`** (chorus / flanger / ensemble) | TRANSFORM / SPACE | O RASGO **não tem nenhum** chorus/flanger/ensemble. Linhas de atraso CURTAS moduladas (1–20 ms), realimentação p/ flanger, N vozes desafinadas p/ ensemble, caráter BBD (clock, companding, banda). O `LOOPER` é delay de LINHA (não faz sweep curto de flange); o `HALL` é reverb. | BBD/bucket-brigade (teoria); Roland Dimension/CE-1, 4ms Ensemble Osc; §6 (BBD delay/flanger) |
-| **`PHASER`** | TRANSFORM | Cascata de all-pass (4–12 polos) + LFO — o irmão do flanger, timbre distinto (notch móvel, não comb). Nenhum equivalente hoje (o `FILTER`/`WASP`/`FORMANT`/`PARAMETRIC` não fazem all-pass em cascata). Pode ser um `mode` do `SWIRL` se a UI comportar. | phaser clássico (Bode/Small Stone/Phase 90 — all-pass network, teoria pública) |
+| ~~**`SWIRL`** (chorus / flanger / ensemble / **phaser**)~~ | SPACE | **FEITO — 2026-09-07, `dossies/52_swirl.md`, `src/dsp/Swirl.hpp` (Módulo 52).** Os quatro num módulo (`type`): chorus/flanger/ensemble = atrasos CURTOS modulados por LFO triangular; phaser = **6 all-pass de 1ª ordem TPT** (o `PHASER` da linha abaixo entrou aqui). `feedback` (−1..1, `tanh` no laço; flanger auto-oscila passando da unidade), `spread` (LFO de R defasado → estéreo), `tone` (1 polo no molhado), `age` (**desvio Rasgo** — caráter BBD: companding + ruído semeado + wobble; daí a auto-oscilação sem entrada), `mix`. `mix=0` bypass exato. | BBD/bucket-brigade (teoria); Roland Dimension/CE-1, Juno/Solina; phaser Bode/Small Stone (all-pass, Zölzer DAFX); §6 |
 | **`STAGES`** (gerador de segmentos configuráveis) | MODULATE / TIME | N segmentos, cada um com forma/tempo/loop próprios → **função emergente**: vira envelope, LFO, sequência de degraus, osc lento ou ruído conforme como é ligado. O `FUNCTION` é UMA função tipo Maths; isto é Mutable Stages / Rossum Control Forge / Blukač Fractalist. Casa direto com o desvio da matriz Mutable (§3: "fragmento que vira env/seq/osc/ruído conforme quem conecta"). | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (§7 #43); Serge DUSG encadeado; Blukač Fractalist ★ (§7 #4) |
 | **`CRUSH`** (destruidor lo-fi / decimador) | TRANSFORM / DAMAGE | Redução de taxa de amostragem (sample-&-hold no sinal) + profundidade de bits + aliasing + glitch/dropout. Hoje o `wear` está espalhado em `SAMPLER`/`TURNTABLE`/`LOOPER` mas não há um módulo dedicado de degradação digital — e é o verbo **DAMAGE** que ainda não tem casa própria (`§4.2`). | decimator/bitcrusher clássico (teoria); Schlappi 100 Grit ★ (§7 #13); "Book of Bad Ideas" (§8); Atlas §16/§17 |
 
@@ -356,7 +355,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 - **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
 
 **Recomendação de ordem, se o autor quiser uma "Onda E":**
-`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. `SWIRL`/`PHASER` abrem a família de MODULAÇÃO que ainda não existe (chorus/flanger/phaser — distinta do delay de linha do `LOOPER` e dos reverbs `SPACE`/`HALL`); `CRUSH` dá casa ao verbo DAMAGE; `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL` FEITO (2026-09-07)** — abriu a família de MODULAÇÃO (chorus/flanger/ensemble/phaser num módulo). Segue: `CRUSH` dá casa ao verbo DAMAGE; `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
 
 ---
 

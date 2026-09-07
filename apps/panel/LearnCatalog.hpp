@@ -1763,6 +1763,53 @@ inline const LearnTable& learnTable() {
                 "O material gravado lido pelo prato, com acoplamento AC "
                 "(sem degrau de DC quando o prato para).", "", ""}},
         }},
+        {"SWIRL", {
+            {"type", {
+                "0 CHORUS (2 vozes, engorda) · 1 FLANGER (1 atraso curto "
+                "+ realimentação, jato/pente) · 2 ENSEMBLE (3 vozes, Juno/"
+                "Solina) · 3 PHASER (cascata de all-pass, notch móvel).",
+                "Os três primeiros são atrasos CURTOS modulados; o phaser "
+                "troca a linha de atraso por 6 all-pass de 1ª ordem — "
+                "timbre mais oco, menos metálico.",
+                "Compare FLANGER e PHASER no mesmo RATE/DEPTH: o pente "
+                "varre metálico, o notch varre oco."}},
+            {"rate", {
+                "Velocidade do LFO (triangular) que varre a modulação. "
+                "0,02 Hz = quase parado; 8 Hz = vibrato.", "", ""}},
+            {"depth", {
+                "Profundidade da varredura — quanto o atraso (ou o corte "
+                "dos all-pass) se move. 0 = coloração estática.", "", ""}},
+            {"feedback", {
+                "Realimentação (−1..1). No FLANGER/PHASER cria a "
+                "ressonância (positivo = pente/notch agudo, negativo = "
+                "invertido). No CHORUS/ENSEMBLE um fio dá vibrato.",
+                "Um tanh no laço segura o nível; perto de ±1 auto-oscila "
+                "(o modo autônomo, a partir do piso de ruído do AGE).", ""}},
+            {"spread", {
+                "Largura estéreo: o LFO do canal R defasa de spread·¼ de "
+                "ciclo do L; nas vozes múltiplas também espalha o "
+                "desafino. 0 = mono.", "", ""}},
+            {"tone", {
+                "Filtro de 1 polo NO molhado: <0 passa-baixa (o "
+                "'aveludado' do BBD), >0 passa-alta (afina, tira o "
+                "grave), 0 neutro.", "", ""}},
+            {"age", {
+                "Caráter BBD (bucket-brigade): companding (comprime antes "
+                "da linha, expande depois), um fio de ruído semeado e uma "
+                "pontinha de aliasing. 0 = limpo.",
+                "Determinístico — dois renders com o mesmo AGE são "
+                "byte-idênticos.", ""}},
+            {"mix", {"Seco ↔ molhado. 0 = passa-direto (bypass exato).",
+                     "", ""}},
+            {"in:in", {"Áudio a processar.", "", ""}},
+            {"in:rate_mod", {"CV somada a RATE (varredura fora do "
+                            "compasso).", "", ""}},
+            {"in:mix_mod", {"CV somada a MIX (o efeito entra no ataque/"
+                           "cauda, via um ENVELOPE).", "", ""}},
+            {"out:l", {"Canal esquerdo (seco + molhado por MIX).", "", ""}},
+            {"out:r", {"Canal direito — o LFO defasado por SPREAD faz a "
+                      "imagem abrir.", "", ""}},
+        }},
         {"SEQUENCE", {
             {"length", {"Quantos dos 8 passos entram no padrão.", "", ""}},
             {"mode", {
@@ -2161,6 +2208,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "ambiente curto a cauda longa; pre-delay e amortecimento.",
             "O SPACE é o reverb 'clássico'; o HALL é FDN de 8 linhas "
             "(mais denso, estéreo); o MEMORY é granular.", ""}},
+        {"SWIRL", {
+            "Efeitos de MODULAÇÃO — chorus, flanger, ensemble e phaser "
+            "num módulo (TYPE). Atrasos CURTOS modulados por LFO (+ o "
+            "phaser, cascata de all-pass), com caráter BBD no AGE.",
+            "O RASGO não tinha nenhum. Distinto do LOOPER (delay de "
+            "linha, ecos audíveis) e do reverb — aqui você ouve o "
+            "MOVIMENTO, não o eco.",
+            "voz → SWIRL → MASTER engorda; LFO → RATE deixa a varredura "
+            "respirar fora do compasso; FBK perto de ±1 + AGE = auto-oscila."}},
         {"HALL", {
             "Reverb FDN de 8 linhas + matriz de Householder — cauda densa "
             "e estéreo, com FREEZE (congela infinito) e pre-delay.", "",

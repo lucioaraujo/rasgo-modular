@@ -286,6 +286,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_boxcar_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_boxcar_tests COMMAND rasgo_modular_boxcar_tests)
 
+    add_executable(rasgo_modular_swirl_tests tests/test_swirl.cpp)
+    target_link_libraries(rasgo_modular_swirl_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_swirl_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_swirl_tests COMMAND rasgo_modular_swirl_tests)
+
     # usa apps/panel/MotionEngine.hpp — include dir extra `apps`, como o
     # painel gráfico e a peça 4.
     add_executable(rasgo_modular_motion_engine_tests tests/test_motion_engine.cpp)
