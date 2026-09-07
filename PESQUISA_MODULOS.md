@@ -308,6 +308,51 @@ Cada um vira dossiê antes do código (método §1).
 > wishlist pessoal. Não há entrada externa pendente; a fila abaixo segue
 > como está até nova pesquisa dirigida.
 
+### 2.5 Revisão — o que ainda NÃO foi codado (2026-09-07)
+
+Cruzamento dos **51 módulos feitos** contra §2.2/§3/§4/§6/§7/§8. Nada
+disto está aprovado — é a revisão da lista pedida pelo autor. Cada um,
+se for adiante, vira dossiê antes do código (método §1). Ordenado por
+"tapa um buraco real do rack" → "amplia alcance" → "provável modo, não
+módulo".
+
+**Tier 1 — buracos reais na paleta de efeitos/utilidade:**
+
+| Cand. | Família | O que é / por que falta | Parte de (conceito público) |
+|---|---|---|---|
+| **`SWIRL`** (chorus / flanger / ensemble) | TRANSFORM / SPACE | O RASGO **não tem nenhum** chorus/flanger/ensemble. Linhas de atraso CURTAS moduladas (1–20 ms), realimentação p/ flanger, N vozes desafinadas p/ ensemble, caráter BBD (clock, companding, banda). O `LOOPER` é delay de LINHA (não faz sweep curto de flange); o `HALL` é reverb. | BBD/bucket-brigade (teoria); Roland Dimension/CE-1, 4ms Ensemble Osc; §6 (BBD delay/flanger) |
+| **`PHASER`** | TRANSFORM | Cascata de all-pass (4–12 polos) + LFO — o irmão do flanger, timbre distinto (notch móvel, não comb). Nenhum equivalente hoje (o `FILTER`/`WASP`/`FORMANT`/`PARAMETRIC` não fazem all-pass em cascata). Pode ser um `mode` do `SWIRL` se a UI comportar. | phaser clássico (Bode/Small Stone/Phase 90 — all-pass network, teoria pública) |
+| **`STAGES`** (gerador de segmentos configuráveis) | MODULATE / TIME | N segmentos, cada um com forma/tempo/loop próprios → **função emergente**: vira envelope, LFO, sequência de degraus, osc lento ou ruído conforme como é ligado. O `FUNCTION` é UMA função tipo Maths; isto é Mutable Stages / Rossum Control Forge / Blukač Fractalist. Casa direto com o desvio da matriz Mutable (§3: "fragmento que vira env/seq/osc/ruído conforme quem conecta"). | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (§7 #43); Serge DUSG encadeado; Blukač Fractalist ★ (§7 #4) |
+| **`CRUSH`** (destruidor lo-fi / decimador) | TRANSFORM / DAMAGE | Redução de taxa de amostragem (sample-&-hold no sinal) + profundidade de bits + aliasing + glitch/dropout. Hoje o `wear` está espalhado em `SAMPLER`/`TURNTABLE`/`LOOPER` mas não há um módulo dedicado de degradação digital — e é o verbo **DAMAGE** que ainda não tem casa própria (`§4.2`). | decimator/bitcrusher clássico (teoria); Schlappi 100 Grit ★ (§7 #13); "Book of Bad Ideas" (§8); Atlas §16/§17 |
+
+**Tier 2 — vozes / geradores que ampliam o alcance:**
+
+| Cand. | Família | O que é / por que | Parte de |
+|---|---|---|---|
+| **`RESONATOR`** | TRANSFORM / MATTER | Banco de ressonadores modais afinados, **excitados por sinal EXTERNO** (o `in` bate/arqueia as cordas). O `MATTER` é voz auto-contida; isto é o Rings/Elements no modo "ressoador" — você toca com o que quiser. A relação entre as saídas (grave/médio/agudo que se cruzam) pode ser o processo. | Mutable Rings/Elements (MIT — conceito, §3); Mannequins Three Sisters ★★ (§7 #50); 4ms SMR (§8); `BiomaModalResonator` (§4) |
+| **`PULSAR`** | SOURCE | Síntese pulsar (Curtis Roads): um trem de *pulsarets* (grão curto) + silêncio; a razão grão/silêncio controla o **formante independente da altura**. Nem o `ADDITIVE` nem o `OPERATOR` nem o `MEMORY` fazem isso — é grão a taxa de nota, entre a síntese granular e a de formante. | Curtis Roads, *Microsound* (teoria pública); `BiomaPulsar` (§4) |
+| **`SWARM`** (multi-LFO orgânico) | MODULATE | N (4–8) LFOs com relação de fase e uma "dispersão orgânica" — do quad travado (Batumi) ao cardume que deriva junto mas nunca idêntico (ochd). O `DRIFT` é escala de MINUTOS; o `FUNCTION` é um. Isto é sub-áudio, várias saídas, para animar um patch inteiro. **Forte candidato a `mode` do `FUNCTION`** (N saídas defasadas) em vez de módulo — decisão do autor. | DivKid ochd ★ (§7 #31); Xaoc Batumi ★ (§7 #61); IME Kermit ★ (§7 #70) |
+
+**Tier 3 — provavelmente MODO, não módulo (o `feedback_generative_design_light_touch` pede modo antes de módulo):**
+
+- **sequenciador melódico euclidiano** — Bjorklund + acento por AND/OR de divisores (vpme Euclidean Circles ★ §7 #46) → `mode` do `TRIGSEQ` (saída de pitch) ou do `SEQUENCE`.
+- **melodia generativa** (contorno/densidade/registro em vez de passos desenhados — Bard Quartet ★ §7 #38, meloDICER ★ §7 #78) → `mode` do `SEQUENCE` ou do `DECISION` + `QUANTIZER`.
+- **envelope quádruplo** (Klavis Quadigy ★ §7 #74) — utilitário; baixa prioridade.
+- **delay de pente rítmico** (Rainmaker ★ §7 #42) — 16 taps afinados; nichado, avaliar depois.
+- **oscilador caótico como voz** (Orbit 3 ★ §7 #60, Clank Chaos ★★ §7 #82) — o `CHAOS` já vai a 400 Hz; um `mode` "voz" se faltar corpo.
+- **striker granular** (rajada de grãos no disparo — `BiomaGranularStriker` §4) → `mode` do `MEMORY`.
+
+**Parados de propósito (não viram módulo):**
+
+- **memória de estados / keyframes** (Frames, §3) — feature de painel (navegar snapshots do patch), não DSP.
+- **plataforma polimórfica** (Ornament & Crime, §6) — amplo demais; o espírito vive no `SWITCH`/`MATRIX`/`STAGES`.
+- **spatializer / multitap de posição** (`AquariumSpatializer` §4) — a família SPACE (`SPACE`+`HALL`+`LOOPER`+`MEMORY`) já cobre; reavaliar só se o autor pedir imagem estéreo posicional.
+- **CV bruto DC-coupled in/out** (Expert Sleepers) — `SIGNAL-IN` já traz MIDI+áudio; fica "pra quando houver caso" (§2.2).
+- **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
+
+**Recomendação de ordem, se o autor quiser uma "Onda E":**
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. Os três primeiros fecham a paleta de efeitos (hoje só há reverb/delay/distorção-de-fold); `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+
 ---
 
 ## 3. Matriz Mutable Instruments → Rasgo (Atlas §36)
