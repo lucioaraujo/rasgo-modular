@@ -2671,7 +2671,11 @@ int main() {
         // Pausa enquanto a mão do usuário está num controle (`drag.active`).
         // A energia do som (RMS do MASTER) acelera a mão e, perto do teto,
         // puxa tudo pro centro (duck protetor — evita o clip com [v] on).
-        if (motionOn && !drag.active) {
+        // O músico continua no comando com [v] ligado: mexeu num knob à
+        // mão → a fibra re-ancora ali (no `tick`); mexeu na fiação → a
+        // amplitude das fibras cabeadas cai (não briga com o LFO/env).
+        if (motionOn && !drag.active && !cdrag.active) {
+            motion.refreshCables(graph);
             float eRms = 0.0f;
             for (const auto& kv : scopeSnap) {
                 if (graph.node(kv.first).type() != "MASTER") continue;
