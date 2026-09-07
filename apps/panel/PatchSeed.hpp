@@ -454,7 +454,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // os cabos do passeio e a modulação. Era rng(-2, +5): +5 dB mandava
     // o barramento pra +2..+8 dBFS e o MASTER limitava demais (o "clipe").
     setT("MIXER", "gain1", rng(-10.0f, -2.0f));
-    setT("MIXER", "pan1", rng(-0.4f, 0.4f));
+    // pan SEMPRE no centro em todo seed (pedido do autor, 2026-09-08) — ele
+    // abre no palco à mão se quiser. Era rng(-0.4, 0.4).
+    setT("MIXER", "pan1", 0.0f);
     if (hasT("MIXER")) {
         const int ci = pIn(firstT("MIXER"), "ch1"), so = pOut(bodyNode, bodyOut);
         if (ci >= 0 && so >= 0)
@@ -479,9 +481,11 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     }
 
     // ================ PASSEIO PONDERADO (o coração) ================
-    // teto por passeio: 3 → ~43 tentativas (era ×25 = ~28, com 42 módulos;
-    // com 56 há mais portas livres, o rack aguenta mais relação).
-    const int nCables = 3 + static_cast<int>(std::lround(id.complexity * 40.0f));
+    // teto por passeio: mínimo 3 (inalterado); topo ×75 — o autor pediu
+    // patches bem densos pra testar vários módulos de uma vez (2026-09-08,
+    // era ×40). O laço já se auto-limita (12 tentativas por cabo, só porta
+    // livre), então pedir 75 não põe 75 — põe o que couber.
+    const int nCables = 3 + static_cast<int>(std::lround(id.complexity * 75.0f));
     for (int c = 0; c < nCables; ++c) {
         // 1) escolhe uma classe de destino, depois um destino livre nela
         float dw[5] = {3.0f, 1.5f, 6.0f, 4.0f, 1.5f};
@@ -544,8 +548,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 if (connect(p, {mx, static_cast<std::size_t>(ci)})) {
                     setP(mx, (std::string("gain") + std::to_string(used + 2)).c_str(),
                          rng(-24.0f, -11.0f));
+                    // pan no centro (idem pan1) — o autor abre o palco à mão
                     setP(mx, (std::string("pan") + std::to_string(used + 2)).c_str(),
-                         rng(-0.5f, 0.5f));
+                         0.0f);
                     ++used;
                 }
             }
