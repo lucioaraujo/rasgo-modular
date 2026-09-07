@@ -124,16 +124,33 @@ inline const LearnTable& learnTable() {
                 "Q = frequência ÷ largura de banda. Com res alto e ruído "
                 "na entrada, cada vogal vira 5 tons senoidais.",
                 "ENVELOPE → RES: a voz 'aperta' no ataque e relaxa."}},
+            {"vocoder", {
+                "Mistura para o modo VOCODER: os GANHOS das 5 bandas "
+                "passam a seguir a energia do MODULADOR (jack MOD) em cada "
+                "frequência de formante, em vez da tabela de vogal. 0 = "
+                "FORMANT clássico; 1 = vocoder de 5 bandas.",
+                "Vocoder de Homer Dudley (1938): (modulador → banco de "
+                "seguidores de envelope por banda) × (portadora → banco "
+                "de filtros). Aqui as 5 bandas de formante são as bandas "
+                "do vocoder — grosso mas vocálico. Sem MOD cabeado, não "
+                "faz efeito.",
+                "Fala no MOD, um OSC/PAD rico no IN, VOCODER=1: o pad "
+                "'fala'. VOWEL escolhe QUAIS 5 frequências vocodar."}},
             {"mix", {"Seco ↔ ressoado. 0 = passa-direto.", "", ""}},
             {"drift", {
                 "Cada formante ganha um wobble lento e independente "
                 "(±drift·3 %) — a voz respira. Determinístico (senos, "
                 "sem RNG). 0 = estático.", "", ""}},
-            {"in:in", {"Áudio a ressoar (um OSC, NOISE, qualquer voz).",
-                      "", ""}},
+            {"in:in", {"A PORTADORA — o que vai ser moldado (um OSC "
+                      "serra, um pad, NOISE). No modo vocoder é a voz "
+                      "'sintética' que fala.", "", ""}},
             {"in:vowel", {"CV somada em VOWEL (LFO, SEQUENCE, envelope…).",
                          "", ""}},
             {"in:shift", {"CV somada em SHIFT.", "", ""}},
+            {"in:mod", {"O MODULADOR do vocoder — o som cuja envoltória "
+                       "espectral vai controlar as 5 bandas (uma voz, "
+                       "um DRUM, uma gravação). Só faz efeito com VOCODER "
+                       "> 0.", "", ""}},
             {"out:out", {
                 "Seco + as 5 bandas, misturados por MIX, com limitador "
                 "suave.", "", ""}},
@@ -2393,8 +2410,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "+ cutoff baixo = uma voz de seno afinável."}},
         {"FORMANT", {
             "Banco de 5 passa-faixas paralelos — as ressonâncias de "
-            "vogais; VOWEL faz o morph A→E→I→O→U.", "",
-            "Num ruído/pulso: fala sintética. Num acorde: coro."}},
+            "vogais; VOWEL faz o morph A→E→I→O→U. VOCODER>0 + jack MOD = "
+            "vocoder de 5 bandas (as bandas seguem a envoltória do "
+            "modulador em vez da tabela de vogal).",
+            "Fonte-filtro de Fant; no modo vocoder, o canal de Dudley "
+            "(1938).",
+            "Num ruído/pulso: fala sintética. Num acorde: coro. Voz no "
+            "MOD + serra no IN + VOCODER=1: o sinte 'fala'."}},
         {"RESONATOR", {
             "Banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal "
             "EXTERNO (você bate com o que quiser). Rings/Elements no modo "
