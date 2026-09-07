@@ -265,7 +265,7 @@ void testEveryCatalogModuleHasBlurb() {
         "OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE",
         "MATTER", "STRING", "DRUM", "SIGNAL-IN",
         "FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC",
-        "GLIDE", "CONTROL",
+        "GLIDE", "CONTROL", "CRUSH",
         "ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH",
         "CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ",
         "QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR",

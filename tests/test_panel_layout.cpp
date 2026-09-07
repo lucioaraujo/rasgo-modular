@@ -15,6 +15,7 @@
 #include "dsp/Chaos.hpp"
 #include "dsp/Chord.hpp"
 #include "dsp/Control.hpp"
+#include "dsp/Crush.hpp"
 #include "dsp/Decision.hpp"
 #include "dsp/Drift.hpp"
 #include "dsp/Drum.hpp"
@@ -197,6 +198,7 @@ int main() {
     mods.emplace_back("TURNTABLE", std::make_unique<Turntable>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
+    mods.emplace_back("CRUSH", std::make_unique<Crush>());
     mods.emplace_back("LPG", std::make_unique<Lpg>());
     mods.emplace_back("DECISION", std::make_unique<Decision>());
     mods.emplace_back("DRIFT", std::make_unique<Drift>());
