@@ -29,7 +29,9 @@
 // Desvio Rasgo: Q contínuo (não os degraus 1/2/4/8/16 do Parametra);
 // `sweep` desloca todos os estágios como um grupo (a relação entre as
 // bandas como processo, Warps/Atlas §39); `amount` escala todos os
-// ganhos. Determinístico (sem RNG). Coeficientes recalculados por bloco.
+// ganhos. Determinístico (sem RNG). Coeficientes recalculados por bloco
+// e DESLIZADOS por amostra (~5 ms) pros alvos — sem zíper quando um
+// knob/CV/Motion Engine move a frequência ou o ganho ao vivo.
 
 namespace rasgo::modular {
 
@@ -99,6 +101,9 @@ public:
         Signal::prepare(sampleRate, blockSize);
         for (auto& st : stages_)
             st = Stage{};
+        coefPrimed_ = false;
+        // ~5 ms de deslize por amostra pros coeficientes de biquad
+        coefSmooth_ = 1.0f - std::exp(-1.0f / (0.005f * std::max(1.0f, sampleRate)));
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -138,6 +143,15 @@ public:
                 stages_[s].sections = sections;
             }
         }
+        // 1º bloco: os coeficientes começam JÁ nos alvos (sem deslize de
+        // partida). Depois disso o deslize por amostra faz o trabalho.
+        if (!coefPrimed_) {
+            for (auto& st : stages_) {
+                st.b0 = st.tb0; st.b1 = st.tb1; st.b2 = st.tb2;
+                st.a1 = st.ta1; st.a2 = st.ta2;
+            }
+            coefPrimed_ = true;
+        }
 
         const float outGain = dbToGain(parameterValue("output"));
         const float drive = parameterValue("drive");
@@ -150,6 +164,12 @@ public:
             for (auto& st : stages_) {
                 if (!st.active)
                     continue;
+                // desliza os coeficientes pros alvos — sem zíper
+                st.b0 += (st.tb0 - st.b0) * coefSmooth_;
+                st.b1 += (st.tb1 - st.b1) * coefSmooth_;
+                st.b2 += (st.tb2 - st.b2) * coefSmooth_;
+                st.a1 += (st.ta1 - st.a1) * coefSmooth_;
+                st.a2 += (st.ta2 - st.a2) * coefSmooth_;
                 for (int k = 0; k < st.sections; ++k) {
                     const float y = st.b0 * x + st.z1[k];
                     st.z1[k] = st.b1 * x - st.a1 * y + st.z2[k];
@@ -176,6 +196,8 @@ private:
         bool active = false;
         int sections = 1;  // 1/2/4 pra 12/24/48 dB/oct (só cortes)
         float b0 = 1.0f, b1 = 0.0f, b2 = 0.0f, a1 = 0.0f, a2 = 0.0f;
+        // alvos (recalculados por bloco); os de cima deslizam pra cá
+        float tb0 = 1.0f, tb1 = 0.0f, tb2 = 0.0f, ta1 = 0.0f, ta2 = 0.0f;
         float z1[kMaxSections] = {};  // Direct Form II transposta, por seção
         float z2[kMaxSections] = {};
     };
@@ -270,14 +292,16 @@ private:
         }
         }
         const float inv = 1.0f / a0;
-        st.b0 = b0 * inv;
-        st.b1 = b1 * inv;
-        st.b2 = b2 * inv;
-        st.a1 = a1 * inv;
-        st.a2 = a2 * inv;
+        st.tb0 = b0 * inv;
+        st.tb1 = b1 * inv;
+        st.tb2 = b2 * inv;
+        st.ta1 = a1 * inv;
+        st.ta2 = a2 * inv;
     }
 
     Stage stages_[kStages];
+    bool coefPrimed_ = false;
+    float coefSmooth_ = 1.0f;
 };
 
 }  // namespace rasgo::modular

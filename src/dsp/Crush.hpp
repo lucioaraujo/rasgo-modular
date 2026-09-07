@@ -82,6 +82,8 @@ public:
         jitterLfo_ = 0.0f;
         rng_ = 0xC205ADEC1A1C0FFEULL;
         toneCoef_ = 1.0f - std::exp(-2.0f * 3.14159265f * 1600.0f / sr_);
+        ctlPrimed_ = false;
+        ctlSmooth_ = 1.0f - std::exp(-1.0f / (0.006f * sr_));  // ~6 ms
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -96,21 +98,32 @@ public:
 
         const int bits = static_cast<int>(std::lround(
             clampf(parameterValue("bits"), 1.0f, 16.0f)));
-        const float drive = clampf(parameterValue("drive"), 0.0f, 4.0f);
-        const float wrap = clamp01(parameterValue("wrap"));
         const float glitch = clamp01(parameterValue("glitch"));
         const float jitter = clamp01(parameterValue("jitter"));
-        const float tone = clampf(parameterValue("tone"), -1.0f, 1.0f);
+        const float driveT = clampf(parameterValue("drive"), 0.0f, 4.0f);
+        const float wrapT = clamp01(parameterValue("wrap"));
+        const float toneT = clampf(parameterValue("tone"), -1.0f, 1.0f);
         const float mixP = clamp01(parameterValue("mix"));
-        const float qL = std::pow(2.0f,
-                                  static_cast<float>(std::max(1, bits - 1)));
+        const float qLT = std::pow(2.0f,
+                                   static_cast<float>(std::max(1, bits - 1)));
+        if (!ctlPrimed_) {
+            sDrive_ = driveT; sWrap_ = wrapT; sTone_ = toneT;
+            sMix_ = mixP; sQL_ = qLT;
+            ctlPrimed_ = true;
+        }
 
         for (std::size_t f = 0; f < frames; ++f) {
             const float in = inB ? inB->at(0, f) : 0.0f;
             const float rate = clampf(
                 parameterValue("rate") + (rmB ? rmB->at(0, f) : 0.0f),
                 20.0f, sr_ * 0.5f);
-            const float mix = clamp01(mixP + (mmB ? mmB->at(0, f) : 0.0f));
+            // deslize por amostra dos controles contínuos — anti-zíper
+            sDrive_ += (driveT - sDrive_) * ctlSmooth_;
+            sWrap_  += (wrapT  - sWrap_)  * ctlSmooth_;
+            sTone_  += (toneT  - sTone_)  * ctlSmooth_;
+            sMix_   += (mixP   - sMix_)   * ctlSmooth_;
+            sQL_    += (qLT    - sQL_)    * ctlSmooth_;
+            const float mix = clamp01(sMix_ + (mmB ? mmB->at(0, f) : 0.0f));
 
             // ---- clock do S&H (com jitter — passeio lento = "wow" digital) ----
             jitterLfo_ += (rnd01() - 0.5f) * 0.04f;
@@ -121,7 +134,7 @@ public:
             if (holdPh_ >= 1.0f) {
                 holdPh_ -= std::floor(holdPh_);
                 const float src =
-                    (inB ? in : (rnd01() * 2.0f - 1.0f)) * drive;
+                    (inB ? in : (rnd01() * 2.0f - 1.0f)) * sDrive_;
                 if (glitch > 0.0f && rnd01() < glitch) {
                     const float sub = rnd01();
                     held_ = sub < 0.4f ? held_
@@ -133,17 +146,17 @@ public:
             }
 
             // ---- quantização ----
-            float q = std::round(held_ * qL) / qL;
+            float q = std::round(held_ * sQL_) / sQL_;
 
             // ---- transbordo: clip ↔ enrola ----
             const float qc = clampf(q, -1.0f, 1.0f);
             const float qw = q - 2.0f * std::round(q * 0.5f);   // saw wrap
-            float o = qc + (qw - qc) * wrap;
+            float o = qc + (qw - qc) * sWrap_;
 
             // ---- filtro de tom ----
             toneZ_ += (o - toneZ_) * toneCoef_;
-            if (tone < 0.0f) o = o + (toneZ_ - o) * (-tone);
-            else             o = o + ((o - toneZ_) - o) * tone;
+            if (sTone_ < 0.0f) o = o + (toneZ_ - o) * (-sTone_);
+            else               o = o + ((o - toneZ_) - o) * sTone_;
 
             float y = in + (o - in) * mix;
             y = clampf(y, -4.0f, 4.0f);
@@ -169,6 +182,12 @@ private:
     float toneCoef_ = 0.2f;
     std::uint64_t rng_ = 0xC205ADEC1A1C0FFEULL;
     float sr_ = 48000.0f;
+    // controles contínuos deslizados por amostra (anti-zíper); `rate`/
+    // `bits`(glitch)/`jitter` ficam crus — são o caráter destruidor
+    bool ctlPrimed_ = false;
+    float ctlSmooth_ = 1.0f;
+    float sDrive_ = 1.0f, sWrap_ = 0.0f, sTone_ = 0.0f, sMix_ = 1.0f,
+          sQL_ = 32768.0f;
 };
 
 }  // namespace rasgo::modular
