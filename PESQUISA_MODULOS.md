@@ -359,6 +359,98 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 
 ---
 
+### 2.6 Revisão cruzada com o ranking de POPULARIDADE do ModularGrid (2026-09-07)
+
+O `§7` é o Top 100 por **avaliação** (satisfação, consultado 2026-09-01).
+Esta revisão cruza os **56 módulos feitos** contra o Top 100 por
+**popularidade** — quantos racks contêm o módulo (o *module finder*
+ordenado por `order=popular`; a lista é conhecida e muito estável entre
+anos). O objetivo é achar buracos que só aparecem quando se olha o que a
+comunidade de fato usa, não só o que avalia bem.
+
+**Conclusão do cruzamento:** ~85 % do Top 100 por popularidade já tem
+casa no RASGO. O ranking é dominado por **utilidades** (VCA, atenuversor,
+mult, mixer, mudança de oitava, S&H — ~40 %) e **vozes/filtros de
+trabalho** (VCO analógico, VCF, ADSR — ~30 %); as duas faixas o RASGO
+cobre inteiras (`VCA`, `CONTROL`, `ABACUS`, `MULT`, `MATRIX`, `SWITCH`,
+`MIXER`, `SH`, `LOGIC` · `OSC`, `FILTER`, `ENVELOPE`, `FUNCTION`, `LPG`).
+O terço de "caráter" (granular, físico, caos, efeito digital) está quase
+todo coberto (`MEMORY`, `MATTER`, `STRING`, `RESONATOR`, `CHAOS`,
+`SWIRL`, `CRUSH`, `HALL`, `SPACE`, `LOOPER`, `SAMPLER`, `TURNTABLE`).
+
+**O que o cruzamento expôs de novo (não estava no `§2.5`):** a lacuna
+**análise → síntese**. O RASGO tem `ADDITIVE`/`FORMANT` (constroem
+espectro) e `SCOPE` (mede áudio → CV), mas nada que **ouve um sinal e
+o re-sintetiza**. Nada digno de nota está approvado — cada linha, se for
+adiante, vira dossiê antes do código (método `§1`). Nomes provisórios.
+
+**Tier 1 — buracos reais (dossiê próprio).**
+
+| Cand. | Família | O que é / por que falta | Parte de (conceito público) |
+|---|---|---|---|
+| **`SHIFTER`** (deslocador de frequência) | TRANSFORM | Move o espectro inteiro por um Δf **fixo em Hz** (não em razão) — desafina em intervalos que *variam* com a frequência → metálico, sineiro, inarmônico; o `feedback` shift clássico é um drone que nunca se repete. O `SHAPE` faz ring-mod (bandas soma **e** diferença simétricas em torno da portadora); *frequency shift* entrega **só uma** (upper **ou** lower sideband). Nenhum módulo RASGO faz. **Desvio Rasgo:** sai `up` **e** `down` ao mesmo tempo — a relação entre as duas saídas é o processo (idioma Three Sisters); `drift` semeado no Δf. **Provável `mode` do `SHAPE`** (uma entrada de portadora + knob `shift` em Hz), não módulo — decisão do autor. | Harald Bode / Bode-Moog frequency shifter (SSB por deslocador de fase — teoria pública, anos 1960); transformada de Hilbert por rede all-pass ou FFT; Hartley/Weaver SSB; Zölzer *DAFX* (cap. frequency shifting); Shakmat SumDif (`§7 #86` — ficha pública) |
+| **`SPECTRA`** (resíntese espectral) | SOURCE / TRANSFORM | Analisa o espectro de curto prazo de uma entrada e re-oscila como um banco de parciais que **segue** o som — com `freeze` (congela o envelope espectral e continua oscilando), `blur` (borra o tempo/frequência da análise), `shift`/`stretch` de altura sobre a re-síntese. É a ponte análise↔síntese que falta, e é dos conceitos mais cobiçados fora do RASGO. **Desvio Rasgo:** roda **sem entrada** (um ruído interno de −36 dB semeia o banco — modo autônomo, identidade RASGO); `jitter` semeado nos parciais. Distinto do `ADDITIVE` (constrói do zero) e do `MEMORY` (grão no tempo, não no espectro). | Phase vocoder (Flanagan & Golden 1966 — teoria pública); síntese por modelagem espectral / SMS (Xavier Serra, tese 1989); modelo sinusoidal McAulay–Quatieri (1986); *spectral freeze* (técnica pública, ex. Miller Puckette / `pvoc`); Rossum Panharmonium e Intellijel Rainmaker spectral (fichas públicas — **conceito, não código**) |
+
+**Tier 2 — `mode` de um módulo existente (o `feedback_generative_design_light_touch` pede modo antes de módulo).**
+
+| Cand. | Onde | O que é / por que | Parte de (conceito público) |
+|---|---|---|---|
+| **vocoder de análise/síntese** | `mode` do `FORMANT` | O `FORMANT` hoje é um banco de vogais **estático** (5 SVF paralelos varridos por `vowel`). Um vocoder é (modulador → banco de seguidores de envelope por banda) × (portadora → banco de filtros casados). Adicionar uma entrada `mod` (o modulador) e um `bands` (8–20) transforma o `FORMANT` no clássico de Dudley sem módulo novo. **Desvio Rasgo:** sem portadora patcheada, usa uma fonte interna (autônomo); `freeze` segura o envelope espectral do último instante. | Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco de análise + seguidores RC + banco de síntese (teoria clássica); Frap Fumana / Bastl Pizza (fichas públicas) |
+| **análise de áudio → CV: pitch por autocorrelação + onset/transiente** | estende o `SCOPE` | O `SCOPE` já entrega `level` (seguidor de pico), `pitch` (v/oct por período entre cruzamentos de zero — trava após 3 períodos) e `bright` (centroide). Falta o que Maths ch2/3 + Kinks fazem pra **áudio**: pitch robusto sob ruído (autocorrelação / YIN — já listado como pendência do `SCOPE`) e uma saída `onset` (pulso no ataque — fluxo espectral ou derivada da envoltória). Fecha o "seguidor de envelope pra áudio" que hoje só existe pra CV (`CONTROL.rectify`+`slew`). | Envelope follower = retificação + passa-baixa (clássico); YIN (de Cheveigné & Kawahara, 2002 — artigo público); detecção de onset por fluxo espectral (Bello et al., 2005 — *tutorial* público) |
+
+**Tier 3 — utilidade que falta, cerimônia mínima.**
+
+| Cand. | Onde | O que é / por que | Parte de |
+|---|---|---|---|
+| **banco de VCA de 4 canais** | estende o `VCA` (hoje **duplo**) | Veils / Intellijel Quad VCA estão no topo da popularidade — VCA em quantidade é a utilidade nº 1 do formato. Com `CHORD` parafônico e as saídas `low/mid/high` do `RESONATOR`/`FILTER`, 4 canais com CV + um mix somado na saída é uma lacuna concreta e trivial. `mode` linear/exp por canal, como o `VCA` atual. | Doepfer A-130/131/132 (VCA linear/exp — teoria pública); Mutable Veils (curva de resposta — ficha pública) |
+
+**O ranking de popularidade RE-CONFIRMA candidatos do `§2.5`:**
+
+- **`SWARM`** (multi-LFO orgânico) — Xaoc Batumi (`§7 #61`), DivKid ochd
+  (`§7 #31`), Eowave Quadrantid Swarm e Frap Tools 333 estão todos alto
+  na popularidade. `§2.5` Tier 2, forte candidato a `mode` do `FUNCTION`.
+- **sequenciador euclidiano melódico** — Pamela's, vpme Euclidean Circles.
+  `§2.5` Tier 3 → `mode` do `TRIGSEQ`/`SEQUENCE`.
+- **melodia generativa por contorno/densidade** — Vermona meloDICER
+  (`§7 #78`), Shakmat Bard Quartet (`§7 #38`), Mimetic Digitalis. `§2.5`
+  Tier 3.
+
+**Parados de propósito (o cruzamento não muda a decisão do `§2.5`):**
+canivete polimórfico (Disting / O&C — vive em `SWITCH`/`MATRIX`/`STAGES`);
+spatializer posicional (a família SPACE cobre); performance mixer com
+sends/mutes/cue (fora do escopo de instrumento de composição por ora).
+
+**Ordem sugerida, se virar "Onda F":** `SPECTRA` → `SHIFTER` (ou `mode`
+do `SHAPE`) → vocoder (`mode` do `FORMANT`) → VCA 4ch. `SPECTRA` é o mais
+rico e o único genuinamente novo no catálogo.
+
+---
+
+### 2.7 Nota — a fase didática (site + PDF)
+
+Depois de fechada a construção de módulos, começa a **etapa didática**:
+como usar cada módulo (portas, controles, o que cada knob faz de
+verdade), como cabear, e — como a tabela "módulo popular → equivalente
+RASGO" acima — **como chegar a resultados interessantes conectando um
+conjunto de módulos**, com exemplos passo a passo. Material para o site
+que será criado e para uma publicação (PDF).
+
+Insumos que já existem para isso:
+- o `LEARN` do painel (`apps/panel/LearnCatalog.hpp`) — 3 níveis por
+  bind (*rápido* / *entender* / *explorar*) + a definição de cada
+  módulo; é a semente do texto de referência;
+- os dossiês (`dossies/NN_*.md`) — problema, fontes, modelo, testes de
+  cada módulo;
+- as 5 peças de exemplo (`examples/peca_generativa*`) — patches completos
+  comentados;
+- este `PESQUISA_MODULOS.md` — a proveniência conceitual (de que a
+  publicação precisa para citar fontes corretamente).
+
+A tabela de equivalências ModularGrid → RASGO (feita nesta revisão) entra
+como apêndice: "se você conhece o módulo X do Eurorack, no RASGO é o Y".
+
+---
+
 ## 3. Matriz Mutable Instruments → Rasgo (Atlas §36)
 
 Licença: geração **STM32F** (Plaits, Marbles, Rings, Stages, Tides, Warps,
