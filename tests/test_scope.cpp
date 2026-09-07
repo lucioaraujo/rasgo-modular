@@ -29,14 +29,14 @@ constexpr float kSr = 48000.0f;
 constexpr std::size_t kB = 128;
 
 struct Out {
-    std::vector<float> thru, trig, level, bright, pitch;
+    std::vector<float> thru, trig, level, bright, pitch, onset;
 };
 
 // roda `sc` com uma senoide de `hz`/`amp` (ou ruído se hz<0) por `blocks`.
 // `extHz` >= 0 injeta uma senoide em `ext`.
 Out run(Scope& sc, int blocks, float hz, float amp = 0.5f, float extHz = -1.0f) {
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(5, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB), bext(kSr, 1, kB);
     Out r;
     double ph = 0.0, phe = 0.0;
@@ -63,11 +63,12 @@ Out run(Scope& sc, int blocks, float hz, float amp = 0.5f, float extHz = -1.0f) 
         for (std::size_t k = 0; k < kB; ++k) {
             const float th = out[0].at(0, k), tg = out[1].at(0, k),
                         lv = out[2].at(0, k), br = out[3].at(0, k),
-                        pi = out[4].at(0, k);
+                        pi = out[4].at(0, k), on = out[5].at(0, k);
             check(std::isfinite(th) && std::isfinite(tg) && std::isfinite(lv)
-                  && std::isfinite(br) && std::isfinite(pi), "finito");
+                  && std::isfinite(br) && std::isfinite(pi)
+                  && std::isfinite(on), "finito");
             r.thru.push_back(th); r.trig.push_back(tg); r.level.push_back(lv);
-            r.bright.push_back(br); r.pitch.push_back(pi);
+            r.bright.push_back(br); r.pitch.push_back(pi); r.onset.push_back(on);
         }
     }
     return r;
@@ -83,7 +84,7 @@ int risingEdges(const std::vector<float>& g) {
 void testThruIsClean() {
     Scope sc;
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(5, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB);
     std::uint64_t rng = 99;
     for (int b = 0; b < 20; ++b) {
@@ -207,7 +208,7 @@ void testPitchZeroForNoise() {
 void testHoldFreezes() {
     Scope sc;
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(5, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB);
     double ph = 0.0;
     auto fill = [&](float hz, float amp) {
@@ -271,6 +272,61 @@ void testInGraph() {
     (void)lo;
 }
 
+// bate um "ataque" (rampa de amplitude rápida) a cada `periodBlk` blocos
+Out runBursts(Scope& sc, int bursts, int periodBlk, float sens = 0.4f) {
+    sc.setParameter("sens", sens);
+    sc.prepare(kSr, kB);
+    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
+    AudioBlock bin(kSr, 1, kB);
+    Out r;
+    double ph = 0.0;
+    long n = 0;
+    for (int b = 0; b < bursts * periodBlk; ++b) {
+        const int phase = b % periodBlk;
+        for (std::size_t k = 0; k < kB; ++k) {
+            // envelope: ataque ~2 ms no início do período, decai
+            const double t = (double)(phase * (int)kB + (int)k) / kSr;
+            const float env = std::exp(-static_cast<float>(t) * 18.0f)
+                            * (t < 0.0005 ? static_cast<float>(t) / 0.0005f
+                                          : 1.0f);
+            bin.at(0, k) = 0.6f * env * static_cast<float>(std::sin(ph));
+            ph += 2.0 * M_PI * 220.0 / kSr;
+        }
+        std::vector<const AudioBlock*> ins{&bin, nullptr};
+        sc.process(ins, out);
+        for (std::size_t k = 0; k < kB; ++k) {
+            r.onset.push_back(out[5].at(0, k));
+            r.level.push_back(out[2].at(0, k));
+        }
+        (void)n;
+    }
+    return r;
+}
+
+void testOnsetFiresOnAttacks() {
+    Scope sc;
+    const Out r = runBursts(sc, 12, 60);            // 12 ataques
+    const int fired = risingEdges(r.onset);
+    check(fired >= 9 && fired <= 15, "onset dispara ~1x por ataque");
+    for (float v : r.onset) check(v == 0.0f || v == 1.0f, "onset é gate 0/1");
+}
+
+void testOnsetSilentOnSteadyTone() {
+    Scope sc;
+    const Out r = run(sc, 300, 300.0f, 0.5f);       // tom contínuo, sem ataque
+    // depois do transiente inicial (1 disparo no arranque), nada
+    const int fired = risingEdges(std::vector<float>(
+        r.onset.begin() + r.onset.size() / 4, r.onset.end()));
+    check(fired == 0, "sem onset num tom estável");
+}
+
+void testOnsetSensitivity() {
+    Scope loud;   const Out rl = runBursts(loud, 10, 60, 0.9f);  // sensível
+    Scope quiet;  const Out rq = runBursts(quiet, 10, 60, 0.05f); // exigente
+    check(risingEdges(rl.onset) >= risingEdges(rq.onset),
+          "sens alto dispara >= sens baixo");
+}
+
 void testPanel() {
     Scope sc;
     const std::string problem = validatePanel(sc);
@@ -294,6 +350,9 @@ int main() {
     testPitchTracks();
     testPitchZeroForNoise();
     testHoldFreezes();
+    testOnsetFiresOnAttacks();
+    testOnsetSilentOnSteadyTone();
+    testOnsetSensitivity();
     testDeterminism();
     testInGraph();
     testPanel();

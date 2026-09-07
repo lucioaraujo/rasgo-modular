@@ -5542,6 +5542,31 @@ na pilha (sem heap); ~2–4 % de um núcleo. Determinístico. Os testes do
 Docs: 58_shifter.md §3/§6/§7, 29_scope.md §1/§2/§3/§6, RASGO_MODULAR.md
 §36.3 (linhas #29 e #58), PESQUISA §2.6.
 
-**71/71 CTest Debug + Release.** Pendências restantes do §2.6: saída
-`onset` no SCOPE; vocoder de N bandas dedicado; FFT real / partial
-tracking no SPECTRA; rede all-pass IIR de banda larga no SHIFTER.
+**71/71 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: pendências — SCOPE ganha saída `onset`
+
+**`src/dsp/Scope.hpp`, `tests/test_scope.cpp` (3 testes novos, 16 no
+total).** Fecha a análise-de-áudio-pra-CV do `§2.6`: além do `pitch`
+(YIN) e `level`, o `SCOPE` agora tem **`onset`** — um gate de ~2 ms a
+cada ataque/transiente.
+
+- **Saída `onset`** apensa no índice 5 (patches referenciam 0–4,
+  intactos — mesma tática do `mod` no FORMANT / `mix` no VCA4).
+- **Param `sens`** aposto (0–1, def 0,4) — sensibilidade.
+- DSP: dois seguidores de envelope no `|in|` (rápido ~0,8 ms / lento
+  ~15 ms de ataque); dispara quando `envRápido > envLento · limiar`
+  (limiar `1,2`–`3,0` por `sens`) fora de um cooldown de ~30 ms. Tom
+  estável e ruído estável não disparam. O detector de transiente
+  clássico (Maths ch2/3 é pra CV; este é pra áudio).
+- Painel 14 → 15 HP (jack ONS + knob SENS). LearnCatalog: `sens` +
+  `out:onset` + blurb atualizado.
+
+Docs: 29_scope.md §1/§5/§7, RASGO_MODULAR.md §36.3, PESQUISA §2.6.
+
+**71/71 CTest Debug + Release.** Pendências restantes do §2.6: vocoder de
+N bandas dedicado; FFT real / partial tracking no SPECTRA; rede all-pass
+IIR de banda larga no SHIFTER — todas mudanças grandes de caráter, ficam
+pra quando o autor pedir.
