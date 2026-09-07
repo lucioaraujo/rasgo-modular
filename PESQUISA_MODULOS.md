@@ -388,7 +388,7 @@ adiante, vira dossiê antes do código (método `§1`). Nomes provisórios.
 
 | Cand. | Família | O que é / por que falta | Parte de (conceito público) |
 |---|---|---|---|
-| **`SHIFTER`** (deslocador de frequência) | TRANSFORM | Move o espectro inteiro por um Δf **fixo em Hz** (não em razão) — desafina em intervalos que *variam* com a frequência → metálico, sineiro, inarmônico; o `feedback` shift clássico é um drone que nunca se repete. O `SHAPE` faz ring-mod (bandas soma **e** diferença simétricas em torno da portadora); *frequency shift* entrega **só uma** (upper **ou** lower sideband). Nenhum módulo RASGO faz. **Desvio Rasgo:** sai `up` **e** `down` ao mesmo tempo — a relação entre as duas saídas é o processo (idioma Three Sisters); `drift` semeado no Δf. **Provável `mode` do `SHAPE`** (uma entrada de portadora + knob `shift` em Hz), não módulo — decisão do autor. | Harald Bode / Bode-Moog frequency shifter (SSB por deslocador de fase — teoria pública, anos 1960); transformada de Hilbert por rede all-pass ou FFT; Hartley/Weaver SSB; Zölzer *DAFX* (cap. frequency shifting); Shakmat SumDif (`§7 #86` — ficha pública) |
+| ~~**`SHIFTER`** (deslocador de frequência)~~ | TRANSFORM | **FEITO — 2026-09-07, `dossies/58_shifter.md`, `src/dsp/Shifter.hpp` (Módulo 58).** Virou MÓDULO próprio (não `mode` do `SHAPE` — o conceito é distinto do waveshaper). Move o espectro por Δf fixo em Hz (SSB por Hilbert FIR de 255 taps + atraso casado). Saídas `up`/`down` simultâneas; `feedback` = barber pole (a saída `up` volta pra entrada, `tanh` no laço); `drift` semeado; `tone`; `mix`. Rejeição de imagem > 50 dB acima de ~250 Hz. Distinto do ring-mod do `SHAPE` (bandas simétricas). | Harald Bode / Bode-Moog frequency shifter (SSB — teoria pública, anos 1960); Hartley/Weaver SSB; transformada de Hilbert (FIR); Zölzer *DAFX*; barber-pole / Shepard-Risset (Shepard 1964, Risset 1969) |
 | ~~**`SPECTRA`** (resíntese espectral)~~ | SOURCE | **FEITO — 2026-09-07, `dossies/57_spectra.md`, `src/dsp/Spectra.hpp` (Módulo 57).** Banco de 64 passa-faixas ressonantes log (35 Hz–14 kHz) + seguidor de pico → a cada ~6 ms pega os `voices` picos, interpolação parabólica; `voices` (2–24) senóides de fase contínua que deslizam pros picos herdados. `blur` (velocidade do rastreio), `shift`/`stretch` transpõem a re-síntese, `tone`, `jitter` semeado, **`freeze`** (para a análise = *spectral freeze* / pad infinito), `mix`. `in` livre → ruído + 2 parciais fantasma semeados → drone autônomo. `process()` não aloca. Pendências: FFT real, *partial tracking* com continuidade. | phase vocoder (Flanagan & Golden 1966); SMS (Xavier Serra 1989); McAulay–Quatieri (1986); *spectral freeze* (técnica pública); Q constante (Brown 1991); Panharmonium / Rainmaker spectral (**conceito, não código**) |
 
 **Tier 2 — `mode` de um módulo existente (o `feedback_generative_design_light_touch` pede modo antes de módulo).**
@@ -422,9 +422,9 @@ sends/mutes/cue (fora do escopo de instrumento de composição por ora).
 
 **Ordem sugerida, se virar "Onda F":** `SPECTRA` → `SHIFTER` (ou `mode`
 do `SHAPE`) → vocoder (`mode` do `FORMANT`) → VCA 4ch. `SPECTRA` é o mais
-rico e o único genuinamente novo no catálogo. **`SPECTRA` FEITO
-(2026-09-07, Módulo 57) — a Onda F começou.** Segue `SHIFTER`, vocoder,
-VCA 4ch.
+rico e o único genuinamente novo no catálogo. **Onda F: `SPECTRA` ✓
+(Módulo 57) · `SHIFTER` ✓ (Módulo 58) — virou módulo próprio, não `mode`
+do `SHAPE`.** Seguem vocoder (`mode` do `FORMANT`) e VCA 4ch.
 
 ---
 

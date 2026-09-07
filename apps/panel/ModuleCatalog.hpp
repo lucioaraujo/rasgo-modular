@@ -50,6 +50,7 @@
 #include "dsp/Scope.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
+#include "dsp/Shifter.hpp"
 #include "dsp/Spectra.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
@@ -96,6 +97,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "TURNTABLE")  return std::make_unique<Turntable>();
     if (t == "SCOPE")      return std::make_unique<Scope>();
     if (t == "SHAPE")      return std::make_unique<Shape>();
+    if (t == "SHIFTER")    return std::make_unique<Shifter>();
     if (t == "CRUSH")      return std::make_unique<Crush>();
     if (t == "LPG")        return std::make_unique<Lpg>();
     if (t == "DECISION")   return std::make_unique<Decision>();
@@ -153,7 +155,7 @@ struct CatalogGroup {
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
-        {"TRANSFORM", {"FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
+        {"TRANSFORM", {"FILTER", "FORMANT", "RESONATOR", "WASP", "LPG", "VCA", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},

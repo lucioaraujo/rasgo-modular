@@ -156,7 +156,7 @@ SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE PULSAR
                          SPECTRA MATTER STRING AUDIO-IN
   └ inclui as vozes de modelagem física (o mundo Eurorack marca
     "Synth Voice"/"Resonator"; o Patch & Tweak as põe em Sound Sources)
-TRANSFORM  transformar   FILTER FORMANT RESONATOR WASP LPG VCA SHAPE CRUSH PARAMETRIC GLIDE CONTROL
+TRANSFORM  transformar   FILTER FORMANT RESONATOR WASP LPG VCA SHAPE SHIFTER CRUSH PARAMETRIC GLIDE CONTROL
   └ modifica um sinal que PASSA (áudio ou CV)
 MODULATE   mover         ENVELOPE FUNCTION STAGES DRIFT CHAOS SH
   └ GERA um sinal de controle
@@ -1123,7 +1123,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 57 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 58 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1220,7 +1220,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 57 módulos DSP
+### 36.3 Os 58 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1285,6 +1285,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 55 | `RESONATOR` | TRANSFORM | **banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal EXTERNO** (Rings/Elements no modo ressoador; o `MATTER` é voz fechada, aqui você bate com o que quiser — `DRUM`, `NOISE`, uma voz). `freq` (20–5000 Hz, +CV 1V/oct), `structure` (0–1 — harmônico ↔ esticado `k·√(1+B·k²)`, a mesma fórmula do `ADDITIVE`), `partials` (1–24), `decay` (0–1 — Q/tempo de anel; pólos < 1, nunca auto-oscila), `damp` (0–1 — os agudos decaem antes dos graves), **`tilt`** (−1..1 — inclinação espectral: <0 `low` domina, >0 `high` domina; **varrer `tilt` CRUZA `low`↔`high`** — a relação entre as saídas é o processo, Three Sisters), `position` (0–1 — pente de pluck: 0,5 = só ímpares), `mix` (0 = bypass). 3 saídas `low`/`mid`/`high` (1/3 grave/médio/agudo dos parciais). `strike` = exciter embutido (rajada de ruído de ~3 ms). `in` livre → ruído interno de −36 dB arqueia o banco (modo autônomo — canto de taça). Determinístico (ruído semeado). `process()` não aloca (coefs recalc só na mudança). Distinto do `MATTER` (voz) e do `FILTER` (bandas não afinadas) | Mutable Rings/Elements (MIT — conceito); Mannequins Three Sisters ★★ (`§7 #50` — a relação entre as saídas); `BiomaModalResonator` (`§4` — algoritmo, código do autor); biquad ressonante de 2 polos (DSP clássico); inarmonicidade de barra/corda rígida (acústica); 4ms SMR (`§8`) (`PESQUISA §2.5` Onda E) |
 | 56 | `PULSAR` | SOURCE | **síntese pulsar (Curtis Roads) — trem de pulsarets (grão curto + silêncio) com DUAS frequências independentes**: `freq` (20–2000 Hz, +CV 1V/oct — a taxa de repetição = a ALTURA) e `formant` (0,1–8×, +CV — a frequência interna do pulsaret = o TIMBRE, **sem desafinar**: o pente harmônico fica em múltiplos de `freq`, `formant` só move o envelope espectral). `shape` (0–1 — 1 ciclo de seno → 2–3 + harmônico agudo), `window` (0 ≈ retangular/brilhante → 0,4 Hann → 1 expodec percussivo — janela de Tukey→Hann→expodec), `jitter` (**desvio Rasgo** SEMEADO no período/amplitude), `mask` (0–1 — probabilidade de PULAR um pulsaret; o *masking* de Roads, padrões rítmicos por subtração), `spread` (pulsarets alternados L/R — estéreo por granulação), `level` (softclip tanh). Saídas `out`/`r` (L/R). Fonte autônoma — soa ao carregar; `jitter=mask=0` → trem periódico determinístico. Pool de 4 vozes de grão; `process()` não aloca. Entre a granular e a de formante; distinto do `OPERATOR`/`ADDITIVE` (espectro preso à altura) | Curtis Roads, *Microsound* (2001) — síntese pulsar (conceito público); pulsaret + *masking* (teoria); janela de grão granular (Gabor/Roads); Xenakis (trens de grãos) (`PESQUISA §2.5` Onda E) |
 | 57 | `SPECTRA` | SOURCE | **resíntese espectral — OUVE `in`, acha os parciais mais fortes e re-oscila como um banco de senóides que SEGUE o som** (a ponte análise → síntese). ANÁLISE: 64 passa-faixas ressonantes log (35 Hz–14 kHz, sobrepostas) + seguidor de pico; a cada ~6 ms pega os `voices` picos, interpolação parabólica em log-freq. SÍNTESE: `voices` (2–24) senóides de fase contínua que DESLIZAM (sem zíper) pros picos herdados; `blur` (0–1 — velocidade do rastreio, 0 trava no som ↔ 1 borra ~0,6 s), `shift` (±2 oct, +CV 1V/oct) e `stretch` (−1..1 inarmônico) transpõem a re-síntese SEM tocar na análise, `tone` (−1..1) inclina o espectro, `jitter` (**desvio Rasgo** SEMEADO por voz), **`freeze`** (toggle + gate — para a análise, o banco segura o último espectro = *spectral freeze* / pad infinito), `mix`. Saídas `out`/`r` (L/R, vozes ímpares/pares panoramizadas). `in` livre → ruído interno de −30 dB + 2 parciais fantasma que derivam (semeados) → drone tonal autônomo. `process()` não aloca; `jitter=0` → determinístico. Distinto do `ADDITIVE` (constrói do zero) e do `MEMORY` (grão no tempo) | phase vocoder (Flanagan & Golden 1966 — teoria pública); SMS (Xavier Serra 1989); modelo sinusoidal McAulay–Quatieri (1986); *spectral freeze* (técnica pública); banco de filtros de Q constante (Brown 1991); Rossum Panharmonium / Intellijel Rainmaker spectral (**conceito, não código**) (`PESQUISA §2.6` Onda F) |
+| 58 | `SHIFTER` | TRANSFORM | **deslocador de frequência (SSB) — move o espectro INTEIRO por um Δf FIXO EM HZ** (não em razão), então os parciais deixam de ser harmônicos → metálico/sineiro. Diferente do ring-mod do `SHAPE` (bandas soma **e** diferença simétricas), aqui é banda ÚNICA: `up` (espectro + Δf) e `down` (espectro − Δf), cada uma em sua saída — a relação entre elas é o processo (Three Sisters). `shift` (−2000..2000 Hz, +CV `shift_mod` ×1000 Hz), **`feedback`** (−0,95..0,95 — a saída `up` volta pra entrada → glissando infinito, o *barber pole* de Risset-Shepard; `tanh` no laço), `tone` (−1..1 — inclina o molhado), `drift` (**desvio Rasgo** SEMEADO no Δf), `mix`. SSB por transformada de Hilbert (FIR de 255 taps + atraso casado de 127); rejeição de imagem > 50 dB acima de ~250 Hz (abaixo tende ao ring-mod — limite do FIR curto, como o hardware). `process()` não aloca; `drift=0` → determinístico | Harald Bode / Bode-Moog frequency shifter (SSB, anos 1960 — conceito público); SSB por método Hartley/Weaver (teoria de rádio); transformada de Hilbert (DSP clássico); Zölzer *DAFX* (cap. frequency shifting); barber-pole / Shepard-Risset (Shepard 1964, Risset 1969) (`PESQUISA §2.6` Onda F) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1326,7 +1327,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**69 alvos CTest**, 100% verdes em **Debug e Release**
+**70 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham
