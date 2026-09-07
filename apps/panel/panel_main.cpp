@@ -339,6 +339,13 @@ int main() {
     std::atomic<bool> reprepare{false};
     std::mutex gmx;
 
+    // energia real da saída (RMS, seguidor rápido) — escrita pelo thread de
+    // áudio a cada chunk, lida pela "mão caótica" (Motion Engine) sem lock.
+    // A v3 usava o anel de osciloscópio decimado do MASTER via `try_lock`,
+    // que defasava sob carga e cegava o duck protetor. Ver
+    // `dossies/ESTUDO_seed_composicao_generativa.md §3.7`.
+    std::atomic<float> gOutRms{0.0f};
+
     // ---- AUDIO-IN — captura ao vivo (adaptador OPCIONAL, nunca
     // dependência) --------------------------------------------------------
     // Só abre o dispositivo de captura ALSA quando o patch tem de fato um
@@ -507,10 +514,21 @@ int main() {
                     graph.prepare(static_cast<float>(alsa.rate()), 2, block);
                 for (std::size_t c = 0; c < chunks; ++c) {
                     graph.process(st, sink, 0);
+                    double sq = 0.0;
                     for (std::size_t i = 0; i < block; ++i) {
-                        inter[2 * (c * block + i)] = st.at(0, i);
-                        inter[2 * (c * block + i) + 1] = st.at(1, i);
+                        const float l = st.at(0, i), r = st.at(1, i);
+                        inter[2 * (c * block + i)] = l;
+                        inter[2 * (c * block + i) + 1] = r;
+                        sq += static_cast<double>(l) * l
+                            + static_cast<double>(r) * r;
                     }
+                    // seguidor de energia (τ ≈ 25 ms) pra a mão caótica
+                    const float inst = static_cast<float>(
+                        std::sqrt(sq / static_cast<double>(block * 2)));
+                    const float prev =
+                        gOutRms.load(std::memory_order_relaxed);
+                    gOutRms.store(prev + (inst - prev) * 0.2f,
+                                  std::memory_order_relaxed);
                 }
                 if (recording.load(std::memory_order_relaxed)) {
                     if (recBuf.size() + period * 2 <= recBuf.capacity())
@@ -2286,6 +2304,7 @@ int main() {
     }
 
     redraw();  // primeira pintura (não depende só do Expose)
+    int motionCableThrottle = 30;   // re-escaneia a fiação ~1x/s, não a 33 ms
     while (alive) {
         if (g_quit.load()) alive = false;
         while (XPending(dpy)) {
@@ -2669,22 +2688,20 @@ int main() {
         }
         // Motion Engine: a mão caótica move as fibras ([v] liga/desliga).
         // Pausa enquanto a mão do usuário está num controle (`drag.active`).
-        // A energia do som (RMS do MASTER) acelera a mão e, perto do teto,
-        // puxa tudo pro centro (duck protetor — evita o clip com [v] on).
-        // O músico continua no comando com [v] ligado: mexeu num knob à
-        // mão → a fibra re-ancora ali (no `tick`); mexeu na fiação → a
-        // amplitude das fibras cabeadas cai (não briga com o LFO/env).
+        // A energia REAL da saída (RMS do thread de áudio, `gOutRms`)
+        // acelera a mão e, perto do teto, puxa tudo pro centro (duck
+        // protetor — evita o clip com [v] on). O músico continua no
+        // comando: mexeu num knob à mão → a fibra re-ancora ali (no
+        // `tick`); mexeu na fiação → a amplitude das fibras cabeadas cai.
+        // `refreshCables` roda ~1x/s (a fiação quase nunca muda entre
+        // frames; alívio de CPU pra não estourar o buffer de áudio).
         if (motionOn && !drag.active && !cdrag.active) {
-            motion.refreshCables(graph);
-            float eRms = 0.0f;
-            for (const auto& kv : scopeSnap) {
-                if (graph.node(kv.first).type() != "MASTER") continue;
-                double sq = 0.0; std::size_t n = 0;
-                for (const float v : kv.second.buf) { sq += (double)v * v; ++n; }
-                if (n) eRms = std::max(eRms,
-                                       (float)std::sqrt(sq / (double)n));
+            if (++motionCableThrottle >= 30) {
+                motionCableThrottle = 0;
+                motion.refreshCables(graph);
             }
-            const float energy = std::min(1.0f, eRms * 2.2f);
+            const float energy = std::min(
+                1.0f, gOutRms.load(std::memory_order_relaxed) * 2.2f);
             motion.tick(graph, 0.033f, energy);
         }
         // repinta a ~30 fps pra os osciloscópios dos módulos animarem — o
