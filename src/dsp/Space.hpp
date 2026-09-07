@@ -81,6 +81,12 @@ public:
         writePos_ = 0;
         lpState_ = 0.0f;
         lfoPhase_ = 0.0f;
+        // glide de ~10 ms nos parâmetros contínuos: sem isto, quando o VARIA
+        // (ou um arrasto de knob) varre `time`, a tomada de atraso salta de
+        // posição a cada bloco = um clique. `ctlPrimed_` faz o 1º bloco
+        // assentar no valor exato → patch estático fica byte-idêntico.
+        ctlCoef_ = 1.0f - std::exp(-1.0f / (0.010f * sampleRate));
+        ctlPrimed_ = false;
         for (int i = 0; i < kAllpass; ++i) {
             apBuf_[i].assign(kApLen[i], 0.0f);
             apPos_[i] = 0;
@@ -108,16 +114,28 @@ public:
         const AudioBlock* timeMod = inputs[1];
         const AudioBlock* fbMod = inputs[2];
 
-        const float lpCoeff = 0.08f + tone * 0.9f;  // 1 = brilhante (passa tudo)
         const float lfoInc = 0.13f / sampleRate_;    // ~0,13 Hz
         const float modSamples = modAmt * 0.004f * sampleRate_;
 
+        if (!ctlPrimed_) {
+            sTime_ = timeParam; sSpread_ = spread; sFb_ = feedbackParam;
+            sTone_ = tone; sMix_ = mix;
+            ctlPrimed_ = true;
+        }
+
         for (std::size_t frame = 0; frame < frames; ++frame) {
+            sTime_   += (timeParam     - sTime_)   * ctlCoef_;
+            sSpread_ += (spread        - sSpread_) * ctlCoef_;
+            sFb_     += (feedbackParam - sFb_)     * ctlCoef_;
+            sTone_   += (tone          - sTone_)   * ctlCoef_;
+            sMix_    += (mix           - sMix_)    * ctlCoef_;
+            const float lpCoeff = 0.08f + sTone_ * 0.9f;  // 1 = brilhante
+
             const float dry = in ? in->at(0, frame) : 0.0f;
-            float t = timeParam;
+            float t = sTime_;
             if (timeMod)
                 t = clampf(t + timeMod->at(0, frame), 0.001f, 2.1f);
-            float fb = feedbackParam;
+            float fb = sFb_;
             if (fbMod)
                 fb = clampf(fb + fbMod->at(0, frame), 0.0f, 0.97f);
 
@@ -134,7 +152,7 @@ public:
                 const float frac = static_cast<float>(k + 1)
                     / static_cast<float>(taps);
                 const float d =
-                    baseDelay * (1.0f - spread + spread * frac)
+                    baseDelay * (1.0f - sSpread_ + sSpread_ * frac)
                     + lfo * (k % 2 == 0 ? 1.0f : -1.0f);
                 wet += readInterp(d) * (1.0f - 0.12f * static_cast<float>(k));
             }
@@ -153,7 +171,7 @@ public:
                 diffused = allpass(i, diffused, 0.6f);
             const float wetMixed =
                 (1.0f - diffusion) * wet + diffusion * diffused;
-            const float outValue = mix * wetMixed + (1.0f - mix) * dry;
+            const float outValue = sMix_ * wetMixed + (1.0f - sMix_) * dry;
             for (std::size_t channel = 0; channel < channels; ++channel) {
                 out.at(channel, frame) = outValue;
                 wetOut.at(channel, frame) = wetMixed;
@@ -203,6 +221,10 @@ private:
     std::size_t writePos_ = 0;
     float lpState_ = 0.0f;
     float lfoPhase_ = 0.0f;
+    // parâmetros contínuos suavizados por amostra (anti-zíper / anti-clique)
+    float sTime_ = 0.0f, sSpread_ = 0.0f, sFb_ = 0.0f, sTone_ = 0.0f, sMix_ = 0.0f;
+    float ctlCoef_ = 0.0f;
+    bool ctlPrimed_ = false;
 
     std::vector<float> apBuf_[kAllpass];
     std::size_t apPos_[kAllpass] = {0, 0, 0, 0};
