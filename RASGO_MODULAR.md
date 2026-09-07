@@ -1325,15 +1325,19 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**67 alvos CTest**, 100% verdes em **Debug e Release**
+**68 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham
 `test_mix`), `test_panel_layout` (regressão de sobreposição de rótulos),
-`test_motion_engine`/`test_patch_genetics`/`test_score_recorder`/
-`test_learn_catalog` (protótipos de composição generativa e pedagogia,
-`dossies/ESTUDO_seed_composicao_generativa.md` — `test_patch_genetics`
-cobre `MUTATE`/`EVOLVE`/`CROSS`), `test_chaos`/`test_pll`/
+`test_motion_engine`/`test_motion_no_clip`/`test_patch_genetics`/
+`test_score_recorder`/`test_learn_catalog` (protótipos de composição
+generativa e pedagogia, `dossies/ESTUDO_seed_composicao_generativa.md` —
+`test_patch_genetics` cobre `MUTATE`/`EVOLVE`/`CROSS`;
+`test_motion_no_clip` reconstrói o caminho do painel — grafo completo +
+`seedPatch` + `motion.tick` a 33 ms — e garante que o Motion Engine
+nunca clipa a saída, mesmo com o MASTER no teto do slider),
+`test_chaos`/`test_pll`/
 `test_note_out`/`test_audio_in` (módulos 35–38), `test_true_peak`/
 `test_output_stage`/`test_wav_writer` (excelência de saída: pico
 verdadeiro, guarda ultrassônica, governador de corpo, dither TPDF), e o

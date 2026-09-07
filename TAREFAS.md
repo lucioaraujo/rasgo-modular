@@ -5193,3 +5193,44 @@ CTest.
 
 **67/67 CTest Debug + Release.** **Onda E COMPLETA:** SWIRL ✓ CRUSH ✓
 STAGES ✓ RESONATOR ✓ PULSAR ✓ (o PHASER entrou no SWIRL).
+
+---
+
+## Registro da etapa — 2026-09-07: investigação do clip com VARIA + teste de regressão
+
+O autor reportou clip de áudio com o VARIA (Motion Engine v3) ligado nas
+seeds 597512815 / 625938148. Investigação **headless** (`clip_probe` —
+reproduz o caminho do painel: grafo completo de 1 de cada módulo + voz-base
++ `seedPatch` + `motion.inhabit` + laço de `motion.refreshCables`/
+`motion.tick` a 33 ms, medindo pico/clips/RMS na saída):
+
+- **7 seeds × MASTER a −24 / 0 / +12 dB × VARIA on/off × 60–180 s:
+  ZERO clips (`|x| ≥ 1`) em todos os casos.** Com o MASTER a +12 dB (teto
+  do slider) o limitador do MASTER trava o pico em ≈ 0,8913 (−1 dBFS).
+- VARIA ON empurra mais energia (RMS ~20–40 % maior em alguns seeds), mas
+  o limitador absorve — nunca clipa.
+- `AlsaSink.hpp:80` já faz clamp em [−1, 1] antes do int16 → sem clip
+  digital duro na camada ALSA.
+- Hipóteses restantes (fora do alcance do headless): binário v2 velho
+  (pré-duck protetor) ou **xrun do ALSA** — o comentário de `AlsaSink.hpp:72`
+  diz que underrun "soa como 'tudo rachado'"; é crepitação de *timing*
+  (custo do `motion.tick`), não de amplitude.
+- Observação de código (NÃO alterado — mexe no Motion Engine): o
+  `motion.tick` e o arrasto de knob à mão escrevem parâmetros sem pegar o
+  `gmx` (o thread de áudio segura o `gmx` no `process()`; o de MIDI e o de
+  áudio-in pegam `try_lock`). Escrita de float solta — no pior caso um
+  valor rasgado por 1 bloco (inaudível). Fica pra decisão do autor pôr o
+  tick sob `try_lock`.
+
+**Teste de regressão novo:** `tests/test_motion_no_clip.cpp` +
+`rasgo_modular_motion_no_clip_tests` (CTest 68). 3 casos: (1) +12 dB VARIA
+ON, 8 seeds → zero clips + pico < 1,0; (2) +36 dB VARIA ON nas 2 seeds do
+autor → zero clips; (3) −24 dB (fábrica) → pico folgado (< 0,5) e o patch
+produz som. ~8 s de execução.
+
+O teste do teclado MIDI ao vivo (hardware) continua pendente e é do autor —
+a lógica do `SIGNAL-IN` (note-on/off, last-note, vel 0) já é coberta por
+`test_signal_in.cpp`; o thread ALSA-seq do painel está guardado por
+`gmx.try_lock()`.
+
+**68/68 CTest Debug + Release.**
