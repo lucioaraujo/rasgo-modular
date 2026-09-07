@@ -5335,3 +5335,24 @@ dá pra selecionar/copiar. Agora:
   `UTF8_STRING` (já existia). `#include <X11/Xatom.h>`.
 
 Só painel — sem alvo CTest; **68/68** continua verde.
+
+---
+
+## Registro da etapa — 2026-09-07: seed de lançamento com entropia real + teto de cabeamento ↑
+
+**`nextRandomSeed` (`panel_main.cpp`):** o autor reportou repetição de
+números ao reiniciar. A versão antiga misturava só o `steady_clock` com
+UMA rodada de xorshift — mistura fraca; entre lançamentos rápidos (delta
+de poucos ms nos bits baixos) podia dar seeds correlacionados/repetidos.
+Agora: `std::random_device` (/dev/urandom) ⊕ os dois relógios ⊕ seed
+anterior → **splitmix64** (finalizador forte). 12 lançamentos seguidos =
+12 seeds distintos e bem espalhados. `#include <random>`.
+
+**Teto de cabeamento (`PatchSeed.hpp`):** com 42 módulos o passeio
+ponderado ia a `3 + complexity·25` ≈ 28 tentativas; com 56 módulos há
+muito mais porta livre. Subido pra `·40` ≈ 43. Distribuição real
+(20 000 seeds): mediana 19→**22**, média 22→**26**, p90 35→**47**, teto
+45→**60**. Os patches simples continuam simples (o grosso ainda entre
+10–19 cabos); só o topo ficou mais denso. `id.complexity` inalterado.
+
+**68/68 CTest Debug + Release.**
