@@ -5516,3 +5516,32 @@ CTest.
 
 **71/71 CTest Debug + Release. ONDA F COMPLETA:** SPECTRA ✓ SHIFTER ✓
 vocoder (mode do FORMANT) ✓ VCA4 ✓.
+
+---
+
+## Registro da etapa — 2026-09-07: pendências — SHIFTER FIR 511 + SCOPE pitch YIN
+
+**SHIFTER (`src/dsp/Shifter.hpp`):** FIR de Hilbert **255 → 511 taps**
+(atraso casado 127 → 255 ≈ 5,3 ms). Rejeição de imagem a 120 Hz sobe de
+10 → 21 dB; a 440 Hz de 52 → 86 dB. Os 256 taps não-nulos são guardados
+compactados (offset + coef) → o laço não itera os zeros nem paga
+modulo por tap; ~2 % de um núcleo pra 60 s de áudio. Testes inalterados
+(usavam 440 Hz, já boa).
+
+**SCOPE (`src/dsp/Scope.hpp`):** `pitch` trocou o **ZCR** por
+**autocorrelação YIN** (de Cheveigné & Kawahara, 2002). Roda num sinal
+decimado 3× (decSr ≈ 16 kHz), janela de 320, lags 16–300 (≈ 53–1000 Hz),
+a cada ~12 ms: função de diferença acumulada normalizada → 1º mínimo
+local abaixo de 0,15 → interpolação parabólica. O ZCR reportava 2×/3× a
+altura em serra/quadrada/acorde; o YIN dá erro < 1 % nesses casos
+(medido: serra 110/82 Hz, quadrada 147, acorde 165 — todos exatos);
+ruído → sem mínimo → `pitch` fica em 0. `analyzePitch` usa `float w[622]`
+na pilha (sem heap); ~2–4 % de um núcleo. Determinístico. Os testes do
+`test_scope.cpp` (senos puros) passam sem mudança.
+
+Docs: 58_shifter.md §3/§6/§7, 29_scope.md §1/§2/§3/§6, RASGO_MODULAR.md
+§36.3 (linhas #29 e #58), PESQUISA §2.6.
+
+**71/71 CTest Debug + Release.** Pendências restantes do §2.6: saída
+`onset` no SCOPE; vocoder de N bandas dedicado; FFT real / partial
+tracking no SPECTRA; rede all-pass IIR de banda larga no SHIFTER.

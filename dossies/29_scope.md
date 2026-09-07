@@ -30,11 +30,14 @@ corte do filtro, altura → oscilador, nível → VCA, disparo → envelope).
   energia da derivada é o segundo momento do espectro), por janela de
   512 amostras, mapeado `√(f_c/8000)` e suavizado por `response`. Sem
   FFT: barato, determinístico, sem alocação;
-- **`pitch`** (CV v/oct) — fundamental por período entre cruzamentos de
-  zero de subida (com histerese), aceito só em [20, 5000] Hz e com
-  `level` acima de um piso; sai em **oitavas relativas a 110 Hz** (o
-  `freq` padrão do `OSC` — `SCOPE.pitch → OSC.pitch` rastreia direto);
-  0 quando não há altura estável;
+- **`pitch`** (CV v/oct) — fundamental por **autocorrelação YIN** (de
+  Cheveigné & Kawahara, 2002) sobre o sinal decimado 3× (≈ 16 kHz):
+  diferença acumulada normalizada → 1º mínimo local abaixo do limiar
+  (0,15) → interpolação parabólica. Robusto a harmônicos — serra,
+  quadrada, acorde: erro < 1 % (o ZCR anterior reportava 2×/3× a altura
+  nesses casos). Faixa útil ~53–1000 Hz; sai em **oitavas relativas a
+  110 Hz** (o `freq` padrão do `OSC` — `SCOPE.pitch → OSC.pitch`
+  rastreia direto); 0 quando não há período claro (ruído, silêncio);
 - **`hold`** (0/1) — congela `level`/`bright`/`pitch` no último valor
   (o `trig` continua vivo).
 
@@ -60,8 +63,9 @@ sobreposição.
 **Pendências (candidatos):** o **espectro desenhado** (barras FFT janela
 Hann) — é feature do painel lendo o buffer da saída 0, não porta de
 módulo (portas são escalares por amostra); modo **XY / Lissajous** (idem
-— o painel cruza `in`×`ext`); autocorrelação pra `pitch` polifônico /
-mais robusto que ZCR; `trigger` como fração da amplitude medida
+— o painel cruza `in`×`ext`); ~~autocorrelação pra `pitch`~~ FEITO
+2026-09-07 (YIN decimado); `pitch` polifônico (mais de uma f₀) fica pra
+depois; `trigger` como fração da amplitude medida
 (auto-nível).
 
 ---
@@ -87,7 +91,7 @@ como fontes lentas de modulação — o instrumento reagindo ao que produz.
 | **Osciloscópio de bancada** (Tektronix etc., teoria) | trigger de nível + borda + histerese (holdoff); timebase | teoria pública |
 | **Mordax DATA, ALM MUM M8, Intellijel µScope** | scope de rack como utilitário; saídas de CV derivadas do sinal | ficha/conceito, código não consultado |
 | **Centroide espectral pelo diferenciador** (Parseval) | `∫ω²|X|²dω` = energia de `x'` → `f_c ≈ √(E[x'²]/E[x²])` | resultado matemático público (MPEG-7 low-level descriptors, análise de sinais) |
-| **Zero-crossing rate / detecção de pitch por período** | período entre cruzamentos de zero de subida → f₀ | teoria pública (Rabiner, análise de fala) |
+| **YIN** (de Cheveigné & Kawahara, *A fundamental frequency estimator for speech and music*, JASA 2002) | função de diferença acumulada normalizada + limiar absoluto + interpolação parabólica → f₀ robusto a harmônicos | artigo público (o ZCR anterior — Rabiner, análise de fala — reportava a oitava errada em som rico) |
 | Saída `level` do `MASTER` do Rasgo | medição de nível como CV de saída | código do autor |
 
 ## 3. Modelo — matemática, estados, extremos
@@ -113,15 +117,30 @@ if ++win == 512:
     win = 0 ; sumX2 = sumD2 = 0
 bright += (bTarget − bright)·relCoef            # se !hold
 
-# pitch (período entre cruzamentos de zero de subida, com histerese ±0,02)
-++sinceZC
-if zcArmed && x > 0.02:
-    if lvl > 0.02 && 20 ≤ sr/sinceZC ≤ 5000:
-        periodEst += (sinceZC − periodEst)·0.30
-        hz = sr/periodEst ;  pitchTarget = log2(hz/110)
-    sinceZC = 0 ; zcArmed = false
-if x < −0.02: zcArmed = true
-if lvl ≤ 0.02: pitchTarget → 0
+# pitch — YIN sobre o sinal decimado 3× (decSr ≈ 16 kHz)
+decAcc += x
+if ++decCnt == 3:
+    dhist[dw++ mod kHist] = decAcc/3 ; decAcc = 0 ; decCnt = 0
+    if ++hopCnt == 64:                        # ~12 ms
+        hopCnt = 0
+        if lvl > 0.02: analyzePitch()  else  lockCount = 0
+
+analyzePitch():
+    copia dhist (mais antigo→novo) → w[0..kHist)
+    running = 0 ; bestTau = −1
+    for tau in [1 .. 300]:
+        d = Σ_{i<320} (w[i] − w[i+tau])²
+        running += d ;  d'[tau] = d·tau/running          # YIN cmndf
+        if tau ≥ 16 && bestTau < 0 && d'[tau] < 0.15 && mínimo local:
+            bestTau = tau
+    if bestTau < 0: lockCount−− ; return                  # sem período (ruído)
+    p = bestTau + parábola(d'[bestTau∓1])
+    if |p − lastP| < 0.25·lastP:  lockCount++ ; periodEst += (p−periodEst)·0.35
+    else:                         lockCount = 0 ; periodEst = p
+    lastP = p
+
+if lockCount ≥ 2 && lvl > 0.02:  pitchTarget = log2( (decSr/periodEst) / 110 )
+else:                            pitchTarget = 0
 pitchOct += (pitchTarget − pitchOct)·relCoef    # se !hold
 
 # trigger (comparador com histerese + borda)
@@ -133,8 +152,10 @@ trig = trigCd > 0 ? 1 : 0 ;  if trigCd > 0: −−trigCd
 ```
 
 **Estados:** `lvl`, `bright`, `pitchOct`, `xPrev`, `sumX2`, `sumD2`,
-`win`, `sinceZC`, `periodEst`, `zcArmed`, `pitchTarget`, `bTarget`,
-`armed`, `trigCd`. Sem alocação.
+`win`, `pitchTarget`, `bTarget`, `armed`, `trigCd`; para o pitch YIN:
+`dhist[622]` (buffer decimado, no header), `decAcc`, `decCnt`, `hopCnt`,
+`dw`, `periodEst`, `lastP`, `lockCount`. Sem alocação de heap
+(`analyzePitch` usa `float w[622]` na pilha).
 
 **Extremos.** Silêncio → `level`→0, `bright`→0 (numerador e denominador
 zeram; o `max(...,1e−12)` evita NaN), `pitch`→0, `trig` só se `trigger`
@@ -185,10 +206,12 @@ por amostra. Sem alocação.
   limitação de design.
 - **`gain` de entrada:** um medidor com trim de ganho mente sobre o que
   mede; `thru` tem que passar limpo. Sem `gain`.
-- **`pitch` por autocorrelação já:** mais robusto e polifônico-tolerante,
-  mas O(N²) ou precisa de FFT; o ZCR com histerese + piso de nível
-  cobre o caso monofônico (a maioria) barato. Autocorrelação fica
-  candidata.
+- ~~**`pitch` por ZCR só:**~~ trocado por **autocorrelação YIN**
+  (2026-09-07) — o ZCR reportava 2×/3× a altura em serra/quadrada/acorde.
+  O YIN roda num sinal DECIMADO 3× (janela 320, lags 16–300 dec) e só a
+  cada ~12 ms → O(lag·janela) por hop ≈ 2–4 % de um núcleo, sem
+  alocação de heap (janela copiada pra `float w[622]` na pilha),
+  determinístico. Polifonia (mais de uma f₀) fica pra depois.
 - **`trig` de 1 amostra:** some no sub-bloco do painel e em cadeias que
   amostram esparso; ~1 ms é o mínimo audível/detectável.
 

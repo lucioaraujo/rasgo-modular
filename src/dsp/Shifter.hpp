@@ -35,11 +35,12 @@
 // - `drift`      (0–1, desvio Rasgo)    wobble lento e SEMEADO no Δf.
 // - `mix`        (0–1)                  seco ↔ deslocado (nas duas saídas).
 //
-// SSB por transformada de Hilbert (FIR de 255 taps, janela de Blackman +
-// linha de atraso casada) → modulação em quadratura. Rejeição de imagem
-// > 50 dB acima de ~250 Hz; abaixo disso degrada para ring-mod (limite
-// do FIR curto — como os deslocadores de hardware). `process()` não
-// aloca (o buffer vem no `prepare()`). `drift=0` → determinístico.
+// SSB por transformada de Hilbert (FIR de 511 taps, janela de Blackman +
+// linha de atraso casada de 255 ≈ 5,3 ms) → modulação em quadratura.
+// Rejeição de imagem > 80 dB acima de ~400 Hz, ~20 dB perto de 100 Hz;
+// no grave profundo degrada para ring-mod (limite estrutural do FIR —
+// como os deslocadores de hardware). `process()` não aloca (o buffer
+// vem no `prepare()`). `drift=0` → determinístico.
 
 namespace rasgo::modular {
 
@@ -82,16 +83,19 @@ public:
 
         // FIR de Hilbert: h[k] = 2/(π k) para k ímpar, 0 par; janela de
         // Blackman. A saída imaginária = x ∗ h ; a real = x atrasada de M.
+        // Só metade dos taps é ≠ 0 — guardamos os não-nulos compactados
+        // (offset + coef) pra o laço de `process` não pagar os zeros.
+        nTaps_ = 0;
         for (int i = 0; i < kN; ++i) {
             const int k = i - kM;
-            if (k % 2 == 0) {
-                h_[i] = 0.0f;
-            } else {
-                const double bl = 0.42
-                    - 0.5 * std::cos(2.0 * 3.14159265358979 * i / (kN - 1))
-                    + 0.08 * std::cos(4.0 * 3.14159265358979 * i / (kN - 1));
-                h_[i] = static_cast<float>(2.0 / (3.14159265358979 * k) * bl);
-            }
+            if (k % 2 == 0) continue;
+            const double bl = 0.42
+                - 0.5 * std::cos(2.0 * 3.14159265358979 * i / (kN - 1))
+                + 0.08 * std::cos(4.0 * 3.14159265358979 * i / (kN - 1));
+            tapOff_[nTaps_] = i;
+            tapCoef_[nTaps_] =
+                static_cast<float>(2.0 / (3.14159265358979 * k) * bl);
+            ++nTaps_;
         }
         buf_.assign(kN, 0.0f);
         wr_ = 0;
@@ -143,14 +147,15 @@ public:
             // --- Hilbert FIR + atraso casado ---
             buf_[static_cast<std::size_t>(wr_)] = x;
             const int rd = wr_;
-            wr_ = (wr_ + 1) % kN;
-            const float re = buf_[static_cast<std::size_t>(
-                ((rd - kM) % kN + kN) % kN)];
+            wr_ = wr_ + 1 == kN ? 0 : wr_ + 1;
+            int ri = rd - kM;
+            if (ri < 0) ri += kN;
+            const float re = buf_[static_cast<std::size_t>(ri)];
             float im = 0.0f;
-            for (int k = 0; k < kN; ++k) {
-                if (h_[k] == 0.0f) continue;   // metade dos taps é zero
-                im += h_[k] * buf_[static_cast<std::size_t>(
-                    ((rd - k) % kN + kN) % kN)];
+            for (int t = 0; t < nTaps_; ++t) {
+                int idx = rd - tapOff_[t];
+                if (idx < 0) idx += kN;
+                im += tapCoef_[t] * buf_[static_cast<std::size_t>(idx)];
             }
 
             // --- modulação em quadratura → SSB ---
@@ -188,8 +193,8 @@ public:
     }
 
 private:
-    static constexpr int kN = 255;
-    static constexpr int kM = 127;
+    static constexpr int kN = 511;
+    static constexpr int kM = 255;
 
     static float clampf(const float v, const float lo, const float hi) noexcept {
         return v < lo ? lo : (v > hi ? hi : v);
@@ -209,7 +214,9 @@ private:
     }
 
     float sr_ = 48000.0f;
-    std::array<float, kN> h_{};
+    std::array<float, kN / 2 + 1> tapCoef_{};   // só os taps ≠ 0
+    std::array<int, kN / 2 + 1> tapOff_{};
+    int nTaps_ = 0;
     std::vector<float> buf_;
     int wr_ = 0;
     double oscPh_ = 0.0;
