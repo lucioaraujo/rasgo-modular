@@ -5069,3 +5069,27 @@ Integração: `CMakeLists.txt` (CTest 63), `ModuleCatalog.hpp` (SPACE),
 contagens (51 módulos, 63 CTest), `README`.
 
 **63/63 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: Onda E — Módulo 53 CRUSH (destruidor lo-fi)
+
+**`src/dsp/Crush.hpp` (NOVO), `tests/test_crush.cpp` (10 testes).** É onde
+mora o verbo **DAMAGE** (o `wear` estava espalhado em SAMPLER/TURNTABLE/
+LOOPER). Cinco vetores de dano DIGITAL: `rate` (S&H interno 100 Hz–24 kHz,
++CV — SEM anti-alias, o aliasing É o som), `bits` (quantização a 2^bits),
+`drive` (ganho antes da quantização), `wrap` (0 clipa · 1 enrola
+`mod(x+1,2)−1` = overflow de inteiro · blend), `glitch` (probabilidade
+por hold de amostra travada / dropout / repique — semeado), `jitter`
+(passeio lento no clock do S&H → wow digital, semeado), `tone` (1 polo),
+`mix` (+CV). Dano **reprodutível**. `in` livre + `mix=1` → S&H do próprio
+ruído = fonte lo-fi. `mix=0` bypass exato. Família **TRANSFORM** (junto
+de SHAPE/WASP). `process()` não aloca (sem buffer).
+
+Integração: CMake (CTest 64), ModuleCatalog (TRANSFORM), LearnCatalog
+(12 binds + def. de módulo), test_panel_layout, test_learn_catalog.
+Docs: 00_indice, 53_crush.md, PESQUISA §2.5, RASGO_MODULAR.md §4.1/§36.3,
+README; contagens 52 módulos / 64 alvos CTest.
+
+**64/64 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ | STAGES,
+RESONATOR, PULSAR pendentes.

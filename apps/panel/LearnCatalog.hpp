@@ -1498,6 +1498,55 @@ inline const LearnTable& learnTable() {
                 "em 1 V/oct — só trava depois de 3 períodos consistentes "
                 "(ruído nunca trava, fica em 0).", "", ""}},
         }},
+        {"CRUSH", {
+            {"rate", {
+                "Taxa do sample-and-hold interno (100 Hz–24 kHz, +CV). "
+                "Baixo = escada grossa + aliasing forte (a 'voz de robô' "
+                "dos 8-bit) — NÃO há filtro anti-alias, o aliasing É o som.",
+                "", "LFO → RATE varre a taxa: o 'engoli-fita ao "
+                "contrário'."}},
+            {"bits", {
+                "Quantiza a amplitude a 2^bits níveis "
+                "(round(x·L)/L). bits=1 ≈ onda quadrada; bits=16 ≈ "
+                "transparente.", "",
+                "ENVELOPE → BITS: a resolução cai na cauda da nota."}},
+            {"drive", {
+                "Ganho ANTES da quantização — empurra o sinal pro "
+                "transbordo (ver WRAP).", "", ""}},
+            {"wrap", {
+                "Como o sinal que passa de ±1 se comporta: 0 CLIPA "
+                "(limita), 1 ENROLA (mod(x+1,2)−1 — o estouro de inteiro, "
+                "dente de serra brutal), entre os dois um blend.",
+                "Com DRIVE alto + WRAP=1 o sinal enrola várias vezes → "
+                "harmônicos até Nyquist, aliasa (aceito — é o efeito).",
+                ""}},
+            {"glitch", {
+                "Probabilidade, por amostra-de-hold, de uma FALHA: "
+                "amostra travada (fica no valor anterior), dropout "
+                "(silêncio) ou repique (o anterior amplificado). Simula "
+                "uma conexão digital ruim / CD arranhado.",
+                "Semeado (xorshift) — o mesmo patch soa igual duas vezes. "
+                "Dano REPRODUTÍVEL, ao contrário de um bug.", ""}},
+            {"jitter", {
+                "Instabilidade da taxa do S&H — o clock treme → "
+                "instabilidade de afinação (o 'wow' digital). Semeado.",
+                "", ""}},
+            {"tone", {
+                "Filtro de 1 polo na saída (o filtro de reconstrução, ou "
+                "a falta dele): <0 passa-baixa (dócil), >0 passa-alta "
+                "(só o lixo agudo), 0 neutro.", "", ""}},
+            {"mix", {"Seco ↔ destruído. 0 = passa-direto (bypass exato).",
+                     "", ""}},
+            {"in:in", {
+                "Áudio a destruir. Desconectado + MIX>0 → o S&H amostra o "
+                "próprio ruído branco → uma fonte de ruído lo-fi/glitch.",
+                "", ""}},
+            {"in:rate_mod", {"CV somada a RATE.", "", ""}},
+            {"in:mix_mod", {"CV somada a MIX (o dano entra por dose, via "
+                           "um ENVELOPE).", "", ""}},
+            {"out:out", {"O sinal destruído, misturado com o seco por "
+                        "MIX. Clamp de segurança a ±4.", "", ""}},
+        }},
         {"SHAPE", {
             {"ring", {"Mistura IN com IN×MOD (ring-mod de 4 quadrantes).",
                      "", ""}},
@@ -2110,6 +2159,15 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"SHAPE", {
             "Waveshaper — dobra/satura/retifica a forma de onda pra criar "
             "harmônicos; de calor sutil a destruição.", "", ""}},
+        {"CRUSH", {
+            "Destruidor lo-fi / decimador — o lixo DIGITAL: redução de "
+            "taxa (aliasing), de bits, transbordo que enrola, glitch "
+            "(dropout/travada/repique) e jitter de clock.",
+            "É onde mora o verbo DAMAGE. O SHAPE/WASP distorcem de forma "
+            "ANALÓGICA (fold, tanh); aqui é quantização, overflow de "
+            "inteiro, conexão ruim. Tudo semeado → dano reprodutível.",
+            "ENVELOPE → BITS (resolução cai na cauda); LFO → RATE; sem "
+            "IN + MIX=1 = uma fonte de ruído lo-fi."}},
         {"PARAMETRIC", {
             "EQ paramétrico — bandas de sino/shelf pra esculpir o "
             "espectro cirurgicamente, sem ressonância de filtro.", "", ""}},
