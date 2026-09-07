@@ -892,6 +892,22 @@ int main() {
         else XDrawString(dpy, bb, gc, x, y, s.c_str(),
                          static_cast<int>(s.size()));
     };
+    // fonte menor, ALINHADA À DIREITA (o texto termina em `rx`, baseline `y`)
+    auto capTextR = [&](int rx, int y, const std::string& s, unsigned long c) {
+        int tw = static_cast<int>(s.size()) * 6;
+        if (fsCap) {
+            XRectangle ink, log;
+            Xutf8TextExtents(fsCap, s.c_str(), static_cast<int>(s.size()),
+                             &ink, &log);
+            tw = log.width;
+        }
+        const int x = rx - tw;
+        XSetForeground(dpy, gc, c);
+        if (fsCap) Xutf8DrawString(dpy, bb, fsCap, gc, x, y, s.c_str(),
+                                   static_cast<int>(s.size()));
+        else XDrawString(dpy, bb, gc, x, y, s.c_str(),
+                         static_cast<int>(s.size()));
+    };
 
     struct Drag { bool active = false; std::size_t node = 0; std::string bind;
         float startVal = 0, lo = 0, hi = 1; int startY = 0; } drag;
@@ -1434,12 +1450,13 @@ int main() {
         // ---- case: os módulos (cada um recortado à sua caixa) --------
         clipTo(kPaletteW + 1, kCaseTop, winW - kPaletteW, winH - kCaseTop);
         // frase de crédito da família, na faixa vazia acima da 1ª fileira
-        // (pedido do autor 2026-09-07 — os módulos ficam onde estão) —
-        // com ano (na frase) + versão (o carimbo de build)
-        capText(kPaletteW + (winW - kPaletteW) / 2, kCaseTop + 11,
-                tr(S::footerCredit, uiLang)
-                    + std::string(RASGO_MODULAR_BUILD),
-                T.textSecondary);
+        // (pedido do autor 2026-09-07 — os módulos ficam onde estão),
+        // alinhada à DIREITA da tela; com ano (na frase) + versão (o
+        // carimbo de build)
+        capTextR(winW - 10, kCaseTop + 11,
+                 tr(S::footerCredit, uiLang)
+                     + std::string(RASGO_MODULAR_BUILD),
+                 T.textSecondary);
         for (const auto& m : mods) {
             const auto [bx, by] = modOrigin(m);
             if (by + modH < kCaseTop || by > winH) continue;
