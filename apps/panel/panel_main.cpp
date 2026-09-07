@@ -2700,8 +2700,17 @@ int main() {
                 motionCableThrottle = 0;
                 motion.refreshCables(graph);
             }
-            const float energy = std::min(
-                1.0f, gOutRms.load(std::memory_order_relaxed) * 2.2f);
+            // (B) se o limitador do MASTER já está trabalhando, o patch
+            // está QUENTE demais mesmo que o RMS não pareça — dobra essa
+            // redução de ganho na energia pra o duck puxar de volta.
+            // ~5 dB de redução = duck cheio.
+            float grDb = 0.0f;
+            for (const auto& m : mods)
+                if (auto* ms = dynamic_cast<rasgo::modular::Master*>(
+                        &graph.node(m.id)))
+                    grDb = std::max(grDb, ms->gainReductionDb());
+            const float energy = std::min(1.0f, std::max(
+                gOutRms.load(std::memory_order_relaxed) * 2.2f, grDb * 0.18f));
             motion.tick(graph, 0.033f, energy);
         }
         // repinta a ~30 fps pra os osciloscópios dos módulos animarem — o
