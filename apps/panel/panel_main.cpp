@@ -794,6 +794,13 @@ int main() {
     const Atom aTextPlain = XInternAtom(dpy, "text/plain", False);
     const Atom aTextPlainU8 =
         XInternAtom(dpy, "text/plain;charset=utf-8", False);
+    // alvos de "housekeeping" que o gestor de clipboard (csd-clipboard no
+    // Cinnamon) exige pra CACHEAR o conteúdo — sem eles a cópia só vale
+    // enquanto o painel está aberto e em foco.
+    const Atom aTimestamp = XInternAtom(dpy, "TIMESTAMP", False);
+    const Atom aMultiple  = XInternAtom(dpy, "MULTIPLE", False);
+    const Atom aAtomPair  = XInternAtom(dpy, "ATOM_PAIR", False);
+    Time seedOwnTime = CurrentTime;   // quando viramos dono da seleção
     auto setTitle = [&](const std::string& s) {
         const auto* d = reinterpret_cast<const unsigned char*>(s.data());
         const int n = static_cast<int>(s.size());
@@ -806,7 +813,8 @@ int main() {
     sh->flags = PMinSize; sh->min_width = 480; sh->min_height = 320;
     XSetWMNormalHints(dpy, win, sh); XFree(sh);
     XSelectInput(dpy, win, ExposureMask | ButtonPressMask | ButtonReleaseMask
-                 | PointerMotionMask | KeyPressMask | StructureNotifyMask);
+                 | PointerMotionMask | KeyPressMask | StructureNotifyMask
+                 | PropertyChangeMask);
     Atom wmDel = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(dpy, win, &wmDel, 1);
     XMapWindow(dpy, win);
@@ -1093,6 +1101,7 @@ int main() {
     // caixa de número de seed no cabeçalho — editável, copia/cola pelo
     // clipboard do X11. `seedBoxFocus` suspende os atalhos de letra.
     bool seedBoxFocus = false;
+    bool seedBoxSelAll = false;          // número inteiro "selecionado" (realce)
     std::string seedBoxText;             // buffer editado quando focado
     std::string seedClipOut;             // string servida numa SelectionRequest
 
@@ -1311,10 +1320,9 @@ int main() {
             headerHits.push_back({rx, hbY, w, hbH, HA_SEED});
             rx -= 4;
         }
-        {   // caixa de número de seed — rebaixada, editável (digitar/colar
-            // um seed). O número também sai no terminal a cada troca, pra
-            // copiar de lá (a seleção X11 não é confiável no ambiente do
-            // autor). Sem "copiar ao clicar" nem destaque COPIÉ.
+        {   // caixa de número de seed — rebaixada, editável (digitar/colar).
+            // Clicar seleciona o número inteiro (realce) e copia; o número
+            // também sai no terminal a cada troca, como reserva.
             const std::string shown = seedBoxFocus
                 ? seedBoxText
                 : (seedNum ? std::to_string(
@@ -1326,8 +1334,14 @@ int main() {
             XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
             XSetForeground(dpy, gc, seedBoxFocus ? T.accent : T.line);
             XDrawRectangle(dpy, bb, gc, rx, hbY, w, hbH);
-            text(rx + 8, hbBase, shown, T.textPrimary);
-            if (seedBoxFocus) {   // cursor no fim
+            const bool sel = seedBoxFocus && seedBoxSelAll && !shown.empty();
+            if (sel) {   // realce de "texto selecionado"
+                XSetForeground(dpy, gc, T.accent);
+                XFillRectangle(dpy, bb, gc, rx + 6, hbY + 3,
+                               textW(shown) + 4, hbH - 6);
+            }
+            text(rx + 8, hbBase, shown, sel ? T.bg : T.textPrimary);
+            if (seedBoxFocus && !sel) {   // cursor no fim
                 const int cx = rx + 8 + textW(shown);
                 XSetForeground(dpy, gc, T.accent);
                 XFillRectangle(dpy, bb, gc, cx + 1, hbY + 4, 2, hbH - 8);
@@ -2223,18 +2237,31 @@ int main() {
     // switch de KeyPress.)
     auto actSeed = [&] { seedNum = nextRandomSeed(); applySeed(seedNum); };
 
+    // timestamp REAL do servidor (ICCCM: nunca use CurrentTime pra virar
+    // dono de seleção — o gestor de clipboard precisa de um TIMESTAMP
+    // válido pra cachear). Truque padrão: append de 0 byte numa
+    // propriedade nossa gera um PropertyNotify com o `time` do servidor.
+    auto serverTime = [&]() -> Time {
+        XChangeProperty(dpy, win, aSeedPaste, XA_STRING, 8, PropModeAppend,
+                        nullptr, 0);
+        for (int i = 0; i < 200; ++i) {
+            XEvent e;
+            if (XCheckTypedWindowEvent(dpy, win, PropertyNotify, &e)
+                && e.xproperty.atom == aSeedPaste)
+                return e.xproperty.time;
+            XSync(dpy, False);
+        }
+        return CurrentTime;
+    };
+
     // copia `s` pro clipboard do X11 (CLIPBOARD + PRIMARY) — protocolo
     // servido nos eventos SelectionRequest lá embaixo.
     auto seedCopy = [&](const std::string& s, Time when) {
         if (s.empty()) return;
         seedClipOut = s;
-        // `CurrentTime` (0) é aceito sempre; alguns servidores recusam um
-        // timestamp de evento já "velho" e a posse não gruda em silêncio —
-        // era o motivo de "não consigo copiar". Toma a posse com
-        // CurrentTime e confirma.
-        (void)when;
-        XSetSelectionOwner(dpy, win, aClipboard, CurrentTime);
-        XSetSelectionOwner(dpy, win, XA_PRIMARY, CurrentTime);
+        seedOwnTime = (when && when != CurrentTime) ? when : serverTime();
+        XSetSelectionOwner(dpy, win, aClipboard, seedOwnTime);
+        XSetSelectionOwner(dpy, win, XA_PRIMARY, seedOwnTime);
         XFlush(dpy);
         if (XGetSelectionOwner(dpy, aClipboard) != win)
             std::fprintf(stderr, "[seed] não consegui a posse do CLIPBOARD; "
@@ -2246,6 +2273,7 @@ int main() {
         seedBoxText = seedNum
             ? std::to_string(static_cast<unsigned long long>(seedNum))
             : std::string();
+        seedBoxSelAll = !seedBoxText.empty();
     };
     auto seedBoxCommit = [&] {
         if (!seedBoxText.empty()) {
@@ -2253,7 +2281,7 @@ int main() {
                                                   nullptr, 10);
             if (s) { seedNum = s; applySeed(s); }
         }
-        seedBoxFocus = false;
+        seedBoxFocus = false; seedBoxSelAll = false;
         redraw();
     };
 
@@ -2439,8 +2467,48 @@ int main() {
             } else if (ev.type == Expose) {
                 if (ev.xexpose.count == 0) redraw();
             } else if (ev.type == SelectionRequest) {
-                // outro app pediu o número do seed que copiamos
+                // outro app pediu o número do seed que copiamos. Handler
+                // ICCCM completo: TARGETS + TIMESTAMP + MULTIPLE + texto —
+                // o csd-clipboard do Cinnamon só CACHEIA se a gente
+                // responde TIMESTAMP e lista TARGETS direito.
                 const XSelectionRequestEvent rq = ev.xselectionrequest;
+                // preenche UM alvo numa propriedade do requestor; devolve
+                // o Atom da propriedade escrita, ou None se recusado.
+                auto fillTarget = [&](Atom target, Atom into) -> Atom {
+                    if (into == None) into = target;
+                    if (target == aTargets) {
+                        Atom list[] = {aTargets, aTimestamp, aMultiple, aUtf8,
+                                       XA_STRING, aText, aTextPlain,
+                                       aTextPlainU8};
+                        XChangeProperty(dpy, rq.requestor, into, XA_ATOM, 32,
+                                        PropModeReplace,
+                                        reinterpret_cast<unsigned char*>(list),
+                                        (int)(sizeof list / sizeof list[0]));
+                        return into;
+                    }
+                    if (target == aTimestamp) {
+                        long t = static_cast<long>(seedOwnTime);
+                        XChangeProperty(dpy, rq.requestor, into, XA_INTEGER, 32,
+                                        PropModeReplace,
+                                        reinterpret_cast<unsigned char*>(&t), 1);
+                        return into;
+                    }
+                    const bool strT = target == aUtf8 || target == XA_STRING
+                        || target == aText || target == aTextPlain
+                        || target == aTextPlainU8;
+                    if (strT && !seedClipOut.empty()) {
+                        const Atom ty = (target == XA_STRING || target == aText)
+                            ? XA_STRING : aUtf8;
+                        XChangeProperty(dpy, rq.requestor, into, ty, 8,
+                                        PropModeReplace,
+                                        reinterpret_cast<const unsigned char*>(
+                                            seedClipOut.data()),
+                                        static_cast<int>(seedClipOut.size()));
+                        return into;
+                    }
+                    return None;
+                };
+
                 XEvent reply{};
                 XSelectionEvent& se = reply.xselection;
                 se.type = SelectionNotify;
@@ -2451,32 +2519,29 @@ int main() {
                 se.property = rq.property;
                 se.time = rq.time;
                 const Atom prop = rq.property != None ? rq.property : rq.target;
-                const bool strTarget =
-                    rq.target == aUtf8 || rq.target == XA_STRING
-                    || rq.target == aText || rq.target == aTextPlain
-                    || rq.target == aTextPlainU8;
+
                 if (rq.requestor == 0) {
                     // requestor inválido — ignora
-                } else if (rq.target == aTargets) {
-                    Atom list[5] = {aTargets, aUtf8, XA_STRING, aText,
-                                    aTextPlainU8};
-                    XChangeProperty(dpy, rq.requestor, prop, XA_ATOM, 32,
-                                    PropModeReplace,
-                                    reinterpret_cast<unsigned char*>(list), 5);
-                    se.property = prop;
-                    XSendEvent(dpy, rq.requestor, False, 0L, &reply);
-                } else if (strTarget && !seedClipOut.empty()) {
-                    const Atom reportType =
-                        (rq.target == XA_STRING) ? XA_STRING : aUtf8;
-                    XChangeProperty(dpy, rq.requestor, prop, reportType, 8,
-                                    PropModeReplace,
-                                    reinterpret_cast<const unsigned char*>(
-                                        seedClipOut.data()),
-                                    static_cast<int>(seedClipOut.size()));
-                    se.property = prop;
+                } else if (rq.target == aMultiple && rq.property != None) {
+                    // lista de pares (target, property) na propriedade
+                    Atom ty; int fmt; unsigned long n, after;
+                    unsigned char* data = nullptr;
+                    if (XGetWindowProperty(dpy, rq.requestor, rq.property, 0,
+                                           1024, False, aAtomPair, &ty, &fmt,
+                                           &n, &after, &data) == Success
+                        && data && fmt == 32) {
+                        Atom* pairs = reinterpret_cast<Atom*>(data);
+                        for (unsigned long i = 0; i + 1 < n; i += 2)
+                            if (fillTarget(pairs[i], pairs[i + 1]) == None)
+                                pairs[i + 1] = None;
+                        XChangeProperty(dpy, rq.requestor, rq.property, aAtomPair,
+                                        32, PropModeReplace, data, (int)n);
+                    }
+                    if (data) XFree(data);
+                    se.property = rq.property;
                     XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 } else {
-                    se.property = None;   // recusa
+                    se.property = fillTarget(rq.target, prop);
                     XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 }
                 XFlush(dpy);   // não deixa a resposta presa no buffer até o
@@ -2518,27 +2583,40 @@ int main() {
                 // letra ficam suspensos) — dígitos / Backspace / Enter /
                 // Esc / Ctrl+C copia / Ctrl+V cola
                 if (seedBoxFocus) {
-                    if (k == XK_Escape) { seedBoxFocus = false; redraw(); }
+                    if (k == XK_Escape) {
+                        seedBoxFocus = false; seedBoxSelAll = false; redraw();
+                    }
                     else if (k == XK_Return || k == XK_KP_Enter) seedBoxCommit();
-                    else if (k == XK_BackSpace) {
-                        if (!seedBoxText.empty()) seedBoxText.pop_back();
+                    else if (ctrl && (k == XK_a || k == XK_A)) {
+                        seedBoxSelAll = !seedBoxText.empty();
+                        if (seedBoxSelAll) seedCopy(seedBoxText, ev.xkey.time);
                         redraw();
                     }
-                    else if (ctrl && (k == XK_c || k == XK_C || k == XK_a
-                                      || k == XK_A))
+                    else if (ctrl && (k == XK_c || k == XK_C))
                         seedCopy(seedBoxText, ev.xkey.time);
-                    else if (ctrl && (k == XK_v || k == XK_V))
+                    else if (ctrl && (k == XK_v || k == XK_V)) {
+                        seedBoxSelAll = false;
                         XConvertSelection(dpy, aClipboard, aUtf8, aSeedPaste,
                                           win, ev.xkey.time);
+                    }
+                    else if (k == XK_BackSpace) {
+                        if (seedBoxSelAll) { seedBoxText.clear(); seedBoxSelAll = false; }
+                        else if (!seedBoxText.empty()) seedBoxText.pop_back();
+                        redraw();
+                    }
                     else {
                         char buf[16] = {0};
                         KeySym ks;
                         const int n = XLookupString(&ev.xkey, buf,
                                                     sizeof buf - 1, &ks, nullptr);
                         for (int i = 0; i < n; ++i)
-                            if (buf[i] >= '0' && buf[i] <= '9'
-                                && seedBoxText.size() < 19)
-                                seedBoxText.push_back(buf[i]);
+                            if (buf[i] >= '0' && buf[i] <= '9') {
+                                if (seedBoxSelAll) {
+                                    seedBoxText.clear(); seedBoxSelAll = false;
+                                }
+                                if (seedBoxText.size() < 19)
+                                    seedBoxText.push_back(buf[i]);
+                            }
                         redraw();
                     }
                     continue;
@@ -2593,7 +2671,7 @@ int main() {
 
                 // clique fora do cabeçalho tira o foco da caixa de seed
                 if (my >= kCaseTop && seedBoxFocus) {
-                    seedBoxFocus = false; redraw();
+                    seedBoxFocus = false; seedBoxSelAll = false; redraw();
                 }
 
                 // ---- overlay (tutorial / sobre): clique fecha ----------
@@ -2616,14 +2694,16 @@ int main() {
                         if (mx >= h.x && mx <= h.x + h.w
                             && my >= h.y && my <= h.y + h.h) { hit = h.act; break; }
                     if (hit != HA_SEEDBOX && seedBoxFocus) {
-                        seedBoxFocus = false; redraw();
+                        seedBoxFocus = false; seedBoxSelAll = false; redraw();
                     }
                     switch (hit) {
                     case HA_SEED:   actSeed(); continue;
                     case HA_SEEDBOX:
-                        // clique na caixa: só foca pra digitar/colar um seed
-                        // (o número pra copiar sai no terminal a cada troca)
+                        // clique na caixa: foca, "seleciona" o número inteiro
+                        // (realce) e copia pra CLIPBOARD + PRIMARY — colar com
+                        // Ctrl+V ou botão do meio. (Também sai no terminal.)
                         seedBoxOpen();
+                        seedCopy(seedBoxText, ev.xbutton.time);
                         redraw();
                         continue;
                     case HA_REC:    actRec(); continue;
