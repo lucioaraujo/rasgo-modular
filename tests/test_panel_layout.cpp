@@ -43,6 +43,7 @@
 #include "dsp/Oscillator.hpp"
 #include "dsp/Parametric.hpp"
 #include "dsp/Planar.hpp"
+#include "dsp/Pulsar.hpp"
 #include "dsp/Pll.hpp"
 #include "dsp/Quantizer.hpp"
 #include "dsp/SampleHold.hpp"
@@ -186,6 +187,7 @@ int main() {
     mods.emplace_back("WAVETABLE", std::make_unique<Wavetable>());
     mods.emplace_back("ADDITIVE", std::make_unique<Additive>());
     mods.emplace_back("OPERATOR", std::make_unique<Operator>());
+    mods.emplace_back("PULSAR", std::make_unique<Pulsar>());
     mods.emplace_back("NOISE", std::make_unique<Noise>());
     mods.emplace_back("CHORD", std::make_unique<Chord>());
     mods.emplace_back("FUNCTION", std::make_unique<FunctionGenerator>());

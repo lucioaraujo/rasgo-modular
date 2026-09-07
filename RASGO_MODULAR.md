@@ -152,7 +152,7 @@ ordem de instanciação dos nós (o que cada `RASGO_SEED=N` produz — ver
 `tests/test_seed_patch.cpp`).
 
 ```text
-SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE
+SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE PULSAR
                          MATTER STRING AUDIO-IN
   └ inclui as vozes de modelagem física (o mundo Eurorack marca
     "Synth Voice"/"Resonator"; o Patch & Tweak as põe em Sound Sources)
@@ -1123,7 +1123,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 54 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 56 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1220,7 +1220,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 54 módulos DSP
+### 36.3 Os 56 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1283,6 +1283,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 53 | `CRUSH` | TRANSFORM | **destruidor lo-fi / decimador — é aqui que mora o verbo DAMAGE** (o `wear` estava espalhado em `SAMPLER`/`TURNTABLE`/`LOOPER`). Cinco vetores de dano DIGITAL num módulo: `rate` (S&H interno 100 Hz–24 kHz, +CV — **sem** anti-alias, o aliasing É o som), `bits` (quantização a 2^bits níveis), `drive` (ganho antes da quantização → empurra pro transbordo), `wrap` (0 clipa · 1 **enrola** `mod(x+1,2)−1` — o estouro de inteiro, dente de serra brutal · blend entre os dois), `glitch` (probabilidade por hold de amostra travada / dropout / repique — a "conexão digital ruim"), `jitter` (passeio lento no clock do S&H → o "wow" digital), `tone` (1 polo na saída), `mix` (+CV). Tudo **semeado** → dano REPRODUTÍVEL (ao contrário de um bug). `in` livre + `mix=1` → o S&H amostra o próprio ruído = fonte lo-fi/glitch. `mix=0` bypass exato. Distinto do `SHAPE`/`WASP` (distorção ANALÓGICA — fold, tanh) e do `wear` do `SAMPLER` (por disparo). `process()` não aloca (sem buffer) | decimação sem anti-alias + quantização uniforme (teoria de amostragem, domínio público); overflow de complemento de dois (wrap); dropout de S/PDIF / CD arranhado (fenômeno, reescrito); jitter de conversor; Schlappi 100 Grit ★ (`§7 #13`), OTO Biscuit, µBraids (referência funcional); `wear` do Rasgo (`SAMPLER`/`TURNTABLE`) (`PESQUISA §2.5` Onda E) |
 | 54 | `STAGES` | MODULATE | **gerador de N segmentos reconfiguráveis — a FUNÇÃO EMERGE de como se encadeiam** (Mutable Stages / Rossum Control Forge / Blukač Fractalist). O `FUNCTION` é UMA rampa; o `STAGES` é a forma COMPOSTA. `segments` (2–8), `rate` (0,02–20 Hz, +CV — velocidade da volta no modo loop), `contour` (0–1 — a forma dos níveis-alvo: 0 escada subindo · 0,5 arco · 1 descendo, blend), `curve` (−1..1 — transição exp/lin/log por segmento), **`hold`** (0 desliza suave = rampa/envelope/LFO · 1 salta e segura = degrau/S&H/sequência — o knob que faz o módulo virar env OU seq sem trocar de tipo), `tilt` (−1..1 — distorção das durações: attack lento ↔ release lento), `jitter` (**desvio Rasgo** — passeio lento SEMEADO nos níveis/durações; a forma respira mas o render é reprodutível), `loop` (corre livre = LFO complexo ↔ um disparo = envelope, precisa do `gate`). Saídas `out` + `eoc` (pulso no fim da volta — encadeia com o `reset` de outra instância) + `step` (pulso por fronteira de segmento — `step → ENVELOPE.gate` encadeia). Desenhado por macros (gerador, não editor de breakpoints — identidade RASGO). `jitter=0` → determinístico puro. `process()` não aloca (os níveis/durações são pré-computados) | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (`§7 #43`); Blukač Fractalist ★ (`§7 #4`); envelope de segmentos (Serge/Buchla 281 — teoria pública); curva exp/log de segmento (`ENVELOPE.curve` do Rasgo) (`PESQUISA §2.5` Onda E) |
 | 55 | `RESONATOR` | TRANSFORM | **banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal EXTERNO** (Rings/Elements no modo ressoador; o `MATTER` é voz fechada, aqui você bate com o que quiser — `DRUM`, `NOISE`, uma voz). `freq` (20–5000 Hz, +CV 1V/oct), `structure` (0–1 — harmônico ↔ esticado `k·√(1+B·k²)`, a mesma fórmula do `ADDITIVE`), `partials` (1–24), `decay` (0–1 — Q/tempo de anel; pólos < 1, nunca auto-oscila), `damp` (0–1 — os agudos decaem antes dos graves), **`tilt`** (−1..1 — inclinação espectral: <0 `low` domina, >0 `high` domina; **varrer `tilt` CRUZA `low`↔`high`** — a relação entre as saídas é o processo, Three Sisters), `position` (0–1 — pente de pluck: 0,5 = só ímpares), `mix` (0 = bypass). 3 saídas `low`/`mid`/`high` (1/3 grave/médio/agudo dos parciais). `strike` = exciter embutido (rajada de ruído de ~3 ms). `in` livre → ruído interno de −36 dB arqueia o banco (modo autônomo — canto de taça). Determinístico (ruído semeado). `process()` não aloca (coefs recalc só na mudança). Distinto do `MATTER` (voz) e do `FILTER` (bandas não afinadas) | Mutable Rings/Elements (MIT — conceito); Mannequins Three Sisters ★★ (`§7 #50` — a relação entre as saídas); `BiomaModalResonator` (`§4` — algoritmo, código do autor); biquad ressonante de 2 polos (DSP clássico); inarmonicidade de barra/corda rígida (acústica); 4ms SMR (`§8`) (`PESQUISA §2.5` Onda E) |
+| 56 | `PULSAR` | SOURCE | **síntese pulsar (Curtis Roads) — trem de pulsarets (grão curto + silêncio) com DUAS frequências independentes**: `freq` (20–2000 Hz, +CV 1V/oct — a taxa de repetição = a ALTURA) e `formant` (0,1–8×, +CV — a frequência interna do pulsaret = o TIMBRE, **sem desafinar**: o pente harmônico fica em múltiplos de `freq`, `formant` só move o envelope espectral). `shape` (0–1 — 1 ciclo de seno → 2–3 + harmônico agudo), `window` (0 ≈ retangular/brilhante → 0,4 Hann → 1 expodec percussivo — janela de Tukey→Hann→expodec), `jitter` (**desvio Rasgo** SEMEADO no período/amplitude), `mask` (0–1 — probabilidade de PULAR um pulsaret; o *masking* de Roads, padrões rítmicos por subtração), `spread` (pulsarets alternados L/R — estéreo por granulação), `level` (softclip tanh). Saídas `out`/`r` (L/R). Fonte autônoma — soa ao carregar; `jitter=mask=0` → trem periódico determinístico. Pool de 4 vozes de grão; `process()` não aloca. Entre a granular e a de formante; distinto do `OPERATOR`/`ADDITIVE` (espectro preso à altura) | Curtis Roads, *Microsound* (2001) — síntese pulsar (conceito público); pulsaret + *masking* (teoria); janela de grão granular (Gabor/Roads); Xenakis (trens de grãos) (`PESQUISA §2.5` Onda E) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1324,7 +1325,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**66 alvos CTest**, 100% verdes em **Debug e Release**
+**67 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

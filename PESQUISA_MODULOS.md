@@ -334,7 +334,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 | Cand. | Família | O que é / por que | Parte de |
 |---|---|---|---|
 | ~~**`RESONATOR`**~~ | TRANSFORM | **FEITO — 2026-09-07, `dossies/55_resonator.md`, `src/dsp/Resonator.hpp` (Módulo 55).** Banco de ≤ 24 modos afinados, excitado de fora; `structure` harmônico↔esticado, `tilt` cruza as saídas `low`/`high` (Three Sisters), `strike` = exciter embutido, modo autônomo por ruído interno. Distinto do `MATTER` (voz fechada). | Mutable Rings/Elements (MIT — conceito, §3); Mannequins Three Sisters ★★ (§7 #50); `BiomaModalResonator` (§4) |
-| **`PULSAR`** | SOURCE | Síntese pulsar (Curtis Roads): um trem de *pulsarets* (grão curto) + silêncio; a razão grão/silêncio controla o **formante independente da altura**. Nem o `ADDITIVE` nem o `OPERATOR` nem o `MEMORY` fazem isso — é grão a taxa de nota, entre a síntese granular e a de formante. | Curtis Roads, *Microsound* (teoria pública); `BiomaPulsar` (§4) |
+| ~~**`PULSAR`**~~ | SOURCE | **FEITO — 2026-09-07, `dossies/56_pulsar.md`, `src/dsp/Pulsar.hpp` (Módulo 56).** Trem de *pulsarets* + silêncio; `freq` = altura (taxa de repetição), `formant` = timbre (freq interna do pulsaret), **independentes** — o pente harmônico fica preso a `freq`, `formant` só move o envelope espectral. `shape`, `window` (Tukey→Hann→expodec), `jitter`/`mask` (semeados; *masking* de Roads), `spread` (estéreo por granulação). Nem `ADDITIVE`/`OPERATOR`/`MEMORY` fazem isso. | Curtis Roads, *Microsound* (teoria pública); `BiomaPulsar` (§4) |
 | **`SWARM`** (multi-LFO orgânico) | MODULATE | N (4–8) LFOs com relação de fase e uma "dispersão orgânica" — do quad travado (Batumi) ao cardume que deriva junto mas nunca idêntico (ochd). O `DRIFT` é escala de MINUTOS; o `FUNCTION` é um. Isto é sub-áudio, várias saídas, para animar um patch inteiro. **Forte candidato a `mode` do `FUNCTION`** (N saídas defasadas) em vez de módulo — decisão do autor. | DivKid ochd ★ (§7 #31); Xaoc Batumi ★ (§7 #61); IME Kermit ★ (§7 #70) |
 
 **Tier 3 — provavelmente MODO, não módulo (o `feedback_generative_design_light_touch` pede modo antes de módulo):**
@@ -355,7 +355,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 - **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
 
 **Recomendação de ordem, se o autor quiser uma "Onda E":**
-`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL`, `CRUSH`, `STAGES` e `RESONATOR` FEITOS (2026-09-07).** Segue só `PULSAR`. `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **Onda E COMPLETA (2026-09-07): `SWIRL`, `CRUSH`, `STAGES`, `RESONATOR`, `PULSAR` — o `PHASER` entrou no `SWIRL`.** `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
 
 ---
 
