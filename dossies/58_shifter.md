@@ -33,13 +33,16 @@ fica metálico, sineiro, inarmônico. Nada no RASGO fazia isso.
 entre as duas é o processo (idioma Three Sisters) — cabeie em destinos
 diferentes.
 
-**SSB por transformada de Hilbert:** FIR de 255 taps (kernel `2/(πk)`
+**SSB por transformada de Hilbert:** FIR de 511 taps (kernel `2/(πk)`
 para `k` ímpar, janela de Blackman) para a componente imaginária + linha
-de atraso casada (127 amostras, ~2,6 ms) para a real → modulação em
-quadratura (`re·cos ∓ im·sin`). **Rejeição de imagem > 50 dB acima de
-~250 Hz**; abaixo disso a rejeição cai (o FIR curto não consegue Hilbert
-no grave) e o som tende ao ring-mod — mesma limitação dos deslocadores
-de hardware. `process()` não aloca (o buffer vem no `prepare()`).
+de atraso casada (255 amostras, ~5,3 ms) para a real → modulação em
+quadratura (`re·cos ∓ im·sin`). **Rejeição de imagem > 80 dB acima de
+~400 Hz, ~20 dB perto de 100 Hz** (era 255 taps / > 50 dB acima de
+~250 Hz — dobrado 2026-09-07); no grave profundo a rejeição cai (o FIR
+não consegue Hilbert perto de DC) e o som tende ao ring-mod — mesma
+limitação dos deslocadores de hardware. Só os 256 taps não-nulos são
+guardados compactados (offset + coef) → o laço não paga os zeros
+(~2 % de um núcleo). `process()` não aloca (o buffer vem no `prepare()`).
 `drift=0` → determinístico byte a byte.
 
 **Testes (Debug + Release):** `shift=0` → energia fica em `f` (nada
@@ -53,10 +56,12 @@ energia em 400 e 700 (NÃO em 600 = 300·2 — é aditivo, não escala);
 baixo abafa o agudo; `drift` semeado (2 renders idênticos) e modesto
 (RMS não colapsa nem dobra); tudo no talo → |out| < 1,3.
 
-**Pendências (candidatos):** FIR mais longo / rede all-pass IIR pra
-melhorar o grave; `shift` com taper exponencial no painel (controle fino
-perto de 0); saída de quadratura crua (`re`/`im`) pra patch de Dome;
-range "fino" (±100 Hz) por toggle; `feedback` com filtro no laço
+**Pendências (candidatos):** o grave profundo (< ~80 Hz) ainda vira
+ring-mod — rede all-pass IIR de banda larga resolveria sem latência,
+mas os conjuntos de coeficientes testados eram estreitos (ver §6);
+`shift` com taper exponencial no painel (controle fino perto de 0);
+saída de quadratura crua (`re`/`im`) pra patch de Dome; range "fino"
+(±100 Hz) por toggle; `feedback` com filtro no laço
 (barber pole com timbre).
 
 ---
@@ -91,7 +96,7 @@ No fluxo: TRANSFORM, entre a voz e o filtro/espaço. Quase sempre com
   im·sin(2πΔf t)` onde `im` = Hilbert(`re`).
 - **Transformada de Hilbert** — teoria clássica de processamento de
   sinais; realização por FIR (kernel `h[n] = 2/(πn)` ímpar, 0 par) +
-  janela; ou por rede all-pass IIR (polyphase). O RASGO usa FIR de 255
+  janela; ou por rede all-pass IIR (polyphase). O RASGO usa FIR de 511
   taps com janela de Blackman.
 - **Zölzer, *DAFX: Digital Audio Effects*** — o capítulo de *frequency
   shifting* (a fórmula SSB + a rede de quadratura).
@@ -153,7 +158,7 @@ pequeno → as duas bandas vazam (vira ring-mod).
 - **rede all-pass IIR (polyphase Hilbert)** — sem latência, mais barata,
   mas os conjuntos de coeficientes testados (Niemitalo 4+4) davam
   quadratura boa só numa faixa estreita; um conjunto largo precisa de
-  muitas seções. O FIR de 255 taps é robusto e a latência (2,6 ms) é
+  muitas seções. O FIR de 511 taps é robusto e a latência (5,3 ms) é
   irrelevante pro caso de uso. Fica como pendência.
 - **ring-mod com portadora afinável** — isso é o `SHAPE`. O ponto do
   `SHIFTER` é a banda ÚNICA.

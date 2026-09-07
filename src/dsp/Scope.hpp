@@ -77,11 +77,16 @@ public:
         sumX2_ = 0.0f;
         sumD2_ = 0.0f;
         win_ = 0;
-        sinceZC_ = 0;
-        periodEst_ = sr_ / 220.0f;
-        lastP_ = sr_ / 220.0f;
+        // ---- pitch por autocorrelação (YIN) num sinal decimado ----
+        decSr_ = sr_ / static_cast<float>(kDec);
+        decAcc_ = 0.0f;
+        decCnt_ = 0;
+        hopCnt_ = 0;
+        dw_ = 0;
+        for (auto& v : dhist_) v = 0.0f;
+        periodEst_ = decSr_ / 220.0f;   // em amostras DECIMADAS
+        lastP_ = periodEst_;
         lockCount_ = 0;
-        zcArmed_ = false;
         armed_ = false;
         trigCd_ = 0;
     }
@@ -138,32 +143,24 @@ public:
             }
             if (!hold) bright_ += (bTarget_ - bright_) * smCoef;
 
-            // ---- pitch: período entre cruzamentos de zero de subida ----
-            // só "trava" depois de 3 períodos consistentes (±25%) — ruído,
-            // que dá períodos aleatórios, nunca trava → pitch fica em 0.
-            ++sinceZC_;
-            if (zcArmed_ && x > 0.02f) {
-                const float p = static_cast<float>(sinceZC_);
-                const float hz = sr_ / std::max(1.0f, p);
-                if (lvl_ > 0.02f && hz >= 20.0f && hz <= 5000.0f) {
-                    if (std::fabs(p - lastP_) < 0.25f * lastP_) {
-                        if (lockCount_ < 8) ++lockCount_;
-                        periodEst_ += (p - periodEst_) * 0.30f;
-                    } else {
-                        lockCount_ = 0;
-                        periodEst_ = p;
-                    }
-                    lastP_ = p;
-                } else {
-                    lockCount_ = 0;
+            // ---- pitch por autocorrelação (YIN) num sinal decimado 3× ----
+            // robusto a harmônicos (o ZCR reportava 2×/3× a altura); ruído
+            // → sem mínimo abaixo do limiar → `pitch` fica em 0.
+            decAcc_ += x;
+            if (++decCnt_ >= kDec) {
+                decCnt_ = 0;
+                dhist_[static_cast<std::size_t>(dw_)] =
+                    decAcc_ / static_cast<float>(kDec);
+                dw_ = (dw_ + 1) % kHist;
+                decAcc_ = 0.0f;
+                if (++hopCnt_ >= kHop) {
+                    hopCnt_ = 0;
+                    if (lvl_ > 0.02f) analyzePitch();
+                    else lockCount_ = 0;
                 }
-                sinceZC_ = 0;
-                zcArmed_ = false;
             }
-            if (x < -0.02f) zcArmed_ = true;
-            if (sinceZC_ > static_cast<long>(sr_ / 15.0f)) lockCount_ = 0; // sem sinal
-            if (lockCount_ >= 3 && lvl_ > 0.02f) {
-                const float phz = sr_ / std::max(1.0f, periodEst_);
+            if (lockCount_ >= 2 && lvl_ > 0.02f) {
+                const float phz = decSr_ / std::max(1.0f, periodEst_);
                 pitchTarget_ = std::log2(phz / 110.0f);
             } else {
                 pitchTarget_ = 0.0f;
@@ -197,6 +194,64 @@ private:
     }
     static float clamp01(const float v) noexcept { return clampf(v, 0.0f, 1.0f); }
 
+    // YIN (de Cheveigné & Kawahara, 2002) sobre o buffer decimado.
+    // Diferença acumulada normalizada → 1º mínimo local abaixo do limiar
+    // → interpolação parabólica. `periodEst_` em amostras decimadas.
+    void analyzePitch() noexcept {
+        // copia a janela (mais antigo → mais novo) contígua
+        float w[kHist];
+        for (int j = 0; j < kHist; ++j)
+            w[j] = dhist_[static_cast<std::size_t>((dw_ + j) % kHist)];
+
+        float dp[kMaxLag + 2];
+        dp[0] = 1.0f;
+        double running = 0.0;
+        int bestTau = -1;
+        for (int tau = 1; tau <= kMaxLag; ++tau) {
+            double d = 0.0;
+            for (int i = 0; i < kWin; ++i) {
+                const float diff = w[i] - w[i + tau];
+                d += static_cast<double>(diff) * diff;
+            }
+            running += d;
+            dp[tau] = running > 1e-12
+                ? static_cast<float>(d * tau / running) : 1.0f;
+            if (tau >= kMinLag && bestTau < 0
+                && dp[tau] < 0.15f && dp[tau] < dp[tau - 1]) {
+                // confirma que é mínimo local (olha 1 à frente)
+                double dn = 0.0;
+                for (int i = 0; i < kWin; ++i) {
+                    const float diff = w[i] - w[i + tau + 1];
+                    dn += static_cast<double>(diff) * diff;
+                }
+                const float dpn = running + dn > 1e-12
+                    ? static_cast<float>(dn * (tau + 1) / (running + dn)) : 1.0f;
+                if (dp[tau] < dpn) bestTau = tau;
+            }
+        }
+        if (bestTau < 0) {
+            // sem período claro (ruído / silêncio) — solta a trava aos poucos
+            if (--lockCount_ < 0) lockCount_ = 0;
+            return;
+        }
+        // interpolação parabólica em dp[bestTau-1..+1]
+        const float a = dp[bestTau - 1], b = dp[bestTau], c = dp[bestTau + 1];
+        const float denom = a - 2.0f * b + c;
+        const float delta = std::fabs(denom) > 1e-6f
+            ? 0.5f * (a - c) / denom : 0.0f;
+        const float p = static_cast<float>(bestTau)
+            + clampf(delta, -1.0f, 1.0f);
+
+        if (std::fabs(p - lastP_) < 0.25f * lastP_) {
+            if (lockCount_ < 6) ++lockCount_;
+            periodEst_ += (p - periodEst_) * 0.35f;
+        } else {
+            lockCount_ = 0;
+            periodEst_ = p;
+        }
+        lastP_ = p;
+    }
+
     float sr_ = 48000.0f;
     float lvl_ = 0.0f;
     float bright_ = 0.0f;
@@ -207,11 +262,24 @@ private:
     float sumX2_ = 0.0f;
     float sumD2_ = 0.0f;
     int win_ = 0;
-    long sinceZC_ = 0;
-    float periodEst_ = 218.0f;
-    float lastP_ = 218.0f;
+
+    // pitch por autocorrelação (YIN) — sinal decimado 3×
+    static constexpr int kDec = 3;
+    static constexpr int kWin = 320;     // janela de comparação (dec)
+    static constexpr int kMaxLag = 300;  // ~53 Hz reais a decSr/3
+    static constexpr int kMinLag = 16;   // ~1000 Hz reais
+    static constexpr int kHist = kWin + kMaxLag + 2;
+    static constexpr int kHop = 64;      // analisa a cada ~12 ms
+    float decSr_ = 16000.0f;
+    float dhist_[kHist] = {};
+    float decAcc_ = 0.0f;
+    int decCnt_ = 0;
+    int hopCnt_ = 0;
+    int dw_ = 0;
+    float periodEst_ = 72.0f;
+    float lastP_ = 72.0f;
     int lockCount_ = 0;
-    bool zcArmed_ = false;
+
     bool armed_ = false;
     int trigCd_ = 0;
 };
