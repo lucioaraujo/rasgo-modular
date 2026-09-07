@@ -105,6 +105,18 @@ namespace {
 std::atomic<bool> g_quit{false};
 void onSignal(int) { g_quit.store(true); }
 
+// Erro de PROTOCOLO do X (BadWindow, BadMatch, BadAtom…). O padrão do
+// Xlib é imprimir e chamar exit(1) — um requestor de clipboard que
+// morreu entre pedir e receber a seleção (gerenciadores de clipboard
+// fazem isso o tempo todo) NÃO deve derrubar o painel. Loga e segue.
+int onXError(Display* d, XErrorEvent* e) {
+    char buf[128];
+    XGetErrorText(d, e->error_code, buf, sizeof buf);
+    std::fprintf(stderr, "[x11] erro não-fatal: %s (req %d.%d)\n",
+                 buf, e->request_code, e->minor_code);
+    return 0;
+}
+
 struct Out final : Signal {
     Out() : Signal({{"in", PortKind::Audio, ""}}, {{"out", PortKind::Audio, ""}}) {}
     std::string type() const override { return "OUT"; }
@@ -588,6 +600,7 @@ int main() {
     // ---- janela: monitor primário, ~88% da área, centrada -------------
     Display* dpy = XOpenDisplay(nullptr);
     if (!dpy) { fprintf(stderr, "sem display X\n"); running = false; audio.join(); stopAudioIn(); stopMidiIn(); return 1; }
+    XSetErrorHandler(onXError);   // erro de protocolo não derruba o painel
     const int scr = DefaultScreen(dpy);
     const rasgo::panel::MonitorRect mon = primaryMonitor(dpy);
 
@@ -2397,8 +2410,9 @@ int main() {
                 if (ev.xexpose.count == 0) redraw();
             } else if (ev.type == SelectionRequest) {
                 // outro app pediu o número do seed que copiamos
-                const XSelectionRequestEvent& rq = ev.xselectionrequest;
-                XSelectionEvent se{};
+                const XSelectionRequestEvent rq = ev.xselectionrequest;
+                XEvent reply{};
+                XSelectionEvent& se = reply.xselection;
                 se.type = SelectionNotify;
                 se.display = rq.display;
                 se.requestor = rq.requestor;
@@ -2406,24 +2420,29 @@ int main() {
                 se.target = rq.target;
                 se.property = rq.property;
                 se.time = rq.time;
-                if (rq.property == None) se.property = rq.target;
-                if (rq.target == aTargets) {
+                const Atom prop = rq.property != None ? rq.property : rq.target;
+                if (rq.requestor == 0) {
+                    // requestor inválido — ignora
+                } else if (rq.target == aTargets) {
                     Atom list[2] = {aUtf8, XA_STRING};
-                    XChangeProperty(dpy, rq.requestor, se.property, XA_ATOM, 32,
+                    XChangeProperty(dpy, rq.requestor, prop, XA_ATOM, 32,
                                     PropModeReplace,
                                     reinterpret_cast<unsigned char*>(list), 2);
+                    se.property = prop;
+                    XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 } else if ((rq.target == aUtf8 || rq.target == XA_STRING)
                            && !seedClipOut.empty()) {
-                    XChangeProperty(dpy, rq.requestor, se.property, rq.target, 8,
+                    XChangeProperty(dpy, rq.requestor, prop, rq.target, 8,
                                     PropModeReplace,
                                     reinterpret_cast<const unsigned char*>(
                                         seedClipOut.data()),
                                     static_cast<int>(seedClipOut.size()));
+                    se.property = prop;
+                    XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 } else {
-                    se.property = None;
+                    se.property = None;   // recusa
+                    XSendEvent(dpy, rq.requestor, False, 0L, &reply);
                 }
-                XSendEvent(dpy, rq.requestor, True, NoEventMask,
-                           reinterpret_cast<XEvent*>(&se));
             } else if (ev.type == SelectionClear) {
                 seedClipOut.clear();   // perdemos a posse do clipboard
             } else if (ev.type == SelectionNotify) {
