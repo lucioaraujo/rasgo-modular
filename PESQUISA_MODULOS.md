@@ -395,14 +395,14 @@ adiante, vira dossiê antes do código (método `§1`). Nomes provisórios.
 
 | Cand. | Onde | O que é / por que | Parte de (conceito público) |
 |---|---|---|---|
-| **vocoder de análise/síntese** | `mode` do `FORMANT` | O `FORMANT` hoje é um banco de vogais **estático** (5 SVF paralelos varridos por `vowel`). Um vocoder é (modulador → banco de seguidores de envelope por banda) × (portadora → banco de filtros casados). Adicionar uma entrada `mod` (o modulador) e um `bands` (8–20) transforma o `FORMANT` no clássico de Dudley sem módulo novo. **Desvio Rasgo:** sem portadora patcheada, usa uma fonte interna (autônomo); `freeze` segura o envelope espectral do último instante. | Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco de análise + seguidores RC + banco de síntese (teoria clássica); Frap Fumana / Bastl Pizza (fichas públicas) |
+| ~~**vocoder de análise/síntese**~~ | `mode` do `FORMANT` | **FEITO — 2026-09-07, `mode` do `FORMANT` (Módulo 45).** Entrada `mod` (índice 3, apensa — patches existentes intactos) + param `vocoder` (0–1). `vocoder>0` + `mod` cabeado → +5 SVF de análise no modulador + 5 seguidores de envelope (~12 ms) → os ganhos das 5 bandas de formante seguem a energia do modulador em cada frequência, em vez da tabela de vogal. Vocoder de 5 bandas (grosso mas vocálico); `vowel` escolhe QUAIS 5 frequências vocodar. `vocoder=0` ou sem `mod` → FORMANT byte-idêntico. 4 testes novos em `test_formant.cpp`. | Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco de análise + seguidores RC + banco de síntese (teoria clássica) |
 | **análise de áudio → CV: pitch por autocorrelação + onset/transiente** | estende o `SCOPE` | O `SCOPE` já entrega `level` (seguidor de pico), `pitch` (v/oct por período entre cruzamentos de zero — trava após 3 períodos) e `bright` (centroide). Falta o que Maths ch2/3 + Kinks fazem pra **áudio**: pitch robusto sob ruído (autocorrelação / YIN — já listado como pendência do `SCOPE`) e uma saída `onset` (pulso no ataque — fluxo espectral ou derivada da envoltória). Fecha o "seguidor de envelope pra áudio" que hoje só existe pra CV (`CONTROL.rectify`+`slew`). | Envelope follower = retificação + passa-baixa (clássico); YIN (de Cheveigné & Kawahara, 2002 — artigo público); detecção de onset por fluxo espectral (Bello et al., 2005 — *tutorial* público) |
 
 **Tier 3 — utilidade que falta, cerimônia mínima.**
 
 | Cand. | Onde | O que é / por que | Parte de |
 |---|---|---|---|
-| **banco de VCA de 4 canais** | estende o `VCA` (hoje **duplo**) | Veils / Intellijel Quad VCA estão no topo da popularidade — VCA em quantidade é a utilidade nº 1 do formato. Com `CHORD` parafônico e as saídas `low/mid/high` do `RESONATOR`/`FILTER`, 4 canais com CV + um mix somado na saída é uma lacuna concreta e trivial. `mode` linear/exp por canal, como o `VCA` atual. | Doepfer A-130/131/132 (VCA linear/exp — teoria pública); Mutable Veils (curva de resposta — ficha pública) |
+| **banco de VCA de 4 canais** (`VCA4`, MÓDULO próprio) | novo — o `VCA` duplo fica | Veils / Intellijel Quad VCA estão no topo da popularidade — VCA em quantidade é a utilidade nº 1 do formato. Com `CHORD` parafônico e as saídas `low/mid/high` do `RESONATOR`/`FILTER`, 4 canais com CV + um mix somado na saída é uma lacuna concreta. Módulo próprio (não estender o `VCA` — mexer nas portas dele quebra a ordem de índice de patches existentes). `mode` linear/exp por canal. | Doepfer A-130/131/132 (VCA linear/exp — teoria pública); Mutable Veils (curva de resposta — ficha pública) |
 
 **O ranking de popularidade RE-CONFIRMA candidatos do `§2.5`:**
 
@@ -423,8 +423,10 @@ sends/mutes/cue (fora do escopo de instrumento de composição por ora).
 **Ordem sugerida, se virar "Onda F":** `SPECTRA` → `SHIFTER` (ou `mode`
 do `SHAPE`) → vocoder (`mode` do `FORMANT`) → VCA 4ch. `SPECTRA` é o mais
 rico e o único genuinamente novo no catálogo. **Onda F: `SPECTRA` ✓
-(Módulo 57) · `SHIFTER` ✓ (Módulo 58) — virou módulo próprio, não `mode`
-do `SHAPE`.** Seguem vocoder (`mode` do `FORMANT`) e VCA 4ch.
+(Módulo 57) · `SHIFTER` ✓ (Módulo 58, virou módulo próprio) · vocoder ✓
+(`mode` do `FORMANT` #45, 2026-09-07).** Segue só o VCA 4 canais (vai
+ser módulo próprio `VCA4`, não estender o `VCA` duplo — decisão do autor
+pra não quebrar a ordem de portas).
 
 ---
 

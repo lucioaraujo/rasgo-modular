@@ -160,6 +160,101 @@ void testBounded() {
     }
 }
 
+// ---- vocoder (modo, +2026-09-07) ----
+
+// renderiza com carrier em `in` (índice 0) e modulador em `mod` (índice 3)
+std::vector<float> renderVoc(Formant& fm, int blocks, Gen carrier, Gen mod,
+                             float vocoder, float vowel = 0.3f) {
+    fm.setParameter("vowel", vowel);
+    fm.setParameter("shift", 0.0f);
+    fm.setParameter("res", 0.4f);
+    fm.setParameter("mix", 1.0f);
+    fm.setParameter("drift", 0.0f);
+    fm.setParameter("vocoder", vocoder);
+    fm.prepare(kSr, kB);
+    std::vector<AudioBlock> out(1, AudioBlock(kSr, 1, kB));
+    AudioBlock bi(kSr, 1, kB), bv(kSr, 1, kB), bs(kSr, 1, kB), bm(kSr, 1, kB);
+    std::vector<float> r;
+    std::size_t n = 0;
+    for (int b = 0; b < blocks; ++b) {
+        for (std::size_t k = 0; k < kB; ++k) {
+            bi.at(0, k) = carrier ? carrier(n + k) : 0.0f;
+            bm.at(0, k) = mod ? mod(n + k) : 0.0f;
+        }
+        std::vector<const AudioBlock*> ins{&bi, nullptr, nullptr,
+                                           mod ? &bm : nullptr};
+        fm.process(ins, out);
+        for (std::size_t k = 0; k < kB; ++k) r.push_back(out[0].at(0, k));
+        n += kB;
+    }
+    return r;
+}
+
+Gen saw(double hz, float amp) {
+    return [hz, amp](std::size_t i) {
+        const double ph = std::fmod((double)i * hz / kSr, 1.0);
+        return amp * static_cast<float>(2.0 * ph - 1.0);
+    };
+}
+
+// modulador de "sílabas": ruído de banda larga com envelope de 4 Hz
+Gen syllables(float amp) {
+    auto s = std::make_shared<std::uint32_t>(0xBEEF01u);
+    return [s, amp](std::size_t i) {
+        *s = *s * 1664525u + 1013904223u;
+        const float wn = static_cast<float>(static_cast<std::int32_t>(*s))
+                       / 2147483648.0f;
+        const double t = (double)i / kSr;
+        const float env = (std::fmod(t, 0.25) < 0.12) ? 1.0f : 0.03f;
+        return amp * wn * env;
+    };
+}
+
+void testVocoderZeroIsClassicFormant() {
+    // vocoder=0 → idêntico ao FORMANT sem modulador
+    Formant a;
+    const auto ra = renderVoc(a, 60, saw(110.0, 0.5f), syllables(0.4f), 0.0f);
+    Formant b;
+    const auto rb = render(b, 60, saw(110.0, 0.5f), 0.3f, 0.0f, 0.4f, 1.0f);
+    bool same = ra.size() == rb.size();
+    for (std::size_t i = 0; same && i < ra.size(); ++i) same = ra[i] == rb[i];
+    EXPECT(same);
+}
+
+void testVocoderFollowsModulatorEnvelope() {
+    Formant fm;
+    const auto y = renderVoc(fm, 300, saw(110.0, 0.5f), syllables(0.4f), 1.0f);
+    // RMS durante as "sílabas" muito maior que nos vãos
+    double loud = 0.0, quiet = 0.0; std::size_t nl = 0, nq = 0;
+    for (std::size_t i = y.size() / 3; i < y.size(); ++i) {
+        const double t = (double)i / kSr;
+        if (std::fmod(t, 0.25) < 0.12) { loud += y[i] * (double)y[i]; ++nl; }
+        else { quiet += y[i] * (double)y[i]; ++nq; }
+    }
+    const double lr = std::sqrt(loud / std::max<std::size_t>(1, nl));
+    const double qr = std::sqrt(quiet / std::max<std::size_t>(1, nq));
+    EXPECT(lr > 0.01);
+    EXPECT(lr > 2.0 * qr);
+}
+
+void testVocoderNeedsModulator() {
+    // vocoder=1 mas sem `mod` cabeado → cai no FORMANT clássico
+    Formant a;
+    const auto ra = renderVoc(a, 40, saw(110.0, 0.5f), nullptr, 1.0f);
+    Formant b;
+    const auto rb = render(b, 40, saw(110.0, 0.5f), 0.3f, 0.0f, 0.4f, 1.0f);
+    bool same = ra.size() == rb.size();
+    for (std::size_t i = 0; same && i < ra.size(); ++i) same = ra[i] == rb[i];
+    EXPECT(same);
+}
+
+void testVocoderBounded() {
+    Formant fm;
+    const auto y = renderVoc(fm, 200, saw(90.0, 1.0f), syllables(1.0f), 1.0f,
+                             0.8f);
+    for (float v : y) EXPECT(std::isfinite(v) && std::fabs(v) < 1.05f);
+}
+
 void testPanel() {
     Formant fm;
     check(validatePanel(fm).empty(), "painel FORMANT fecha");
@@ -177,6 +272,10 @@ int main() {
     testSilentInput();
     testDeterminism();
     testBounded();
+    testVocoderZeroIsClassicFormant();
+    testVocoderFollowsModulatorEnvelope();
+    testVocoderNeedsModulator();
+    testVocoderBounded();
     testPanel();
 
     if (g_failures == 0) {

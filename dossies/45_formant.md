@@ -1,10 +1,10 @@
 # Dossiê — Módulo 45: Ressoador espectral multibanda (`FORMANT`)
 
 **Família:** TRANSFORM
-**Estado:** **implementado — Onda B** (2026-09-06)
+**Estado:** **implementado — Onda B** (2026-09-06); **modo vocoder — Onda F** (2026-09-07)
 **Padrão:** `AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`
 **Arquivos:** `src/dsp/Formant.hpp`, `tests/test_formant.cpp`
-**Candidato:** `PESQUISA_MODULOS.md §2.4` (Onda B, #45)
+**Candidato:** `PESQUISA_MODULOS.md §2.4` (Onda B, #45); `§2.6` (Onda F — modo vocoder)
 
 ## Estado da implementação
 
@@ -143,13 +143,36 @@ formantes, `softLimit` no fim.
 
 ## 5. Portas, parâmetros, limites
 
-**Entradas:** `in` (Audio), `vowel` (Control), `shift` (Control).
+**Entradas:** `in` (Audio — a portadora), `vowel` (Control), `shift`
+(Control), `mod` (Audio — o modulador do vocoder; índice 3, apensa).
 **Saídas:** `out` (Audio).
 **Parâmetros:** `vowel` (0–1, def 0), `shift` (−1..1, def 0), `res`
-(0–1, def 0,4), `mix` (0–1, def 1), `drift` (0–1, def 0).
+(0–1, def 0,4), `vocoder` (0–1, def 0), `mix` (0–1, def 1), `drift`
+(0–1, def 0).
 **Limites:** `out` limitado por `softLimit` (linear até 0,8, `tanh`
 depois — o mesmo do `FILTER`). CPU: por amostra 5× SVF (5 `tan` + ~8
-mul-add cada) + 5 `sin` (drift) + 5 `exp`. Sem alocação.
+mul-add cada) + 5 `sin` (drift) + 5 `exp`; no modo vocoder + 5× SVF de
+análise + 5 seguidores. Sem alocação.
+
+### 5.1 Modo vocoder (`vocoder` > 0, +2026-09-07)
+
+`vocoder` mistura entre o FORMANT clássico (ganhos das 5 bandas = tabela
+de vogal interpolada por `vowel`) e o **vocoder de 5 bandas**: um segundo
+banco de 5 SVF passa-faixa analisa `mod` nas MESMAS frequências das
+bandas de portadora; um seguidor de envelope (ataque rápido, release
+~12 ms) por banda; o ganho de cada banda passa a ser
+`lerp(ganhoVogal, env·makeup, vocoder)`. `vowel` continua posicionando
+as 5 frequências → você escolhe QUAIS 5 pontos do espectro vocodar.
+
+- **`vocoder = 0`** OU `mod` não cabeado → o código do vocoder é pulado
+  inteiro; a saída é **byte-idêntica** à versão anterior do módulo
+  (determinismo preservado, comprovado em `test_formant.cpp`).
+- Grosso (só 5 bandas) — vocálico, não fala inteligível de banda larga.
+  Um `VOCODER` de N bandas dedicado fica como pendência do `§2.6` se
+  precisar de mais definição.
+- Modelo: o canal vocoder de Homer Dudley (Bell Labs, 1938 — domínio
+  público): (modulador → banco de seguidores de envelope) × (portadora
+  → banco de filtros).
 
 ## 6. Alternativas descartadas
 
@@ -161,8 +184,9 @@ mul-add cada) + 5 `sin` (drift) + 5 `exp`. Sem alocação.
 - **excitador glotal interno** (virar SOURCE) — quebra "TRANSFORM"; fica
   como pendência (`FORMANT` + buzz = uma voz). O `MATTER`/`STRING` já
   cobrem ressoador-fonte.
-- **modo vocoder já** — precisa de N bandas de análise + envelope
-  follower por banda; é um módulo maior. Pendência anotada.
+- ~~**modo vocoder já**~~ — FEITO 2026-09-07 (`§5.1`) como `mode`
+  (`vocoder` + entrada `mod`), reaproveitando as 5 bandas. Um `VOCODER`
+  de N bandas dedicado continua pendência se precisar de mais definição.
 - **`vowel` 2D (grade)** — a sequência A→E→I→O→U cobre o gesto de fala
   clássico e cabe num knob; a grade fica como evolução.
 
@@ -170,8 +194,11 @@ mul-add cada) + 5 `sin` (drift) + 5 `exp`. Sem alocação.
 
 14 HP, família **TRANSFORM** (junto de `FILTER`/`WASP`/`PARAMETRIC`).
 Display do espectro (o `SCOPE` mostra). Knobs `VOWEL`/`SHIFT`/`RES`/`MIX`
-(linha 1), `DRIFT` (linha 2); jacks `IN`/`VOW`/`SHF` + `OUT`.
+(linha 1), `DRIFT`/`VOCOD` (linha 2); jacks `IN`/`VOW`/`SHF`/`MOD` +
+`OUT`. LEARN: `vocoder` + `in:mod` documentados.
 
 Cadeias canônicas: `OSC.saw → FORMANT`, `LFO → FORMANT.vowel` (pad que
 fala); `NOISE → FORMANT`, `res` alto (5 tons por vogal — coro sintético);
-`SEQUENCE → FORMANT.vowel` (melodia de vogais sobre um drone).
+`SEQUENCE → FORMANT.vowel` (melodia de vogais sobre um drone);
+**vocoder:** uma voz/`SIGNAL-IN` → `FORMANT.mod`, um `OSC.saw`/pad rico →
+`FORMANT.in`, `vocoder = 1` (o sinte fala).

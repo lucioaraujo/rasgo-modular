@@ -5448,3 +5448,38 @@ CTest.
 
 **70/70 CTest Debug + Release.** Onda F: SPECTRA ✓ SHIFTER ✓ | vocoder
 (mode do FORMANT), VCA 4ch pendentes.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda F — vocoder como `mode` do FORMANT (#45)
+
+**`src/dsp/Formant.hpp`, `tests/test_formant.cpp` (4 testes novos, 13 no
+total).** Não é módulo novo — o `FORMANT` (5 passa-faixas paralelos de
+vogal) ganhou um modo vocoder. Recomendação do autor: opção A (no
+FORMANT) para o vocoder, opção B (módulo próprio `VCA4`) para o VCA.
+
+- **Entrada `mod`** (índice 3, **apensa** — patches existentes referenciam
+  índices 0–2, intactos) = o modulador.
+- **Param `vocoder`** (0–1, apenso). `vocoder>0` + `mod` cabeado → +5 SVF
+  de análise no `mod` nas mesmas frequências das bandas de portadora + 5
+  seguidores de envelope (~12 ms); o ganho de cada banda vira
+  `lerp(ganhoVogal, env·6, vocoder)`. `vowel` continua posicionando as 5
+  frequências → escolhe QUAIS 5 pontos vocodar.
+- **`vocoder=0` ou sem `mod`** → o bloco do vocoder é pulado inteiro →
+  saída **byte-idêntica** à versão anterior (teste
+  `testVocoderZeroIsClassicFormant` + `testVocoderNeedsModulator`
+  comparam byte a byte).
+
+Vocoder de 5 bandas — grosso mas vocálico (não fala inteligível de banda
+larga). Um `VOCODER` de N bandas dedicado fica como pendência do `§2.6`.
+Modelo: canal vocoder de Homer Dudley (Bell Labs, 1938 — domínio
+público).
+
+Integração: LearnCatalog (`vocoder` + `in:mod` binds + blurb do FORMANT
+atualizado), test_panel_layout (o painel do FORMANT já era pego pelo
+teste — só ganhou 1 knob + 1 jack, cabe nos 14 HP). Sem novo alvo CTest
+(é `mode`). Docs: 45_formant.md §5.1, RASGO_MODULAR.md §36.3, PESQUISA
+§2.6.
+
+**70/70 CTest Debug + Release.** Onda F: SPECTRA ✓ SHIFTER ✓ vocoder ✓ |
+só `VCA4` (4 canais, módulo próprio) pendente.

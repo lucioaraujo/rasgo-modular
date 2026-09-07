@@ -20,12 +20,19 @@
 // - `vowel` (0–1, +CV)  posição na sequência A → E → I → O → U
 // - `shift` (−1..1)     escala todas as frequências (2^(shift·1,5)) — trato
 // - `res`   (0–1)       estreita as bandas (bw / (1 + res·8)) — canta/apita
+// - `vocoder` (0–1)     mistura: os GANHOS das 5 bandas passam a seguir a
+//                       energia do MODULADOR (entrada `mod`) em cada
+//                       frequência de formante em vez da tabela de vogal.
+//                       0 = FORMANT clássico; 1 = vocoder de 5 bandas
+//                       (Dudley). Sem `mod` cabeado → tratado como 0.
 // - `mix`   (0–1)       seco ↔ ressoado (0 = passa-direto bit-exato)
 // - `drift` (0–1)       wobble lento por formante, DETERMINÍSTICO (sem RNG)
 //
 // Núcleo: 5× SVF TPT (Simper/Cytomic), não-linearidade no laço — mesmo do
-// `FILTER`/`WASP`. Sem entrada → silêncio (é TRANSFORM). `process()` não
-// aloca; os dados de vogal são `constexpr`. Determinístico sempre.
+// `FILTER`/`WASP`. No modo vocoder, +5 SVF de análise no `mod` + 5
+// seguidores de envelope. Sem entrada → silêncio (é TRANSFORM).
+// `process()` não aloca; os dados de vogal são `constexpr`. Determinístico
+// sempre (`vocoder=0` → saída byte-idêntica à versão sem esta feature).
 
 namespace rasgo::modular {
 
@@ -38,11 +45,13 @@ public:
         : Signal(
               {{"in", PortKind::Audio, ""},
                {"vowel", PortKind::Control, ""},
-               {"shift", PortKind::Control, ""}},
+               {"shift", PortKind::Control, ""},
+               {"mod", PortKind::Audio, ""}},
               {{"out", PortKind::Audio, ""}},
               {{"vowel", 0.0f, 1.0f, 0.0f, ""},
                {"shift", -1.0f, 1.0f, 0.0f, ""},
                {"res", 0.0f, 1.0f, 0.4f, ""},
+               {"vocoder", 0.0f, 1.0f, 0.0f, ""},
                {"mix", 0.0f, 1.0f, 1.0f, ""},
                {"drift", 0.0f, 1.0f, 0.0f, ""}}) {}
 
@@ -58,9 +67,11 @@ public:
         p.add(Widget::Kind::Knob, "RES", "res", 41.0f, 28.0f);
         p.add(Widget::Kind::Knob, "MIX", "mix", 58.0f, 28.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 7.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "VOCOD", "vocoder", 24.0f, 50.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "VOW", "in:vowel", 24.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "SHF", "in:shift", 40.0f, 92.0f);
+        p.add(Widget::Kind::Jack, "VOW", "in:vowel", 22.0f, 92.0f);
+        p.add(Widget::Kind::Jack, "SHF", "in:shift", 36.0f, 92.0f);
+        p.add(Widget::Kind::Jack, "MOD", "in:mod", 50.0f, 92.0f);
         p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 114.0f);
         return p;
     }
@@ -72,8 +83,12 @@ public:
         for (int k = 0; k < kBands; ++k) {
             svf_[k].ic1eq = 0.0f;
             svf_[k].ic2eq = 0.0f;
+            anaSvf_[k].ic1eq = 0.0f;
+            anaSvf_[k].ic2eq = 0.0f;
+            env_[k] = 0.0f;
             dph_[k] = 0.0f;
         }
+        envCoef_ = 1.0f - std::exp(-1.0f / (0.012f * sr_));   // ~12 ms
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -85,12 +100,15 @@ public:
         const AudioBlock* in = inputs[0];
         const AudioBlock* vowIn = inputs[1];
         const AudioBlock* shfIn = inputs[2];
+        const AudioBlock* modIn = inputs.size() > 3 ? inputs[3] : nullptr;
 
         const float vowKnob = clamp01(parameterValue("vowel"));
         const float shfKnob = clampf(parameterValue("shift"), -1.0f, 1.0f);
         const float res = clamp01(parameterValue("res"));
         const float mix = clamp01(parameterValue("mix"));
         const float drift = clamp01(parameterValue("drift"));
+        // vocoder só quando há modulador cabeado
+        const float voc = modIn ? clamp01(parameterValue("vocoder")) : 0.0f;
         const float nyqCut = 0.45f * sr_;
         const float resDiv = 1.0f + res * 8.0f;
 
@@ -109,6 +127,7 @@ public:
 
         for (std::size_t f = 0; f < frames; ++f) {
             const float x = in ? in->at(0, f) : 0.0f;
+            const float m = (voc > 0.0f && modIn) ? modIn->at(0, f) : 0.0f;
 
             const float vw = clamp01(vowKnob + (vowIn ? vowIn->at(0, f) : 0.0f))
                            * static_cast<float>(kVowels - 1);
@@ -128,8 +147,19 @@ public:
                 const float bw = (kBw[seg][k] * (1.0f - t) + kBw[seg + 1][k] * t)
                                / resDiv;
                 const float gDb = kGain[seg][k] * (1.0f - t) + kGain[seg + 1][k] * t;
-                const float gLin = std::pow(10.0f, gDb / 20.0f);
+                float gLin = std::pow(10.0f, gDb / 20.0f);
                 const float kk = clampf(bw / fk, 0.02f, 2.0f);
+
+                // vocoder: o ganho da banda passa a seguir a energia do
+                // MODULADOR nessa frequência (banco de análise + seguidor)
+                if (voc > 0.0f) {
+                    const float ab = anaSvf_[k].runBand(m, fk, kk, sr_);
+                    const float amag = std::fabs(ab);
+                    env_[k] += (amag - env_[k])
+                             * (amag > env_[k] ? envCoef_ * 5.0f : envCoef_);
+                    const float gVoc = clampf(env_[k] * 6.0f, 0.0f, 4.0f);
+                    gLin = gLin * (1.0f - voc) + gVoc * voc;
+                }
 
                 const float bnd = svf_[k].runBand(x, fk, kk, sr_);
                 wet += bnd * kk * gLin;
@@ -197,6 +227,9 @@ private:
     };
 
     Svf svf_[kBands];
+    Svf anaSvf_[kBands];              // banco de análise do modulador (vocoder)
+    float env_[kBands] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    float envCoef_ = 0.02f;
     float sr_ = 48000.0f;
     float dt_ = 1.0f / 48000.0f;
     float dph_[kBands] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
