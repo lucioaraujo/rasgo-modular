@@ -5264,13 +5264,51 @@ decimação, sem defasagem. O escalonamento `× 2,2` e o limiar do duck
 Ambas são correção técnica (custo de CPU + sinal de realimentação
 quebrado); o COMPORTAMENTO da mão quando o som está calmo é idêntico.
 
-**Pendente de decisão do autor:** os cliques são muito provavelmente
-**flips de toggle** do Motion Engine (`sub_2`, `sync_enable`, `reverse`,
-`freeze`, `dir` … ~15 toggles no rack, virados em timers de dwell de
-5–25 s). Um toggle é binário — não dá pra fazer slew; virar no meio do
-som sempre estala. C + A NÃO resolvem isso. Proposta: a mão caótica
-para de dirigir toggles (mexe só em knobs/sliders — contínuos,
-interpoláveis). Reverte o "os toggles também" do autor, mas está dentro
-do "limitaremos o que não funciona". Aguarda OK.
+**68/68 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-07: B + suavização por-amostra (5 módulos) + diagnóstico final do clique
+
+**B (`panel_main.cpp`):** o duck do Motion Engine também dobra
+`Master::gainReductionDb()` na energia — se o limitador trabalha, puxa
+as fibras quentes pro centro. Commit `93df255`.
+
+**Suavização por-amostra (`PARAMETRIC`, `SHAPE`, `HALL`, `RESONATOR`,
+`CRUSH`):** recalculavam coeficiente/curva por bloco a partir do param
+cru; um degrau entre blocos saltava a resposta com estado não-nulo →
+zíper. Agora deslizam por amostra (~5–10 ms) pros alvos, como o `FILTER`
+já faz com `cutoff`. Estado inicia no valor do param → patch estático
+byte-idêntico. `rate`/`bits`/`jitter` do CRUSH ficam crus (caráter).
+Commit `2924c71`.
+
+**Diagnóstico final do clique — é xrun do ALSA, não o áudio.** Probe
+`wd2` reproduz o caminho EXATO do painel (grafo completo podado +
+`seedPatch` + `motion.inhabit` + laço de `motion.tick` a 33 ms) no ganho
+do próprio seed. Sete seeds, incluindo as 3 que o autor reportou
+(944390523, 625938148, 597512815, 181161106):
+
+| | maior \|x[n]−x[n−1]\| | saltos > 0,08 |
+|---|---|---|
+| VARIA OFF | ≤ 0,0139 (−37 dBFS) | **0** |
+| VARIA ON  | ≤ 0,0139 | **0** |
+
+O DSP **não produz clique** em nenhum seed, com ou sem VARIA. (As
+contagens de "centenas de cliques" das medições anteriores eram bug do
+probe: threshold fixo 0,08 medido com o MASTER forçado a 0 dB = +24 dB
+acima do seed → a forma de onda normal cruzava o threshold.)
+
+Logo o clique está no **caminho de tempo real**: o `snd_pcm_recover` do
+`AlsaSink.hpp:96` engole xruns sem log; o comentário de `AlsaSink.hpp:72`
+já descreve que xrun na camada ALSA do PipeWire "soa como 'tudo rachado'".
+O VARIA acrescenta custo por frame (o `redraw()` repinta ~60 painéis a
+30 fps com os knobs se movendo) → em máquina/config no limite, derruba
+períodos de áudio = clique. O **C** (refreshCables 1×/s) já ataca parte.
+
+**Próximo passo proposto (aguarda OK):** baixar a taxa de `redraw` quando
+o VARIA está ligado e nada mais acontece (pintar 1 a cada 2 frames, ~15
+fps) e/ou só repintar painéis cujos valores mudaram. Alívio de CPU
+direto. Toggles do Motion Engine: descartado como causa (só ~1% dos
+eventos; e o DSP não clica de qualquer forma).
 
 **68/68 CTest Debug + Release.**
