@@ -266,7 +266,7 @@ void testEveryCatalogModuleHasBlurb() {
         "MATTER", "STRING", "DRUM", "SIGNAL-IN",
         "FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "PARAMETRIC",
         "GLIDE", "CONTROL", "CRUSH",
-        "ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH",
+        "ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH",
         "CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ",
         "QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR",
         "SWITCH", "MATRIX", "MULT", "PLANAR",

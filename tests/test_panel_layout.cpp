@@ -51,6 +51,7 @@
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
+#include "dsp/Stages.hpp"
 #include "dsp/StepSequencer.hpp"
 #include "dsp/StringVoice.hpp"
 #include "dsp/Switch.hpp"
@@ -207,6 +208,7 @@ int main() {
     mods.emplace_back("BOXCAR", std::make_unique<Boxcar>());
     mods.emplace_back("CLOCK", std::make_unique<EuclidClock>());
     mods.emplace_back("ENVELOPE", std::make_unique<Envelope>());
+    mods.emplace_back("STAGES", std::make_unique<Stages>());
     mods.emplace_back("LOGIC", std::make_unique<Logic>());
     mods.emplace_back("MEMORY", std::make_unique<Memory>());
     mods.emplace_back("TURING", std::make_unique<TuringLoop>());

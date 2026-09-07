@@ -5093,3 +5093,33 @@ README; contagens 52 módulos / 64 alvos CTest.
 
 **64/64 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ | STAGES,
 RESONATOR, PULSAR pendentes.
+
+---
+
+## Registro da etapa — 2026-09-07: Onda E — Módulo 54 STAGES (segmentos configuráveis)
+
+**`src/dsp/Stages.hpp` (NOVO), `tests/test_stages.cpp` (10 testes).** O
+`FUNCTION` é UMA rampa; o `STAGES` é N segmentos reconfiguráveis cuja
+FUNÇÃO EMERGE de como se encadeiam (Mutable Stages / Rossum Control
+Forge / Blukač Fractalist). `segments` (2–8), `rate` (0,02–20 Hz, +CV),
+`contour` (0–1 — forma dos níveis: sobe/arco/desce, blend), `curve`
+(−1..1 — exp/lin/log por segmento), **`hold`** (0 desliza = rampa/env/
+LFO · 1 salta e segura = degrau/S&H/sequência — o knob que faz virar
+env OU seq sem trocar de tipo), `tilt` (−1..1 — distorção das durações),
+`jitter` (desvio Rasgo — passeio SEMEADO nos níveis/durações), `loop`
+(corre ↔ dispara). Saídas `out`/`eoc`/`step`. Desenhado por macros
+(gerador, não editor). `jitter=0` → determinístico puro. `process()`
+não aloca. Família **MODULATE**.
+
+Ajuste no desenvolvimento: `curveShape` estava com exp/log trocados
+(`<0` deve ser côncava p/ baixo = rápido→lento); corrigido. `hold≥1` →
+`t=0` (segura `from`, salta na fronteira — degrau limpo, sem rampa de
+1 sample).
+
+Integração: CMake (CTest 65), ModuleCatalog (MODULATE), LearnCatalog
+(13 binds + def. de módulo), test_panel_layout, test_learn_catalog.
+Docs: 00_indice, 54_stages.md, PESQUISA §2.5, RASGO_MODULAR.md §4.1/
+§36.3, README; contagens 53 módulos / 65 alvos CTest.
+
+**65/65 CTest Debug + Release.** Onda E: SWIRL ✓ CRUSH ✓ STAGES ✓ |
+RESONATOR, PULSAR pendentes.

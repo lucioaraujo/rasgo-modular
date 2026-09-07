@@ -50,6 +50,7 @@
 #include "dsp/Shape.hpp"
 #include "dsp/Space.hpp"
 #include "dsp/Swirl.hpp"
+#include "dsp/Stages.hpp"
 #include "dsp/StepSequencer.hpp"
 #include "dsp/StringVoice.hpp"
 #include "dsp/Switch.hpp"
@@ -96,6 +97,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "DRIFT")      return std::make_unique<Drift>();
     if (t == "CLOCK")      return std::make_unique<EuclidClock>();
     if (t == "ENVELOPE")   return std::make_unique<Envelope>();
+    if (t == "STAGES")     return std::make_unique<Stages>();
     if (t == "LOGIC")      return std::make_unique<Logic>();
     if (t == "MEMORY")     return std::make_unique<Memory>();
     if (t == "LOOPER")     return std::make_unique<Looper>();
@@ -146,7 +148,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "FORMANT", "WASP", "LPG", "VCA", "SHAPE", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "DRIFT", "CHAOS", "SH"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},

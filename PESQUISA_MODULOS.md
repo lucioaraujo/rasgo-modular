@@ -326,7 +326,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 | Cand. | Família | O que é / por que falta | Parte de (conceito público) |
 |---|---|---|---|
 | ~~**`SWIRL`** (chorus / flanger / ensemble / **phaser**)~~ | SPACE | **FEITO — 2026-09-07, `dossies/52_swirl.md`, `src/dsp/Swirl.hpp` (Módulo 52).** Os quatro num módulo (`type`): chorus/flanger/ensemble = atrasos CURTOS modulados por LFO triangular; phaser = **6 all-pass de 1ª ordem TPT** (o `PHASER` da linha abaixo entrou aqui). `feedback` (−1..1, `tanh` no laço; flanger auto-oscila passando da unidade), `spread` (LFO de R defasado → estéreo), `tone` (1 polo no molhado), `age` (**desvio Rasgo** — caráter BBD: companding + ruído semeado + wobble; daí a auto-oscilação sem entrada), `mix`. `mix=0` bypass exato. | BBD/bucket-brigade (teoria); Roland Dimension/CE-1, Juno/Solina; phaser Bode/Small Stone (all-pass, Zölzer DAFX); §6 |
-| **`STAGES`** (gerador de segmentos configuráveis) | MODULATE / TIME | N segmentos, cada um com forma/tempo/loop próprios → **função emergente**: vira envelope, LFO, sequência de degraus, osc lento ou ruído conforme como é ligado. O `FUNCTION` é UMA função tipo Maths; isto é Mutable Stages / Rossum Control Forge / Blukač Fractalist. Casa direto com o desvio da matriz Mutable (§3: "fragmento que vira env/seq/osc/ruído conforme quem conecta"). | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (§7 #43); Serge DUSG encadeado; Blukač Fractalist ★ (§7 #4) |
+| ~~**`STAGES`**~~ (gerador de segmentos configuráveis) | MODULATE | **FEITO — 2026-09-07, `dossies/54_stages.md`, `src/dsp/Stages.hpp` (Módulo 54).** `segments` (2–8), `contour`/`tilt`/`hold`/`curve` esculpem a forma por macros (gerador, não editor); `hold` faz virar envelope (0, rampa) ↔ sequência (1, degrau); `loop` corre ↔ dispara; `jitter` (desvio Rasgo — passeio semeado). Saídas `out`/`eoc`/`step`. | Mutable Stages (MIT — conceito); Rossum Control Forge ★ (§7 #43); Blukač Fractalist ★ (§7 #4) |
 | ~~**`CRUSH`**~~ (destruidor lo-fi / decimador) | TRANSFORM | **FEITO — 2026-09-07, `dossies/53_crush.md`, `src/dsp/Crush.hpp` (Módulo 53).** `rate` (S&H sem anti-alias), `bits`, `drive`, `wrap` (clipa↔enrola — overflow de inteiro), `glitch` (travada/dropout/repique), `jitter` (wow digital), `tone`, `mix`. Tudo semeado → dano REPRODUTÍVEL. É onde mora o verbo **DAMAGE**. | decimator/bitcrusher (teoria); Schlappi 100 Grit ★ (§7 #13); Atlas §16/§17 |
 
 **Tier 2 — vozes / geradores que ampliam o alcance:**
@@ -355,7 +355,7 @@ distorção/fold (`SHAPE`, `WASP`), EQ (`PARAMETRIC`), LFO/função
 - **`OrganismVoiceEngine` / `Ecosystem`** (§4) — arquitetura (despacho tipado; a cicatriz do `Cable`), não módulo de catálogo.
 
 **Recomendação de ordem, se o autor quiser uma "Onda E":**
-`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL` e `CRUSH` FEITOS (2026-09-07)** — família de MODULAÇÃO + verbo DAMAGE. Segue: `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
+`SWIRL` → `CRUSH` → `PHASER` (ou dobrar no `SWIRL`) → `STAGES` → `RESONATOR` → `PULSAR`. **`SWIRL`, `CRUSH` e `STAGES` FEITOS (2026-09-07).** Segue: `STAGES` é o mais rico conceitualmente; `RESONATOR`/`PULSAR` ampliam as vozes.
 
 ---
 
