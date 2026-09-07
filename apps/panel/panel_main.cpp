@@ -1098,11 +1098,17 @@ int main() {
     std::map<std::size_t, ScopeTrace> scopeSnap;
     std::uint64_t seedNum = 0;
 
-    // caixa de número de seed no cabeçalho — editável, copia/cola pelo
-    // clipboard do X11. `seedBoxFocus` suspende os atalhos de letra.
+    // caixa de número de seed no cabeçalho — campo de texto padrão:
+    // clicar posiciona o cursor, arrastar seleciona, duplo-clique
+    // seleciona tudo; Backspace/Delete apagam; Ctrl+A/C/V/X; setas.
+    // `seedBoxFocus` suspende os atalhos de letra.
     bool seedBoxFocus = false;
-    bool seedBoxSelAll = false;          // número inteiro "selecionado" (realce)
-    std::string seedBoxText;             // buffer editado quando focado
+    std::string seedBoxText;             // conteúdo editável
+    int seedCaret = 0;                   // posição do cursor (0..len)
+    int seedSelA = -1;                   // âncora da seleção (-1 = sem seleção)
+    bool seedBoxDrag = false;            // arrastando pra selecionar
+    Time seedLastClick = 0;              // p/ detectar duplo-clique
+    int seedBoxX = 0, seedBoxW = 0;      // geometria da caixa (posta no redraw)
     std::string seedClipOut;             // string servida numa SelectionRequest
 
     // ---- cabeçalho de linha única (modelo RASGO Synth) ----------------
@@ -1320,9 +1326,7 @@ int main() {
             headerHits.push_back({rx, hbY, w, hbH, HA_SEED});
             rx -= 4;
         }
-        {   // caixa de número de seed — rebaixada, editável (digitar/colar).
-            // Clicar seleciona o número inteiro (realce) e copia; o número
-            // também sai no terminal a cada troca, como reserva.
+        {   // caixa de número de seed — campo de texto padrão
             const std::string shown = seedBoxFocus
                 ? seedBoxText
                 : (seedNum ? std::to_string(
@@ -1330,19 +1334,23 @@ int main() {
                            : std::string("\xE2\x80\x94"));   // "—"
             const int w = std::max(textW("999999999"), textW(shown)) + 16;
             rx -= w;
+            seedBoxX = rx; seedBoxW = w;   // p/ o hit-test do mouse
             XSetForeground(dpy, gc, T.recessed);
             XFillRectangle(dpy, bb, gc, rx, hbY, w, hbH);
             XSetForeground(dpy, gc, seedBoxFocus ? T.accent : T.line);
             XDrawRectangle(dpy, bb, gc, rx, hbY, w, hbH);
-            const bool sel = seedBoxFocus && seedBoxSelAll && !shown.empty();
-            if (sel) {   // realce de "texto selecionado"
+            if (seedBoxFocus && seedSelA >= 0 && seedSelA != seedCaret) {
+                const int a = std::min(seedSelA, seedCaret);
+                const int b = std::max(seedSelA, seedCaret);
+                const int xa = rx + 8 + textW(seedBoxText.substr(0, a));
+                const int xb = rx + 8 + textW(seedBoxText.substr(0, b));
                 XSetForeground(dpy, gc, T.accent);
-                XFillRectangle(dpy, bb, gc, rx + 6, hbY + 3,
-                               textW(shown) + 4, hbH - 6);
+                XFillRectangle(dpy, bb, gc, xa, hbY + 3, xb - xa, hbH - 6);
             }
-            text(rx + 8, hbBase, shown, sel ? T.bg : T.textPrimary);
-            if (seedBoxFocus && !sel) {   // cursor no fim
-                const int cx = rx + 8 + textW(shown);
+            text(rx + 8, hbBase, shown, T.textPrimary);
+            if (seedBoxFocus && (seedSelA < 0 || seedSelA == seedCaret)) {
+                const int cx = rx + 8
+                    + textW(seedBoxText.substr(0, seedCaret));
                 XSetForeground(dpy, gc, T.accent);
                 XFillRectangle(dpy, bb, gc, cx + 1, hbY + 4, 2, hbH - 8);
             }
@@ -2273,7 +2281,8 @@ int main() {
         seedBoxText = seedNum
             ? std::to_string(static_cast<unsigned long long>(seedNum))
             : std::string();
-        seedBoxSelAll = !seedBoxText.empty();
+        seedCaret = static_cast<int>(seedBoxText.size());
+        seedSelA = seedBoxText.empty() ? -1 : 0;   // abre com tudo selecionado
     };
     auto seedBoxCommit = [&] {
         if (!seedBoxText.empty()) {
@@ -2281,8 +2290,32 @@ int main() {
                                                   nullptr, 10);
             if (s) { seedNum = s; applySeed(s); }
         }
-        seedBoxFocus = false; seedBoxSelAll = false;
+        seedBoxFocus = false; seedSelA = -1; seedBoxDrag = false;
         redraw();
+    };
+    // --- helpers do campo de texto do seed ---------------------------------
+    auto seedSelLo = [&] { return seedSelA < 0 ? seedCaret
+                             : std::min(seedSelA, seedCaret); };
+    auto seedSelHi = [&] { return seedSelA < 0 ? seedCaret
+                             : std::max(seedSelA, seedCaret); };
+    auto seedHasSel = [&] { return seedSelA >= 0 && seedSelA != seedCaret; };
+    auto seedDelSel = [&] {
+        if (!seedHasSel()) return;
+        const int lo = seedSelLo(), hi = seedSelHi();
+        seedBoxText.erase(static_cast<std::size_t>(lo),
+                          static_cast<std::size_t>(hi - lo));
+        seedCaret = lo; seedSelA = -1;
+    };
+    // x de tela (px) -> índice de caractere mais próximo
+    auto seedCaretAtX = [&](int x) -> int {
+        const int base = seedBoxX + 8;
+        int best = 0, bestD = 1 << 30;
+        for (int i = 0; i <= static_cast<int>(seedBoxText.size()); ++i) {
+            const int cx = base + textW(seedBoxText.substr(0, i));
+            const int d = std::abs(cx - x);
+            if (d < bestD) { bestD = d; best = i; }
+        }
+        return best;
     };
 
     auto actMotion = [&] {
@@ -2566,11 +2599,16 @@ int main() {
                                            AnyPropertyType, &ty, &fmt, &nItems,
                                            &after, &data) == Success
                         && data) {
+                        // cola no cursor, sobre a seleção (só dígitos)
+                        if (seedHasSel()) seedDelSel();
                         for (unsigned long i = 0;
                              i < nItems && seedBoxText.size() < 19; ++i)
-                            if (data[i] >= '0' && data[i] <= '9')
-                                seedBoxText.push_back(
+                            if (data[i] >= '0' && data[i] <= '9') {
+                                seedBoxText.insert(
+                                    static_cast<std::size_t>(seedCaret), 1,
                                     static_cast<char>(data[i]));
+                                ++seedCaret;
+                            }
                         XFree(data);
                         redraw();
                     }
@@ -2579,29 +2617,65 @@ int main() {
                 const KeySym k = XLookupKeysym(&ev.xkey, 0);
                 const bool ctrl = (ev.xkey.state & ControlMask) != 0;
 
-                // caixa de seed focada: captura o teclado (atalhos de
-                // letra ficam suspensos) — dígitos / Backspace / Enter /
-                // Esc / Ctrl+C copia / Ctrl+V cola
+                // caixa de seed focada: campo de texto padrão (setas, Home/
+                // End, Shift-seleção, Backspace/Delete, Ctrl+A/C/V/X)
                 if (seedBoxFocus) {
+                    const bool shift = (ev.xkey.state & ShiftMask) != 0;
+                    const int len = static_cast<int>(seedBoxText.size());
+                    auto moveTo = [&](int pos) {
+                        pos = std::max(0, std::min(len, pos));
+                        if (shift) { if (seedSelA < 0) seedSelA = seedCaret; }
+                        else seedSelA = -1;
+                        seedCaret = pos;
+                    };
                     if (k == XK_Escape) {
-                        seedBoxFocus = false; seedBoxSelAll = false; redraw();
+                        seedBoxFocus = false; seedSelA = -1; redraw();
                     }
                     else if (k == XK_Return || k == XK_KP_Enter) seedBoxCommit();
                     else if (ctrl && (k == XK_a || k == XK_A)) {
-                        seedBoxSelAll = !seedBoxText.empty();
-                        if (seedBoxSelAll) seedCopy(seedBoxText, ev.xkey.time);
+                        seedSelA = 0; seedCaret = len; redraw();
+                    }
+                    else if (ctrl && (k == XK_c || k == XK_C)) {
+                        seedCopy(seedHasSel()
+                            ? seedBoxText.substr(seedSelLo(),
+                                                 seedSelHi() - seedSelLo())
+                            : seedBoxText, ev.xkey.time);
+                    }
+                    else if (ctrl && (k == XK_x || k == XK_X)) {
+                        if (seedHasSel()) {
+                            seedCopy(seedBoxText.substr(seedSelLo(),
+                                     seedSelHi() - seedSelLo()), ev.xkey.time);
+                            seedDelSel();
+                        } else {
+                            seedCopy(seedBoxText, ev.xkey.time);
+                            seedBoxText.clear(); seedCaret = 0; seedSelA = -1;
+                        }
                         redraw();
                     }
-                    else if (ctrl && (k == XK_c || k == XK_C))
-                        seedCopy(seedBoxText, ev.xkey.time);
-                    else if (ctrl && (k == XK_v || k == XK_V)) {
-                        seedBoxSelAll = false;
+                    else if (ctrl && (k == XK_v || k == XK_V))
                         XConvertSelection(dpy, aClipboard, aUtf8, aSeedPaste,
                                           win, ev.xkey.time);
+                    else if (ctrl && (k == XK_u || k == XK_U)) {
+                        seedBoxText.clear(); seedCaret = 0; seedSelA = -1;
+                        redraw();
                     }
+                    else if (k == XK_Left)  { moveTo(seedCaret - 1); redraw(); }
+                    else if (k == XK_Right) { moveTo(seedCaret + 1); redraw(); }
+                    else if (k == XK_Home)  { moveTo(0); redraw(); }
+                    else if (k == XK_End)   { moveTo(len); redraw(); }
                     else if (k == XK_BackSpace) {
-                        if (seedBoxSelAll) { seedBoxText.clear(); seedBoxSelAll = false; }
-                        else if (!seedBoxText.empty()) seedBoxText.pop_back();
+                        if (seedHasSel()) seedDelSel();
+                        else if (seedCaret > 0) {
+                            seedBoxText.erase(
+                                static_cast<std::size_t>(--seedCaret), 1);
+                        }
+                        redraw();
+                    }
+                    else if (k == XK_Delete || k == XK_KP_Delete) {
+                        if (seedHasSel()) seedDelSel();
+                        else if (seedCaret < len)
+                            seedBoxText.erase(
+                                static_cast<std::size_t>(seedCaret), 1);
                         redraw();
                     }
                     else {
@@ -2611,11 +2685,13 @@ int main() {
                                                     sizeof buf - 1, &ks, nullptr);
                         for (int i = 0; i < n; ++i)
                             if (buf[i] >= '0' && buf[i] <= '9') {
-                                if (seedBoxSelAll) {
-                                    seedBoxText.clear(); seedBoxSelAll = false;
+                                if (seedHasSel()) seedDelSel();
+                                if (seedBoxText.size() < 19) {
+                                    seedBoxText.insert(
+                                        static_cast<std::size_t>(seedCaret), 1,
+                                        buf[i]);
+                                    ++seedCaret;
                                 }
-                                if (seedBoxText.size() < 19)
-                                    seedBoxText.push_back(buf[i]);
                             }
                         redraw();
                     }
@@ -2671,7 +2747,8 @@ int main() {
 
                 // clique fora do cabeçalho tira o foco da caixa de seed
                 if (my >= kCaseTop && seedBoxFocus) {
-                    seedBoxFocus = false; seedBoxSelAll = false; redraw();
+                    seedBoxFocus = false; seedSelA = -1; seedBoxDrag = false;
+                    redraw();
                 }
 
                 // ---- overlay (tutorial / sobre): clique fecha ----------
@@ -2694,18 +2771,32 @@ int main() {
                         if (mx >= h.x && mx <= h.x + h.w
                             && my >= h.y && my <= h.y + h.h) { hit = h.act; break; }
                     if (hit != HA_SEEDBOX && seedBoxFocus) {
-                        seedBoxFocus = false; seedBoxSelAll = false; redraw();
+                        seedBoxFocus = false; seedSelA = -1; seedBoxDrag = false;
+                        redraw();
                     }
                     switch (hit) {
                     case HA_SEED:   actSeed(); continue;
-                    case HA_SEEDBOX:
-                        // clique na caixa: foca, "seleciona" o número inteiro
-                        // (realce) e copia pra CLIPBOARD + PRIMARY — colar com
-                        // Ctrl+V ou botão do meio. (Também sai no terminal.)
-                        seedBoxOpen();
-                        seedCopy(seedBoxText, ev.xbutton.time);
+                    case HA_SEEDBOX: {
+                        // campo de texto padrão: 1º clique foca + seleciona
+                        // tudo; clique seguinte posiciona o cursor; arrastar
+                        // seleciona; duplo-clique seleciona tudo.
+                        const bool wasFocused = seedBoxFocus;
+                        const bool dbl = wasFocused
+                            && (ev.xbutton.time - seedLastClick) < 400;
+                        seedLastClick = ev.xbutton.time;
+                        if (!wasFocused) {
+                            seedBoxOpen();          // foca, seleciona tudo
+                        } else if (dbl) {
+                            seedSelA = 0;
+                            seedCaret = static_cast<int>(seedBoxText.size());
+                        } else {
+                            seedCaret = seedCaretAtX(mx);
+                            seedSelA = seedCaret;   // começa seleção vazia
+                            seedBoxDrag = true;
+                        }
                         redraw();
                         continue;
+                    }
                     case HA_REC:    actRec(); continue;
                     case HA_LANG:   cycleLang(); continue;
                     case HA_TUTORIAL: overlay = (overlay == 1 ? 0 : 1); redraw(); continue;
@@ -2901,6 +2992,13 @@ int main() {
                 // soltar o botão do meio só encerra o pan — não mexe num
                 // cabeamento em curso (o esquerdo ainda está pressionado)
                 if (ev.xbutton.button == 2) { panDrag.active = false; continue; }
+                if (seedBoxDrag) {
+                    seedBoxDrag = false;
+                    // "selecionar = copiar" (PRIMARY, colável com botão do meio)
+                    if (seedSelA >= 0 && seedSelA != seedCaret)
+                        seedCopy(seedBoxText.substr(seedSelLo(),
+                                 seedSelHi() - seedSelLo()), ev.xbutton.time);
+                }
                 palBarDrag.active = false;
                 if (drag.active && recording.load()) {
                     const float toVal = graph.parameterUserValue(drag.node, drag.bind);
@@ -2960,6 +3058,9 @@ int main() {
                     spawnType.clear();
                 }
                 setTitle("RASGO Modular — painel de teste");
+                redraw();
+            } else if (ev.type == MotionNotify && seedBoxDrag) {
+                seedCaret = seedCaretAtX(ev.xmotion.x);   // âncora fixa
                 redraw();
             } else if (ev.type == MotionNotify && palBarDrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
