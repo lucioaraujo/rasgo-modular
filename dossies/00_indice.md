@@ -79,9 +79,10 @@ propriedade do cabo, não um módulo do catálogo.
 | 57 | [`57_spectra.md`](57_spectra.md) | `SPECTRA` (resíntese espectral — Panharmonium/phase vocoder) | SOURCE | **implementado** (2026-09-07) |
 | 58 | [`58_shifter.md`](58_shifter.md) | `SHIFTER` (deslocador de frequência — SSB, Bode/Moog) | TRANSFORM | **implementado** (2026-09-07) |
 | 59 | [`59_vca4.md`](59_vca4.md) | `VCA4` (banco de 4 VCAs + mixer — Veils/Quad VCA) | TRANSFORM | **implementado** (2026-09-07) |
-| — | — | vocoder = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
+| 60 | [`60_vocoder.md`](60_vocoder.md) | `VOCODER` (vocoder de N bandas — Dudley 1938) | TRANSFORM | **implementado** (2026-09-08) |
+| — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
-**59 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+**60 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
 módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
 O #51 (`BOXCAR`) veio depois do roadmap, a partir do interesse do autor
 no AI Synthesis AI250 BXR; junto dele o `NOISE` (#19) ganhou o modo
@@ -99,9 +100,10 @@ ponte análise → síntese que faltava. O #58 (`SHIFTER`) é o deslocador de
 frequência (SSB, Bode/Moog): move o espectro inteiro por um Δf fixo em
 Hz → inarmônico; saídas `up`/`down`, `feedback` = barber pole. O #59
 (`VCA4`) é o banco de 4 VCAs + mixer (Veils/Quad VCA — o `VCA` #20
-continua duplo). E o `FORMANT` (#45) ganhou um `mode` **vocoder** (5
-bandas, Dudley 1938). **Onda F completa: SPECTRA · SHIFTER · vocoder ·
-VCA4.**
+continua duplo). E o `FORMANT` (#45) ganhou um `mode` **vocoder** de 5
+bandas; o #60 (`VOCODER`) é o vocoder DEDICADO de até 20 bandas
+(Dudley 1938 — fala inteligível de banda larga). **Onda F: SPECTRA ·
+SHIFTER · vocoder (FORMANT mode + VOCODER) · VCA4.**
 Pendência do #49: a thread ALSA-seq de MIDI no painel.
 
 **Fundação** (sem dossiê próprio — documentada em `RASGO_MODULAR.md §36.1-36.2`):

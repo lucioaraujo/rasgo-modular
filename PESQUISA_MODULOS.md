@@ -395,7 +395,7 @@ adiante, vira dossiê antes do código (método `§1`). Nomes provisórios.
 
 | Cand. | Onde | O que é / por que | Parte de (conceito público) |
 |---|---|---|---|
-| ~~**vocoder de análise/síntese**~~ | `mode` do `FORMANT` | **FEITO — 2026-09-07, `mode` do `FORMANT` (Módulo 45).** Entrada `mod` (índice 3, apensa — patches existentes intactos) + param `vocoder` (0–1). `vocoder>0` + `mod` cabeado → +5 SVF de análise no modulador + 5 seguidores de envelope (~12 ms) → os ganhos das 5 bandas de formante seguem a energia do modulador em cada frequência, em vez da tabela de vogal. Vocoder de 5 bandas (grosso mas vocálico); `vowel` escolhe QUAIS 5 frequências vocodar. `vocoder=0` ou sem `mod` → FORMANT byte-idêntico. 4 testes novos em `test_formant.cpp`. | Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco de análise + seguidores RC + banco de síntese (teoria clássica) |
+| ~~**vocoder de análise/síntese**~~ | `mode` do `FORMANT` **+ `VOCODER` dedicado** | **FEITO — em dois níveis.** (1) `mode` do `FORMANT` #45 (2026-09-07): entrada `mod` (apensa) + param `vocoder` — 5 bandas de vogal seguem a envoltória do modulador; `vocoder=0`/sem `mod` → FORMANT byte-idêntico. (2) **`VOCODER` (Módulo 60, 2026-09-08, `dossies/60_vocoder.md`):** o dedicado — `bands` 4–20 (log 80 Hz–8 kHz, inteligível), `shift` (formant shift), `attack`/`release`, **`sibilance`** (agudo do modulador direto → fricativas), **`freeze`** (pad falado), `mix`. 2·`bands` SVF + expansão-pra-baixo por banda. `carrier` livre → serra interna afinável por `pitch`. 8 testes. | Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco de Q constante + seguidor RC; voiced/unvoiced passthrough (EMS/Roland/Moog — técnica pública) |
 | ~~**análise de áudio → CV: pitch por autocorrelação + onset/transiente**~~ | estende o `SCOPE` | **FEITO — 2026-09-07.** `SCOPE.pitch` trocou o ZCR por **autocorrelação YIN** (decimado 3×, janela 320, lags 16–300, a cada ~12 ms) — robusto a harmônicos (serra/quadrada/acorde: erro < 1 %; ruído → 0). E `SCOPE` ganhou a saída **`onset`** (índice 5, apensa) + param `sens`: gate no ataque/transiente por dois seguidores de envelope (rápido > lento × `sens`) — o detector de transiente pra áudio tipo Maths ch2/3. 3 testes novos. | YIN (de Cheveigné & Kawahara, 2002 — artigo público); detector de transiente por dois seguidores (teoria pública) |
 
 **Tier 3 — utilidade que falta, cerimônia mínima.**
@@ -422,9 +422,10 @@ sends/mutes/cue (fora do escopo de instrumento de composição por ora).
 
 **Ordem sugerida, se virar "Onda F":** `SPECTRA` → `SHIFTER` (ou `mode`
 do `SHAPE`) → vocoder (`mode` do `FORMANT`) → VCA 4ch. `SPECTRA` é o mais
-rico e o único genuinamente novo no catálogo. **Onda F COMPLETA
-(2026-09-07): `SPECTRA` ✓ (#57) · `SHIFTER` ✓ (#58, módulo próprio) ·
-vocoder ✓ (`mode` do `FORMANT` #45) · `VCA4` ✓ (#59, módulo próprio).**
+rico e o único genuinamente novo no catálogo. **Onda F COMPLETA:
+`SPECTRA` ✓ (#57) · `SHIFTER` ✓ (#58) · vocoder ✓ (`mode` do `FORMANT`
+#45 de 5 bandas + `VOCODER` #60 dedicado de N bandas, 2026-09-08) ·
+`VCA4` ✓ (#59).**
 
 ---
 
