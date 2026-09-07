@@ -64,6 +64,7 @@
 #include "dsp/TuringLoop.hpp"
 #include "dsp/Vca.hpp"
 #include "dsp/Vca4.hpp"
+#include "dsp/Vocoder.hpp"
 #include "dsp/Wasp.hpp"
 
 #include <iostream>
@@ -201,6 +202,7 @@ int main() {
     mods.emplace_back("WASP", std::make_unique<Wasp>());
     mods.emplace_back("VCA", std::make_unique<Vca>());
     mods.emplace_back("VCA4", std::make_unique<Vca4>());
+    mods.emplace_back("VOCODER", std::make_unique<Vocoder>());
     mods.emplace_back("CONTROL", std::make_unique<Control>());
     mods.emplace_back("GLIDE", std::make_unique<Glide>());
     mods.emplace_back("SH", std::make_unique<SampleHold>());

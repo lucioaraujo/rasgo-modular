@@ -96,13 +96,15 @@ banco de senóides que o segue; `blur`, `freeze` = *spectral freeze*,
 autônomo sem entrada) + `SHIFTER` (Módulo 58 — deslocador de frequência
 SSB: move o espectro inteiro por um Δf fixo em Hz → inarmônico; saídas
 `up`/`down`, `feedback` = barber pole de Risset; Bode/Moog) + `VCA4`
-(Módulo 59 — banco de 4 VCAs + mixer somado; Veils/Quad VCA) + o
-`FORMANT` (#45) ganhou um `mode` **vocoder** de 5 bandas (Dudley 1938).
-**Onda F completa.**
+(Módulo 59 — banco de 4 VCAs + mixer somado; Veils/Quad VCA) + `VOCODER`
+(Módulo 60 — vocoder DEDICADO de até 20 bandas: a portadora fala o
+modulador; `sibilance` pra as fricativas, `freeze` = pad falado; o
+`FORMANT` já tinha um `mode` vocoder de 5 bandas). **Onda F completa
+(Dudley 1938 pra os dois).**
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-59 módulos DSP,
-71 alvos CTest
+60 módulos DSP,
+72 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -129,12 +131,12 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 59 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 60 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 71 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 72 alvos CTest.
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.

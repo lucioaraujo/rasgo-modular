@@ -156,7 +156,7 @@ SOURCE     gerar         OSC WAVETABLE ADDITIVE PLL CHORD NOISE PULSAR
                          SPECTRA MATTER STRING AUDIO-IN
   └ inclui as vozes de modelagem física (o mundo Eurorack marca
     "Synth Voice"/"Resonator"; o Patch & Tweak as põe em Sound Sources)
-TRANSFORM  transformar   FILTER FORMANT RESONATOR WASP LPG VCA VCA4 SHAPE SHIFTER CRUSH PARAMETRIC GLIDE CONTROL
+TRANSFORM  transformar   FILTER FORMANT VOCODER RESONATOR WASP LPG VCA VCA4 SHAPE SHIFTER CRUSH PARAMETRIC GLIDE CONTROL
   └ modifica um sinal que PASSA (áudio ou CV)
 MODULATE   mover         ENVELOPE FUNCTION STAGES DRIFT CHAOS SH
   └ GERA um sinal de controle
@@ -1123,7 +1123,7 @@ no grafo unificado.
 
 ## 36. Estado atual (marco 3 — 2026-09-04)
 
-Projeto com **fundação de áudio executável, 59 módulos DSP de excelência
+Projeto com **fundação de áudio executável, 60 módulos DSP de excelência
 (inclui o barramento de saída — `MIXER` + `MASTER` estéreo — e o
 oscilador subtrativo `OSC`), o modelo de conexão de três camadas
 completo, três peças generativas e um painel gráfico de teste**
@@ -1220,7 +1220,7 @@ vivo, e **patch serializado como partitura legível**
 (`serialize()`/`deserialize()`, Atlas §23 — texto salvável e versionável;
 formato `rasgo-modular-patch 1`).
 
-### 36.3 Os 59 módulos DSP
+### 36.3 Os 60 módulos DSP
 
 Cada um com dossiê (problema musical, fontes primárias, modelo
 matemático, três modos obrigatórios, critérios de escuta), testes
@@ -1287,6 +1287,7 @@ isolados e integração no grafo. Padrão: `AQUORBIUM/MODULE_DEVELOPMENT_STANDAR
 | 57 | `SPECTRA` | SOURCE | **resíntese espectral — OUVE `in`, acha os parciais mais fortes e re-oscila como um banco de senóides que SEGUE o som** (a ponte análise → síntese). ANÁLISE: 64 passa-faixas ressonantes log (35 Hz–14 kHz, sobrepostas) + seguidor de pico; a cada ~6 ms pega os `voices` picos, interpolação parabólica em log-freq. SÍNTESE: `voices` (2–24) senóides de fase contínua que DESLIZAM (sem zíper) pros picos herdados; `blur` (0–1 — velocidade do rastreio, 0 trava no som ↔ 1 borra ~0,6 s), `shift` (±2 oct, +CV 1V/oct) e `stretch` (−1..1 inarmônico) transpõem a re-síntese SEM tocar na análise, `tone` (−1..1) inclina o espectro, `jitter` (**desvio Rasgo** SEMEADO por voz), **`freeze`** (toggle + gate — para a análise, o banco segura o último espectro = *spectral freeze* / pad infinito), `mix`. Saídas `out`/`r` (L/R, vozes ímpares/pares panoramizadas). `in` livre → ruído interno de −30 dB + 2 parciais fantasma que derivam (semeados) → drone tonal autônomo. `process()` não aloca; `jitter=0` → determinístico. Distinto do `ADDITIVE` (constrói do zero) e do `MEMORY` (grão no tempo) | phase vocoder (Flanagan & Golden 1966 — teoria pública); SMS (Xavier Serra 1989); modelo sinusoidal McAulay–Quatieri (1986); *spectral freeze* (técnica pública); banco de filtros de Q constante (Brown 1991); Rossum Panharmonium / Intellijel Rainmaker spectral (**conceito, não código**) (`PESQUISA §2.6` Onda F) |
 | 58 | `SHIFTER` | TRANSFORM | **deslocador de frequência (SSB) — move o espectro INTEIRO por um Δf FIXO EM HZ** (não em razão), então os parciais deixam de ser harmônicos → metálico/sineiro. Diferente do ring-mod do `SHAPE` (bandas soma **e** diferença simétricas), aqui é banda ÚNICA: `up` (espectro + Δf) e `down` (espectro − Δf), cada uma em sua saída — a relação entre elas é o processo (Three Sisters). `shift` (−2000..2000 Hz, +CV `shift_mod` ×1000 Hz), **`feedback`** (−0,95..0,95 — a saída `up` volta pra entrada → glissando infinito, o *barber pole* de Risset-Shepard; `tanh` no laço), `tone` (−1..1 — inclina o molhado), `drift` (**desvio Rasgo** SEMEADO no Δf), `mix`. SSB por transformada de Hilbert (FIR de 511 taps + atraso casado de 255 ≈ 5,3 ms; +2026-09-07, era 255 taps); rejeição de imagem > 80 dB acima de ~400 Hz, ~20 dB perto de 100 Hz (no grave profundo tende ao ring-mod — limite estrutural do FIR, como o hardware). `process()` não aloca; `drift=0` → determinístico | Harald Bode / Bode-Moog frequency shifter (SSB, anos 1960 — conceito público); SSB por método Hartley/Weaver (teoria de rádio); transformada de Hilbert (DSP clássico); Zölzer *DAFX* (cap. frequency shifting); barber-pole / Shepard-Risset (Shepard 1964, Risset 1969) (`PESQUISA §2.6` Onda F) |
 | 59 | `VCA4` | TRANSFORM | **banco de 4 VCAs + mixer** — o `VCA` (#20) é duplo; este é o banco pra patch grande (Mutable Veils / Intellijel Quad VCA — a utilidade nº 1 do formato). 4 canais: `levelN` (0–1, o knob que a CV soma por PORTA), `cvN_amt` (−1..1, atenuversor). `curve` (0–1, **compartilhado** — 0 linear pra somar CV, 1 exp `g^(1+3c)` pra volume percebido), `mix_gain` (0–2 — ganho da saída `mix`, a soma dos 4 com teto suave), `drift` (**desvio Rasgo** SEMEADO nos 4 ganhos). Entradas `in1..4`/`cv1..4`; saídas `out1..4` + `mix`. Ganho suavizado (~1,5 ms) + `softSat` por canal e na soma. Módulo próprio (não estende o `VCA` — mexer nas portas dele quebra a ordem de índice). `process()` não aloca; `drift=0` → determinístico | Doepfer A-131/132 (VCA exp/linear — teoria pública); Mutable Veils (curva de resposta — ficha pública); Quad VCA como mixer (Intellijel/4ms) (`PESQUISA §2.6` Onda F) |
+| 60 | `VOCODER` | TRANSFORM | **vocoder de N bandas (Homer Dudley, 1938)** — a energia do MODULADOR (voz/fala) por banda controla o ganho da mesma banda numa PORTADORA (sinal rico); a portadora "fala". O `FORMANT` tem um `mode` vocoder de 5 bandas (vocálico); este é o DEDICADO: `bands` 4–20 (log, 80 Hz–8 kHz — inteligível), `shift` (−1..1 — formant shift `2^(shift·1,2)`, desloca a síntese não a análise), `attack`/`release` (seguidores de envelope por banda, 1–60 ms / 20–600 ms), **`sibilance`** (0–1 — o agudo do modulador > ~3,5 kHz passa DIRETO: as fricativas s/f/ch que a análise de banda não pega), **`freeze`** (congela as envoltórias — pad falado infinito), `mix`. Análise + síntese = 2·`bands` SVF TPT + `bands` seguidores + expansão-pra-baixo por banda (o piso de ruído não abre a banda). `carrier` livre → uma serra interna afinável por `pitch` fala sozinha. `process()` não aloca; determinístico. Distinto do `FORMANT` mode (5 bandas de vogal) e do `SPECTRA` (re-síntese que segue a altura) | Homer Dudley, *The Vocoder* (Bell Labs, 1938/1939 — domínio público); banco de filtros de Q constante + seguidor de envelope RC (teoria clássica); voiced/unvoiced passthrough (EMS 5000 / Roland VP-330 / Moog — técnica pública); SVF TPT (Simper/Cytomic) (`PESQUISA §2.6` Onda F) |
 
 **Desvios Rasgo recorrentes:** `drift` (deriva orgânica seeded);
 não-linearidade NO laço (auto-oscilação/arco como ciclo-limite, não NaN);
@@ -1328,7 +1329,7 @@ repetem no tempo. Em `validation-output/` (fora do git).
 
 `CMakeLists.txt` — `add_library(rasgo_modular_core INTERFACE)`,
 `CMAKE_CXX_STANDARD 17`, só `find_package(Threads)`.
-**71 alvos CTest**, 100% verdes em **Debug e Release**
+**72 alvos CTest**, 100% verdes em **Debug e Release**
 (`-Wall -Wextra -Wpedantic -Werror`): grafo/fundação (com matriz,
 constelação, barramento semântico, serialização, feedback, condução,
 modulação aditiva), um alvo por módulo (`MIXER` + `MASTER` compartilham

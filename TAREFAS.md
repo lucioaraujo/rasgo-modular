@@ -5570,3 +5570,44 @@ Docs: 29_scope.md §1/§5/§7, RASGO_MODULAR.md §36.3, PESQUISA §2.6.
 N bandas dedicado; FFT real / partial tracking no SPECTRA; rede all-pass
 IIR de banda larga no SHIFTER — todas mudanças grandes de caráter, ficam
 pra quando o autor pedir.
+
+---
+
+## Registro da etapa — 2026-09-08: Onda F — Módulo 60 VOCODER
+
+**`src/dsp/Vocoder.hpp`, `tests/test_vocoder.cpp` (8 testes), `dossies/60_vocoder.md`.**
+Fecha a linha "vocoder de análise/síntese" do `§2.6` no nível dedicado.
+O `FORMANT` (#45) já tinha o `mode` vocoder de **5 bandas** (as
+ressonâncias de vogal — vocálico). `VOCODER` é o de **banda larga**:
+até 20 bandas log-espaçadas de 80 Hz a 8 kHz → fala inteligível.
+
+- Família TRANSFORM (junto de `FILTER`/`FORMANT`). Entradas `carrier`,
+  `mod`, `pitch`; saída `out`.
+- Params: `bands` (4–20, def 16), `shift` (formant shift ±1 oct),
+  `attack`/`release` (seguidores por banda), **`sibilance`** (agudo do
+  modulador direto pra as fricativas), **`freeze`** (envoltórias
+  congeladas — pad falado), `mix` (0 = bypass byte-exato).
+- DSP: 2·`bands` SVF TPT (análise no `mod`, síntese na portadora em
+  `f_k·2^(shift·1,2)`), seguidor de envelope + **expansão pra baixo**
+  por banda (`ge = env·clamp(env·7, 0,05, 1)` — o chão de ruído do
+  modulador não abre a banda), soma × makeup + sibilância, `tanh`.
+- **Portadora livre → serra interna** (110 Hz·`2^pitch` + sopro semeado):
+  o vocoder fala sozinho a partir só do `mod`.
+- Painel 14 HP (BANDS/SHIFT/SIBIL, ATK/REL/MIX, FRZ; jacks CAR/MOD/PIT +
+  OUT). LearnCatalog: 11 binds (3 níveis) + blurb.
+- Testes: portadora de espectro plano + modulador tonal → pico na banda
+  do modulador (≥ 2,5× o resto); sílabas → a saída segue a envoltória
+  (RMS sílaba > 2× vão); `shift` transpõe a re-síntese; `freeze`
+  sustenta sem `mod`; sem `carrier` → a serra fala; `mix=0` byte-exato;
+  determinístico; `bands=20` no talo → |out| < 1,1.
+
+Homer Dudley, *The Vocoder* (Bell Labs, 1938 — domínio público); banco
+de Q constante + seguidor RC; voiced/unvoiced passthrough (técnica
+pública de estúdio).
+
+Docs: 60_vocoder.md, 00_indice.md (#60), RASGO_MODULAR.md §4.1 + §36.3,
+README, PESQUISA §2.6.
+
+**72/72 CTest Debug + Release.** Pendências restantes do §2.6: FFT real /
+partial tracking no SPECTRA; rede all-pass IIR de banda larga no
+SHIFTER — mudanças grandes de caráter, ficam pra quando o autor pedir.

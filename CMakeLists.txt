@@ -326,6 +326,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_vca4_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_vca4_tests COMMAND rasgo_modular_vca4_tests)
 
+    add_executable(rasgo_modular_vocoder_tests tests/test_vocoder.cpp)
+    target_link_libraries(rasgo_modular_vocoder_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_vocoder_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_vocoder_tests COMMAND rasgo_modular_vocoder_tests)
+
     # usa apps/panel/MotionEngine.hpp — include dir extra `apps`, como o
     # painel gráfico e a peça 4.
     add_executable(rasgo_modular_motion_engine_tests tests/test_motion_engine.cpp)

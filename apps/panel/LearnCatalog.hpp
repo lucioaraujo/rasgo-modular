@@ -155,6 +155,50 @@ inline const LearnTable& learnTable() {
                 "Seco + as 5 bandas, misturados por MIX, com limitador "
                 "suave.", "", ""}},
         }},
+        {"VOCODER", {
+            {"bands", {
+                "Quantas bandas de frequência (4–20). Poucas = 'robô' "
+                "grosso; muitas (16–20) = fala inteligível.",
+                "Vocoder de Homer Dudley (1938): a energia do MODULADOR "
+                "por banda controla o ganho da mesma banda na PORTADORA. "
+                "O `FORMANT` faz o mesmo com 5 bandas de vogal; este é o "
+                "vocoder dedicado, banda larga.",
+                "Voz no MOD, um pad/serra no CAR, BANDS=16: o pad fala. "
+                "BANDS=6 = o vocoder dos anos 70."}},
+            {"shift", {
+                "Desloca as frequências da SÍNTESE em relação à análise "
+                "(2^(shift·1,2)) — formant shift: pra cima = voz pequena, "
+                "pra baixo = voz grande, sem mudar a fala.", "",
+                "LFO → nada (não é entrada); mexa à mão pra uma voz que "
+                "'cresce' na frase."}},
+            {"attack", {
+                "Ataque dos seguidores de envelope (1–60 ms). Curto = as "
+                "consoantes cortam secas; longo = tudo amolece.", "", ""}},
+            {"release", {
+                "Release (20–600 ms). Curto = staccato/inteligível; longo "
+                "= as sílabas borram uma na outra (pad falado).", "", ""}},
+            {"sibilance", {
+                "Quanto do AGUDO do modulador (> ~3,5 kHz) passa DIRETO — "
+                "as fricativas (s, f, ch, x) que a análise de banda não "
+                "pega. 0 = ceceio; alto = fala nítida.", "", ""}},
+            {"freeze", {
+                "Congela as envoltórias das bandas — a portadora fica "
+                "'falando a última sílaba' para sempre. Tira o MOD depois "
+                "de congelar e o pad segura.", "", ""}},
+            {"mix", {"Portadora seca ↔ vocodada. 0 = bypass.", "", ""}},
+            {"in:carrier", {
+                "A PORTADORA — o que vai 'falar' (serra rica, pad, "
+                "acorde, ruído). Livre → uma serra interna afinável por "
+                "PIT.", "", ""}},
+            {"in:mod", {
+                "O MODULADOR — a voz/fala (ou DRUM, ou qualquer som "
+                "rítmico) cuja envoltória espectral molda a portadora.",
+                "", ""}},
+            {"in:pitch", {"CV 1 V/oct pra a serra interna (só quando CAR "
+                         "está livre).", "", ""}},
+            {"out:out", {"A portadora moldada pelas bandas do modulador + "
+                        "sibilância, com softclip.", "", ""}},
+        }},
         {"FILTER", {
             {"cutoff", {
                 "Frequência de corte — acima dela, o som é atenuado.",
@@ -2472,7 +2516,18 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Fonte-filtro de Fant; no modo vocoder, o canal de Dudley "
             "(1938).",
             "Num ruído/pulso: fala sintética. Num acorde: coro. Voz no "
-            "MOD + serra no IN + VOCODER=1: o sinte 'fala'."}},
+            "MOD + serra no IN + VOCODER=1: o sinte 'fala'. Pra fala "
+            "inteligível de banda larga, o VOCODER dedicado."}},
+        {"VOCODER", {
+            "Vocoder de N bandas (4–20) — a energia do MODULADOR por "
+            "banda controla o ganho da mesma banda na PORTADORA: a "
+            "portadora 'fala' o modulador. Homer Dudley, 1938.",
+            "O FORMANT tem um mode vocoder de 5 bandas (vocálico); este "
+            "é o dedicado, banda larga (fala inteligível). SIBIL passa "
+            "as fricativas; FREEZE = pad falado infinito; SHIFT = "
+            "formant shift.",
+            "Voz no MOD + serra/pad no CAR + BANDS=16 = o clássico. Sem "
+            "CAR, a serra interna afina por PIT."}},
         {"RESONATOR", {
             "Banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal "
             "EXTERNO (você bate com o que quiser). Rings/Elements no modo "
