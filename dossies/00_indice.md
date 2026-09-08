@@ -126,7 +126,13 @@ também fica salva, `peca_generativa_4.score.txt`).
 
 **Painel gráfico de teste** (`../apps/panel/`, X11 + ALSA + Xrandr):
 case Eurorack que quebra em linhas, coluna de catálogo por família,
-arrastar-para-criar, sugestão de módulo por `[s]`. Decisões de design em
+arrastar-para-criar, sugestão de módulo por `[s]`. Cabeçalho de linha
+única traduzido (EN/PT/FR/ES); **caixa do número do seed** = campo de
+texto padrão com clipboard X11 completo (o seed também sai no terminal);
+roda / botão do meio / arrasto de cabo na borda navegam o rack;
+**TUTORIAL rolável de 12 seções** (o que é · cabeçalho botão a botão ·
+cabear · navegar · adicionar/remover módulos · as 8 famílias · gravar e
+onde ficam os `.wav` · LEARN). Decisões de design em
 [`../apps/panel/design.md`](../apps/panel/design.md).
 
 **Estudos à parte:**
@@ -135,9 +141,9 @@ arrastar-para-criar, sugestão de módulo por `[s]`. Decisões de design em
 Engine (`apps/panel/MotionEngine.hpp`), Patch Genetics `MUTATE`/`EVOLVE`/
 `CROSS`/`FREEZE` (`apps/panel/PatchGenetics.hpp`), `SYSTEM SCORE` +
 `MUSICAL SCORE` (`apps/panel/ScoreRecorder.hpp`, `NOTE-OUT`), gramática
-explícita do `Seed` (`apps/panel/SeedGrammar.hpp`) e a caixa LEARN dos 37
-módulos (`apps/panel/LearnCatalog.hpp`, sempre presente no rodapé da
-paleta) — **feitos**. Form Engine e a camada contextual do Learning
+explícita do `Seed` (`apps/panel/SeedGrammar.hpp`) e a caixa LEARN de
+todos os 60 módulos (`apps/panel/LearnCatalog.hpp`, sempre presente no
+rodapé da paleta) — **feitos**. Form Engine e a camada contextual do Learning
 Engine (`WHY?`/`WHAT IF?`) continuam mapeados, não construídos;
 [`ESTUDO_audio_sampling.md`](ESTUDO_audio_sampling.md) — `SAMPLER`/
 `TURNTABLE`/`TAPE` (revisto 2026-09-06: §2 mapeia o **Navalha 2** como
