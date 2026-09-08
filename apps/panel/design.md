@@ -205,17 +205,37 @@ um vão largo + régua vertical, "pra não clicar nele sem querer e mutar o
 som" (autor 2026-09-05). À direita, montado da borda pra dentro:
 `SOBRE` · `TUTORIAL`
 · `IDIOMA` (mostra `EN`/`PT`/`FR`/`ES`, cicla) · **`● REC`** (vermelho
-gravando) · **`⚄ SEED n`** (o botão de antes, agora no cluster) · pico da
-saída do MASTER (barra + dB, lê o snapshot dos osciloscópios) · leitura
-`N mód · M cabos`. Quando falta largura, o sacrifício é: leitura → pico →
-os comandos da direita da barra (`SAVE`/`BANK`/…) somem; SEED, REC e
-IDIOMA/TUTORIAL/SOBRE nunca somem. Toda tecla continua funcionando — o
-botão é só o atalho visual, com **uma implementação por ação**
+gravando) · **`⚄ SEED`** (só ícone+palavra) + **caixa do número** ao lado
+· pico da saída do MASTER (barra + dB, lê o snapshot dos osciloscópios) ·
+leitura `N mód · M cabos`. Quando falta largura, o sacrifício é: leitura
+→ pico → os comandos da direita da barra (`SAVE`/`BANK`/…) somem; SEED,
+REC e IDIOMA/TUTORIAL/SOBRE nunca somem. Toda tecla continua funcionando
+— o botão é só o atalho visual, com **uma implementação por ação**
 (`act*` lambdas, chamadas pela tecla e pelo clique).
 
-**TUTORIAL** e **SOBRE** abrem um card sobreposto (`overlay`) — qualquer
-clique ou `[Esc]` fecha. O tutorial tem 6 cartões (cabear, seed, variar,
-mover, zoom, aprender).
+**Caixa do número do seed** (2026-09-08): campo de texto padrão —
+cursor + âncora de seleção. Clique posiciona, arrasta seleciona,
+duplo-clique / `Ctrl+A` tudo; `Backspace`/`Delete`, setas, `Home`/`End`,
+`Shift`+seta; `Ctrl+C`/`Ctrl+X`/`Ctrl+V` e o **botão do meio** (cola a
+última seleção via `PRIMARY`). Digitar um número + `Enter` carrega
+aquele seed. Handler de seleção X11 **ICCCM completo**
+(`TARGETS`/`TIMESTAMP`/`MULTIPLE` + timestamp real do servidor via
+property-notify — o `csd-clipboard` do Cinnamon só cacheia assim). O
+seed atual **também é impresso no stdout** (`seed <N>`) a cada troca,
+como reserva independente do clipboard.
+
+**Navegar no rack** (2026-09-08): a roda rola; o **botão do meio**
+arrasta o rack na vertical a qualquer hora (inclusive durante o
+cabeamento — não cancela o `cdrag`); arrastar um cabo pra perto da
+borda de cima/baixo **rola contínuo** enquanto fica lá.
+
+**TUTORIAL** e **SOBRE** abrem um card sobreposto (`overlay`) — clique
+esquerdo ou `[Esc]` fecha. O tutorial (2026-09-08) tem **12 seções e é
+rolável** (roda / `↑↓` / `PgUp`-`PgDn` / `Home`-`End` + barra), título
+fixo no topo: o que é · SEED · a caixa do número · VARIA · BANCO/SALVA e
+`~/.local/share/rasgo-modular/` · REC e os `rec-NN.wav`/`.score.txt` · o
+cabeçalho botão a botão · cabear · navegar · adicionar/mover/remover
+módulos · as 8 famílias · LEARN. Nas 4 línguas.
 
 **i18n** (`apps/panel/UiLanguage.hpp`, porte sem JUCE do `UiLanguage.h`
 dos Synth): `enum Lang{en,pt,fr,es}`, `L4{en;pt;fr;es}`, `tr()` com
@@ -276,20 +296,28 @@ qualquer conexão é possível, só mais ou menos provável.
   Cabeamento bruto ~10^147; patches realistas **10^16 (6 cabos) a 10^44
   (20 cabos)**. Seed `uint64` = **1,8·10^19 sementes**.
 - **Genes** (SplitMix64, stream por decisão): `complexity` (0 = mínimo
-  ~14 cabos, 1 = teia densa ~45), `wildness` (convencional↔experimental),
+  ~6 cabos, 1 = teia densa ~60–70 — teto `3 + complexity·75`, ampliado
+  2026-09-08 a pedido do autor pra testar muitos módulos de uma vez;
+  mínimo inalterado), `wildness` (convencional↔experimental),
   `motion` (quanto o `DRIFT` mexe a estrutura), `energy`, `space`,
   `voiceBias`, root/escala, bpm (46–156, enviesado devagar). Curva de
   `complexity`/`wildness` dá **15 % patches minimalistas e 10 % máximos**.
 - **Garantias:** sempre há uma ESPINHA voz → processamento → MIXER.ch1 →
   MASTER → sink (audível); a voz é sacrossanta (o passeio não mexe nas
   entradas dela); o CLOCK sempre tica; detector de ciclo liga como
-  feedback; `connectToParameter` sempre com atraso de 1 bloco.
-- **Verificado (80 seeds):** 0 mudos, 0 erros, RMS 0,024–0,67, cabos
-  14–45 (média 22), MIXER com 3+ canais em 75/80. Determinístico.
+  feedback; `connectToParameter` sempre com atraso de 1 bloco;
+  **os pans do MIXER (`pan1/2/3`) nascem sempre no centro** (2026-09-08 —
+  o músico abre o palco à mão); o MASTER sempre em −24 dB.
+- **Verificado (80 seeds, teto ×40):** 0 mudos, 0 erros, RMS 0,024–0,67,
+  cabos 14–45 (média 22), MIXER com 3+ canais em 75/80. Determinístico.
+  (Teto ampliado pra ×75 depois — patches mais densos, mesmas
+  garantias; `test_seed_patch` revalida.)
 - **`DRIFT`** plugado em 2–4 parâmetros estruturais por seed → **todo
   patch evolui sozinho** (deriva lenta com momentum, estilo ANTITOTEM).
 - **Botão `⚄ SEED`** / **`[g]`** → sorteia um seed ALEATÓRIO (não
-  incrementa). `RASGO_SEED=N` / `--seed N` reproduzem um específico.
+  incrementa; RNG endurecido com `std::random_device` + splitmix64).
+  `RASGO_SEED=N` / `--seed N` reproduzem um específico; a **caixa do
+  número** ao lado do botão também aceita digitar/colar um seed + `Enter`.
 - **Banco de patches** (`§2.9`): `[Ctrl+B]` guarda o patch atual em
   `~/.local/share/rasgo-modular/patches/seed-N.rmp` (com a linha `seed N`).
 

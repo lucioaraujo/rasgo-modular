@@ -5758,3 +5758,10 @@ absorvidas nos novos cards.
 Docs: `RASGO_MODULAR.md §36.7`, `README.md`.
 
 **72/72 CTest Debug + Release.**
+
+**Doc sweep (mesma data):** `apps/panel/design.md` (§ cabeçalho — caixa
+do seed como campo de texto, navegação botão-do-meio/borda, tutorial de
+12 seções; §2.3 — teto ×75, pans no centro, RNG endurecido),
+`dossies/10_space.md` (anti-zíper), `dossies/00_indice.md` (painel +
+LEARN de 60), `PESQUISA_MODULOS.md §2.7` (o TUTORIAL vira insumo da fase
+didática; o que falta = guia corrido módulo-a-módulo + receitas).

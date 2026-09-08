@@ -27,6 +27,14 @@ reverberação, pelos mesmos controles.
   ±(`mod`·4 ms), com sinal alternado por tomada;
 - `mix` seco/molhado; saídas `out` (misturada) e `wet` (só molhado).
 
+**Anti-zíper (2026-09-08):** `time`, `spread`, `feedback`, `tone` e `mix`
+são suavizados **por amostra** (one-pole ~10 ms) rumo ao valor do bloco.
+Sem isto, quando o VARIA ou um arrasto de knob varria o `time` a tomada
+de atraso saltava de posição a cada bloco = um clique na cauda. Um flag
+`ctlPrimed_` assenta no valor exato no 1º bloco → **patch estático fica
+byte-idêntico** (o `test_space` passa sem mudança). Mesma lição de
+`Parametric`/`Shape`/`Hall`/`Resonator`/`Crush`.
+
 Determinístico (LFO senoidal, sem RNG). Buffer + buffers de all-pass
 alocados em `prepare()`; `process()` não aloca.
 

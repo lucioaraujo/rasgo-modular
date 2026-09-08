@@ -442,12 +442,22 @@ Insumos que já existem para isso:
 - o `LEARN` do painel (`apps/panel/LearnCatalog.hpp`) — 3 níveis por
   bind (*rápido* / *entender* / *explorar*) + a definição de cada
   módulo; é a semente do texto de referência;
+- o **TUTORIAL do painel** (`apps/panel/UiLanguage.hpp`, strings `tut*` —
+  reescrito 2026-09-08, 12 seções nas 4 línguas): o que é, o cabeçalho
+  botão a botão, cabear, navegar, adicionar/mover/remover módulos, as
+  **8 famílias**, gravar e onde ficam os arquivos, LEARN. É o esqueleto
+  do capítulo "primeiros passos" da publicação;
 - os dossiês (`dossies/NN_*.md`) — problema, fontes, modelo, testes de
   cada módulo;
 - as 5 peças de exemplo (`examples/peca_generativa*`) — patches completos
   comentados;
 - este `PESQUISA_MODULOS.md` — a proveniência conceitual (de que a
   publicação precisa para citar fontes corretamente).
+
+O que **falta** escrever (não coberto pelos insumos acima): um guia
+corrido módulo-a-módulo (uma página por módulo, prosa, não só o hover do
+LEARN) e um caderno de **receitas de patch** passo a passo. É o trabalho
+central da fase didática.
 
 A tabela de equivalências ModularGrid → RASGO (feita nesta revisão) entra
 como apêndice: "se você conhece o módulo X do Eurorack, no RASGO é o Y".
