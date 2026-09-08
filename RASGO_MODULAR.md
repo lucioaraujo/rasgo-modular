@@ -1439,6 +1439,28 @@ cursor, ou clique no trilho pra paginar. O **LEARN** ganhou a
 o que é / o lugar dele / uma cadeia pra experimentar) e o **dwell caiu de
 2 s → 1 s**.
 
+**Navegação e tutorial (2026-09-08):**
+- **Caixa do número do seed** = campo de texto padrão: clique posiciona o
+  cursor, arraste seleciona, duplo-clique / Ctrl+A tudo; Backspace/Delete,
+  setas, Home/End; Ctrl+C/X/V e o botão do meio (cola a última seleção);
+  digitar + Enter carrega o seed. O clipboard X11 usa handler ICCCM
+  completo (TARGETS/TIMESTAMP/MULTIPLE + timestamp real do servidor) —
+  testado com `csd-clipboard` do Cinnamon. O seed também **sai no
+  terminal** (`seed <N>`) a cada troca, como reserva.
+- **Rolagem ao cabear:** arrastar um cabo pra perto da borda de cima/baixo
+  do rack rola continuamente; o **botão do meio** paneia o rack na
+  vertical a qualquer hora (inclusive durante o cabeamento).
+- **Tutorial** (`TUTORIAL`) reescrito e **rolável** (roda / ↑↓ / PgUp-Dn /
+  Home-End): o que é · SEED e a caixa do número · VARIA e a mão caótica ·
+  BANCO/SALVA e onde ficam os arquivos (`~/.local/share/rasgo-modular/`) ·
+  REC e os `rec-NN.wav`/`rec-NN.score.txt` · o cabeçalho botão a botão ·
+  cabear · navegar · adicionar/mover/remover módulos (paleta, `[x]` no
+  canto, soltar de volta na paleta) · **as 8 famílias** · LEARN. Todo o
+  texto nas 4 línguas (`test_ui_language` cobre a completude).
+- **Pans do MIXER** agora nascem **sempre no centro** em todo seed
+  (`PatchSeed.hpp`) — o músico abre o palco à mão. Teto de cabeamento do
+  passeio ampliado (`complexity·75`) pra seeds bem densos.
+
 ### 36.8 Acoplamento — instrumentos e recursos de composição
 
 Autônomo **não** quer dizer fechado. Além de soar sozinho (§35.4.1), o

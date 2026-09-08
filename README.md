@@ -101,6 +101,14 @@ SSB: move o espectro inteiro por um Δf fixo em Hz → inarmônico; saídas
 modulador; `sibilance` pra as fricativas, `freeze` = pad falado; o
 `FORMANT` já tinha um `mode` vocoder de 5 bandas). **Onda F completa
 (Dudley 1938 pra os dois).**
++ **painel — navegação e tutorial (2026-09-08):** caixa do número do seed
+vira **campo de texto padrão** (selecionar/copiar/colar/apagar, botão do
+meio cola; clipboard ICCCM completo; o seed também sai no terminal);
+**rolar o rack ao cabear** (arrastar o cabo pra borda) e **botão do meio
+paneia**; **TUTORIAL reescrito e rolável** — cobre o cabeçalho botão a
+botão, gravar e onde ficam os `.wav` (`~/.local/share/rasgo-modular/`),
+adicionar/remover módulos e **as 8 famílias**, nas 4 línguas; pans do
+MIXER sempre no centro em todo seed.
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
 60 módulos DSP,
