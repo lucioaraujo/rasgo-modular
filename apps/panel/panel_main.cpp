@@ -829,6 +829,9 @@ int main() {
     // `ui-lang` logo abaixo. `overlay`: 0 nenhum · 1 tutorial · 2 sobre.
     rasgo::panel::Lang uiLang = rasgo::panel::Lang::en;
     int overlay = 0;
+    int tutScroll = 0;          // rolagem do overlay do tutorial (px)
+    int tutContentH = 0;        // altura do conteúdo (posta no redraw)
+    int tutViewH = 0;           // altura visível do card (posta no redraw)
 
     // recalcula `g_s` pela altura, as larguras px, e distribui os módulos
     // numa case de largura de rack (104 HP), centrada, que quebra em linhas
@@ -1933,16 +1936,13 @@ int main() {
             XSetFillStyle(dpy, gc, FillStippled);
             XFillRectangle(dpy, bb, gc, 0, 0, winW, winH);
             XSetFillStyle(dpy, gc, FillSolid);
-            const int cw = std::min(760, winW - 60);
-            const int chh = std::min(winH - 60, overlay == 1 ? 600 : 285);
+            const int cw = std::min(820, winW - 60);
+            const int chh = std::min(winH - 60, overlay == 1 ? winH - 60 : 285);
             const int cxx = (winW - cw) / 2, cyy = (winH - chh) / 2;
             XSetForeground(dpy, gc, T.surface);
             XFillRectangle(dpy, bb, gc, cxx, cyy, cw, chh);
             XSetForeground(dpy, gc, T.accent);
             XDrawRectangle(dpy, bb, gc, cxx, cyy, cw, chh);
-            clipTo(cxx + 1, cyy + 1, cw - 2, chh - 2);
-            const int px = cxx + 24, wrapPx = cw - 48;
-            int py = cyy + 30;
             {   // CLOSE (canto sup. direito do card) — decorativo: o clique
                 // fecha em qualquer lugar
                 const std::string cl = tr(S::close, uiLang);
@@ -1952,29 +1952,57 @@ int main() {
                 XDrawRectangle(dpy, bb, gc, bxc, byc, w, 20);
                 text(bxc + 7, byc + 14, cl, T.textSecondary);
             }
+            const int px = cxx + 24, wrapPx = cw - 56;
+            const int top = cyy + 30;
             if (overlay == 1) {
-                text(px, py, tr(S::tutTitle, uiLang), T.accent);
-                py += 18;
-                text(px, py, tr(S::tutSubtitle, uiLang), T.textSecondary);
-                py += 26;
+                // área rolável: título fixo no topo, corpo desliza
+                text(px, top, tr(S::tutTitle, uiLang), T.accent);
+                text(px, top + 16, tr(S::tutSubtitle, uiLang), T.textSecondary);
+                const int viewTop = top + 34;
+                tutViewH = cyy + chh - 16 - viewTop;
+                if (tutContentH > tutViewH)
+                    tutScroll = std::min(std::max(0, tutScroll),
+                                         tutContentH - tutViewH);
+                else tutScroll = 0;
+                clipTo(cxx + 1, viewTop, cw - 2, tutViewH);
+                int py = viewTop + 4 - tutScroll;
                 const rasgo::panel::L4* cards[][2] = {
-                    {&S::tutCableTitle, &S::tutCableBody},
+                    {&S::tutWhatTitle,  &S::tutWhatBody},
                     {&S::tutSeedTitle,  &S::tutSeedBody},
+                    {&S::tutSeedBoxTitle, &S::tutSeedBoxBody},
                     {&S::tutVaryTitle,  &S::tutVaryBody},
-                    {&S::tutMoveTitle,  &S::tutMoveBody},
-                    {&S::tutZoomTitle,  &S::tutZoomBody},
+                    {&S::tutStoreTitle, &S::tutStoreBody},
+                    {&S::tutRecTitle,   &S::tutRecBody},
+                    {&S::tutHdrTitle,   &S::tutHdrBody},
+                    {&S::tutCableTitle, &S::tutCableBody},
+                    {&S::tutNavTitle,   &S::tutNavBody},
+                    {&S::tutModTitle,   &S::tutModBody},
+                    {&S::tutFamTitle,   &S::tutFamBody},
                     {&S::tutLearnTitle, &S::tutLearnBody},
                 };
                 for (auto& c : cards) {
-                    text(px, py, tr(*c[0], uiLang), T.textPrimary);
+                    text(px, py, tr(*c[0], uiLang), T.accent);
                     py += 16;
                     for (const auto& ln : wrapText(tr(*c[1], uiLang), wrapPx)) {
                         text(px, py, ln, T.textSecondary);
                         py += 14;
                     }
-                    py += 10;
+                    py += 12;
+                }
+                tutContentH = (py + tutScroll) - (viewTop + 4);
+                clipOff();
+                // barra de rolagem
+                if (tutContentH > tutViewH) {
+                    const int trkX = cxx + cw - 7, trkH = tutViewH;
+                    const int thH = std::max(24, trkH * tutViewH / tutContentH);
+                    const int thY = viewTop
+                        + (trkH - thH) * tutScroll / (tutContentH - tutViewH);
+                    XSetForeground(dpy, gc, T.line);
+                    XFillRectangle(dpy, bb, gc, trkX, thY, 4, thH);
                 }
             } else {
+                clipTo(cxx + 1, cyy + 1, cw - 2, chh - 2);
+                int py = top;
                 text(px, py, "RASGO MODULAR", T.accent);
                 py += 16;
                 text(px, py,
@@ -1986,8 +2014,8 @@ int main() {
                     text(px, py, ln, T.textSecondary);
                     py += 15;
                 }
+                clipOff();
             }
-            clipOff();
         }
 
         XCopyArea(dpy, bb, win, gc, 0, 0,
@@ -2702,7 +2730,20 @@ int main() {
                     if (overlay) { overlay = 0; redraw(); }
                     else alive = false;
                 }
-                else if (k == XK_q) alive = false;
+                // rolagem do tutorial pelo teclado
+                else if (overlay == 1 && (k == XK_Down || k == XK_Up
+                         || k == XK_Next || k == XK_Prior
+                         || k == XK_Home || k == XK_End)) {
+                    if (k == XK_Down)  tutScroll += 40;
+                    else if (k == XK_Up) tutScroll -= 40;
+                    else if (k == XK_Next)  tutScroll += tutViewH - 40;
+                    else if (k == XK_Prior) tutScroll -= tutViewH - 40;
+                    else if (k == XK_Home)  tutScroll = 0;
+                    else if (k == XK_End)   tutScroll = 1 << 20;
+                    if (tutScroll < 0) tutScroll = 0;
+                    redraw();
+                }
+                else if (k == XK_q && !overlay) alive = false;
                 else if (ctrl && (k == XK_plus || k == XK_equal || k == XK_KP_Add))
                     actZoom(+1);
                 else if (ctrl && (k == XK_minus || k == XK_KP_Subtract))
@@ -2751,9 +2792,15 @@ int main() {
                     redraw();
                 }
 
-                // ---- overlay (tutorial / sobre): clique fecha ----------
+                // ---- overlay (tutorial / sobre) ----------------------
                 if (overlay) {
-                    if (ev.xbutton.button == 1) { overlay = 0; redraw(); }
+                    if (overlay == 1 && ev.xbutton.button == 4) {
+                        tutScroll = std::max(0, tutScroll - 48); redraw();
+                    } else if (overlay == 1 && ev.xbutton.button == 5) {
+                        tutScroll += 48; redraw();
+                    } else if (ev.xbutton.button == 1) {
+                        overlay = 0; redraw();   // clique esquerdo fecha
+                    }
                     continue;
                 }
 
@@ -2799,7 +2846,9 @@ int main() {
                     }
                     case HA_REC:    actRec(); continue;
                     case HA_LANG:   cycleLang(); continue;
-                    case HA_TUTORIAL: overlay = (overlay == 1 ? 0 : 1); redraw(); continue;
+                    case HA_TUTORIAL:
+                        overlay = (overlay == 1 ? 0 : 1);
+                        tutScroll = 0; redraw(); continue;
                     case HA_ABOUT:  overlay = (overlay == 2 ? 0 : 2); redraw(); continue;
                     case HA_VARY:   actMotion(); continue;
                     case HA_STANDBY: actStandby(); continue;

@@ -5721,3 +5721,40 @@ coisas:
    - O número segue saindo no terminal a cada troca, como reserva.
 
 **72/72 CTest Debug + Release.**
+
+---
+
+## Registro da etapa — 2026-09-08: painel — navegação + tutorial reescrito (4 línguas)
+
+Sequência de pedidos do autor sobre a usabilidade do painel:
+
+**Caixa do número do seed → campo de texto padrão** (`panel_main.cpp`):
+cursor + âncora de seleção. Clique posiciona; arrastar seleciona;
+duplo-clique / Ctrl+A tudo; Backspace/Delete/KP_Delete apagam; Ctrl+U
+limpa; setas ←/→, Home/End; Shift+seta estende; Ctrl+C/Ctrl+X/Ctrl+V;
+soltar uma seleção copia pra PRIMARY (botão do meio cola). Digitar +
+Enter carrega. **Clipboard ICCCM completo** (TARGETS + TIMESTAMP +
+MULTIPLE/ATOM_PAIR + timestamp real do servidor via property-notify) —
+testado com `clip_test.c` contra o `csd-clipboard` do Cinnamon: funciona
+e o gestor cacheia após o app sair. O seed **também sai no stdout**
+(`seed <N>`) a cada troca, como reserva.
+
+**Rolar ao cabear** (`panel_main.cpp`): arrastar o cabo pra perto da
+borda de cima/baixo do rack rola contínuo; **botão do meio paneia** o
+rack na vertical a qualquer hora (inclusive durante o cabeamento — não
+cancela o `cdrag`).
+
+**TUTORIAL reescrito e rolável** (`panel_main.cpp` + `UiLanguage.hpp`):
+card fixo no topo + corpo com scroll (roda / ↑↓ / PgUp-Dn / Home-End +
+barra). 12 seções: o que é · SEED · a caixa do número · VARIA/mão
+caótica · BANCO/SALVA + `~/.local/share/rasgo-modular/` · REC +
+`rec-NN.wav`/`.score.txt` · **cabeçalho botão a botão** · cabear (+ scroll
+na borda) · navegar (roda, botão do meio, zoom) · **adicionar/mover/
+remover módulos** (paleta, `[x]` no canto, soltar de volta) · **as 8
+famílias** · LEARN. Tudo nas **4 línguas**; `test_ui_language.cpp`
+atualizado (cobre a completude das novas strings). `tutMove*`/`tutZoom*`
+absorvidas nos novos cards.
+
+Docs: `RASGO_MODULAR.md §36.7`, `README.md`.
+
+**72/72 CTest Debug + Release.**
