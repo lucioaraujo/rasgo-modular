@@ -93,6 +93,37 @@ de 3,5 mm mono, "P2"); o plugue macho no cabo é o "P2 plug". No painel:
   pra os plugues não se cobrirem; módulos com 5 saídas (`NOISE`, `OSC`)
   ganharam largura pra isso.
 
+### 2.5.1 Inspector de cabo — relação, condução, ruptura seletiva (2026-09-12)
+
+O motor sempre suportou três recursos por `Cable` (`setRelation`/
+`setConductance`/`rupture`/`reconnect` — `RASGO_MODULAR.md §36.9`) sem
+nenhum controle de painel; só dava pra usar editando o `.rmp` à mão
+(`guia/RELACAO_DE_CABO.md`). Implementado:
+
+- **clicar no CORPO de um cabo** (não numa ponta — as pontas continuam
+  sendo pra puxar/tirar cabo) abre um pequeno **inspector** ancorado
+  perto do clique — não é o `overlay` de tela cheia do tutorial/sobre;
+  o resto do patch fica à vista. Hit-test por distância à mesma
+  polilinha de 15 pontos que desenha o cabo (`apps/panel/
+  CableGeometry.hpp`, `cablePoints`/`pointNearCable` — extraído
+  pra nunca divergir visual/clicável, e testável sem X11:
+  `tests/test_cable_geometry.cpp`).
+- **4 botões** (`NONE`/`RING`/`FOLD`/`DIFF`) escolhem a relação. Ao
+  ligar uma relação nova, o painel entra no modo **escolher companion**:
+  todo jack de **saída** de todo módulo acende o mesmo halo de afordance
+  já usado ao puxar um cabo comum (§2.5) — inclusive a própria origem do
+  cabo, pra permitir auto-relação. `Esc` cancela e volta a `NONE`
+  (não fica "meio-configurado" sem companion).
+- **2 sliders** (`AMT`/`COND`) — mesma física de arrasto vertical dos
+  knobs de módulo (220 px = curso 0..1 inteiro), num estado à parte
+  (`cslide`) porque `amount`/`conductance` não são `ParameterDescriptor`
+  de módulo, não passam por `setParameterBase`.
+- **1 botão** `ROMPER`/`RECONECTAR` — a versão seletiva do `[espaço]`
+  (que continua rompendo todos de uma vez).
+- Nenhuma mudança de serialização — `serialize()`/`deserialize()` já
+  liam/escreviam `relation=`/`companion=`/`amount=`/`conductance=`/
+  `state=` por cabo antes disto; só faltava o jeito de editar ao vivo.
+
 ### 2.6 Mover e remover módulos (2026-09-02)
 
 - **arrastar o corpo do módulo** (nem controle nem `[x]`) → reposiciona
@@ -204,7 +235,8 @@ botão): `DRIFT` é toggle (acende em âmbar quando ligado),
 um vão largo + régua vertical, "pra não clicar nele sem querer e mutar o
 som" (autor 2026-09-05). À direita, montado da borda pra dentro:
 `SOBRE` · `TUTORIAL`
-· `IDIOMA` (mostra `EN`/`PT`/`FR`/`ES`, cicla) · **`● REC`** (vermelho
+· `IDIOMA` (mostra `EN`/`PT`/`FR`/`ES`, cicla) · **`RACK · …`**
+(vista do rack — ver abaixo) · **`● REC`** (vermelho
 gravando) · **`⚄ SEED`** (só ícone+palavra) + **caixa do número** ao lado
 · pico da saída do MASTER (barra + dB, lê o snapshot dos osciloscópios) ·
 leitura `N mód · M cabos`. Quando falta largura, o sacrifício é: leitura
@@ -229,13 +261,34 @@ arrasta o rack na vertical a qualquer hora (inclusive durante o
 cabeamento — não cancela o `cdrag`); arrastar um cabo pra perto da
 borda de cima/baixo **rola contínuo** enquanto fica lá.
 
+**Vista do rack — botão `RACK`** (2026-09-09, simplificado 2026-09-10):
+**alterna 2 estados**, filtrando quais módulos aparecem na case:
+
+1. **`RACK · TODOS`** — o rack inteiro (padrão / repouso).
+2. **`RACK · SAÍDA`** — só os módulos que chegam à saída
+   (`SignalGraph::nodesFeeding(sink)` — os que de fato fazem som; STANDBY
+   não muda isto).
+
+Uma 3ª vista ("saída + qualquer módulo cabeado", via `nodesConnected()`)
+existiu por um dia — mas com o gerador de seed sem cabo morto (`§2.3`,
+2026-09-10) ela ficou **idêntica** a "só saída" pra todo patch de seed, e
+saiu.
+
+É **só uma vista** — não instancia nem remove nada (isso segue na paleta,
+`§2.6`). O filtro reflowa o rack (os ocultos não ocupam espaço); a
+leitura mostra `visíveis/total`; vista vazia mostra uma dica no centro.
+Ao vivo: cabear/descabear faz o módulo aparecer/sumir na hora. Reordenar
+por arraste (`§2.6`) só vale na vista `TODOS`. A escolha é persistida em
+`dataDir()/rack-view` (como o idioma; o valor antigo `wired` cai em
+`output`). O botão ganha o anel de destaque quando ≠ `TODOS`.
+
 **TUTORIAL** e **SOBRE** abrem um card sobreposto (`overlay`) — clique
 esquerdo ou `[Esc]` fecha. O tutorial (2026-09-08) tem **12 seções e é
 rolável** (roda / `↑↓` / `PgUp`-`PgDn` / `Home`-`End` + barra), título
 fixo no topo: o que é · SEED · a caixa do número · VARIA · BANCO/SALVA e
-`~/.local/share/rasgo-modular/` · REC e os `rec-NN.wav`/`.score.txt` · o
-cabeçalho botão a botão · cabear · navegar · adicionar/mover/remover
-módulos · as 8 famílias · LEARN. Nas 4 línguas.
+`~/.local/share/rasgo-modular/` · REC e os `.wav`/`.score.txt` em
+`~/Music/RasgoModular/` · o cabeçalho botão a botão · cabear · navegar ·
+adicionar/mover/remover módulos · as 8 famílias · LEARN. Nas 4 línguas.
 
 **i18n** (`apps/panel/UiLanguage.hpp`, porte sem JUCE do `UiLanguage.h`
 dos Synth): `enum Lang{en,pt,fr,es}`, `L4{en;pt;fr;es}`, `tr()` com
@@ -247,10 +300,14 @@ escolha persiste no pref `~/.local/share/rasgo-modular/ui-lang` (arquivo
 próprio, não o patch — sobrevive a abrir num seed novo). Teste:
 `tests/test_ui_language.cpp` (fallback, ciclo, completude do cabeçalho).
 
-### 2.8 Salvar o patch e gravar (2026-09-02)
+### 2.8 Salvar o patch e gravar (2026-09-02; gravações movidas 2026-09-11)
 
-O trabalho do músico precisa de um lugar. Diretório de dados do usuário:
-`$XDG_DATA_HOME/rasgo-modular/` (fallback `~/.local/share/rasgo-modular/`).
+O trabalho do músico precisa de um lugar. **Dois diretórios:**
+
+- **estado interno** (sessão, banco, prefs) — `$XDG_DATA_HOME/rasgo-modular/`
+  (fallback `~/.local/share/rasgo-modular/`);
+- **gravações** — `~/Music/RasgoModular/` (a pasta de música do usuário;
+  `RASGO_REC_DIR` no ambiente muda o destino). Criado no 1º `Ctrl+R`.
 
 - **Sessão** — `session.rmp` (formato `rasgo-modular-patch 1` do motor,
   `SignalGraph::serialize`/`deserialize` + uma linha `panel shown …` com
@@ -259,9 +316,12 @@ O trabalho do músico precisa de um lugar. Diretório de dados do usuário:
   saída** — inclusive num `SIGINT`/`SIGTERM` (handler pede saída limpa).
   `[Ctrl+S]` salva na hora.
 - **Gravação** — `[Ctrl+R]` liga/desliga; a saída estéreo é acumulada em
-  memória (reserva ~4 min; auto-para quando enche) e escrita como
-  `rec-NN.wav` (16-bit, `io/WavWriter.hpp`) ao parar. Faixa vermelha
-  "● GRAVANDO" na barra de status.
+  memória (reserva ~4 min; auto-para quando enche) e escrita ao parar
+  como **`rec-AAAAMMDD-HHMMSS.wav`** (16-bit, `io/WavWriter.hpp`) + o
+  `.score.txt` de mesmo nome. **Nome por data/hora → nunca sobrescreve**
+  (antes era `rec-NN` com contador que reiniciava a cada sessão e
+  sobrescrevia o `rec-01`). Colisão no mesmo segundo → sufixo `-2`, `-3`.
+  Faixa vermelha "● GRAVANDO" na barra de status.
 - Factory do painel pra desserializar: `makeModule` do catálogo + o nó
   `OUT` (sink, não é módulo de catálogo).
 - **Pendente:** patches nomeados (hoje só a sessão); a gravação num
@@ -289,8 +349,19 @@ TODA porta do rack por função musical (fonte: voz / bus / lenta / random /
 gate / altura; destino: áudio / FM / mod / gate / altura) e o seed é um
 **passeio aleatório PONDERADO** por esse grafo: uma matriz de
 compatibilidade `W[fonte][destino]` (com bônus "experimental" escalado
-pelo gene `wildness`), cabo a cabo. **Não há limitação de cabeamento** —
-qualquer conexão é possível, só mais ou menos provável.
+pelo gene `wildness`), cabo a cabo. A ponderação decide *quais* conexões
+são prováveis; a única restrição dura é **função sonora** — ver Garantias.
+
+**Nenhum cabo sem função sonora (2026-09-10).** O passeio só cabeia em
+módulos que já chegam à saída (`SignalGraph::nodesFeeding(sink)`,
+recalculado a cada cabo — o conjunto **cresce** conforme o passeio liga
+uma fonte de áudio numa entrada audível), e uma poda final remove os
+cabos de montagem que ficaram órfãos. Antes, ~62 % dos cabos tinham
+destino que não chegava à saída (fiação de exploração pelo rack inteiro,
+invisível/inaudível). Efeito: menos cabos, mas **mais módulos de fato
+soando** (complexity alta: ~16 → ~25 módulos audíveis). **Todo
+`RASGO_SEED=N` anterior a esta data produz um patch diferente** (o stream
+de RNG diverge).
 
 - **Espaço:** rack de 27 módulos = 80 entradas, 68 saídas, 211 parâmetros.
   Cabeamento bruto ~10^147; patches realistas **10^16 (6 cabos) a 10^44
@@ -304,10 +375,13 @@ qualquer conexão é possível, só mais ou menos provável.
   `complexity`/`wildness` dá **15 % patches minimalistas e 10 % máximos**.
 - **Garantias:** sempre há uma ESPINHA voz → processamento → MIXER.ch1 →
   MASTER → sink (audível); a voz é sacrossanta (o passeio não mexe nas
-  entradas dela); o CLOCK sempre tica; detector de ciclo liga como
-  feedback; `connectToParameter` sempre com atraso de 1 bloco;
-  **os pans do MIXER (`pan1/2/3`) nascem sempre no centro** (2026-09-08 —
-  o músico abre o palco à mão); o MASTER sempre em −24 dB.
+  entradas dela); **todo cabo do patch tem o destino chegando à saída**
+  (sem cabo morto — `test_seed_patch` verifica); o CLOCK sempre tica;
+  detector de ciclo liga como feedback; `connectToParameter` sempre com
+  atraso de 1 bloco; **os pans do MIXER (`pan1/2/3`) nascem sempre no
+  centro** (2026-09-08 — o músico abre o palco à mão); o MASTER sempre
+  em **−6 dB (75% do slider)** — 2026-09-10, a pedido do autor (era −24 /
+  50%); o limitador true-peak + body-guard do MASTER seguram o teto.
 - **Verificado (80 seeds, teto ×40):** 0 mudos, 0 erros, RMS 0,024–0,67,
   cabos 14–45 (média 22), MIXER com 3+ canais em 75/80. Determinístico.
   (Teto ampliado pra ×75 depois — patches mais densos, mesmas

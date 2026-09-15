@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Rasgo Modular
+GenericName=Generative Modular Instrument
+Comment=Instrumento modular generativo — soa ao carregar, patch por seed
+Exec=rasgo-modular
+Icon=rasgo-modular
+Terminal=false
+Categories=AudioVideo;Audio;Music;

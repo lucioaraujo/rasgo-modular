@@ -72,6 +72,20 @@ public:
         muteGain_ = parameterValue("mute") >= 0.5f ? 0.0f : 1.0f;
         // rampa de ~8 ms (1 polo) — silêncio sem estalo
         muteCoef_ = std::exp(-1.0f / (0.008f * std::max(1.0f, sampleRate)));
+        // GAIN e WIDTH também precisam de rampa. Eram lidos uma vez por
+        // bloco e aplicados como constante: trocar o valor entre blocos
+        // punha um DEGRAU na onda na fronteira — clique audível. Não é
+        // caso raro: o VARIA mexe nos parâmetros a cada 33 ms e o arrasto
+        // de um fader gera uma troca por evento de mouse. Achado pela
+        // bateria de `tests/test_output_excellence.cpp` (§5 do
+        // `SAIDA_AUDIO_COMUM.md`: "automação rápida de ganho, pan, width,
+        // mute e bypass sem clique"), 2026-09-15.
+        //
+        // 8 ms, o mesmo do MUTE: rápido o bastante pra o gesto parecer
+        // imediato, lento o bastante pra não ser degrau.
+        paramCoef_ = muteCoef_;
+        gainSm_ = dbToGain(parameterValue("gain"));
+        widthSm_ = parameterValue("width");
         // proteção de saída de excelência (look-ahead + teto suave) —
         // padrão RASGO, ver `src/dsp/OutputStage.hpp`
         out_.prepare(sampleRate, -1.0f /*teto dBFS*/, 3.0f /*look-ahead ms*/,
@@ -88,8 +102,8 @@ public:
         const std::size_t channels = out.channels();
 
         const AudioBlock* in = inputs[0];
-        const float gain = dbToGain(parameterValue("gain"));
-        const float width = parameterValue("width");
+        const float gainTarget = dbToGain(parameterValue("gain"));
+        const float widthTarget = parameterValue("width");
         const bool mono = parameterValue("mono") >= 0.5f;
         const bool dcBlock = parameterValue("dc_block") >= 0.5f;
         const bool limit = parameterValue("limit") >= 0.5f;
@@ -101,15 +115,19 @@ public:
             float l = in ? in->at(0, frame) : 0.0f;
             float r = (in && inCh >= 2) ? in->at(1, frame) : l;
 
+            // rampa por amostra de GAIN e WIDTH (ver `prepare`)
+            gainSm_  += (gainTarget  - gainSm_)  * (1.0f - paramCoef_);
+            widthSm_ += (widthTarget - widthSm_) * (1.0f - paramCoef_);
+
             // largura mid/side
             const float mid = 0.5f * (l + r);
-            float side = 0.5f * (l - r) * width;
+            float side = 0.5f * (l - r) * widthSm_;
             l = mid + side;
             r = mid - side;
             if (mono) { l = mid; r = mid; }
 
-            l *= gain;
-            r *= gain;
+            l *= gainSm_;
+            r *= gainSm_;
 
             // MUTE — rampa suave no fader, antes da proteção de saída
             muteGain_ += (muteTarget - muteGain_) * (1.0f - muteCoef_);
@@ -153,6 +171,9 @@ private:
     float peakDecay_ = 0.9999f;
     float muteGain_ = 1.0f;
     float muteCoef_ = 0.0f;
+    float paramCoef_ = 0.0f;      // rampa de GAIN/WIDTH (ver `prepare`)
+    float gainSm_ = 1.0f;
+    float widthSm_ = 1.0f;
 };
 
 }  // namespace rasgo::modular

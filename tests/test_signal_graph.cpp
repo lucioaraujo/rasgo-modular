@@ -578,6 +578,53 @@ void testSemanticBus() {
     expectNear(p.second, -2.0f);
 }
 
+// nodesFeeding() = quem alimenta a saída (poda de setActiveOutput) — a
+// vista "SÓ SAÍDA" do rack no painel. nodesConnected() = quem tem
+// qualquer cabo (consulta genérica de topologia).
+void testActiveAndConnectedSets() {
+    SignalGraph graph;
+    const auto src   = graph.add(std::make_unique<Constant>(0.2f));
+    const auto g1    = graph.add(std::make_unique<Gain>(1.0f));
+    const auto mix   = graph.add(std::make_unique<Sum>());
+    const auto fbTap = graph.add(std::make_unique<Gain>(0.3f));
+    const auto out   = graph.add(std::make_unique<Gain>(1.0f));
+    const auto pmod  = graph.add(std::make_unique<Constant>(1.0f));
+    const auto w1    = graph.add(std::make_unique<Constant>(0.5f));  // cabeado,
+    const auto w2    = graph.add(std::make_unique<Gain>(1.0f));      // não à saída
+    const auto orphan = graph.add(std::make_unique<Constant>(0.9f)); // solto
+
+    graph.connect(src, 0, g1, 0);
+    graph.connect(g1, 0, mix, 0);
+    graph.connect(fbTap, 0, mix, 1);
+    graph.connect(mix, 0, fbTap, 0, /*feedback=*/true);   // laço de feedback
+    graph.connect(mix, 0, out, 0);
+    graph.connectToParameter(pmod, 0, out, "gain", /*depth=*/2.0f);
+    graph.connect(w1, 0, w2, 0);
+    graph.prepare(48000.0f, 1, 64);
+
+    const auto feed  = graph.nodesFeeding(out);
+    const auto wired = graph.nodesConnected();
+
+    EXPECT(feed[out] && feed[mix] && feed[g1] && feed[src]);
+    EXPECT(feed[fbTap]);          // membro do laço de feedback conta
+    EXPECT(feed[pmod]);           // fonte de link de parâmetro conta
+    EXPECT(!feed[w1] && !feed[w2]);   // cabeados, mas não chegam à saída
+    EXPECT(!feed[orphan]);
+
+    EXPECT(wired[src] && wired[g1] && wired[mix] && wired[fbTap] && wired[out]);
+    EXPECT(wired[pmod] && wired[w1] && wired[w2]);
+    EXPECT(!wired[orphan]);
+
+    // nodesFeeding ⊆ nodesConnected
+    for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+        EXPECT(!feed[i] || wired[i]);
+
+    // índice inválido -> máscara zerada
+    const auto none = graph.nodesFeeding(graph.nodeCount() + 5);
+    EXPECT(none.size() == graph.nodeCount());
+    for (const char c : none) EXPECT(c == 0);
+}
+
 }  // namespace
 
 int main() {
@@ -595,6 +642,7 @@ int main() {
     testSemanticBus();
     testSerialization();
     testSerializationLocaleIndependent();
+    testActiveAndConnectedSets();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular signal graph tests passed\n";

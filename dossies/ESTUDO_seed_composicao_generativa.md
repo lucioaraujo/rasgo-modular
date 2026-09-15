@@ -264,6 +264,20 @@ par de seeds idêntico; espectro grave/médio-grave saudável na maioria.
 Ver `TAREFAS.md`, registro "Motion Engine janela uniforme, MASTER 50%,
 seed anti-viés-agudo".
 
+**Passeio restrito ao subgrafo audível (2026-09-10)** — a nova vista
+`RACK · SAÍDA` do painel (2026-09-09) expôs que **~62 % dos cabos** de um
+seed tinham destino que não chegava à saída: fiação de exploração pelo
+rack inteiro, inaudível. O autor: *"não gostaria que os cabos ficassem
+sem função sonora."* O passeio ponderado e a fiação da `DRIFT` passaram a
+só aceitar destino em módulo que **já chega à saída**
+(`SignalGraph::nodesFeeding(sink)`, recalculado a cada cabo — o conjunto
+CRESCE conforme o passeio liga uma fonte de áudio numa entrada audível),
+mais uma poda final dos cabos de montagem órfãos. Menos cabos totais, mas
+**mais módulos de fato soando** (complexity alta: ~16 → ~25). O stream de
+RNG diverge → todo seed anterior vira um patch diferente.
+`test_seed_patch` ganhou a asserção "sem cabo morto". Ver `TAREFAS.md`,
+registro "seed — passeio restrito ao subgrafo audível".
+
 **Não existe nada que orquestre uma evolução da peça no tempo** —
 nenhuma seção, nenhuma curva de tensão, nenhuma decisão de "agora a
 densidade sobe". As 3 peças de exemplo determinísticas

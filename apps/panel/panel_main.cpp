@@ -47,12 +47,16 @@
 #include "panel/AlsaSink.hpp"
 #include "panel/AlsaSource.hpp"
 #include "panel/AlsaMidi.hpp"
+#include "ui/CableGeometry.hpp"
+#include "ui/PanelGeometry.hpp"
+#include "ui/ScopeTrace.hpp"
 #include "panel/LearnCatalog.hpp"
 #include "panel/ModuleCatalog.hpp"
 #include "panel/MotionEngine.hpp"
 #include "panel/PatchGenetics.hpp"
 #include "panel/PatchSeed.hpp"
 #include "panel/ScoreRecorder.hpp"
+#include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"
 
@@ -117,39 +121,16 @@ int onXError(Display* d, XErrorEvent* e) {
     return 0;
 }
 
-struct Out final : Signal {
-    Out() : Signal({{"in", PortKind::Audio, ""}}, {{"out", PortKind::Audio, ""}}) {}
-    std::string type() const override { return "OUT"; }
-    void process(const std::vector<const AudioBlock*>& in,
-                 std::vector<AudioBlock>& out) noexcept override {
-        if (in[0]) out[0].copyFrom(*in[0]);
-        else out[0].clear();
-    }
-};
+// O sink `OUT` mora em `panel/SinkOut.hpp` — compartilhado com o app
+// JUCE, e é ele que carrega a guarda de segurança da saída.
+using Out = rasgo::panel::SinkOut;
 
 // osciloscópio por módulo — anel de amostras da saída, desenhado no
 // retângulo `Display` do painel. Enche pelo thread de áudio.
-constexpr std::size_t kScopeLen = 220;
-constexpr std::size_t kLaneLen = 128;
-struct ScopeTrace {
-    std::vector<float> buf = std::vector<float>(kScopeLen, 0.0f);
-    std::size_t w = 0;
-    // TRIGSEQ: histórico das 4 saídas de gate (t1-t4) — pré-alocado sempre
-    // pra o thread de áudio nunca alocar; ~2 KB por módulo
-    std::array<std::vector<float>, 4> lanes{
-        std::vector<float>(kLaneLen, 0.0f), std::vector<float>(kLaneLen, 0.0f),
-        std::vector<float>(kLaneLen, 0.0f), std::vector<float>(kLaneLen, 0.0f)};
-    std::size_t lw = 0;
-    void push(const float v) noexcept {
-        buf[w] = v;
-        w = (w + 1) % kScopeLen;
-    }
-    void pushLanes(const float a, const float b, const float c,
-                   const float d) noexcept {
-        lanes[0][lw] = a; lanes[1][lw] = b; lanes[2][lw] = c; lanes[3][lw] = d;
-        lw = (lw + 1) % kLaneLen;
-    }
-};
+// Mora em `ui/ScopeTrace.hpp` porque o app JUCE desenha o MESMO gráfico.
+using rasgo::ui::kScopeLen;
+using rasgo::ui::kLaneLen;
+using rasgo::ui::ScopeTrace;
 
 // ---- tokens (IDENTIDADE_VISUAL §4: cor nomeada por função) --------------
 struct Tokens {
@@ -157,8 +138,12 @@ struct Tokens {
         accent, warning;
 };
 // --- "Eurorack proporcional" (design.md §3.2): coordenadas em mm --------
-constexpr float kMMHP = 5.08f;      // mm por HP (0,2 pol - horizontal pitch)
-constexpr float kMM3U = 128.5f;     // mm de altura do painel (3U)
+// `kMMHP`/`kMM3U`/`RectMM`/`footprintMM`/`overlapMM` moram em
+// `src/ui/PanelGeometry.hpp`, compartilhados com o front-end JUCE
+// (`apps/juce/`) — se cada front-end tivesse a sua pegada, o clique de um
+// acertaria onde o outro não desenha. A conversão pra pixel (`g_s`/`mmpx`,
+// abaixo) continua sendo de cada front-end.
+using namespace rasgo::ui;
 constexpr float kSMin = 1.6f;       // px/mm mínimo (knob legível)
 constexpr float kSMax = 2.6f;       // px/mm máximo (não vira outdoor)
 constexpr int kTargetRows = 3;      // linhas de módulos que se quer ver
@@ -198,45 +183,16 @@ struct Rect { int x, y, w, h; };
 // e no fim da família, nessa ordem (pedido do autor 2026-09-05: "par
 // grudado sem unir os módulos"). Só exibição — não mexe na ordem de
 // `moduleCatalog()`.
-inline void sortFamilyForDisplay(std::vector<const char*>& types) {
-    auto key = [](const char* t) -> std::string {
-        const std::string s = t;
-        if (s == "MIXER") return "\x7e" "1";   // '~' vem depois de A..Z
-        if (s == "MASTER") return "\x7e" "2";
-        return s;
-    };
-    std::sort(types.begin(), types.end(),
-              [&](const char* a, const char* b) { return key(a) < key(b); });
-}
+// `sortFamilyForDisplay` mora em `panel/ModuleCatalog.hpp` — o app JUCE
+// precisa da MESMA ordem na paleta dele.
+using rasgo::panel::sortFamilyForDisplay;
 
-// pegada do widget em MILÍMETROS (canto sup-esq do painel na origem)
-struct RectMM { float x, y, w, h; };
-RectMM footprintMM(const Widget& w) {
-    const float lbl = static_cast<float>(w.label.size());
-    switch (w.kind) {
-    case Widget::Kind::Knob:   return {w.x - 0.5f, w.y - 1.0f, 10.0f, 15.0f};
-    case Widget::Kind::Slider: return {w.x - 1.0f, w.y - 1.0f, 10.0f, 36.0f};
-    case Widget::Kind::Toggle: return {w.x - 0.5f, w.y - 0.5f, 5.0f + lbl * 1.7f, 6.0f};
-    // o rótulo do jack (fonte cap ~9px, NÃO escala com o zoom) fica
-    // centrado em `w.x`, acima do furo — modelamos a largura dele, senão
-    // rótulos de 3+ letras a ~9 mm de distância se tocam
-    case Widget::Kind::Jack: {
-        const float half = std::max(3.0f, lbl * 1.6f);
-        return {w.x - half, w.y - 7.0f, 2.0f * half, 13.0f};
-    }
-    case Widget::Kind::Display: return {w.x - 0.5f, w.y - 0.5f,
-                                       (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 17.5f};
-    case Widget::Kind::Label:  return {w.x - 0.5f, w.y - 0.5f, 2.0f + lbl * 1.9f, 3.5f};
-    }
-    return {w.x, w.y, 4.0f, 4.0f};
-}
+// `RectMM`/`footprintMM`/`overlapMM`: `src/ui/PanelGeometry.hpp` (vêm pelo
+// `using namespace rasgo::ui` lá em cima). Só a conversão pra pixel é
+// daqui, porque `g_s` é a escala DESTE front-end.
 Rect footprintPx(const Widget& w) {
     const RectMM r = footprintMM(w);
     return {mmpx(r.x), mmpx(r.y), mmpx(r.w), mmpx(r.h)};
-}
-bool overlapMM(const RectMM& a, const RectMM& b) {
-    return a.x < b.x + b.w && b.x < a.x + a.w
-        && a.y < b.y + b.h && b.y < a.y + a.h;
 }
 
 // MATRIX: a grade 4×4 de ganhos (`g<jk>`) é desenhada como uma matriz de
@@ -678,8 +634,17 @@ int main() {
 
     // ---- layout de "case": módulos numa fileira que quebra em LINHAS --
     // Mod::w em px é recalculado no relayout (depende de `g_s`).
-    struct Mod { std::size_t id; int col; int w; int hp; };
+    struct Mod { std::size_t id; int col; int w; int hp; bool shownInView = true; };
     std::vector<Mod> mods;
+
+    // vista do rack (botão RACK do cabeçalho, alterna): TODOS os módulos ·
+    // só os que chegam à saída (`sink`). É só uma VISTA — não instancia
+    // nem remove nada (isso segue na paleta). Persistida em
+    // `dataDir()/rack-view`. (Uma 3ª vista "saída + qualquer módulo
+    // cabeado" foi tirada em 2026-09-10: com o gerador de seed sem cabo
+    // morto, ela ficou idêntica a "só saída" pra todo patch de seed.)
+    enum class RackView { All, Output };
+    RackView rackView = RackView::All;
     rasgo::panel::MotionEngine motion;
     bool motionOn = true;     // VARIA / [v] -- variação ao vivo dos knobs (±20%), ligada
     std::uint64_t curSeed = 0;   // seed do patch atual (0 = editado à mão)
@@ -847,6 +812,16 @@ int main() {
         const int gapPx = mmpx(kModGapMM);
         for (auto& m : mods) m.w = mmpx(static_cast<float>(m.hp) * kMMHP);
 
+        // vista do rack: `All` => todos; `Output` => só os que alimentam
+        // o `sink` (os que de fato soam).
+        {
+            const std::vector<char> mask = rackView == RackView::Output
+                ? graph.nodesFeeding(sink) : std::vector<char>();
+            for (auto& m : mods)
+                m.shownInView =
+                    mask.empty() || (m.id < mask.size() && mask[m.id] != 0);
+        }
+
         // a case ENCHE a largura disponível — começa colada na paleta,
         // sem margem vazia (o autor pediu aproveitamento máximo da tela).
         // O rack de 104 HP fica só como largura de referência da 1ª abertura.
@@ -855,12 +830,15 @@ int main() {
         rackX0 = caseLeft;
 
         int x = rackX0, row = 0;
+        bool anyShown = false;
         for (auto& m : mods) {
+            if (!m.shownInView) { m.col = -1; continue; }
             if (x + m.w > rackX0 + rackW && x > rackX0) { x = rackX0; ++row; }
             m.col = (row << 20) | x;
             x += m.w + gapPx;
+            anyShown = true;
         }
-        caseH = (row + 1) * (modH + kCasePad);
+        caseH = (anyShown ? row + 1 : 1) * (modH + kCasePad);
         const int maxScroll = std::max(0, caseH - (winH - kCaseTop));
         scrollY = std::min(std::max(0, scrollY), maxScroll);
     };
@@ -1001,6 +979,37 @@ int main() {
         int ax = 0, ay = 0;
     } cdrag;
     bool allRuptured = false;
+
+    // ---- inspector de relação/condução/ruptura seletiva (por cabo) ----
+    // (`RASGO_MODULAR.md §36.9`, `guia/RELACAO_DE_CABO.md`) — clicar no
+    // CORPO de um cabo (não numa ponta) abre um pequeno painel ancorado
+    // perto do clique, com a relação (RingMod/Fold/Difference + um
+    // companion escolhido clicando num jack de saída, o mesmo afordance
+    // de halo do cabeamento normal), a condução probabilística, e um
+    // botão de romper/reconectar só aquele cabo (o `[espaço]` continua
+    // fazendo isso pra todos de uma vez, ver `actRupture`).
+    struct CableHit { std::size_t cableIndex; int x0, y0, x1, y1; };
+    std::vector<CableHit> cableHits;   // recomputado a cada `redraw`
+    enum class InspAct { NoHit, RelNone, RelRing, RelFold, RelDiff,
+                          PickCompanion, Amount, Conductance, Rupture };
+    struct InspHit { int x, y, w, h; InspAct act; };
+    std::vector<InspHit> inspectorHits;   // idem
+    struct CableInspector {
+        bool open = false;
+        std::size_t cableIndex = 0;
+        int x = 0, y = 0;   // âncora na tela (canto onde foi clicado)
+    } inspector;
+    int inspBoxX = 0, inspBoxY = 0, inspBoxW = 0, inspBoxH = 0;
+    bool pickingCompanion = false;
+    // arrasto do slider AMOUNT/CONDUCTANCE do inspector — a barra é
+    // HORIZONTAL, então (diferente do knob genérico de módulo, que é
+    // vertical) o valor segue a posição X do mouse dentro da trilha
+    // diretamente, não um delta — é o gesto natural de arrastar um
+    // slider horizontal. `Cable::relationAmount()`/`conductance()` não
+    // são `ParameterDescriptor` de módulo (não passam por
+    // `setParameterBase`), daí um estado à parte.
+    struct CableSlider { bool active = false; int which = 0;   // 0=amount,1=conductance
+        int trackX = 0, trackW = 1; } cslide;
     // botão do meio (ou meio enquanto cabeia): paneia o rack na vertical
     struct { bool active = false; int startY = 0; int startScrollY = 0; } panDrag;
     struct ModDrag { bool active = false; std::size_t id = 0; } mdrag;
@@ -1036,6 +1045,7 @@ int main() {
     auto rebuildJacks = [&] {
         jacks.clear();
         for (const auto& m : mods) {
+            if (!m.shownInView) continue;
             const auto [bx, by] = modOrigin(m);
             Signal& node = graph.node(m.id);
             for (const auto& w : node.panel().widgets) {
@@ -1071,17 +1081,49 @@ int main() {
         }
         return -1;
     };
-    // curva do cabo (bezier quadrática com barriga pra baixo)
+    // rótulo humano de um módulo pelo id do nó — "OSC" sozinho, ou
+    // "OSC #2" quando há mais de uma instância do mesmo tipo no rack
+    // (não existia rotulagem nenhuma além do `type()` cru antes disto).
+    auto moduleLabel = [&](std::size_t nodeId) -> std::string {
+        const std::string ty = graph.node(nodeId).type();
+        int count = 0, mine = -1;
+        for (const auto& m : mods) {
+            if (graph.node(m.id).type() != ty) continue;
+            if (m.id == nodeId) mine = count;
+            ++count;
+        }
+        if (count <= 1 || mine < 0) return ty;
+        return ty + " #" + std::to_string(mine + 1);
+    };
+    // curva do cabo (bezier quadrática com barriga pra baixo) — os
+    // pontos vêm de `cablePoints` (CableGeometry.hpp), compartilhados
+    // com o hit-test do corpo do cabo, pra nunca divergir visual/clicável
+    // mistura uma cor com OUTRA (não há alfa em XFillRectangle puro).
+    // O alvo importa: esmaecer em direção ao fundo da janela some com um
+    // elemento desenhado sobre a superfície do módulo — tem que mirar no
+    // que está ATRÁS dele.
+    auto dimToward = [&](unsigned long col, unsigned long to,
+                         float k) -> unsigned long {
+        const auto mix = [&](int sh) {
+            const int c = static_cast<int>((col >> sh) & 0xFF);
+            const int b = static_cast<int>((to >> sh) & 0xFF);
+            return static_cast<unsigned long>(
+                static_cast<float>(c) + (static_cast<float>(b - c)) * k) & 0xFF;
+        };
+        return (mix(16) << 16) | (mix(8) << 8) | mix(0);
+    };
+    auto dimColor = [&](unsigned long col, float k) {
+        return dimToward(col, T.bg, 1.0f - k);   // cabos: sobre o fundo
+    };
     auto drawCable = [&](int x0, int y0, int x1, int y1, unsigned long col,
                          bool dashed) {
-        const int sag = 18 + std::abs(x1 - x0) / 6;
-        const int cx = (x0 + x1) / 2, cy = std::max(y0, y1) + sag;
+        const auto geo = rasgo::ui::cablePoints(
+            static_cast<float>(x0), static_cast<float>(y0),
+            static_cast<float>(x1), static_cast<float>(y1));
         XPoint pts[15];
         for (int k = 0; k < 15; ++k) {
-            const float t = static_cast<float>(k) / 14.0f;
-            const float u = 1.0f - t;
-            pts[k].x = static_cast<short>(u * u * x0 + 2 * u * t * cx + t * t * x1);
-            pts[k].y = static_cast<short>(u * u * y0 + 2 * u * t * cy + t * t * y1);
+            pts[k].x = static_cast<short>(geo[static_cast<std::size_t>(k)].x);
+            pts[k].y = static_cast<short>(geo[static_cast<std::size_t>(k)].y);
         }
         XSetForeground(dpy, gc, col);
         XSetLineAttributes(dpy, gc, dashed ? 1 : 2,
@@ -1120,7 +1162,7 @@ int main() {
     // botão momentâneo por ~160 ms depois de acionado.
     enum HdrAct { HA_NONE, HA_SEED, HA_SEEDBOX, HA_REC, HA_LANG, HA_TUTORIAL,
                   HA_ABOUT, HA_VARY, HA_STANDBY, HA_MUTATE, HA_EVOLVE, HA_CROSS,
-                  HA_BANK, HA_SAVE, HA_ZOUT, HA_ZIN };
+                  HA_BANK, HA_SAVE, HA_ZOUT, HA_ZIN, HA_RACKVIEW };
     struct HdrHit { int x, y, w, h; HdrAct act; };
     std::vector<HdrHit> headerHits;
     std::map<int, std::chrono::steady_clock::time_point> hdrFlash;
@@ -1192,6 +1234,7 @@ int main() {
         std::string rawTitle, rawKey;
         {
             for (const auto& m : mods) {
+                if (!m.shownInView) continue;
                 const auto [bx, by] = modOrigin(m);
                 if (mouseX < bx || mouseX > bx + m.w
                     || mouseY < by || mouseY > by + modH) continue;
@@ -1230,14 +1273,22 @@ int main() {
         // (autor 2026-09-05; encurtado de 2 s pra 1 s em 2026-09-07). Fora
         // de qualquer objeto, mantém o último.
         {
+            // A contagem NÃO reinicia quando o ponteiro fica sobre NADA:
+            // as pegadas dos widgets têm folga entre si, e atravessar um
+            // vão de um pixel zerava o relógio — na prática o segundo
+            // quase nunca fechava. Só um objeto DIFERENTE reinicia.
+            // (Mesma correção no app JUCE, 2026-09-14.)
             const auto now = std::chrono::steady_clock::now();
-            if (rawKey != learnHoverKey) {
-                learnHoverKey = rawKey;
-                learnHoverSince = now;
-            } else if (!rawKey.empty() && rawHit != learnShown
-                       && now - learnHoverSince >= std::chrono::milliseconds(1000)) {
-                learnShown = rawHit;
-                learnShownTitle = rawTitle;
+            if (!rawKey.empty()) {
+                if (rawKey != learnHoverKey) {
+                    learnHoverKey = rawKey;
+                    learnHoverSince = now;
+                } else if (rawHit != learnShown
+                           && now - learnHoverSince
+                              >= std::chrono::milliseconds(1000)) {
+                    learnShown = rawHit;
+                    learnShownTitle = rawTitle;
+                }
             }
         }
         const rasgo::panel::LearnEntry* learnHit = learnShown;
@@ -1314,6 +1365,14 @@ int main() {
         hdrBtnR(tr(S::hdrAbout, uiLang), overlay == 2, HA_ABOUT);
         hdrBtnR(tr(S::hdrTutorial, uiLang), overlay == 1, HA_TUTORIAL);
         hdrBtnR(rasgo::panel::langLabel(uiLang), false, HA_LANG);
+        rx -= 8;
+        {   // RACK — alterna a vista: TODOS ↔ só os que chegam à saída.
+            // Anel de destaque quando filtrando (≠ TODOS).
+            const rasgo::panel::L4& vl =
+                rackView == RackView::Output ? S::hdrRackOut : S::hdrRackAll;
+            hdrBtnR("RACK \xC2\xB7 " + tr(vl, uiLang),
+                    rackView != RackView::All, HA_RACKVIEW);
+        }
         rx -= 8;
         // REC — toggle vermelho (T.warning), com o mesmo anel de destaque
         hdrBtnR(std::string("\xE2\x97\x8F ") + tr(S::hdrRec, uiLang),
@@ -1400,8 +1459,16 @@ int main() {
                 rx -= 12;
             }
         }
-        {   // leitura N mód · M cabos
-            const std::string rd = std::to_string(mods.size()) + " "
+        {   // leitura N mód · M cabos — na vista filtrada, "visíveis/total"
+            std::size_t visMods = mods.size();
+            if (rackView != RackView::All) {
+                visMods = 0;
+                for (const auto& m : mods) if (m.shownInView) ++visMods;
+            }
+            const std::string modCount = rackView == RackView::All
+                ? std::to_string(visMods)
+                : std::to_string(visMods) + "/" + std::to_string(mods.size());
+            const std::string rd = modCount + " "
                 + tr(S::rdModules, uiLang) + "  \xC2\xB7  "
                 + std::to_string(graph.cableCount()) + " "
                 + tr(S::rdCables, uiLang);
@@ -1527,8 +1594,7 @@ int main() {
             const int wrapPx = lw - 16;
             if (!learnHit) {
                 for (const auto& ln : wrapText(
-                         "passe o mouse sobre um knob ou jack\n"
-                         "de um módulo do rack.", wrapPx)) {
+                         tr(S::learnIdle, uiLang), wrapPx)) {
                     text(tx, ty, ln, T.textSecondary);
                     ty += 14;
                 }
@@ -1565,7 +1631,10 @@ int main() {
                  tr(S::footerCredit, uiLang)
                      + std::string(RASGO_MODULAR_BUILD),
                  T.textSecondary);
+        int shownInCase = 0;
         for (const auto& m : mods) {
+            if (!m.shownInView) continue;
+            ++shownInCase;
             const auto [bx, by] = modOrigin(m);
             if (by + modH < kCaseTop || by > winH) continue;
             Signal& node = graph.node(m.id);
@@ -1683,27 +1752,12 @@ int main() {
                             // espectro: banco Goertzel log de ~24 bandas
                             dlabel = "spec";
                             constexpr int nb = 24;
-                            const int n = static_cast<int>(sc.buf.size());
                             float mag[nb];
+                            rasgo::ui::scopeSpectrum(
+                                sc, mag, nb, rasgo::ui::kLegacySpectrumRateHz);
                             float mmax = 1e-6f;
-                            for (int b = 0; b < nb; ++b) {
-                                const float f = 60.0f * std::pow(
-                                    200.0f, static_cast<float>(b) / (nb - 1));
-                                const float wn = 6.2831853f * f / 24000.0f;
-                                const float cr = std::cos(wn);
-                                float s1 = 0.0f, s2 = 0.0f;
-                                for (int k = 0; k < n; ++k) {
-                                    const float x = sc.buf[(sc.w
-                                        + static_cast<std::size_t>(k))
-                                        % sc.buf.size()];
-                                    const float s0 = x + 2.0f * cr * s1 - s2;
-                                    s2 = s1; s1 = s0;
-                                }
-                                mag[b] = std::sqrt(std::fabs(
-                                    s1 * s1 + s2 * s2 - 2.0f * cr * s1 * s2))
-                                    / static_cast<float>(n);
+                            for (int b = 0; b < nb; ++b)
                                 mmax = std::max(mmax, mag[b]);
-                            }
                             const int bw2 = std::max(1, (dw - 2) / nb);
                             XSetForeground(dpy, gc, T.accent);
                             for (int b = 0; b < nb; ++b) {
@@ -1771,6 +1825,13 @@ int main() {
                         } else {
                             state = 3;
                         }
+                    } else if (pickingCompanion && isOut) {
+                        // escolhendo companion pra uma relação de cabo
+                        // (RingMod/Fold/Difference): qualquer saída de
+                        // qualquer módulo serve — inclusive a própria
+                        // origem do cabo, pra permitir auto-relação
+                        // (ver `guia/RELACAO_DE_CABO.md` §1)
+                        state = 1;
                     }
                     if (state == 1 || state == 2) {
                         XSetForeground(dpy, gc, T.accent);
@@ -1781,7 +1842,14 @@ int main() {
                             XDrawArc(dpy, bb, gc, wx - hr - 2, wy - hr - 2,
                                      2 * hr + 4, 2 * hr + 4, 0, 360 * 64);
                     }
-                    const unsigned long ring = state == 3 ? T.recessed
+                    // Jack inválido durante o cabeamento: anel RECUADO,
+                    // não apagado. Era `T.recessed` (o tom do miolo), o
+                    // que sumia com o jack e fazia perder o mapa do painel
+                    // justo na hora de mirar — relato do autor 2026-09-14.
+                    // Guiar é destacar o válido, não cegar o resto.
+                    // Mesma mudança no app JUCE, no mesmo dia.
+                    const unsigned long ring = state == 3
+                        ? dimToward(T.line, T.surface, 0.45f)
                         : (state ? T.accent : T.line);
                     XSetForeground(dpy, gc, ring);
                     XDrawArc(dpy, bb, gc, wx - jr, wy - jr, 2 * jr, 2 * jr, 0,
@@ -1882,6 +1950,12 @@ int main() {
 
             clipTo(kPaletteW + 1, kCaseTop, winW - kPaletteW, winH - kCaseTop);
         }
+        // vista filtrada sem nada pra mostrar: uma dica no lugar do rack
+        if (shownInCase == 0 && rackView != RackView::All && !mods.empty()) {
+            const std::string hint = tr(S::rackViewEmpty, uiLang);
+            capText((kPaletteW + winW) / 2 - textW(hint) / 2,
+                    kCaseTop + (winH - kCaseTop) / 3, hint, T.textSecondary);
+        }
         clipOff();
 
         // ---- cabos por cima dos módulos (recortados à case) ----------
@@ -1891,6 +1965,12 @@ int main() {
                 if (j.node == n && j.port == p && j.isOut == out) return &j;
             return nullptr;
         };
+        cableHits.clear();
+        bool masterMutedNow = false;
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+            if (graph.node(i).type() == "MASTER"
+                && graph.parameterUserValue(i, "mute") >= 0.5f)
+                masterMutedNow = true;
         for (std::size_t i = 0; i < graph.cableCount(); ++i) {
             const Cable& c = graph.cable(i);
             const JackScreen* s = findJack(c.source().node,
@@ -1905,8 +1985,16 @@ int main() {
                 + c.target().node * 5 + c.target().port;
             const unsigned long* pal = s->kind == PortKind::Control
                 ? cableCtrl : cableAudio;
-            drawCable(s->x, s->y, t->x, t->y,
-                      cut ? T.warning : pal[h & 3], cut);
+            // STANDBY: a saída está em silêncio e o cabeamento mostra isso
+            // — esmaecido, mas INTEIRO (o patch continua rodando por
+            // baixo). Quem rompe tudo é o [espaço], e aí os cabos ficam
+            // tracejados de `warning`. Comportamento novo, pedido do autor
+            // em 2026-09-14, aplicado aos DOIS front-ends no mesmo dia pra
+            // não divergirem.
+            unsigned long ccol = cut ? T.warning : pal[h & 3];
+            if (masterMutedNow) ccol = dimColor(ccol, 0.32f);
+            drawCable(s->x, s->y, t->x, t->y, ccol, cut);
+            cableHits.push_back({i, s->x, s->y, t->x, t->y});
         }
         // cabo elástico sendo puxado — na cor da paleta da ponta ancorada
         if (cdrag.active) {
@@ -1915,6 +2003,101 @@ int main() {
             drawCable(cdrag.ax, cdrag.ay, mouseX, mouseY, pal[0], true);
         }
         clipOff();
+
+        // ==== inspector de cabo (relação/condução/ruptura seletiva) ====
+        // Clicar no CORPO de um cabo abre isto, ancorado perto do
+        // clique — não é um `overlay` de tela cheia, o resto do patch
+        // continua à vista (`RASGO_MODULAR.md §36.9`).
+        inspectorHits.clear();
+        if (inspector.open && inspector.cableIndex < graph.cableCount()) {
+            const Cable& c = graph.cable(inspector.cableIndex);
+            const bool hasRel = c.hasRelation();
+            const int pad = 8, rowH = 20;
+            const int bw = 190;
+            const int rows = hasRel ? 5 : 3;   // título+relação+ruptura [+amt+cond]
+            const int bh = pad * 2 + rowH * rows;
+            inspBoxX = std::max(kPaletteW + 4,
+                                 std::min(inspector.x, winW - bw - 6));
+            inspBoxY = std::max(kCaseTop + 4,
+                                 std::min(inspector.y, winH - bh - 6));
+            inspBoxW = bw; inspBoxH = bh;
+
+            XSetForeground(dpy, gc, T.surface);
+            XFillRectangle(dpy, bb, gc, inspBoxX, inspBoxY, bw, bh);
+            XSetForeground(dpy, gc, T.accent);
+            XDrawRectangle(dpy, bb, gc, inspBoxX, inspBoxY, bw, bh);
+
+            int ry = inspBoxY + pad;
+            text(inspBoxX + pad, ry + 12,
+                 moduleLabel(c.source().node) + " -> "
+                     + moduleLabel(c.target().node),
+                 T.textSecondary);
+            ry += rowH;
+
+            // botão pequeno reutilizável (mesmo idioma do `hdrBtnC`, mas
+            // em posição livre — o inspector não vive na faixa do
+            // cabeçalho, por isso não usa `headerHits`)
+            auto boxBtn = [&](int bxp, int byp, int bwp, int bhp,
+                              const std::string& label, bool active,
+                              InspAct act) {
+                XSetForeground(dpy, gc, active ? T.accent : T.line);
+                if (active) XFillRectangle(dpy, bb, gc, bxp, byp, bwp, bhp);
+                XDrawRectangle(dpy, bb, gc, bxp, byp, bwp, bhp);
+                text(bxp + 4, byp + bhp - 6, label,
+                     active ? T.bg : T.textSecondary);
+                inspectorHits.push_back({bxp, byp, bwp, bhp, act});
+            };
+
+            int cxp = inspBoxX + pad;
+            const int relW = (bw - pad * 2) / 4;
+            // `Relation{}` == `Relation::None` (o 1º/zero-valued) — X11
+            // define uma macro `None` (`Xlib.h`), então o TOKEN
+            // `Relation::None` vira `Relation::0L` depois do `#include`
+            // de X11 mais acima neste arquivo; `Relation{}` evita a
+            // colisão sem precisar de `#undef None` (usado por
+            // `XSetClipMask` etc.).
+            boxBtn(cxp, ry, relW, rowH - 2, "NONE",
+                   c.relation() == Relation{}, InspAct::RelNone);
+            cxp += relW;
+            boxBtn(cxp, ry, relW, rowH - 2, "RING",
+                   c.relation() == Relation::RingMod, InspAct::RelRing);
+            cxp += relW;
+            boxBtn(cxp, ry, relW, rowH - 2, "FOLD",
+                   c.relation() == Relation::Fold, InspAct::RelFold);
+            cxp += relW;
+            boxBtn(cxp, ry, bw - pad - cxp + inspBoxX, rowH - 2, "DIFF",
+                   c.relation() == Relation::Difference, InspAct::RelDiff);
+            ry += rowH;
+
+            if (hasRel) {
+                auto sliderRow = [&](const std::string& label, float v,
+                                     InspAct act) {
+                    text(inspBoxX + pad, ry + 13, label, T.textSecondary);
+                    const int trackX = inspBoxX + pad + 42;
+                    const int trackW = bw - pad * 2 - 42;
+                    XSetForeground(dpy, gc, T.line);
+                    XDrawRectangle(dpy, bb, gc, trackX, ry + 3, trackW,
+                                   rowH - 8);
+                    XSetForeground(dpy, gc, T.accent);
+                    const int fillW = static_cast<int>(
+                        static_cast<float>(trackW)
+                        * std::max(0.0f, std::min(1.0f, v)));
+                    if (fillW > 0)
+                        XFillRectangle(dpy, bb, gc, trackX, ry + 3, fillW,
+                                       rowH - 8);
+                    inspectorHits.push_back({trackX, ry, trackW, rowH - 2,
+                                             act});
+                    ry += rowH;
+                };
+                sliderRow("AMT", c.relationAmount(), InspAct::Amount);
+                sliderRow("COND", c.conductance(), InspAct::Conductance);
+            }
+
+            const bool ruptured = c.state() == CableState::Ruptured;
+            boxBtn(inspBoxX + pad, ry, bw - pad * 2, rowH - 2,
+                   ruptured ? "RECONECTAR" : "ROMPER", ruptured,
+                   InspAct::Rupture);
+        }
 
         // (o hover-learn agora vai na caixa LEARN fixa do rodapé da
         // coluna esquerda — desenhada junto da paleta, acima — pra não
@@ -1976,7 +2159,9 @@ int main() {
                     {&S::tutHdrTitle,   &S::tutHdrBody},
                     {&S::tutCableTitle, &S::tutCableBody},
                     {&S::tutNavTitle,   &S::tutNavBody},
+                    {&S::tutKeysTitle,  &S::tutKeysBody},
                     {&S::tutModTitle,   &S::tutModBody},
+                    {&S::tutScratchTitle, &S::tutScratchBody},
                     {&S::tutFamTitle,   &S::tutFamBody},
                     {&S::tutLearnTitle, &S::tutLearnBody},
                 };
@@ -2034,6 +2219,13 @@ int main() {
             graph.connect(s, static_cast<std::size_t>(sp), d,
                           static_cast<std::size_t>(dp));
             graph.prepare(sr, 2, block);
+            // recabear DURANTE a tomada também é gesto de performance e
+            // entra no score (antes só a topologia do instante zero
+            // entrava — mesma adição no app JUCE, 2026-09-15)
+            if (recording.load(std::memory_order_relaxed))
+                score.connection(static_cast<double>(recBuf.size()) / 2.0 / sr,
+                                 s, static_cast<std::size_t>(sp),
+                                 d, static_cast<std::size_t>(dp));
         } catch (const std::logic_error&) {          // ciclo
             graph.disconnect(d, dp);
             try {
@@ -2071,7 +2263,7 @@ int main() {
             (cy - kCaseTop - kCasePad + scrollY) / std::max(1, rowH));
         int dropIdx = 0;
         for (const auto& m : mods) {
-            if (m.id == id) continue;
+            if (m.id == id || !m.shownInView) continue;   // só na vista TODOS
             const int mrow = m.col >> 20;
             const int mcx = (m.col & 0xFFFFF) + m.w / 2;
             if (mrow < cursorRow || (mrow == cursorRow && mcx < cx)) ++dropIdx;
@@ -2086,9 +2278,11 @@ int main() {
     };
 
     // ---- salvar / carregar o patch ------------------------------------
-    // o trabalho do músico fica em ~/.local/share/rasgo-modular/. A sessão
-    // é auto-carregada no arranque e auto-salva na saída; [Ctrl+S] salva
-    // na hora; as gravações vão pra a mesma pasta.
+    // Estado interno (sessão, banco de patches, prefs) fica em
+    // ~/.local/share/rasgo-modular/. As GRAVAÇÕES (`.wav`/`.score.txt`)
+    // vão pra ~/Music/RasgoModular/ — a pasta de música do usuário, com
+    // nome por timestamp (nunca sobrescreve). `RASGO_REC_DIR` no ambiente
+    // muda o destino das gravações.
     auto dataDir = [] {
         const char* xdg = std::getenv("XDG_DATA_HOME");
         const char* home = std::getenv("HOME");
@@ -2099,6 +2293,29 @@ int main() {
         std::error_code ec;
         std::filesystem::create_directories(d, ec);
         return d;
+    };
+    auto recDir = [] {
+        const char* over = std::getenv("RASGO_REC_DIR");
+        const char* home = std::getenv("HOME");
+        std::filesystem::path d = (over && *over)
+            ? std::filesystem::path(over)
+            : std::filesystem::path(home ? home : ".") / "Music" / "RasgoModular";
+        std::error_code ec;
+        std::filesystem::create_directories(d, ec);
+        return d;
+    };
+    // carimbo de tempo pra o nome do arquivo: rec-AAAAMMDD-HHMMSS[-N]
+    auto recStamp = [] {
+        std::time_t t = std::time(nullptr);
+        std::tm tm{};
+#if defined(_WIN32)
+        localtime_s(&tm, &t);
+#else
+        localtime_r(&t, &tm);
+#endif
+        char buf[32];
+        std::strftime(buf, sizeof buf, "rec-%Y%m%d-%H%M%S", &tm);
+        return std::string(buf);
     };
     const std::filesystem::path sessionFile = dataDir() / "session.rmp";
 
@@ -2113,6 +2330,23 @@ int main() {
     auto saveLangPref = [&] {
         std::ofstream lf(langPrefFile);
         if (lf) lf << rasgo::panel::langCode(uiLang) << '\n';
+    };
+
+    // pref da vista do rack — mesmo padrão do idioma (arquivo próprio, uma
+    // palavra: all/output). Carregada antes do 1º patch (o relayout de
+    // applySeed/loadPatch a aplica). "wired" (a 3ª vista antiga) cai em
+    // "output".
+    const std::filesystem::path rackViewPrefFile = dataDir() / "rack-view";
+    {
+        std::ifstream rf(rackViewPrefFile);
+        std::string v;
+        if (rf && (rf >> v))
+            rackView = (v == "output" || v == "wired") ? RackView::Output
+                                                       : RackView::All;
+    }
+    auto saveRackViewPref = [&] {
+        std::ofstream rf(rackViewPrefFile);
+        if (rf) rf << (rackView == RackView::Output ? "output" : "all") << '\n';
     };
 
     auto panelFactory = [](const std::string& t) -> std::unique_ptr<Signal> {
@@ -2166,9 +2400,18 @@ int main() {
             for (std::size_t i = 0; i < graph.nodeCount(); ++i)
                 if (graph.node(i).type() == "OUT") sink = i;
             shown.clear();
-            if (!ord.empty()) shown = ord;
-            else for (std::size_t i = 0; i < graph.nodeCount(); ++i)
-                if (graph.node(i).type() != "OUT") shown.push_back(i);
+            // Validar os ids do arquivo NÃO é paranoia: `shown` é
+            // percorrido pelo THREAD DE ÁUDIO (osciloscópios, notas do
+            // score) e `SignalGraph::node()` é `nodes_.at()`, que LANÇA.
+            // Um `.rmp` de um patch maior — ou corrompido — derrubava o
+            // áudio com uma exceção. (Achado na revisão de 2026-09-15;
+            // mesma correção no app JUCE.)
+            for (const auto id : ord)
+                if (id < graph.nodeCount() && graph.node(id).type() != "OUT")
+                    shown.push_back(id);
+            if (shown.empty())
+                for (std::size_t i = 0; i < graph.nodeCount(); ++i)
+                    if (graph.node(i).type() != "OUT") shown.push_back(i);
             scopes.clear();
             for (const auto id : shown) scopes[id];
             graph.prepare(sr, 2, block);
@@ -2185,29 +2428,38 @@ int main() {
             return false;
         }
     };
-    int recCount = 0;
+    int recCount = 0;   // só pra o dither/telemetria; o nome vem do timestamp
     auto stopRec = [&] {
         if (recBuf.empty()) { recording.store(false); return; }
         recording.store(false);
         std::vector<float> copy;
         { std::lock_guard<std::mutex> lk(gmx); copy.swap(recBuf); }
-        char name[64];
-        std::snprintf(name, sizeof name, "rec-%02d.wav", ++recCount);
-        const auto p = dataDir() / name;
+        ++recCount;
+        const std::filesystem::path dir = recDir();
+        // nome por data/hora: rec-AAAAMMDD-HHMMSS. Se já existir (2ª
+        // gravação no mesmo segundo), acrescenta -2, -3…
+        std::string stem = recStamp();
+        {
+            std::error_code ec;
+            std::string base = stem;
+            for (int n = 2; std::filesystem::exists(dir / (stem + ".wav"), ec);
+                 ++n)
+                stem = base + "-" + std::to_string(n);
+        }
+        const auto p = dir / (stem + ".wav");
         // dither TPDF ligado (seed != 0) -- gravação real do usuário, não
         // um render de auditoria/exemplo (ver `src/io/WavWriter.hpp`)
         rasgo::modular::writeWav16(p.string(), copy,
                                    static_cast<std::uint32_t>(alsa.rate()), 2,
                                    static_cast<std::uint64_t>(recCount));
-        char scoreName[64];
-        std::snprintf(scoreName, sizeof scoreName, "rec-%02d.score.txt", recCount);
-        std::ofstream sf(dataDir() / scoreName);
+        const auto sp = dir / (stem + ".score.txt");
+        std::ofstream sf(sp);
         std::string scoreText;
         { std::lock_guard<std::mutex> lk(gmx); scoreText = score.toText(); }
         sf << scoreText;
         std::fprintf(stderr, "[rec] %.1f s -> %s (+ %s)\n",
                      static_cast<double>(copy.size()) / 2.0 / alsa.rate(),
-                     p.string().c_str(), scoreName);
+                     p.string().c_str(), sp.filename().string().c_str());
         { std::lock_guard<std::mutex> lk(gmx); recBuf.reserve(copy.capacity()); }
     };
 
@@ -2353,6 +2605,32 @@ int main() {
         redraw();
     };
 
+    // [n] — DESCABEAR: começar o patch do zero, à mão.
+    // Tira os CABOS, não os módulos: o rack é o conjunto de módulos
+    // disponíveis e o PATCH é o cabeamento. O Rasgo Modular abre tocando,
+    // e isso é identidade: não existe folha em branco por omissão. Mas
+    // "não por omissão" é diferente de "não existe" — sem isto, descabear
+    // à mão eram dezenas de cliques. Aqui é um ato DELIBERADO.
+    // (Adicionado 2026-09-15, junto com o mesmo gesto no app JUCE.)
+    auto actClear = [&] {
+        {
+            std::lock_guard<std::mutex> lk(gmx);
+            for (std::size_t i = graph.cableCount(); i-- > 0;) {
+                const auto& c = graph.cable(i);
+                graph.disconnect(c.target().node, c.target().port);
+            }
+            // tira os CABOS, não os módulos: o rack é o conjunto
+            // disponível, e o PATCH é o cabeamento
+            curSeed = 0;          // deixou de ser um patch reproduzível
+            allRuptured = false;
+            graph.prepare(sr, 2, block);
+            graph.setActiveOutput(sink);
+        }
+        buildMods(); populateMotion(); syncSignalIn(); relayout();
+        setTitle("RASGO Modular — descabeado");
+        redraw();
+    };
+
     // [espaço] — rompe/reata TODOS os cabos de uma vez (gesto grande)
     auto actRupture = [&] {
         std::lock_guard<std::mutex> lk(gmx);
@@ -2484,6 +2762,16 @@ int main() {
     auto cycleLang = [&] {
         uiLang = rasgo::panel::nextLang(uiLang);
         saveLangPref();
+        redraw();
+    };
+
+    // botão RACK — alterna a vista: TODOS ↔ só os módulos que chegam à
+    // saída (os que de fato soam).
+    auto actRackView = [&] {
+        rackView = rackView == RackView::All ? RackView::Output : RackView::All;
+        saveRackViewPref();
+        scrollY = 0;
+        relayout();
         redraw();
     };
 
@@ -2727,7 +3015,19 @@ int main() {
                 }
 
                 if (k == XK_Escape) {
-                    if (overlay) { overlay = 0; redraw(); }
+                    if (pickingCompanion) {
+                        // cancela a escolha — a relação volta a NONE, não
+                        // fica presa "meio-configurada" sem companion
+                        pickingCompanion = false;
+                        if (inspector.cableIndex < graph.cableCount()) {
+                            std::lock_guard<std::mutex> lk(gmx);
+                            graph.cable(inspector.cableIndex)
+                                .setRelation(Relation{}, 0, 0, 0);
+                        }
+                        redraw();
+                    } else if (inspector.open) {
+                        inspector.open = false; redraw();
+                    } else if (overlay) { overlay = 0; redraw(); }
                     else alive = false;
                 }
                 // rolagem do tutorial pelo teclado
@@ -2776,6 +3076,7 @@ int main() {
                     }
                     redraw();
                 }
+                else if (k == XK_n || k == XK_N) actClear();
                 else if (k == XK_g || k == XK_G) actSeed();
                 else if (k == XK_v || k == XK_V) actMotion();
                 else if (k == XK_m || k == XK_M) actMutate();
@@ -2802,6 +3103,98 @@ int main() {
                         overlay = 0; redraw();   // clique esquerdo fecha
                     }
                     continue;
+                }
+
+                // ---- escolhendo companion pra uma relação de cabo -----
+                // (entrou aqui por um botão RING/FOLD/DIFF do inspector).
+                // Precisa vir ANTES do jack hit-test normal (mais abaixo)
+                // porque, hoje, qualquer clique num jack já começa um
+                // `cdrag` novo — este modo precisa de "primeira recusa"
+                // sobre o clique.
+                if (pickingCompanion && ev.xbutton.button == 1) {
+                    rebuildJacks();
+                    const int ji = jackAt(mx, my);
+                    if (ji >= 0 && jacks[static_cast<std::size_t>(ji)].isOut) {
+                        const JackScreen j = jacks[static_cast<std::size_t>(ji)];
+                        std::lock_guard<std::mutex> lk(gmx);
+                        Cable& c = graph.cable(inspector.cableIndex);
+                        c.setRelation(c.relation(), j.node, j.port,
+                                      c.relationAmount());
+                    }
+                    pickingCompanion = false;
+                    redraw(); continue;
+                }
+
+                // ---- inspector de cabo aberto: seus botões, ou fecha --
+                if (inspector.open) {
+                    InspAct hit = InspAct::NoHit;
+                    InspHit hitRect{};
+                    for (const auto& h : inspectorHits)
+                        if (mx >= h.x && mx <= h.x + h.w
+                            && my >= h.y && my <= h.y + h.h) {
+                            hit = h.act; hitRect = h; break;
+                        }
+                    const bool insideBox = mx >= inspBoxX && mx <= inspBoxX + inspBoxW
+                        && my >= inspBoxY && my <= inspBoxY + inspBoxH;
+                    if (hit == InspAct::NoHit && !insideBox) {
+                        inspector.open = false;
+                    } else if (hit != InspAct::NoHit) {
+                        std::lock_guard<std::mutex> lk(gmx);
+                        Cable& c = graph.cable(inspector.cableIndex);
+                        switch (hit) {
+                        case InspAct::RelNone:
+                            c.setRelation(Relation{}, 0, 0, 0);
+                            break;
+                        case InspAct::RelRing:
+                        case InspAct::RelFold:
+                        case InspAct::RelDiff: {
+                            const Relation r = hit == InspAct::RelRing
+                                ? Relation::RingMod
+                                : (hit == InspAct::RelFold ? Relation::Fold
+                                                            : Relation::Difference);
+                            if (!c.hasRelation()) {
+                                // relação nova: começa auto-relacionada
+                                // (companion = a própria origem) e abre o
+                                // modo de escolha pra trocar se quiser
+                                c.setRelation(r, c.source().node,
+                                              c.source().port, 0.5f);
+                                pickingCompanion = true;
+                            } else {
+                                // só troca o tipo, mantém companion+amount
+                                c.setRelation(r, c.companion().node,
+                                              c.companion().port,
+                                              c.relationAmount());
+                            }
+                            break;
+                        }
+                        case InspAct::PickCompanion:
+                            pickingCompanion = true;
+                            break;
+                        case InspAct::Amount:
+                        case InspAct::Conductance: {
+                            // barra HORIZONTAL: o valor segue a posição X
+                            // do mouse na trilha, desde o primeiro clique
+                            // (não um delta vertical, como o knob genérico)
+                            cslide = {true, hit == InspAct::Amount ? 0 : 1,
+                                      hitRect.x, hitRect.w};
+                            const float v = std::max(0.0f, std::min(1.0f,
+                                static_cast<float>(mx - hitRect.x)
+                                    / static_cast<float>(std::max(1, hitRect.w))));
+                            if (cslide.which == 0)
+                                c.setRelation(c.relation(), c.companion().node,
+                                              c.companion().port, v);
+                            else
+                                c.setConductance(v);
+                            break;
+                        }
+                        case InspAct::Rupture:
+                            if (c.state() == CableState::Ruptured) c.reconnect();
+                            else c.rupture();
+                            break;
+                        case InspAct::NoHit: break;
+                        }
+                    }
+                    redraw(); continue;
                 }
 
                 // ---- botão do meio: paneia o rack (também durante o
@@ -2859,6 +3252,7 @@ int main() {
                     case HA_SAVE:   hdrFlash[HA_SAVE] = std::chrono::steady_clock::now(); actSave(); redraw(); continue;
                     case HA_ZOUT:   actZoom(-1); continue;
                     case HA_ZIN:    actZoom(+1); continue;
+                    case HA_RACKVIEW: actRackView(); continue;
                     case HA_NONE:   break;
                     }
                 }
@@ -2919,6 +3313,7 @@ int main() {
                             }
                             if (any) graph.prepare(sr, 2, block);
                         }
+                        relayout();   // vista filtrada: um módulo pode sumir
                         redraw(); continue;
                     }
                     // botão esquerdo: puxa um cabo
@@ -2959,10 +3354,13 @@ int main() {
                     redraw(); continue;
                 }
 
+                bool hitModule = false;
                 for (const auto& m : mods) {
+                    if (!m.shownInView) continue;
                     const auto [bx, by] = modOrigin(m);
                     if (mx < bx || mx > bx + m.w || my < by || my > by + modH)
                         continue;
+                    hitModule = true;
                     Signal& node = graph.node(m.id);
                     // [x] no canto superior direito -> remove o módulo
                     if (mx >= bx + m.w - 15 && my <= by + 15) {
@@ -3036,6 +3434,27 @@ int main() {
                     if (!hitCtl) mdrag = {true, m.id};
                     break;
                 }
+                // ---- último recurso: clique no CORPO de um cabo --------
+                // (não rouba prioridade de jack/módulo, que ficam por
+                // cima da curva sagging do cabo)
+                if (!hitModule && ev.xbutton.button == 1) {
+                    // alcance generoso e proporcional ao zoom (igual ao
+                    // raio dos jacks, `jackAt`) — um valor fixo em pixel
+                    // ficava minúsculo em zoom alto, e mirar bem na curva
+                    // fina (um alvo em movimento, não um ponto) já é mais
+                    // difícil que acertar um jack
+                    const float cableTol = static_cast<float>(mmpx(4.0f) + 2);
+                    for (const auto& ch : cableHits) {
+                        if (!rasgo::ui::pointNearCable(
+                                static_cast<float>(mx), static_cast<float>(my),
+                                static_cast<float>(ch.x0), static_cast<float>(ch.y0),
+                                static_cast<float>(ch.x1), static_cast<float>(ch.y1),
+                                cableTol))
+                            continue;
+                        inspector = {true, ch.cableIndex, mx, my};
+                        break;
+                    }
+                }
                 redraw();
             } else if (ev.type == ButtonRelease) {
                 // soltar o botão do meio só encerra o pan — não mexe num
@@ -3060,6 +3479,7 @@ int main() {
                     }
                 }
                 drag.active = false;
+                cslide.active = false;
                 if (cdrag.active) {
                     rebuildJacks();
                     const int ji = jackAt(ev.xbutton.x, ev.xbutton.y);
@@ -3079,6 +3499,7 @@ int main() {
                         }
                     }
                     cdrag.active = false;
+                    relayout();   // vista filtrada: um módulo pode aparecer
                     redraw();
                     continue;
                 }
@@ -3144,7 +3565,10 @@ int main() {
                 relayout(); redraw();
             } else if (ev.type == MotionNotify && mdrag.active) {
                 mouseX = ev.xmotion.x; mouseY = ev.xmotion.y;
-                if (mouseX >= kPaletteW)   // reordena ao vivo (cabos seguem)
+                // reordenar ao vivo (cabos seguem) — só na vista TODOS; nas
+                // filtradas a ordem visível é parcial e a conta não fecha.
+                // Arrastar pra a paleta pra remover segue valendo.
+                if (mouseX >= kPaletteW && rackView == RackView::All)
                     moduleReorderTo(mdrag.id, mouseX, mouseY);
                 redraw();
             } else if (ev.type == MotionNotify && !spawnType.empty()) {
@@ -3174,6 +3598,24 @@ int main() {
                               graph.node(drag.node).type().c_str(),
                               drag.bind.c_str(), v);
                 setTitle(title);
+                redraw();
+            } else if (ev.type == MotionNotify && cslide.active
+                       && inspector.cableIndex < graph.cableCount()) {
+                // slider AMOUNT/CONDUCTANCE do inspector de cabo: a barra
+                // é HORIZONTAL, então o valor segue a posição X do mouse
+                // dentro da trilha diretamente (não um delta vertical
+                // como o knob genérico de módulo — aqui isso deixava o
+                // slider "não obedecer" a um arrasto horizontal natural).
+                const float v = std::max(0.0f, std::min(1.0f,
+                    static_cast<float>(ev.xmotion.x - cslide.trackX)
+                        / static_cast<float>(std::max(1, cslide.trackW))));
+                std::lock_guard<std::mutex> lk(gmx);
+                Cable& c = graph.cable(inspector.cableIndex);
+                if (cslide.which == 0)
+                    c.setRelation(c.relation(), c.companion().node,
+                                  c.companion().port, v);
+                else
+                    c.setConductance(v);
                 redraw();
             }
         }

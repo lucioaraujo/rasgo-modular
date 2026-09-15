@@ -1307,7 +1307,34 @@ transiente/ritmo/ruído de banda larga passam; só o grito estável é
 contido; 0 = bypass exato; telemetria `bodyGuardDb()`) → limitador com
 look-ahead (~3 ms, orientado por pico verdadeiro) → teto suave de 1
 amostra → teto −1 dBFS + telemetria de redução de ganho. `TruePeakEstimator`
-(`src/dsp/TruePeak.hpp`) já integrado. O `MASTER` (Módulo 17) usa tudo
+(`src/dsp/TruePeak.hpp`) já integrado.
+
+**Guarda de segurança no sink (2026-09-15).** A cadeia acima mora DENTRO
+do MASTER — e o MASTER é um módulo como outro qualquer: dá pra cabear
+direto no `OUT` e passar por fora dele. Nesse caminho não havia proteção
+nenhuma (o painel X11 só limitava amplitude na conversão pra int16, e
+aquele clamp **não pega NaN**; o app JUCE não limitava nada). O sink
+passou a ser `apps/panel/SinkOut.hpp`, compartilhado pelos dois
+front-ends, com a camada de SEGURANÇA na acepção de
+`SAIDA_AUDIO_COMUM.md`: vem depois do master criativo, não pode ser
+desligada, e é mínima de propósito — saneia não-finito e impõe o teto de
+−1 dBFS, sem look-ahead e sem cor. No caminho normal ela **nunca atua**, e
+`tests/test_sink_guard.cpp` fixa isso: abaixo do teto a saída é idêntica
+amostra a amostra.
+
+**Medição BS.1770-4 / EBU R128 (2026-09-15).** `src/dsp/Loudness.hpp`:
+momentary (400 ms), short-term (3 s) e integrated com as duas portas
+(absoluta −70 LUFS, relativa −10 LU). Ponderação K derivada da taxa em
+uso, não os coeficientes tabelados de 48 kHz — usá-los crus em 44,1 ou 96
+kHz daria número errado sem avisar. É MEDIDOR: não toca no sinal, e nada
+normaliza automaticamente (o documento comum é explícito: loudness
+informa a decisão). No app JUCE é alimentado com o par que de fato sai, e
+o integrado zera a cada tomada de REC. Conformidade em
+`tests/test_loudness.cpp` — o par estéreo de −26 dBFS/canal lê −23,0 LUFS
+(EBU Tech 3341), a ponderação é unitária em 1 kHz, e as relações de +6,02
+(dobrar amplitude) e +3,01 (segundo canal correlacionado) batem.
+
+O `MASTER` (Módulo 17) usa tudo
 isso. Testes: `test_true_peak.cpp` + `test_output_stage.cpp`.
 Pendente: `TruePeakDetector` 4× polifásico plenamente conforme BS.1770,
 como na `NAVALHA`.
@@ -1344,7 +1371,12 @@ nunca clipa a saída, mesmo com o MASTER no teto do slider),
 `test_chaos`/`test_pll`/
 `test_note_out`/`test_audio_in` (módulos 35–38), `test_true_peak`/
 `test_output_stage`/`test_wav_writer` (excelência de saída: pico
-verdadeiro, guarda ultrassônica, governador de corpo, dither TPDF), e o
+verdadeiro, guarda ultrassônica, governador de corpo, dither TPDF),
+`test_sink_guard` (a última barreira antes do dispositivo),
+`test_output_excellence` (a bateria de casos-limite do §5 do
+`SAIDA_AUDIO_COMUM.md`: impulso, DC, subgrave, Nyquist em antifase,
+NaN/Inf, blocos irregulares, troca de taxa, automação sem clique, downmix
+mono), `test_loudness` (fixtures de conformidade BS.1770), e o
 `test_graph_engine` legado. `PatchSeed.hpp`/`SeedGrammar.hpp` não têm
 alvo CTest dedicado — verificados por comparação byte a byte
 (`serialize()`, seeds 1–200) contra a versão pré-refactor, ver
@@ -1374,8 +1406,31 @@ Android; onde os instrumentos RASGO se unem no Ensemble Bus) e
 **web/WASM** (esboço, patch = URL, PWA). Um `.rmp` de texto e uma `Panel`
 servem os dois. Os dois "grandes" ainda não escritos.
 
+**Segundo front-end, de PRODUÇÃO (2026-09-13): `apps/juce/` — JUCE,
+multiplataforma.** Escolhido pelo autor entre os dois previstos aqui,
+como primeiro passo da estrada de publicação (multiplataforma é
+requisito de `ESTRATEGIA_DE_PUBLICACAO.md`, e o painel X11 é só Linux).
+Compartilha com o painel de teste o motor inteiro, a geometria de widget
+(`src/ui/PanelGeometry.hpp`, extraída pra os dois não divergirem na área
+de clique) e a de cabo (`src/ui/CableGeometry.hpp`). O port é uma
+**transliteração**: os dois desenhos são immediate-mode. Empacota em
+DEB/NSIS/DragNDrop (molde ANTITOTEM), com CI de 3 SOs que também roda os
+testes do motor — primeira prova de que o núcleo compila fora do
+Linux. JUCE sob AGPLv3, sem licença comercial
+(`apps/juce/LICENSE_STATUS.md`).
+
+**Estado (2026-09-15): paridade funcional com o painel X11 alcançada** —
+ver `apps/juce/PARIDADE.md`, a auditoria feature a feature que guiou o
+porte. Tem cabeamento com inspector de relação, VARIA/MUTA/EVOLUI/CRUZA,
+salvar/banco/abrir, REC com SYSTEM SCORE, entrada de áudio e MIDI,
+teclado completo, overlays, LEARN e os osciloscópios. Recursos que
+existem só aqui, porque dependem de API multiplataforma que o painel X11
+não tem: `ABRIR` com seletor de arquivo nativo e o **desfazer** (`Ctrl+Z`,
+anel de 24 fotografias serializadas, cobrindo cada cabo).
+
 **Primeiro front-end (2026-09-02): `apps/panel/` — painel gráfico de
-teste** (X11 + ALSA + Xrandr). Executável que linka X11/libasound —
+teste** (X11 + ALSA + Xrandr). Ferramenta de desenvolvimento Linux, **não
+é o artefato publicável**. Executável que linka X11/libasound —
 **o `rasgo_modular_core` continua sem dependência**. Bases lidas:
 `RASGO_DOCUMENTATION/design/` (README, INTERFACES_E_LAYOUTS,
 IDENTIDADE_VISUAL, AUDITORIA_MIGRACAO_RESPONSIVA…). Detalhe e roadmap da
@@ -1397,6 +1452,13 @@ Concept da experiência (decisões **específicas do Rasgo Modular**):
   marcador; a sugestão completa é feature registrada;
 - **camada de patch** (desenhar/criar cabos, matriz e constelação como
   views) — pendente;
+- **inspector de cabo** (2026-09-12) — clicar no **corpo** de um cabo
+  abre um painel pequeno ancorado ali: relação (`RingMod`/`Fold`/
+  `Difference` + companion escolhido clicando num jack, reusando o halo
+  de afordance do cabeamento normal), condução probabilística, e
+  ruptura/reconexão seletiva de só aquele cabo — o `[espaço]` continua
+  fazendo isso pra todos de uma vez. Ver `apps/panel/design.md §2.5.1`
+  e `guia/RELACAO_DE_CABO.md §4`;
 - painéis renderizados **a partir da `Panel` declarativa** (nada
   hard-coded); knobs/sliders/toggles/jacks; arrastar um controle → ouve
   ao vivo (RT-safe no callback);
@@ -1453,13 +1515,36 @@ o que é / o lugar dele / uma cadeia pra experimentar) e o **dwell caiu de
 - **Tutorial** (`TUTORIAL`) reescrito e **rolável** (roda / ↑↓ / PgUp-Dn /
   Home-End): o que é · SEED e a caixa do número · VARIA e a mão caótica ·
   BANCO/SALVA e onde ficam os arquivos (`~/.local/share/rasgo-modular/`) ·
-  REC e os `rec-NN.wav`/`rec-NN.score.txt` · o cabeçalho botão a botão ·
+  REC e os `.wav`/`.score.txt` por data/hora em `~/Music/RasgoModular/` ·
+  o cabeçalho botão a botão ·
   cabear · navegar · adicionar/mover/remover módulos (paleta, `[x]` no
   canto, soltar de volta na paleta) · **as 8 famílias** · LEARN. Todo o
   texto nas 4 línguas (`test_ui_language` cobre a completude).
 - **Pans do MIXER** agora nascem **sempre no centro** em todo seed
   (`PatchSeed.hpp`) — o músico abre o palco à mão. Teto de cabeamento do
   passeio ampliado (`complexity·75`) pra seeds bem densos.
+
+**Vista do rack — botão `RACK` (2026-09-09):** alterna **`TODOS`** (rack
+inteiro, padrão) ↔ **`SAÍDA`** (só os módulos que chegam ao `sink` — os
+que de fato soam). Motor: `SignalGraph::nodesFeeding(outputNode)` (o mesmo
+critério da poda de `setActiveOutput` — via `reachableMask` privado,
+extraído sem mudar o comportamento de `evaluationOrder()`). É só uma
+**vista** (não instancia nem remove — isso é a paleta); reflowa o rack,
+atualiza ao cabear, persiste em `dataDir()/rack-view`. Reordenar por
+arraste só na vista `TODOS`. (Uma 3ª vista "saída + cabeados" nasceu junto
+mas saiu em 2026-09-10 — com o seed sem cabo morto, ficou idêntica a
+"só saída".) Detalhe em `apps/panel/design.md §2.11`.
+
+**Seed — nenhum cabo sem função sonora (2026-09-10):** o "passeio
+ponderado" do `PatchSeed.hpp` só cabeia em módulos que já chegam à saída
+(`nodesFeeding(sink)`, recalculado a cada cabo — o conjunto **cresce**
+conforme o passeio liga uma fonte de áudio numa entrada audível); uma
+poda final remove os cabos de montagem órfãos. Antes ~62 % dos cabos
+tinham destino que não chegava à saída (fiação de exploração pelo rack
+inteiro). Resultado: menos cabos totais, **mais módulos de fato soando**
+(complexity alta: ~16 → ~25). Efeito colateral: o stream de RNG diverge,
+**todo `RASGO_SEED=N` anterior produz um patch diferente**.
+`test_seed_patch` ganha a asserção "sem cabo morto".
 
 ### 36.8 Acoplamento — instrumentos e recursos de composição
 
@@ -1484,16 +1569,85 @@ Todos entram do mesmo jeito: **só mais um nó `Signal`** (um
 nunca dependendo deles. Portão G4: promover o contrato comum só depois
 de dois acoplamentos de naturezas diferentes.
 
+### 36.8.1 Fase didática — o guia módulo-a-módulo (`guia/`)
+
+Iniciada 2026-09-09 (`PESQUISA_MODULOS.md §2.7`). Corre **em paralelo**
+com o desenvolvimento de módulos — o catálogo segue permanentemente
+aberto, então cada módulo novo ganha sua página de guia junto com o
+dossiê.
+
+`RASGO_MODULAR/guia/` — guia **para quem toca**, em 4 partes. Alvo
+(autor, 2026-09-10): *"a pessoa entende como pensar a tocar o instrumento
+(como criar)"*, sobre a camada conceitual + técnica de cada módulo.
+Numeração espelha `dossies/` (`guia/18_oscilador.md` ↔
+`dossies/18_oscilador.md`). Só português — estrutura pronta pra tradução
+quando o site for construído.
+
+- `guia/00_indice.md` — as 4 partes, o gabarito, o índice por família.
+- `guia/COMO_PENSAR.md` — a **mentalidade**: soa ao carregar; o seed é
+  hipótese; o cabo é objeto; a relação entre saídas é o gesto; `drift`;
+  as 8 famílias como verbos; como ter e crescer uma ideia.
+- `guia/CABEAMENTO.md` — o **funcionamento**: áudio × controle, o
+  caminho do som (MIXER→MASTER), cada tipo de entrada, somar sinais,
+  **retroalimentar** um módulo, fan-in.
+- `guia/RELACAO_DE_CABO.md` (2026-09-11) — o cabo como objeto que
+  **processa** (`RingMod`/`Fold`/`Difference` da classe `Cable`,
+  ruptura/cicatriz, condução probabilística): fórmulas exatas, 5
+  receitas, e o aviso honesto de que hoje só se usa editando o `.rmp`
+  salvo — o painel não tem controle visual pra isto (§36.9).
+- **`guia/NN_*.md` — os 58 módulos, um a um** (2026-09-11, as 8 famílias
+  completas). Gabarito de 8 partes: a ideia · por dentro · **os jacks um
+  a um** (tipo, o que plugar, se vai ao mixer) · controles · como cabear
+  (com diagramas de cadeia) · **potencializar** · Eurorack. Conferidos
+  contra o construtor `Signal(...)` de cada `.hpp` + `LearnCatalog` +
+  dossiê §1. **Aprofundamento didático completo (2026-09-12)**: cada
+  página ganhou o conceito por trás de cada parâmetro explicado desde o
+  início (pra quem não conhece o termo — o que é um SVF, um vactrol, um
+  guia-de-onda, síntese aditiva, etc.), não só a fórmula/valor — pedido
+  do autor, "explique o que é cada coisa... bem didático". `COMO_PENSAR.md`
+  e `APENDICE_equivalencias.md` também passaram pelo mesmo aprofundamento.
+- `guia/APENDICE_equivalencias.md` — "se você conhece o módulo X do
+  Eurorack…".
+- `guia/RECEITAS.md` (completo, 2026-09-12) — 10 receitas de patch
+  passo a passo (jacks reais, valores de partida, "o que ouvir"), da
+  voz subtrativa mínima ao vocoder falado.
+- Andamento por lote em `TAREFAS.md`. **A fase didática está completa**
+  — falta só a tradução, quando o site for construído.
+
 ### 36.9 Próximo
 
-- inclinações de 24/48 dB no `PARAMETRIC` (cascata de biquads);
-- movimento harmônico (`HarmonicWanderer` — escala/tônica se movendo);
-- reverb por FDN como modo do `SPACE`; decaimento dependente de
-  frequência na `STRING`;
-- sequenciador editável (família de comportamentos, Hexen §119);
-- serialização das três camadas de conexão no patch de texto;
-- **front-ends JUCE + web/WASM** a partir do core framework-free;
-- contrato do Ensemble Bus (após dois instrumentos).
+**Limpeza (2026-09-12):** esta lista tinha 5 itens que já estavam
+**feitos** há tempo — construídos depois da última revisão daqui, e
+nunca tirados. Verificado linha a linha contra o código antes de tirar
+cada um, não só contra a documentação:
+
+- ~~inclinações de 24/48 dB no `PARAMETRIC`~~ — feito: `slope1..4`
+  (1/2/4 biquads em cascata), `src/dsp/Parametric.hpp`.
+- ~~movimento harmônico (`HarmonicWanderer`)~~ — feito: é o `HARMONY`
+  (#14), 6 técnicas de movimento (Coltrane, substituição tritônica…).
+- ~~reverb por FDN como modo do `SPACE`~~ — feito, como módulo **próprio**
+  em vez de modo: `HALL` (#46), 8 linhas + matriz de Householder.
+- ~~decaimento dependente de frequência na `STRING`~~ — feito: `damping`
+  já é um filtro de perda de 1 polo no laço (`src/dsp/StringVoice.hpp`),
+  o agudo decai antes do grave.
+- ~~sequenciador editável (Hexen §119)~~ — feito: é o `SEQUENCE` (#15),
+  marcado "feito" desde o marco 2 (`PESQUISA_MODULOS.md` linha 113).
+- ~~serialização das três camadas de conexão no patch de texto~~ —
+  feito: `serialize()`/`deserialize()` já leem e escrevem as 3 camadas
+  — `cable`/`mod` (matriz), `pos` (constelação), `qin`/`qout`
+  (semântico) — `src/core/SignalGraph.hpp:809-861` e `:948-978`.
+
+**Pendências reais, verificadas:**
+
+- **front-ends JUCE + web/WASM** a partir do core framework-free —
+  nada construído ainda pra nenhum dos dois.
+- **contrato do Ensemble Bus** (após dois instrumentos RASGO existirem)
+  — decisão de arquitetura do autor, não iniciada.
+
+~~**painel: controle visual pra relação de cabo**~~ — **feito
+(2026-09-12)**: clicar no corpo de um cabo abre um inspector com
+relação/companion/amount/condução/ruptura seletiva. Ver
+`apps/panel/design.md §2.5.1`, `guia/RELACAO_DE_CABO.md §4`.
 
 ### 36.10 Histórico do protótipo (agosto 2026)
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 // Catálogo de módulos do Rasgo Modular: nome de tipo -> construtor, e a
 // listagem agrupada por família pra a paleta lateral do painel. Também
 // serve de factory pra desserializar um `.rmp` (`SignalGraph::deserialize`).
@@ -156,6 +158,26 @@ struct CatalogGroup {
 // `RASGO_SEED=N` produz e o doador do CROSS. Reordenada nesta revisão;
 // `tests/test_seed_patch.cpp` revalida (caminho audível, sem exceção,
 // saída finita).
+// Ordem de EXIBIÇÃO dos tipos dentro de uma família: alfabética, com
+// MIXER e MASTER grudados no fim (são o destino, não mais um módulo da
+// lista). Mora aqui porque três lugares precisam CONCORDAR — a paleta do
+// painel X11, a paleta do app JUCE e a ordem das caixas no rack — e
+// concordar por cópia é como se desalinha (foi assim que a paleta do JUCE
+// acabou fora de ordem, achado do autor em 2026-09-15).
+//
+// NÃO é a ordem do catálogo acima: aquela é a ordem de INSTANCIAÇÃO dos
+// nós, e mexer nela mudaria o que cada `RASGO_SEED=N` produz.
+inline void sortFamilyForDisplay(std::vector<const char*>& types) {
+    const auto key = [](const char* t) -> std::string {
+        const std::string s = t;
+        if (s == "MIXER") return "\x7e" "1";   // '~' vem depois de A..Z
+        if (s == "MASTER") return "\x7e" "2";
+        return s;
+    };
+    std::sort(types.begin(), types.end(),
+              [&](const char* a, const char* b) { return key(a) < key(b); });
+}
+
 inline const std::vector<CatalogGroup>& moduleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},

@@ -1,0 +1,136 @@
+name: Rasgo Modular — build, test & package
+
+# ATENÇÃO — este workflow está INERTE hoje.
+#
+# O GitHub Actions só lê workflows do `.github/workflows/` da RAIZ do
+# repositório. O Rasgo Modular vive dentro do monorepo privado
+# `rasgo-instruments`, então este arquivo (em `RASGO_MODULAR/.github/`)
+# não é executado. Ele passa a valer no momento em que o projeto for
+# extraído pro seu próprio repositório público — exatamente o que
+# aconteceu com o Antitotem (27 ago. 2026) e com o Navalha 2, cujos
+# workflows moram na mesma posição relativa e só ficaram vivos depois da
+# extração. Ver `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`.
+#
+# Está aqui agora porque o gate de publicação exige "ao menos um caminho
+# de build/execução verificável por plataforma suportada", e sem máquina
+# Windows/macOS à mão é a CI que produz essa evidência.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            generator: DEB
+            artifact-glob: build/*.deb
+          - os: windows-latest
+            generator: NSIS
+            artifact-glob: build/*.exe
+          - os: macos-latest
+            generator: DragNDrop
+            artifact-glob: build/*.dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Rasgo Modular
+        uses: actions/checkout@v4
+
+      # O JUCE não é versionado neste repositório (nem submodule, nem
+      # FetchContent) — mesma política do Antitotem/Navalha 2/Rasgo Synth.
+      # `ref: master` segue o upstream; pra uma release reprodutível,
+      # fixar aqui o commit/tag usado e registrá-lo na release
+      # (ver apps/juce/LICENSE_STATUS.md).
+      - name: Checkout JUCE
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: master
+          path: JUCE-checkout
+
+      # Dependências de build do JUCE no Linux. Windows (MSVC) e macOS
+      # (Xcode) já trazem o necessário nos runners.
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2-dev libjack-jackd2-dev \
+            libcurl4-openssl-dev \
+            libfreetype6-dev libfontconfig1-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
+            libxinerama-dev libxrandr-dev libxrender-dev \
+            libwebkit2gtk-4.1-dev libgtk-3-dev \
+            libglu1-mesa-dev mesa-common-dev
+
+      - name: Install NSIS (Windows)
+        if: runner.os == 'Windows'
+        run: choco install nsis -y
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DRASGO_MODULAR_JUCE_PATH=${{ github.workspace }}/JUCE-checkout
+
+      # O MOTOR nos três sistemas. O núcleo é framework-free por projeto,
+      # mas até aqui só tinha sido compilado no Linux — esta é a primeira
+      # prova real dessa portabilidade, e vale por si mesma
+      # (independente do empacotamento).
+      - name: Build & run engine tests
+        run: |
+          cmake --build build --config Release --parallel
+          ctest --test-dir build -C Release --output-on-failure
+
+      - name: Build the JUCE app
+        run: cmake --build build --target RasgoModularApp --config Release --parallel
+
+      # Sem Mac à mão pra testar na unha, isto substitui o teste manual:
+      # falha o build se o .app não for realmente distribuível (Universal 2
+      # de verdade e deployment target do projeto, não a versão do runner —
+      # o bug que o Antitotem e o Navalha 2 pegaram ao vivo).
+      - name: Validate macOS app bundle
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          APP=$(find build -maxdepth 6 -name "*.app" -print -quit)
+          if [ -z "$APP" ]; then echo "::error::No .app bundle found"; exit 1; fi
+          echo "App bundle: $APP"
+          EXE="$APP/Contents/MacOS/Rasgo Modular"
+
+          echo "--- file (architecture) ---"
+          file "$EXE"
+          if ! file "$EXE" | grep -q "Mach-O universal binary with 2 architectures"; then
+            echo "::error::Expected a Universal 2 (x86_64+arm64) binary"; exit 1
+          fi
+          if ! (lipo -info "$EXE" | grep -q "x86_64" && lipo -info "$EXE" | grep -q "arm64"); then
+            echo "::error::Missing x86_64 or arm64 slice"; exit 1
+          fi
+
+          echo "--- otool -l (deployment target) ---"
+          otool -l "$EXE" | grep -A4 "LC_BUILD_VERSION\|LC_VERSION_MIN_MACOSX"
+          MINOS=$(otool -l "$EXE" | awk '/LC_BUILD_VERSION/{f=1} f && /minos/{print $2; exit}')
+          echo "minos=$MINOS"
+          if [[ "$MINOS" == 2[0-9].* ]]; then
+            echo "::error::minos $MINOS looks like it defaulted to the runner's own macOS version, not the project's deployment target"
+            exit 1
+          fi
+
+          echo "--- codesign (ad-hoc; sem Developer ID/notarização na CI) ---"
+          codesign -dv "$APP" 2>&1 || echo "::warning::Não assinado — ok pra teste local, mas distribuição real precisa de Developer ID + notarização, senão o Gatekeeper mostra aviso de desenvolvedor não identificado na primeira abertura"
+
+      - name: Package
+        working-directory: build
+        run: cpack -G ${{ matrix.generator }} -C Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rasgo-modular-${{ matrix.os }}
+          path: ${{ matrix.artifact-glob }}
+          if-no-files-found: error

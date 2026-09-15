@@ -16,8 +16,16 @@
 //
 // GARANTIAS: sempre há um caminho voz → ... → MASTER → sink (audível); o
 // CLOCK sempre tica; detector de ciclo liga como feedback. Do mínimo
-// (3 cabos) à teia densa (~43 no passeio + espinha ≈ 60) conforme
-// `complexity`.
+// (3 cabos) à teia densa conforme `complexity`.
+//
+// (2026-09-10) NENHUM CABO SEM FUNÇÃO SONORA: o passeio e a DRIFT só
+// cabeiam em módulos que já chegam à saída (`feeds`, recalculado a cada
+// cabo — CRESCE conforme fontes de áudio se ligam a entradas audíveis);
+// uma poda final varre os cabos de montagem que ficaram órfãos. Antes,
+// ~62% dos cabos tinham destino que não chegava à saída (fiação de
+// exploração pelo rack inteiro). Efeito colateral: o stream de RNG
+// diverge, então TODO `RASGO_SEED=N` anterior a esta data produz um
+// patch diferente. Verificado em `tests/test_seed_patch.cpp`.
 //
 // Genes (poucos, via SplitMix64 — stream separado por decisão): complexity,
 // wildness, energy, space, motion, voiceBias, root/scale, bpm. O resto
@@ -465,10 +473,12 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     }
     if (hasT("MASTER") && hasT("MIXER")) {
         setT("MASTER", "width", rng(0.85f, 1.5f));
-        // fixo (não sorteado) — 50% do slider (faixa -60..+12 -> -24 dB) em
-        // TODO seed, sem exceção; o autor sobe na mão a partir daí.
-        // (era 30% / -38,4 dB; mudado a pedido do autor em 2026-09-05.)
-        setT("MASTER", "gain", -24.0f);
+        // fixo (não sorteado) — 75% do slider (faixa -60..+12 -> -6 dB) em
+        // TODO seed, sem exceção; o autor ajusta a partir daí. O limitador
+        // true-peak + body-guard do MASTER (ligados por default) seguram o
+        // teto em -1 dBFS. (30% / -38,4 dB até 2026-09-05; 50% / -24 dB
+        // até 2026-09-10; a pedido do autor.)
+        setT("MASTER", "gain", -6.0f);
         connectByName("MIXER", "out", "MASTER", "in");
         if (haveSink) {
             const int mo = pOut(firstT("MASTER"), "out");
@@ -486,7 +496,15 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // era ×40). O laço já se auto-limita (12 tentativas por cabo, só porta
     // livre), então pedir 75 não põe 75 — põe o que couber.
     const int nCables = 3 + static_cast<int>(std::lround(id.complexity * 75.0f));
+    // O passeio só cabeia em módulos que JÁ CHEGAM À SAÍDA (`feeds`) —
+    // assim todo cabo tem função sonora. `feeds` CRESCE durante o passeio:
+    // ligar `OSC.saw → SHAPE.mod` (SHAPE audível) faz o OSC e o que o
+    // alimenta passarem a chegar à saída, abrindo novos destinos válidos.
+    // Recalculado a cada cabo (O(nós+cabos), microssegundos).
+    std::vector<char> feeds = haveSink ? g.nodesFeeding(sink)
+                                       : std::vector<char>(N, 1);
     for (int c = 0; c < nCables; ++c) {
+        if (haveSink) feeds = g.nodesFeeding(sink);
         // 1) escolhe uma classe de destino, depois um destino livre nela
         float dw[5] = {3.0f, 1.5f, 6.0f, 4.0f, 1.5f};
         // mais cedo prioriza gate/pitch/audio; mais tarde, mod
@@ -494,9 +512,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         float dtot = 0.0f; for (float x : dw) dtot += x;
         float dr = f01() * dtot; int dc = 0;
         for (; dc < 4; ++dc) { if (dr < dw[dc]) break; dr -= dw[dc]; }
-        // destino livre aleatório
+        // destino livre aleatório — SÓ em módulo que chega à saída
         Port d{0, 0}; bool okD = false;
-        for (int tries = 0; tries < 12 && !okD; ++tries) {
+        for (int tries = 0; tries < 16 && !okD; ++tries) {
             if (dst[dc].empty()) break;
             const Port cand = dst[dc][rnd() % dst[dc].size()];
             // MIXER/MASTER não são destino do passeio — as camadas
@@ -504,6 +522,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             // joga fonte crua direto no barramento de saída)
             if (typ(cand.node) == "MIXER" || typ(cand.node) == "MASTER")
                 continue;
+            if (cand.node < feeds.size() && !feeds[cand.node])
+                continue;   // destino não soa — cabo seria sem função
             if (cand.node < N && cand.port < inUsed[cand.node].size()
                 && !inUsed[cand.node][cand.port]) { d = cand; okD = true; }
         }
@@ -581,9 +601,13 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         };
         const int nDrift = 2 + static_cast<int>(std::lround(id.motion * 2.0f));
         const char* outs[4] = {"a", "b", "c", "d"};
+        const std::vector<char> dfeeds = haveSink ? g.nodesFeeding(sink)
+                                                  : std::vector<char>(N, 1);
         for (int i = 0; i < nDrift && i < 4; ++i) {
             const PT& tp = tgts[rnd() % (sizeof(tgts) / sizeof(tgts[0]))];
             if (!hasT(tp.mod)) continue;
+            if (firstT(tp.mod) < dfeeds.size() && !dfeeds[firstT(tp.mod)])
+                continue;   // DRIFT num módulo mudo = deriva sem função
             const int so = pOut(dn, outs[i]);
             if (so < 0) continue;
             try {
@@ -591,6 +615,29 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                                      firstT(tp.mod), tp.par,
                                      tp.depth * (0.3f + id.motion), tp.off, true);
             } catch (...) {}
+        }
+    }
+
+    // ================ poda: nenhum cabo sem função sonora =========
+    // O passeio e a DRIFT já são restritos ao subgrafo audível; isto
+    // varre os cabos de MONTAGEM que ficaram órfãos — ex.: quando a voz
+    // é ruído e nenhum oscilador consome a altura, `CLOCK→QUANTIZER` e
+    // `TURING→QUANTIZER` não têm pra onde ir. Remover um cabo pode secar
+    // outro (era o único elo audível de um ramo), então repete até
+    // estabilizar (limitado pelo nº de cabos).
+    if (haveSink) {
+        for (std::size_t guard = 0; guard <= g.cableCount() + 1; ++guard) {
+            const std::vector<char> pf = g.nodesFeeding(sink);
+            bool cut = false;
+            for (std::size_t i = g.cableCount(); i-- > 0;) {
+                const auto& cb = g.cable(i);
+                if (cb.target().node < pf.size() && !pf[cb.target().node]) {
+                    g.disconnect(cb.target().node, cb.target().port);
+                    cut = true;
+                    break;
+                }
+            }
+            if (!cut) break;
         }
     }
 
