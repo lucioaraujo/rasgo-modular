@@ -1,0 +1,8 @@
+# checkout local do JUCE — dependência de terceiro, não é nossa pra
+# versionar. Aponte com -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE
+# (ver apps/juce/LICENSE_STATUS.md e o README).
+/JUCE/
+/third_party/JUCE/
+
+# build
+/build/

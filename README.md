@@ -106,9 +106,21 @@ vira **campo de texto padrão** (selecionar/copiar/colar/apagar, botão do
 meio cola; clipboard ICCCM completo; o seed também sai no terminal);
 **rolar o rack ao cabear** (arrastar o cabo pra borda) e **botão do meio
 paneia**; **TUTORIAL reescrito e rolável** — cobre o cabeçalho botão a
-botão, gravar e onde ficam os `.wav` (`~/.local/share/rasgo-modular/`),
-adicionar/remover módulos e **as 8 famílias**, nas 4 línguas; pans do
-MIXER sempre no centro em todo seed.
+botão, gravar (as gravações vão pra `~/Music/RasgoModular/`, nome por
+data/hora — desde 2026-09-11), adicionar/remover módulos e **as 8
+famílias**, nas 4 línguas; pans do MIXER sempre no centro em todo seed.
++ **painel — vista do rack (2026-09-09):** botão `RACK` no cabeçalho
+alterna **TODOS** os módulos ↔ só os que **chegam à saída**
+(`SignalGraph::nodesFeeding`); é só uma vista, persistida, com reflow ao
+vivo ao cabear.
++ **fase didática completa (2026-09-09 → 12):**
+[`guia/`](guia/00_indice.md) — guia para quem toca, em 4 partes:
+mentalidade (`COMO_PENSAR.md`), funcionamento (`CABEAMENTO.md` +
+`RELACAO_DE_CABO.md`), **os 58 módulos um a um** (jack a jack, "como
+cabear", "potencializar"), o apêndice de equivalências Eurorack e o
+caderno de **10 receitas** de patch passo a passo — todos com um passe
+de aprofundamento didático (o conceito por trás de cada parâmetro, não
+só a fórmula). Falta só a tradução, quando o site for construído.
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
 60 módulos DSP,
@@ -120,6 +132,62 @@ Lúcio de Araújo.
 habitual da família RASGO). Código de terceiros só entra sob licença
 livre compatível com AGPLv3 (MIT/BSD/ISC/Apache-2.0/LGPL/GPL/AGPL) e com
 proveniência registrada.
+
+## Build e plataformas
+
+Duas interfaces, papéis diferentes:
+
+| | `apps/juce/` — **produção** | `apps/panel/` — **teste** |
+|---|---|---|
+| Plataformas | Linux · Windows · macOS | Linux (X11 + ALSA) |
+| Papel | o que vai em release | ferramenta de desenvolvimento |
+| Estado | paridade funcional alcançada (`apps/juce/PARIDADE.md`) | completo |
+
+O app JUCE tem dois recursos que o painel X11 não tem, porque dependem de
+API multiplataforma: **ABRIR** um `.rmp` por seletor de arquivo nativo, e
+**desfazer** (`Ctrl+Z`) — um anel de fotografias serializadas do grafo que
+cobre cada cabo ligado ou cortado.
+
+**Motor + testes** (sem dependência de GUI, os três sistemas):
+
+```sh
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+ctest --test-dir build
+```
+
+**Front-end JUCE.** O JUCE não é versionado aqui (política da família
+RASGO: nem submodule, nem FetchContent) — aponte um checkout local:
+
+```sh
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE
+cmake --build build --target RasgoModularApp -j
+cd build && cpack -G DEB      # ou NSIS (Windows) / DragNDrop (macOS)
+```
+
+Licenciamento do JUCE: [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
+
+**Excelência de saída.** O instrumento segue a arquitetura comum da
+família (`RASGO_DOCUMENTATION/architecture/SAIDA_AUDIO_COMUM.md`):
+proteção de excelência no `MASTER` (finitude, DC, guarda ultrassônica,
+governador de corpo, limitador look-ahead por pico verdadeiro, teto
+−1 dBFS) e uma **guarda de segurança no sink**, que não pode ser
+contornada nem desligada — o MASTER é um módulo, e dá pra cabear por fora
+dele. Medição BS.1770-4 (momentary, short-term, integrated com as duas
+portas) em `src/dsp/Loudness.hpp`, com fixtures de conformidade EBU no
+`ctest`. **Ainda fora:** taps nomeados de gravação
+(`pre-master-criativo`/`pre-safety`/`post-safety`) e exportação PCM24 e
+float — os dois dependem de um alvo de publicação declarado.
+
+**Painel de teste (só Linux):** `./.run_rasgo_modular.sh` — precisa de
+`libX11` e `libasound`; o alvo é pulado automaticamente se faltarem.
+
+Matriz de plataformas: Linux é a única **verificada em hardware real**
+hoje. Windows e macOS são construídos e empacotados pela CI
+(`.github/workflows/package.yml`, com checagem de Universal 2 e
+deployment target no macOS), ainda **não abertos em máquina real** — a
+mesma condição em que o Antitotem foi publicado, e uma decisão a
+registrar explicitamente antes de qualquer release.
 
 ## Apresentação
 
@@ -139,6 +207,9 @@ conceitual, não como um projeto separado.
   de execução (§2);
 - [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
+- [`guia/`](guia/00_indice.md) — guia de referência **para quem toca**:
+  uma página em prosa por módulo (fase didática, `PESQUISA_MODULOS.md
+  §2.7`; iniciada 2026-09-09, piloto `OSC`/`MULT`/`SPACE`);
 - `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 60 módulos
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste

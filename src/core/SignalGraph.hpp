@@ -536,6 +536,30 @@ public:
     Cable& cable(const std::size_t index) { return *connections_.at(index); }
     std::size_t nodeCount() const noexcept { return nodes_.size(); }
 
+    // Front-ends ao vivo — NÃO faz parte do caminho de áudio.
+    // Máscara (tamanho `nodeCount()`) dos nós que ALIMENTAM `outputNode`
+    // transitivamente: conexões (inclusive feedback) + links de parâmetro.
+    // Inclui o próprio `outputNode`. `outputNode` inválido => tudo zero.
+    // É o mesmo critério da poda de `setActiveOutput()`.
+    std::vector<char> nodesFeeding(const std::size_t outputNode) const {
+        return reachableMask(outputNode);
+    }
+
+    // Máscara dos nós tocados por QUALQUER cabo ou link de parâmetro, como
+    // fonte ou destino — "está cabeado no patch".
+    std::vector<char> nodesConnected() const {
+        std::vector<char> wired(nodes_.size(), 0);
+        for (const auto& connection : connections_) {
+            wired[connection->source().node] = 1;
+            wired[connection->target().node] = 1;
+        }
+        for (const auto& link : parameterLinks_) {
+            wired[link.sourceNode] = 1;
+            wired[link.targetNode] = 1;
+        }
+        return wired;
+    }
+
     // Último bloco calculado na saída (node, port) — pra medidores /
     // osciloscópios de UI. Válido só depois de um `process()`; devolve
     // nullptr se ainda não preparado ou índices fora de faixa.
@@ -1133,6 +1157,30 @@ private:
         return count > 0.0f ? sum / count : 0.0f;
     }
 
+    // BFS reverso: máscara dos nós que alimentam `outputNode`
+    // transitivamente (conexões — inclusive feedback — + links de
+    // parâmetro). Inclui `outputNode`. Índice inválido => máscara zerada.
+    std::vector<char> reachableMask(const std::size_t outputNode) const {
+        std::vector<char> keep(nodes_.size(), 0);
+        if (outputNode >= nodes_.size())
+            return keep;
+        std::vector<std::vector<std::size_t>> incoming(nodes_.size());
+        for (const auto& connection : connections_)
+            incoming[connection->target().node]
+                .push_back(connection->source().node);
+        for (const auto& link : parameterLinks_)
+            incoming[link.targetNode].push_back(link.sourceNode);
+        std::vector<std::size_t> stack{outputNode};
+        keep[outputNode] = 1;
+        while (!stack.empty()) {
+            const std::size_t n = stack.back();
+            stack.pop_back();
+            for (const auto p : incoming[n])
+                if (!keep[p]) { keep[p] = 1; stack.push_back(p); }
+        }
+        return keep;
+    }
+
     // Ordem topológica só sobre as conexões NÃO-feedback; feedback usa o
     // bloco anterior e por isso não fecha ciclo.
     std::vector<std::size_t> evaluationOrder() const {
@@ -1167,21 +1215,7 @@ private:
         // na saída). Sentinela kEvaluateAll => sem poda (renders de
         // exemplo e testes byte-idênticos).
         if (activeOutput_ != kEvaluateAll && activeOutput_ < nodes_.size()) {
-            std::vector<std::vector<std::size_t>> incoming(nodes_.size());
-            for (const auto& connection : connections_)
-                incoming[connection->target().node]
-                    .push_back(connection->source().node);
-            for (const auto& link : parameterLinks_)
-                incoming[link.targetNode].push_back(link.sourceNode);
-            std::vector<char> keep(nodes_.size(), 0);
-            std::vector<std::size_t> stack{activeOutput_};
-            keep[activeOutput_] = 1;
-            while (!stack.empty()) {
-                const std::size_t n = stack.back();
-                stack.pop_back();
-                for (const auto p : incoming[n])
-                    if (!keep[p]) { keep[p] = 1; stack.push_back(p); }
-            }
+            const std::vector<char> keep = reachableMask(activeOutput_);
             order.erase(std::remove_if(order.begin(), order.end(),
                         [&](const std::size_t id) { return !keep[id]; }),
                         order.end());

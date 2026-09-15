@@ -72,9 +72,20 @@ inline const L4 hdrEvolve  {"EVOLVE",  "EVOLUI",   "ÉVOLUE",   "EVOLUCIONA"};
 inline const L4 hdrCross   {"CROSS",   "CRUZA",    "CROISER",  "CRUZAR"};
 inline const L4 hdrBank    {"BANK",    "BANCO",    "BANQUE",   "BANCO"};
 inline const L4 hdrSave    {"SAVE",    "SALVA",    "ENREG.",   "GUARDA"};
+inline const L4 hdrOpen    {"OPEN",    "ABRIR",    "OUVRIR",   "ABRIR"};
 inline const L4 hdrRec     {"REC",     "REC",      "REC",      "REC"};
 inline const L4 hdrSeed    {"SEED",    "SEED",     "SEED",     "SEED"};
 inline const L4 seedCopied {"COPIED",  "COPIADO",  "COPIÉ",    "COPIADO"};
+
+// ---- cabeçalho: vista do rack (botão RACK, alterna 2 estados) ---------
+// TODOS os módulos  ↔  só os que chegam à saída (os que de fato soam).
+inline const L4 hdrRackAll {"ALL",    "TODOS", "TOUS",   "TODOS"};
+inline const L4 hdrRackOut {"OUTPUT", "SAÍDA", "SORTIE", "SALIDA"};
+inline const L4 rackViewEmpty {
+    "no module reaches the output yet — patch toward the MASTER, or RACK: ALL",
+    "nenhum módulo chega à saída ainda — cabeie até o MASTER, ou RACK: TODOS",
+    "aucun module n’atteint la sortie — câblez vers le MASTER, ou RACK : TOUS",
+    "ningún módulo llega a la salida — cablee hacia el MASTER, o RACK: TODOS"};
 
 // ---- cabeçalho: navegação -----------------------------------------------
 inline const L4 hdrTutorial{"TUTORIAL", "TUTORIAL", "TUTORIEL",   "TUTORIAL"};
@@ -132,26 +143,26 @@ inline const L4 tutVaryBody {
 inline const L4 tutStoreTitle {
     "KEEP A PATCH — BANK, SAVE", "GUARDAR UM PATCH — BANCO, SALVA", "GARDER UN PATCH — BANQUE, ENREG.", "GUARDAR UN PATCH — BANCO, GUARDA"};
 inline const L4 tutStoreBody {
-    "BANK stores the current patch in a rotating set you can page back through. SAVE writes the whole session to disk; it also auto-saves on exit and reloads on the next launch. Everything lives in  ~/.local/share/rasgo-modular/  (session.rmp and the banks).",
-    "BANCO guarda o patch atual num conjunto rotativo que dá pra folhear de volta. SALVA grava a sessão inteira em disco; ela também é auto-salva na saída e recarregada no próximo arranque. Tudo fica em  ~/.local/share/rasgo-modular/  (session.rmp e os bancos).",
-    "BANQUE stocke le patch courant dans un jeu tournant que l’on peut refeuilleter. ENREG. écrit toute la session sur le disque ; elle est aussi enregistrée automatiquement à la sortie et rechargée au lancement suivant. Tout se trouve dans  ~/.local/share/rasgo-modular/  (session.rmp et les banques).",
-    "BANCO guarda el patch actual en un conjunto rotativo que se puede hojear hacia atrás. GUARDA escribe toda la sesión en disco; también se guarda sola al salir y se recarga en el siguiente arranque. Todo está en  ~/.local/share/rasgo-modular/  (session.rmp y los bancos)."};
+    "SAVE (Ctrl+S) writes the whole session to a .rmp — the graph, the cabling, every parameter, the seed. It is the instrument, not the sound. BANK (Ctrl+B) files the current patch under its own name instead of overwriting the session. OPEN (Ctrl+O) brings any .rmp back, starting in the bank folder. All of it lives in  ~/.local/share/rasgo-modular/  (session.rmp and patches/). REC is a different thing: it records the AUDIO — see RECORD AUDIO.",
+    "SALVA (Ctrl+S) grava a sessão inteira num .rmp — o grafo, o cabeamento, cada parâmetro, o seed. É o instrumento, não o som. BANCO (Ctrl+B) arquiva o patch atual com nome próprio, em vez de sobrescrever a sessão. ABRIR (Ctrl+O) traz qualquer .rmp de volta, já começando na pasta do banco. Tudo fica em  ~/.local/share/rasgo-modular/  (session.rmp e patches/). REC é outra coisa: grava o ÁUDIO — veja GRAVAR ÁUDIO.",
+    "ENREG. (Ctrl+S) écrit toute la session dans un .rmp — le graphe, le câblage, chaque paramètre, le seed. C’est l’instrument, pas le son. BANQUE (Ctrl+B) classe le patch courant sous son propre nom au lieu d’écraser la session. OUVRIR (Ctrl+O) rouvre n’importe quel .rmp, en démarrant dans le dossier de la banque. Tout est dans  ~/.local/share/rasgo-modular/  (session.rmp et patches/). REC est autre chose : il enregistre l’AUDIO — voir ENREGISTRER.",
+    "GUARDA (Ctrl+S) escribe la sesión entera en un .rmp — el grafo, el cableado, cada parámetro, el seed. Es el instrumento, no el sonido. BANCO (Ctrl+B) archiva el patch actual con nombre propio en vez de sobrescribir la sesión. ABRIR (Ctrl+O) trae de vuelta cualquier .rmp, empezando en la carpeta del banco. Todo está en  ~/.local/share/rasgo-modular/  (session.rmp y patches/). REC es otra cosa: graba el AUDIO — vea GRABAR AUDIO."};
 
 inline const L4 tutRecTitle {
     "RECORD AUDIO — REC", "GRAVAR ÁUDIO — REC", "ENREGISTRER — REC", "GRABAR AUDIO — REC"};
 inline const L4 tutRecBody {
-    "REC (or Ctrl+R) starts and stops recording the output. On stop it writes a stereo 16-bit WAV to  ~/.local/share/rasgo-modular/  named rec-01.wav, rec-02.wav, … next to a rec-NN.score.txt log of the take. Recording auto-stops when the in-memory buffer (about four minutes) fills.",
-    "REC (ou Ctrl+R) começa e para a gravação da saída. Ao parar, grava um WAV estéreo de 16 bits em  ~/.local/share/rasgo-modular/  com nome rec-01.wav, rec-02.wav, … ao lado de um rec-NN.score.txt com o registro da tomada. A gravação para sozinha quando o buffer em memória (cerca de quatro minutos) enche.",
-    "REC (ou Ctrl+R) démarre et arrête l’enregistrement de la sortie. À l’arrêt, il écrit un WAV stéréo 16 bits dans  ~/.local/share/rasgo-modular/  nommé rec-01.wav, rec-02.wav, … à côté d’un rec-NN.score.txt journal de la prise. L’enregistrement s’arrête seul quand le tampon mémoire (environ quatre minutes) est plein.",
-    "REC (o Ctrl+R) inicia y detiene la grabación de la salida. Al parar, escribe un WAV estéreo de 16 bits en  ~/.local/share/rasgo-modular/  llamado rec-01.wav, rec-02.wav, … junto a un rec-NN.score.txt con el registro de la toma. La grabación se detiene sola cuando el búfer en memoria (unos cuatro minutos) se llena."};
+    "REC (or Ctrl+R) starts and stops recording the output. On stop it writes a stereo 16-bit WAV to  ~/Music/RasgoModular/  named by date and time — rec-20260911-143052.wav — next to a matching .score.txt log of the take (so it never overwrites). Recording auto-stops when the in-memory buffer (about four minutes) fills. Set RASGO_REC_DIR to change the folder.",
+    "REC (ou Ctrl+R) começa e para a gravação da saída. Ao parar, grava um WAV estéreo de 16 bits em  ~/Music/RasgoModular/  com nome por data e hora — rec-20260911-143052.wav — ao lado de um .score.txt com o mesmo nome (nunca sobrescreve). A gravação para sozinha quando o buffer em memória (cerca de quatro minutos) enche. RASGO_REC_DIR no ambiente muda a pasta.",
+    "REC (ou Ctrl+R) démarre et arrête l’enregistrement de la sortie. À l’arrêt, il écrit un WAV stéréo 16 bits dans  ~/Music/RasgoModular/  nommé par date et heure — rec-20260911-143052.wav — à côté d’un .score.txt du même nom (n’écrase jamais). L’enregistrement s’arrête seul quand le tampon mémoire (environ quatre minutes) est plein. RASGO_REC_DIR change le dossier.",
+    "REC (o Ctrl+R) inicia y detiene la grabación de la salida. Al parar, escribe un WAV estéreo de 16 bits en  ~/Music/RasgoModular/  con nombre por fecha y hora — rec-20260911-143052.wav — junto a un .score.txt del mismo nombre (nunca sobrescribe). La grabación se detiene sola cuando el búfer en memoria (unos cuatro minutos) se llena. RASGO_REC_DIR cambia la carpeta."};
 
 inline const L4 tutHdrTitle {
     "THE HEADER, LEFT TO RIGHT", "O CABEÇALHO, DA ESQUERDA PRA DIREITA", "L’EN-TÊTE, DE GAUCHE À DROITE", "LA CABECERA, DE IZQUIERDA A DERECHA"};
 inline const L4 tutHdrBody {
-    "VARY chaotic hand · STANDBY master mute · CHANGE resample ~25% · EVOLVE the same in 6 steps · CROSS recombine with a new patch · BANK store patch · SAVE write session · REC record WAV · SEED draw patch, with its number box · the readout shows modules / cables / output PEAK · the language button cycles EN→PT→FR→ES · TUTORIAL this screen · ABOUT version and licence.",
-    "VARIA mão caótica · ESPERA muta o master · MUDA reamostra ~25% · EVOLUI o mesmo em 6 passos · CRUZA recombina com um patch novo · BANCO guarda o patch · SALVA grava a sessão · REC grava WAV · SEED sorteia o patch, com a caixa do número · a leitura mostra módulos / cabos / PICO da saída · o botão de idioma cicla EN→PT→FR→ES · TUTORIAL esta tela · SOBRE versão e licença.",
-    "VARIER main chaotique · VEILLE coupe le master · CHANGER rééchantillonne ~25% · ÉVOLUE de même en 6 pas · CROISER recombine avec un nouveau patch · BANQUE stocke le patch · ENREG. écrit la session · REC enregistre un WAV · SEED tire le patch, avec sa case numéro · l’affichage montre modules / câbles / CRÊTE de sortie · le bouton de langue fait EN→PT→FR→ES · TUTORIEL cet écran · À PROPOS version et licence.",
-    "VARIAR mano caótica · ESPERA silencia el master · CAMBIA remuestrea ~25% · EVOLUCIONA lo mismo en 6 pasos · CRUZAR recombina con un patch nuevo · BANCO guarda el patch · GUARDA escribe la sesión · REC graba WAV · SEED sortea el patch, con su caja de número · la lectura muestra módulos / cables / PICO de salida · el botón de idioma cicla EN→PT→FR→ES · TUTORIAL esta pantalla · ACERCA DE versión y licencia."};
+    "VARY chaotic hand · STANDBY master mute · CHANGE resample ~25% · EVOLVE the same in 6 steps · CROSS recombine with a new patch · BANK store patch · SAVE write session · REC record WAV · SEED draw patch, with its number box · the readout shows modules / cables / output PEAK · the language button cycles EN→PT→FR→ES · RACK toggles the rack view: ALL modules ↔ only those reaching the OUTPUT · TUTORIAL this screen · ABOUT version and licence.",
+    "VARIA mão caótica · ESPERA muta o master · MUDA reamostra ~25% · EVOLUI o mesmo em 6 passos · CRUZA recombina com um patch novo · BANCO guarda o patch · SALVA grava a sessão · REC grava WAV · SEED sorteia o patch, com a caixa do número · a leitura mostra módulos / cabos / PICO da saída · o botão de idioma cicla EN→PT→FR→ES · RACK alterna a vista do rack: TODOS os módulos ↔ só os que chegam à SAÍDA · TUTORIAL esta tela · SOBRE versão e licença.",
+    "VARIER main chaotique · VEILLE coupe le master · CHANGER rééchantillonne ~25% · ÉVOLUE de même en 6 pas · CROISER recombine avec un nouveau patch · BANQUE stocke le patch · ENREG. écrit la session · REC enregistre un WAV · SEED tire le patch, avec sa case numéro · l’affichage montre modules / câbles / CRÊTE de sortie · le bouton de langue fait EN→PT→FR→ES · RACK bascule la vue du rack : TOUS les modules ↔ seulement ceux qui atteignent la SORTIE · TUTORIEL cet écran · À PROPOS version et licence.",
+    "VARIAR mano caótica · ESPERA silencia el master · CAMBIA remuestrea ~25% · EVOLUCIONA lo mismo en 6 pasos · CRUZAR recombina con un patch nuevo · BANCO guarda el patch · GUARDA escribe la sesión · REC graba WAV · SEED sortea el patch, con su caja de número · la lectura muestra módulos / cables / PICO de salida · el botón de idioma cicla EN→PT→FR→ES · RACK alterna la vista del rack: TODOS los módulos ↔ solo los que llegan a la SALIDA · TUTORIAL esta pantalla · ACERCA DE versión y licencia."};
 
 inline const L4 tutCableTitle {
     "PATCH CABLES", "CABEAR", "CÂBLER", "CABLEAR"};
@@ -172,10 +183,10 @@ inline const L4 tutNavBody {
 inline const L4 tutModTitle {
     "ADD, MOVE, REMOVE MODULES", "ADICIONAR, MOVER, REMOVER MÓDULOS", "AJOUTER, DÉPLACER, RETIRER DES MODULES", "AÑADIR, MOVER, QUITAR MÓDULOS"};
 inline const L4 tutModBody {
-    "The left column is the palette — the full catalogue, grouped by family. Drag a name from it into the rack to add that module. Drag a module by its body to reposition it. To remove one: click the [x] at its top-right corner, or drag it back onto the palette. The instrument opens with one of every module already in the rack, all silent until you cable them.",
-    "A coluna da esquerda é a paleta — o catálogo inteiro, agrupado por família. Arraste um nome dela pra o rack pra adicionar aquele módulo. Arraste um módulo pelo corpo pra reposicionar. Pra remover: clique no [x] no canto superior direito, ou arraste o módulo de volta pra paleta. O instrumento abre com um de cada módulo já no rack, todos mudos até você cabeá-los.",
-    "La colonne de gauche est la palette — le catalogue complet, groupé par famille. Glissez-en un nom dans le rack pour ajouter ce module. Glissez un module par son corps pour le repositionner. Pour en retirer un : cliquez le [x] en haut à droite, ou glissez le module vers la palette. L’instrument s’ouvre avec un de chaque module déjà dans le rack, tous muets jusqu’à ce que vous les câbliez.",
-    "La columna izquierda es la paleta — el catálogo completo, agrupado por familia. Arrastre un nombre de ella al rack para añadir ese módulo. Arrastre un módulo por su cuerpo para reubicarlo. Para quitar uno: clic en la [x] de su esquina superior derecha, o arrástrelo de vuelta a la paleta. El instrumento abre con uno de cada módulo ya en el rack, todos mudos hasta que los cablee."};
+    "The left column is the palette — the full catalogue, grouped by family. Drag a name from it into the rack to add that module. Drag a module by its body to reposition it. To remove one: click the [x] at its top-right corner, or drag it back onto the palette. The rack holds one of every module. The instrument does not open silent: it draws a seed and plays at once — see BUILD FROM SCRATCH for the other way in.",
+    "A coluna da esquerda é a paleta — o catálogo inteiro, agrupado por família. Arraste um nome dela pra o rack pra adicionar aquele módulo. Arraste um módulo pelo corpo pra reposicionar. Pra remover: clique no [x] no canto superior direito, ou arraste o módulo de volta pra paleta. O rack tem um de cada módulo. O instrumento não abre mudo: ele sorteia um seed e já toca — veja CONSTRUIR DO ZERO pro outro caminho.",
+    "La colonne de gauche est la palette — le catalogue complet, groupé par famille. Glissez-en un nom dans le rack pour ajouter ce module. Glissez un module par son corps pour le repositionner. Pour en retirer un : cliquez le [x] en haut à droite, ou glissez le module vers la palette. Le rack contient un de chaque module. L’instrument ne s’ouvre pas muet : il tire un seed et joue aussitôt — voir CONSTRUIRE DE ZÉRO pour l’autre voie.",
+    "La columna izquierda es la paleta — el catálogo completo, agrupado por familia. Arrastre un nombre de ella al rack para añadir ese módulo. Arrastre un módulo por su cuerpo para reubicarlo. Para quitar uno: clic en la [x] de su esquina superior derecha, o arrástrelo de vuelta a la paleta. El rack tiene uno de cada módulo. El instrumento no abre mudo: sortea un seed y suena de inmediato — vea CONSTRUIR DESDE CERO para la otra vía."};
 
 inline const L4 tutFamTitle {
     "THE EIGHT FAMILIES", "AS OITO FAMÍLIAS", "LES HUIT FAMILLES", "LAS OCHO FAMILIAS"};
@@ -185,6 +196,31 @@ inline const L4 tutFamBody {
     "SOURCE crée du son à partir de rien (oscillateurs, modèles physiques, bruit). TRANSFORM modifie un signal qui la traverse — audio ou contrôle (filtres, VCA, waveshapers). MODULATE génère un signal de contrôle (enveloppes, LFO, chaos, sample-and-hold). TIME marque le temps (horloge, logique d’horloge, séquenceurs). DECISION choisit une valeur (quantifier, harmoniser, compter). ROUTE achemine les signaux (commutateur, matrice, multiple, morph). SPACE spatialise et mémorise le son (delay, réverbe, granulaire, looper). OUT mixe, mesure et envoie (mixeur, master, scope, note-out).",
     "SOURCE hace sonido de la nada (osciladores, modelos físicos, ruido). TRANSFORM cambia una señal que pasa por él — audio o control (filtros, VCA, modeladores de onda). MODULATE genera una señal de control (envolventes, LFO, caos, sample-and-hold). TIME marca el tiempo (reloj, lógica de reloj, secuenciadores). DECISION elige un valor (cuantizar, armonizar, contar). ROUTE encamina señales (conmutador, matriz, múltiple, morph). SPACE espacializa y recuerda el sonido (delay, reverb, granular, looper). OUT mezcla, mide y envía (mezclador, master, scope, note-out)."};
 
+// Cartão de ATALHOS. Os atalhos estavam espalhados pelos outros cartões
+// (seed, REC, navegação) e as teclas de uma letra — g, v, m, e, c — não
+// apareciam em lugar nenhum: quem só lesse o tutorial não descobria que
+// existiam. Reunidos aqui, sem tirar as menções em contexto.
+// Os dois caminhos de uso. O instrumento toca sozinho por omissão, mas
+// construir o patch à mão é caminho de primeira classe, não gambiarra —
+// e faltava dizer isso em algum lugar (o autor perguntou se a opção
+// existia; existia só como dezenas de cliques, por isso veio o [n]).
+inline const L4 tutScratchTitle {
+    "BUILD FROM SCRATCH", "CONSTRUIR DO ZERO",
+    "CONSTRUIRE DE ZÉRO", "CONSTRUIR DESDE CERO"};
+inline const L4 tutScratchBody {
+    "There are two ways in. One: press SEED and steer what comes out. Two: press n to pull every cable at once — the modules stay, the sound stops — and build the piece connection by connection. The rack is the set of modules available; the patch is the cabling. While building, keep RACK on ALL so you can see everything; switch it to OUTPUT to show only the modules that actually reach the sound, which is also how you thin a crowded rack without removing anything. Ctrl+Z steps back one action, cable by cable.",
+    "Há dois caminhos. Um: aperte SEED e conduza o que sair. Dois: aperte n pra tirar todos os cabos de uma vez — os módulos ficam, o som para — e construa a peça ligação por ligação. O rack é o conjunto de módulos disponíveis; o patch é o cabeamento. Enquanto constrói, deixe RACK em TODOS pra enxergar tudo; passe pra SAÍDA pra ver só os módulos que de fato chegam ao som, que é também como enxugar um rack cheio sem remover nada. Ctrl+Z volta uma ação, cabo a cabo.",
+    "Il y a deux voies. Une : appuyez sur SEED et dirigez ce qui sort. Deux : appuyez sur n pour retirer tous les câbles d’un coup — les modules restent, le son s’arrête — et construisez la pièce liaison par liaison. Le rack est l’ensemble des modules disponibles ; le patch est le câblage. Pendant la construction, gardez RACK sur TOUS ; passez à SORTIE pour ne voir que les modules qui atteignent le son, ce qui allège aussi un rack chargé sans rien retirer. Ctrl+Z revient d’une action, câble par câble.",
+    "Hay dos vías. Una: pulse SEED y guíe lo que salga. Dos: pulse n para quitar todos los cables de una vez — los módulos quedan, el sonido para — y construya la pieza conexión por conexión. El rack es el conjunto de módulos disponibles; el patch es el cableado. Mientras construye, deje RACK en TODOS; pase a SALIDA para ver solo los módulos que llegan al sonido, que es también cómo aligerar un rack cargado sin quitar nada. Ctrl+Z retrocede una acción, cable a cable."};
+
+inline const L4 tutKeysTitle {
+    "KEYBOARD", "TECLADO", "CLAVIER", "TECLADO"};
+inline const L4 tutKeysBody {
+    "g new seed  ·  v live variation on/off  ·  m mutate  ·  e evolve (six small steps)  ·  c cross with a fresh donor patch  ·  space breaks and restores every cable at once  ·  Ctrl+S save the session  ·  Ctrl+B file the patch in the bank  ·  Ctrl+R record  ·  Ctrl+Z undo (one action back, cable by cable)  ·  n pull every cable  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  arrows scroll the rack  ·  q quit. Inside TUTORIAL and ABOUT: arrows, Page Up/Down, Home/End scroll, Esc closes.",
+    "g sorteia um seed  ·  v liga/desliga a variação ao vivo  ·  m muda  ·  e evolui (seis passos pequenos)  ·  c cruza com um doador novo  ·  [espaço] rompe e reata todos os cabos de uma vez  ·  Ctrl+S salva a sessão  ·  Ctrl+B arquiva o patch no banco  ·  Ctrl+R grava  ·  Ctrl+Z desfaz (uma ação, cabo a cabo)  ·  n tira todos os cabos  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  setas rolam o rack  ·  q sai. Dentro de TUTORIAL e SOBRE: setas, Page Up/Down, Home/End rolam, Esc fecha.",
+    "g nouveau seed  ·  v variation en direct on/off  ·  m muter  ·  e évoluer (six petits pas)  ·  c croiser avec un donneur neuf  ·  espace rompt et rétablit tous les câbles d’un coup  ·  Ctrl+S enregistre la session  ·  Ctrl+B classe le patch dans la banque  ·  Ctrl+R enregistre  ·  Ctrl+Z annule (une action, câble par câble)  ·  n retire tous les câbles  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flèches font défiler le rack  ·  q quitte. Dans TUTORIEL et À PROPOS : flèches, Page Haut/Bas, Origine/Fin défilent, Échap ferme.",
+    "g sortea un seed  ·  v activa/desactiva la variación en vivo  ·  m muta  ·  e evoluciona (seis pasos pequeños)  ·  c cruza con un donante nuevo  ·  espacio rompe y restablece todos los cables a la vez  ·  Ctrl+S guarda la sesión  ·  Ctrl+B archiva el patch en el banco  ·  Ctrl+R graba  ·  Ctrl+Z deshace (una acción, cable a cable)  ·  n quita todos los cables  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flechas desplazan el rack  ·  q sale. Dentro de TUTORIAL y ACERCA DE: flechas, Re/Av Pág, Inicio/Fin desplazan, Esc cierra."};
+
 inline const L4 tutLearnTitle {
     "LEARN — EVERY MODULE, EVERY KNOB", "LEARN — CADA MÓDULO, CADA KNOB", "LEARN — CHAQUE MODULE, CHAQUE POT.", "LEARN — CADA MÓDULO, CADA KNOB"};
 inline const L4 tutLearnBody {
@@ -192,6 +228,16 @@ inline const L4 tutLearnBody {
     "Passe o mouse sobre o corpo de um módulo e a caixa no canto inferior esquerdo diz pra que aquele módulo serve. Passe sobre qualquer knob ou jack e ela explica aquele controle naquele módulo, em três níveis — rápido, como funciona, e um experimento. Um guia escrito mais completo e receitas de patch estão a caminho, como site e PDF.",
     "Survolez le corps d’un module : la boîte en bas à gauche dit à quoi sert ce module. Survolez un potentiomètre ou un jack : elle explique ce contrôle dans ce module, sur trois niveaux — rapide, comment ça marche, et une chose à essayer. Un guide écrit plus complet et des recettes de patch arrivent, sous forme de site et de PDF.",
     "Pase el ratón sobre el cuerpo de un módulo: la caja de la esquina inferior izquierda dice para qué sirve ese módulo. Pase sobre un knob o jack: explica ese control en ese módulo, en tres niveles — rápido, cómo funciona, y algo para probar. Una guía escrita más completa y recetas de patch están en camino, como sitio y PDF."};
+
+// Caixa LEARN sem nada sob o mouse. Existia como literal fixo em
+// português dentro do `panel_main.cpp` — os outros três idiomas viam uma
+// frase em português. Trazida pra cá em 2026-09-14, quando o app JUCE
+// precisou da mesma dica.
+inline const L4 learnIdle {
+    "hover a knob or jack of a module in the rack.",
+    "passe o mouse sobre um knob ou jack de um módulo do rack.",
+    "survolez un potentiomètre ou un jack d’un module du rack.",
+    "pase el ratón sobre un knob o jack de un módulo del rack."};
 
 // ---- créditos / sobre -----------------------------------------------
 inline const L4 aboutBody {

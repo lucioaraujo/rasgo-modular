@@ -459,8 +459,37 @@ corrido módulo-a-módulo (uma página por módulo, prosa, não só o hover do
 LEARN) e um caderno de **receitas de patch** passo a passo. É o trabalho
 central da fase didática.
 
+**Atualização (2026-09-09 a 2026-09-12):** o guia módulo-a-módulo está
+**feito** — `guia/NN_*.md`, as 58 páginas, todas as 8 famílias, gabarito
+de 8 partes. Em 2026-09-12, um segundo passe **aprofundou** cada página
+(pedido do autor: "explique bem", "bem didático") — o conceito por trás
+de cada parâmetro explicado desde o início pra quem não conhece o
+termo, não só a fórmula. `COMO_PENSAR.md`, `CABEAMENTO.md`,
+`RELACAO_DE_CABO.md` (nova, cobre a relação de `Cable`) e
+`APENDICE_equivalencias.md` também estão prontos e passaram pelo mesmo
+aprofundamento. **Atualização (2026-09-12): `RECEITAS.md` também está
+completo** — 10 receitas passo a passo. **A fase didática do Rasgo
+Modular está fechada**; só falta a tradução, quando o site for
+construído.
+
 A tabela de equivalências ModularGrid → RASGO (feita nesta revisão) entra
 como apêndice: "se você conhece o módulo X do Eurorack, no RASGO é o Y".
+
+**`RASGO_MODULAR/guia/` — as 58 páginas de módulo prontas (2026-09-11).**
+Iniciado 2026-09-09. Estrutura em 4 partes (`guia/00_indice.md`):
+mentalidade (`COMO_PENSAR.md` — como pensar/criar no instrumento),
+funcionamento (`CABEAMENTO.md` — áudio×CV, o caminho do som, cada tipo
+de entrada, feedback, fan-in), os **módulos um a um** (gabarito de 8
+partes: a ideia · por dentro · **os jacks um a um** · controles · como
+cabear · **potencializar** · Eurorack), e o apêndice de equivalências.
+**As 8 famílias completas, 58/58**, conferidas contra o construtor
+`Signal(...)` de cada `.hpp` + `LearnCatalog` + dossiê §1. Só PT;
+estrutura pronta pra tradução. **A página de guia é entregável de todo
+módulo novo** (junto com o dossiê). Registro por lote em `TAREFAS.md`.
+
+**Falta:** o caderno de `guia/RECEITAS.md` (montagens passo a passo — 10
+receitas planejadas no esqueleto) e a tradução (EN/FR/ES) quando o site
+for construído.
 
 ---
 

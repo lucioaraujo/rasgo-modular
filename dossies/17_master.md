@@ -2,10 +2,12 @@
 
 **Família:** MIX / METER
 **Estado:** **implementado — marco 2** (2026-09-02); default de `gain`
-fixo em todo seed — **−24 dB (50% do slider)** desde 2026-09-05 (era
-−38,4 / 30% em 2026-09-04) — pedido exato do autor, ver `TAREFAS.md`
-registros "MASTER — volume padrão mais baixo", "MASTER — gain fixo em
-30% do slider" e "painel — NOISE... / MASTER 50%"; limitador
+fixo em todo seed — **−6 dB (75% do slider)** desde 2026-09-10 (−38,4 /
+30% em 2026-09-04; −24 / 50% de 2026-09-05 a 2026-09-10) — pedido exato
+do autor, ver `TAREFAS.md` registros "MASTER — volume padrão mais baixo",
+"MASTER — gain fixo em 30% do slider", "painel — NOISE... / MASTER 50%" e
+"seed — MASTER 75%"; o limitador true-peak + body-guard seguram o teto
+(−1 dBFS) — em 400 seeds a −6 dB, 0 passaram de −1 dBFS; limitador
 passou a considerar PICO VERDADEIRO (entre amostras), não só pico de
 amostra, em 2026-09-04 (ver `TAREFAS.md`, registro "excelência de saída
 — true peak + dither TPDF"; `src/dsp/TruePeak.hpp`); **guarda

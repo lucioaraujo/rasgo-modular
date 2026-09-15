@@ -5765,3 +5765,1988 @@ do seed como campo de texto, navegação botão-do-meio/borda, tutorial de
 `dossies/10_space.md` (anti-zíper), `dossies/00_indice.md` (painel +
 LEARN de 60), `PESQUISA_MODULOS.md §2.7` (o TUTORIAL vira insumo da fase
 didática; o que falta = guia corrido módulo-a-módulo + receitas).
+
+## Registro da etapa — 2026-09-09: fase didática — guia módulo-a-módulo (andaime + piloto)
+
+Começa a **fase didática** (`PESQUISA_MODULOS.md §2.7`) — o guia de
+referência voltado ao músico, base do site multilíngue futuro e de um
+PDF. Corre **em paralelo** com o desenvolvimento: o catálogo do Rasgo
+Modular segue permanentemente aberto, então cada módulo novo passa a
+ganhar sua página de guia junto com o dossiê.
+
+Decisões do autor: **só PT agora** (estrutura pronta pra tradução
+depois); **piloto → família → família** (fecha o formato antes de
+escalar).
+
+**`RASGO_MODULAR/guia/` (NOVO):**
+- `00_indice.md` — índice por família (58 módulos tocáveis / 60 dossiês),
+  o gabarito de página de 7 partes (pra que serve · portas · cada
+  controle · como cabear · experimente · equivalente Eurorack), nota de
+  língua, progresso.
+- `APENDICE_equivalencias.md` — "se você conhece o Eurorack": tabela de
+  papéis por família, semeada de `RASGO_MODULAR.md §36.3` + dossiês §2.
+- `RECEITAS.md` — esqueleto com 10 receitas planejadas (fase final).
+- **Piloto (3/58):** `18_oscilador.md` (OSC — médio), `34_mult.md`
+  (MULT — simples), `10_space.md` (SPACE — complexo). Conferidos contra
+  o `.hpp` de cada módulo (nomes de porta/parâmetro e faixas do código,
+  não do dossiê — o `OSC` ganhou `prox` depois do dossiê §5; o `MULT` é
+  ROUTE no `00_indice`, não "UTILITY" do cabeçalho do dossiê 34).
+
+**Governança:** `dossies/00_indice.md` (aponta pra `../guia/`),
+`RASGO_MODULAR.md §36.8.1` (novo — registra a fase e o diretório),
+`README.md` (link), `PESQUISA_MODULOS.md §2.7` (marca o iniciado).
+Pendente: acrescentar "página de guia" como entregável no
+`AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`.
+
+Sem mudança de código / build / testes — **72/72 CTest** intocado.
+
+**Próximo:** revisão do autor do piloto (formato / profundidade / tom);
+depois SOURCE família inteira. Fila DSP inalterada (SPECTRA FFT real,
+SHIFTER all-pass IIR — quando o autor pedir).
+
+## Registro da etapa — 2026-09-09: painel — vista do rack (botão `RACK`, 3 estados)
+
+Pedido do autor: além da vista de todos os módulos, um botão no cabeçalho
+pra ver **só os módulos que atuam no patch**. Fechado como um botão que
+**cicla 3 estados**: `TODOS` → `SAÍDA` (só os que chegam ao `sink`) →
+`SAÍDA+CABO` (esses + qualquer módulo com um cabo). É **só uma vista** — a
+gestão manual do rack (instanciar/duplicar pela paleta, remover
+arrastando de volta) segue igual e independente.
+
+**`src/core/SignalGraph.hpp`:**
+- `reachableMask(outputNode)` privado — extraído da poda que
+  `evaluationOrder()` já fazia (BFS reverso sobre conexões + feedback +
+  links de parâmetro). `evaluationOrder()` chama o helper; **comportamento
+  idêntico** — `test_seed_patch` byte-idêntico.
+- `nodesFeeding(outputNode)` público (= `reachableMask`) e
+  `nodesConnected()` público (nó tocado por qualquer cabo/link). Fora do
+  caminho de áudio.
+
+**`apps/panel/panel_main.cpp`:** `Mod::shownInView`; `enum RackView` +
+estado + pref `dataDir()/rack-view` (all/output/wired, como o `ui-lang`);
+`relayout()` monta a máscara e os ocultos não ocupam espaço (reflow);
+render + hit-tests + `rebuildJacks` pulam os ocultos; `relayout()` novo
+após cabear/descabear (o módulo aparece/some ao vivo); leitura vira
+`visíveis/total`; vista vazia → dica no centro; reordenar por arraste só
+na vista `TODOS`. Botão `HA_RACKVIEW` no cluster da direita (anel de
+destaque quando ≠ TODOS), `actRackView()` cicla + salva + relayout.
+
+**`apps/panel/UiLanguage.hpp`:** `hdrRackAll`/`hdrRackOut`/`hdrRackOutW` +
+`rackViewEmpty` (4 línguas); `tutHdrBody` menciona o botão.
+
+**Testes:** `test_signal_graph` — `testActiveAndConnectedSets`
+(órfão fora; alimentador direto/transitivo dentro; fonte de feedback
+dentro; fonte de link de parâmetro dentro; `feed ⊆ wired`; índice
+inválido → máscara zerada). `test_ui_language` — completude das 3
+strings. **72/72 CTest Debug + Release**, painel `-Wall -Wextra` limpo,
+smoke test (abre com seed denso, lê o pref, não quebra).
+
+**Docs:** `apps/panel/design.md §2.11`, `RASGO_MODULAR.md §36.7`,
+`dossies/00_indice.md`, `README.md`.
+
+## Registro da etapa — 2026-09-10: seed — passeio restrito ao subgrafo audível (nenhum cabo sem função)
+
+A vista `RACK · SAÍDA` expôs: o gerador de seed cabeava **~62 %** dos
+cabos em módulos que **não chegavam à saída** — fiação de exploração pelo
+rack inteiro, inaudível. O autor: *"não gostaria que os cabos ficassem
+sem função sonora no patch do seed."* Medido em 500 seeds: 37 cabos/seed,
+23 mortos, 17 módulos mortos.
+
+Descartado: rede de resgate pra o MIXER (precisaria de ~16 canais e não
+cobre os cabos de CV/gate mortos); mais canais (idem). **Feito: restringir
+o passeio.**
+
+**`apps/panel/PatchSeed.hpp` (+39/−2):**
+- O "passeio ponderado" e a fiação da `DRIFT` só aceitam destino em
+  módulo que **já chega à saída** — `g.nodesFeeding(sink)`, recalculado a
+  cada cabo. O conjunto **cresce** durante o passeio: ligar `OSC.saw →
+  SHAPE.mod` (SHAPE audível) faz o OSC e a montante passarem a chegar à
+  saída, abrindo novos destinos. Tentativas por cabo 12 → 16 (a rejeição
+  consome tentativa).
+- **Poda final** (limitada pelo nº de cabos): remove os cabos de MONTAGEM
+  que sobraram órfãos — ex.: voz de ruído + `CLOCK→QUANTIZER`/
+  `TURING→QUANTIZER` sem oscilador consumindo a altura.
+
+**Resultado (1000 seeds, por complexity):**
+- baixa: 20 → 14 cabos, 10 → **12** módulos audíveis
+- média: 39 → 24 cabos, 12 → **17**
+- alta: 68 → 45 cabos, 16 → **25**
+Menos cabos (os mortos sumiram), **mais módulos de fato soando** —
+cada cabo do passeio agora torna algo audível ou modula algo audível.
+
+**Validação:** 2000 seeds — 0 crash, 0 fan-in ilegal, 0 saída
+não-finita, **0 cabo morto**; quase-mudos 44/2000 (era 47). Determinístico.
+`test_seed_patch` ganha a asserção `deadCables == 0` e passa.
+
+**Custo assumido:** o stream de RNG diverge → **todo `RASGO_SEED=N`
+anterior produz um patch diferente**. Aprovado pelo autor.
+
+**Depende de:** `SignalGraph::nodesFeeding()` (adicionado na etapa da
+vista do rack, 2026-09-09) — agora também é load-bearing pro gerador de
+seed.
+
+**Docs:** topo de `PatchSeed.hpp`, `apps/panel/design.md §2.3`,
+`RASGO_MODULAR.md §36.7`.
+
+**72/72 CTest Debug + Release.**
+
+## Registro da etapa — 2026-09-10: painel — vista do rack volta a 2 estados
+
+Consequência direta do seed sem cabo morto: o autor notou que *"só faz
+sentido ter 'RACK all' e 'RACK saída'"* — com todo patch de seed sem cabo
+morto, `SAÍDA` e `SAÍDA+CABO` (`nodesFeeding` vs `nodesFeeding ∪
+nodesConnected`) ficam **idênticas**; a 3ª vista só diferia num ramo
+meio-cabeado à mão. Tirada.
+
+`apps/panel/panel_main.cpp`: `enum RackView { All, Output }` (era 3);
+botão **alterna** (não cicla); `relayout` usa só `nodesFeeding`; pref
+`rack-view` aceita só `all`/`output` (o antigo `wired` cai em `output`).
+`UiLanguage.hpp`: `hdrRackOutW` removido; `tutHdrBody` volta a "alterna
+2 estados" (4 línguas). `SignalGraph::nodesConnected()` fica (consulta
+genérica de topologia, testada) mas não tem mais consumidor no painel.
+`test_signal_graph` e `test_ui_language` ajustados.
+
+Também investigado: **áudio "mais baixo"** — 400 seeds antes/depois: RMS
+média −49 dB nos dois, pico mediana −36 dB nos dois (Δ −0,2 dB, nada). O
+painel abre baixo **de propósito** (MASTER −24 dB desde 2026-09-05, a
+pedido do autor — "sobe na mão a partir daí"); cada seed mudou, então o
+patch de agora pode ser um mais quieto, mas a média do gerador não mexeu.
+**"SPACE sempre aparece sem cabo"**: em 60 seeds novos o SPACE nunca
+aparece na vista `SAÍDA` sem cabo (16/60 aparecem, sempre cabeados) — era
+a 3ª vista (`nodesConnected` conta o link de parâmetro DRIFT→SPACE.mix,
+que sobrevive a tirar o cabo de áudio à mão). Resolvido junto ao tirar a
+3ª vista.
+
+## Registro da etapa — 2026-09-10: seed — MASTER 75% do slider
+
+O autor: *"suba o default do master para todos os seeds para 75%."* Faixa
+do `gain` do MASTER −60..+12 dB → 75% = **−6 dB** (era 50% / −24 dB).
+`apps/panel/PatchSeed.hpp`: `setT("MASTER","gain",-6.0f)`.
+
+Verificado (400 seeds): RMS média −31 dBFS (era −49), pico mediana
+−18 dBFS, **max −5,5 dBFS — 0/400 passam de −1 dBFS, 0 clip, 0 mudos**. O
+limitador true-peak + body-guard do MASTER (ligados por default) seguram
+o teto. +18 dB, claramente audível, com folga.
+
+Docs: `dossies/17_master.md`, `apps/panel/design.md §2.3`.
+
+**72/72 CTest Debug + Release.**
+
+## Registro da etapa — 2026-09-10: guia — mentalidade + cabeamento + SOURCE (parte)
+
+O autor definiu o alvo da publicação: *"a pessoa entende como pensar a
+tocar o instrumento (como criar)"* — com a camada conceitual + técnica de
+cada módulo, como o todo funciona, como potencializar uma ideia. E pediu
+explicitamente: **explicar bem cada jack** (o que plugar, o que vai ao
+mixer), feedback, e quais jacks aceitam múltiplos cabos.
+
+**`guia/` reestruturado em 4 partes** (`00_indice.md` reescrito):
+1. **Mentalidade** — `COMO_PENSAR.md` (NOVO): soa ao carregar; o seed é
+   hipótese, não preset; o cabo é objeto (relação/ruptura/cicatriz); a
+   relação entre saídas é o gesto; `drift` e o módulo `DRIFT`/`VARIA`; as
+   8 famílias como verbos; o instrumento que se ouve; autonomia ↔
+   acoplamento; como ter e crescer uma ideia.
+2. **Funcionamento** — `CABEAMENTO.md` (NOVO): áudio × controle (halo
+   duplo), o caminho do som (MIXER 4 canais → MASTER → placa),
+   entrada por entrada (`1V/O`/`GATE`/`TRIG`/`FM`/`_mod`…), somar sinais
+   (fan-in é explícito — 2º cabo substitui; use MIXER/VCA/CONTROL),
+   **retroalimentar** um módulo (o painel marca feedback sozinho, atraso
+   de 1 bloco; + os knobs `feedback` embutidos), tabela de fontes de
+   modulação, o patch mínimo comentado.
+3. **Módulos** — gabarito de **8 partes** (ideia · por dentro · **os
+   jacks, um a um** · controles · como cabear · **potencializar** ·
+   Eurorack).
+4. **Receitas** — `RECEITAS.md` (esqueleto).
+
+**Páginas de módulo (5/58):** `OSC` reescrito no gabarito novo; `MATTER`,
+`STRING` novos (jack a jack — o que plugar, de onde vem, se vai ao
+mixer). `MULT`/`SPACE` ficam no formato antigo até o passe de detalhe.
+
+Fase didática — `PESQUISA_MODULOS.md §2.7`. Sem código. **72/72 CTest**
+intocado.
+
+**Próximo:** resto da família SOURCE (NOISE, CHORD, PLL, WAVETABLE,
+ADDITIVE, OPERATOR, DRUM, SIGNAL-IN, PULSAR, SPECTRA).
+
+## Registro da etapa — 2026-09-11: guia — família SOURCE completa
+
+`guia/` — a família **SOURCE inteira (13/13)** no gabarito de 8 partes,
+com o "jack a jack" que o autor pediu (tipo, o que plugar, de onde vem,
+se vai ao mixer): `NOISE`, `CHORD`, `PLL`, `WAVETABLE`, `ADDITIVE`,
+`OPERATOR`, `DRUM`, `SIGNAL-IN`, `PULSAR`, `SPECTRA` (+ `OSC`, `MATTER`,
+`STRING` da leva anterior). Conferidas contra o construtor `Signal(...)`
+de cada `.hpp` (nomes/faixas de porta e parâmetro) e contra o
+`LearnCatalog`.
+
+**15/58 páginas de módulo** (SOURCE + `MULT`/`SPACE` piloto). Total no
+`guia/`: 20 arquivos. Links pra `../dossies/` resolvem.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** família TRANSFORM (`FILTER`, `PARAMETRIC`, `VCA`, `CONTROL`,
+`SHAPE`, `LPG`, `WASP`, `GLIDE`, `FORMANT`, `CRUSH`, `RESONATOR`,
+`SHIFTER`, `VCA4`, `VOCODER`).
+
+## Registro da etapa — 2026-09-11: guia — família TRANSFORM completa
+
+`guia/` — a família **TRANSFORM inteira (14/14)** no gabarito de 8 partes,
+jack a jack: `FILTER`, `PARAMETRIC`, `VCA`, `CONTROL`, `SHAPE`, `LPG`,
+`WASP`, `GLIDE`, `FORMANT`, `CRUSH`, `RESONATOR`, `SHIFTER`, `VCA4`,
+`VOCODER`. Conferidas contra o construtor `Signal(...)` de cada `.hpp` e
+contra o `LearnCatalog` + dossiê §1.
+
+**29/58 páginas de módulo** (SOURCE + TRANSFORM + `MULT`/`SPACE` piloto).
+34 arquivos no `guia/`. Links pra `../dossies/` resolvem.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** MODULATE (`FUNCTION`, `ENVELOPE`, `SH`, `DRIFT`, `CHAOS`,
+`STAGES`).
+
+## Registro da etapa — 2026-09-11: painel — gravações em ~/Music, nome por data/hora
+
+O autor: *"gravações em /home/luc/Music/RasgoModular"* + *"nomes de
+arquivos também com datas e hora, minuto, etc"*. O bug de fundo: o
+contador `rec-%02d` reiniciava em 01 a cada abertura do painel → a 1ª
+gravação de uma sessão nova sobrescrevia o `rec-01.wav` da anterior.
+
+**`apps/panel/panel_main.cpp`:**
+- `recDir()` (novo) — `~/Music/RasgoModular/` (a pasta de música do
+  usuário; `RASGO_REC_DIR` no ambiente muda o destino). Criado no 1º
+  `Ctrl+R`, não no arranque.
+- `recStamp()` (novo) — `rec-%Y%m%d-%H%M%S` via `localtime_r` +
+  `strftime` (`rec-20260911-143052`).
+- `stopRec` — `.wav` + `.score.txt` de mesmo nome (o stem do timestamp),
+  em `recDir()`. Colisão no mesmo segundo → sufixo `-2`, `-3`… **Nunca
+  sobrescreve.** O `recCount` fica só pra o dither/telemetria.
+- O **estado interno** (session.rmp, banco, prefs) segue em
+  `~/.local/share/rasgo-modular/` — só as gravações mudaram de casa.
+
+Docs: `UiLanguage.hpp` (`tutRecBody`, 4 línguas), `design.md §2.8`,
+`RASGO_MODULAR.md §36.7`, `README.md`. Testado (lógica de dir/stamp/
+colisão isolada; painel compila `-Wall -Wextra`). As gravações antigas
+(`rec-01..04.wav` em `~/.local/share/rasgo-modular/`) ficam onde estão —
+mover é decisão do autor.
+
+## Registro da etapa — 2026-09-11: guia — família MODULATE completa
+
+`guia/` — **MODULATE (6/6)** no gabarito de 8 partes, jack a jack:
+`FUNCTION`, `ENVELOPE`, `SH`, `DRIFT`, `CHAOS`, `STAGES`. Ênfase no que
+cada saída **dirige** (é fonte de modulação) e no que cada disparo
+espera. Conferidas contra o construtor `.hpp` + `LearnCatalog` + dossiê
+§1. (Nota: o dossiê do `CHAOS` diz família DECISION; o catálogo do painel
+e o índice do guia usam MODULATE — segui o catálogo.)
+
+**35/58 páginas de módulo** — SOURCE (13) + TRANSFORM (14) + MODULATE (6)
++ `MULT`/`SPACE`. 3 famílias inteiras.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** TIME (`CLOCK`, `TURING`, `SEQUENCE`, `LOGIC`, `TRIGSEQ`).
+
+## Registro da etapa — 2026-09-11: guia — família TIME completa
+
+`guia/` — **TIME (5/5)**: `CLOCK`, `TURING`, `SEQUENCE`, `LOGIC`,
+`TRIGSEQ`. Gabarito de 8 partes, jack a jack — ênfase em qual saída de
+gate vai em qual entrada de disparo, e no que é "escrito" vs. "emerge".
+Conferidas contra o `.hpp` + `LearnCatalog` + dossiê §1.
+
+**40/58 páginas de módulo** — 4 famílias inteiras (SOURCE 13, TRANSFORM
+14, MODULATE 6, TIME 5) + `MULT`/`SPACE`. 45 arquivos no `guia/`.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** DECISION (`DECISION`, `QUANTIZER`, `HARMONY`, `ABACUS`,
+`BOXCAR`).
+
+## Registro da etapa — 2026-09-11: guia — família DECISION completa
+
+`guia/` — **DECISION (5/5)**: `DECISION`, `QUANTIZER`, `HARMONY`,
+`ABACUS`, `BOXCAR`. Gabarito de 8 partes, jack a jack. Conferidas contra
+o `.hpp` + `LearnCatalog` + dossiê §1.
+
+**45/58 páginas de módulo** — 5 famílias inteiras (SOURCE 13, TRANSFORM
+14, MODULATE 6, TIME 5, DECISION 5) + `MULT`/`SPACE`. 50 arquivos no
+`guia/`.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** ROUTE (`SWITCH`, `MATRIX`, `MULT`†, `PLANAR`) — `MULT` já
+tem página piloto, falta o passe de detalhe; depois SPACE (7) e OUT (4).
+
+## Registro da etapa — 2026-09-11: guia — família ROUTE completa (+ MULT revisado)
+
+`guia/` — **ROUTE (4/4)**: `SWITCH`, `MATRIX`, `PLANAR` novos; `MULT`
+reescrito do formato piloto pro gabarito de 8 partes (jack a jack,
+"Potencializar", link pra `CABEAMENTO.md`). Conferidas contra o `.hpp` +
+`LearnCatalog` + dossiê §1.
+
+**48/58 páginas de módulo** — 6 famílias inteiras (SOURCE 13, TRANSFORM
+14, MODULATE 6, TIME 5, DECISION 5, ROUTE 4) + `SPACE` piloto. 53
+arquivos no `guia/`.
+
+Sem código. **72/72 CTest** intocado.
+
+**Próximo:** SPACE (`MEMORY`, `SPACE`†, `LOOPER`, `HALL`, `SAMPLER`,
+`TURNTABLE`, `SWIRL`) e OUT (`MIXER`, `MASTER`, `SCOPE`, `NOTE-OUT`).
+
+## Registro da etapa — 2026-09-11: guia — SPACE + OUT completas → TODOS OS 58 MÓDULOS
+
+`guia/` — as duas últimas famílias:
+- **SPACE (7/7):** `MEMORY`, `LOOPER`, `HALL`, `SAMPLER`, `TURNTABLE`,
+  `SWIRL` novos; `SPACE` reescrito do piloto pro gabarito de 8 partes.
+- **OUT (4/4):** `MIXER`, `MASTER`, `SCOPE`, `NOTE-OUT`.
+
+**As 8 famílias completas — 58/58 páginas de módulo** no gabarito de 8
+partes (a ideia · por dentro · **os jacks um a um** · controles · como
+cabear · **potencializar** · Eurorack), cada uma conferida contra o
+construtor `Signal(...)` do `.hpp` + `LearnCatalog` + dossiê §1.
+SOURCE 13 · TRANSFORM 14 · MODULATE 6 · TIME 5 · DECISION 5 · ROUTE 4 ·
+SPACE 7 · OUT 4.
+
+**63 arquivos no `guia/`:** `00_indice`, `COMO_PENSAR`, `CABEAMENTO`,
+`APENDICE_equivalencias`, `RECEITAS` (esqueleto) + 58 páginas de módulo.
+Links pra `../dossies/` resolvem.
+
+Sem código. **72/72 CTest** intocado.
+
+**Falta da fase didática:** o caderno de `RECEITAS.md` (montagens passo a
+passo) e a tradução (quando o site for construído). A camada de
+mentalidade (`COMO_PENSAR.md`) e a de funcionamento (`CABEAMENTO.md`)
+já estão de pé.
+
+## Registro da etapa — 2026-09-11: guia — relação de cabo explicada, com receitas
+
+Pedido: explicar bem a relação de `Cable` (`RingMod`/`Fold`/`Difference`,
+ruptura/cicatriz, condução probabilística) e dar receitas. Pesquisa: `grep`
+em `apps/panel/panel_main.cpp` e `apps/panel/PatchSeed.hpp` por
+`setRelation|Relation::|setConductance|rupture()|reconnect()` confirmou
+que **o painel não expõe nada disso** hoje — só `[espaço]` (ruptura +
+reconexão global via `[space]`). Leitura completa de `src/core/
+SignalGraph.hpp` (classe `Cable`: `setRelation`, `hasRelation`,
+`rupture`/`reconnect`, `setConductance`, `applyRelation()`) pra extrair as
+fórmulas exatas e o formato de serialização (`cable N:P -> N:P ...
+relation=.. companion=.. amount=..`, `state=ruptured`,
+`conductance=..` — parser é `key=value` livre de ordem).
+
+**Criado `guia/RELACAO_DE_CABO.md`** (nova página, fora da numeração de
+dossiê — é propriedade do cabo, não um módulo):
+- Aviso de honestidade logo no topo: hoje isso só se usa editando o
+  `.rmp` salvo (`Ctrl+S` → `~/.local/share/rasgo-modular/session.rmp`,
+  recarregado com `RASGO_RESUME=1`/`--resume`) ou em C++; não há controle
+  visual no painel.
+- §1 a relação (tabela com as 3 fórmulas exatas + o que soa); §2 ruptura
+  e cicatriz (~350ms de decaimento); §3 condução probabilística
+  (~20Hz, default 1.0); §4 passo a passo de 7 etapas pra editar o `.rmp`
+  à mão, incluindo como mapear posição visual → ID de nó via a linha
+  `panel shown ...`; §5 cinco receitas com índices de porta reais
+  (ring-mod OSC↔OSC, fold via `ENVELOPE.env`, difference via
+  `SPACE.wet`, ruptura seletiva de um único cabo, condução parcial tipo
+  Marbles embutido); §6 pendência explícita de painel
+  (referencia `RASGO_MODULAR.md §36.9` e `apps/panel/design.md`); nota
+  final de equivalência com o Mutable Warps.
+
+Linkada em `guia/00_indice.md` (Parte 2, e na nota "Dois dossiês sem
+página de módulo") e em `guia/COMO_PENSAR.md` §3 ("o cabo é um objeto,
+não um fio").
+
+**64 arquivos no `guia/`.** Link-check de todos os `.md` relativos dentro
+de `guia/*.md` — todos resolvem, nenhum quebrado.
+
+Sem código, sem mudança de comportamento. **72/72 CTest** intocado
+(nada tocou `src/` ou `apps/panel/` nesta etapa).
+
+**Falta da fase didática:** só o caderno de `RECEITAS.md` (montagens
+passo a passo) e a tradução (quando o site for construído). A pendência
+de painel pra relação de cabo/condução/ruptura seletiva **não** é
+trabalho pedido — é gap documentado pra quando alguém decidir picar essa
+tarefa.
+
+## Registro da etapa — 2026-09-11: guia — relação de cabo, explicação aprofundada de cada característica
+
+Pedido: "explique o que é cada coisa... para todos as possibilidades e
+características... bem didático" — a explicação anterior tinha a
+fórmula e uma frase de efeito, mas não explicava os conceitos em si
+(o que é ring-mod, o que é um wavefolder, o que "dirigido por `y`"
+significa) nem cobria os casos-limite.
+
+Reescrita de `guia/RELACAO_DE_CABO.md` §1–§3, mantendo a mesma
+matemática (conferida de novo contra `applyRelation()` e o `process()`
+de `Cable` em `src/core/SignalGraph.hpp:255-399`):
+
+- **§1** virou 3 subseções (`RingMod`/`Fold`/`Difference`), cada uma
+  com: o conceito em si pra quem nunca mexeu (multiplicar sinais gera
+  bandas soma/diferença; dobra reflete em vez de cortar, tipo bola
+  batendo na parede; subtrair cancela o que é igual); a fórmula termo a
+  termo; o papel de `amount` nos extremos (0 e 1); o papel de `y` por
+  regime (áudio × lento × silêncio × valor fixo); e uma caixa "e se o
+  companion for o próprio cabo?" em cada uma (auto-relação: ring-mod
+  vira ~elevar ao quadrado/oitava acima; fold vira distorção dirigida
+  pelo próprio volume recente; difference vira um diferenciador/passa-
+  alta "de graça").
+- **§2** (ruptura/cicatriz) ganhou a mecânica exata: a cicatriz não é um
+  valor congelado, é o **último bloco de áudio em loop**, com envelope
+  que decai exponencialmente (~350 ms) até um piso de silêncio
+  absoluto — verificado linha a linha contra `scarGain_`/`scarPhase_`/
+  `held_` no `process()`.
+- **§3** (condução probabilística) ganhou a mecânica exata: sorteio tipo
+  moeda a cada ~50 ms (não um fade contínuo), transição suavizada em
+  ~30 ms pra não estalar, semente por cabo (determinístico, reproduz
+  igual ao recarregar), e a limitação honesta de que o ritmo do sorteio
+  (~20 Hz) não é ajustável hoje.
+
+Sem código, sem mudança de comportamento — só a explicação. Link-check
+de `guia/RELACAO_DE_CABO.md` OK. **72/72 CTest** intocado.
+
+## Registro da etapa — 2026-09-11: guia — aprofundamento didático iniciado (todos os documentos e módulos)
+
+Pedido: "se aprofunde para todos os módulos e documentos didáticos" —
+levar o padrão de explicação usado no `RELACAO_DE_CABO.md` (conceito em
+si, pra quem não conhece o termo; mecanismo por trás do número/fórmula;
+o que muda em cada extremo/regime) pro resto do `guia/`. Escopo: 58
+páginas de módulo + `CABEAMENTO.md`/`COMO_PENSAR.md`/
+`APENDICE_equivalencias.md`. É trabalho grande — indo em lotes, do jeito
+que a escrita original das páginas foi (`avance`/`continue` por
+família), não tudo de uma vez.
+
+**Feito nesta etapa:**
+- **`CABEAMENTO.md`** (212→335 linhas): por que uma saída vai a vários
+  lugares de graça e uma entrada só aceita um cabo (o que uma entrada É
+  por dentro); por que um laço de feedback não trava (bloco anterior,
+  não "o futuro") nem explode (teto suave, `tanh`, ciclo-limite); o que
+  áudio × controle são de fato (o mesmo número, a diferença é o que se
+  faz com ele) e por que cruzar os tipos funciona; `WIDTH` e as 3 camadas
+  de proteção do `MASTER` (DC, guarda de agudo, limitador **true
+  peak** — o que cada uma resolve); por que 1 V/oitava (percepção de
+  altura é exponencial); a distinção real `GATE`×`TRIG` (duração
+  importa ou não); "soma ao knob" com exemplo numérico concreto.
+- **`guia/01_gerador_de_funcao.md`** (`FUNCTION`, 99→154 linhas), como
+  piloto do padrão aplicado a uma página de módulo: o que é um
+  acumulador de fase (a mesma rampa vira LFO/envelope/oscilador só pela
+  velocidade); o que `SLOPE` faz geometricamente à volta da fase, com os
+  3 casos + o meio-termo; por que `UNI` × `BI` importa pra cada tipo de
+  destino; por que `DRIFT` tira o caráter "mecânico" de um LFO perfeito.
+
+Conferido contra `src/dsp/FunctionGenerator.hpp` (a rampa/`SLOPE`) e
+`src/core/SignalGraph.hpp` (feedback = leitura do bloco anterior; nada
+de código mudou, só a explicação leu o mecanismo real).
+
+Sem código. **72/72 CTest** intocado. **Próximo:** SOURCE e as demais
+famílias de módulo, uma por vez; depois `COMO_PENSAR.md` e
+`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-11: guia — aprofundamento didático, família SOURCE completa (13/13)
+
+Continuação do aprofundamento (pedido "avance"). Todos os 13 módulos de
+SOURCE, no mesmo padrão de `RELACAO_DE_CABO.md`/`CABEAMENTO.md`/
+`FUNCTION`: o conceito em si explicado pra quem não conhece o termo, o
+mecanismo por trás do parâmetro, e o porquê de cada comportamento —
+sempre reconferido contra o `.hpp` real antes de escrever.
+
+- **`OSC`** (#18): o que faz PolyBLEP existir (aliasing de uma quebra
+  abrupta); o sub como flip-flop travado na fase principal; hard sync
+  como reinício forçado; FM linear/through-zero × FM de fase; PWM como
+  fração do ciclo.
+- **`NOISE`** (#19): o que é ruído branco (todas as frequências, mesma
+  energia) e como cada cor nasce de filtrar/integrar/diferenciar esse
+  branco; S&H × smooth como dois jeitos de tratar o mesmo sorteio;
+  Poisson como o "contador Geiger" (tempos aleatórios, não regulares).
+- **`MATTER`** (#9): o que é um "modo" de vibração; por que razões
+  inteiras soam corda e razões esticadas soam sino (física da rigidez);
+  `position` como excitar-num-nó (a mesma física de tocar uma corda em
+  pontos diferentes).
+- **`DRUM`** (#47): por que o pitch-sweep do corpo imita a física de uma
+  pele esticando no impacto; o estalo como ruído passa-alta simulando o
+  ataque antes do corpo assentar; `MAP`/`tanh` como o clique do 909.
+- **`CHORD`** (#26): tabela de intervalo como deslocamentos fixos em
+  semitons; inversão e condução de vozes (voice leading) explicadas do
+  zero; por que a soma escala por `1/√vozes`.
+- **`STRING`** (#11): Karplus-Strong explicado como laço de atraso cujo
+  comprimento é o período da nota, e por que ruído filtrado em loop
+  converge pra uma nota afinada; por que "arcar" com `tanh` no laço não
+  diverge (ciclo-limite).
+- **`PLL`** (#37): detector de fase e por que a correção é gradual, não
+  instantânea; por que o alcance de captura é limitado; `RING` como o
+  mesmo heterodino do `RingMod` de cabo; `FTYP` como distorção de fase
+  (não desafina porque não mexe na taxa).
+- **`PULSAR`** (#56): por que `FREQ`/`FORMANT` não interferem (qualquer
+  periódico gera um pente de harmônicos exatos; mudar o grão só move o
+  envelope espectral por cima do pente).
+- **`SPECTRA`** (#57): análise (banco de passa-faixa + pico) e síntese
+  (senoides de fase contínua) explicadas separadamente; por que sem
+  deslize suave (`BLUR`) haveria "zíper" audível.
+- **`WAVETABLE`** (#40): o que é um quadro (um ciclo gravado, não uma
+  fórmula); por que existem mip-maps (aliasing em notas agudas,
+  resolvido trocando de versão band-limited sozinho); `WARP` como
+  distorção de fase.
+- **`ADDITIVE`** (#42): a ideia de Fourier em uma frase (todo som
+  periódico é soma de senoides); `TILT`/`ODD`/`STRCH`/`COMB` explicados
+  como controles diretos dessa soma (por que só ímpar = quadrada, por
+  causa da simetria da onda).
+- **`OPERATOR`** (#44): o que "um operador modula outro" é de fato
+  (empurra a fase do outro); por que `INDEX` controla quantas bandas
+  laterais aparecem; por que razões inteiras = harmônico e fracionárias
+  = inarmônico; `FB` como automodulação virando dente-de-serra.
+- **`SIGNAL-IN`** (#49): por que um anel (ring buffer) evita estalos
+  entre a thread de captura e o motor; *last-note priority* explicado
+  (a pilha de teclas); por que silêncio determinístico sem hardware
+  importa pra teste.
+
+Link-check de `guia/*.md` OK (todos os `.md` relativos resolvem). Sem
+código, sem mudança de comportamento. **72/72 CTest** intocado.
+
+**Próximo:** TRANSFORM (14 módulos: `FILTER`, `FORMANT`, `VOCODER`,
+`RESONATOR`, `WASP`, `LPG`, `VCA`, `VCA4`, `SHAPE`, `SHIFTER`, `CRUSH`,
+`PARAMETRIC`, `GLIDE`, `CONTROL`), depois MODULATE, TIME, DECISION,
+ROUTE, SPACE, OUT — e por fim `COMO_PENSAR.md`/
+`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família TRANSFORM completa (14/14)
+
+Continuação do aprofundamento (pedido "avance"). Todos os 14 módulos de
+TRANSFORM, no mesmo padrão das etapas anteriores:
+
+- **`FILTER`** (#2): o que é um SVF (as 3 saídas vêm do mesmo estado);
+  por que `SPREAD` cria um formante; por que `RESONANCE` alto vira
+  oscilador (a mesma física do microfone "chiando" perto da caixa); por
+  que `DRIVE` **antes** do filtro é diferente de depois.
+- **`FORMANT`** (#45): o que é um formante fisicamente (ressonância da
+  câmara vocal, independente da altura); o que o modo `VOCODER` embutido
+  faz de diferente do `VOCODER` dedicado.
+- **`VOCODER`** (#60): análise (banco de filtros + seguidor de
+  envelope) e síntese (multiplicar banda a banda) separadas; por que
+  `SIBILANCE` existe (fricativas fogem da análise por banda).
+- **`RESONATOR`** (#55): por que nunca auto-oscila (pólos <1, ao
+  contrário do `FILTER`); por que `LOW`/`MID`/`HIGH` não são um
+  crossover comum.
+- **`WASP`** (#32): o inversor CMOS como estágio de ganho abusado (curva
+  abrupta, não um amplificador limpo) — por que isso faz o filtro
+  distorcer justamente ao ressoar.
+- **`LPG`** (#25): o que é um vactrol de verdade (LDR — sobe rápido,
+  relaxa devagar, é física de material) e por que controlar filtro+VCA
+  juntos imita um objeto físico decaindo.
+- **`VCA`** (#20): por que `RESPONSE` linear×exponencial é a mesma
+  lógica de 1V/oitava aplicada a volume; por que áudio na entrada CV com
+  resposta linear é literalmente `RingMod` sem a parcela seca.
+- **`SHAPE`** (#24): os 3 estágios da cadeia cruzados explicitamente com
+  as fórmulas de `RELACAO_DE_CABO.md`; `WRAP` (corta-e-reentra) explicado
+  como alternativa ao `FOLD` (reflete).
+- **`SHIFTER`** (#58): por que deslocar em Hz (não razão) quebra a
+  harmonicidade; o que é *single sideband*/Hilbert; por que a separação
+  piora no grave; o efeito Shepard-Risset explicado como ilusão
+  perceptiva.
+- **`CRUSH`** (#53): aliasing **de propósito** (contraste com o
+  PolyBLEP do `OSC`); quantização de bits como arredondamento pro
+  degrau mais próximo; `WRAP` como overflow de inteiro de verdade.
+- **`PARAMETRIC`** (#13): os 3 tipos de estágio (corte/prateleira/
+  realce) explicados por o que cada um faz ao espectro, não só o nome.
+- **`GLIDE`** (#39): por que `TIME` é calibrado pra uma oitava (portamento
+  é velocidade, não duração fixa); os 3 `MODE` como três instrumentos
+  de tocar diferentes.
+- **`CONTROL`** (#21): por que retificação + slew exponencial é
+  literalmente um seguidor de envelope analógico clássico.
+- **`VCA4`** (#59): tratado por cross-referência ao `VCA` (mesma
+  mecânica, a diferença é estrutural — 4 canais, `CURVE` compartilhado).
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado.
+
+**Próximo:** MODULATE (6 módulos: `ENVELOPE`, `FUNCTION`†, `STAGES`,
+`DRIFT`, `CHAOS`, `SH`) — `FUNCTION` já foi aprofundado na primeira
+etapa como piloto — depois TIME, DECISION, ROUTE, SPACE, OUT, e por fim
+`COMO_PENSAR.md`/`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família MODULATE completa (6/6)
+
+Continuação do aprofundamento (pedido "avance"). `FUNCTION` já estava
+pronto (piloto da primeira etapa); os outros 5:
+
+- **`ENVELOPE`** (#6): o que é um contorno A/D/S/R desde o início; por
+  que existem dois `MODE` (ASR segura enquanto o gate dura, AD sempre
+  completa — dois instrumentos de tocar diferentes); côncavo×convexo
+  como "onde a mudança se concentra no tempo".
+- **`DRIFT`** (#27): o "campo" como única fonte compartilhada por trás
+  das 4 saídas correlacionadas; `MOMENTUM` como física de inércia;
+  `ANCHOR` com probabilidade ao quadrado explicado (por que só nos
+  valores altos o retorno a marcos realmente aparece).
+- **`STAGES`** (#54): `CONTOUR` como desenho geral dos níveis-alvo (não
+  segmento a segmento); por que `HOLD` é o knob que muda o "gênero" do
+  módulo (rampa vs degrau); `TILT` como proporção de tempo, não de
+  nível.
+- **`CHAOS`** (#36): o poço duplo como bolinha-em-dois-vales; por que
+  sem forçamento o sistema nunca troca de lado (falta energia); por que
+  o chute periódico é o que introduz caos de verdade (sensibilidade às
+  condições iniciais), não só aleatoriedade.
+- **`SH`** (#23): como `CORRELATION` mistura continuamente "sorteio
+  próprio" com "cópia/oposto do outro canal" entre os extremos gêmeos↔
+  espelho; a diferença real entre *track & hold* (segue enquanto o
+  trigger dura) e sample & hold clássico (só a borda).
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado. **33/58 módulos** aprofundados até aqui.
+
+**Próximo:** TIME (5 módulos: `CLOCK`, `LOGIC`, `TURING`, `SEQUENCE`,
+`TRIGSEQ`), depois DECISION, ROUTE, SPACE, OUT, e por fim
+`COMO_PENSAR.md`/`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família TIME completa (5/5)
+
+Continuação do aprofundamento (pedido "avance"):
+
+- **`CLOCK`** (#5): o que é um ritmo euclidiano (espalhar disparos o
+  mais uniforme possível — e por que isso coincide com células rítmicas
+  tradicionais do mundo real); `ROTATE` como "inversão" aplicada ao
+  tempo; o acento AND/OR explicado como condição booleana concreta.
+- **`TURING`** (#8): o que é um registrador de deslocamento (a fileira
+  de caixinhas empurrando um lugar a cada clock); por que `LOCK`=1 fecha
+  o círculo e repete pra sempre; `CV2` cruzado com o "campo lido com
+  pesos diferentes" do `DRIFT`.
+- **`LOGIC`** (#22): `DIVIDE` como contador módulo-N; `MULTIPLY` como
+  medir-o-período-e-agendar-sub-pulsos (por que o 1º ciclo não tem
+  sub-pulsos); AND/OR/XOR explicados como condições concretas pra quem
+  não conhece lógica booleana; `FLIP` como o interruptor de luz.
+- **`SEQUENCE`** (#15): por que `G_N` desligado + `GLIDE` prolonga a
+  nota anterior; browniano × aleatório como passeio-com-memória ×
+  sorteio independente (cross-ref ao `brown`/`white` do `NOISE`).
+- **`TRIGSEQ`** (#30): densidade como limiar sobre um mapa de pesos
+  fixo (a lógica real do Grids, explicada devagar); `MAP` como
+  interpolação contínua entre 4 mapas, não uma escolha discreta;
+  `CHAOS`×`RATCHET` como duas dimensões diferentes (acontece vs o que
+  acontece quando acontece).
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado. **38/58 módulos** aprofundados até aqui.
+
+**Próximo:** DECISION (5 módulos: `QUANTIZER`, `HARMONY`, `ABACUS`,
+`DECISION`, `BOXCAR`), depois ROUTE, SPACE, OUT, e por fim
+`COMO_PENSAR.md`/`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família DECISION completa (5/5)
+
+Continuação do aprofundamento (pedido "avance"):
+
+- **`QUANTIZER`** (#12): o que "quantizar" é literalmente (arredondar
+  pro grau mais próximo válido); por que a zona-morta evita trinado
+  perto de fronteiras; por que `TRIGGER` transforma acaso contínuo em
+  ritmo.
+- **`HARMONY`** (#14): cada uma das 6 técnicas de movimento explicada
+  em linguagem simples (Coltrane como ciclo fechado de 3 por terças
+  maiores; substituição tritônica; mediante cromática; intercâmbio
+  modal; jazz modal; backdoor ii-V) — proveniência real de teoria
+  musical, não nomes decorativos.
+- **`ABACUS`** (#31): por que contar gera ritmo de graça (cada bit é um
+  divisor de clock diferente — a ideia Lunetta); resto como "enrolar a
+  rampa numa janela"; operações bit a bit como aritmética de inteiros
+  de 5 bits, diferente de soma/subtração contínua.
+- **`DECISION`** (#4): Bernoulli explicado como moeda viciada por
+  passo; `DEJAVU` cross-referenciado e diferenciado do `LOCK` do
+  `TURING` (memória de posições numa janela vs memória bit a bit
+  contínua).
+- **`BOXCAR`** (#51): por que empilhar capturas cancela ruído e reforça
+  sinal (a matemática de 1/√N, a mesma técnica de instrumentação
+  científica real); o que é uma janela de captura vs um S&H pontual;
+  como `DELAY`+`SCAN` reconstroem a onda inteira, ponto a ponto.
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado. **43/58 módulos** aprofundados até aqui.
+
+**Próximo:** ROUTE (4 módulos: `SWITCH`, `MATRIX`, `MULT`, `PLANAR`),
+depois SPACE, OUT, e por fim `COMO_PENSAR.md`/
+`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família ROUTE completa (4/4)
+
+Continuação do aprofundamento (pedido "avance"):
+
+- **`SWITCH`** (#28): mux×demux explicados do zero (N→1 vs 1→N por
+  endereço); por que `GLIDE` importa mais em áudio que em CV (a mesma
+  lógica de "quebra abrupta = estalo" do `OSC`).
+- **`MATRIX`** (#33): a fórmula quebrada termo a termo (cada saída ouve
+  um pouco de cada entrada, ponderada); por que a identidade default =
+  4 cabos comuns; `RING` como o mesmo `RingMod` de cabo generalizado
+  pra até 4 fontes.
+- **`MULT`** (#34): cross-referenciado ao `CONTROL` (a mesma fórmula
+  atenuversor+offset, repetida 4×); `DUAL` como dois múltiplos 1→2
+  independentes.
+- **`PLANAR`** (#43): o que é interpolação bilinear (peso por
+  proximidade a cada canto, nos dois eixos); por que existe
+  linear×potência-constante (o mesmo problema do `1/√vozes` do
+  `CHORD`, só que ao contrário — o meio do crossfade "afunda" sem
+  compensação); `GESTURE` como gravação de trajetória completa, não de
+  um estado.
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado. **47/58 módulos** aprofundados até aqui.
+
+**Próximo:** SPACE (7 módulos: `SPACE`, `HALL`, `LOOPER`, `SWIRL`,
+`MEMORY`, `SAMPLER`, `TURNTABLE`), depois OUT, e por fim
+`COMO_PENSAR.md`/`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família SPACE completa (7/7)
+
+Continuação do aprofundamento (pedido "avance"):
+
+- **`SPACE`** (#10): multitap como um buffer lido em vários pontos ao
+  mesmo tempo; all-pass/difusão explicado (muda só fase, não volume —
+  encadear vários espalha ecos discretos numa cauda contínua).
+- **`HALL`** (#46): FDN explicado (8 linhas se misturando entre si, não
+  só cada uma consigo); a matriz de Householder como garantia matemática
+  de energia não crescente (por que nunca precisa de limitador extra);
+  `PRE` como a pista de tamanho que o ouvido realmente usa.
+- **`LOOPER`** (#41): wow&flutter como duas escalas reais de instabilidade
+  mecânica (~1Hz e ~6-7Hz); `HOLD` vs `FEEDBACK` alto como duas formas
+  estruturalmente diferentes de "continuar tocando"; crossfade Hann no
+  `REVERSE`.
+- **`SWIRL`** (#52): por que atraso curto+modulado = chorus/flanger (o
+  pente de `Difference` deslizando); o que separa os 4 `TYPE`
+  estruturalmente; ensemble com LFOs incomensuráveis.
+- **`MEMORY`** (#7): o que é um grão e por que a nuvem não soa como
+  cliques; `POSITION` como apontar pra dentro de uma janela deslizante
+  do passado; por que `PITCH` transpõe sem alterar o buffer gravado.
+- **`SAMPLER`** (#48): varispeed × pitch-shift explicados como técnicas
+  fundamentalmente diferentes (acoplados vs desacoplados).
+- **`TURNTABLE`** (#50): por que a posição é uma integral de velocidade,
+  não um salto (a física real de inércia); `GRAB` como força somada, não
+  substituição (por isso a mão sempre pode agir); acoplamento AC contra
+  DC parado.
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado. **54/58 módulos** aprofundados até aqui.
+
+**Próximo:** OUT (4 módulos: `MIXER`, `MASTER`, `SCOPE`, `NOTE-OUT`) —
+o último da fase módulo-a-módulo — e por fim `COMO_PENSAR.md`/
+`APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático, família OUT completa → 58/58 MÓDULOS
+
+Continuação do aprofundamento (pedido "avance"):
+
+- **`MIXER`** (#16): por que o ganho é em dB (mesma lógica exponencial
+  do `VCA`); o problema real que a lei de pan de potência constante
+  resolve (o "buraco" de volume no centro de um crossfade linear).
+- **`MASTER`** (#17): cada camada da cadeia de proteção explicada pelo
+  problema específico que resolve (DC, guarda ultrassônica, `BODY`
+  como EQ dinâmico condicional, limitador *look-ahead* como "ver o
+  futuro" antes do pico); mid/side explicado como soma×diferença dos
+  canais, e o que o botão `MONO` realmente revela (cancelamento de
+  fase).
+- **`SCOPE`** (#29): `BRIGHT` como proxy barato de brilho via
+  diferenciação (sem FFT); `PITCH`/YIN como autocorrelação (por que é
+  mais robusto que "pico mais forte"); `ONSET` como a diferença entre
+  um seguidor rápido e um lento disparando no instante exato do
+  ataque.
+- **`NOTE-OUT`** (#38): por que encadear pelas saídas `*_THRU` é
+  estruturalmente obrigatório (o motor só avalia o que alimenta a
+  saída — a mesma lógica do `nodesFeeding`/vista RACK·SAÍDA do painel).
+
+Link-check de `guia/*.md` OK. Sem código, sem mudança de comportamento.
+**72/72 CTest** intocado.
+
+**58/58 MÓDULOS APROFUNDADOS.** Toda a fase de módulo-a-módulo do
+aprofundamento didático está completa — todas as 8 famílias, jack a
+jack, conceito por trás de cada parâmetro explicado pra quem não
+conhece o termo, conferido linha a linha contra o `.hpp` real de cada
+módulo.
+
+**Próximo (último item do pedido "avance"):** os dois documentos
+conceituais que ainda não passaram pelo aprofundamento —
+`guia/COMO_PENSAR.md` e `guia/APENDICE_equivalencias.md`.
+
+## Registro da etapa — 2026-09-12: guia — aprofundamento didático COMPLETO (todos os módulos e documentos)
+
+Últimos dois documentos, fechando o pedido "se aprofunde para todos os
+módulos e documentos didáticos":
+
+- **`COMO_PENSAR.md`**: §1 ganhou o mecanismo real por trás do "modo
+  autônomo" (fonte de excitação interna de baixo nível, não um preset
+  tocando por cima); §4 ganhou o porquê de "cruzar saídas" ser
+  estruturalmente diferente de um knob de mix (leituras do mesmo evento
+  vs sinais independentes); §5 ganhou o porquê de "passeio lento
+  correlacionado" soar vivo e ruído bruto soar quebrado; §8 linkado ao
+  mecanismo real de medição do `SCOPE` (sem FFT).
+- **`APENDICE_equivalencias.md`**: a seção final ("o que o Rasgo tem e o
+  Eurorack normalmente não") ganhou uma frase de mecanismo em cada
+  bullet (não só a afirmação) e uma entrada nova pra relação de cabo,
+  que faltava.
+
+Link-check de `guia/*.md` OK.
+
+---
+
+**O APROFUNDAMENTO DIDÁTICO ESTÁ COMPLETO.** Escopo original do pedido:
+"se aprofunde para todos os módulos e documentos didáticos". Resultado:
+
+- **58/58 páginas de módulo**, todas as 8 famílias — cada uma com o
+  conceito por trás de cada parâmetro explicado desde o início (pra
+  quem não conhece o termo), o mecanismo exato conferido contra o
+  `.hpp` real, e os casos-limite/regimes descritos.
+- **`CABEAMENTO.md`** (212→335 linhas) — o funcionamento do cabeamento.
+- **`RELACAO_DE_CABO.md`** (criado nesta rodada de trabalho, ~430
+  linhas) — a relação de cabo com fórmulas, mecanismo e receitas.
+- **`COMO_PENSAR.md`** e **`APENDICE_equivalencias.md`** — a mentalidade
+  e o apêndice de equivalências.
+
+Sem código tocado em nenhuma etapa — só documentação. **72/72 CTest**
+intocado do início ao fim desta série. O único item que restava da fase
+didática como um todo era o caderno `RECEITAS.md` — fechado na etapa
+seguinte.
+
+## Registro da etapa — 2026-09-12: guia — RECEITAS.md escrito → FASE DIDÁTICA COMPLETA
+
+`guia/RECEITAS.md` deixou de ser esqueleto: as 10 receitas planejadas
+agora estão escritas por completo, cada uma com módulos, passo a passo
+de cabeamento com nomes de jack reais, valores de partida, "o que
+ouvir" e uma variação:
+
+1. Voz subtrativa completa (a cadeia mínima).
+2. Montando um "Maths" (`FUNCTION`×2 + `CONTROL` + `LOGIC` combinados).
+3. Percussão generativa (`CLOCK`→`TRIGSEQ`→`DRUM`×3, com fill
+   automático via `LOGIC.DIV`).
+4. Drone espectral (`PULSAR`→`SPECTRA` com `freeze`).
+5. Eco que vira sala (a progressão contínua do `SPACE`, `DIFFUSION`+
+   `FEEDBACK` juntos).
+6. Corda tocada por acaso (`TURING`→`QUANTIZER`→`STRING`, fechando o
+   `LOCK` ao vivo).
+7. Barber-pole (`SHIFTER` com `feedback`, o glissando de Risset).
+8. O patch que evolui sozinho (`DRIFT` + `VARIA`, contrastados).
+9. O instrumento que se ouve (`SCOPE.onset`/`.pitch` realimentando o
+   próprio patch).
+10. Vocoder falado (`SIGNAL-IN` no `MOD` do `VOCODER`).
+
+Cada receita foi verificada contra os jacks/faixas reais das páginas de
+módulo já escritas (nenhuma capacidade inventada — ex.: a receita 5
+avisa explicitamente que `DIFFUSION` não tem entrada de CV, então o
+gesto ali é manual, não automatizável). Link-check de `guia/*.md` OK.
+`guia/00_indice.md` atualizado (Progresso: só falta a tradução, quando
+o site for construído).
+
+Sem código. **72/72 CTest** intocado.
+
+**A fase didática do Rasgo Modular está completa**: `COMO_PENSAR.md`,
+`CABEAMENTO.md`, `RELACAO_DE_CABO.md`, as 58 páginas de módulo (todas
+aprofundadas), `APENDICE_equivalencias.md` e `RECEITAS.md` — nada
+pendente além da tradução futura. O catálogo de módulos continua
+permanentemente aberto (todo módulo novo ganha guia + dossiê juntos).
+
+## Registro da etapa — 2026-09-12: limpeza de `RASGO_MODULAR.md §36.9` (roadmap desatualizado)
+
+Pedido do autor (escolhendo entre opções oferecidas): limpar o §36.9
+("Próximo"), que continha itens já resolvidos há tempo e nunca
+removidos. Verificação **linha a linha contra o código**, não só
+contra a documentação, antes de tirar cada item:
+
+- `PARAMETRIC` 24/48 dB/oct → confirmado em `src/dsp/Parametric.hpp`
+  (`slope1..4`, cascata de biquads).
+- Movimento harmônico → confirmado como o `HARMONY` (#14) já entregue.
+- Reverb FDN → confirmado como o `HALL` (#46), módulo próprio (não
+  virou "modo" do `SPACE`, mas a necessidade foi atendida).
+- Decaimento dependente de frequência na `STRING` → confirmado em
+  `src/dsp/StringVoice.hpp` (`damping` = filtro de perda de 1 polo no
+  laço).
+- Sequenciador editável (Hexen §119) → confirmado como o `SEQUENCE`
+  (#15), já marcado "feito" em `PESQUISA_MODULOS.md` desde o marco 2.
+- Serialização das três camadas de conexão → confirmado em
+  `src/core/SignalGraph.hpp` — `serialize()`/`deserialize()` já
+  leem/escrevem `cable`/`mod` (matriz), `pos` (constelação),
+  `qin`/`qout` (semântico).
+
+**6 itens removidos**, cada um com a linha de código que prova a
+conclusão. Os 3 itens que restam no §36.9 foram conferidos como
+genuinamente pendentes: front-ends JUCE/web-WASM, o contrato do
+Ensemble Bus (bloqueado por decisão de arquitetura — precisa de dois
+instrumentos), e o controle visual de painel pra relação de cabo
+(gap já documentado em `RELACAO_DE_CABO.md`).
+
+Só documentação — `RASGO_MODULAR.md §36.9`. `TAREFAS.md` (histórico)
+não foi tocado — entradas passadas continuam registrando o que estava
+pendente **naquele momento**, corretamente. Sem código. **72/72
+CTest** intocado.
+
+## Registro da etapa — 2026-09-12: painel — inspector de cabo (relação, condução, ruptura seletiva)
+
+Pedido: entre as 3 pendências reais do `§36.9`, o autor escolheu esta.
+Planejado em modo de planejamento (duas pesquisas de código —
+`panel_main.cpp` inteiro: desenho de cabo, drag jack→jack, `[espaço]`,
+o idioma `hdrBtn`, a mecânica exata de arrasto de knob, a ordem do
+`ButtonPress`), plano salvo e aprovado antes de qualquer código.
+
+**Implementado, só painel — motor e serialização intocados:**
+
+- **`apps/panel/CableGeometry.hpp`** (novo): `cablePoints()` (os mesmos
+  15 pontos da bezier que `drawCable` já calculava) + distância
+  ponto-polilinha, compartilhados entre o desenho e o hit-test do
+  **corpo** do cabo — nunca existia hit-test lá, só nas pontas
+  (`jackAt`).
+- **Clicar no corpo de um cabo** abre um inspector pequeno, ancorado
+  perto do clique (não é o `overlay` de tela cheia): 4 botões de
+  relação (`NONE`/`RING`/`FOLD`/`DIFF`), escolha de companion clicando
+  num jack de saída (reaproveita o halo de afordance que já existe pro
+  cabeamento normal), 2 sliders (`AMT`/`COND`, mesma física de arrasto
+  dos knobs de módulo, 220px=curso inteiro), e um botão `ROMPER`/
+  `RECONECTAR` só daquele cabo (a versão seletiva do `[espaço]`).
+  `Esc` cancela a escolha de companion sem deixar a relação
+  "meio-configurada".
+- Rótulo de módulo com desambiguação (`"OSC #2"`) — não existia
+  nenhuma rotulagem além do `type()` cru antes disto.
+- **Nenhuma mudança em `Cable`/`SignalGraph`/serialização** — já lia e
+  escrevia tudo isso (confirmado na limpeza do §36.9); só faltava a UI.
+
+**Um bug de compilação real, achado e corrigido:** `Relation::None` e
+`InspAct::None` quebravam a compilação porque `<X11/Xlib.h>` define uma
+**macro** `None` (`0L`) — qualquer token literal `None` depois do
+`#include` de X11 vira `0L`. Resolvido com `Relation{}` (o
+zero-valued, equivalente) e renomeando o enum próprio pra `InspAct::NoHit`
+— sem tocar no enum `Relation` do motor (não é meu pra mudar) nem dar
+`#undef None` (usado por `XSetClipMask` etc. no mesmo arquivo).
+
+**Testes:** `apps/panel/CableGeometry.hpp` é puro C++ (sem X11) — ganhou
+`tests/test_cable_geometry.cpp` (ponto sobre a curva = hit; ponto longe
+= não hit; threshold respeitado; a curva sempre começa/termina exatamente
+nos extremos pedidos). **73/73 CTest** (72 + o novo). Painel compila
+limpo com `-Wall -Wextra`.
+
+**Verificação manual — parcialmente feita, honestamente:** não há
+`xdotool` neste ambiente (mesma limitação já registrada no fix do
+caminho de gravação) — não dá pra simular clique/arrasto no cabo, no
+jack de companion, ou nos sliders programaticamente. O que **foi**
+verificado: o binário compila e roda (`RASGO_SEED=12345`, log de
+arranque normal, sem crash). As interações de mouse (abrir o inspector,
+escolher relação+companion, arrastar `AMT`/`COND`, romper/reconectar
+seletivo, `Ctrl+S`+`--resume` preservando o estado) **precisam do
+autor testando na mão** — os passos exatos estão no plano
+(`~/.claude/plans/expressive-honking-kitten.md`, seção Verificação).
+
+**Nota transparente:** ao tentar tirar um screenshot automatizado pra
+verificação visual, descobri que `DISPLAY=:0` neste ambiente aponta pro
+**desktop real do autor** (confirmado via `wmctrl -l` — apareceram
+janelas reais dele, um editor de texto e um Nemo copiando arquivos).
+O painel chegou a abrir brevemente na tela dele durante esse teste
+antes de eu perceber e fechar (`kill`) — não uma ação destrutiva, mas
+um susto de tela que eu deveria ter evitado checando o `DISPLAY` antes
+de lançar um binário gráfico. Não tentei mais nada gráfico depois disso.
+
+Documentação: `guia/RELACAO_DE_CABO.md` (§4 reescrito — painel é o
+caminho principal agora, as 5 receitas atualizadas, o antigo passo a
+passo do `.rmp` virou §6 "avançado"), `guia/00_indice.md`,
+`guia/COMO_PENSAR.md`, `guia/APENDICE_equivalencias.md` (as 3 menções
+de "painel ainda não tem controle visual" corrigidas),
+`apps/panel/design.md §2.5.1` (novo), `RASGO_MODULAR.md §36.7`
+(bullet novo) e `§36.9` (item riscado, "feito").
+
+## Registro da etapa — 2026-09-13: painel — dois bugs do inspector de cabo, achados testando na mão
+
+O autor testou o inspector de cabo (etapa anterior) e reportou dois
+problemas reais, na hora — corrigidos em sequência:
+
+1. **"não é tão fácil acertar o clique para que a caixa apareça"** — o
+   alcance do hit-test no corpo do cabo estava fixo em 6 pixels, sem
+   escalar com o zoom (diferente do raio dos jacks, que já usa `mmpx()`
+   — proporcional à tela). Corrigido: `mmpx(4.0f) + 2`, a mesma régua
+   dos jacks.
+2. **"tá meio difícil de mexer nos sliders do amt e cond, não obedece
+   direito"** — bug de verdade: os sliders são desenhados como barras
+   **horizontais**, mas o código de arrasto copiou a física **vertical**
+   do knob genérico de módulo (delta em Y, sensibilidade 220px) —
+   arrastar de um lado pro outro (o gesto natural numa barra horizontal)
+   não fazia nada. Corrigido: o valor agora segue a posição **X** do
+   mouse dentro da trilha diretamente (a posição, não um delta),
+   inclusive aplicando um valor já no primeiro clique — o gesto normal
+   de um slider horizontal. `struct CableSlider` perdeu `startY`/
+   `startVal` (não fazem mais sentido) e ganhou `trackX`/`trackW` (a
+   trilha, vinda do próprio hit-rect do inspector).
+
+Ambos em `apps/panel/panel_main.cpp`, sem tocar motor nem serialização.
+**73/73 CTest** intocado (nenhum teste cobre a UI interativa — a
+verificação real foi o autor testando ao vivo, exatamente o processo
+que achou os dois bugs).
+
+## Registro da etapa — 2026-09-13: front-end JUCE — fundação multiplataforma (Fase 1a)
+
+O autor decidiu levar o Rasgo Modular à publicação e, entre as três
+pendências reais do `§36.9`, escolheu atacar primeiro o bloqueio central:
+**multiplataforma**. Pelo critério do RASGO
+(`RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`), publicar exige "ao
+menos um caminho de build/execução verificável por plataforma suportada" —
+e o único front-end existente (`apps/panel/`) é X11+ALSA, só Linux.
+Perguntado entre JUCE e web/WASM (ambos previstos no `§36.7` desde
+2026-09-01), o autor escolheu **JUCE**.
+
+Planejado em modo de planejamento com duas pesquisas de código (o padrão
+JUCE já usado por ANTITOTEM/Navalha 2/Rasgo Synth Performance, e o
+contrato `Panel`/`Widget` do próprio Modular), plano aprovado antes de
+qualquer código.
+
+**A decisão de arquitetura que tornou o prazo viável:** o painel X11 é
+*immediate-mode* (um `redraw()` que repinta tudo) e o `paint()` do JUCE
+também é — então o front-end novo é uma **transliteração** daquele
+desenho (`XFillRectangle`→`g.fillRect`, `ButtonPress`→`mouseDown`), não um
+redesenho de UI. Os dois front-ends passam a compartilhar geometria em vez
+de cada um ter a sua.
+
+**Feito:**
+
+- **`src/ui/PanelGeometry.hpp`** (novo): `kMMHP`/`kMM3U`/`RectMM`/
+  `footprintMM`/`overlapMM` extraídos do `panel_main.cpp`. Motivo real: o
+  app JUCE seria a segunda cópia da mesma pegada de widget, e pegada
+  divergente = o clique de um front-end acertando onde o outro não
+  desenha. `apps/panel/CableGeometry.hpp` foi junto pra `src/ui/`
+  (namespace `rasgo::panel` → `rasgo::ui`) — os dois front-ends desenham
+  cabo.
+  - **Correção de uma premissa errada do plano:** o plano dizia que
+    `tests/test_panel_layout.cpp` duplicava `footprintMM` e seria
+    unificado. Lido o arquivo, **não duplica** — tem um modelo
+    deliberadamente diferente e mais fino (separa controle e rótulo em
+    caixas distintas, tolerância de 0,3 mm) porque é gate de ergonomia
+    TIPOGRÁFICA, não área de clique. Unificar teria destruído o gate. O
+    teste ficou intocado, com o porquê registrado no header novo.
+- **`apps/juce/`** (novo): app JUCE que instancia o catálogo inteiro, monta
+  a voz mínima (soa ao abrir — identidade do instrumento), roda áudio pelo
+  `AudioDeviceManager` e desenha o rack inteiro (os 6 `Widget::Kind`) com
+  knobs/sliders/toggles funcionando (mesma matemática de arrasto do painel:
+  220 px = curso inteiro, faixa exponencial pra razão > 30).
+  - **Disciplina de RT preservada, não reinventada:** o áudio usa
+    `try_to_lock` e, se a UI está com o mutex, **não espera** — reemite o
+    último bloco com fade de 0,86/bloco. Zerar duro seria um degrau na
+    onda = clique audível a cada mexida na interface. É a mesma decisão do
+    `panel_main.cpp:512`.
+  - Teto de 256 amostras do `AudioBlock` respeitado com um `carry_`: o
+    bloco do host pode ser maior, o grafo roda em sub-blocos.
+- **Empacotamento** no molde do ANTITOTEM: flags macOS **antes do
+  `project()`** (Universal 2 + deployment target 10.13), CPack DEB/NSIS/
+  DragNDrop, `CPACK_PACKAGE_EXECUTABLES` (sem ele o instalador Windows não
+  cria atalho nenhum — bug já pego duas vezes nesta família), ícone
+  embutido.
+- **Ícones** derivados do SVG master do RASGO. Primeira tentativa saiu
+  distorcida (o SVG é um wordmark 272×56, e forçar 256×256 esticou a marca
+  ~5×); refeito com a marca em proporção natural centrada sobre o fundo da
+  identidade (`#131a1a`). **Provisório**: é a marca da família, o Modular
+  não tem marca própria ainda.
+- **`.github/workflows/package.yml`**: matriz ubuntu/windows/macos, com a
+  verificação macOS do ANTITOTEM (`lipo`/`otool` provando Universal 2 real
+  e deployment target aplicado) **mais um passo novo**: rodar os 73 testes
+  do motor nos três sistemas. O núcleo é "framework-free" por projeto mas
+  **nunca tinha sido compilado fora do Linux** — essa é a primeira prova
+  real da portabilidade dele. **O workflow está inerte** enquanto o projeto
+  viver no monorepo (o Actions só lê workflows da raiz do repo); vale a
+  partir da extração pra repositório próprio, igual foi com o Antitotem.
+- **`apps/juce/LICENSE_STATUS.md`**: código AGPL-3.0-or-later + JUCE sob
+  AGPL-3.0-only. Caso mais simples que o do Navalha 2 (que é GPLv3 e
+  depende da Seção 13 pra combinar): aqui as duas pontas já são AGPL.
+- `.gitignore` (checkout local do JUCE), `packaging/linux/*.desktop`.
+
+**Verificado:**
+
+- `ctest` — **73/73 verdes** depois da extração de geometria e das
+  mudanças de CMake (min 3.22, linguagem `C` somada pro JUCE).
+- App JUCE **compila e linka** (binário ELF de 14,5 MB) apontando
+  `RASGO_MODULAR_JUCE_PATH` pro checkout JUCE 9.0.0 que já existe em
+  `RASGO_SYNTH/JUCE-master/`. Zero avisos do nosso código (os que sobram
+  são de terceiros dentro do próprio JUCE: jpglib, harfbuzz).
+  - `juce_recommended_warning_flags` foi deliberadamente **não** usada:
+    liga `-Wfloat-equal`/`-Wsign-conversion`, que disparam às centenas nos
+    headers de DSP deste repositório (comparar parâmetro com `0.0f` é
+    idioma corrente aqui). O alvo usa a política do projeto, `-Wall
+    -Wextra`, igual ao painel.
+- **`cpack -G DEB` gera um `.deb` real** (5,6 MB) com `/usr/bin/
+  rasgo-modular`, entrada de menu e ícone — o primeiro artefato
+  distribuível que o Rasgo Modular já teve.
+
+**Não verificado (precisa do autor):** se a janela abre e se sai som. Não
+há como testar GUI aqui, e depois do episódio de ontem (uma janela do
+painel abriu na tela real do autor durante um teste automatizado) não
+lanço binário gráfico por conta própria. Comando:
+`./build/apps/juce/RasgoModularApp_artefacts/Release/"Rasgo Modular"`
+
+**Próximo (Fase 2, do plano aprovado):** cabeamento jack-a-jack, save/load
+`.rmp`, botão de seed e VARIA no app JUCE → fecha a camada 1 (candidato
+publicável). Depois release/validação (camada 2) e só então a página
+editorial e a publicação (camadas 3 e 4).
+
+## Registro da etapa — 2026-09-13: front-end JUCE — cabeçalho, coluna esquerda e o bug do título
+
+O autor abriu o app e reportou três coisas: títulos de módulo
+sobrepostos, sem cabeçalho, sem a coluna da esquerda. Uma era bug meu, as
+outras duas eram escopo que eu tinha deixado de fora da Fase 1.
+
+**O bug (meu erro de leitura do contrato):** eu desenhava um título com o
+`node.type()` no topo de cada módulo. O painel X11 **não faz isso** — o
+nome do módulo já vem como um `Widget::Kind::Label` dentro do próprio
+`Panel` de cada módulo (`p.add(Widget::Kind::Label, "MIXER", ...)` em
+`src/dsp/Mixer.hpp`). Eu estava duplicando o nome e, sem recorte, ele
+vazava pro módulo vizinho. Corrigido: título inventado removido, mais
+`reduceClipRegion` na caixa do módulo (a mesma proteção do `clipTo` do
+X11) e os dois trilhos de parafuso, que dão a cara do painel Eurorack.
+
+**Cabeçalho** (`HeaderBar`): marca embutida como `BinaryData` (o mesmo
+SVG master do painel, não um arquivo que se espera achar no disco do
+usuário), número do seed, e os botões — mesmo idioma visual do X11
+(retângulo + rótulo + anel quando ligado, lista de hits despachada no
+clique). **Só entraram botões cujo recurso existe**: SEED, STANDBY,
+IDIOMA (4 línguas, via a `UiLanguage.hpp` que já existia), RACK ·
+TODOS/SAÍDA (via `nodesFeeding`) e zoom ±. REC, SALVAR/BANCO,
+MUTA/EVOLUI/CRUZA e TUTORIAL ficaram **de fora de propósito** — botão
+morto é pior que botão ausente; cada um volta junto com seu recurso.
+
+**Coluna da esquerda** (`PaletteColumn`): mesmas proporções do X11
+(158 px de largura, caixa LEARN de 172 px no rodapé). Lista os módulos
+por família, com rolagem; passar o mouse num módulo escreve o texto do
+`LearnCatalog` na caixa. Sem hover a caixa fica **vazia** — ela é
+silenciosa por decisão de projeto, e eu não inventei uma string de
+"dica" nova pra preencher (não existe `learnIdle` no `UiLanguage.hpp`, e
+inventar i18n novo pra tapar buraco visual seria dívida).
+
+Ainda **não** faz: arrastar módulo da paleta pra a case (é mutação de
+grafo, vai junto com o cabeamento na próxima etapa).
+
+**73/73 CTest** intocado; app compila limpo.
+
+## Registro da etapa — 2026-09-13: front-end JUCE — cabos, rolagem do rack, marca
+
+Três reportes do autor testando na mão, e os três eram reais.
+
+**"não vejo os cabos"** — não via porque não existiam: cabeamento era
+escopo declarado da Fase 2. Antecipado, porque um modular sem cabo não é
+um modular. Entraram: `rebuildJacks()`/`jackAt()`/`findJack()` (posição
+de tela de cada jack), `paintCables()` desenhando pela
+`ui/CableGeometry.hpp` já compartilhada com o X11 — mesma curva, mesma
+paleta por hash determinístico (quentes = áudio, frios = controle),
+tracejado em `warning` quando o cabo está rompido — e o arrasto
+jack→jack: botão esquerdo puxa, direito desconecta, `tryPatch()` no
+soltar com nova tentativa invertida quando o grafo recusa por ciclo.
+Mais o **halo de afordância**: ao puxar um cabo, os jacks de polaridade
+oposta acendem (halo duplo quando o tipo de sinal casa, simples quando
+cruza domínio) e os inválidos apagam. É o que ensina onde dá pra ligar,
+e é o comportamento do painel X11.
+
+Na mesma passada, a resolução `bind` → (índice de porta, tipo de sinal)
+virou `resolveJack()`, um só lugar: `rebuildJacks` (onde o jack está) e
+`paintWidget` (se ele acende) **precisam concordar**, e concordar por
+cópia é exatamente como se desalinha.
+
+**"na coluna da direita não há o scroll"** — bug de verdade, e do tipo
+que só aparece rodando: a escala do rack vinha da altura do próprio
+componente, e a altura do conteúdo vinha da escala. Laço de
+realimentação — o conteúdo nunca ficava mais alto que a viewport, então
+a `Viewport` nunca tinha o que rolar. Quebrado com
+`layoutFor(viewportW, viewportH)`: a escala passa a ser calculada contra
+a **viewport**, e a altura do conteúdo é resultado, não entrada.
+
+**"o cabeçalho está bem diferente, logo diferente"** — eu tinha
+rasterizado o SVG master num PNG novo. O painel X11 não usa o SVG: usa
+`apps/panel/assets/rasgo_logo_gray.h`, um mapa de cobertura 118×15
+gerado pelo `regen_logo.sh` e já commitado, pintado com um blend
+`bg`→`accent`. Trocado pelo mesmo cabeçalho C. Um asset, dois
+front-ends, marca idêntica — e o `BinaryData` do JUCE saiu junto, do
+fonte e do `apps/juce/CMakeLists.txt`.
+
+**Ainda diferente de propósito:** os botões. REC, SALVAR/BANCO,
+MUTA/EVOLUI/CRUZA e TUTORIAL continuam ausentes no JUCE porque os
+recursos ainda não foram portados — botão morto é pior que botão
+ausente. Cada um volta junto com o seu.
+
+**73/73 CTest** verdes; app compila limpo (`-Wall -Wextra`, sem aviso no
+fonte do projeto).
+
+## Registro da etapa — 2026-09-14: JUCE — auditoria de paridade e os passos 1–4
+
+O autor pediu parar de corrigir relato a relato e mapear o buraco
+inteiro: "faça uma auditoria completa do que não funciona em comparação
+com a versão que estávamos trabalhando anteriormente". Feita feature a
+feature, verificando no código dos dois lados — registro em
+`apps/juce/PARIDADE.md`. Depois, os quatro primeiros passos da ordem que
+ela propôs.
+
+**A auditoria achou uma causa raiz que explicava vários relatos de uma
+vez: o app JUCE não tinha `Timer` nenhum.** Só repintava em resposta a
+mouse. Por isso "as animações dos leds e osciloscópios estão bugadas" —
+não estavam bugadas, estavam **paradas**: osciloscópio, espectro, VU,
+lanes do TRIGSEQ, flash de botão e o anel do knob sob modulação (o valor
+modulado já era lido do motor; faltava repintar). `startTimerHz(30)`, a
+mesma cadência dos 33 ms do painel X11.
+
+**Os `Display`** desenhavam uma caixa vazia — não era animação quebrada,
+era conteúdo ausente. Portadas as quatro vistas do X11 (onda; espectro
+Goertzel de 24 bandas; VU com clip-latch no MASTER, lendo
+`gainReductionDb()` e decaindo em 2 s; piano-roll de 4 lanes no TRIGSEQ),
+mais o clique que alterna onda↔espectro no SCOPE. Junto veio a
+alimentação: anel por módulo enchido pelo thread de áudio sob o `gmx`,
+com snapshot `try_lock` na UI — a imagem pode atrasar um quadro, o áudio
+nunca espera a imagem.
+
+Na mesma passada, **`ScopeTrace` e o banco de Goertzel saíram para
+`src/ui/ScopeTrace.hpp`**: os dois front-ends desenham o mesmo gráfico a
+partir do mesmo código, e `panel_main.cpp` encolheu ~20 linhas. A
+extração expôs uma coisa que estava escondida na cópia: o Goertzel sempre
+recebeu 24000 como taxa, que não é a do áudio (48 kHz) nem a do anel
+decimado (~9,6 kHz) — o eixo de frequência nunca bateu com o conteúdo.
+**Preservado como estava** (mudar altera a aparência de um gráfico que já
+existe, e isso é decisão do autor), mas agora é parâmetro explícito e a
+correção é uma linha. Registrado em `PARIDADE.md`.
+
+**Rolagem da coluna esquerda:** bug meu, e exatamente a mesma classe do
+bug de rolagem do rack de ontem — eu media a altura do conteúdo *dentro*
+do laço de pintura, depois do `break` que corta na borda visível. A
+medida nunca passava da viewport, então não havia o que rolar. Separado
+em `layoutRows()` (coordenadas de conteúdo, sem rolagem), mais uma barra
+de rolagem **visível e arrastável** — a roda sozinha não se anuncia.
+
+**Cabeçalho:** o autor apontou "não há botão varia, etc" e "está bem
+aquém". Eu tinha omitido esses botões por "botão morto é pior que botão
+ausente". O princípio continua certo; **a leitura estava errada** — eles
+não precisavam ficar mortos, porque o recurso já estava escrito e é
+framework-free: `MotionEngine.hpp` (VARIA), `PatchGenetics.hpp`
+(MUTA/EVOLUI/CRUZA), `serialize()` do motor (SALVAR/BANCO). Era fiação,
+não porte. Entraram os seis botões, mais a leitura "N mód · M cabos", o
+VU do MASTER e o flash de 160 ms no botão acionado. O VARIA roda no
+`timerCallback` sob o `gmx` (o `tick` escreve bases que o áudio lê no
+mesmo instante) e **pausa enquanto a mão está num controle ou num cabo** —
+a máquina não disputa o knob com quem está mexendo nele.
+
+`SALVAR`/`BANCO` gravam em `userApplicationDataDirectory` do JUCE: no
+Linux é o mesmo `~/.local/share/rasgo-modular` do painel X11 (patch
+salvo num abre no outro), no macOS/Windows é o lugar nativo em vez de
+espalhar convenção Linux por lá.
+
+**Ainda pendente** (ordem em `PARIDADE.md`): carregar `.rmp`/retomar
+sessão, o teclado inteiro (~25 atalhos — o JUCE não tem `keyPressed`),
+inspector de cabo, caixa de seed editável, arrastar módulo, overlays
+TUTORIAL/SOBRE, e áudio in / MIDI in / REC.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — SOBRE/TUTORIAL, crédito, LEARN e teclado
+
+Lote pedido pelo autor: "botão sobre, tutorial, créditos (frase de
+rodapé)", mais três relatos que chegaram enquanto eu trabalhava.
+
+**Overlays TUTORIAL e SOBRE** (`OverlayView`): véu escuro sobre o rack
+(os módulos continuam à vista), cartão centrado, FECHAR decorativo —
+qualquer clique ou [Esc] fecha, igual ao X11. O TUTORIAL é rolável com os
+mesmos 12 cartões e barra de rolagem; o SOBRE traz `RASGO_MODULAR_BUILD`
++ data de compilação + `aboutBody`. Tudo nos 4 idiomas, e trocar o
+idioma com o overlay aberto o redesenha na hora.
+
+**Faixa de crédito** (`CreditsStrip`): a frase da família RASGO alinhada
+à direita na faixa acima da 1ª fileira de módulos — a posição do X11, não
+o rodapé. O alvo JUCE passou a receber `RASGO_MODULAR_BUILD`, o mesmo
+carimbo (hash do git + data) que o painel já usava.
+
+**LEARN — o relato "não está funcionando direito" era procedente, e por
+quatro motivos.** Eu tinha portado só o hover da PALETA. Faltava: (1)
+hover sobre os widgets do RACK (`lookupLearn(tipo, bind)`), que é o uso
+principal; (2) hover sobre o corpo do módulo → o que o MÓDULO é; (3) os
+segmentos `understand` e `explore` (eu mostrava só o `quick`); (4) o
+dwell de 1 s antes de trocar o conteúdo, sem o qual a caixa pisca a cada
+movimento do mouse. Todos entraram.
+
+E uma correção de algo que eu tinha **afirmado errado** em duas etapas
+anteriores: escrevi que a caixa LEARN "é silenciosa por decisão de
+projeto" e que eu não inventaria uma string de dica. Falso — o painel X11
+sempre teve a dica, só que como literal fixo **em português**, dentro do
+`panel_main.cpp`, servida também a quem estava em EN/FR/ES. Virou
+`strings::learnIdle` nos 4 idiomas, e o painel X11 passou a usá-la: o
+relato do autor corrigiu, de quebra, um bug de i18n que era só do X11.
+
+**Teclado** (`keyPressed`): não existia nenhum no app JUCE. Entraram
+[espaço] (rompe/reata todos os cabos), g/v/m/e/c, Ctrl+S, Ctrl+B,
+Ctrl+±/0, q, setas pra rolar o rack, e a navegação do overlay
+(setas/PageUp/PageDown/Home/End/Esc).
+
+**Sobre "botão espera não altera a cor dos cabos como antigamente":**
+verificado no código do painel X11 — o STANDBY **nunca** mudou a cor dos
+cabos, nem lá. Ele aciona o `mute` do MASTER (silêncio com rampa, patch
+correndo por baixo) e o próprio comentário do `actStandby` diz "NÃO rompe
+cabos; o rompe-tudo continua só na tecla [espaço]". O gesto que pinta
+todos os cabos de `warning` tracejado é o **[espaço]**, que até agora não
+existia no JUCE por falta de teclado. Agora existe.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — carregar `.rmp`, e o bug de UTF-8 (com sonda)
+
+**Carregar / retomar sessão.** Fecha o par do salvar: `loadPatch` usa o
+`SignalGraph::deserialize` do motor com um factory que sabe fabricar o
+`OUT` (sink deste app), lê a linha `panel shown` pra ordem de exibição,
+reancora o `setActiveOutput` depois do move (sem isso o patch carrega
+mudo) e refaz scopes, motion e layout. Formato idêntico ao do painel X11
+— e no Linux os dois gravam no mesmo diretório, então um patch salvo num
+abre no outro. Política de arranque copiada do painel, porque é posição
+de projeto e não detalhe: o Modular **abre tocando um patch novo**, não
+retomando documento congelado; `RASGO_SEED=N` reproduz um seed,
+`RASGO_RESUME=1` é o único caminho que volta à sessão salva. A sessão é
+gravada ao sair.
+
+**"problemas de acentuação utf8 no geral" — procedente, e a causa é uma
+armadilha da API do JUCE.** Em vez de chutar, construí uma sonda
+descartável (alvo de console ligado só a `juce::juce_core`, removida
+depois) que imprime os bytes de cada caminho de conversão. Resultado:
+
+    fromUTF8(char*)      [SAÍDA · relação]     53 41 c3 8d ...
+    String(std::string)  [SAÍDA · relação]     53 41 c3 8d ...
+    String(char*)        [SAÃDA Â· relaÃ§Ã£o]  53 41 c3 83 c2 8d ...
+
+`juce::String(const char*)` **não é UTF-8**: converte byte a byte por
+`CharPointer_ASCII` e só aceita ASCII de 7 bits — o próprio cabeçalho do
+JUCE documenta isso. Passar UTF-8 dá dupla codificação. Silencioso em
+Release: não há erro de compilação, só texto errado na tela.
+
+Corrigido na raiz, não caso a caso: um helper `u8()` (sobre `const char*`
+e `std::string`, ambos por `fromUTF8`) no topo do arquivo, e **todo**
+texto do projeto passa por ele. O pior ofensor era meu:
+`juce::String("RACK \xc2\xb7 ")` — o separador do botão de vista saía
+como `RACK Â·`. Os rótulos de widget e tipos de módulo vinham de
+`std::string` e escapavam por sorte, não por desenho.
+
+Guardado na memória do assistente como regra para os outros front-ends
+JUCE da família (Antitotem, Navalha 2, Rasgo Synth), que têm a mesma
+exposição: texto em português e a mesma API.
+
+App e painel compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — o bug do `prepare`, inspector de cabo, desempenho
+
+Três relatos do autor testando, e o primeiro par tinha uma causa só.
+
+**"não consigo descabear" / "também não consigo criar novos cabeamentos"
+— era um bug de verdade, e sério: nenhuma mudança de topologia chamava
+`graph.prepare()`.** O painel X11 chama `prepare(sr, 2, block)` depois de
+todo `connect`/`disconnect`, porque é o `prepare` que recalcula a ordem de
+processamento e os buffers. Sem ele o cabo entra na lista do grafo e
+simplesmente **não passa a valer** — clicar parecia não fazer nada. Meu
+`tryPatch` também não desfazia a tentativa antes de repetir como
+feedback, e o corte não refazia o layout (na vista SAÍDA um módulo pode
+sumir). Corrigidos os três caminhos; `Rack` passou a guardar
+`sampleRate`/`blockFrames` e expor `reprepare()`, pra não haver como
+esquecer de novo.
+
+Na mesma passada entrou o gesto que faltava: **botão esquerdo numa
+entrada já cabeada "pega" a ponta** — desliga e ancora o arrasto na saída
+de origem, que é como se repatcheia sem ir até a outra ponta.
+
+**Inspector de cabo.** Um cabo do Rasgo não é um fio: é objeto com estado
+(ganho, condutância, relação com um companion, ruptura com cicatriz). A
+caixa transliterada do X11: clique no CORPO do cabo abre (alcance
+proporcional ao zoom — mirar numa curva fina é mais difícil que acertar
+um jack), quatro botões de relação (NONE/RING/FOLD/DIFF), sliders
+horizontais AMT e COND quando há relação, e ROMPER/RECONECTAR só daquele
+cabo. Relação nova começa **auto-relacionada** (companion = a própria
+origem) e abre o modo de escolha, com halo em toda saída. Diferença
+consciente em relação ao X11: a caixa é ancorada em coordenadas de
+CONTEÚDO, então rola junto com o rack e fica sempre ao lado do seu cabo
+(no X11 não havia viewport; o ponto era o mesmo).
+
+**"tá meio lento o app, tudo meio em atraso" — procedente, duas causas.**
+(1) `Signal::panel()` devolve `Panel` **por valor e reconstrói a lista de
+widgets a cada chamada**; eu o chamava por módulo a cada quadro — 60
+módulos × 30 fps. Agora o `Panel` é cacheado no `ModBox` e reconstruído
+só no `relayout()`, que é quando de fato muda. (2) **Não havia culling**:
+o rack inteiro era repintado mesmo com duas fileiras visíveis. O painel
+X11 sempre descartou módulo fora da janela; agora o JUCE também, por
+`g.getClipBounds()`. De brinde, o snapshot dos scopes passou a atribuir
+entrada a entrada em vez de trocar o mapa inteiro — eram ~175 KB
+realocados por quadro à toa.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — cliques no áudio, arrastar módulo, e paridade fina
+
+Rodada guiada por seis relatos do autor testando ao vivo. O mais grave
+primeiro.
+
+**"muitos clics no audio" — regressão minha, e séria.** Eu tinha posto
+`lock_guard` bloqueante no `paintCables` e no `paintInspector`, ou seja, a
+UI tomava o mutex do grafo **duas vezes por quadro, 30×/s**. O painel X11
+nunca trava o grafo pra desenhar cabo — usa só um `try_lock` pro
+snapshot dos scopes. Com a UI segurando o lock tanto, o thread de áudio
+perdia a corrida do `try_to_lock` a toda hora, e cada bloco perdido é um
+bloco reemitido com fade; ao recuperar o lock, o ganho **saltava** de
+volta pra 1.0 — degrau na onda, clique audível.
+
+Duas correções: (1) os cabos passaram a ser desenhados de um
+`Rack::cableSnap`, tirado uma vez por quadro sob o mesmo `try_lock` dos
+scopes — `paint` não trava mais nada; (2) a volta do fade virou rampa
+**por amostra** ao longo do bloco, em vez de salto. A segunda vale por si:
+mesmo com starve raro, o degrau era audível.
+
+**Arrastar módulo.** Corpo do módulo arrasta pra reposicionar
+(`reorderTo`, transliterado do `moduleReorderTo` do X11 — só na vista
+TODOS, porque nas filtradas a ordem visível é parcial e o índice de
+destino não fecha). Soltar sobre a paleta remove da case: desliga só os
+cabos que encostam no módulo e o nó fica órfão no grafo — remover da
+vista não é apagar do patch. Arrastar da paleta pra a case adiciona, com
+fantasma "+ TIPO" seguindo o cursor. E o `[x]` do canto superior direito,
+que também faltava.
+
+**"a caixa mixer master ... precisa clicar várias vezes até achar o ponto
+certo".** Diagnóstico: os cabos são desenhados POR CIMA dos módulos, mas
+o CORPO do módulo tinha prioridade no clique — e como os módulos ocupam
+quase toda a case, quase todo o comprimento do cabo era zona morta; só
+dava pra abrir o inspector nas frestas entre fileiras. Invertida a
+prioridade: jack e controle continuam ganhando (alvos pequenos e
+intencionais), mas o **cabo ganha do corpo do módulo**. Arrastar módulo
+segue funcionando em toda parte onde não passa cabo. Tolerância também
+subiu pra `mmpx(5)+3`.
+
+**"letras pequenas para textos (sobre, tutorials)".** 10 px servia pra
+rótulo de painel, não pra leitura corrida. Corpo 13, cartão 14, título 16,
+com os avanços de linha e a altura do cartão SOBRE ajustados.
+
+**Destaque laranja por hover na paleta.** Existia mesmo no X11
+(`paletteHoverType`, borda dupla de acento no módulo correspondente) e eu
+não tinha portado. Portado.
+
+**"ao clicar em espera, os cabos continuam iguais".** Verifiquei de novo
+o histórico e o código: o STANDBY **nunca** mudou a cor dos cabos em
+nenhum dos dois front-ends — quem faz isso é o `[espaço]`. Mas o autor
+pediu duas vezes, e o pedido é coerente: se nada está chegando à saída, o
+cabeamento pode mostrar. Implementado como comportamento **novo** (não
+restaurado) e **nos dois front-ends no mesmo dia**, pra não divergirem:
+com a saída silenciada os cabos ficam esmaecidos, mas INTEIROS — romper
+continua sendo outra coisa, e continua tracejado de `warning`.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — o travamento (causa provável) e endurecimento
+
+Autor reportou "travou" e "botoões não funcionam". O app já não estava
+rodando quando fui olhar, e **não há Xvfb nesta máquina**, então não pude
+reproduzir ao vivo — o que segue é diagnóstico por leitura, com a
+ressalva honesta de que é *causa provável*, não confirmada.
+
+**Causa provável: tempestade de relayout no arrasto de módulo**, que eu
+mesmo introduzi na etapa anterior. `RackView::mouseDrag` chama
+`reorderTo`, que chamava `relayout()` a cada evento — e `relayout()`
+pedia `Signal::panel()` para TODOS os módulos. `panel()` **constrói** a
+descrição do painel a cada chamada. No painel X11 isso acontece uma vez
+por quadro (o laço de eventos coalesce o movimento); no JUCE, `mouseDrag`
+dispara **por evento do mouse** — centenas por segundo. Dá dezenas de
+milhares de construções de `Panel` por segundo, com a mensagem de
+interface presa nisso: a UI para de responder, e botão que não responde é
+exatamente "botões não funcionam".
+
+Duas correções:
+
+1. **`Rack::panelCache`** — o `Panel` de cada nó é construído uma vez e
+   reusado; invalidado no `loadPatch` (os ids passam a significar outra
+   coisa), no `applySeed` e ao remover módulo. `relayout()` virou só
+   geometria, o que barateia também zoom, redimensionamento e troca de
+   vista.
+2. **Throttle de ~40 ms no `reorderTo`** — no máximo ~25 reordenações por
+   segundo. Reordenar refaz o layout inteiro; não faz sentido fazer isso
+   a 500 Hz.
+
+**Endurecimento do cabeçalho.** O VU e a leitura "N mód · M cabos" eram
+desenhados incondicionalmente e comiam o vão da direita; numa janela
+estreita empurravam os botões de comando pra fora **em silêncio**. Agora
+só entram se sobrar espaço: botão que some não é botão discreto, é botão
+que o músico procura e não acha.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+**Pendente de confirmação do autor:** se o travamento acontecia ao
+ARRASTAR um módulo, a correção acima deve resolver. Se acontecia em outro
+gesto (abrir inspector, cabear, overlay), preciso saber qual — o
+diagnóstico muda.
+
+## Registro da etapa — 2026-09-14: jacks inválidos — recuar, não apagar
+
+"ao puxar um cabo de uma saída os jacks perdem os halos (bordas cinzas)".
+
+Verifiquei: **não era regressão do porte — o painel X11 fazia a mesma
+coisa.** Durante o cabeamento, os jacks de polaridade igual (destinos
+impossíveis) tinham o anel pintado com `T.recessed`, que é exatamente o
+tom do miolo do jack: o jack sumia. Era uma decisão de desenho antiga, e
+o relato mostra que ela está errada — apagar metade dos jacks faz perder
+o mapa do painel justo no instante em que a pessoa está mirando. **Guiar
+é destacar o válido, não cegar o resto.**
+
+Corrigido nos **dois front-ends no mesmo dia**: o jack inválido passa a
+ter o anel apenas RECUADO (mistura com o fundo: 55% no JUCE, 45% no X11 —
+o X11 mistura na mão porque não tem alfa), continuando legível. O halo de
+acento nos destinos válidos continua igual, e o rótulo segue escondido
+nos inválidos (isso sim reduz ruído sem cegar).
+
+De quebra, uma divergência minha que o mesmo trecho expôs: no JUCE eu
+desenhava o anel das SAÍDAS em `T.accent` por padrão, enquanto o X11 usa
+`T.line` para todos os jacks em repouso. Alinhado ao X11 — era mais uma
+fonte de "está diferente do outro".
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — REC, seed editável, dwell do LEARN, títulos
+
+**Dwell do LEARN.** O autor pediu "1 segundo para que apareça o texto". O
+valor já era 1000 ms, mas quase nunca fechava: a contagem reiniciava
+sempre que o ponteiro ficava sobre NADA, e as pegadas dos widgets têm
+folga entre si — atravessar um vão de um pixel zerava o relógio. Agora só
+um objeto DIFERENTE reinicia; ficar sobre nada apenas espera. Corrigido
+nos dois front-ends (o painel X11 tinha o mesmo defeito).
+
+**REC.** Botão no cabeçalho (ponto cheio quando gravando) e `Ctrl+R`.
+Acumula em buffer com reserva de ~4 min estéreo e escreve o `.wav` ao
+parar, pelo MESMO `rasgo::modular::writeWav16` do motor que o painel X11
+usa — com dither TPDF ligado, porque é gravação real do usuário e não
+render de auditoria. Auto-para se a reserva encher: realocar no thread de
+áudio seria alocação em tempo real. As tomadas vão pra a pasta de música
+do usuário (`RASGO_REC_DIR` sobrepõe), não pro diretório de dados — são
+obra, não estado interno. **Ainda sem o SYSTEM SCORE** que acompanha a
+gravação no X11; fica pendente.
+
+**Caixa de seed editável.** Virou um `juce::TextEditor` de verdade, filho
+do cabeçalho: cursor, seleção, teclado e área de transferência vêm de
+graça — no painel X11 isso custou ~17 blocos escritos na mão. Enter
+aplica; Esc e perder o foco voltam ao seed atual, pra digitar um número e
+clicar fora não trocar o patch sem querer. Restrito a dígitos.
+
+**Títulos dos módulos em destaque.** O nome do módulo é o primeiro
+`Label` do painel; passa a sair em negrito, 12 px, no tom primário,
+enquanto os demais Labels seguem discretos em 10 px. Antes o nome se
+perdia no meio dos rótulos de controle.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-14: JUCE — camada fixa cacheada (a lentidão de fundo)
+
+Relatos: "tá meio lento" (de novo) e "puxo o cabo não me obedece". São o
+mesmo problema visto de dois ângulos.
+
+**Diagnóstico.** O rack era repintado inteiro 30×/s pelo timer E de novo
+a cada evento de mouse. No renderizador de software do JUCE, `drawText`
+**refaz layout de glifos a cada chamada** — e um rack visível tem
+centenas de rótulos (nome do módulo, rótulo de cada knob, slider, toggle
+e jack). Era isso que dominava o quadro. O painel X11 repinta na mesma
+cadência, mas desenha texto por `Xutf8DrawString` num fontset já
+carregado, que é ordens de grandeza mais barato — daí um ser fluido e o
+outro não, com o mesmo desenho.
+
+**Correção estrutural: duas passadas.** `paintWidget` ganhou um
+`Pass::Static` / `Pass::Dynamic`, e a passada fixa de cada módulo é
+rasterizada **uma vez** num `juce::Image` guardado no `ModBox`
+(`paintChrome`), depois só copiada. Vai pra camada fixa tudo que não
+depende de valor nem de interação: fundo, trilhos de parafuso, `[x]`,
+molduras de knob/slider/display, miolo dos jacks e **todos os rótulos**.
+Fica dinâmico só o que anima: ponteiro do knob, preenchimento do slider,
+estado do toggle, conteúdo dos displays, anel e halo dos jacks, e a borda
+do módulo (que muda com hover da paleta e arrasto). A imagem nasce vazia
+a cada `relayout()`, que é exatamente quando a geometria muda — sem
+invalidação manual pra esquecer.
+
+Usei `Graphics::setOrigin` na imagem pra as duas passadas seguirem usando
+as MESMAS coordenadas absolutas: nenhum código de posicionamento foi
+duplicado nem traduzido.
+
+**Cabo elástico cirúrgico.** Arrastar um cabo repintava o rack inteiro a
+cada evento de mouse. Agora repinta só a união do traçado anterior com o
+novo — somando a BARRIGA do cabo, que desce abaixo dos dois extremos e
+cresce com a distância horizontal (`cablePoints`: 18 + dx/6). Sem somar a
+barriga o retângulo sujo cortaria a curva e deixaria rastro; foi o
+primeiro jeito que escrevi, e estava errado.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+**Nota honesta:** não tenho como medir aqui (sem Xvfb, e não abro janela
+no desktop do autor). O diagnóstico é sólido — o custo de `drawText` no
+renderizador do JUCE é conhecido — mas a confirmação depende de ele abrir
+e sentir.
+
+## Registro da etapa — 2026-09-15: anel do jack, rolagem na borda, ordem da paleta, atalhos
+
+Quatro relatos, e em dois deles o autor lembrava certo do painel antigo.
+
+**"as bordas dos jacks somem quando há um início de cabeamento".**
+Regressão da MINHA correção do dia anterior: eu tinha trocado o anel
+apagado por um anel esmaecido, mas esmaeci em direção ao **fundo da
+janela** (`T.bg`). Só que o jack é desenhado sobre a **superfície do
+módulo** (`T.surface`). A conta dá `#2b323a` contra uma superfície
+`#262b36` — cinco unidades de diferença, invisível. Conferi numericamente
+antes de mexer. Agora a mistura é em direção à superfície, que é o que
+está de fato atrás do jack: `#393f4d`, claramente distinto. Corrigido nos
+dois front-ends; no X11 o `dimColor` virou `dimToward(cor, alvo, k)`,
+porque cabo e jack têm fundos diferentes.
+
+**"quando o mouse desce com um cabo não está acontecendo scroll".**
+Faltava mesmo. Agora usa `Viewport::autoScroll` mais
+`Desktop::beginDragAutoRepeat(40)` — sem o segundo, o JUCE só entrega
+`mouseDrag` quando o ponteiro SE MOVE, e parado na borda a rolagem dava
+um passo só e parava. Vale também pro arrasto de módulo. Quando rola, o
+repinte volta a ser do rack inteiro: o conteúdo andou sob o ponteiro e o
+retângulo sujo do cabo não vale mais.
+
+**"a lista de módulos estava em ordem alfabética, pode verificar?"** —
+verificado, e o autor está certo. O painel X11 ordena com
+`sortFamilyForDisplay` (alfabética dentro da família, MIXER/MASTER no
+fim); a paleta do JUCE usava a ordem crua do catálogo, que é a ordem de
+INSTANCIAÇÃO dos nós — mexer nela mudaria o que cada `RASGO_SEED=N`
+produz, então nunca foi ordem de leitura. O helper saiu de
+`panel_main.cpp` para `panel/ModuleCatalog.hpp`: três consumidores (a
+paleta de cada front-end e a ordem das caixas no rack) precisam
+concordar, e concordar por cópia foi exatamente como isso se desalinhou.
+
+**"já colocou os atalhos de teclado no tutorial?"** — não. Havia menções
+espalhadas (campo de seed, Ctrl+R, [espaço], zoom), mas as teclas de uma
+letra — g, v, m, e, c, q — **não apareciam em lugar nenhum**: quem só
+lesse o tutorial não descobria que existiam. Criado o cartão TECLADO nas
+quatro línguas, reunindo tudo, incluindo a navegação dos próprios
+overlays. Entrou nos dois front-ends; as menções em contexto ficaram.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: JUCE — SYSTEM SCORE e entrada de áudio/MIDI
+
+Os dois últimos itens grandes da auditoria de paridade (`PARIDADE.md` B1
+e B3).
+
+**SYSTEM SCORE.** A gravação passa a sair em par: `rec-*.wav` e
+`rec-*.score.txt` com o mesmo nome, lado a lado, como no painel X11. O
+score registra a topologia inteira no instante zero da tomada, as notas
+que os módulos `NoteOut` fecham (lidas do thread de áudio sob o `gmx`,
+que é onde `takeCompletedNote` deve ser chamado — fora do `process()`) e
+as mudanças de parâmetro feitas à mão. Um evento por GESTO, do valor
+inicial ao final quando o controle é solto — não um por pixel de arrasto;
+o toggle conta como gesto também. O tempo é sempre amostras gravadas /
+taxa, nunca relógio de parede: o score fica relativo à TOMADA e continua
+alinhado ao áudio mesmo se a interface engasgar.
+
+Uma adição além da paridade, aplicada aos **dois** front-ends:
+**recabear durante a tomada agora entra no score**. Antes só a topologia
+do instante zero entrava, então uma performance cujo gesto principal é
+repatchear ao vivo era registrada como se nada tivesse mudado.
+
+**Entrada de áudio e MIDI.** Aqui o código do X11 não servia — é ALSA. No
+JUCE virou `AudioAppComponent` com 2 canais de entrada e
+`juce::MidiInput`, o que é multiplataforma de verdade: o motivo de este
+front-end existir.
+
+Mantida a regra do painel, que é decisão de projeto e não economia: a
+entrada só é ABERTA quando o patch tem um `SIGNAL-IN`. O Rasgo Modular
+soa sozinho; MIDI e áudio são adaptadores opcionais. Pedir microfone a
+quem nunca vai usar é ruído — e no macOS é um diálogo de permissão do
+sistema aparecendo sem motivo nenhum.
+
+Detalhes que importam: a entrada é copiada ANTES de qualquer escrita (o
+JUCE entrega o mesmo buffer pra ler e escrever, e a primeira coisa que o
+callback faz é escrever a saída por cima); ela é entregue aos `SIGNAL-IN`
+em fatias do tamanho do sub-bloco, já sob o `gmx`; e o callback de MIDI
+(que roda no thread de MIDI, nem áudio nem interface) usa `try_lock` e
+descarta — perder um CC é melhor que travar a entrada MIDI.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: revisão completa — seis bugs ainda não relatados
+
+Revisão linha a linha do `RasgoModularApp.cpp` (3.199 linhas) procurando
+defeitos que os testes na mão ainda não tinham exposto. Seis achados
+reais. Dois deles derrubariam o app; um corrompe dado do usuário em
+silêncio, que é pior.
+
+**1. `.rmp` com id inválido derrubava o THREAD DE ÁUDIO.** `loadPatch`
+aceitava a linha `panel shown` verbatim. `shown` é percorrido pelo áudio
+(`feedScopes`, `collectNotes`) e `SignalGraph::node()` é `nodes_.at()` —
+que LANÇA. Carregar um patch salvo por uma versão com mais módulos, ou um
+arquivo truncado, fazia a exceção escapar do callback de áudio. Ids fora
+de faixa agora são descartados, com recuo pra lista completa se sobrar
+nada. **O painel X11 tinha o mesmo defeito** — corrigido nos dois.
+
+**2. Inspector de cabo editava o cabo ERRADO.** Ele guardava o ÍNDICE do
+cabo. Índices se deslocam a cada conexão ou desconexão: com a caixa
+aberta, bastava cabear em outro lugar pra o clique seguinte mudar a
+relação — ou romper — um cabo diferente do que estava na tela. Silencioso
+e destrutivo. Agora guarda a PONTA DE DESTINO (nó, porta), que identifica
+o cabo de forma estável porque cada entrada aceita um cabo só; o índice é
+resolvido na hora do uso, e a caixa se fecha sozinha se o cabo sumiu.
+
+**3. Tomada perdida quando a gravação parava sozinha.** A reserva do REC
+enche em ~4 min e o thread de áudio baixa o atômico (correto: realocar ali
+seria alocação em tempo real). Mas nada percebia a transição, então o
+próximo clique em REC caía no ramo de INÍCIO e limpava o buffer — a
+tomada inteira ia pro lixo sem aviso. O timer agora vigia a transição e
+finaliza o arquivo.
+
+**4. Alocação no thread de áudio, e entrada picotada.** `inBuf_.resize()`
+rodava dentro do callback. Pior: a entrada era distribuída em fatias do
+tamanho do sub-bloco e o que sobrava do bloco do host era DESCARTADO —
+com bloco de host que não é múltiplo de 256, a entrada saía picotada.
+Virou uma fila com reserva feita no `prepareToPlay`.
+
+**5. `getNextAudioBlock` sem guarda de canais.** `getWritePointer(0, …)`
+com zero canais é indefinido. Agora retorna cedo.
+
+**6. `applySeed` sombreava `sampleRate`/`blockFrames`.** Preparava o grafo
+com o parâmetro e deixava os membros intactos; como todo
+connect/disconnect chama `reprepare()`, o grafo podia ser reconfigurado
+depois com uma taxa diferente da do dispositivo. Os membros passam a ser
+atualizados, e `applySeed` usa o próprio `reprepare()`.
+
+Mais uma correção menor: soltar um cabo chamava `relayout()` em vez de
+`layoutFor()` — na vista SAÍDA, um módulo que passava a aparecer não
+entrava na faixa de rolagem do Viewport.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+**Não corrigido de propósito** (registrado, não esquecido): `collectNotes`
+faz `dynamic_cast` por nó a cada bloco enquanto grava (~11 k/s) e carimba
+a nota com o tempo do bloco anterior (erro de ~5 ms). O painel X11 faz
+igual; nenhum dos dois incomoda hoje, e mexer sem necessidade em código
+que roda no thread de áudio é risco sem retorno.
+
+## Registro da etapa — 2026-09-15: LEARN legível e o sinal de menos no seed
+
+**"por que existe um sinal de menos no seed?"** — pergunta que achou um
+bug sério, não cosmético. O seed é `std::uint64_t` e o sorteio usa os 64
+bits, mas eu o exibia com `static_cast<juce::int64>`: metade dos sorteios
+aparecia negativo. E como o campo aceita só dígitos, **o número na tela
+não podia ser digitado de volta** — ou seja, o seed exibido não
+reproduzia o patch, que é a única razão de ele existir na tela. O painel
+X11 sempre formatou como `unsigned long long`; o erro era só meu, no
+JUCE.
+
+Junto veio o par: a leitura usava `getLargeIntValue()`, que devolve
+`int64` e portanto não representa seed acima de 2^63−1 — metade da faixa
+ficava impossível de digitar mesmo com a exibição corrigida. Agora lê com
+`strtoull`, com checagem de `ERANGE`. **Resposta à outra pergunta:** a
+caixa aceita **20 dígitos**, que é o comprimento de `uint64` máximo
+(18446744073709551615).
+
+**LEARN legível.** O corpo estava em 10 px — tamanho de rótulo de painel,
+não de leitura corrida. Corpo e título foram pra 12 px (título em
+negrito), a lista de módulos pra 11 px. Aumentar a fonte sem aumentar a
+coluna só trocaria letra pequena por texto picotado, então a coluna foi
+de 158 pra 186 px e a caixa LEARN de 172 pra 232 — os três segmentos
+(`quick`, `understand`, `explore`) continuam cabendo.
+
+Painel X11 e app JUCE compilam limpos; **73/73 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: auditoria de excelência de áudio + desfazer + descabear
+
+### Excelência de áudio — o buraco que a auditoria achou
+
+Auditado contra `RASGO_DOCUMENTATION/architecture/SAIDA_AUDIO_COMUM.md`
+(a arquitetura comum que Navalha 2, Antitotem e Rasgo Synth seguem), não
+contra um critério inventado aqui.
+
+**Achado grave: o caminho final até o dispositivo não tinha guarda.** O
+Modular TEM proteção de saída de excelência — `dsp/OutputStage.hpp`, com
+guarda de finitude, bloqueio de DC, limitador com look-ahead, estimador
+de pico verdadeiro e teto de −1 dBFS. Mas ela mora DENTRO do módulo
+MASTER, e o MASTER é um módulo como qualquer outro: o músico pode cabear
+direto no OUT e passar por fora dele. Nesse caminho:
+
+- o painel X11 limitava a amplitude só na conversão pra int16 do ALSA, e
+  **aquele clamp não pega NaN** — `NaN > 1.0f` e `NaN < -1.0f` são ambos
+  falsos, o NaN atravessa inteiro e o cast pra `int16_t` é comportamento
+  indefinido (na prática, um estalo alto);
+- o app JUCE não fazia clamp nenhum: float cru direto pro dispositivo.
+
+Uma realimentação mal resolvida, uma divisão por zero num módulo
+experimental ou um `.rmp` corrompido chegavam ao alto-falante em escala
+total. Isso é risco de equipamento e de audição — o §3 do documento comum
+exige explicitamente que nenhum valor inválido atinja o dispositivo.
+
+**Correção:** o sink `OUT` saiu das duas cópias locais e virou
+`apps/panel/SinkOut.hpp`, compartilhado, com a guarda de SEGURANÇA na
+acepção do documento: vem depois do master criativo, não pode ser
+desligada, e é deliberadamente mínima — saneia não-finito pra zero e
+impõe o teto de −1 dBFS, nada mais. Não é um segundo limitador: sem
+look-ahead, sem envelope, sem cor. No caminho normal (passando pelo
+MASTER) o sinal já chega abaixo do teto e **a guarda nunca atua**.
+
+`tests/test_sink_guard.cpp` (74º teste) fixa os dois lados do contrato:
+que NaN/±Inf viram silêncio e nada passa do teto, **e** que abaixo do
+teto a saída é idêntica amostra a amostra, com a telemetria zerada. O
+segundo importa tanto quanto o primeiro — uma guarda que colore o
+caminho normal seria pior que guarda nenhuma.
+
+Itens do §5 ainda NÃO cobertos, registrados pra não passarem por
+esquecidos: medição BS.1770/LUFS, taps nomeados
+(`pre-master-criativo`/`pre-safety`/`post-safety`), teste de correlação e
+downmix mono, bateria de blocos irregulares e troca de sample rate,
+exportação PCM24/float. Nenhum deles bloqueia o uso; todos bloqueiam
+poder dizer que a bateria do documento comum está cumprida.
+
+### Desfazer
+
+Pedido do autor depois de constatar o caso real: "um cabo foi conectado e
+não surtiu o efeito desejado, mas o músico já não sabe ao certo qual
+cabeamento foi feito". Escolhido em vez de um botão de limpar ou de
+reset, e a razão é essa: tudo que é destrutivo aqui era irreversível —
+MUTA/EVOLUI/CRUZA reescrevem o patch inteiro —, e ação sem volta é ação
+que o músico deixa de usar.
+
+Barato porque o motor já serializa o grafo: a pilha é um anel de 24
+fotografias em texto, sem lógica inversa por ação (que seria a parte cara
+e a que envelhece mal — toda ação nova teria que lembrar de escrever a
+sua). `Ctrl+Z`. Cobre CADA cabo ligado, cortado ou repatcheado, as
+mudanças do inspector, seed, MUTA/EVOLUI/CRUZA, adicionar/remover módulo
+e o descabear. O arrasto do slider de relação empilha uma vez no clique,
+não por pixel.
+
+### Descabear — e a correção do que eu tinha entendido errado
+
+Implementei primeiro como "rack vazio" (remover os módulos). O autor
+corrigiu: **é remover os CABOS**. E está certo — neste instrumento o rack
+é o conjunto de módulos disponíveis e o PATCH é o cabeamento. `[n]` tira
+todos os cabos; os módulos ficam. O autor completou o fluxo: depois de
+cabear do zero, RACK · SAÍDA enxuga a vista pra só o que chega ao som,
+sem remover nada.
+
+Tutorial: cartão novo CONSTRUIR DO ZERO nas quatro línguas, com os dois
+caminhos de entrada (SEED ou `[n]`) e o par descabear + RACK·SAÍDA.
+Corrigida a frase do cartão de módulos que ainda dizia que o instrumento
+abre "todos mudos até você cabeá-los" — deixou de ser verdade quando o
+arranque passou a sortear um seed. Cartão de atalhos atualizado com `n` e
+`Ctrl+Z`; título TECLADO passou a caixa alta como os outros.
+
+Painel X11 e app JUCE compilam limpos; **74/74 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: ABRIR — o banco era uma gaveta sem puxador
+
+"e como acessamos no rasgo modular um arquivo do banco?" — a resposta era
+**não dá**, e verificar isso expôs duas coisas.
+
+**A lacuna.** `BANCO` (Ctrl+B) escrevia `.rmp` em
+`~/.local/share/rasgo-modular/patches/` e **nenhum dos dois front-ends
+tinha como reabri-los**. O único caminho de carga era a variável de
+ambiente `RASGO_RESUME=1`, e só pro `session.rmp`. Um patch de seed ainda
+dava pra recuperar digitando o número na caixa; um patch editado à mão
+depois de semeado era irrecuperável — o arquivo existia e nada no app o
+alcançava.
+
+**A promessa falsa.** O cartão do tutorial dizia que o BANCO guarda "num
+conjunto rotativo que dá pra folhear de volta". Não existe folheio
+nenhum, nem nunca existiu. Documentação que promete recurso inexistente é
+pior que documentação ausente: manda o músico procurar um botão que não
+está lá. O cartão foi reescrito nas quatro línguas, agora dizendo o que
+cada coisa faz de verdade e — o que faltava — **a diferença entre SALVA e
+REC**: um guarda o instrumento (grafo, cabeamento, parâmetros, seed), o
+outro guarda o som.
+
+**A correção.** Botão `ABRIR` no cabeçalho e `Ctrl+O`, com seletor de
+arquivo nativo (`juce::FileChooser`) começando na pasta do banco mas
+aceitando qualquer `.rmp` — trocar patch com outra pessoa passa a ser o
+mesmo gesto que reabrir o próprio. Abrir empilha no desfazer, como as
+outras ações destrutivas.
+
+**Só no JUCE.** O painel X11 continua sem, e isso é decisão, não
+esquecimento: um seletor de arquivo em X11 puro seria escrever um
+navegador de arquivos à mão, num front-end que é declaradamente de teste.
+Lá o caminho continua sendo `RASGO_RESUME=1`.
+
+Painel X11 e app JUCE compilam limpos; **74/74 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: arrastar módulo de volta — clique vs. arrasto
+
+"antes era possível clicar num módulo e arrastar para mudar de posição no
+rack, mas não consegui fazer isso" — regressão minha, e de um tipo que
+vale nomear: **uma correção que resolveu um conflito escolhendo um lado.**
+
+Quando o autor reportou que o inspector era difícil de abrir, eu dei
+prioridade ao CABO sobre o corpo do módulo no clique. Funcionou pro
+inspector e matou o arrasto de módulo: como os cabos correm por cima dos
+módulos e a tolerância é generosa, quase todo clique no corpo passou a
+abrir a caixa do cabo em vez de pegar o módulo. Troquei um problema pelo
+outro.
+
+O erro foi tratar como disputa de POSIÇÃO o que é disputa de GESTO. Os
+dois querem o mesmo pixel, mas não o mesmo movimento: abrir o inspector é
+um clique, reposicionar é um arrasto. Agora a decisão é adiada — o
+`mouseDown` sobre um corpo com cabo guarda as duas intenções, e quem
+resolve é o que acontece depois: passar de 4 px vira arrasto (e descarta
+o clique pendente), soltar parado vira clique (e abre o inspector). A
+reordenação também só começa depois do limiar, pra um clique não empurrar
+o módulo um lugar antes de abrir a caixa.
+
+Fora do corpo de um módulo — cabo cruzando o vão entre fileiras — o
+clique continua abrindo o inspector na hora: ali não há ambiguidade.
+
+App JUCE compila limpo; **74/74 CTest** verdes.
+
+## Registro da etapa — 2026-09-15: bateria de casos-limite (§5) — e dois cliques reais
+
+`tests/test_output_excellence.cpp` (75º teste) cobre a parte
+automatizável do §5 de `SAIDA_AUDIO_COMUM.md`, exercitando a cadeia real
+de saída (MASTER + guarda do sink, que é o par que chega ao dispositivo):
+
+- silêncio, DC nos dois sinais, entrada muito acima da escala, denormais;
+- impulso isolado — e a verificação de que ele não contamina os blocos
+  seguintes;
+- senos a 5 Hz, 20 Hz e junto de Nyquist (0,45·sr e 0,499·sr), em
+  ANTIFASE, que é o pior caso pro somatório mono;
+- NaN e ±Inf no meio de um bloco válido, checando que não escapam nem
+  envenenam o estado;
+- blocos de tamanho irregular (1, 7, 64, 3, 128, 33, 256, 2 amostras);
+- troca de taxa de amostragem no meio (22,05 / 44,1 / 48 / 96 / 192 kHz);
+- automação rápida de MUTE, GAIN e WIDTH, extremo a extremo entre blocos;
+- downmix mono nos dois casos que importam: antifase (tem que cancelar de
+  forma previsível, e cancelar é física, não bug) e em fase (não pode
+  atenuar o que já era comum).
+
+**A bateria achou dois defeitos na primeira execução.** `GAIN` e `WIDTH`
+eram lidos uma vez por bloco e aplicados como CONSTANTE — trocar o valor
+entre blocos punha um degrau na onda exatamente na fronteira, que é o que
+se ouve como clique. O `MUTE` não falhou porque já tinha rampa. E não é
+caso raro: o VARIA mexe nos parâmetros a cada 33 ms, e arrastar um fader
+gera uma troca por evento de mouse.
+
+Corrigido no `Master` com a mesma rampa de 8 ms que o MUTE já usava —
+rápido o bastante pra o gesto parecer imediato, lento o bastante pra não
+ser degrau. É a mesma prática que o projeto já tinha adotado no SPACE
+(commit de 2026-09-12, "suaviza time/spread/feedback/tone/mix por
+amostra"); faltava no barramento de saída, que é onde mais importa.
+
+**Ainda pendente do §5**, sem mudança: medição BS.1770/LUFS (momentary,
+short-term, integrated), taps nomeados de gravação
+(`pre-master-criativo`/`pre-safety`/`post-safety`) e exportação PCM24 e
+float. Os três dependem de decisão de escopo, não de esforço — e nenhum
+deles é verificável sem um alvo declarado.
+
+**75/75 CTest** verdes; painel X11 e app JUCE compilam limpos.
+
+## Registro da etapa — 2026-09-15: medição BS.1770/EBU R128 + documentação
+
+**O medidor.** `src/dsp/Loudness.hpp`: momentary (400 ms), short-term
+(3 s) e integrated com as duas portas da norma (absoluta −70 LUFS,
+relativa −10 LU abaixo da média dos blocos que passaram na primeira).
+Blocos de 400 ms com 75% de sobreposição, feitos de sub-blocos de 100 ms.
+
+Duas decisões que importam:
+
+1. **A ponderação K é DERIVADA da taxa em uso**, dos protótipos analógicos
+   da norma, não os coeficientes tabelados de 48 kHz. Usar os tabelados
+   crus em 44,1 ou 96 kHz dá um número errado **sem avisar** — e o app
+   abre na taxa que o dispositivo oferecer.
+2. **É medidor, não processador.** Não toca no sinal em lugar nenhum, e
+   nada normaliza automaticamente. O documento comum é explícito:
+   "loudness informa a decisão, mas não deve normalizar uma performance ao
+   vivo automaticamente".
+
+**Verificação antes de acreditar.** Rodei uma sonda antes de escrever o
+teste, e ela me corrigiu: eu esperava −23,0 LUFS pra um par estéreo a −23
+dBFS RMS/canal e li −19,98. A diferença de 3,02 dB é a soma de canais da
+própria norma (G=1,0 em cada) — o fixture EBU é **−26 dBFS por canal** pra
+dar −23,0 LUFS. Minha leitura do fixture é que estava errada, não o
+código. Com isso ajustado: −22,98 (tolerância ±0,1), ponderação unitária
+em 1 kHz (+0,01 dB), +6,00 LU ao dobrar a amplitude, +3,01 LU ao somar o
+segundo canal correlacionado. Tudo isso virou `tests/test_loudness.cpp`,
+incluindo um teste da PORTA — 10 s de tom seguidos de 30 s de silêncio
+têm que medir o mesmo que o tom sozinho, que é o ponto do R128 que mais
+se erra.
+
+**Ligado ao instrumento**, senão seria um header sem uso: o app JUCE
+alimenta o medidor com o par que de fato sai pro dispositivo, publica M/S/I
+em atômicos e mostra a leitura no cartão SOBRE. O integrado zera a cada
+tomada de REC — ele é da TOMADA, não da sessão.
+
+**Documentação atualizada** (pedido do autor): `RASGO_MODULAR.md` ganhou
+as seções da guarda do sink e da medição, a lista de testes ficou
+correta e o estado do front-end JUCE deixou de dizer "Fase 1"; o `README`
+ganhou um bloco de excelência de saída e a tabela de front-ends passou a
+refletir a paridade; `apps/juce/PARIDADE.md` ganhou a tabela de auditoria
+de áudio, com o que está feito e o que depende de decisão.
+
+**76/76 CTest** verdes.
+
+**Pendente, e é decisão sua, não esforço:** taps nomeados de gravação
+(`pre-master-criativo`/`pre-safety`/`post-safety`) e exportação PCM24 e
+float. Os dois só fazem sentido com um alvo de publicação declarado — não
+existe um LUFS certo pra palco, álbum e streaming ao mesmo tempo, e é essa
+escolha que define o resto.

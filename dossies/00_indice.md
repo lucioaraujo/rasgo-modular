@@ -12,6 +12,15 @@ Visão geral e estado do projeto: [`../RASGO_MODULAR.md §36`](../RASGO_MODULAR.
 log operacional: [`../TAREFAS.md`](../TAREFAS.md); ordem de execução e
 pesquisa de módulos: [`../PESQUISA_MODULOS.md`](../PESQUISA_MODULOS.md).
 
+**Guia para quem toca:** o dossiê é o documento de *desenvolvimento*. O
+guia voltado ao músico fica em [`../guia/`](../guia/00_indice.md) — a
+mentalidade (`COMO_PENSAR.md`), o funcionamento (`CABEAMENTO.md`) e **os
+58 módulos um a um** (jack a jack, como cabear, como potencializar),
+cada página com o mesmo número do dossiê
+(`guia/18_oscilador.md` ↔ `dossies/18_oscilador.md`). **Todo módulo novo
+ganha a página de guia junto com o dossiê** (fase didática,
+`PESQUISA_MODULOS.md §2.7`).
+
 Coluna **Família**: as 8 famílias de trabalho de
 [`../RASGO_MODULAR.md §4.1`](../RASGO_MODULAR.md) (SOURCE / TRANSFORM /
 MODULATE / TIME / DECISION / ROUTE / SPACE / OUT — consolidadas
@@ -130,9 +139,10 @@ arrastar-para-criar, sugestão de módulo por `[s]`. Cabeçalho de linha
 única traduzido (EN/PT/FR/ES); **caixa do número do seed** = campo de
 texto padrão com clipboard X11 completo (o seed também sai no terminal);
 roda / botão do meio / arrasto de cabo na borda navegam o rack;
-**TUTORIAL rolável de 12 seções** (o que é · cabeçalho botão a botão ·
-cabear · navegar · adicionar/remover módulos · as 8 famílias · gravar e
-onde ficam os `.wav` · LEARN). Decisões de design em
+botão **`RACK`** alterna a vista (TODOS ↔ só os que chegam à saída);
+**TUTORIAL rolável de 12 seções** (o que é · cabeçalho botão a
+botão · cabear · navegar · adicionar/remover módulos · as 8 famílias ·
+gravar e onde ficam os `.wav` · LEARN). Decisões de design em
 [`../apps/panel/design.md`](../apps/panel/design.md).
 
 **Estudos à parte:**

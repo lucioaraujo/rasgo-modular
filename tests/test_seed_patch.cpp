@@ -98,6 +98,21 @@ void testSeedsAudibleAndBounded() {
         // garantia: o passeio cabeou algo
         check(g.cableCount() >= 2, "seed cabeou o rack");
 
+        // garantia (2026-09-10): NENHUM cabo sem função sonora — todo cabo
+        // do patch de seed tem o destino chegando à saída (o passeio é
+        // restrito ao subgrafo audível + poda final). Ver o registro
+        // "passeio restrito ao subgrafo audível" em TAREFAS.md.
+        {
+            const std::vector<char> feeds = g.nodesFeeding(sink);
+            int deadCables = 0;
+            for (std::size_t i = 0; i < g.cableCount(); ++i)
+                if (!feeds[g.cable(i).target().node]) ++deadCables;
+            check(deadCables == 0, "seed sem cabo morto (todo cabo soa)");
+            if (deadCables != 0)
+                std::cerr << "  [!] seed " << s << ": " << deadCables
+                          << " cabo(s) morto(s) de " << g.cableCount() << "\n";
+        }
+
         // ~5,3 s: seeds lentos (o `bpm` do `seedIdentity` desce a ~46) só
         // produzem o 1º evento do euclid depois de ~1,3 s — 400 blocos
         // não bastavam.

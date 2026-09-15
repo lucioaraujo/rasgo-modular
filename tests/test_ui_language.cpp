@@ -63,6 +63,7 @@ static void testHeaderStringsAreComplete() {
         S::hdrVary, S::hdrStandby, S::hdrChange, S::hdrEvolve, S::hdrCross,
         S::hdrBank, S::hdrSave, S::hdrRec, S::hdrSeed, S::hdrTutorial,
         S::hdrAbout, S::close, S::rdModules, S::rdCables, S::rdPeak,
+        S::hdrRackAll, S::hdrRackOut, S::rackViewEmpty,
         S::tutTitle, S::tutSubtitle,
         S::tutWhatTitle, S::tutWhatBody,
         S::tutSeedTitle, S::tutSeedBody,

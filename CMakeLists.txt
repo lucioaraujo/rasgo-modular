@@ -1,5 +1,18 @@
-cmake_minimum_required(VERSION 3.16)
-project(RasgoModularPrototype VERSION 0.1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.22)
+
+# PRECISA vir antes do `project()` (exigência do CMake/Apple). Mesmo bug
+# que o ANTITOTEM e o Navalha 2 pegaram ao vivo (26 ago. 2026): sem isto o
+# .dmg sai com uma fatia só (a arquitetura do runner) e com `minos` = a
+# versão do macOS do runner, e recusa abrir em Mac mais antigo. 10.13 é
+# alvo amplamente suportado pelo JUCE; x86_64;arm64 dá UM binário
+# Universal 2 em vez de obrigar a escolher entre dois downloads.
+if (APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS version" FORCE)
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build a Universal 2 binary" FORCE)
+endif()
+
+# `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
+project(RasgoModularPrototype VERSION 0.1.0 LANGUAGES C CXX)
 
 include(CTest)
 
@@ -206,6 +219,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_panel_layout_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_panel_layout_tests COMMAND rasgo_modular_panel_layout_tests)
 
+    add_executable(rasgo_modular_cable_geometry_tests tests/test_cable_geometry.cpp)
+    target_link_libraries(rasgo_modular_cable_geometry_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_cable_geometry_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_cable_geometry_tests COMMAND rasgo_modular_cable_geometry_tests)
+
     add_executable(rasgo_modular_matrix_tests tests/test_matrix.cpp)
     target_link_libraries(rasgo_modular_matrix_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_matrix_tests PRIVATE ${rasgo_modular_warnings})
@@ -400,6 +418,31 @@ if(BUILD_TESTING)
     target_link_libraries(rasgo_modular_signal_in_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_signal_in_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_signal_in_tests COMMAND rasgo_modular_signal_in_tests)
+
+    # guarda de segurança do sink: precisa de `apps/` no include path
+    # (o `SinkOut.hpp` é header de aplicação, framework-free)
+    add_executable(rasgo_modular_sink_guard_tests tests/test_sink_guard.cpp)
+    target_include_directories(rasgo_modular_sink_guard_tests PRIVATE apps)
+    target_link_libraries(rasgo_modular_sink_guard_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_sink_guard_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_sink_guard_tests COMMAND rasgo_modular_sink_guard_tests)
+
+    # bateria de casos-limite da saída (SAIDA_AUDIO_COMUM.md §5)
+    add_executable(rasgo_modular_output_excellence_tests
+        tests/test_output_excellence.cpp)
+    target_include_directories(rasgo_modular_output_excellence_tests PRIVATE apps)
+    target_link_libraries(rasgo_modular_output_excellence_tests
+        PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_output_excellence_tests
+        PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_output_excellence_tests
+             COMMAND rasgo_modular_output_excellence_tests)
+
+    # medição BS.1770/EBU R128 — fixtures de conformidade
+    add_executable(rasgo_modular_loudness_tests tests/test_loudness.cpp)
+    target_link_libraries(rasgo_modular_loudness_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_loudness_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_loudness_tests COMMAND rasgo_modular_loudness_tests)
 endif()
 
 add_executable(rasgo_modular_primeiro_fragmento examples/primeiro_fragmento.cpp)
@@ -475,4 +518,67 @@ if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
     message(STATUS "rasgo_modular_panel: painel gráfico de teste habilitado")
 else()
     message(STATUS "rasgo_modular_panel: pulado (falta libX11 ou libasound)")
+endif()
+
+# ---- front-end de produção (JUCE), multiplataforma ---------------------
+# O JUCE NÃO é versionado aqui (nem submodule, nem FetchContent) — é um
+# checkout local que o desenvolvedor/CI aponta, igual ao ANTITOTEM, ao
+# Navalha 2 e ao Rasgo Synth Performance. Localmente:
+#   cmake -B build -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE
+option(RASGO_MODULAR_BUILD_JUCE_APP "Build the JUCE production front-end" ON)
+set(RASGO_MODULAR_JUCE_PATH "" CACHE PATH "Path to a JUCE source checkout")
+
+if(RASGO_MODULAR_BUILD_JUCE_APP)
+    if(RASGO_MODULAR_JUCE_PATH AND EXISTS "${RASGO_MODULAR_JUCE_PATH}/CMakeLists.txt")
+        add_subdirectory("${RASGO_MODULAR_JUCE_PATH}" "${CMAKE_BINARY_DIR}/JUCE"
+                         EXCLUDE_FROM_ALL)
+        add_subdirectory(apps/juce)
+        message(STATUS "rasgo_modular_juce: front-end JUCE habilitado")
+    else()
+        message(STATUS "rasgo_modular_juce: pulado — defina "
+                       "-DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE")
+    endif()
+endif()
+
+# ---- empacotamento (CPack) ---------------------------------------------
+# Só faz sentido quando o app JUCE existe: é ele o artefato publicável (o
+# painel X11 é ferramenta de teste, não vai em release).
+if(RASGO_MODULAR_BUILD_JUCE_APP AND TARGET RasgoModularApp)
+    set(CPACK_PACKAGE_NAME "rasgo-modular")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    set(CPACK_PACKAGE_VENDOR "RASGO")
+    set(CPACK_PACKAGE_CONTACT "Lúcio Araújo <rasgo.instruments@gmail.com>")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+        "Rasgo Modular — instrumento modular generativo")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+        set(CPACK_GENERATOR "DEB")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Lúcio Araújo <rasgo.instruments@gmail.com>")
+        set(CPACK_DEBIAN_PACKAGE_SECTION "sound")
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(CPACK_GENERATOR "NSIS")
+        set(CPACK_NSIS_PACKAGE_NAME "Rasgo Modular")
+        set(CPACK_NSIS_DISPLAY_NAME "Rasgo Modular")
+        set(CPACK_NSIS_MODIFY_PATH OFF)
+        set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+        # SEM isto o template NSIS do CPack registra a desinstalação mas
+        # não cria atalho NENHUM no Menu Iniciar — bug real, achado e
+        # corrigido igual no ANTITOTEM e no Navalha 2 no mesmo dia.
+        set(CPACK_PACKAGE_EXECUTABLES "Rasgo Modular" "Rasgo Modular")
+        set(CPACK_CREATE_DESKTOP_LINKS "Rasgo Modular")
+        set(CPACK_NSIS_INSTALLED_ICON_NAME "Rasgo Modular.exe")
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/rasgo-modular.ico")
+            set(CPACK_NSIS_MUI_ICON
+                "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/rasgo-modular.ico")
+            set(CPACK_NSIS_MUI_UNIICON
+                "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/rasgo-modular.ico")
+        endif()
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(CPACK_GENERATOR "DragNDrop")
+        set(CPACK_DMG_VOLUME_NAME "Rasgo Modular")
+    endif()
+    include(CPack)
 endif()
