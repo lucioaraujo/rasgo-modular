@@ -7750,3 +7750,50 @@ de áudio, com o que está feito e o que depende de decisão.
 float. Os dois só fazem sentido com um alvo de publicação declarado — não
 existe um LUFS certo pra palco, álbum e streaming ao mesmo tempo, e é essa
 escolha que define o resto.
+
+## Registro da etapa — 2026-09-16: preparação de publicação (camada 1)
+
+Auditoria do Rasgo Modular contra o gate editorial de
+`ESTRATEGIA_DE_PUBLICACAO.md`, seguindo o precedente do Antitotem (que já
+passou pelo gate) em vez de inventar formato. Três documentos novos.
+
+**`INSTALL.md`** — build e instalação nos dois idiomas, variáveis de
+ambiente, onde o instrumento guarda estado e gravação, e uma **matriz de
+plataformas que diz a verdade**: Linux verificado em hardware real;
+Windows e macOS construídos e empacotados só pela CI, **nunca abertos**.
+O gate pede que cada combinação seja marcada como testada, parcialmente
+verificada ou planejada — e "a CI compila" não é "abre e soa". Registra
+também que o workflow está inerte enquanto o projeto viver dentro do
+monorepo.
+
+**`CREDITS_AND_SOURCES.md`** — a versão voltada à publicação: autoria,
+licença, os três códigos de terceiros incorporados (dr_wav; e as duas
+entradas GPL-3.0-or-later vindas do Navalha 2, com crédito a Glerm
+Soares), a regra de cores da pesquisa, a teoria de domínio público que
+sustenta o DSP, e o que o repositório NÃO contém. Ele aponta pro
+`RASGO_MODULAR.md §29` como fonte de verdade e diz isso explicitamente —
+resumo que se afasta do original é erro a corrigir, não versão
+alternativa.
+
+**`PUBLICACAO.md`** — a auditoria item a item, o que falta separado por
+**quem resolve**, e o **procedimento de correção e retirada**, que era um
+item do gate sem nada por trás. O princípio adotado: nada some sem deixar
+rastro — uma versão retirada continua no histórico e no arquivo, o que
+muda é deixar de ser oferecida. Corrigir é acrescentar a correção, não
+apagar o erro.
+
+**Um risco estrutural achado ao verificar.** Eu ia escrever que o
+repositório não contém áudio privado; fui conferir antes de afirmar. Não
+contém — mas os 19 MB de renders de referência em `validation-output/`
+estavam fora do git **por acaso, não por desenho**: nada os ignorava, e um
+`git add -A` os teria trazido junto. Agora estão ignorados
+explicitamente, com o motivo escrito no `.gitignore` (são derivados; o
+`examples/` tem o código que os gera).
+
+**Estado: camada 1 quase fechada.** O bloqueio duro da camada 2 é a
+**sessão de escuta documentada** — o Antitotem fechou quatro estudos antes
+de publicar, o Modular não tem nenhum, e nenhum front-end resolve isso:
+alguém precisa ouvir e registrar. Também dependem do autor: a decisão
+sobre publicar com Windows/macOS só verificados por CI, o alvo de
+publicação (que governa loudness, taps e PCM24/float), o contato oficial
+e os screenshots.
