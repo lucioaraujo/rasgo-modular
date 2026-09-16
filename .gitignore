@@ -6,3 +6,16 @@
 
 # build
 /build/
+
+# Renders de referência das peças de exemplo. São DERIVADOS — `examples/`
+# tem o código que os gera, e a checagem é byte a byte contra eles. Ficam
+# fora do git por duas razões: são regeneráveis, e o gate editorial da
+# família exige "ausência de áudio privado, recordings e testes" no que se
+# publica. Sem esta regra eles não estavam rastreados por acaso, não por
+# desenho — um `git add -A` os traria junto.
+/validation-output/*.wav
+
+# gravações do instrumento, se alguém apontar RASGO_REC_DIR pra cá
+*.wav
+*.score.txt
+!guia/**/*.md

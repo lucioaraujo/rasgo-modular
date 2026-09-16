@@ -165,7 +165,12 @@ cmake --build build --target RasgoModularApp -j
 cd build && cpack -G DEB      # ou NSIS (Windows) / DragNDrop (macOS)
 ```
 
-Licenciamento do JUCE: [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
+Instruções completas, matriz de plataformas e variáveis de ambiente:
+[`INSTALL.md`](INSTALL.md). Licenciamento do JUCE:
+[`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md); créditos e
+fontes: [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md); estado de
+prontidão para publicação e procedimento de correção/retirada:
+[`PUBLICACAO.md`](PUBLICACAO.md).
 
 **Excelência de saída.** O instrumento segue a arquitetura comum da
 família (`RASGO_DOCUMENTATION/architecture/SAIDA_AUDIO_COMUM.md`):
