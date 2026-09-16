@@ -1,0 +1,179 @@
+/* Rasgo Modular — identidade própria do instrumento.
+   A paleta é EXTRAÍDA do app real (`apps/juce/RasgoModularApp.cpp`,
+   struct Tokens — os mesmos valores do painel X11): fundo verde-azulado
+   quase preto, superfície fria, laranja como acento único e vermelho
+   reservado pra aviso/ruptura. Não compartilha a paleta do portal geral
+   nem a âmbar/madeira do Antitotem — cada instrumento mantém identidade
+   visual própria (WEBSITES.md §3, GOVERNANCA_E_TRANSVERSALIDADE.md §10).
+
+   O site herda a cor do INSTRUMENTO, não o contrário: se o app mudar de
+   tokens, esta folha é que segue. */
+
+/* Auto-hospedadas, nunca família nomeada do sistema (regra dos sites
+   RASGO, 26 ago. 2026): "DejaVu Sans"/"DejaVu Sans Mono" são livres
+   (derivadas da Bitstream Vera) mas, quando apenas NOMEADAS, caíam num
+   fallback genérico diferente conforme o sistema do visitante — comum no
+   Linux, raras no Windows/macOS. Mesmos arquivos do site do Antitotem. */
+@font-face { font-family: "DejaVu Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/dejavu-sans-400.woff2") format("woff2"); }
+@font-face { font-family: "DejaVu Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/dejavu-sans-700.woff2") format("woff2"); }
+@font-face { font-family: "DejaVu Sans Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/dejavu-sans-mono-400.woff2") format("woff2"); }
+@font-face { font-family: "DejaVu Sans Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/dejavu-sans-mono-700.woff2") format("woff2"); }
+
+:root {
+  --ground: #131a1a;        /* Tokens::bg */
+  --surface: #262b36;       /* Tokens::surface */
+  --recessed: #0e1015;      /* Tokens::recessed */
+  --line: #485060;          /* Tokens::line */
+  --ink: #e0e4ec;           /* Tokens::textPrimary */
+  --muted: #8890a0;         /* Tokens::textSecondary */
+  --accent: #ff9d4c;        /* Tokens::accent */
+  --warning: #ff6b5b;       /* Tokens::warning */
+  --cable-ctrl: #5cb0d4;    /* frio = controle, como no rack */
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--ground);
+  font: 16px/1.65 "DejaVu Sans", system-ui, sans-serif;
+}
+a { color: var(--accent); }
+a:hover { color: var(--warning); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+.skip-link {
+  position: fixed; left: 1rem; top: -4rem; z-index: 20;
+  padding: .65rem .9rem; background: var(--accent); color: var(--ground);
+  font-weight: 700; text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+
+/* Faixa persistente do portal, acima do cabeçalho do instrumento (regra
+   da família, 27 ago. 2026: "sempre haja um cabeçalho do portal rasgo,
+   que ele nunca deixe de existir, fixo"). Neutra de propósito: é uma
+   camada compartilhada, não uma segunda marca disputando com a do
+   instrumento. */
+.rasgo-strip {
+  position: sticky; top: 0; z-index: 11;
+  display: flex; align-items: center; justify-content: center;
+  padding: .4rem 1rem;
+  background: var(--recessed); border-bottom: 1px solid var(--line);
+}
+.rasgo-strip a {
+  color: var(--muted); text-decoration: none;
+  font: 700 .68rem "DejaVu Sans Mono", monospace;
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.rasgo-strip a:hover { color: var(--accent); }
+
+.site-header {
+  position: sticky; top: 1.9rem; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1.5rem; flex-wrap: wrap;
+  padding: .8rem clamp(1rem, 4vw, 3rem);
+  background: var(--ground); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--ink); }
+.brand img { height: 22px; width: auto; }
+.brand span { font: 700 1rem "DejaVu Sans Mono", monospace; letter-spacing: .08em; }
+.brand em { color: var(--accent); font-style: normal; }
+
+.header-nav { display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap; }
+.page-nav a, .lang-switch a {
+  color: var(--muted); text-decoration: none;
+  font: 700 .72rem "DejaVu Sans Mono", monospace;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: .3rem .1rem;
+}
+.page-nav a:hover, .lang-switch a:hover { color: var(--accent); }
+.page-nav a[aria-current], .lang-switch a[aria-current] {
+  color: var(--accent); border-bottom: 2px solid var(--accent);
+}
+.lang-switch { display: flex; gap: .7rem; }
+
+main { max-width: 62rem; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+.hero { padding: 3.5rem 0 2.5rem; }
+.status-pill {
+  display: inline-block; margin-bottom: 1.2rem;
+  padding: .32rem .8rem; border: 1px solid var(--accent); border-radius: 999px;
+  color: var(--accent);
+  font: 700 .68rem "DejaVu Sans Mono", monospace;
+  letter-spacing: .09em; text-transform: uppercase;
+}
+h1 { margin: 0 0 1rem; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; }
+h2 { margin: 0 0 1rem; font-size: clamp(1.3rem, 3vw, 1.7rem); }
+h3 { margin: 1.6rem 0 .5rem; font-size: 1.05rem; color: var(--accent); }
+.lead { font-size: 1.12rem; color: var(--ink); max-width: 46rem; }
+p { max-width: 46rem; }
+
+.section { padding: 2.2rem 0; border-top: 1px solid var(--line); }
+.section-dark {
+  /* `--muted` sobre `--surface` dá 4,42:1 — abaixo dos 4,5:1 do WCAG AA.
+     Hoje nenhum texto secundário cai aí (os cartões têm fundo `recessed`),
+     mas bastaria mover uma tabela ou uma nota pra cá e o contraste
+     reprovaria EM SILÊNCIO. Redefinir o token no escopo da seção fecha a
+     porta de uma vez: qualquer componente que use `var(--muted)` aqui
+     dentro recebe a variante acessível automaticamente, agora e no
+     futuro. #8a92a2 = 4,53:1 sobre surface, mesmo matiz. */
+  --muted: #8a92a2;
+  background: var(--surface);
+  margin: 2.2rem calc(-1 * clamp(1rem, 4vw, 3rem)) 0;
+  padding: 2.2rem clamp(1rem, 4vw, 3rem);
+  border-top: 1px solid var(--line);
+}
+
+code, kbd {
+  font-family: "DejaVu Sans Mono", monospace; font-size: .92em;
+  background: var(--recessed); border: 1px solid var(--line);
+  border-radius: 3px; padding: .08em .35em;
+}
+kbd { color: var(--accent); }
+
+.grid { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.card {
+  background: var(--recessed); border: 1px solid var(--line);
+  padding: 1.1rem 1.2rem;
+}
+.card h3 { margin-top: 0; }
+.card p { font-size: .95rem; color: var(--muted); margin-bottom: 0; }
+
+/* Famílias de módulos — os oito verbos do instrumento */
+.families { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.2rem 0; padding: 0; list-style: none; }
+.families li {
+  border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  padding: .45rem .8rem; background: var(--recessed);
+  font: 700 .74rem "DejaVu Sans Mono", monospace; letter-spacing: .06em;
+}
+.families li span { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.note {
+  border-left: 3px solid var(--warning); background: var(--recessed);
+  padding: .9rem 1.1rem; margin: 1.4rem 0; max-width: 46rem;
+}
+.note p { margin: 0; color: var(--muted); font-size: .95rem; }
+.note strong { color: var(--warning); }
+
+table { border-collapse: collapse; width: 100%; margin: 1.2rem 0; font-size: .93rem; }
+th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font: 700 .72rem "DejaVu Sans Mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
+.wrap { overflow-x: auto; }
+
+footer {
+  border-top: 1px solid var(--line); margin-top: 3rem;
+  padding: 2rem clamp(1rem, 4vw, 3rem) 3rem;
+  color: var(--muted); font-size: .9rem;
+}
+footer p { max-width: 46rem; }
+
+@media (max-width: 40rem) {
+  .site-header { top: 1.8rem; }
+  .header-nav { width: 100%; justify-content: space-between; }
+}

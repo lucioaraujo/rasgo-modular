@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rasgo Modular — un modulaire qui joue tout seul</title>
+<meta name="description" content="Rasgo Modular : l'environnement modulaire génératif de la famille RASGO. Il sonne au démarrage, sans clavier ni entrée audio — et le câble est un objet doté d'un état, pas un fil." />
+<link rel="icon" href="assets/identity/favicon-32.png" type="image/png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — famille d'instruments et de recherche sonore</a></div>
+<a class="skip-link" href="#conteudo">Aller au contenu</a>
+
+<div class="site-header">
+  <a class="brand" href="#top" aria-label="Rasgo Modular">
+    <img src="assets/identity/rasgo_logo_2026.svg" alt="" />
+    <span>RASGO <em>MODULAR</em></span>
+  </a>
+  <div class="header-nav">
+    <nav class="lang-switch" aria-label="Idioma">
+      <a href="index.html">PT</a>
+      <a href="en.html">EN</a>
+      <a href="fr.html" aria-current="true">FR</a>
+      <a href="es.html">ES</a>
+    </nav>
+  </div>
+</div>
+
+<main id="conteudo">
+<section class="hero" id="top">
+  <span class="status-pill">En développement — pas encore de release</span>
+  <h1>Un modulaire qui joue tout seul</h1>
+  <p class="lead">Rasgo Modular produit du son dès l'ouverture. Sans clavier, sans entrée audio, sans page blanche : il tire un patch et se met à jouer, et à partir de là vous le dirigez — en recâblant à la main, en le laissant dériver, ou en construisant tout de zéro si vous préférez.</p>
+</section>
+
+<section class="section">
+  <h2>Ce que c'est</h2>
+  <p>Un environnement modulaire génératif de <strong>60 modules</strong>, écrit
+    en C++17 sans dépendances dans le noyau. Les modules sont décrits comme des
+    données — chacun déclare son propre panneau en millimètres — et un seul
+    moteur alimente deux interfaces : une application JUCE multiplateforme et un
+    panneau de test X11.</p>
+
+  <p>Ce n'est pas un plugin et il ne dépend d'aucune STAN. Il s'ouvre, il sonne,
+    il enregistre. Le MIDI et l'entrée audio existent comme <em>modules
+    adaptateurs optionnels</em> — ouverts seulement quand un patch en contient
+    un, car demander un microphone à qui ne s'en servira jamais est du bruit.</p>
+
+  <h3>Les huit familles</h3>
+  <ul class="families">
+    <li>SOURCE <span>— générer</span></li>
+    <li>TRANSFORM <span>— transformer</span></li>
+    <li>MODULATE <span>— mouvoir</span></li>
+    <li>TIME <span>— marquer le temps</span></li>
+    <li>DECISION <span>— décider</span></li>
+    <li>ROUTE <span>— router</span></li>
+    <li>SPACE <span>— spatialiser et se souvenir</span></li>
+    <li>OUT <span>— mixer, mesurer, envoyer</span></li>
+  </ul>
+</section>
+
+<section class="section section-dark">
+  <h2>Le câble est un objet, pas un fil</h2>
+  <p>C'est l'idée qui sépare Rasgo Modular d'un modulaire conventionnel. Dans un
+    patch ordinaire, le câble ne fait que transporter : on branche, ça passe.
+    Ici il possède son propre état, et cet état se joue.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Conductance</h3>
+      <p>Un câble peut conduire de façon probabiliste — passer parfois plutôt que
+        toujours. Le même patch respire différemment sans qu'aucun module ne
+        change.</p>
+    </div>
+    <div class="card">
+      <h3>Relation</h3>
+      <p>Au lieu de seulement transporter, le câble peut <em>combiner</em> ce qui
+        le traverse avec un second signal : modulation en anneau, repliement
+        d'onde ou différence. Y compris avec lui-même.</p>
+    </div>
+    <div class="card">
+      <h3>Rupture avec cicatrice</h3>
+      <p>Rompre un câble ne produit pas un silence abrupt : la cicatrice retient
+        le dernier bloc et le répète en décroissant. La coupure est un geste
+        musical, pas un accident.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Comment on s'en sert</h2>
+  <p>Il y a deux voies, et aucune n'est la voie « avancée ».</p>
+  <p><strong>Une :</strong> appuyez sur SEED et dirigez ce qui sort. Chaque patch
+    a un numéro, et le même numéro reproduit toujours le même son — la variation
+    est reproductible, pas perdue. Laissez VARIER déplacer les paramètres en
+    direct, ou utilisez CHANGER, ÉVOLUE et CROISER pour emmener le patch
+    ailleurs.</p>
+  <p><strong>Deux :</strong> appuyez sur <kbd>n</kbd> pour retirer tous les
+    câbles d'un coup — les modules restent, le son s'arrête — et construisez la
+    pièce liaison par liaison. <kbd>Ctrl+Z</kbd> revient d'une action, câble par
+    câble.</p>
+
+  <p>Survoler n'importe quel potentiomètre, jack ou module écrit dans la case
+    LEARN ce que cela fait, pourquoi, et quoi essayer ensuite — en portugais,
+    anglais, français ou espagnol.</p>
+</section>
+
+<section class="section section-dark">
+  <h2>Écoute et sortie</h2>
+  <p>Un enregistrement sort par paire : le <code>.wav</code> de ce qu'on a
+    entendu et un <code>.score.txt</code> consignant la topologie au début de la
+    prise et chaque geste effectué pendant. Le patch lui-même est un autre
+    fichier — le <code>.rmp</code>, qui garde l'instrument, pas le son.</p>
+  <p>La sortie suit l'architecture commune de la famille RASGO : protection
+    d'excellence sur le bus final (blocage du DC, garde ultrasonique, limiteur à
+    look-ahead piloté par crête vraie, plafond à −1 dBFS) et une garde de
+    sécurité au puits qui ne peut être contournée. Mesure de loudness BS.1770-4 —
+    momentary, short-term et integrated — pour informer les décisions, jamais
+    pour normaliser une performance toute seule.</p>
+</section>
+
+<section class="section">
+  <h2>État</h2>
+  <div class="note">
+    <p><strong>Il n'y a pas encore de release.</strong> L'instrument fonctionne
+      et est reproductible depuis les sources, mais aucun installateur n'a été
+      publié. Cette page existe en préparation : selon la règle éditoriale de la
+      famille RASGO, le site d'un instrument est publié en même temps que
+      l'instrument lui-même.</p>
+  </div>
+
+  <div class="wrap">
+  <table>
+    <thead><tr><th>Plateforme</th><th>Construit</th><th>Exécuté</th><th>Audio vérifié</th></tr></thead>
+    <tbody>
+      <tr><td>Linux x86-64</td><td>oui</td><td>oui</td><td>oui, sur matériel réel</td></tr>
+      <tr><td>Windows x86-64</td><td>intégration continue seulement</td><td>non</td><td>non</td></tr>
+      <tr><td>macOS (Universal 2)</td><td>intégration continue seulement</td><td>non</td><td>non</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>La distinction compte : l'intégration continue prouve que le projet
+    <em>se construit et s'empaquette</em> sur les trois systèmes, et vérifie que
+    le paquet macOS est bien un Universal 2. Elle ne prouve pas que l'application
+    s'ouvre et sonne sur une machine réelle — et cela ne sera pas formulé
+    autrement ici.</p>
+</section>
+</main>
+
+<footer>
+  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Code sous
+    GNU AGPL-3.0-or-later.</p>
+  <p>Fait partie de la famille RASGO d'instruments et de recherche sonore. Les
+    crédits, les sources tierces et la politique de recherche accompagnent le
+    dépôt de l'instrument.</p>
+</footer>
+</body>
+</html>
