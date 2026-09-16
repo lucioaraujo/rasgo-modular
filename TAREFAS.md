@@ -7797,3 +7797,59 @@ alguém precisa ouvir e registrar. Também dependem do autor: a decisão
 sobre publicar com Windows/macOS só verificados por CI, o alvo de
 publicação (que governa loudness, taps e PCM24/float), o contato oficial
 e os screenshots.
+
+## Registro da etapa — 2026-09-17: website do instrumento (Fase 4, em preparação)
+
+Tarefa que ficou pendente desde o começo da sessão — o autor pediu o site
+no início e ela foi despriorizada quando o trabalho virou pro front-end
+JUCE. É também o único item da Fase 4 que não depende de escuta.
+
+Reli a governança antes de criar, como o autor instruiu na época
+(`RASGO_DOCUMENTATION/design/WEBSITES.md`), e segui o **site do Antitotem
+como padrão** em vez de inventar formato — ele é o único instrumento da
+família que já tem um.
+
+**`RASGO_MODULAR/website/`** — quatro idiomas (pt canônico, en, fr, es),
+uma página por idioma, sem build. Arquivos estáticos que funcionam
+abrindo o `index.html`: um site que precisa de pipeline pra existir é um
+site que apodrece quando o pipeline quebra.
+
+Herdado do padrão da família:
+
+- **faixa `.rasgo-strip` persistente** no topo, acima do cabeçalho do
+  instrumento (regra de 27 ago. 2026: o cabeçalho do portal nunca deixa de
+  existir), deliberadamente neutra pra não competir com a marca do
+  instrumento;
+- **DejaVu auto-hospedada** via `@font-face` — os mesmos `.woff2` do site
+  do Antitotem. Nunca família nomeada do sistema: o bug real encontrado ao
+  vivo nos sites do Antitotem e do Navalha 2 em 26 ago. 2026.
+
+Próprio do instrumento: a paleta é **extraída do app real** (struct
+`Tokens` de `RasgoModularApp.cpp`). O site herda a cor do instrumento, não
+o contrário — se os tokens mudarem, a folha de estilo é que segue.
+
+O conteúdo tem uma página só e ela é honesta: diz que **não há release**,
+e a tabela de plataformas repete a distinção do `INSTALL.md` — a
+integração contínua prova que constrói e empacota, não que abre e soa.
+
+**Um defeito de acessibilidade achado ao verificar.** Eu tinha escrito no
+README do site que todos os pares de cor passavam em AA. Fui medir antes
+de deixar escrito, e um reprovava: `--muted` sobre `--surface`, 4,42:1,
+abaixo dos 4,5:1. Hoje essa combinação não ocorre — o texto secundário
+vive em cartões e notas, que têm fundo `recessed` —, mas bastaria mover
+uma tabela ou nota pra uma seção escura e o contraste cairia em silêncio.
+Em vez de documentar a restrição e confiar na lembrança, `.section-dark`
+passou a redefinir `--muted` no próprio escopo: qualquer componente usado
+ali dentro recebe a variante acessível automaticamente. Fechar a porta é
+melhor que lembrar de não entrar nela.
+
+**`website/README.md`** cobre os oito itens que o `WEBSITES.md §5` exige
+de toda definição de site, incluindo a tabela de contraste medida e — o
+item que costuma ficar de fora — **o que ainda NÃO foi verificado**:
+nenhum navegador real abriu estas páginas. Não há navegador gráfico neste
+ambiente e eu não abro janela na máquina do autor. Antes de publicar,
+falta conferir num navegador de cada motor, em desktop e telefone, mais
+uma passada de leitor de tela na ordem de foco.
+
+O site **não será publicado antes do instrumento** — regra editorial
+vigente da família, registrada no próprio README do site.
