@@ -49,7 +49,10 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 - extrair o projeto pra repositório próprio — é o que torna a CI de três
   sistemas viva (hoje ela está inerte: o Actions só lê o
   `.github/workflows/` da raiz do repositório);
-- `CHANGELOG.md` / notas da `v0.1.0`, quando a versão for cortada;
+- ~~`CHANGELOG.md` / notas da `v0.1.0`~~ **feito** — [`CHANGELOG.md`](CHANGELOG.md),
+  escrito e marcado como *preparada, ainda não cortada*, com as limitações
+  declaradas (Windows/macOS nunca abertos, CI inerte, PCM24/float à espera
+  do alvo de publicação). Falta só criar a tag quando a Parte A fechar;
 - ~~site do instrumento~~ **feito** (`website/`, 4 idiomas, faixa
   `.rasgo-strip`, DejaVu auto-hospedada, captura de execução real). Falta
   só abri-lo num navegador de cada motor antes de publicar;

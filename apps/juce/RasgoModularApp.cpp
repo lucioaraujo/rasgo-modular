@@ -40,6 +40,7 @@
 #include "ui/CableGeometry.hpp"
 #include "ui/PanelGeometry.hpp"
 #include "ui/ScopeTrace.hpp"
+#include "ui/Shortcuts.hpp"        // tabela ÚNICA de atalhos (testada)
 
 #include <algorithm>
 #include <atomic>
@@ -314,7 +315,13 @@ struct Rack {
             graph.disconnect(c.target().node, c.target().port);
         }
         cableSnap.clear();
-        curSeed = 0;                 // deixou de ser um patch reproduzível
+        // O seed NÃO é jogado fora. Descabear é uma EDIÇÃO como qualquer
+        // outra, e o seed que gerou o patch continua sendo um ponto de
+        // retorno válido — aliás o mais útil justamente aqui. Zerá-lo
+        // fazia o botão REPOR sumir no instante em que ele mais serviria,
+        // e era incoerente com o resto: ligar e cortar cabos à mão nunca
+        // zerou o seed. (Achado do autor, 20 set. 2026: pressionou `n` e
+        // depois `r`, e o `r` corretamente não fez nada.)
         allRuptured = false;
         reprepare();
         graph.setActiveOutput(sink);
@@ -693,7 +700,22 @@ private:
 // ausente; eles voltam junto com o recurso.
 class HeaderBar : public juce::Component {
 public:
-    static constexpr int kHeight = 46;
+    static constexpr int kHeight = 46;        // uma fileira
+    static constexpr int kRow2 = 28;         // acréscimo da segunda
+
+    // Altura necessária pra NENHUM botão sumir. A barra de comandos
+    // cortava o excedente em silêncio (`break` no laço) — e quem sumia
+    // primeiro era o último da fila, que por acaso era o DESCABEIA. O
+    // autor apertou `n`, nada acendeu, e concluiu que o atalho estava
+    // quebrado: ele funcionava, o botão é que não estava lá.
+    //
+    // Botão que some sem avisar já tinha me mordido antes (o VU e a
+    // leitura, que ganharam guarda). Em vez de recuperar folga — que a
+    // próxima palavra longa ou o próximo botão consome de novo —, o
+    // cabeçalho passa a QUEBRAR EM DUAS FILEIRAS quando não cabe.
+    int preferredHeight(const int width) const {
+        return commandsFit(width) ? kHeight : kHeight + kRow2;
+    }
 
     std::function<void()> onSeed, onLang, onRackView, onStandby,
         onVary, onMutate, onEvolve, onCross, onBank, onSave,
@@ -809,7 +831,30 @@ public:
             x += button(g, x, str(rasgo::panel::strings::hdrRestore),
                         flashing(Act::restore), Act::restore);
 
+        // Largura que a barra de comandos VAI precisar, medida antes de
+        // qualquer coisa opcional ser desenhada. Sem isto o VU e a leitura
+        // comiam o vão primeiro (eles são desenhados antes) e a barra era
+        // cortada depois, em silêncio — que foi exatamente o que escondeu
+        // o botão DESCABEIA e fez o `n` parecer quebrado. A guarda que eu
+        // tinha posto media o espaço no ponto errado do desenho.
+        {
+            namespace S2 = rasgo::panel::strings;
+            cmdsW_ = 0;
+            for (const auto* l : {&S2::hdrVary, &S2::hdrChange, &S2::hdrEvolve,
+                                  &S2::hdrCross, &S2::hdrBank, &S2::hdrSave,
+                                  &S2::hdrOpen, &S2::hdrUndo, &S2::hdrUncable})
+                cmdsW_ += labelW(str(*l)) + 6;
+            cmdsW_ += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
+            cmdsW_ += 28 + labelW(str(S2::hdrStandby)) + 6;
+            // A fileira é decidida AQUI, antes de qualquer coisa que a
+            // consulte. Decidir depois deixava as guardas do VU e da
+            // leitura lendo o valor do quadro ANTERIOR — um atraso de um
+            // quadro que pisca na troca de tamanho da janela.
+            cmdY_ = commandsFit(getWidth()) ? 12 : kHeight - 6;
+        }
+
         // ---- cluster da direita, montado da borda pra dentro -----------
+        btnY_ = 12;
         int rx = getWidth() - 12;
         rx -= buttonR(g, rx, str(rasgo::panel::strings::hdrAbout),
                       overlay_ == 2, Act::about);
@@ -837,7 +882,7 @@ public:
         // esta guarda uma janela estreita os empurrava pra fora em
         // silêncio — botão que some não é botão discreto, é botão que o
         // músico procura e não acha.
-        if (rx - x > 54 + 220) {
+        if (rx - x - (cmdY_ == 12 ? cmdsW_ : 0) > 54 + 24) {
             const int mw = 54, mh = 8;
             const int my = 19;
             rx -= mw;
@@ -864,7 +909,7 @@ public:
                 + str(rasgo::panel::strings::rdCables);
             g.setFont(juce::FontOptions(11.0f));
             const int w = textW(g, rd);
-            if (rx - x > w + 24) {
+            if (rx - x - (cmdY_ == 12 ? cmdsW_ : 0) > w + 24) {
                 rx -= w;
                 g.setColour(T.textSecondary);
                 g.drawText(rd, rx, 12, w, 22,
@@ -879,6 +924,9 @@ public:
         // `serialize()` do motor) — eram fiação, não porte. Por isso
         // entram todos de uma vez.
         namespace S = rasgo::panel::strings;
+        // Segunda fileira (decidida acima): recomeça da margem esquerda,
+        // com a largura toda disponível. Nada é cortado.
+        if (cmdY_ != 12) { x = 14; rx = getWidth() - 12; }
         const struct { const rasgo::panel::L4* label; bool on; Act act; } cmds[] = {
             {&S::hdrVary,   vary_, Act::vary},
             {&S::hdrChange, false, Act::mutate},
@@ -894,8 +942,11 @@ public:
             {&S::hdrUncable, false, Act::uncable},
         };
         g.setFont(juce::FontOptions(11.0f));
+        btnY_ = cmdY_;
         for (const auto& c : cmds) {
             const juce::String L = str(*c.label);
+            // com duas fileiras o corte nunca acontece; a guarda fica só
+            // como rede pra janela absurdamente estreita
             if (x + textW(g, L) + 14 > rx - 8) break;
             x += button(g, x, L, c.on || flashing(c.act), c.act);
         }
@@ -994,6 +1045,36 @@ private:
                < std::chrono::milliseconds(160);
     }
 
+    // Largura de um rótulo de botão, medível FORA do `paint` — é o que
+    // permite decidir a altura antes de desenhar.
+    static int labelW(const juce::String& t) {
+        const juce::Font f(juce::FontOptions(11.0f));
+        return juce::roundToInt(juce::GlyphArrangement::getStringWidth(f, t)) + 14;
+    }
+
+    bool commandsFit(const int width) const {
+        namespace S = rasgo::panel::strings;
+        int need = kBrandW + 6 + kSeedBoxW + 6
+                 + labelW(u8("\xE2\x9A\x84 ") + str(S::hdrSeed)) + 6;
+        if (seed_ != 0) need += labelW(str(S::hdrRestore)) + 6;
+        for (const auto* l : {&S::hdrVary, &S::hdrChange, &S::hdrEvolve,
+                              &S::hdrCross, &S::hdrBank, &S::hdrSave,
+                              &S::hdrOpen, &S::hdrUndo, &S::hdrUncable})
+            need += labelW(str(*l)) + 6;
+        need += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
+        need += 28 + labelW(str(S::hdrStandby)) + 6;                   // ESPERA
+        // cluster da direita (sem o VU e a leitura, que já têm guarda)
+        need += labelW(str(S::hdrAbout)) + labelW(str(S::hdrTutorial))
+              + labelW(langLabel()) + labelW(u8("\xe2\x97\x8f ") + str(S::hdrRec))
+              + labelW(u8("RACK \xc2\xb7 ") + str(rackOut_ ? S::hdrRackOut
+                                                            : S::hdrRackAll))
+              + 5 * 6 + 24;
+        return need <= width;
+    }
+
+    static constexpr int kBrandW = 240;   // marca + "MODULAR" + régua
+    static constexpr int kSeedBoxW = 108;
+
     juce::String langLabel() const {
         switch (lang_) {
         case rasgo::panel::Lang::en: return "EN";
@@ -1009,7 +1090,7 @@ private:
         g.setFont(juce::FontOptions(11.0f));
         const int w = juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), label)) + 14;
-        const juce::Rectangle<int> r(bx, 12, w, 22);
+        const juce::Rectangle<int> r(bx, btnY_, w, 22);
         if (active) { g.setColour(T.accent); g.fillRect(r); }
         g.setColour(active ? T.accent : T.line);
         g.drawRect(r, 1);
@@ -1052,6 +1133,9 @@ private:
     }
 
     juce::TextEditor seedBox_;
+    int cmdY_ = 12;     // y da barra de comandos (12 = 1ª fileira)
+    int cmdsW_ = 0;     // largura que a barra de comandos exige
+    int btnY_ = 12;     // y do botão sendo desenhado agora
     std::uint64_t shownSeed_ = 0;
     juce::Image logo_;
     std::vector<Hit> hits_;
@@ -2467,15 +2551,37 @@ private:
             // um engano, que até agora eram indistinguíveis.
             if (halo == 1 || halo == 2) {
                 const bool soa = audibleTarget(m.id);
-                g.setColour(soa ? T.accent : T.accent.withAlpha(0.35f));
                 const float hr = static_cast<float>(r + mmpx(halo == 1 ? 2.4f : 1.6f));
                 const auto c = box.getCentre();
-                g.drawEllipse(c.x - hr, c.y - hr, 2 * hr, 2 * hr,
-                              soa ? 1.6f : 1.0f);
-                if (halo == 1)
-                    g.drawEllipse(c.x - hr - 2.0f, c.y - hr - 2.0f,
-                                  2 * hr + 4.0f, 2 * hr + 4.0f,
-                                  soa ? 1.6f : 1.0f);
+
+                // A distinção é de FORMA, não só de brilho: contínuo = vai
+                // soar, tracejado = ainda não chega ao som. Só a diferença
+                // de alfa era fraca demais pra ler como duas categorias —
+                // o autor olhou e não distinguiu. Forma também sobrevive a
+                // monitor ruim e a quem enxerga cor de outro jeito.
+                const auto ring = [&](float rad, float w) {
+                    if (soa) {
+                        g.setColour(T.accent);
+                        g.drawEllipse(c.x - rad, c.y - rad, 2 * rad, 2 * rad, w);
+                        return;
+                    }
+                    juce::Path p;
+                    p.addEllipse(c.x - rad, c.y - rad, 2 * rad, 2 * rad);
+                    const float dash[] = {3.0f, 3.0f};
+                    juce::Path d;
+                    juce::PathStrokeType(w).createDashedStroke(d, p, dash, 2);
+                    g.setColour(T.accent.withAlpha(0.55f));
+                    g.fillPath(d);
+                };
+                ring(hr, soa ? 1.8f : 1.2f);
+                if (halo == 1) ring(hr + 2.0f, soa ? 1.8f : 1.2f);
+
+                // destino que SOA ganha ainda um miolo aceso — a leitura
+                // "vai dar som" tem que ser instantânea
+                if (soa) {
+                    g.setColour(T.accent.withAlpha(0.28f));
+                    g.fillEllipse(box);
+                }
             }
 
             // Jack INVÁLIDO durante o cabeamento continua com o anel
@@ -3005,10 +3111,11 @@ public:
         // quantas alterações houve pelo caminho. Entra no desfazer, então
         // repor não é irreversível.
         header_.onRestore = [this] {
-            if (seed_ == 0) return;
+            const std::uint64_t s = rack_.curSeed;
+            if (s == 0) return;
             rack_.pushUndo();
-            rack_.applySeed(seed_, sampleRate_, blockSize_);
-            rack_.curSeed = seed_;
+            rack_.applySeed(s, sampleRate_, blockSize_);
+            rack_.curSeed = s;
             rack_.populateMotion();
             syncSignalIn();
             view_->refresh();
@@ -3151,7 +3258,8 @@ public:
     void resized() override {
         overlay_.setBounds(getLocalBounds());
         auto area = getLocalBounds();
-        header_.setBounds(area.removeFromTop(HeaderBar::kHeight));
+        header_.setBounds(area.removeFromTop(
+            header_.preferredHeight(getWidth())));
         palette_.setBounds(area.removeFromLeft(PaletteColumn::kWidth));
         credits_.setBounds(area.removeFromTop(CreditsStrip::kHeight));
         viewport_.setBounds(area);
@@ -3241,6 +3349,14 @@ public:
     // `keyPressed`, então nenhuma tecla fazia nada — incluindo [espaço],
     // que é o gesto que rompe/reata todos os cabos (e portanto o que muda
     // a cor deles; o STANDBY nunca fez isso).
+    //
+    // Este método NÃO decide mais quais teclas existem: quem decide é a
+    // tabela de `src/ui/Shortcuts.hpp`, que é testada. Aqui ficam só as
+    // teclas especiais (que têm constante própria no JUCE) e a tradução
+    // de `Shortcut` para a ação. Ter a decisão em um lugar só foi a
+    // correção de raiz das três quebras seguidas do teclado — cada
+    // remendo anterior consertava um ramo e deixava os outros com a
+    // regra antiga.
     bool keyPressed(const juce::KeyPress& k) override {
         const int c = k.getKeyCode();
         const bool ctrl = k.getModifiers().isCommandDown();
@@ -3257,33 +3373,9 @@ public:
             return true;
         }
 
-        // Todo atalho que TEM botão passa por `header_.trigger`, que
-        // acende o botão correspondente por ~160 ms além de executar a
-        // ação. Sem isso o atalho agia sem sinal nenhum na tela.
-        if (ctrl) {
-            // Comparar por `KeyPress` e não pelo código cru: com um
-            // modificador segurado, o que chega em `getKeyCode()` varia
-            // entre sistema e layout — pode vir a letra, pode vir o
-            // caractere de controle (Ctrl+Z = 26). O `operator==` do
-            // `KeyPress` normaliza isso. Era por aqui que o Ctrl+Z não
-            // chegava enquanto o BOTÃO desfazer funcionava: o problema
-            // nunca esteve no desfazer, e sim na tecla.
-            const auto is = [&k](const char ch) {
-                return k == juce::KeyPress(ch, juce::ModifierKeys::commandModifier, 0);
-            };
-            if (is('s')) { header_.trigger(HeaderBar::Act::save); return true; }
-            if (is('b')) { header_.trigger(HeaderBar::Act::bank); return true; }
-            if (is('r')) { header_.trigger(HeaderBar::Act::rec); return true; }
-            if (is('z')) { header_.trigger(HeaderBar::Act::undo); return true; }
-            if (is('o')) { header_.trigger(HeaderBar::Act::open); return true; }
-            if (c == '+' || c == '=') { header_.trigger(HeaderBar::Act::zoomIn); return true; }
-            if (c == '-') { header_.trigger(HeaderBar::Act::zoomOut); return true; }
-            if (c == '0') { view_->nudgeZoom(0);  layoutRack(); return true; }
-            return false;
-        }
-
-        // if/else e não switch: as constantes de tecla do JUCE são
-        // `static const int` de runtime, não expressões constantes
+        // Teclas especiais primeiro — elas têm constante própria no JUCE
+        // e não passam pela tabela. if/else e não switch: essas constantes
+        // são `static const int` de runtime, não expressões constantes.
         if (c == juce::KeyPress::escapeKey) {
             view_->cancelInteraction();   // desistir é um gesto legítimo
             return true;
@@ -3302,18 +3394,36 @@ public:
                 std::max(0, viewport_.getViewPositionY() - 40));
             return true;
         }
-        switch (c) {
-        case 'G': header_.trigger(HeaderBar::Act::seed);   return true;
-        case 'V': header_.trigger(HeaderBar::Act::vary);   return true;
-        case 'M': header_.trigger(HeaderBar::Act::mutate); return true;
-        case 'E': header_.trigger(HeaderBar::Act::evolve); return true;
-        case 'C': header_.trigger(HeaderBar::Act::cross);  return true;
-        case 'N': header_.trigger(HeaderBar::Act::uncable); return true;
-        case 'R': header_.trigger(HeaderBar::Act::restore); return true;
-        case 'Q': juce::JUCEApplication::getInstance()->systemRequestedQuit();
-                  return true;
-        default: return false;
+
+        // E o resto pela tabela testada. Todo atalho que TEM botão passa
+        // por `header_.trigger`, que acende o botão correspondente por
+        // ~160 ms além de executar a ação — sem isso o atalho agia sem
+        // sinal nenhum na tela, e era impossível saber o que funcionava.
+        using S = rasgo::ui::Shortcut;
+        using A = HeaderBar::Act;
+        switch (rasgo::ui::lookupShortcut(
+                    c, static_cast<int>(k.getTextCharacter()), ctrl)) {
+        case S::seed:    header_.trigger(A::seed);    return true;
+        case S::vary:    header_.trigger(A::vary);    return true;
+        case S::mutate:  header_.trigger(A::mutate);  return true;
+        case S::evolve:  header_.trigger(A::evolve);  return true;
+        case S::cross:   header_.trigger(A::cross);   return true;
+        case S::uncable: header_.trigger(A::uncable); return true;
+        case S::restore: header_.trigger(A::restore); return true;
+        case S::save:    header_.trigger(A::save);    return true;
+        case S::bank:    header_.trigger(A::bank);    return true;
+        case S::rec:     header_.trigger(A::rec);     return true;
+        case S::undo:    header_.trigger(A::undo);    return true;
+        case S::open:    header_.trigger(A::open);    return true;
+        case S::zoomIn:  header_.trigger(A::zoomIn);  return true;
+        case S::zoomOut: header_.trigger(A::zoomOut); return true;
+        case S::zoomReset: view_->nudgeZoom(0); layoutRack(); return true;
+        case S::quit:
+            juce::JUCEApplication::getInstance()->systemRequestedQuit();
+            return true;
+        case S::none: return false;
         }
+        return false;
     }
 
 private:
@@ -3341,7 +3451,11 @@ private:
         rack_.clearCables();
         rack_.populateMotion();
         syncSignalIn();
-        seed_ = 0;
+        // O seed NÃO é zerado aqui. Ontem tirei o zeramento de
+        // `Rack::curSeed` e deixei ESTE passar — o seed vive em dois
+        // lugares (o do rack e o do cabeçalho), e corrigir um só deixou o
+        // REPOR sumindo do mesmo jeito. Foi por isso que o autor
+        // continuou sem ver o `r` funcionar depois da "correção".
         view_->refresh();
         syncHeader();
     }
@@ -3986,7 +4100,12 @@ private:
         view_->layoutFor(viewport_.getMaximumVisibleWidth(),
                          viewport_.getMaximumVisibleHeight());
     }
+    // Fonte ÚNICA do seed: `rack_.curSeed`. Manter uma cópia em `seed_`
+    // foi o que permitiu a correção pela metade — dois lugares pra
+    // esquecer um. `seed_` segue existindo só como o que o usuário
+    // digitou/sorteou nesta sessão, mas quem manda na tela é o rack.
     void syncHeader() {
+        seed_ = rack_.curSeed;
         header_.setState(seed_, lang_, view_->outputOnly(), standby_);
     }
 

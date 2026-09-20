@@ -399,6 +399,15 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_ui_language_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_ui_language_tests COMMAND rasgo_modular_ui_language_tests)
 
+    # Auditoria dos atalhos de teclado: a tabela de src/ui/Shortcuts.hpp
+    # contra o cartão TECLADO de apps/panel/UiLanguage.hpp. Sem janela e
+    # sem JUCE — por isso roda no ctest, que é onde precisava estar: o
+    # teclado quebrou três vezes e nenhuma quebra tinha teste.
+    add_executable(rasgo_modular_shortcuts_tests tests/test_shortcuts.cpp)
+    target_include_directories(rasgo_modular_shortcuts_tests PRIVATE src apps)
+    target_compile_options(rasgo_modular_shortcuts_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_shortcuts_tests COMMAND rasgo_modular_shortcuts_tests)
+
     add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
     target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})
