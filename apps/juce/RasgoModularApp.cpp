@@ -199,6 +199,7 @@ struct Rack {
     std::atomic<float> lufsM{LoudnessMeter::kSilence};
     std::atomic<float> lufsS{LoudnessMeter::kSilence};
     std::atomic<float> lufsI{LoudnessMeter::kSilence};
+    std::atomic<float> lufsTP{-120.0f};   // true-peak, dBTP
 
     // ---- taps de gravação (`SAIDA_AUDIO_COMUM.md §3/§4`) --------------
     // `post-safety` é o que se ouviu — depois do limitador, do teto, de
@@ -2939,6 +2940,41 @@ public:
                                + u8("   (BS.1770-4)"),
                            px, py, wrapW, 17,
                            juce::Justification::topLeft, false);
+                py += 19;
+
+                // FORMATO REAL da saída, não o presumido. O app adota a
+                // taxa do dispositivo em vez de impor uma; sem esta linha
+                // a única forma de saber em que taxa se está tocando era
+                // ler o código.
+                g.drawText(juce::String(juce::roundToInt(lu.sr)) + u8(" Hz")
+                               + u8("   \xc2\xb7   REC 24 bits PCM"),
+                           px, py, wrapW, 17,
+                           juce::Justification::topLeft, false);
+                py += 19;
+
+                // Distância até o alvo declarado (streaming). Os dois
+                // números que importam estão aqui: o quanto falta em LU
+                // para −14, e se o true-peak já passou de −1 dBTP — que é
+                // o que estoura na recodificação e NÃO aparece no pico de
+                // amostra. Nada disto normaliza nada; é leitura para
+                // quem está ouvindo decidir.
+                using LM = rasgo::modular::LoudnessMeter;
+                const bool overTp = lu.tp > LM::kTargetDbtp;
+                g.setColour(overTp ? T.warning : T.textSecondary);
+                juce::String alvo = u8("alvo  ")
+                    + juce::String(LM::kTargetLufs, 0) + u8(" LUFS / ")
+                    + juce::String(LM::kTargetDbtp, 0) + u8(" dBTP   \xc2\xb7   TP ")
+                    + (lu.tp <= -119.0f ? u8("--")
+                                        : juce::String(lu.tp, 1) + u8(" dBTP"));
+                if (lu.i > LM::kSilence) {
+                    const float d = LM::kTargetLufs - lu.i;
+                    alvo += u8("   \xc2\xb7   ")
+                          + juce::String(d >= 0.0f ? "+" : "")
+                          + juce::String(d, 1) + u8(" LU");
+                }
+                g.drawText(alvo, px, py, wrapW, 17,
+                           juce::Justification::topLeft, false);
+                g.setColour(T.textSecondary);
                 py += 26;
             }
             drawWrapped(g, str(S::aboutBody), px, py, wrapW, T.textSecondary);
@@ -2956,7 +2992,11 @@ public:
     }
 
     std::function<void()> onClose;
-    struct Lufs { float m, s, i; };
+    // `tp` = true-peak em dBTP; `sr` = a taxa REAL do dispositivo, que o
+    // app adota em vez de impor (foi a pergunta do autor em 21 set. 2026:
+    // "a saída é 48 kHz?" — e a resposta só podia vir da tela, porque
+    // depende do dispositivo).
+    struct Lufs { float m, s, i, tp; double sr; };
     std::function<Lufs()> onLoudness;
 
 private:
@@ -3174,7 +3214,9 @@ public:
             return OverlayView::Lufs{
                 rack_.lufsM.load(std::memory_order_relaxed),
                 rack_.lufsS.load(std::memory_order_relaxed),
-                rack_.lufsI.load(std::memory_order_relaxed)};
+                rack_.lufsI.load(std::memory_order_relaxed),
+                rack_.lufsTP.load(std::memory_order_relaxed),
+                sampleRate_};
         };
 
         if (rackOutputPref_) view_->setOutputOnly(true);
@@ -3959,13 +4001,18 @@ private:
         for (int n = 2; out.existsAsFile(); ++n)
             out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");
 
-        // dither TPDF ligado (seed != 0): é gravação real do usuário, não
-        // um render de auditoria — mesma regra do painel X11
+        // PCM 24 bits desde 21 set. 2026, quando o alvo de publicação foi
+        // declarado (streaming). A tomada do músico não é o arquivo final
+        // — vai ser comparada com o tap `pre-safety` e possivelmente
+        // masterizada depois, e 16 bits jogariam fora resolução que não
+        // volta. Sem dither: em 24 bits o degrau de quantização está bem
+        // abaixo do ruído do material, então TPDF só somaria ruído sem
+        // corrigir defeito nenhum (a justificativa longa está no
+        // `WavWriter.hpp`).
         const auto write = [&](const juce::File& f, const std::vector<float>& v) {
             if (v.empty()) return;
-            rasgo::modular::writeWav16(f.getFullPathName().toStdString(), v,
-                                       static_cast<std::uint32_t>(sampleRate_), 2,
-                                       static_cast<std::uint64_t>(recCount_));
+            rasgo::modular::writeWav24(f.getFullPathName().toStdString(), v,
+                                       static_cast<std::uint32_t>(sampleRate_), 2);
         };
         // O nome DIZ o tap. Um `.wav` sem essa marca seria uma armadilha:
         // dois arquivos da mesma tomada soando diferente sem explicação.
@@ -4059,6 +4106,7 @@ private:
         rack_.lufsM.store(rack_.loudness.momentary(), std::memory_order_relaxed);
         rack_.lufsS.store(rack_.loudness.shortTerm(), std::memory_order_relaxed);
         rack_.lufsI.store(rack_.loudness.integrated(), std::memory_order_relaxed);
+        rack_.lufsTP.store(rack_.loudness.truePeakDbtp(), std::memory_order_relaxed);
 
         // REC: intercala L/R no buffer reservado. Para sozinho se a
         // reserva encher — realocar aqui seria alocação em tempo real.

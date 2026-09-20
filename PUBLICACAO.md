@@ -4,7 +4,7 @@ Auditoria contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`: as
 cinco camadas e o gate editorial comum. Cada item está marcado com o que
 **foi feito**, não com o que deveria estar pronto.
 
-**Data:** 18 set. 2026 · **Camada atual: 1 (candidato publicável), quase
+**Data:** 21 set. 2026 · **Camada atual: 1 (candidato publicável), quase
 fechada.** O que falta pra camada 2 depende de escuta humana, não de
 código.
 
@@ -32,7 +32,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | autoria, créditos, fontes e licença | ✅ `CREDITS_AND_SOURCES.md`, `LICENSE`, `apps/juce/LICENSE_STATUS.md` |
 | instruções de build/instalação e plataforma suportada | ✅ `INSTALL.md` |
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
-| testes automatizados e validações humanas **realmente executados** | 🟡 76 testes automatizados ✅ · validação humana ❌ |
+| testes automatizados e validações humanas **realmente executados** | 🟡 77 testes automatizados ✅ · validação humana ❌ |
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
 | links corretos para repositório, documentação e release | ❌ dependem da extração e da release |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
@@ -46,13 +46,15 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 ### Depende de mim (código/documento)
 
-- extrair o projeto pra repositório próprio — é o que torna a CI de três
-  sistemas viva (hoje ela está inerte: o Actions só lê o
-  `.github/workflows/` da raiz do repositório);
+- **extrair o projeto pra repositório próprio, preservando o histórico**
+  (decidido em 21 set. 2026) — é o que torna a CI de três sistemas viva
+  (hoje ela está inerte: o Actions só lê o `.github/workflows/` da raiz do
+  repositório). Preservar o histórico é a postura arquivística do resto do
+  RASGO: o rastro de como o instrumento chegou aqui é parte do acervo;
 - ~~`CHANGELOG.md` / notas da `v0.1.0`~~ **feito** — [`CHANGELOG.md`](CHANGELOG.md),
   escrito e marcado como *preparada, ainda não cortada*, com as limitações
-  declaradas (Windows/macOS nunca abertos, CI inerte, PCM24/float à espera
-  do alvo de publicação). Falta só criar a tag quando a Parte A fechar;
+  declaradas (Windows/macOS só na CI, CI inerte até a extração). Falta só
+  criar a tag quando a Parte A fechar;
 - ~~site do instrumento~~ **feito** (`website/`, 4 idiomas, faixa
   `.rasgo-strip`, DejaVu auto-hospedada, captura de execução real). Falta
   só abri-lo num navegador de cada motor antes de publicar;
@@ -68,14 +70,16 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
    [`dossies/VALIDACAO_v0.1.0.md`](dossies/VALIDACAO_v0.1.0.md): quatro
    estudos (Semente, Deriva, Cabo, Matéria e espaço), com o que escutar em
    cada um e espaço para os achados. Falta executá-lo.
-2. **Decisão sobre Windows e macOS.** A CI prova que constrói e empacota;
-   não prova que abre e soa. O Antitotem foi publicado exatamente nessa
-   condição, com a decisão registrada. Aqui a matriz já declara isso em
-   voz alta — falta você decidir se publica assim ou se segura até
-   alguém abrir numa máquina real.
-3. **Alvo de publicação** (palco / álbum / streaming). Sem ele não faz
-   sentido escolher um perfil de loudness, e sem perfil não faz sentido
-   fechar a exportação PCM24/float nem os taps nomeados de gravação.
+2. ~~**Decisão sobre Windows e macOS.**~~ **DECIDIDO em 21 set. 2026:**
+   publicar nessa condição, com verificação só pela CI — mesmo precedente
+   do Antitotem. Registrado no `INSTALL.md`; a página editorial dirá o
+   mesmo, porque o gate exige que a limitação seja dita e não suposta.
+3. ~~**Alvo de publicação.**~~ **DECIDIDO em 21 set. 2026: streaming /
+   plataformas.** Daí saíram **−14 LUFS integrado** e teto de **−1 dBTP**
+   (`LoudnessMeter::kTargetLufs` / `kTargetDbtp`), a medição de
+   **true-peak** que faltava, a leitura de distância até o alvo no cartão
+   SOBRE, e a **gravação em PCM 24 bits** — que era o item que dependia
+   justamente desta decisão.
 4. **Contato oficial** e, se aplicável, campanha de apoio.
 5. **Mais screenshots**, se quiser mostrar o instrumento em outros
    estados (rack vazio, inspector de cabo aberto, vista SAÍDA). A

@@ -31,6 +31,12 @@ Windows nem Mac aqui. O Antitotem foi publicado nessa mesma condição, com
 a decisão registrada explicitamente; o mesmo vale ser dito aqui em vez de
 deixar o leitor supor.
 
+**Decisão do autor (21 set. 2026):** publicar a `v0.1.0` **nessa
+condição**, com Windows e macOS verificados apenas pela CI — o mesmo
+precedente do Antitotem. A decisão fica registrada aqui, e a página
+editorial dirá o mesmo: o gate do RASGO exige que a limitação seja dita,
+não suposta.
+
 **Ressalva adicional:** o workflow está **inerte** enquanto o projeto vive
 dentro do monorepo `rasgo-instruments` — o GitHub Actions só lê
 `.github/workflows/` da raiz do repositório. Ele passa a valer no momento
@@ -114,7 +120,23 @@ se queria examinar; gravar só o segundo mente sobre o que saiu pelos
 alto-falantes. Com `RASGO_REC_TAP=both` a tomada sai nos dois arquivos,
 com o tap no nome (`rec-….post-safety.wav` e `rec-….pre-safety.wav`) —
 dois arquivos da mesma tomada soando diferente sem explicação seria uma
-armadilha.
+armadilha. Ambos em PCM 24 bits.
+
+### Formato de saída e de gravação
+
+| | |
+|---|---|
+| **Taxa de amostragem** | **a do dispositivo** — o app não impõe uma. Ele abre a saída e adota o que o sistema oferecer (44,1 · 48 · 96 kHz…). A taxa em uso aparece no cartão **SOBRE**, porque a única resposta honesta a "em que taxa estou?" vem da tela, não do código. |
+| **Gravação (REC)** | **WAV PCM 24 bits**, sem dither. A tomada não é o arquivo final: vai ser comparada com o tap `pre-safety` e possivelmente masterizada depois, e 16 bits jogariam fora resolução que não volta — ainda mais porque o MASTER abre em −24 dB de propósito. Em 24 bits o degrau de quantização fica muito abaixo do ruído do material, então dither só somaria ruído. |
+| **Renders de auditoria/CI** | seguem em PCM 16 com dither TPDF desligado, para continuarem byte-idênticos entre execuções (são *goldens*, não obra). |
+
+**Alvo de publicação declarado (21 set. 2026): streaming / plataformas.**
+Daí saem **−14 LUFS integrado** e teto de **−1 dBTP**. O cartão SOBRE
+mostra a distância até o alvo em LU e o true-peak medido, e marca em cor
+de aviso quando o true-peak passa do teto — é essa a condição que estoura
+na recodificação com perdas, e ela **não aparece** no pico de amostra.
+Nada disso normaliza a saída: o medidor não toca no sinal em lugar
+nenhum. O número é para quem está ouvindo decidir.
 
 ### Onde o instrumento guarda as coisas
 
