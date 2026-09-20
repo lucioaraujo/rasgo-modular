@@ -92,6 +92,7 @@
 #include <fstream>
 #include <iterator>
 #include <map>
+#include <set>
 #include <memory>
 #include <mutex>
 #include <random>
@@ -198,11 +199,8 @@ Rect footprintPx(const Widget& w) {
 // MATRIX: a grade 4×4 de ganhos (`g<jk>`) é desenhada como uma matriz de
 // pontos clicável, não como 16 knobs minúsculos. Célula (linha j = entrada,
 // coluna k = saída), em mm, centrada nas posições antigas dos knobs.
-RectMM matrixCellMM(const int j, const int k) {
-    const float cx = 27.0f + static_cast<float>(k) * 17.0f;
-    const float cy = 35.0f + static_cast<float>(j) * 18.0f;
-    return {cx - 8.0f, cy - 8.5f, 16.0f, 17.0f};
-}
+// `matrixCellMM` mora em `ui/PanelGeometry.hpp` — o app JUCE precisa da
+// MESMA célula, senão o módulo fica intratável num dos dois front-ends.
 
 rasgo::panel::MonitorRect primaryMonitor(Display* dpy) {
     rasgo::panel::MonitorRect m;
@@ -645,6 +643,7 @@ int main() {
     // morto, ela ficou idêntica a "só saída" pra todo patch de seed.)
     enum class RackView { All, Output };
     RackView rackView = RackView::All;
+    std::set<std::size_t> pendingInView;   // à vista por exceção (ver relayout)
     rasgo::panel::MotionEngine motion;
     bool motionOn = true;     // VARIA / [v] -- variação ao vivo dos knobs (±20%), ligada
     std::uint64_t curSeed = 0;   // seed do patch atual (0 = editado à mão)
@@ -817,9 +816,21 @@ int main() {
         {
             const std::vector<char> mask = rackView == RackView::Output
                 ? graph.nodesFeeding(sink) : std::vector<char>();
+            // Módulo recém-adicionado ainda não chega à saída — nasceu sem
+            // cabo. Pela regra normal ele sumia, e o músico tinha que
+            // trocar pra vista TODOS pra achar o que acabou de pedir. Fica
+            // à vista por EXCEÇÃO até ser cabeado até o som; a exceção se
+            // limpa sozinha. (Achado do autor, 18 set. 2026; mesma
+            // correção no app JUCE.)
+            if (mask.empty()) pendingInView.clear();
+            else
+                for (auto it = pendingInView.begin(); it != pendingInView.end();)
+                    if (*it < mask.size() && mask[*it]) it = pendingInView.erase(it);
+                    else ++it;
             for (auto& m : mods)
                 m.shownInView =
-                    mask.empty() || (m.id < mask.size() && mask[m.id] != 0);
+                    mask.empty() || (m.id < mask.size() && mask[m.id] != 0)
+                    || pendingInView.count(m.id) != 0;
         }
 
         // a case ENCHE a largura disponível — começa colada na paleta,
@@ -1010,6 +1021,10 @@ int main() {
     // `setParameterBase`), daí um estado à parte.
     struct CableSlider { bool active = false; int which = 0;   // 0=amount,1=conductance
         int trackX = 0, trackW = 1; } cslide;
+    // quem alcança a saída, calculado uma vez ao começar o arrasto de cabo
+    std::vector<char> dragFeeds;
+    bool dragSourceSilent = false;
+
     // botão do meio (ou meio enquanto cabeia): paneia o rack na vertical
     struct { bool active = false; int startY = 0; int startScrollY = 0; } panDrag;
     struct ModDrag { bool active = false; std::size_t id = 0; } mdrag;
@@ -1807,6 +1822,18 @@ int main() {
                     // destinos VÁLIDOS (polaridade oposta) ganham um halo;
                     // os inadequados ficam apagados
                     int state = 0;  // 0 normal · 1 válido-forte · 2 válido · 3 apagado
+                    // `soa`: ligar NESTE destino produz som agora, isto é,
+                    // ele alcança a saída. É o segundo canal da afordância
+                    // — os anéis dizem se o TIPO casa, o brilho diz se você
+                    // vai OUVIR. Halo apagado não é erro: construir longe
+                    // da saída e ligar ao som por último é legítimo, e até
+                    // agora era indistinguível de um engano.
+                    // (Pedido do autor, 20 set. 2026; igual no app JUCE.)
+                    bool soa = true;
+                    if (cdrag.active) {
+                        const std::size_t probe = cdrag.fromOutput ? m.id : cdrag.node;
+                        soa = probe < dragFeeds.size() && dragFeeds[probe] != 0;
+                    }
                     if (cdrag.active) {
                         if (isOut != cdrag.fromOutput) {
                             // resolve o PortKind deste jack
@@ -1834,7 +1861,8 @@ int main() {
                         state = 1;
                     }
                     if (state == 1 || state == 2) {
-                        XSetForeground(dpy, gc, T.accent);
+                        XSetForeground(dpy, gc,
+                            soa ? T.accent : dimToward(T.accent, T.surface, 0.55f));
                         const int hr = jr + mmpx(state == 1 ? 2.4f : 1.6f);
                         XDrawArc(dpy, bb, gc, wx - hr, wy - hr, 2 * hr, 2 * hr,
                                  0, 360 * 64);
@@ -2000,7 +2028,11 @@ int main() {
         if (cdrag.active) {
             const unsigned long* pal = cdrag.kind == PortKind::Control
                 ? cableCtrl : cableAudio;
-            drawCable(cdrag.ax, cdrag.ay, mouseX, mouseY, pal[0], true);
+            // fonte sem sinal agora: o cabo sai recuado — explica o
+            // "liguei e não aconteceu nada" ANTES de ligar
+            drawCable(cdrag.ax, cdrag.ay, mouseX, mouseY,
+                      dragSourceSilent ? dimToward(pal[0], T.bg, 0.55f) : pal[0],
+                      true);
         }
         clipOff();
 
@@ -2095,7 +2127,8 @@ int main() {
 
             const bool ruptured = c.state() == CableState::Ruptured;
             boxBtn(inspBoxX + pad, ry, bw - pad * 2, rowH - 2,
-                   ruptured ? "RECONECTAR" : "ROMPER", ruptured,
+                   tr(ruptured ? S::inspReconnect : S::inspRupture, uiLang),
+                   ruptured,
                    InspAct::Rupture);
         }
 
@@ -2192,7 +2225,8 @@ int main() {
                 py += 16;
                 text(px, py,
                      std::string(RASGO_MODULAR_BUILD)
-                         + "  ·  compilado " __DATE__ " " __TIME__,
+                         + "  ·  " + tr(S::builtOn, uiLang)
+                         + " " __DATE__ " " __TIME__,
                      T.textSecondary);
                 py += 20;
                 for (const auto& ln : wrapText(tr(S::aboutBody, uiLang), wrapPx)) {
@@ -2268,12 +2302,30 @@ int main() {
             const int mcx = (m.col & 0xFFFFF) + m.w / 2;
             if (mrow < cursorRow || (mrow == cursorRow && mcx < cx)) ++dropIdx;
         }
+        // Índice calculado entre os VISÍVEIS e traduzido pra a lista
+        // completa, ancorando no vizinho visível — é o que faz o gesto
+        // valer também nas vistas filtradas. Antes a reordenação era
+        // simplesmente ignorada fora da vista TODOS, e quem adicionasse um
+        // módulo na vista SAÍDA não conseguia posicioná-lo.
+        // (Achado do autor, 18 set. 2026; mesma correção no app JUCE.)
+        std::vector<std::size_t> vis;
+        for (const auto& m : mods)
+            if (m.id != id && m.shownInView) vis.push_back(m.id);
         std::vector<std::size_t> next;
         next.reserve(shown.size());
         for (const auto s : shown) if (s != id) next.push_back(s);
-        if (dropIdx > static_cast<int>(next.size()))
-            dropIdx = static_cast<int>(next.size());
-        next.insert(next.begin() + dropIdx, id);
+        const auto posOf = [&](std::size_t what) {
+            return std::find(next.begin(), next.end(), what) - next.begin();
+        };
+        std::ptrdiff_t at;
+        if (vis.empty())        at = static_cast<std::ptrdiff_t>(next.size());
+        else if (dropIdx <= 0)  at = posOf(vis.front());
+        else if (dropIdx >= static_cast<int>(vis.size()))
+                                at = posOf(vis.back()) + 1;
+        else                    at = posOf(vis[static_cast<std::size_t>(dropIdx)]);
+        at = std::max<std::ptrdiff_t>(0, std::min<std::ptrdiff_t>(at,
+                 static_cast<std::ptrdiff_t>(next.size())));
+        next.insert(next.begin() + at, id);
         if (next != shown) { shown = next; buildMods(); relayout(); }
     };
 
@@ -2602,6 +2654,17 @@ int main() {
         motionOn = !motionOn;
         setTitle(motionOn ? "RASGO Modular — variação ao vivo: ligada"
                           : "RASGO Modular — variação ao vivo: pausada");
+        redraw();
+    };
+
+    // [r] — REPOR: volta o patch ao estado ORIGINAL do seed atual,
+    // jogando fora toda a edição manual de uma vez. Diferente de desfazer
+    // um passo: aqui o destino é conhecido e não depende de quantas
+    // alterações houve pelo caminho. (Igual ao app JUCE, 20 set. 2026.)
+    auto actRestore = [&] {
+        if (curSeed == 0) return;   // patch feito à mão: não há aonde voltar
+        applySeed(curSeed);
+        setTitle("RASGO Modular — patch reposto");
         redraw();
     };
 
@@ -3054,7 +3117,12 @@ int main() {
                 else if (ctrl && (k == XK_b || k == XK_B)) actBank();
                 else if (ctrl && (k == XK_r || k == XK_R)) actRec();
                 else if (k == XK_space) actRupture();
-                else if (k == XK_r) reprepare = true;
+                // `r` minúsculo virou REPOR (igual ao app JUCE); o
+                // `reprepare` — ação de desenvolvimento, nunca documentada
+                // no tutorial — passou pra Shift+R. Sem isto minha linha
+                // do REPOR o sombrearia EM SILÊNCIO, que é o pior jeito de
+                // perder um atalho.
+                else if (k == XK_R) reprepare = true;
                 else if (k == XK_s) {
                     // "sugestão": adiciona um módulo do catálogo (rotação
                     // determinística). O ponto-de-partida por seed (como o
@@ -3077,6 +3145,7 @@ int main() {
                     redraw();
                 }
                 else if (k == XK_n || k == XK_N) actClear();
+                else if (k == XK_r && !ctrl) actRestore();
                 else if (k == XK_g || k == XK_G) actSeed();
                 else if (k == XK_v || k == XK_V) actMotion();
                 else if (k == XK_m || k == XK_M) actMutate();
@@ -3316,6 +3385,14 @@ int main() {
                         relayout();   // vista filtrada: um módulo pode sumir
                         redraw(); continue;
                     }
+                    // prepara a afordância: quem alcança a saída, e se a
+                    // fonte de onde se puxa tem sinal agora
+                    auto beginDragAffordance = [&](std::size_t srcNode) {
+                        dragFeeds = graph.nodesFeeding(sink);
+                        const auto sit = scopeSnap.find(srcNode);
+                        dragSourceSilent = sit == scopeSnap.end()
+                                        || sit->second.peak() < 1.0e-4f;
+                    };
                     // botão esquerdo: puxa um cabo
                     if (!j.isOut) {
                         // se já tem cabo, "pega" a ponta: desliga e ancora
@@ -3345,11 +3422,14 @@ int main() {
                                      true,
                                      sj ? sj->kind : PortKind::Audio,
                                      sj ? sj->x : mx, sj ? sj->y : my};
+                            beginDragAffordance(src.node);
                         } else {
                             cdrag = {true, j.node, j.port, false, j.kind, j.x, j.y};
+                            beginDragAffordance(j.node);
                         }
                     } else {
                         cdrag = {true, j.node, j.port, true, j.kind, j.x, j.y};
+                        beginDragAffordance(j.node);
                     }
                     redraw(); continue;
                 }
@@ -3517,6 +3597,7 @@ int main() {
                         if (nn) {
                             const std::size_t id = graph.add(std::move(nn));
                             shown.push_back(id);
+                            pendingInView.insert(id);
                             scopes[id];
                             graph.prepare(static_cast<float>(alsa.rate()), 2, block);
                             buildMods();
@@ -3568,7 +3649,7 @@ int main() {
                 // reordenar ao vivo (cabos seguem) — só na vista TODOS; nas
                 // filtradas a ordem visível é parcial e a conta não fecha.
                 // Arrastar pra a paleta pra remover segue valendo.
-                if (mouseX >= kPaletteW && rackView == RackView::All)
+                if (mouseX >= kPaletteW)
                     moduleReorderTo(mdrag.id, mouseX, mouseY);
                 redraw();
             } else if (ev.type == MotionNotify && !spawnType.empty()) {

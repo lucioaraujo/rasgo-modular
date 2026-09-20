@@ -4,7 +4,7 @@ Auditoria contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`: as
 cinco camadas e o gate editorial comum. Cada item está marcado com o que
 **foi feito**, não com o que deveria estar pronto.
 
-**Data:** 16 set. 2026 · **Camada atual: 1 (candidato publicável), quase
+**Data:** 18 set. 2026 · **Camada atual: 1 (candidato publicável), quase
 fechada.** O que falta pra camada 2 depende de escuta humana, não de
 código.
 
@@ -17,7 +17,7 @@ código.
 | 0. Pesquisa local | estado documentado; nada apresentado como release | ✅ `RASGO_MODULAR.md`, `TAREFAS.md`, `dossies/`, `PESQUISA_MODULOS.md` |
 | 1. Candidato publicável | build/execução multiplataforma, licença, créditos, documentação e limitações revisados | 🟡 **quase** — ver abaixo |
 | 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | ❌ falta a sessão de escuta documentada |
-| 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | ❌ site não existe (`WEBSITES.md §4`) |
+| 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | 🟡 site **existe** em `website/` (4 idiomas, captura de execução real), em preparação — não publica antes do instrumento |
 | 4. Publicação | portal, repositório e página liberados juntos | ❌ |
 
 A regra é explícita: **não se pula da camada 0 para a 4.**
@@ -33,7 +33,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | instruções de build/instalação e plataforma suportada | ✅ `INSTALL.md` |
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
 | testes automatizados e validações humanas **realmente executados** | 🟡 76 testes automatizados ✅ · validação humana ❌ |
-| screenshots com origem autorizada | ❌ não existem |
+| screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
 | links corretos para repositório, documentação e release | ❌ dependem da extração e da release |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
 | contato oficial | ❌ decisão do autor |
@@ -50,17 +50,21 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
   sistemas viva (hoje ela está inerte: o Actions só lê o
   `.github/workflows/` da raiz do repositório);
 - `CHANGELOG.md` / notas da `v0.1.0`, quando a versão for cortada;
-- site do instrumento (`WEBSITES.md §4`), com a faixa `.rasgo-strip`
-  persistente, header próprio e DejaVu auto-hospedada.
+- ~~site do instrumento~~ **feito** (`website/`, 4 idiomas, faixa
+  `.rasgo-strip`, DejaVu auto-hospedada, captura de execução real). Falta
+  só abri-lo num navegador de cada motor antes de publicar;
+- entrada do Modular no portal da família — mas o portal é território do
+  Codex, então é combinação, não tarefa minha.
 
 ### Depende de você
 
 1. **Sessão de escuta documentada.** É o bloqueio duro da camada 2, e
    nenhum front-end resolve: alguém tem que ouvir e registrar o que
    ouviu. O Antitotem fechou quatro estudos antes de publicar; o Modular
-   não tem nenhum. O instrumento tem `RASGO_SEED=N` e o par
-   `.wav` + `.score.txt`, então a sessão é reproduzível por construção —
-   falta fazê-la.
+   não tem nenhum. **O protocolo está pronto** em
+   [`dossies/VALIDACAO_v0.1.0.md`](dossies/VALIDACAO_v0.1.0.md): quatro
+   estudos (Semente, Deriva, Cabo, Matéria e espaço), com o que escutar em
+   cada um e espaço para os achados. Falta executá-lo.
 2. **Decisão sobre Windows e macOS.** A CI prova que constrói e empacota;
    não prova que abre e soa. O Antitotem foi publicado exatamente nessa
    condição, com a decisão registrada. Aqui a matriz já declara isso em
@@ -70,8 +74,9 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
    sentido escolher um perfil de loudness, e sem perfil não faz sentido
    fechar a exportação PCM24/float nem os taps nomeados de gravação.
 4. **Contato oficial** e, se aplicável, campanha de apoio.
-5. **Screenshots** — precisam sair de uma execução real, e eu não abro
-   janela na sua máquina.
+5. **Mais screenshots**, se quiser mostrar o instrumento em outros
+   estados (rack vazio, inspector de cabo aberto, vista SAÍDA). A
+   primeira já existe — você a capturou em 18 set. 2026.
 
 ---
 

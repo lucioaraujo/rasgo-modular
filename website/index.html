@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — um modular que toca sozinho</title>
 <meta name="description" content="Rasgo Modular: ambiente modular generativo da família RASGO. Soa no arranque, sem teclado e sem entrada de áudio — e o cabo é um objeto com estado, não um fio." />
-<link rel="icon" href="assets/identity/favicon-32.png" type="image/png" />
+<link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,8 +16,10 @@
 
 <div class="site-header">
   <a class="brand" href="#top" aria-label="Rasgo Modular">
-    <img src="assets/identity/rasgo_logo_2026.svg" alt="" />
-    <span>RASGO <em>MODULAR</em></span>
+    <svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="6.63 12.62 258.74 30.75" role="img" aria-label="RASGO">
+  <path fill="currentColor" d="M 8.0120798,40.29824 C 7.252945,38.879784 6.6318348,33.822641 6.6318348,29.060145 c 0,-12.794058 0.1058025,-12.84956 24.4952382,-12.84956 21.305108,0 23.504762,0.5615 23.504762,6 0,5.270564 -2.382823,6 -19.6,6 -16.4,0 -16.4,0 -16.4,5.733334 0,8.456585 -7.191687,12.759725 -10.6197552,6.354321 z M 59.932167,39.457119 c -2.019723,-5.312274 -1.575796,-16.926571 0.775273,-20.283192 2.732511,-3.901206 41.38639,-4.644203 45.16249,-0.868103 4.465,4.464996 2.37351,22.782804 -2.74806,24.068236 -4.507357,1.131273 -6.948629,-1.479657 -7.418446,-7.933987 -0.404923,-5.562821 -0.404923,-5.562821 -12.071589,-5.948065 -7.427558,-0.245264 -11.666667,0.118093 -11.666667,1 0,0.808165 3.47158,1.393749 8.333333,1.405661 10.934075,0.02679 14.911842,3.249251 11.614974,9.409506 -2.44559,4.569626 -30.201236,3.831888 -31.981308,-0.850056 z m 51.985153,0.664056 c -3.7693,-7.042995 0.91607,-9.243923 19.67859,-9.243923 18.03411,0 21.83006,-2.210131 5.03593,-2.932099 -9.33334,-0.401234 -9.33334,-0.401234 -9.73629,-6.650398 -0.50041,-7.760671 3.00717,-10.742235 8.44545,-7.178932 2.1369,1.400149 6.2919,2.094762 12.53034,2.094762 11.15111,0 12.09383,1.039334 12.09383,13.333334 0,13.713936 0.70412,13.333333 -24.66667,13.333333 -20.77845,0 -21.98211,-0.141881 -23.38118,-2.756077 z m 53.67874,1.186966 c -2.00722,-2.007228 -2.19509,-18.885312 -0.25065,-22.518544 1.66447,-3.110065 27.39221,-3.93989 30.35309,-0.979012 5.55622,5.556218 0.58824,10.4 -10.66666,10.4 -5.15556,0 -9.06667,0.575164 -9.06667,1.333334 0,3.356278 23.56097,1.535309 25.87739,-2 4.81344,-7.346239 10.46766,-3.013046 9.8627,7.558432 -0.40676,7.108234 -0.40676,7.108234 -22.44253,7.472457 -16.01251,0.264667 -22.48157,-0.08156 -23.66667,-1.266667 z m 51.74935,-1.009901 c -2.15009,-4.017484 -1.69952,-17.705129 0.69536,-21.124313 2.73252,-3.901206 41.3864,-4.644203 45.16249,-0.868103 2.59203,2.592028 2.97787,20.488804 0.49524,22.971428 -3.04696,3.046963 -44.66892,2.167876 -46.35309,-0.979012 z m 35.28643,-10.754321 c -1.08719,-1.759108 -23.33334,-1.759108 -23.33334,0 0,0.790766 4.91512,1.333333 12.0787,1.333333 7.71293,0 11.78084,-0.481924 11.25464,-1.333333 z"/>
+</svg>
+    <span>MODULAR</span>
   </a>
   <div class="header-nav">
     <nav class="lang-switch" aria-label="Idioma">
@@ -36,6 +40,20 @@
     tocar, e a partir daí você conduz — recabeando à mão, deixando derivar, ou
     construindo tudo do zero se preferir.</p>
 </section>
+
+<figure class="shot">
+  <picture>
+    <source type="image/webp"
+            srcset="assets/images/rack-1000.webp 1000w, assets/images/rack-1600.webp 1600w"
+            sizes="(max-width: 62rem) 100vw, 62rem" />
+    <img src="assets/images/rack-1600.jpg"
+         srcset="assets/images/rack-1000.jpg 1000w, assets/images/rack-1600.jpg 1600w"
+         sizes="(max-width: 62rem) 100vw, 62rem"
+         width="1600" height="838" loading="lazy" decoding="async"
+         alt="Captura do Rasgo Modular em execução: um rack de três fileiras com dezenas de módulos em painéis escuros, cobertos por cerca de setenta cabos curvos em laranja e azul que cruzam a tela de um lado a outro. À esquerda, a paleta de módulos por família e a caixa LEARN; no topo, a barra de comandos com SEED, VARY e os demais." />
+  </picture>
+  <figcaption>O instrumento em execução — patch de seed com 34 dos 58 módulos alcançando a saída, e 75 cabos.</figcaption>
+</figure>
 
 <section class="section">
   <h2>O que ele é</h2>

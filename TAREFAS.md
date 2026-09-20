@@ -7853,3 +7853,493 @@ uma passada de leitor de tela na ordem de foco.
 
 O site **não será publicado antes do instrumento** — regra editorial
 vigente da família, registrada no próprio README do site.
+
+## Registro da etapa — 2026-09-18: teclado morto, e por quê
+
+O autor reportou: "n não funcionou, control Z também não", depois "não
+encontrei os botões de desfazer nem de descabear", depois "acerte também
+os outros atalhos, não sei mais o que funciona e o que não". Os três são
+o mesmo problema visto de ângulos diferentes.
+
+**A causa: o foco de teclado nunca chegava ao app.** `keyPressed` vive no
+`MainComponent`, e só é chamado se ele tiver o foco. O único filho focável
+é a **caixa de seed** — um `juce::TextEditor` —, e o JUCE dá o foco
+inicial ao primeiro filho que o queira. Resultado: ao abrir, o campo de
+texto ficava com o teclado e engolia tudo. `n` não é dígito e era
+descartado pelo `setInputRestrictions`; `Ctrl+Z` virava **desfazer do
+campo**. Os atalhos pareciam não existir até o músico clicar no rack por
+acaso — o que explica por que eles funcionaram nos meus testes de leitura
+e não na mão dele.
+
+Corrigido no `timerCallback`: se o app não tem o foco e ninguém está
+digitando um seed, ele o reaver. Reaver a cada quadro é barato e
+auto-corretivo — não depende de lembrar de chamar `grabKeyboardFocus` em
+cada caminho novo, que é exatamente o tipo de disciplina que falha.
+
+Duas guardas que a própria correção exigiu, e que teriam virado bug se eu
+não as tivesse posto: não reaver o foco enquanto houver **componente
+modal** ou enquanto o **seletor de arquivo nativo** do ABRIR estiver
+aberto (sinalizador `chooserOpen_`). Sem isso o app disputaria o teclado
+com o próprio diálogo 30 vezes por segundo.
+
+**Os botões.** DESFAZ e DESCABEIA existiam só no teclado. O autor não os
+encontrou — e recurso sem porta de entrada visível é recurso que ninguém
+usa. Entraram na barra de comandos do cabeçalho, com string nos quatro
+idiomas.
+
+**Auditoria da lista inteira**, já que o autor disse não saber mais o que
+funciona: comparei o `keyPressed` com o que o cartão TECLADO do tutorial
+promete. Batiam, com dois furos:
+
+- `Ctrl+O` estava implementado e **não** documentado no cartão;
+- `[Esc]` só funcionava dentro dos overlays. Fora deles não fazia nada —
+  começar a puxar um cabo e mudar de ideia obrigava a soltar em algum
+  lugar inofensivo e torcer. Agora cancela o gesto em curso: solta o cabo,
+  fecha o inspector, cancela a escolha de companion, larga o módulo
+  arrastado.
+
+Cartão TECLADO atualizado nas quatro línguas com os dois.
+
+**A faixa de crédito.** O autor notou vão maior que o esperado entre a
+frase e a primeira fileira. Era soma dupla: a faixa é um componente
+próprio de 18 px E o rack começava com `kPadPx` (14) de topo — 32 px, onde
+o painel X11 tem 14. No X11 o crédito é desenhado DENTRO da faixa de
+respiro da case, não acima dela. Faixa reduzida a 16 px e o topo do rack
+passou a usar um `kTopPadPx` de 2, separado do padding lateral e de
+fileira: 18 px no total.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-18: a barra de rolagem por 1 pixel
+
+"antes não acontecia a barra de scroll com 3 linhas de módulos na minha
+resolução de tela."
+
+**O espaçamento entre fileiras não era o problema** — 14 px, o mesmo
+`kCasePad` do painel X11. O problema era a conta da ESCALA.
+
+`relayout()` escolhia a escala dividindo a altura disponível por
+`kTargetRows` e descontando um `kPadPx`. Mas a altura final do conteúdo é
+`kTopPadPx + n·(modH + kPadPx)` — ou seja, o respiro do TOPO nunca entrava
+na conta, e o arredondamento de `mmpx` ainda podia devolver mais um pixel.
+Medido para várias alturas de viewport, o conteúdo saía de **+1 a +3 px
+mais alto que a janela**: o bastante pra barra de rolagem aparecer
+mostrando exatamente as três fileiras que deviam caber. Um pixel de conta
+errada virando um elemento de interface.
+
+**Por que "antes não acontecia":** a escala satura em `kSMax` (2,6). Acima
+de ~1046 px de viewport as três fileiras já cabiam com folga e o erro não
+aparecia. A faixa de crédito que entrou ontem tirou 16 px da viewport e
+empurrou a janela do autor pra dentro da faixa onde o erro se manifesta.
+O defeito era antigo; a faixa só o revelou.
+
+Corrigido descontando `kTopPadPx` da altura disponível e subtraindo 0,5 px
+antes de converter, pra o arredondamento cair pra baixo em vez de devolver
+o pixel. Verificado numericamente em seis alturas de viewport: onde antes
+sobrava de +1 a +3, agora sobra de −2 a 0.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-18: vazamentos de idioma
+
+"identifiquei um botão rack-saída em português sendo que o idioma está na
+configuração inglês." Procedente — e a varredura achou mais três.
+
+**O que estava errado:**
+
+- `RACK · SAÍDA / TODOS` — as duas palavras FIXAS em português no app
+  JUCE. As traduções já existiam em `UiLanguage.hpp` (`hdrRackOut`,
+  `hdrRackAll`) e **o painel X11 já as usava**; só este caminho as
+  ignorava;
+- `ROMPER` / `RECONECTAR` no inspector de cabo — fixos em português nos
+  **dois** front-ends;
+- `compilado` no cartão SOBRE — idem, nos dois;
+- título do seletor de arquivo do ABRIR — fixo em português.
+
+**A causa de fundo, no JUCE:** o `RackView` **não conhecia o idioma**.
+Nunca recebeu um `setLanguage`, então o inspector de cabo inteiro estava
+fora do sistema de tradução — os botões só podiam sair em português
+porque não havia como saírem em outra coisa. Corrigido: o rack passa a
+receber o idioma como a paleta, o cabeçalho e a faixa de crédito já
+recebiam.
+
+**O que NÃO foi traduzido, e é decisão e não esquecimento:** `RING`,
+`FOLD`, `DIFF`, `NONE`, `AMT`, `COND`, `ZOOM`, `LEARN`, `MODULAR`. São
+vocabulário técnico neutro, e a regra está escrita no topo do próprio
+`UiLanguage.hpp`: não se traduzem rótulos de parâmetro nem títulos de
+módulo. Traduzir `RING` viraria ruído pra quem lê esquema de módulo em
+qualquer idioma. O critério aplicado foi: **verbo e prosa se traduzem,
+rótulo técnico não**.
+
+**76/76 CTest** verdes; os dois front-ends compilam limpos.
+
+## Registro da etapa — 2026-09-18: a primeira captura de tela
+
+O autor capturou o instrumento em execução e pôs o PNG no diretório do
+site, dizendo pra eu realocar se achasse melhor. A governança já tinha a
+resposta — `WEBSITES.md §7`: "o website guarda derivados otimizados;
+logos master, screenshots ORIGINAIS e masters de áudio permanecem no
+instrumento ou acervo de origem". Então:
+
+- o original (1920×1006, 832 KB) foi pra `screenshots/`, no instrumento;
+- o site guarda só derivados em `website/assets/images/`: WebP a 1000 e
+  1600 px com JPEG de reserva, servidos por `srcset`/`sizes` — tela
+  estreita não baixa a imagem grande.
+
+**A compressão foi conferida, não presumida.** A captura tem setenta
+cabos finos coloridos sobre fundo escuro, que é justamente onde
+compressão com perda borra. Recortei uma região densa do original e a
+mesma região do WebP a 88 de qualidade e comparei: cabos nítidos, texto
+legível, sem artefato. Só então entrou.
+
+**Texto alternativo descritivo nos quatro idiomas** — não "captura de
+tela do app", mas o que se vê: as três fileiras, os setenta cabos curvos,
+a paleta à esquerda, a barra de comandos no topo. Quem usa leitor de tela
+precisa da imagem, não do rótulo dela. `width`/`height` no `<img>` pra o
+texto não pular quando ela carrega, e `loading="lazy"` porque ela fica
+abaixo da dobra na maioria das telas.
+
+Peso: 192 KB → ~1 MB, dos quais 240 KB são a imagem grande, servida só a
+quem tem tela larga.
+
+**Fecha um item do gate editorial** ("screenshots com origem
+autorizada"), e é a primeira evidência visual de execução real que o
+projeto tem. `PUBLICACAO.md` atualizado: a camada 3 saiu de "site não
+existe" pra "site existe, em preparação".
+
+## Registro da etapa — 2026-09-18: auditoria geral X11 ↔ JUCE (2ª passada)
+
+Pedido do autor depois da paridade ter sido declarada — que é exatamente
+quando vale reconferir. Comparação feature a feature, de novo, com o
+método da primeira auditoria: enumerar o que o painel X11 faz e checar
+cada item no app, não de memória.
+
+**Cinco diferenças reais. Quatro corrigidas.**
+
+**1. MATRIX desenhado errado (o mais sério).** O painel X11 desenha a
+grade 4×4 de ganhos como uma matriz de CÉLULAS clicáveis — barra a partir
+do centro, pra cima positivo, pra baixo negativo. O app JUCE desenhava os
+16 `g<jk>` como knobs comuns: tecnicamente funcional, ilegível de relance,
+e diferente do instrumento que o autor conhece. Portado, com a geometria
+da célula (`matrixCellMM`) extraída pra `src/ui/PanelGeometry.hpp` — os
+dois front-ends PRECISAM concordar nela, senão o clique de um cai onde o
+outro não desenha. Mesma razão do `footprintMM`.
+
+**2. Vista filtrada vazia sem explicação.** O X11 mostra uma dica no lugar
+do rack quando nada chega à saída (`rackViewEmpty`, já traduzida nos 4
+idiomas). O JUCE mostrava tela vazia. Isso virou crítico quando o `[n]`
+(descabear) entrou: em RACK·SAÍDA, tirar todos os cabos esvazia a tela por
+completo — e sem explicação parece o app ter quebrado. Portada.
+
+**3. Janela abrindo baixa demais.** O X11 usa
+`WindowPolicy::firstOpen(mon, …, 0.88f)` — 88% do monitor primário. O app
+JUCE abria FIXO em 1280×760. Num monitor grande isso dá uma janela muito
+mais baixa que a do painel, e é **parte do "antes não tinha barra de
+rolagem com 3 fileiras"**: não era só a conta da escala (corrigida mais
+cedo hoje), era também a janela nascer curta. Agora usa a mesma política —
+o header já era geometria pura, "sem X11 nem ALSA" por comentário próprio.
+
+**4. Botão do meio não paneia.** O X11 paneia o rack com o botão do meio,
+inclusive durante o cabeamento (pra alcançar um jack fora da tela sem
+largar o cabo). Faltava. Portado.
+
+**5. Título da janela não reflete estado.** O X11 escreve no título o que
+está acontecendo (STANDBY, GRAVANDO, MUTATE, rack vazio…). O JUCE mantém
+"Rasgo Modular" sempre. **Não portado**, e registro o porquê: no painel de
+teste o título é um canal de diagnóstico barato; no app de produção a
+mesma informação já está visível na interface (botão aceso, ponto do REC,
+leitura do cabeçalho). Piscar o título a cada ação é ruído de barra de
+tarefas. Se o autor quiser, é meia dúzia de linhas.
+
+Diferença menor registrada e NÃO corrigida: o cabeçalho do X11 mostra o
+pico em dB ao lado da barra de VU; o do JUCE mostra só a barra. O número
+em dB está no VU grande do MASTER, dentro do rack.
+
+Painel X11 e app JUCE compilam limpos; **76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-18: taps nomeados de gravação (§5 fechado)
+
+Último item do §5 de `SAIDA_AUDIO_COMUM.md` que não dependia de decisão
+do autor — eu o tinha atribuído erradamente ao alvo de publicação e me
+corrigi: taps são ESTRUTURAIS, o alvo só governa o perfil de loudness.
+
+**O `MASTER` passou a expor um tap `pre-safety`**: o par estéreo depois do
+master criativo (ganho, largura, mono, mute) e ANTES da proteção de saída.
+É só uma cópia, pré-alocada no tamanho máximo de bloco — não muda uma
+amostra do que sai, e o `process` continua sem alocar.
+
+**O REC escolhe a origem** por `RASGO_REC_TAP`: `post` (padrão), `pre` ou
+`both`. O porquê está no §4 do documento comum: alimentar análise ou
+gravação só com a saída pós-limitador faz o limitador **esconder a
+dinâmica** que se queria observar. Mas gravar só o `pre` mentiria sobre o
+que saiu pelos alto-falantes — daí os dois serem nomeados e escolhíveis,
+com o padrão em `post`: o que se ouviu é o que se grava, salvo pedido
+explícito.
+
+**O nome do arquivo diz o tap** (`rec-….post-safety.wav`,
+`rec-….pre-safety.wav`). Dois `.wav` da mesma tomada soando diferente sem
+explicação seria uma armadilha — pior que ter um só.
+
+O nó MASTER de onde sai o tap é achado uma vez, no início da tomada:
+varrer o grafo comparando strings a cada bloco seria trabalho de thread de
+áudio pra uma resposta que não muda.
+
+**Documentação atualizada** (pedido do autor): `INSTALL.md` ganhou a
+variável na tabela e uma seção explicando os dois taps nos dois idiomas;
+`RASGO_MODULAR.md` ganhou o parágrafo na seção de excelência;
+`README.md` e `apps/juce/PARIDADE.md` deixaram de listar os taps como
+pendência. Datas de "estado" corrigidas onde estavam paradas no dia 15/16.
+
+Do §5 resta **só** a exportação PCM24/float, que depende de um alvo de
+publicação declarado.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-18: protocolo de validação da v0.1.0
+
+O autor perguntou o que precisa testar. Em vez de responder por mensagem —
+que se perde —, o protocolo virou documento:
+`dossies/VALIDACAO_v0.1.0.md`.
+
+Segue o precedente do Antitotem, que fechou **quatro estudos formais**
+antes de publicar e achou um bug de sinal real no processo. Aqui os quatro
+mapeiam o território do instrumento: **Semente** (o generativo por
+omissão), **Deriva** (VARIA e as genéticas), **Cabo** (a ideia que separa
+este instrumento dos outros) e **Matéria e espaço** (o DSP pesado e os
+extremos).
+
+Três decisões no desenho do protocolo:
+
+- **Gravar os dois taps** (`RASGO_REC_TAP=both`). Comparar `pre-safety`
+  com `post-safety` é metade do estudo: um mostra a dinâmica que o
+  limitador esconde, o outro o que de fato saiu.
+- **Dois testes DIRIGIDOS a correções recentes**, porque são as que mais
+  merecem desconfiança: o arrasto rápido de GAIN/WIDTH (não tinham rampa e
+  clicavam — a bateria automática pegou, mas o ouvido é o juiz) e o
+  cabeamento direto no OUT, por fora do MASTER, que exercita a guarda de
+  segurança do sink.
+- **Espaço obrigatório de "Achados", com instrução de escrever mesmo que
+  seja "nada a relatar"** — um estudo sem achado registrado é
+  indistinguível de um estudo não feito.
+
+A Parte B lista a verificação funcional do que mudou e **eu não tenho como
+observar**: teclado (o caso que falhava era abrir e teclar sem clicar
+antes), MATRIX, janela, vista vazia, idioma, ícone e o site em navegador
+real. Está em forma de caixas de marcar.
+
+`PUBLICACAO.md` aponta pro protocolo no item que trava a camada 2.
+
+## Registro da etapa — 2026-09-18: o módulo invisível na vista SAÍDA
+
+Achado do autor: na vista RACK·SAÍDA, adicionar um módulo da paleta não
+mostrava nada — ele nasce sem cabo, não chega à saída, e o filtro o
+esconde. O músico era obrigado a trocar pra vista TODOS pra encontrar o
+que tinha acabado de pedir.
+
+**O filtro estava CERTO e ainda assim errado.** O módulo de fato não chega
+à saída; a regra não tem defeito. O problema é que ela escondia justamente
+a coisa que a pessoa acabou de pedir pra existir — o filtro passou a
+mentir sobre a intenção, não sobre o estado.
+
+**Exceção, não mudança de regra.** Quem entra agora fica à vista mesmo na
+vista SAÍDA, até ser cabeado até o som. A exceção **se limpa sozinha**: no
+instante em que o módulo alcança a saída, a regra normal passa a mostrá-lo
+e ele sai da lista. Nada a lembrar de limpar, nada que acumule.
+
+Duas alternativas descartadas e por quê: **trocar a vista automaticamente**
+mexeria no que o músico escolheu ver, sem pedir; **auto-conectar** o módulo
+novo seria adivinhar a intenção musical dele, que é o oposto do que este
+instrumento faz.
+
+**Marca visual:** o módulo em exceção ganha borda tracejada de acento.
+Sem ela a vista SAÍDA passaria a mentir de outro jeito — mostraria algo
+que não chega ao som sem dizer que é diferente.
+
+Corrigido nos **dois** front-ends; o filtro é o mesmo lá. Item somado ao
+protocolo de validação.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-18: reordenar módulo nas vistas filtradas
+
+Achado do autor, encadeado no anterior: adicionou um módulo na vista
+SAÍDA (que agora aparece, pela exceção de ontem), tentou deslocá-lo e não
+conseguiu.
+
+**Era uma trava herdada do painel X11**, com razão declarada no próprio
+comentário: "reordenar ao vivo — só na vista TODOS: nas filtradas a ordem
+visível é parcial e a conta do índice de destino não fecha". A trava é
+honesta sobre a dificuldade. Mas o efeito é que quem adiciona um módulo na
+vista SAÍDA não consegue posicioná-lo — e foi exatamente onde o autor
+caiu, porque a correção de ontem passou a pôr o módulo novo bem ali.
+
+**A conta fecha ancorando no vizinho visível.** O índice é calculado entre
+os módulos VISÍVEIS, como antes, e depois TRADUZIDO pra a lista completa:
+o módulo entra imediatamente antes (ou depois) de um módulo que se está
+vendo. Os invisíveis ficam onde estão, com a ordem relativa intacta — que
+é a propriedade que faltava e que a trava evitava ter de garantir.
+
+Na vista TODOS o resultado é idêntico ao de antes (os visíveis são todos),
+então não há regressão no caminho que já funcionava.
+
+Corrigido nos **dois** front-ends, e a trava saiu dos dois. Item somado ao
+protocolo de validação.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-19: Ctrl+Z mudo e o seed que não voltava
+
+Dois relatos do autor, causas independentes. O fato de o BOTÃO desfazer
+funcionar e a TECLA não já dizia que o desfazer estava certo e o problema
+era o teclado — foi o que separou os dois.
+
+**1. `Ctrl+Z` não chegava.** Os atalhos com modificador eram comparados
+pelo código cru de `getKeyCode()` (`c == 'Z'`). Com um modificador
+segurado, o que chega ali **varia entre sistema e layout**: pode vir a
+letra, pode vir o caractere de controle (Ctrl+Z = 26). Trocado por
+comparação com `juce::KeyPress(ch, commandModifier, 0)`, cujo
+`operator==` normaliza isso. Vale pra todos os `Ctrl+` de uma vez, não só
+pro Z — os outros provavelmente falhavam do mesmo jeito e ninguém tinha
+testado.
+
+As teclas de uma letra (`g`, `v`, `m`, `e`, `c`, `n`, `q`) não passam por
+esse caminho: sem modificador, `getKeyCode()` devolve a maiúscula de forma
+confiável. Ficaram como estavam — mexer em código que funciona só
+acrescenta risco.
+
+**2. O número do seed não voltava no desfazer.** `savePatch` e `snapshot`
+**sempre** escreveram a linha `seed N` no `.rmp`, e o carregador **nunca a
+leu**. Então desfazer uma troca de seed restaurava o patch certo e deixava
+o número do seed anterior na tela: a caixa passava a mentir sobre qual
+patch está soando, que é a única coisa que ela existe pra dizer. Pior que
+o número errado seria a consequência dele — digitar aquele número não
+reproduziria o que se ouve.
+
+O defeito não era só do desfazer: **abrir um `.rmp` pelo ABRIR tinha o
+mesmo problema**, e ninguém tinha percebido porque o caminho é menos
+usado. Corrigido no `applyPatchText`, que serve aos dois.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-20: o app roubava o teclado do sistema
+
+"ainda estou com o terminal bloqueado sempre que abro o app."
+
+Não era o script `./run` — era **bug meu no app, e grave**. A correção de
+foco de 18 set. (que fez os atalhos voltarem a existir) reavia o foco de
+teclado a cada quadro. A guarda que pus verificava se o app já tinha o
+foco, se havia diálogo modal e se a janela estava à mostra — mas **não
+verificava se a janela era a ATIVA**.
+
+Com a janela em segundo plano, `hasKeyboardFocus(false)` é falso, então a
+condição passava e o app chamava `grabKeyboardFocus()` **30 vezes por
+segundo**, roubando o teclado de qualquer outra janela. O autor não
+conseguia digitar no terminal enquanto o app estivesse aberto.
+
+Ou seja: uma correção que fez os atalhos funcionarem tornou **o resto do
+computador inutilizável** enquanto o instrumento roda. É o pior tipo de
+regressão — o app funcionando às custas de tudo em volta —, e não havia
+como um teste automatizado pegá-la: ela só existe na relação com as outras
+janelas do sistema.
+
+Corrigido com `juce::Process::isForegroundProcess()` como primeira guarda:
+reaver foco só faz sentido quando a janela já é a ativa. Trocado também
+`hasKeyboardFocus(false)` por `(true)` — se qualquer filho já tem o foco,
+não há nada a reaver.
+
+**76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-20: atalhos acendem o botão, REPOR, e a afordância de audibilidade
+
+### Atalho sem sinal na tela
+
+Pedido do autor: "é importante que quando utilizamos os atalhos do teclado
+que sinalize o botão que corresponde". Procedente, e explica por que ficou
+tão difícil saber o que funcionava esta semana — o atalho agia **no
+escuro**, sem nada confirmando que a ação saiu.
+
+O flash de 160 ms já existia, mas só o CLIQUE passava por ele: o teclado
+chamava os callbacks direto e pulava o realce. Corrigido unificando os
+dois caminhos num despacho só (`HeaderBar::trigger(Act)`) — que além de
+resolver o pedido garante que uma ação nova não fique ligada ao mouse e
+esquecida no teclado, que é o erro que se comete sozinho.
+
+### REPOR
+
+"não sei se temos ainda um botão para fazer o reset do mesmo seed". Existia
+a capacidade — digitar o número na caixa e dar Enter reaplica o patch —
+mas escondida demais pra uma ação dessa importância.
+
+Botão `REPOR` + tecla `r`: volta o patch ao estado ORIGINAL do seed atual,
+jogando fora toda a edição manual de uma vez. Diferente do desfazer, que
+anda um passo: aqui o destino é conhecido e não depende de quantas
+alterações houve. Entra no desfazer, então repor não é irreversível. **Só
+aparece quando há seed pra onde voltar** — num patch construído à mão
+(seed 0) ele seria botão morto.
+
+### Afordância de audibilidade — as três
+
+O autor descreveu o problema com precisão: ao puxar um cabo, muitos
+destinos acendem, mas alguns cabeamentos não surtem efeito sonoro, e ele
+acaba cabeando ao acaso mais do que sabendo. Pediu orientação **sem
+delimitar as escolhas**.
+
+O princípio adotado: **informar, nunca restringir**. Num instrumento que
+toca sozinho e cuja identidade é o acaso estruturado, cabear ao acaso não
+é falha de uso — é o modo previsto. O que faltava não era orientação sobre
+o que fazer, e sim **legibilidade da consequência**.
+
+1. **Halo graduado.** Dois canais visuais independentes: a quantidade de
+   anéis segue dizendo se o TIPO de sinal casa; o brilho passa a dizer se
+   o destino **alcança a saída**. Cheio = ligar ali soa agora; apagado =
+   válido, mas o caminho ainda não chega ao som. Reusa o `nodesFeeding`
+   que a vista RACK·SAÍDA já calculava, tirado uma vez no início do gesto.
+2. **Fonte muda.** Se a saída de onde se puxa não tem sinal, o cabo
+   elástico sai acinzentado — explica o "liguei e não aconteceu nada"
+   ANTES de ligar, e aponta o culpado certo, que nesse caso é a origem.
+3. **Retorno depois do ato.** Ligar num caminho que não alcança a saída
+   escreve uma linha na caixa LEARN, que some sozinha. Não impede nada;
+   ensina a topologia durante a exploração.
+
+O apagado **não é aviso de erro** — construir uma cadeia longe da saída e
+ligá-la ao som por último é um jeito legítimo de trabalhar. O que faltava
+era distinguir isso de um engano; até agora eram indistinguíveis.
+
+Descartada uma quarta ideia, e o porquê: sugerir conexões a partir de um
+catálogo de "pares recomendados" exigiria dados curados que não existem,
+envelheceria a cada módulo novo, e embutiria gosto meu no instrumento do
+autor.
+
+Tutorial atualizado nos quatro idiomas (cartões TECLADO e CABEAR), mais o
+protocolo de validação. **76/76 CTest** verdes.
+
+## Registro da etapa — 2026-09-20: a divergência que crescia em silêncio
+
+Nos últimos dias só o app JUCE ganhou recursos — desfazer, ABRIR, REPOR,
+taps de gravação, atalho acendendo botão, afordância de audibilidade. É
+esperado (papéis diferentes), mas **divergência não documentada vira
+surpresa**, e foi a origem da maior parte dos relatos do autor nesta
+semana ("está diferente do outro").
+
+Auditei o desvio e apliquei um critério: **comportamento do instrumento é
+portado; conveniência de interface fica onde faz sentido pro papel**.
+
+**Portados pro painel X11:**
+
+- **halo por audibilidade e fonte muda** — é como o instrumento responde
+  ao cabeamento, não enfeite de janela;
+- **REPOR** (`r`), que expôs um conflito: o `r` já era `reprepare`, ação
+  de desenvolvimento nunca documentada. Minha linha o sombraria **em
+  silêncio** — o pior jeito de perder um atalho. O `reprepare` foi pra
+  `Shift+R` e os dois convivem.
+
+**Deliberadamente só no JUCE**, com a razão registrada em
+`apps/juce/PARIDADE.md`: desfazer (estrutura nova, e o painel é
+ferramenta de teste), ABRIR (seletor de arquivo em X11 puro seria
+escrever um navegador à mão), taps no REC, atalho acendendo botão e aviso
+pós-ligação. Os três últimos são portáveis a baixo custo se fizerem falta.
+
+A tabela de divergência entrou no `PARIDADE.md` justamente pra este
+crescimento deixar de ser invisível.
+
+Build dos dois front-ends **sem nenhum aviso próprio**; **76/76 CTest**.

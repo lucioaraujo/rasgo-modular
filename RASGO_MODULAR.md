@@ -1334,6 +1334,16 @@ o integrado zera a cada tomada de REC. Conformidade em
 (EBU Tech 3341), a ponderação é unitária em 1 kHz, e as relações de +6,02
 (dobrar amplitude) e +3,01 (segundo canal correlacionado) batem.
 
+**Taps de gravação nomeados (2026-09-18).** `SAIDA_AUDIO_COMUM.md §3`
+pede taps explícitos e o §4 diz por quê: alimentar análise (ou gravação)
+só com a saída pós-limitador faz o limitador **esconder a dinâmica** que
+se queria observar. O `MASTER` passou a expor um tap `pre-safety` — o par
+estéreo depois do master criativo (ganho, largura, mono, mute) e antes da
+proteção de saída —, pré-alocado e sem alocar no `process`. O REC do app
+JUCE escolhe a origem por `RASGO_REC_TAP` (`post`, padrão · `pre` ·
+`both`), e o nome do arquivo DIZ o tap: dois `.wav` da mesma tomada
+soando diferente sem explicação seria pior que um só.
+
 O `MASTER` (Módulo 17) usa tudo
 isso. Testes: `test_true_peak.cpp` + `test_output_stage.cpp`.
 Pendente: `TruePeakDetector` 4× polifásico plenamente conforme BS.1770,
