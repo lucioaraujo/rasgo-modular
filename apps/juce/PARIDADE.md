@@ -48,6 +48,7 @@ silêncio.
 | **Taps de gravação (`pre-safety`)** | ❌ | ✅ | **só no JUCE** — o `MASTER` já expõe o tap nos dois; falta só a fiação do REC no painel. Portável a baixo custo se fizer falta |
 | **Atalho acende o botão** | ❌ | ✅ | **só no JUCE** — o painel tem o flash no clique; no teclado ele passa direto. Portável, não portado |
 | **Aviso pós-ligação no LEARN** | ❌ | ✅ | **só no JUCE** |
+| **Tabela única de atalhos** (`src/ui/Shortcuts.hpp`, testada) | ❌ | ✅ | **só no JUCE** (21 set. 2026) — o painel mantém o próprio bloco de `XK_*`, com duas ações de desenvolvimento que o app não tem: `s` = sugestão de módulo, `Shift+R` = `reprepare`. Portar é mecânico; não foi feito às pressas antes da publicação |
 
 O critério aplicado: **comportamento do instrumento** (como o som e o
 cabeamento respondem) é portado; **conveniência de interface** fica onde

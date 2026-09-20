@@ -2683,8 +2683,9 @@ int main() {
                 graph.disconnect(c.target().node, c.target().port);
             }
             // tira os CABOS, não os módulos: o rack é o conjunto
-            // disponível, e o PATCH é o cabeamento
-            curSeed = 0;          // deixou de ser um patch reproduzível
+            // disponível, e o PATCH é o cabeamento.
+            // O seed NÃO é zerado: descabear é edição como outra qualquer,
+            // e o seed segue sendo ponto de retorno válido pro REPOR.
             allRuptured = false;
             graph.prepare(sr, 2, block);
             graph.setActiveOutput(sink);

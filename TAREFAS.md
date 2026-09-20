@@ -8343,3 +8343,155 @@ A tabela de divergência entrou no `PARIDADE.md` justamente pra este
 crescimento deixar de ser invisível.
 
 Build dos dois front-ends **sem nenhum aviso próprio**; **76/76 CTest**.
+
+## Registro da etapa — 2026-09-20: o `r` mudo e o halo ilegível
+
+Dois relatos da Parte B do autor. O primeiro foi diagnosticado pela ORDEM
+em que ele testou.
+
+**1. "`r` não acende."** O REPOR só existe quando há seed pra onde voltar
+— e o `n` (descabear) **zerava o seed**. Como a lista da Parte B pede o
+`n` antes do `r`, ele descabeou e o `r` corretamente não fez nada: o botão
+já não estava lá.
+
+O defeito é meu e era incoerente. Ligar e cortar cabos à mão **nunca**
+zerou o seed; só o descabear zerava, com a justificativa de que "deixou de
+ser um patch reproduzível". Mas descabear é uma edição como outra
+qualquer, e o seed que gerou o patch segue sendo um ponto de retorno
+válido — aliás o mais útil justamente aí, depois de apagar tudo. Zerá-lo
+fazia o REPOR sumir no instante em que ele mais serviria. O seed deixou de
+ser zerado, nos dois front-ends.
+
+**2. "halo cheio não vi."** A afordância existia e os dados estavam certos
+— verifiquei fora do app que num patch de seed só **10 a 23 dos 58**
+módulos alcançam a saída, então havia contraste a mostrar. O problema era
+de LEITURA: eu tinha distinguido as duas categorias só por brilho (alfa
+0,35 contra 1,0), fraco demais pra ler como duas coisas diferentes.
+
+Refeito com distinção de **FORMA**: halo CONTÍNUO com o miolo do jack
+aceso quando o destino soa; halo TRACEJADO quando ainda não chega ao som.
+Forma sobrevive a monitor ruim, a brilho baixo e a quem enxerga cor de
+outro jeito — brilho sozinho não sobrevive a nada disso.
+
+Tutorial corrigido nos quatro idiomas: ele descrevia a distinção por
+brilho, que deixou de existir.
+
+**76/76 CTest** verdes; build dos dois front-ends sem avisos próprios.
+
+## Registro da etapa — 2026-09-20: o `r` ainda mudo — correção pela metade
+
+"r ainda não percebi que funciona, verifique."
+
+Fui verificar elo por elo em vez de supor de novo: tecla → `trigger` →
+despacho → callback → desenho do botão → binário. **Todos presentes.** O
+defeito estava no ESTADO, não na fiação.
+
+**O seed vivia em DOIS lugares** — `Rack::curSeed` e `MainComponent::seed_`
+— e ontem eu tirei o zeramento de um só. O `clearCablesAndRefresh`
+continuava fazendo `seed_ = 0`, então o REPOR seguia sumindo depois do
+`n` exatamente como antes. A "correção" de ontem não corrigiu nada do
+ponto de vista de quem usa.
+
+O que permitiu o erro foi a duplicação: com o mesmo dado em dois lugares,
+consertar um e achar que acabou é o resultado esperado, não o azar.
+Corrigido na raiz — `rack_.curSeed` passou a ser **fonte única**, e o
+`syncHeader` lê dele antes de desenhar. Não há mais um segundo lugar pra
+esquecer.
+
+Lição registrada porque vale além deste caso: quando um relato repete
+depois de uma correção, a primeira suspeita deve ser **estado duplicado**,
+não fiação faltando.
+
+**76/76 CTest** verdes; build sem avisos próprios.
+
+## Registro da etapa — 2026-09-20: `n` "não funciona" — o botão é que sumia
+
+"o atalho da tecla n não está funcionando."
+
+Verifiquei a cadeia inteira do `n` (tecla → despacho → callback → botão) e
+estava toda presente. Então medi o cabeçalho, em vez de continuar supondo:
+
+    esquerda (marca + seed + SEED + REPOR) : 469 px
+    barra de comandos (9 botões)           : 510 px
+    zoom + espera                          : 182 px
+    cluster direito + VU + leitura         : 497 px
+    TOTAL                                  : 1658 px
+
+Numa janela de 1689 px (88% de um monitor de 1920) sobram **31 px**. O
+REPOR, que entrou ontem, comeu 79 px dessa margem. Ou seja: a barra estava
+no fio da navalha, e o laço que a desenha **corta o excedente em silêncio**
+(`break`). Quem some primeiro é o último da fila — que por acaso é o
+DESCABEIA.
+
+Então o atalho `n` funcionava; **o botão é que não estava lá**. E como eu
+mesmo ensinei o autor a usar o acender do botão como sinal de que a ação
+saiu, ele concluiu, com razão, que o atalho estava quebrado.
+
+**Corrigido pela classe, não pelo caso.** Recuperar folga só adiaria: a
+próxima palavra longa, o próximo idioma ou o próximo botão consome de
+novo. O cabeçalho passa a **quebrar em duas fileiras** quando não cabe —
+`preferredHeight(width)` mede tudo antes de desenhar e a altura acompanha.
+Nenhum botão pode mais sumir sem avisar.
+
+É a terceira vez que "elemento some em silêncio quando falta espaço" me
+morde (antes: o VU e a leitura de módulos/cabos, que ganharam guarda).
+Desta vez a solução não depende de lembrar de pôr guarda no próximo.
+
+**76/76 CTest** verdes; build sem avisos próprios.
+
+## Registro da etapa — 2026-09-21: os atalhos viram tabela testada
+
+"faça uma auditoria dos atalhos" · "verifique um a um" · "preciso que vc
+tenha certeza do que está fazendo" · "tem muito remendo no código?"
+
+**A pergunta era justa e a resposta é sim** — nesta área. O teclado
+quebrou três vezes em três dias, e as três correções foram feitas por
+LEITURA: eu relia a cadeia, concluía que estava certa, e o autor voltava
+dizendo que não estava. Cada correção mexia num ramo e deixava os outros
+com a regra antiga, então o `keyPressed` acumulou três regras diferentes
+para decidir a mesma coisa — qual tecla foi apertada:
+
+- o ramo `ctrl` comparava por `juce::KeyPress` (correção da 2ª quebra);
+- o ramo de letras comparava `getTextCharacter()` maiúsculo (correção da
+  3ª quebra);
+- as teclas especiais comparavam o código bruto.
+
+Três regras para uma pergunta só é a definição de remendo. E a causa de
+fundo apareceu de novo em cada quebra: **a identidade de uma tecla não é
+confiável pelo código bruto** — varia com sistema, layout, Shift e
+CapsLock.
+
+**Correção de raiz.** `src/ui/Shortcuts.hpp`: uma tabela só, com as 17
+combinações, e uma função pura que as resolve. O `keyPressed` deixou de
+decidir — traduz o evento JUCE e pergunta à tabela. Menos 40 linhas de
+ramos no app.
+
+**A auditoria "um a um" virou executável**, que é a única forma de eu ter
+a certeza que o autor pediu: `tests/test_shortcuts.cpp` aperta cada uma
+das 17 entradas nas quatro formas em que o sistema pode entregá-la —
+minúscula, maiúscula (Shift/CapsLock), sem caractere nenhum (layout/IME),
+e com Ctrl mandando caractere de controle (Ctrl+Z = 26). Mais: nenhuma
+colisão, nenhum vazamento entre com e sem Ctrl (`r` é REPOR, `Ctrl+R` é
+GRAVAR — confundir os dois começaria uma gravação sem pedir), e dez
+teclas que **não** podem ser atalho.
+
+**O teste foi verificado contra o bug.** Reintroduzi a falha histórica de
+propósito e ele acusou **31 falhas**, nomeando `n [maiúscula/Shift]` e
+`Ctrl+Z [caractere de controle]` — exatamente os dois sintomas relatados.
+Um teste que não se prova falhando não prova nada.
+
+**O tutorial deixou de poder divergir.** O cartão TECLADO anunciava
+atalhos que ninguém conferia contra o código. Agora cada entrada da tabela
+carrega como é anunciada, e o teste exige que apareça no cartão — nos
+quatro idiomas para os `Ctrl+`.
+
+Rastros `RASGO_KEYLOG` removidos: cumpriram o papel e a causa está fechada
+por teste.
+
+**Divergência conhecida (deliberada):** o painel X11 mantém o próprio
+bloco de teclas, com duas ações de desenvolvimento que o app não tem
+(`s` = sugestão de módulo, `Shift+R` = reprepare). O painel é ferramenta
+de teste, não o artefato publicado; portá-lo para a tabela é mecânico e
+fica registrado, não feito às pressas antes da publicação.
+
+**77/77 CTest** verdes.
