@@ -25,8 +25,15 @@ A **B** é verificação funcional do que mudou e eu não pude observar.
   é o que sai de fato. Comparar os dois é metade do estudo.
 - Cada tomada gera `.wav` + `.score.txt`. **Anote o número do seed** — ele
   reproduz o patch exatamente, e é o que torna o estudo repetível.
-- A leitura de LUFS (momentary / short-term / integrated) está no cartão
-  **SOBRE**. Anote a integrada ao fim de cada tomada.
+- A leitura está no cartão **SOBRE**: LUFS (momentary / short-term /
+  integrated), **true-peak em dBTP**, a **taxa de amostragem real** e a
+  distância até o alvo. Anote a integrada e o true-peak ao fim de cada
+  tomada.
+- **Alvo declarado (21 set. 2026): streaming** — −14 LUFS integrado, teto
+  de −1 dBTP. A linha do alvo fica em cor de aviso quando o true-peak
+  passa do teto. Isso **não corrige nada sozinho**: o medidor não toca no
+  sinal. É informação pra você decidir.
+- As gravações saem em **PCM 24 bits**.
 
 ### Estudo 1 — Semente
 
@@ -98,7 +105,9 @@ feia e audível — isso é proposital, é o aviso de que falta um MASTER — ma
 - [ ] Os quatro estudos têm achados escritos.
 - [ ] Ao menos uma tomada por estudo, com seed anotado.
 - [ ] Bugs achados viraram entrada em `TAREFAS.md`.
-- [ ] LUFS integrado anotado — é o que informa o perfil de publicação.
+- [ ] LUFS integrado e true-peak anotados por tomada.
+- [ ] Alguma tomada passou de −1 dBTP? Se sim, em que situação — é o dado
+      que diz se a guarda de saída precisa de ajuste antes de publicar.
 
 ---
 

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <limits>
 #include <vector>
+#include <cmath>
 
 using namespace rasgo::modular;
 
@@ -21,6 +22,33 @@ void check(const bool c, const char* const e) {
     if (!c) { std::cerr << "CHECK FALHOU: " << e << '\n'; ++g_failures; }
 }
 #define EXPECT(x) check((x), #x)
+
+// lê o cabeçalho (bits por amostra) e os samples int24 do "data" de um WAV
+std::vector<std::int32_t> readPcm24(const std::string& path,
+                                    std::uint16_t* bitsOut = nullptr) {
+    std::ifstream f(path, std::ios::binary);
+    std::vector<char> buf((std::istreambuf_iterator<char>(f)),
+                          std::istreambuf_iterator<char>());
+    std::size_t p = 12, dataOff = 0, dataLen = 0;
+    while (p + 8 <= buf.size()) {
+        char id[5] = {buf[p], buf[p+1], buf[p+2], buf[p+3], 0};
+        std::uint32_t sz; std::memcpy(&sz, &buf[p+4], 4);
+        if (std::string(id) == "fmt " && bitsOut != nullptr)
+            std::memcpy(bitsOut, &buf[p + 8 + 14], 2);
+        if (std::string(id) == "data") { dataOff = p + 8; dataLen = sz; break; }
+        p += 8 + sz + (sz & 1);
+    }
+    std::vector<std::int32_t> out(dataLen / 3);
+    for (std::size_t i = 0; i < out.size(); ++i) {
+        const auto b0 = static_cast<std::uint8_t>(buf[dataOff + i*3]);
+        const auto b1 = static_cast<std::uint8_t>(buf[dataOff + i*3 + 1]);
+        const auto b2 = static_cast<std::uint8_t>(buf[dataOff + i*3 + 2]);
+        std::int32_t v = static_cast<std::int32_t>(b0 | (b1 << 8) | (b2 << 16));
+        if (v & 0x800000) v -= 0x1000000;          // sinal de 24 bits
+        out[i] = v;
+    }
+    return out;
+}
 
 // lê de volta os samples int16 do "data" chunk de um WAV recém-escrito
 std::vector<std::int16_t> readPcm16(const std::string& path) {
@@ -123,6 +151,88 @@ void testStereoChannelsDoNotShareDitherNoise() {
     std::remove(path.c_str());
 }
 
+
+// ---- PCM 24 bits (a GRAVAÇÃO desde 21 set. 2026) --------------------
+
+// O cabeçalho tem que ANUNCIAR 24 bits. Um WAV que diz 16 e carrega 24
+// toca como ruído — é o tipo de erro que só aparece no reprodutor de
+// outra pessoa.
+void test24HeaderDeclaresDepth() {
+    const std::string path = "/tmp/rasgo_wav24_header.wav";
+    EXPECT(writeWav24(path, {0.0f, 0.0f, 0.5f, -0.5f}, 48000, 2));
+    std::uint16_t bits = 0;
+    const auto pcm = readPcm24(path, &bits);
+    check(bits == 24, "o cabeçalho declara 24 bits");
+    check(pcm.size() == 4, "quatro amostras escritas");
+    std::remove(path.c_str());
+}
+
+// Little-endian explícito: escrito byte a byte justamente para não
+// depender da ordem da máquina. Se alguém "simplificar" para um fwrite de
+// int32 truncado, isto quebra.
+void test24IsLittleEndianAndSigned() {
+    const std::string path = "/tmp/rasgo_wav24_le.wav";
+    EXPECT(writeWav24(path, {1.0f, -1.0f}, 48000, 1));
+    const auto pcm = readPcm24(path);
+    check(pcm.size() == 2, "duas amostras");
+    check(pcm[0] == 8388607, "fundo de escala positivo satura em +2^23-1");
+    check(pcm[1] == -8388607 || pcm[1] == -8388608,
+          "fundo de escala negativo satura no mínimo");
+    std::remove(path.c_str());
+}
+
+// A MESMA guarda de finitude do writeWav16: NaN e Inf não podem chegar ao
+// cast pra inteiro, porque as comparações de clamp são falsas pra NaN e o
+// resultado seria indefinido.
+void test24FinitenessGuard() {
+    const std::string path = "/tmp/rasgo_wav24_nan.wav";
+    const float inf = std::numeric_limits<float>::infinity();
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    EXPECT(writeWav24(path, {nan, inf, -inf, 0.25f}, 48000, 1));
+    const auto pcm = readPcm24(path);
+    // Não-finito vira ZERO, e não fundo de escala — mesma regra do
+    // `writeWav16`. Um Inf é defeito, não uma amostra alta: saturá-lo
+    // gravaria o bug como estouro audível no arquivo do músico, enquanto
+    // zerar deixa um furo silencioso que se percebe e se investiga.
+    check(pcm[0] == 0, "NaN vira zero, não lixo");
+    check(pcm[1] == 0, "+Inf vira zero (é defeito, não sample alto)");
+    check(pcm[2] == 0, "-Inf vira zero");
+    check(pcm[3] > 2000000, "a amostra boa ao lado passa intacta");
+    std::remove(path.c_str());
+}
+
+// 24 bits resolve o que 16 não resolve. Um sinal baixo — e o MASTER abre
+// em −24 dB de propósito, então este é o caso REAL — tem que sobreviver
+// com resolução de sobra.
+void test24ResolvesQuietMaterial() {
+    const std::string p16 = "/tmp/rasgo_wav24_cmp16.wav";
+    const std::string p24 = "/tmp/rasgo_wav24_cmp24.wav";
+    // ~-90 dBFS: abaixo de 1 LSB de 16 bits, bem acima do de 24
+    const float tiny = 3.0e-5f;
+    EXPECT(writeWav16(p16, {tiny, tiny, tiny, tiny}, 48000, 1, 0));
+    EXPECT(writeWav24(p24, {tiny, tiny, tiny, tiny}, 48000, 1));
+    const auto a = readPcm16(p16);
+    const auto b = readPcm24(p24);
+    check(a[0] == 0 || a[0] == 1, "em 16 bits o sinal baixo quase some");
+    check(b[0] > 200, "em 24 bits ele ainda tem resolução de sobra");
+    std::remove(p16.c_str());
+    std::remove(p24.c_str());
+}
+
+// Sem dither, e isso é deliberado (ver WavWriter.hpp): duas escritas do
+// mesmo material têm que sair byte a byte idênticas.
+void test24IsDeterministic() {
+    const std::string a = "/tmp/rasgo_wav24_det_a.wav";
+    const std::string b = "/tmp/rasgo_wav24_det_b.wav";
+    std::vector<float> v;
+    for (int i = 0; i < 480; ++i) v.push_back(0.3f * std::sin(i * 0.05f));
+    EXPECT(writeWav24(a, v, 48000, 1));
+    EXPECT(writeWav24(b, v, 48000, 1));
+    check(readPcm24(a) == readPcm24(b), "24 bits é determinístico (sem dither)");
+    std::remove(a.c_str());
+    std::remove(b.c_str());
+}
+
 }  // namespace
 
 int main() {
@@ -131,6 +241,11 @@ int main() {
     testDitherBypassIsDeterministic();
     testDitherChangesOutputButIsDeterministicPerSeed();
     testStereoChannelsDoNotShareDitherNoise();
+    test24HeaderDeclaresDepth();
+    test24IsLittleEndianAndSigned();
+    test24FinitenessGuard();
+    test24ResolvesQuietMaterial();
+    test24IsDeterministic();
     if (g_failures == 0) {
         std::cout << "RASGO Modular WAV writer tests passed\n";
         return 0;

@@ -8495,3 +8495,70 @@ de teste, não o artefato publicado; portá-lo para a tabela é mecânico e
 fica registrado, não feito às pressas antes da publicação.
 
 **77/77 CTest** verdes.
+
+## Registro da etapa — 2026-09-21: alvo de publicação declarado, e a saída em 24 bits
+
+Três decisões do autor destravaram o que estava parado há dias, e uma
+pergunta dele — "confirma a qualidade do áudio de saída é 48 kHz?" —
+expôs duas imprecisões que eu não tinha notado.
+
+**A resposta honesta era "não", em dois pontos.**
+
+1. **A taxa não é imposta.** O app chama `setAudioChannels(0, 2)` e adota
+   a que o dispositivo oferecer. O `48000` no código é só o valor antes de
+   o dispositivo abrir. Não é defeito — impor taxa a um app de áudio é que
+   seria — mas era **invisível**: a única forma de saber em que taxa se
+   estava tocando era ler o código. Agora a taxa real aparece no cartão
+   SOBRE.
+2. **A gravação saía em PCM 16 bits.** Era o item "PCM24/float" que estava
+   pendente à espera justamente do alvo de publicação.
+
+**Decisões (21 set. 2026):** alvo = **streaming**; publicar com
+Windows/macOS verificados só pela CI; extrair pra repositório próprio
+**preservando o histórico**.
+
+**O que o alvo de streaming exigiu em código:**
+
+- **`−14 LUFS` integrado e teto de `−1 dBTP`** como constantes nomeadas
+  (`LoudnessMeter::kTargetLufs` / `kTargetDbtp`), com o porquê escrito ao
+  lado: −14 é onde as plataformas normalizam, e entregar mais alto não
+  soa mais alto — só é atenuado na reprodução, e a dinâmica esmagada pra
+  chegar lá não volta.
+- **Medição de true-peak**, que faltava por inteiro. O pico de amostra
+  mente: entre duas amostras o sinal reconstruído sobe acima das duas, e
+  o que estoura na recodificação com perdas é o true-peak. Sem ele o teto
+  de −1 dBTP seria decorativo.
+- **PCM 24 bits na gravação**, sem dither. A tomada não é o arquivo final
+  — vai ser comparada com o tap `pre-safety` e possivelmente masterizada
+  — e o MASTER abre em −24 dB de propósito, que é exatamente o caso em
+  que os bits que faltam viram ruído. Em 24 bits o degrau de quantização
+  fica ~48 dB abaixo do ruído do material, então TPDF só somaria ruído.
+- **Leitura no SOBRE**: taxa real, profundidade, true-peak, e a distância
+  em LU até o alvo, em cor de aviso quando o true-peak passa do teto.
+
+**Sobre o filtro de true-peak, dito em voz alta:** não é a tabela
+normativa do Anexo 2 da BS.1770-4. É um interpolador polifásico de sinc
+janelado projetado na taxa em uso, com 16 taps por fase contra os 12 do
+mínimo da norma. Preferi um filtro que eu consigo derivar e verificar
+aqui a transcrever de memória uma tabela que eu não teria como conferir —
+e o teste ancora no caso analítico conhecido.
+
+**Dois testes me corrigiram, e os dois estavam certos:**
+
+- o teste de contínua em fundo de escala leu **1,07 dBTP** em vez de 0.
+  Não era erro de ganho: é o degrau de 0 pra 1 no primeiro sample, e
+  qualquer interpolador ressoa nele. O sinal de teste é que era
+  artificial — trocado por senoide grave em FS, e a explicação ficou no
+  comentário pra ninguém "consertar" o medidor por causa disso;
+- o teste de finitude acusou que `±Inf` vira **zero**, não satura. Minha
+  expectativa é que estava errada: é a mesma regra do `writeWav16`, e é a
+  certa — um infinito é defeito, não sample alto, e saturá-lo gravaria o
+  bug como estouro audível no arquivo do músico.
+
+**Nove testes novos** (4 de true-peak e alvo, 5 de PCM24, incluindo
+little-endian explícito e a resolução de material baixo). **77/77 CTest**
+verdes, build sem avisos próprios.
+
+Documentos sincronizados: `INSTALL.md` (formato de saída e gravação,
+decisão sobre Windows/macOS), `PUBLICACAO.md` (as três decisões),
+`CHANGELOG.md`.

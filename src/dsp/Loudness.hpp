@@ -35,15 +35,138 @@
 
 namespace rasgo::modular {
 
+// ---- true-peak (pico entre amostras) ------------------------------------
+//
+// O pico de amostra MENTE. Entre duas amostras o sinal reconstruído pelo
+// conversor pode subir acima das duas, e um sinal que marca 0,0 dBFS na
+// amostra chega a passar de +3 dBTP depois do DAC — ou depois de um
+// codificador com perdas, que é o caso que interessa aqui: plataformas de
+// streaming recodificam, e o que estoura é o true-peak, não o de amostra.
+// Por isso o alvo de publicação tem teto em dBTP e não em dBFS.
+//
+// A BS.1770-4 (Anexo 2) pede sobreamostragem de pelo menos 4× antes de
+// medir o pico. **Isto não é a tabela normativa de coeficientes**: é um
+// interpolador polifásico de sinc janelado, projetado na taxa em uso. A
+// escolha é deliberada — preferi um filtro que eu consigo derivar e
+// verificar aqui a transcrever de memória uma tabela que eu não teria como
+// conferir. O Anexo 2 define um filtro MÍNIMO; este é mais longo (16 taps
+// por fase contra 12), então mede pelo menos tão bem. O teste compara
+// contra o caso analítico conhecido — a senoide amostrada exatamente nos
+// zeros do pico, onde o pico de amostra erra por ~3 dB.
+class TruePeakMeter {
+public:
+    void prepare(const float sampleRate) {
+        // A norma quer taxa efetiva de 192 kHz ou mais.
+        const float sr = sampleRate > 0.0f ? sampleRate : 48000.0f;
+        factor_ = sr <= 50000.0f ? 4 : (sr <= 100000.0f ? 2 : 1);
+        design();
+        hist_.assign(kTapsPerPhase * 2, 0.0);   // dois canais intercalados
+        peak_ = 0.0;
+    }
+
+    void reset() {
+        for (auto& v : hist_) v = 0.0;
+        peak_ = 0.0;
+    }
+
+    void push(const float l, const float r) noexcept {
+        // atraso comum aos dois canais, mais novo primeiro
+        for (std::size_t k = kTapsPerPhase - 1; k > 0; --k) {
+            hist_[k * 2]     = hist_[(k - 1) * 2];
+            hist_[k * 2 + 1] = hist_[(k - 1) * 2 + 1];
+        }
+        hist_[0] = static_cast<double>(l);
+        hist_[1] = static_cast<double>(r);
+
+        for (int p = 0; p < factor_; ++p) {
+            double al = 0.0, ar = 0.0;
+            for (std::size_t k = 0; k < kTapsPerPhase; ++k) {
+                const double h = coef_[static_cast<std::size_t>(p) * kTapsPerPhase + k];
+                al += h * hist_[k * 2];
+                ar += h * hist_[k * 2 + 1];
+            }
+            const double m = std::fabs(al) > std::fabs(ar) ? std::fabs(al)
+                                                           : std::fabs(ar);
+            if (m > peak_) peak_ = m;
+        }
+    }
+
+    // dBTP. `-inf` vira −120 pra não poluir a leitura.
+    float dBTP() const noexcept {
+        if (peak_ <= 1e-12) return -120.0f;
+        return static_cast<float>(20.0 * std::log10(peak_));
+    }
+
+    double linear() const noexcept { return peak_; }
+
+private:
+    static constexpr std::size_t kTapsPerPhase = 16;
+
+    void design() {
+        const std::size_t L = static_cast<std::size_t>(factor_);
+        const std::size_t n = kTapsPerPhase * L;
+        coef_.assign(kTapsPerPhase * 4, 0.0);
+        if (L == 1) {                    // já está em 192k ou acima
+            coef_[0] = 1.0;
+            return;
+        }
+        std::vector<double> h(n, 0.0);
+        const double center = (static_cast<double>(n) - 1.0) * 0.5;
+        for (std::size_t i = 0; i < n; ++i) {
+            const double m = static_cast<double>(i) - center;
+            const double x = M_PI * m / static_cast<double>(L);
+            const double s = (std::fabs(x) < 1e-12) ? 1.0 : std::sin(x) / x;
+            const double t = static_cast<double>(i) / (static_cast<double>(n) - 1.0);
+            const double w = 0.42 - 0.5 * std::cos(2.0 * M_PI * t)
+                                  + 0.08 * std::cos(4.0 * M_PI * t);
+            h[i] = s * w;
+        }
+        // Cada fase tem que ter ganho unitário em DC, senão a
+        // sobreamostragem introduz uma ondulação que o medidor leria como
+        // pico — mediria o filtro, não o sinal.
+        for (std::size_t p = 0; p < L; ++p) {
+            double sum = 0.0;
+            for (std::size_t k = 0; k < kTapsPerPhase; ++k)
+                sum += h[p + k * L];
+            if (std::fabs(sum) < 1e-12) sum = 1.0;
+            for (std::size_t k = 0; k < kTapsPerPhase; ++k)
+                coef_[p * kTapsPerPhase + k] = h[p + k * L] / sum;
+        }
+    }
+
+    int factor_ = 4;
+    std::vector<double> coef_;
+    std::vector<double> hist_;
+    double peak_ = 0.0;
+};
+
 class LoudnessMeter {
 public:
     // valor devolvido quando ainda não há material suficiente, ou quando
     // tudo que houve foi silêncio
     static constexpr float kSilence = -70.0f;
 
+    // ---- alvo de publicação ---------------------------------------------
+    //
+    // Decisão do autor, 21 set. 2026: **streaming / plataformas**. Daí
+    // saem os dois números abaixo, e é só por existir essa decisão que
+    // eles fazem sentido — sem alvo declarado, escolher um perfil seria
+    // arbitrário, e foi por isso que ficaram em aberto até agora.
+    //
+    // −14 LUFS é onde as plataformas normalizam; entregar mais alto não
+    // soa mais alto, só é atenuado na reprodução, e a dinâmica que se
+    // esmagou pra chegar lá não volta. −1 dBTP é a margem que evita
+    // estouro quando o material é recodificado com perdas.
+    //
+    // Nada disto normaliza coisa alguma: o medidor não toca no sinal. São
+    // números para a pessoa que está ouvindo decidir.
+    static constexpr float kTargetLufs  = -14.0f;
+    static constexpr float kTargetDbtp  =  -1.0f;
+
     void prepare(const float sampleRate) {
         sr_ = sampleRate > 0.0f ? sampleRate : 48000.0f;
         designKWeighting();
+        tp_.prepare(sr_);
 
         // sub-blocos de 100 ms: 4 deles = momentary (400 ms), 30 =
         // short-term (3 s), e a sobreposição de 75% do integrated cai
@@ -66,6 +189,7 @@ public:
     // um par estéreo. `pushSamples` é `noexcept` e não aloca: pode vir do
     // thread de áudio.
     void push(const float l, const float r) noexcept {
+        tp_.push(l, r);
         const double kl = filter(0, static_cast<double>(l));
         const double kr = filter(1, static_cast<double>(r));
         subAcc_ += kl * kl + kr * kr;
@@ -88,6 +212,21 @@ public:
     // LUFS das janelas móveis. `kSilence` enquanto não houver material.
     float momentary() const noexcept { return windowLufs(kMomentarySubs); }
     float shortTerm() const noexcept { return windowLufs(kShortTermSubs); }
+
+    // Pico entre amostras da tomada inteira, em dBTP.
+    float truePeakDbtp() const noexcept { return tp_.dBTP(); }
+
+    // Quanto falta (LU) para o alvo. Positivo = está abaixo do alvo.
+    float headroomToTargetLu() const noexcept {
+        const float i = integrated();
+        return (i <= kSilence) ? 0.0f : kTargetLufs - i;
+    }
+
+    // true se o true-peak já passou do teto do alvo — é a condição que
+    // estoura na recodificação, e ela não aparece no pico de amostra.
+    bool overTruePeakTarget() const noexcept {
+        return truePeakDbtp() > kTargetDbtp;
+    }
 
     // LUFS integrado com as duas portas da norma.
     float integrated() const noexcept {
@@ -203,6 +342,7 @@ private:
     std::vector<double> hist_;        // energias dos sub-blocos de 100 ms
     std::size_t histWrite_ = 0, histCount_ = 0;
     std::vector<double> blocks_;      // blocos de 400 ms p/ o integrated
+    TruePeakMeter tp_;
 };
 
 }  // namespace rasgo::modular

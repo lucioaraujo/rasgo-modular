@@ -60,6 +60,19 @@ MIDI, áudio e acoplamento de instrumento são nós adaptadores opcionais.
   `pre-safety` (antes da proteção). `RASGO_REC_TAP=both` grava os dois,
   com o tap no nome do arquivo — dois arquivos da mesma tomada soando
   diferente sem explicação seria uma armadilha.
+- **Gravação em PCM 24 bits**, sem dither. A tomada não é o arquivo
+  final, e o MASTER abre em −24 dB de propósito: em 16 bits isso jogaria
+  fora resolução que não volta. Em 24 bits o degrau de quantização fica
+  muito abaixo do ruído do material, então dither só somaria ruído.
+- **Medição de true-peak** (pico entre amostras), sobreamostrando 4×.
+  O pico de amostra mente: um sinal que marca 0 dBFS pode passar de
+  +3 dBTP depois do conversor ou de um codificador com perdas — e é o
+  true-peak que estoura na recodificação.
+- **Alvo de publicação declarado: streaming** — −14 LUFS integrado, teto
+  de −1 dBTP. O cartão SOBRE mostra a distância até o alvo em LU, o
+  true-peak medido e a **taxa de amostragem real** do dispositivo (o app
+  adota a do sistema, não impõe uma). Nada disso normaliza o sinal: o
+  medidor não o toca em lugar nenhum.
 - **Rampas por amostra** em GAIN e WIDTH do MASTER, que antes clicavam.
 - Cada tomada sai com um `.score.txt` que registra o patch e as ligações.
 
@@ -88,15 +101,13 @@ supostas:
 
 - **Windows e macOS nunca foram abertos.** A CI prova que **constrói e
   empacota**; não prova que abre, soa e se comporta numa máquina real. Não
-  há Windows nem Mac no ambiente de desenvolvimento. A matriz completa
-  está em `INSTALL.md`.
+  há Windows nem Mac no ambiente de desenvolvimento. **O autor decidiu
+  publicar nessa condição** (21 set. 2026), com a limitação declarada —
+  mesmo precedente do Antitotem. A matriz completa está em `INSTALL.md`.
 - **O workflow de CI está inerte** enquanto o projeto vive dentro do
   monorepo `rasgo-instruments` — o GitHub Actions só lê o
   `.github/workflows/` da raiz do repositório. Passa a valer na extração
   para repositório próprio.
-- **Exportação PCM24/float** e o perfil de loudness dependem de um alvo de
-  publicação declarado (palco / álbum / streaming). Sem esse alvo, escolher
-  um perfil seria arbitrário.
 - **Linux ARM** não foi construído nem testado.
 - O catálogo de módulos **não é fechado** por desenho: a fase didática
   corre em paralelo com módulos novos.
@@ -133,19 +144,22 @@ environment that **sounds on load**, with no MIDI and no audio input.
   panel remains a development tool; deliberate divergences are tabulated
   in `apps/juce/PARIDADE.md`.
 - **Output safety stage** (non-finite sanitising plus a ±0.891251
-  ceiling), **BS.1770-4 / EBU R128 metering**, and **two named recording
-  taps** — `post-safety` (what you heard) and `pre-safety` (before the
-  protection).
+  ceiling) and **two named recording taps** — `post-safety` (what you
+  heard) and `pre-safety` (before the protection).
+- **BS.1770-4 / EBU R128 metering with true-peak**, and a declared
+  **streaming target** (−14 LUFS integrated, −1 dBTP ceiling). Recording
+  is **24-bit PCM**; the sample rate is whatever the device offers, and
+  the ABOUT card shows it alongside the distance to the target. None of
+  this normalises the signal — the meter never touches it.
 - The audio thread never waits on the UI: it takes the graph with
   `try_to_lock` and re-emits the last block with a ramp back to unity if
   the UI holds it.
 - **77 automated tests**, no window server or audio device required.
 
 **Declared limitations.** Windows and macOS have **never been opened** —
-CI proves the build and the package, not the behaviour on real hardware.
-The CI workflow is inert until the project is extracted to its own
-repository. PCM24/float export and the loudness profile await a declared
-publication target. Linux ARM is untested. The module catalogue is open by
-design.
+CI proves the build and the package, not the behaviour on real hardware;
+the author decided to publish under that condition, stated openly. The CI
+workflow is inert until the project is extracted to its own repository.
+Linux ARM is untested. The module catalogue is open by design.
 
 AGPL-3.0-or-later; JUCE under AGPLv3, no commercial licence.
