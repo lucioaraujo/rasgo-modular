@@ -1,6 +1,6 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (16 set. 2026):** candidato publicável em preparação. Ainda
+> **Estado (18 set. 2026):** candidato publicável em preparação. Ainda
 > **não há release** nem pacote assinado. Este documento descreve como
 > construir e rodar a partir do código — que é o caminho reproduzível
 > hoje, e é o que a `ESTRATEGIA_DE_PUBLICACAO.md` chama de release de
@@ -99,6 +99,22 @@ cpack -G DragNDrop    # macOS
 | `RASGO_SEED=N` | abre reproduzindo o patch do seed `N` (render determinístico) |
 | `RASGO_RESUME=1` | retoma a sessão salva em vez de sortear um patch novo |
 | `RASGO_REC_DIR` | pasta das gravações (padrão: `~/Music/RasgoModular/`) |
+| `RASGO_REC_TAP` | de onde o REC grava: `post` (padrão) · `pre` · `both` |
+
+### Taps de gravação
+
+O REC pode gravar de dois pontos da cadeia de saída:
+
+- **`post-safety`** (padrão) — o que se ouviu: depois do limitador, do
+  teto e de toda a proteção;
+- **`pre-safety`** — o mesmo sinal ANTES da proteção de saída.
+
+Gravar só o primeiro faz o limitador esconder justamente a dinâmica que
+se queria examinar; gravar só o segundo mente sobre o que saiu pelos
+alto-falantes. Com `RASGO_REC_TAP=both` a tomada sai nos dois arquivos,
+com o tap no nome (`rec-….post-safety.wav` e `rec-….pre-safety.wav`) —
+dois arquivos da mesma tomada soando diferente sem explicação seria uma
+armadilha.
 
 ### Onde o instrumento guarda as coisas
 
@@ -161,7 +177,9 @@ cd build && cpack -G DEB    # or NSIS / DragNDrop
 
 `RASGO_SEED=N` reproduces a specific patch; `RASGO_RESUME=1` restores the
 saved session instead of drawing a new one; `RASGO_REC_DIR` changes the
-recording folder.
+recording folder; `RASGO_REC_TAP` picks where REC captures from —
+`post` (default, what you heard), `pre` (before the safety stage) or
+`both`, which writes one file per tap with the tap in its name.
 
 ### Where state lives
 

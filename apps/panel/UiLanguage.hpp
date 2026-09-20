@@ -73,6 +73,20 @@ inline const L4 hdrCross   {"CROSS",   "CRUZA",    "CROISER",  "CRUZAR"};
 inline const L4 hdrBank    {"BANK",    "BANCO",    "BANQUE",   "BANCO"};
 inline const L4 hdrSave    {"SAVE",    "SALVA",    "ENREG.",   "GUARDA"};
 inline const L4 hdrOpen    {"OPEN",    "ABRIR",    "OUVRIR",   "ABRIR"};
+inline const L4 hdrUndo    {"UNDO",    "DESFAZ",   "ANNULER",  "DESHACER"};
+inline const L4 hdrUncable {"UNPATCH", "DESCABEIA","DÉCÂBLER", "DESCABLEA"};
+// Volta o patch ao estado original do seed atual, desfazendo TODA edição
+// manual de uma vez. Diferente do desfazer, que anda um passo.
+inline const L4 hdrRestore {"RESTORE", "REPOR",    "RÉTABLIR", "REPONER"};
+
+// Aviso momentâneo na caixa LEARN, depois de ligar um cabo num caminho
+// que ainda não alcança a saída. Descreve ESTADO, não erro: construir uma
+// cadeia longe da saída e ligá-la ao som por último é legítimo.
+inline const L4 cableNotAudible {
+    "Patched — but this path does not reach the sound yet. Cable it onward to the MASTER to hear it.",
+    "Ligado — mas este caminho ainda não chega ao som. Siga cabeando até o MASTER pra ouvir.",
+    "Câblé — mais ce chemin n’atteint pas encore le son. Continuez à câbler jusqu’au MASTER pour l’entendre.",
+    "Conectado — pero este camino aún no llega al sonido. Siga cableando hasta el MASTER para oírlo."};
 inline const L4 hdrRec     {"REC",     "REC",      "REC",      "REC"};
 inline const L4 hdrSeed    {"SEED",    "SEED",     "SEED",     "SEED"};
 inline const L4 seedCopied {"COPIED",  "COPIADO",  "COPIÉ",    "COPIADO"};
@@ -92,6 +106,16 @@ inline const L4 hdrTutorial{"TUTORIAL", "TUTORIAL", "TUTORIEL",   "TUTORIAL"};
 inline const L4 hdrAbout   {"ABOUT",    "SOBRE",    "À PROPOS",   "ACERCA DE"};
 inline const L4 close      {"CLOSE",    "FECHAR",   "FERMER",     "CERRAR"};
 
+// ---- inspector de cabo e diálogos ------------------------------------
+// Verbos e prosa SE traduzem. Rótulos técnicos não (`RING`, `FOLD`,
+// `DIFF`, `AMT`, `COND`, `ZOOM`, `LEARN`) — são vocabulário neutro, mesma
+// regra dos nomes de parâmetro e de módulo declarada no topo deste
+// arquivo.
+inline const L4 inspRupture   {"BREAK",     "ROMPER",     "ROMPRE",      "ROMPER"};
+inline const L4 inspReconnect {"RECONNECT", "RECONECTAR", "RECONNECTER", "RECONECTAR"};
+inline const L4 openPatch     {"Open patch","Abrir patch","Ouvrir un patch","Abrir patch"};
+inline const L4 builtOn       {"built",     "compilado",  "compilé",     "compilado"};
+
 // ---- cabeçalho: leitura de estado --------------------------------------
 inline const L4 rdModules  {"mod",  "mód",  "mod",  "mód"};
 inline const L4 rdCables   {"cables","cabos","câbles","cables"};
@@ -103,10 +127,10 @@ inline const L4 rdMuted    {"MUTE", "MUDO", "COUPÉ","MUDO"};
 inline const L4 tutTitle {
     "HOW TO USE", "COMO USAR", "MODE D’EMPLOI", "CÓMO USAR"};
 inline const L4 tutSubtitle {
-    "a generative modular — it sounds on its own; you steer it   ·   scroll / ↑↓ · click to close",
-    "um modular generativo — soa sozinho; você conduz   ·   role / ↑↓ · clique fecha",
-    "un modulaire génératif — il sonne seul ; vous le dirigez   ·   défilez / ↑↓ · clic pour fermer",
-    "un modular generativo — suena solo; usted lo guía   ·   desplace / ↑↓ · clic para cerrar"};
+    "a generative modular — it sounds on its own; you steer it   ·   scroll / ↑↓",
+    "um modular generativo — soa sozinho; você conduz   ·   role / ↑↓",
+    "un modulaire génératif — il sonne seul ; vous le dirigez   ·   défilez / ↑↓",
+    "un modular generativo — suena solo; usted lo guía   ·   desplace / ↑↓"};
 
 inline const L4 tutWhatTitle {
     "WHAT THIS IS", "O QUE É ISTO", "CE QUE C’EST", "QUÉ ES ESTO"};
@@ -167,10 +191,10 @@ inline const L4 tutHdrBody {
 inline const L4 tutCableTitle {
     "PATCH CABLES", "CABEAR", "CÂBLER", "CABLEAR"};
 inline const L4 tutCableBody {
-    "Drag a cable from an output jack to an input jack. A double halo means the same signal type (audio or control). Right-click a jack to remove its cable. [space] cuts and restores every cable at once. While dragging a cable, move it near the top or bottom edge to scroll the rack.",
-    "Puxe um cabo de um jack de saída até um de entrada. Halo duplo = mesmo tipo de sinal (áudio ou controle). Botão direito num jack tira o cabo. [espaço] rompe e reata todos os cabos de uma vez. Enquanto arrasta um cabo, leve-o pra perto da borda de cima ou de baixo pra rolar o rack.",
-    "Tirez un câble d’une sortie vers une entrée. Un double halo indique le même type de signal (audio ou contrôle). Clic droit sur un jack pour retirer son câble. [espace] coupe et rétablit tous les câbles d’un coup. En tirant un câble, approchez-le du bord haut ou bas pour faire défiler le rack.",
-    "Arrastre un cable de una salida a una entrada. Doble halo = mismo tipo de señal (audio o control). Clic derecho en un jack para quitar su cable. [espacio] corta y restablece todos los cables a la vez. Mientras arrastra un cable, llévelo cerca del borde superior o inferior para desplazar el rack."};
+    "Drag a cable from an output jack to an input jack. A double halo means the same signal type (audio or control). A FULL halo means patching there sounds right away; a faded one means the connection is valid but that path does not reach the sound yet — building away from the output and connecting it last is legitimate. If the cable you are dragging looks greyed, it is the SOURCE that is silent. Right-click a jack to remove its cable. [space] cuts and restores every cable at once. While dragging a cable, move it near the top or bottom edge to scroll the rack.",
+    "Puxe um cabo de um jack de saída até um de entrada. Halo duplo = mesmo tipo de sinal (áudio ou controle). Halo CHEIO = ligar ali soa agora; halo apagado = a ligação vale, mas o caminho ainda não chega ao som — construir longe da saída e ligar ao som por último é legítimo. Se o cabo que você puxa sai acinzentado, a FONTE é que está muda no momento. Botão direito num jack tira o cabo. [espaço] rompe e reata todos os cabos de uma vez. Enquanto arrasta um cabo, leve-o pra perto da borda de cima ou de baixo pra rolar o rack.",
+    "Tirez un câble d’une sortie vers une entrée. Un double halo indique le même type de signal (audio ou contrôle). Halo PLEIN : câbler là sonne tout de suite ; halo atténué : la liaison est valide mais ce chemin n’atteint pas encore le son. Si le câble tiré paraît grisé, c’est la SOURCE qui est muette. Clic droit sur un jack pour retirer son câble. [espace] coupe et rétablit tous les câbles d’un coup. En tirant un câble, approchez-le du bord haut ou bas pour faire défiler le rack.",
+    "Arrastre un cable de una salida a una entrada. Doble halo = mismo tipo de señal (audio o control). Halo LLENO: cablear ahí suena de inmediato; halo atenuado: la conexión es válida pero ese camino aún no llega al sonido. Si el cable que arrastra se ve grisáceo, es la FUENTE la que está muda. Clic derecho en un jack para quitar su cable. [espacio] corta y restablece todos los cables a la vez. Mientras arrastra un cable, llévelo cerca del borde superior o inferior para desplazar el rack."};
 
 inline const L4 tutNavTitle {
     "MOVE AROUND THE RACK", "NAVEGAR NO RACK", "SE DÉPLACER DANS LE RACK", "MOVERSE POR EL RACK"};
@@ -216,10 +240,10 @@ inline const L4 tutScratchBody {
 inline const L4 tutKeysTitle {
     "KEYBOARD", "TECLADO", "CLAVIER", "TECLADO"};
 inline const L4 tutKeysBody {
-    "g new seed  ·  v live variation on/off  ·  m mutate  ·  e evolve (six small steps)  ·  c cross with a fresh donor patch  ·  space breaks and restores every cable at once  ·  Ctrl+S save the session  ·  Ctrl+B file the patch in the bank  ·  Ctrl+R record  ·  Ctrl+Z undo (one action back, cable by cable)  ·  n pull every cable  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  arrows scroll the rack  ·  q quit. Inside TUTORIAL and ABOUT: arrows, Page Up/Down, Home/End scroll, Esc closes.",
-    "g sorteia um seed  ·  v liga/desliga a variação ao vivo  ·  m muda  ·  e evolui (seis passos pequenos)  ·  c cruza com um doador novo  ·  [espaço] rompe e reata todos os cabos de uma vez  ·  Ctrl+S salva a sessão  ·  Ctrl+B arquiva o patch no banco  ·  Ctrl+R grava  ·  Ctrl+Z desfaz (uma ação, cabo a cabo)  ·  n tira todos os cabos  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  setas rolam o rack  ·  q sai. Dentro de TUTORIAL e SOBRE: setas, Page Up/Down, Home/End rolam, Esc fecha.",
-    "g nouveau seed  ·  v variation en direct on/off  ·  m muter  ·  e évoluer (six petits pas)  ·  c croiser avec un donneur neuf  ·  espace rompt et rétablit tous les câbles d’un coup  ·  Ctrl+S enregistre la session  ·  Ctrl+B classe le patch dans la banque  ·  Ctrl+R enregistre  ·  Ctrl+Z annule (une action, câble par câble)  ·  n retire tous les câbles  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flèches font défiler le rack  ·  q quitte. Dans TUTORIEL et À PROPOS : flèches, Page Haut/Bas, Origine/Fin défilent, Échap ferme.",
-    "g sortea un seed  ·  v activa/desactiva la variación en vivo  ·  m muta  ·  e evoluciona (seis pasos pequeños)  ·  c cruza con un donante nuevo  ·  espacio rompe y restablece todos los cables a la vez  ·  Ctrl+S guarda la sesión  ·  Ctrl+B archiva el patch en el banco  ·  Ctrl+R graba  ·  Ctrl+Z deshace (una acción, cable a cable)  ·  n quita todos los cables  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flechas desplazan el rack  ·  q sale. Dentro de TUTORIAL y ACERCA DE: flechas, Re/Av Pág, Inicio/Fin desplazan, Esc cierra."};
+    "g new seed  ·  v live variation on/off  ·  m mutate  ·  e evolve (six small steps)  ·  c cross with a fresh donor patch  ·  space breaks and restores every cable at once  ·  Ctrl+S save the session  ·  Ctrl+B file the patch in the bank  ·  Ctrl+R record  ·  Ctrl+Z undo (one action back, cable by cable)  ·  Ctrl+O open a patch  ·  Esc cancel the gesture in progress  ·  n pull every cable  ·  r restore the current seed (undo every hand edit)  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  arrows scroll the rack  ·  q quit. Every shortcut that has a button lights that button for a moment, so you can see what you just did. Inside TUTORIAL and ABOUT: arrows, Page Up/Down, Home/End scroll, Esc closes.",
+    "g sorteia um seed  ·  v liga/desliga a variação ao vivo  ·  m muda  ·  e evolui (seis passos pequenos)  ·  c cruza com um doador novo  ·  [espaço] rompe e reata todos os cabos de uma vez  ·  Ctrl+S salva a sessão  ·  Ctrl+B arquiva o patch no banco  ·  Ctrl+R grava  ·  Ctrl+Z desfaz (uma ação, cabo a cabo)  ·  Ctrl+O abre um patch  ·  Esc cancela o gesto em curso  ·  n tira todos os cabos  ·  r repõe o seed atual (desfaz toda edição à mão)  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  setas rolam o rack  ·  q sai. Todo atalho que tem botão ACENDE esse botão por um instante — dá pra ver o que você acabou de fazer. Dentro de TUTORIAL e SOBRE: setas, Page Up/Down, Home/End rolam, Esc fecha.",
+    "g nouveau seed  ·  v variation en direct on/off  ·  m muter  ·  e évoluer (six petits pas)  ·  c croiser avec un donneur neuf  ·  espace rompt et rétablit tous les câbles d’un coup  ·  Ctrl+S enregistre la session  ·  Ctrl+B classe le patch dans la banque  ·  Ctrl+R enregistre  ·  Ctrl+Z annule (une action, câble par câble)  ·  Ctrl+O ouvre un patch  ·  Échap annule le geste en cours  ·  n retire tous les câbles  ·  r rétablit le seed courant (annule toute édition manuelle)  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flèches font défiler le rack  ·  q quitte. Chaque raccourci qui a un bouton ALLUME ce bouton un instant. Dans TUTORIEL et À PROPOS : flèches, Page Haut/Bas, Origine/Fin défilent, Échap ferme.",
+    "g sortea un seed  ·  v activa/desactiva la variación en vivo  ·  m muta  ·  e evoluciona (seis pasos pequeños)  ·  c cruza con un donante nuevo  ·  espacio rompe y restablece todos los cables a la vez  ·  Ctrl+S guarda la sesión  ·  Ctrl+B archiva el patch en el banco  ·  Ctrl+R graba  ·  Ctrl+Z deshace (una acción, cable a cable)  ·  Ctrl+O abre un patch  ·  Esc cancela el gesto en curso  ·  n quita todos los cables  ·  r repone el seed actual (deshace toda edición manual)  ·  Ctrl+= / Ctrl+− / Ctrl+0 zoom  ·  flechas desplazan el rack  ·  q sale. Cada atajo que tiene botón ENCIENDE ese botón un instante. Dentro de TUTORIAL y ACERCA DE: flechas, Re/Av Pág, Inicio/Fin desplazan, Esc cierra."};
 
 inline const L4 tutLearnTitle {
     "LEARN — EVERY MODULE, EVERY KNOB", "LEARN — CADA MÓDULO, CADA KNOB", "LEARN — CHAQUE MODULE, CHAQUE POT.", "LEARN — CADA MÓDULO, CADA KNOB"};

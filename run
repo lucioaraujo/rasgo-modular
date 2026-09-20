@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# Rasgo Modular — abre o app JUCE (o front-end de produção).
+#
+# O painel X11 de teste continua no `.run_rasgo_modular.sh`; este script é
+# do app multiplataforma, que é o artefato que vai na release.
+#
+# Uso:
+#   ./run                  abre sorteando um patch novo
+#   ./run 12345            abre reproduzindo o seed 12345
+#   ./run --resume         retoma a sessão salva
+#   ./run --rec-both       grava dos DOIS taps (pre-safety e post-safety)
+#   ./run --build          recompila antes de abrir
+#   ./run --fg             fica em primeiro plano (prende o terminal)
+#   ./run 12345 --rec-both combina
+#
+# Por padrão o app abre SOLTO do terminal: o prompt volta na hora e a
+# saída de diagnóstico vai pra um log. Use --fg quando quiser ver o
+# stderr ao vivo.
+#
+# As opções são as variáveis de ambiente documentadas no INSTALL.md —
+# aqui só embrulhadas em algo que se digita.
+
+set -euo pipefail
+cd "$(dirname "$0")"
+
+BUILD_DIR=build
+APP="$BUILD_DIR/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular"
+DO_BUILD=0
+FOREGROUND=0
+LOG="${TMPDIR:-/tmp}/rasgo-modular.log"
+
+for arg in "$@"; do
+  case "$arg" in
+    --build)     DO_BUILD=1 ;;
+    --fg)        FOREGROUND=1 ;;
+    --resume)    export RASGO_RESUME=1 ;;
+    --rec-both)  export RASGO_REC_TAP=both ;;
+    --rec-pre)   export RASGO_REC_TAP=pre ;;
+    # imprime o cabeçalho de comentário ATÉ a primeira linha de código —
+    # faixa fixa de linhas desalinha assim que o comentário muda
+    -h|--help)   awk 'NR>1 && /^#/ {sub(/^# ?/,""); print; next} NR>1 {exit}' "$0"; exit 0 ;;
+    [0-9]*)      export RASGO_SEED="$arg" ;;
+    *) echo "opção desconhecida: $arg (use --help)" >&2; exit 2 ;;
+  esac
+done
+
+# Sem o JUCE apontado, o alvo do app nem existe — e o erro do CMake sobre
+# isso é obscuro. Melhor dizer o que falta.
+if [ ! -x "$APP" ] || [ "$DO_BUILD" = 1 ]; then
+  if [ ! -d "$BUILD_DIR" ]; then
+    echo "-> configurando (primeira vez)"
+    echo "   se falhar por falta do JUCE, aponte-o:"
+    echo "   cmake -B build -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE"
+    cmake -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+  fi
+  echo "-> compilando"
+  cmake --build "$BUILD_DIR" --target RasgoModularApp -j"$(nproc 2>/dev/null || echo 4)"
+fi
+
+if [ ! -x "$APP" ]; then
+  echo "erro: não achei o app em:" >&2
+  echo "  $APP" >&2
+  echo "rode './run --build', ou configure com -DRASGO_MODULAR_JUCE_PATH=..." >&2
+  exit 1
+fi
+
+echo "-> abrindo${RASGO_SEED:+  seed=$RASGO_SEED}${RASGO_RESUME:+  resume}${RASGO_REC_TAP:+  tap=$RASGO_REC_TAP}"
+
+if [ "$FOREGROUND" = 1 ]; then
+  exec "$APP"
+fi
+
+# SOLTO do terminal. Com `exec` o shell era substituído pelo app e o
+# terminal ficava preso até ele fechar — pra um app gráfico isso está
+# errado: quem abriu quer o prompt de volta na hora. `setsid` o desprende
+# da sessão, então fechar o terminal também não mata mais o app no meio de
+# uma gravação.
+setsid "$APP" >"$LOG" 2>&1 < /dev/null &
+PID=$!
+sleep 0.4
+if kill -0 "$PID" 2>/dev/null; then
+  echo "   pid $PID  ·  log: $LOG"
+  echo "   diagnóstico ao vivo:  tail -f $LOG"
+else
+  echo "erro: o app não subiu. Últimas linhas do log:" >&2
+  tail -n 15 "$LOG" >&2 || true
+  exit 1
+fi

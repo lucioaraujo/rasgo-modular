@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // Geometria de painel em MILÍMETROS, compartilhada entre os front-ends.
 //
 // O contrato de `Panel`/`Widget` (`core/Panel.hpp`) é declarativo e em mm:
@@ -64,6 +66,31 @@ inline RectMM footprintMM(const rasgo::modular::Widget& w) {
 inline bool overlapMM(const RectMM& a, const RectMM& b) {
     return a.x < b.x + b.w && b.x < a.x + a.w
         && a.y < b.y + b.h && b.y < a.y + a.h;
+}
+
+
+// MATRIX (#33): a grade 4×4 de ganhos (`g<jk>`) NÃO é desenhada como 16
+// knobs minúsculos, e sim como uma matriz de células clicáveis — linha j
+// = entrada, coluna k = saída. As células ficam centradas onde os knobs
+// estavam declarados, então o `Panel` do módulo continua íntegro: quem
+// muda é só o desenho.
+//
+// Mora aqui, e não num front-end, porque os DOIS precisam concordar: se o
+// painel X11 desenhar a célula num lugar e o app JUCE testar o clique em
+// outro, o módulo fica intratável num deles. Mesma razão do
+// `footprintMM`.
+inline RectMM matrixCellMM(const int j, const int k) {
+    const float cx = 27.0f + static_cast<float>(k) * 17.0f;
+    const float cy = 35.0f + static_cast<float>(j) * 18.0f;
+    return {cx - 8.0f, cy - 8.5f, 16.0f, 17.0f};
+}
+
+// `true` se o widget é uma das 16 células da matriz — quem desenha a
+// grade precisa PULAR esses knobs.
+inline bool isMatrixCellBind(const std::string& bind) {
+    return bind.size() == 3 && bind[0] == 'g'
+        && bind[1] >= '1' && bind[1] <= '4'
+        && bind[2] >= '1' && bind[2] <= '4';
 }
 
 } // namespace rasgo::ui

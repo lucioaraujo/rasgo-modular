@@ -74,16 +74,34 @@ a:hover { color: var(--warning); }
 .rasgo-strip a:hover { color: var(--accent); }
 
 .site-header {
-  position: sticky; top: 1.9rem; z-index: 10;
+  position: sticky; top: 1.9rem; z-index: 10;   /* = altura da .rasgo-strip */
   display: flex; justify-content: space-between; align-items: center;
   gap: 1.5rem; flex-wrap: wrap;
-  padding: .8rem clamp(1rem, 4vw, 3rem);
+  padding: .95rem clamp(1rem, 4vw, 3rem);
   background: var(--ground); border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--ink); }
-.brand img { height: 22px; width: auto; }
-.brand span { font: 700 1rem "DejaVu Sans Mono", monospace; letter-spacing: .08em; }
-.brand em { color: var(--accent); font-style: normal; }
+/* A marca é o wordmark RASGO (SVG EMBUTIDO, não <img>) seguido da palavra
+   MODULAR — a mesma composição do cabeçalho do app. Embutido porque
+   `currentColor` só herda assim: via <img> o SVG não enxerga o CSS da
+   página, e o master tem `fill:#000000` (foi desenhado pra fundo claro),
+   então ele sumia no escuro. Agora a cor vem do token e acompanha a
+   paleta.
+   O texto NÃO repete "RASGO": o wordmark já diz isso. */
+.brand { display: flex; align-items: baseline; gap: .55rem; text-decoration: none; color: var(--accent); }
+/* `align-self: baseline`, não `center`: num contêiner flex a linha de
+   base de um elemento substituído é sua BORDA INFERIOR — e o viewBox do
+   wordmark foi apertado à tinta justamente pra essa borda ser a linha de
+   base das letras. Assim "RASGO" e "MODULAR" assentam na mesma linha de
+   verdade, em vez de parecerem alinhados num tamanho e desalinharem no
+   seguinte.
+   `height` agora mede as LETRAS (o viewBox não tem mais folga). */
+.brand .wordmark { height: 18px; width: auto; display: block; align-self: baseline; }
+.brand span {
+  color: var(--ink);
+  font: 700 1.05rem "DejaVu Sans Mono", monospace; letter-spacing: .12em;
+}
+.brand:hover { color: var(--warning); }
+.brand:hover span { color: var(--ink); }
 
 .header-nav { display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap; }
 .page-nav a, .lang-switch a {
@@ -176,4 +194,18 @@ footer p { max-width: 46rem; }
 @media (max-width: 40rem) {
   .site-header { top: 1.8rem; }
   .header-nav { width: 100%; justify-content: space-between; }
+}
+
+/* Captura de tela. `width`/`height` no <img> reservam a caixa antes de a
+   imagem chegar — sem isso o texto abaixo pula quando ela carrega, que é
+   o incômodo clássico de página com imagem grande. `loading="lazy"`
+   porque ela está abaixo da dobra na maioria das telas. */
+.shot { margin: 2.2rem 0 0; }
+.shot img {
+  display: block; width: 100%; height: auto;
+  border: 1px solid var(--line); background: var(--recessed);
+}
+.shot figcaption {
+  margin-top: .6rem; color: var(--muted);
+  font: .85rem/1.5 "DejaVu Sans", system-ui, sans-serif;
 }

@@ -36,6 +36,7 @@
 #include "panel/PatchGenetics.hpp"   // MUTA / EVOLUI / CRUZA
 #include "panel/PatchSeed.hpp"
 #include "panel/UiLanguage.hpp"
+#include "panel/WindowPolicy.hpp"   // mesma política de abertura do painel X11
 #include "ui/CableGeometry.hpp"
 #include "ui/PanelGeometry.hpp"
 #include "ui/ScopeTrace.hpp"
@@ -53,6 +54,7 @@
 #include <map>
 #include <mutex>
 #include <random>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -197,9 +199,35 @@ struct Rack {
     std::atomic<float> lufsS{LoudnessMeter::kSilence};
     std::atomic<float> lufsI{LoudnessMeter::kSilence};
 
+    // ---- taps de gravação (`SAIDA_AUDIO_COMUM.md §3/§4`) --------------
+    // `post-safety` é o que se ouviu — depois do limitador, do teto, de
+    // tudo. `pre-safety` é o mesmo sinal ANTES da proteção de saída.
+    // Gravar só o primeiro faz o limitador esconder justamente a dinâmica
+    // que se queria examinar; gravar só o segundo mente sobre o que saiu
+    // pelos alto-falantes. Por isso os dois são nomeados e escolhíveis, e
+    // por isso o padrão é `post` — o que se ouviu é o que se grava, salvo
+    // pedido explícito.
+    enum class RecTap { post, pre, both };
+    RecTap recTap = RecTap::post;
+
     std::atomic<bool> recording{false};
-    std::vector<float> recBuf;
-    void reserveRec() { recBuf.reserve(static_cast<std::size_t>(sampleRate) * 2 * 240); }
+    std::vector<float> recBuf;       // post-safety
+    std::vector<float> recPreBuf;    // pre-safety
+    void reserveRec() {
+        const auto n = static_cast<std::size_t>(sampleRate) * 2 * 240;
+        if (recTap != RecTap::pre)  recBuf.reserve(n);
+        if (recTap != RecTap::post) recPreBuf.reserve(n);
+    }
+
+    // nó MASTER de onde sai o tap `pre-safety`, achado uma vez só —
+    // varrer o grafo comparando strings a cada bloco seria trabalho de
+    // thread de áudio pra uma resposta que não muda
+    std::size_t masterTapNode = static_cast<std::size_t>(-1);
+    void findMasterTap() {
+        masterTapNode = static_cast<std::size_t>(-1);
+        for (const auto id : shown)
+            if (graph.node(id).type() == "MASTER") { masterTapNode = id; return; }
+    }
 
     // SYSTEM SCORE da tomada (§5 do estudo): a topologia no instante em
     // que a gravação começa, mais o que acontece enquanto ela corre. O
@@ -509,6 +537,13 @@ public:
         const int bottom = getHeight() - 6;
         g.setFont(juce::FontOptions(kLearnPt));
 
+        if (noticeActive()) {
+            g.setColour(T.accent);
+            g.drawFittedText(notice_, tx, ty, wrapW, kLearnH - 40,
+                             juce::Justification::topLeft, 8);
+            return;
+        }
+
         if (learn_ == nullptr) {
             g.setColour(T.textSecondary);
             g.drawFittedText(str(rasgo::panel::strings::learnIdle),
@@ -550,6 +585,19 @@ public:
     // dwell de 1 s antes de trocar o conteúdo (senão pisca a cada
     // movimento do mouse), e fora de qualquer objeto MANTÉM o último —
     // exatamente a regra do painel X11.
+    // Aviso momentâneo, por cima do LEARN. Some sozinho — é retorno de
+    // uma ação, não conteúdo; ficar fixo competiria com o LEARN, que é
+    // quem mora aqui.
+    void setNotice(const juce::String& text) {
+        notice_ = text;
+        noticeUntil_ = juce::Time::getMillisecondCounter() + 6000;
+        repaint();
+    }
+    bool noticeActive() const {
+        return notice_.isNotEmpty()
+            && juce::Time::getMillisecondCounter() < noticeUntil_;
+    }
+
     void setLearn(const rasgo::panel::LearnEntry* e, const juce::String& title) {
         if (e == learn_) return;
         learn_ = e;
@@ -629,6 +677,8 @@ private:
     std::string hover_;
     const rasgo::panel::LearnEntry* learn_ = nullptr;
     juce::String learnTitle_;
+    juce::String notice_;
+    std::uint32_t noticeUntil_ = 0;
     int scroll_ = 0, contentH_ = 0;
     bool barDrag_ = false;
     std::string spawn_;
@@ -647,7 +697,7 @@ public:
 
     std::function<void()> onSeed, onLang, onRackView, onStandby,
         onVary, onMutate, onEvolve, onCross, onBank, onSave,
-        onTutorial, onAbout, onRec, onOpen;
+        onTutorial, onAbout, onRec, onOpen, onUndo, onUncable, onRestore;
     std::function<void(int)> onZoom;
 
     std::function<void(std::uint64_t)> onSeedTyped;
@@ -709,6 +759,10 @@ public:
         syncSeedText();
         repaint();
     }
+    // Quem está com o teclado: o MainComponent precisa saber pra não
+    // roubar o foco de quem está digitando um seed.
+    bool seedBoxFocused() const { return seedBox_.hasKeyboardFocus(true); }
+
     // leitura viva: contagem de módulos/cabos, VU do MASTER e VARIA
     void setReadout(std::size_t visMods, std::size_t totalMods,
                     std::size_t cables, float vu, bool vary, bool rec) {
@@ -746,7 +800,14 @@ public:
         x += 114;
 
         x += button(g, x, u8("\xE2\x9A\x84 ")
-                    + str(rasgo::panel::strings::hdrSeed), false, Act::seed);
+                    + str(rasgo::panel::strings::hdrSeed),
+                    flashing(Act::seed), Act::seed);
+        // REPOR só existe quando há um seed pra onde voltar. Num patch
+        // construído à mão (seed 0) ele seria um botão morto — e botão
+        // morto é pior que botão ausente.
+        if (seed_ != 0)
+            x += button(g, x, str(rasgo::panel::strings::hdrRestore),
+                        flashing(Act::restore), Act::restore);
 
         // ---- cluster da direita, montado da borda pra dentro -----------
         int rx = getWidth() - 12;
@@ -758,9 +819,14 @@ public:
         // REC — ponto cheio quando gravando, como no painel X11
         rx -= buttonR(g, rx, u8("\xe2\x97\x8f ")
                       + str(rasgo::panel::strings::hdrRec),
-                      recording_, Act::rec);
+                      recording_ || flashing(Act::rec), Act::rec);
+        // As duas palavras vinham FIXAS em português — o botão dizia
+        // "RACK · SAÍDA" mesmo com a interface em inglês (achado do autor,
+        // 18 set. 2026). As traduções já existiam em `UiLanguage.hpp` e o
+        // painel X11 já as usava; só este caminho as ignorava.
         rx -= buttonR(g, rx, u8("RACK \xc2\xb7 ")
-                      + u8(rackOut_ ? "SAÍDA" : "TODOS"),
+                      + str(rackOut_ ? rasgo::panel::strings::hdrRackOut
+                                     : rasgo::panel::strings::hdrRackAll),
                       rackOut_, Act::rackView);
 
         // VU do MASTER — a mesma leitura que o painel X11 põe no
@@ -821,6 +887,11 @@ public:
             {&S::hdrBank,   false, Act::bank},
             {&S::hdrSave,   false, Act::save},
             {&S::hdrOpen,   false, Act::open},
+            // DESFAZ e DESCABEIA existiam só no teclado — e o autor não os
+            // encontrou, o que é o mesmo que não existirem. Recurso sem
+            // porta de entrada visível é recurso que ninguém usa.
+            {&S::hdrUndo,    false, Act::undo},
+            {&S::hdrUncable, false, Act::uncable},
         };
         g.setFont(juce::FontOptions(11.0f));
         for (const auto& c : cmds) {
@@ -828,14 +899,16 @@ public:
             if (x + textW(g, L) + 14 > rx - 8) break;
             x += button(g, x, L, c.on || flashing(c.act), c.act);
         }
+        // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
+        // próprios `button`/`buttonR` acima, via `flashing`)
         if (x + 24 + 40 < rx - 8) {   // ZOOM − / +
             g.setColour(T.textSecondary);
             g.setFont(juce::FontOptions(11.0f));
             g.drawText("ZOOM", x, 12, 38, 22,
                        juce::Justification::centredLeft, false);
             x += 40;
-            x += button(g, x, u8("\xe2\x88\x92"), false, Act::zoomOut);
-            x += button(g, x, "+", false, Act::zoomIn);
+            x += button(g, x, u8("\xe2\x88\x92"), flashing(Act::zoomOut), Act::zoomOut);
+            x += button(g, x, "+", flashing(Act::zoomIn), Act::zoomIn);
         }
         // STANDBY isolado no fim, com régua antes — pra não clicar nele
         // sem querer (mesma separação do painel X11)
@@ -858,40 +931,48 @@ public:
         // atalhos de teclado continuam mudos depois de digitar um número
         if (seedBox_.hasKeyboardFocus(true))
             if (auto* p = getParentComponent()) p->grabKeyboardFocus();
-        for (const auto& h : hits_) {
-            if (!h.bounds.contains(e.getPosition())) continue;
-            const auto fire = [&](const std::function<void()>& f) {
-                flash_[static_cast<int>(h.act)] =
-                    std::chrono::steady_clock::now();
-                if (f) f();
-            };
-            switch (h.act) {
-            case Act::seed:      fire(onSeed); break;
-            case Act::lang:      if (onLang) onLang(); break;
-            case Act::rackView:  if (onRackView) onRackView(); break;
-            case Act::standby:   if (onStandby) onStandby(); break;
-            case Act::zoomIn:    if (onZoom) onZoom(+1); break;
-            case Act::zoomOut:   if (onZoom) onZoom(-1); break;
-            case Act::vary:      if (onVary) onVary(); break;
-            case Act::mutate:    fire(onMutate); break;
-            case Act::evolve:    fire(onEvolve); break;
-            case Act::cross:     fire(onCross); break;
-            case Act::bank:      fire(onBank); break;
-            case Act::save:      fire(onSave); break;
-            case Act::tutorial:  if (onTutorial) onTutorial(); break;
-            case Act::about:     if (onAbout) onAbout(); break;
-            case Act::rec:       if (onRec) onRec(); break;
-            case Act::open:      if (onOpen) onOpen(); break;
-            }
-            repaint();
-            return;
+        for (const auto& h : hits_)
+            if (h.bounds.contains(e.getPosition())) { trigger(h.act); return; }
+    }
+
+
+    enum class Act { seed, lang, rackView, standby, zoomIn, zoomOut,
+                     vary, mutate, evolve, cross, bank, save,
+                     tutorial, about, rec, open, undo, uncable, restore };
+
+    // Despacho ÚNICO de ação: o clique e o atalho de teclado entram os
+    // dois por aqui. Antes o teclado chamava os callbacks direto e pulava
+    // o flash — o atalho funcionava "no escuro", sem nada na tela dizer
+    // que algo aconteceu, e era por isso que ficava difícil saber o que
+    // estava ou não funcionando. Um despacho só também garante que uma
+    // ação nova não fique ligada ao mouse e esquecida no teclado.
+    void trigger(const Act a) {
+        flash_[static_cast<int>(a)] = std::chrono::steady_clock::now();
+        switch (a) {
+        case Act::seed:      if (onSeed) onSeed(); break;
+        case Act::lang:      if (onLang) onLang(); break;
+        case Act::rackView:  if (onRackView) onRackView(); break;
+        case Act::standby:   if (onStandby) onStandby(); break;
+        case Act::zoomIn:    if (onZoom) onZoom(+1); break;
+        case Act::zoomOut:   if (onZoom) onZoom(-1); break;
+        case Act::vary:      if (onVary) onVary(); break;
+        case Act::mutate:    if (onMutate) onMutate(); break;
+        case Act::evolve:    if (onEvolve) onEvolve(); break;
+        case Act::cross:     if (onCross) onCross(); break;
+        case Act::bank:      if (onBank) onBank(); break;
+        case Act::save:      if (onSave) onSave(); break;
+        case Act::tutorial:  if (onTutorial) onTutorial(); break;
+        case Act::about:     if (onAbout) onAbout(); break;
+        case Act::rec:       if (onRec) onRec(); break;
+        case Act::open:      if (onOpen) onOpen(); break;
+        case Act::undo:      if (onUndo) onUndo(); break;
+        case Act::uncable:   if (onUncable) onUncable(); break;
+        case Act::restore:   if (onRestore) onRestore(); break;
         }
+        repaint();
     }
 
 private:
-    enum class Act { seed, lang, rackView, standby, zoomIn, zoomOut,
-                     vary, mutate, evolve, cross, bank, save,
-                     tutorial, about, rec, open };
     struct Hit { juce::Rectangle<int> bounds; Act act; };
 
     static juce::String str(const rasgo::panel::L4& s, rasgo::panel::Lang l) {
@@ -1002,6 +1083,7 @@ public:
     static constexpr int kTargetRows = 3;
     static constexpr float kGapMM = 3.0f;
     static constexpr int kPadPx = 14;
+    static constexpr int kTopPadPx = 2;   // ver `relayout`
 
     int mmpx(float mm) const { return juce::roundToInt(mm * scale_); }
 
@@ -1017,6 +1099,19 @@ public:
             if (m.bounds.intersects(vis)) paintModule(g, m);
         paintCables(g);
         paintInspector(g);
+
+        // Vista filtrada sem nada pra mostrar: uma dica no lugar do rack
+        // vazio. Ficou essencial quando o [n] (descabear) entrou — em
+        // RACK·SAÍDA, tirar todos os cabos esvazia a tela por completo, e
+        // sem explicação isso parece o app ter quebrado.
+        if (mods_.empty() && outputOnly_) {
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(13.0f));
+            g.drawText(u8(rasgo::panel::tr(
+                           rasgo::panel::strings::rackViewEmpty, lang_)),
+                       0, viewportH_ / 3, getWidth(), 24,
+                       juce::Justification::centred, false);
+        }
 
         // fantasma do módulo vindo da paleta
         if (!spawnType_.empty()) {
@@ -1059,8 +1154,12 @@ public:
             cableHits_.push_back({i, s->x, s->y, t->x, t->y});
         }
         if (cdrag_.active) {
-            const juce::Colour col = cdrag_.kind == PortKind::Control
+            // Fonte sem sinal agora: o cabo sai acinzentado. Explica o
+            // "liguei e não aconteceu nada" ANTES de ligar — e aponta o
+            // culpado certo, que nesse caso é a origem e não o destino.
+            juce::Colour col = cdrag_.kind == PortKind::Control
                 ? kCableCtrl[0] : kCableAudio[0];
+            if (dragSourceSilent_) col = col.withAlpha(0.30f);
             strokeCable(g, cdrag_.ax, cdrag_.ay, mouse_.x, mouse_.y, col, true);
         }
     }
@@ -1155,7 +1254,30 @@ public:
 
         const bool ruptured = c.ruptured;
         boxBtn(insp_.bx + pad, ry, bw - pad * 2, rowH - 2,
-               ruptured ? "RECONECTAR" : "ROMPER", ruptured, InspAct::Rupture);
+               rasgo::panel::tr(ruptured ? rasgo::panel::strings::inspReconnect
+                                         : rasgo::panel::strings::inspRupture,
+                                lang_).c_str(),
+               ruptured, InspAct::Rupture);
+    }
+
+    // Prepara a afordância do cabeamento: quem alcança a saída, e se a
+    // fonte de onde se está puxando tem sinal agora.
+    void beginDragAffordance(std::size_t sourceNode) {
+        {
+            std::lock_guard<std::mutex> lk(rack_.gmx);
+            dragFeeds_ = rack_.graph.nodesFeeding(rack_.sink);
+        }
+        const auto it = rack_.scopeSnap.find(sourceNode);
+        dragSourceSilent_ = it == rack_.scopeSnap.end()
+                            || it->second.peak() < 1.0e-4f;
+    }
+
+    // `true` se ligar NESTE nó produz som agora — isto é, se ele alcança a
+    // saída. Puxando de uma ENTRADA, quem precisa alcançar é o dono dela,
+    // e a resposta é a mesma pra todos os destinos.
+    bool audibleTarget(std::size_t node) const {
+        const std::size_t n = cdrag_.fromOutput ? node : cdrag_.node;
+        return n < dragFeeds_.size() && dragFeeds_[n] != 0;
     }
 
     // índice do cabo inspecionado no SNAPSHOT (-1 se já não existe)
@@ -1214,6 +1336,15 @@ public:
     void mouseDown(const juce::MouseEvent& e) override {
         mouse_ = e.getPosition();
         if (onFocusWanted) onFocusWanted();
+
+        // Botão do MEIO paneia o rack, como no painel X11 — inclusive
+        // durante o cabeamento, pra alcançar um jack fora da tela sem
+        // largar o cabo.
+        if (e.mods.isMiddleButtonDown()) {
+            if (auto* vp = findParentComponentOfClass<juce::Viewport>())
+                pan_ = {true, e.getPosition().y, vp->getViewPositionY()};
+            return;
+        }
 
         // ---- escolhendo o companion de uma relação de cabo ------------
         // qualquer SAÍDA serve, inclusive a própria origem do cabo (a
@@ -1298,12 +1429,14 @@ public:
                                   true, sj ? sj->kind : PortKind::Audio,
                                   sj ? sj->x : e.getPosition().x,
                                   sj ? sj->y : e.getPosition().y};
+                        beginDragAffordance(src.node);
                     }
                 }
                 if (from >= 0) { repaint(); return; }
             }
 
             cdrag_ = {true, j.node, j.port, j.isOut, j.kind, j.x, j.y};
+            beginDragAffordance(j.node);
             juce::Desktop::getInstance().beginDragAutoRepeat(40);
             repaint();
             return;
@@ -1318,7 +1451,30 @@ public:
                 return;
             }
             Signal& node = rack_.graph.node(m.id);
+
+            // MATRIX: arrasto vertical numa célula ajusta `g<jk>` — mesma
+            // via do knob genérico, só a área de pega é outra
+            if (node.type() == "MATRIX") {
+                for (int j = 0; j < 4; ++j)
+                    for (int k = 0; k < 4; ++k) {
+                        const ui::RectMM rm = ui::matrixCellMM(j, k);
+                        const juce::Rectangle<int> cell(
+                            m.bounds.getX() + mmpx(rm.x),
+                            m.bounds.getY() + mmpx(rm.y),
+                            mmpx(rm.w), mmpx(rm.h));
+                        if (!cell.contains(e.getPosition())) continue;
+                        const char id[4] = {'g', static_cast<char>('1' + j),
+                                            static_cast<char>('1' + k), 0};
+                        drag_ = {true, m.id, std::string(id),
+                                 rack_.graph.parameterUserValue(m.id, id),
+                                 -1.0f, 1.0f, e.getPosition().y};
+                        return;
+                    }
+            }
+
             for (const auto& w : m.panel.widgets) {
+                if (node.type() == "MATRIX" && w.kind == Widget::Kind::Knob
+                    && ui::isMatrixCellBind(w.bind)) continue;
                 if (w.kind != Widget::Kind::Knob
                     && w.kind != Widget::Kind::Slider
                     && w.kind != Widget::Kind::Toggle) continue;
@@ -1428,6 +1584,12 @@ public:
     }
 
     void mouseDrag(const juce::MouseEvent& e) override {
+        if (pan_.active) {
+            if (auto* vp = findParentComponentOfClass<juce::Viewport>())
+                vp->setViewPosition(0, std::max(0,
+                    pan_.startView + (pan_.startY - e.getPosition().y)));
+            return;
+        }
         // slider AMT/COND do inspector: barra HORIZONTAL, o valor segue a
         // posição X do mouse na trilha (não um delta vertical)
         if (cslide_.active) {
@@ -1453,8 +1615,7 @@ public:
             // reordenar ao vivo — só na vista TODOS: nas filtradas a ordem
             // visível é parcial e a conta do índice de destino não fecha.
             // Arrastar pra a paleta pra remover continua valendo nas duas.
-            if (!outputOnly_ && pendingInspect_ < 0)
-                reorderTo(mdrag_.id, e.getPosition());
+            if (pendingInspect_ < 0) reorderTo(mdrag_.id, e.getPosition());
             repaint();
             return;
         }
@@ -1506,6 +1667,7 @@ public:
 
     void mouseUp(const juce::MouseEvent& e) override {
         juce::Desktop::getInstance().beginDragAutoRepeat(0);
+        if (pan_.active) { pan_.active = false; return; }
         if (cslide_.active) { cslide_.active = false; return; }
         if (mdrag_.active) {
             const std::size_t id = mdrag_.id;
@@ -1544,8 +1706,17 @@ public:
                 const int sp = cdrag_.fromOutput ? cdrag_.port : j.port;
                 const std::size_t d = cdrag_.fromOutput ? j.node : cdrag_.node;
                 const int dp = cdrag_.fromOutput ? j.port : cdrag_.port;
-                std::lock_guard<std::mutex> lk(rack_.gmx);
-                tryPatch(s, sp, d, dp);
+                {
+                    std::lock_guard<std::mutex> lk(rack_.gmx);
+                    tryPatch(s, sp, d, dp);
+                }
+                // Retorno DEPOIS do ato, em vez de restrição antes: se o
+                // caminho recém-ligado ainda não chega ao som, a caixa
+                // LEARN diz isso numa linha. Não impede nada — ensina a
+                // topologia enquanto a pessoa explora.
+                if (!audibleTarget(d) && onNotice)
+                    onNotice(rasgo::panel::tr(
+                        rasgo::panel::strings::cableNotAudible, lang_));
             }
         }
         cdrag_.active = false;
@@ -1700,6 +1871,12 @@ private:
     struct CableSlider { bool active = false; int which = 0;
                          int trackX = 0, trackW = 1; };
 
+    // Calculado UMA vez, ao começar o arrasto: a topologia não muda no
+    // meio do gesto. Diz quais nós alcançam a saída — é a diferença entre
+    // "dá pra ligar aqui" e "aqui você vai OUVIR".
+    std::vector<char> dragFeeds_;
+    bool dragSourceSilent_ = false;
+
     struct CableDrag { bool active = false; std::size_t node = 0; int port = 0;
         bool fromOutput = true; PortKind kind = PortKind::Audio;
         int ax = 0, ay = 0; };
@@ -1736,6 +1913,17 @@ private:
     // Onde o módulo arrastado cai na ordem de `shown`: conta quantos
     // módulos ficam ANTES do cursor (linha acima, ou mesma linha e centro
     // à esquerda). Transliterado do `moduleReorderTo` do painel X11.
+    // Onde o módulo arrastado cai na ordem de `shown`.
+    //
+    // O índice é calculado entre os módulos VISÍVEIS e depois TRADUZIDO
+    // pra a lista completa. É isso que faz o gesto funcionar também na
+    // vista SAÍDA: o painel X11 desistia dela ("a ordem visível é parcial
+    // e a conta não fecha") e simplesmente ignorava o arrasto — o que
+    // deixava o músico sem conseguir posicionar um módulo que ele acabou
+    // de adicionar ali. A conta fecha ancorando no vizinho visível: o
+    // módulo entra imediatamente antes (ou depois) de um módulo que se
+    // está vendo, e os invisíveis ficam onde estão, com a ordem relativa
+    // intacta.
     void reorderTo(std::size_t id, juce::Point<int> p) {
         // no máximo ~25 reordenações por segundo: `mouseDrag` dispara por
         // evento do mouse, e cada reordenação refaz o layout inteiro
@@ -1752,11 +1940,27 @@ private:
             const int mcx = m.bounds.getCentreX();
             if (mrow < cursorRow || (mrow == cursorRow && mcx < p.x)) ++dropIdx;
         }
+        // ordem dos VISÍVEIS (sem o arrastado), pra ancorar a tradução
+        std::vector<std::size_t> vis;
+        vis.reserve(mods_.size());
+        for (const auto& m : mods_) if (m.id != id) vis.push_back(m.id);
+
         std::vector<std::size_t> next;
         next.reserve(rack_.shown.size());
         for (const auto sid : rack_.shown) if (sid != id) next.push_back(sid);
-        dropIdx = std::min(dropIdx, static_cast<int>(next.size()));
-        next.insert(next.begin() + dropIdx, id);
+
+        const auto posOf = [&](std::size_t what) {
+            return std::find(next.begin(), next.end(), what) - next.begin();
+        };
+        std::ptrdiff_t at;
+        if (vis.empty())            at = static_cast<std::ptrdiff_t>(next.size());
+        else if (dropIdx <= 0)      at = posOf(vis.front());
+        else if (dropIdx >= static_cast<int>(vis.size()))
+                                    at = posOf(vis.back()) + 1;
+        else                        at = posOf(vis[static_cast<std::size_t>(dropIdx)]);
+        at = std::max<std::ptrdiff_t>(0, std::min<std::ptrdiff_t>(at,
+                 static_cast<std::ptrdiff_t>(next.size())));
+        next.insert(next.begin() + at, id);
         if (next != rack_.shown) {
             rack_.shown = next;
             relayout();
@@ -1765,8 +1969,21 @@ private:
 
     void relayout() {
         const int availH = std::max(120, viewportH_);
+        // A escala tem que caber `kTargetRows` fileiras COM o padding —
+        // e era isso que faltava. O cálculo antigo dividia a altura pelas
+        // fileiras e só descontava um `kPadPx`, ignorando o respiro do
+        // topo e o arredondamento de `mmpx`. O conteúdo saía de 1 a 3 px
+        // MAIS ALTO que a viewport: o bastante pra barra de rolagem
+        // aparecer mostrando exatamente as três fileiras que deviam
+        // caber — um pixel de conta errada virando um elemento de
+        // interface.
+        //
+        // `- kTopPadPx` desconta o respiro do topo; `- 0.5f` garante que o
+        // arredondamento de `mmpx` caia pra baixo e não devolva o pixel.
+        const float rowBudget =
+            static_cast<float>(availH - kTopPadPx) / kTargetRows;
         scale_ = juce::jlimit(kSMin, kSMax,
-            (static_cast<float>(availH) / kTargetRows - kPadPx) / ui::kMM3U) * zoom_;
+            (rowBudget - kPadPx - 0.5f) / ui::kMM3U) * zoom_;
         modH_ = mmpx(ui::kMM3U);
         mods_.clear();
 
@@ -1777,18 +1994,46 @@ private:
         if (outputOnly_) {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             feeds = rack_.graph.nodesFeeding(rack_.sink);
+            // Um módulo recém-adicionado ainda NÃO chega à saída — ele
+            // acabou de nascer sem cabo nenhum. Filtrado pela regra
+            // normal, ele simplesmente não aparecia: o músico pedia um
+            // módulo e nada acontecia na tela, sendo obrigado a trocar
+            // pra vista TODOS pra encontrá-lo. O filtro estava CERTO e
+            // ainda assim escondia justamente a coisa que a pessoa acabou
+            // de pedir pra existir.
+            //
+            // Exceção: quem entrou agora fica à vista até chegar à saída.
+            // Ela se limpa sozinha — no instante em que o módulo é cabeado
+            // até o som, a regra normal passa a mostrá-lo e a exceção sai.
+            for (auto it = pending_.begin(); it != pending_.end();) {
+                if (*it < feeds.size() && feeds[*it]) it = pending_.erase(it);
+                else ++it;
+            }
+        } else {
+            pending_.clear();   // na vista TODOS a exceção não tem sentido
         }
 
-        int x = kPadPx, y = kPadPx;
+        // Topo SEM o padding cheio: a faixa de crédito já é um componente
+        // próprio acima do rack, então somar `kPadPx` aqui empilhava dois
+        // espaços e afastava a primeira fileira. No painel X11 o crédito é
+        // desenhado DENTRO da faixa de respiro da case (em `kCaseTop+11`,
+        // com os módulos começando em `kCasePad`), não acima dela — por
+        // isso lá o vão é menor. `kPadPx` segue valendo pras laterais e
+        // pro intervalo entre fileiras.
+        int x = kPadPx, y = kTopPadPx;
         for (const auto id : rack_.shown) {
-            if (outputOnly_ && (id >= feeds.size() || !feeds[id])) continue;
+            if (outputOnly_ && (id >= feeds.size() || !feeds[id])
+                && pending_.count(id) == 0) continue;
             const Panel& p = rack_.panelOf(id);
             const int w = mmpx(ui::panelWidthMM(p.hp));
             if (x + w > viewportW_ - kPadPx && x > kPadPx) {
                 x = kPadPx;
                 y += modH_ + kPadPx;
             }
-            mods_.push_back({id, p.hp, {x, y, w, modH_}, p});
+            // `{}` explícito pra `chrome`: ela nasce vazia de propósito
+            // (é rasterizada no 1º `paintModule`), e deixar implícito
+            // fazia o compilador avisar com razão
+            mods_.push_back({id, p.hp, {x, y, w, modH_}, p, {}});
             x += w + mmpx(kGapMM);
         }
         contentH_ = y + modH_ + kPadPx;
@@ -1866,6 +2111,32 @@ public:
     bool outputOnly() const { return outputOnly_; }
     std::size_t visibleModuleCount() const { return mods_.size(); }
 
+    // Um módulo que acabou de entrar: fica visível mesmo na vista SAÍDA
+    // até ser cabeado até o som. Ver `relayout`.
+    void markPending(std::size_t id) { pending_.insert(id); }
+
+    // O rack desenha o inspector de cabo, que tem PROSA (romper /
+    // reconectar) — então ele precisa saber o idioma. Não sabia: o
+    // inspector inteiro estava fora do sistema de tradução, e os dois
+    // botões saíam sempre em português.
+    void setLanguage(rasgo::panel::Lang l) { lang_ = l; repaint(); }
+
+    // [Esc] — desiste do gesto em curso: solta o cabo que está sendo
+    // puxado, fecha o inspector, cancela a escolha de companion. Devolve
+    // true se havia algo pra cancelar. Sem isto, começar a puxar um cabo
+    // e mudar de ideia obrigava a soltar em algum lugar inofensivo e
+    // torcer — desistir é um gesto legítimo e precisa de tecla.
+    bool cancelInteraction() {
+        const bool had = cdrag_.active || picking_ || insp_.open || mdrag_.active;
+        cdrag_.active = false;
+        picking_ = false;
+        insp_.open = false;
+        mdrag_.active = false;
+        pendingInspect_ = -1;
+        if (had) repaint();
+        return had;
+    }
+
     // Ligações com o resto da janela: a paleta é componente irmão, então
     // quem sabe se o ponteiro está sobre ela (pra soltar = remover) é o
     // MainComponent. `spawn*` desenha o fantasma do módulo que vem da
@@ -1875,6 +2146,7 @@ public:
     // clicar no rack devolve o teclado aos atalhos (a caixa de seed é um
     // TextEditor e retém o foco enquanto ninguém o tira dela)
     std::function<void()> onFocusWanted;
+    std::function<void(const std::string&)> onNotice;
     // gesto de parâmetro concluído (pra o SYSTEM SCORE da gravação)
     std::function<void(std::size_t, const std::string&, float, float)>
         onParamGesture;
@@ -1952,10 +2224,68 @@ private:
         g.drawRect(m.bounds, 1);
         if (dragging || palHit) g.drawRect(m.bounds.expanded(1), 1);
 
+        // Módulo à vista por EXCEÇÃO (entrou agora e ainda não chega à
+        // saída): borda tracejada, pra ficar claro que ele está ali porque
+        // é novo e não porque está soando. Sem essa marca a vista SAÍDA
+        // passaria a mentir — mostraria algo que não chega ao som sem
+        // dizer que é diferente.
+        if (outputOnly_ && pending_.count(m.id)) {
+            g.setColour(T.accent);
+            const float dash[] = {4.0f, 3.0f};
+            const auto r = m.bounds.toFloat().reduced(0.5f);
+            juce::Path p;
+            p.addRectangle(r);
+            juce::Path dashed;
+            juce::PathStrokeType(1.0f).createDashedStroke(dashed, p, dash, 2);
+            g.fillPath(dashed);
+        }
+
         const juce::Graphics::ScopedSaveState clip(g);
         g.reduceClipRegion(m.bounds.reduced(1));
-        for (const auto& w : m.panel.widgets)
+        const bool matrix = node.type() == "MATRIX";
+        for (const auto& w : m.panel.widgets) {
+            if (matrix && w.kind == Widget::Kind::Knob
+                && ui::isMatrixCellBind(w.bind)) continue;
             paintWidget(g, m, node, w, Pass::Dynamic);
+        }
+        if (matrix) paintMatrix(g, m, node);
+    }
+
+    // MATRIX (#33): a grade 4×4 como células clicáveis, não 16 knobs
+    // minúsculos — o mesmo desenho do painel X11, agora a partir da
+    // célula compartilhada em `ui::matrixCellMM`. Barra a partir do
+    // CENTRO: pra cima é ganho positivo, pra baixo negativo, que é o que
+    // faz a matriz ser lida de relance.
+    void paintMatrix(juce::Graphics& g, const ModBox& m, Signal& node) {
+        for (int j = 0; j < 4; ++j)
+            for (int k = 0; k < 4; ++k) {
+                const ui::RectMM rm = ui::matrixCellMM(j, k);
+                const int cx = m.bounds.getX() + mmpx(rm.x);
+                const int cy = m.bounds.getY() + mmpx(rm.y);
+                const int cw = mmpx(rm.w), chh = mmpx(rm.h);
+                const char id[4] = {'g', static_cast<char>('1' + j),
+                                    static_cast<char>('1' + k), 0};
+                float v = 0.0f;
+                try { v = node.parameterValue(id); } catch (...) {}
+
+                g.setColour(T.recessed);
+                g.fillRect(cx, cy, cw, chh);
+                const int mid = cy + chh / 2;
+                const int bar = static_cast<int>(v * (chh / 2 - 2));
+                if (bar != 0) {
+                    g.setColour(v >= 0.0f ? T.accent : kCableCtrl[0]);
+                    g.fillRect(cx + 2, bar > 0 ? mid - bar : mid,
+                               cw - 4, bar > 0 ? bar : -bar);
+                }
+                g.setColour(T.line);
+                g.drawHorizontalLine(mid, static_cast<float>(cx + 1),
+                                     static_cast<float>(cx + cw - 2));
+                const bool hot = drag_.active && drag_.node == m.id
+                    && drag_.bind.size() == 3 && drag_.bind[1] == id[1]
+                    && drag_.bind[2] == id[2];
+                g.setColour(hot ? T.accent : T.line);
+                g.drawRect(cx, cy, cw, chh, 1);
+            }
     }
 
     // Tudo que NÃO depende de valor nem de interação: fundo, trilhos de
@@ -1991,8 +2321,21 @@ private:
         }
         const juce::Graphics::ScopedSaveState clip(g);
         g.reduceClipRegion(m.bounds.reduced(1));
-        for (const auto& w : m.panel.widgets)
+        const bool matrix = node.type() == "MATRIX";
+        for (const auto& w : m.panel.widgets) {
+            // as 16 células da matriz não são knobs: ver `paintMatrix`
+            if (matrix && w.kind == Widget::Kind::Knob
+                && ui::isMatrixCellBind(w.bind)) continue;
             paintWidget(g, m, node, w, Pass::Static);
+        }
+        if (matrix) {
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(9.0f));
+            g.drawText(u8("IN \xe2\x86\x93   OUT \xe2\x86\x92"),
+                       m.bounds.getX() + mmpx(50.0f),
+                       m.bounds.getY() + mmpx(16.0f), mmpx(40.0f), mmpx(5.0f),
+                       juce::Justification::centredLeft, false);
+        }
     }
 
     void paintWidget(juce::Graphics& g, const ModBox& m, Signal& node,
@@ -2072,8 +2415,10 @@ private:
             break;
         }
         case Widget::Kind::Jack: {
+            // (não há mais `isOut` aqui: o anel base passou a depender só
+            // do halo quando alinhei a cor ao painel X11 — saída e entrada
+            // em repouso usam o mesmo `T.line`)
             const int r = mmpx(2.4f);
-            const bool isOut = w.bind.rfind("out:", 0) == 0;
             const juce::Rectangle<float> box(static_cast<float>(wx - r),
                                              static_cast<float>(wy - r),
                                              static_cast<float>(2 * r),
@@ -2106,14 +2451,31 @@ private:
                 else
                     halo = (jk == cdrag_.kind) ? 1 : 2;
             }
+            // DOIS canais visuais independentes, e a distinção entre eles
+            // é o ponto: o halo diz "dá pra ligar", o brilho diz "você vai
+            // OUVIR".
+            //
+            //  · quantidade de anéis = TIPO de sinal casa (duplo) ou cruza
+            //    domínio (simples) — como sempre foi;
+            //  · brilho = o destino alcança a saída. Cheio: ligar aqui soa
+            //    agora. Apagado: a ligação é válida e legítima, mas este
+            //    caminho ainda não chega ao som.
+            //
+            // O apagado NÃO é aviso de erro. Construir uma cadeia inteira
+            // longe da saída e ligá-la ao som por último é um jeito
+            // legítimo de trabalhar — o que faltava era distinguir isso de
+            // um engano, que até agora eram indistinguíveis.
             if (halo == 1 || halo == 2) {
-                g.setColour(T.accent);
+                const bool soa = audibleTarget(m.id);
+                g.setColour(soa ? T.accent : T.accent.withAlpha(0.35f));
                 const float hr = static_cast<float>(r + mmpx(halo == 1 ? 2.4f : 1.6f));
                 const auto c = box.getCentre();
-                g.drawEllipse(c.x - hr, c.y - hr, 2 * hr, 2 * hr, 1.0f);
+                g.drawEllipse(c.x - hr, c.y - hr, 2 * hr, 2 * hr,
+                              soa ? 1.6f : 1.0f);
                 if (halo == 1)
                     g.drawEllipse(c.x - hr - 2.0f, c.y - hr - 2.0f,
-                                  2 * hr + 4.0f, 2 * hr + 4.0f, 1.0f);
+                                  2 * hr + 4.0f, 2 * hr + 4.0f,
+                                  soa ? 1.6f : 1.0f);
             }
 
             // Jack INVÁLIDO durante o cabeamento continua com o anel
@@ -2281,6 +2643,8 @@ private:
     Rack& rack_;
     std::vector<ModBox> mods_;
     std::vector<JackScreen> jacks_;
+    struct Pan { bool active = false; int startY = 0, startView = 0; };
+    Pan pan_;
     ModDrag mdrag_;
     juce::Point<int> downAt_;
     int pendingInspect_ = -1;   // clique-ou-arrasto ainda indeciso
@@ -2294,6 +2658,8 @@ private:
     Inspector insp_;
     CableSlider cslide_;
     bool picking_ = false;                   // escolhendo companion
+    rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
+    std::set<std::size_t> pending_;   // à vista por exceção
     std::map<std::size_t, int> scopeView_;   // SCOPE: 0 = onda, 1 = espectro
     std::map<std::size_t, std::chrono::steady_clock::time_point> clipSeen_;
     Drag drag_;
@@ -2313,7 +2679,7 @@ private:
 // frase e o carimbo de build ao fim — não no rodapé.
 class CreditsStrip : public juce::Component {
 public:
-    static constexpr int kHeight = 18;
+    static constexpr int kHeight = 16;
     CreditsStrip() { setOpaque(true); setInterceptsMouseClicks(false, false); }
     void setLanguage(rasgo::panel::Lang l) { lang_ = l; repaint(); }
     void paint(juce::Graphics& g) override {
@@ -2452,7 +2818,8 @@ public:
             g.setColour(T.textSecondary);
             g.setFont(juce::FontOptions(kBodyPt));
             g.drawText(u8(RASGO_MODULAR_BUILD)
-                           + u8("  \xc2\xb7  compilado ")
+                           + u8("  \xc2\xb7  ")
+                           + str(rasgo::panel::strings::builtOn) + u8(" ")
                            + u8(__DATE__ " " __TIME__),
                        px, py, wrapW, 17, juce::Justification::topLeft, false);
             py += 24;
@@ -2542,6 +2909,7 @@ public:
             saveLangPref();
             palette_.setLanguage(lang_);
             credits_.setLanguage(lang_);
+            view_->setLanguage(lang_);
             if (overlay_.mode() != OverlayView::Mode::none)
                 overlay_.show(overlay_.mode(), lang_);
             syncHeader();
@@ -2630,6 +2998,24 @@ public:
         };
         header_.onRec = [this] { toggleRec(); };
         header_.onOpen = [this] { openPatchDialog(); };
+        header_.onUndo = [this] { undoLast(); grabKeyboardFocus(); };
+        // REPOR — volta o patch ao estado ORIGINAL do seed atual, jogando
+        // fora toda a edição manual de uma vez. Diferente do desfazer, que
+        // anda um passo: aqui o destino é conhecido e não depende de
+        // quantas alterações houve pelo caminho. Entra no desfazer, então
+        // repor não é irreversível.
+        header_.onRestore = [this] {
+            if (seed_ == 0) return;
+            rack_.pushUndo();
+            rack_.applySeed(seed_, sampleRate_, blockSize_);
+            rack_.curSeed = seed_;
+            rack_.populateMotion();
+            syncSignalIn();
+            view_->refresh();
+            syncHeader();
+            grabKeyboardFocus();
+        };
+        header_.onUncable = [this] { clearCablesAndRefresh(); grabKeyboardFocus(); };
         header_.onSave = [this] { savePatch(dataDir().getChildFile("session.rmp")); };
         header_.onBank = [this] {
             // se o músico gostou de um seed, BANCO registra o patch num
@@ -2651,6 +3037,9 @@ public:
         };
         view_->onRemoveModule = [this](std::size_t id) { removeModule(id); };
         view_->onFocusWanted = [this] { grabKeyboardFocus(); };
+        view_->onNotice = [this](const std::string& t) {
+            palette_.setNotice(u8(t));
+        };
         view_->onParamGesture = [this](std::size_t node, const std::string& bind,
                                        float from, float to) {
             if (!rack_.recording.load()) return;
@@ -2684,9 +3073,34 @@ public:
         if (rackOutputPref_) view_->setOutputOnly(true);
         palette_.setLanguage(lang_);
         credits_.setLanguage(lang_);
+        view_->setLanguage(lang_);
         syncHeader();
         setWantsKeyboardFocus(true);
-        setSize(1280, 760);
+        // Abertura pela MESMA política do painel X11
+        // (`panel/WindowPolicy.hpp`, geometria pura — o comentário do
+        // próprio header diz "sem X11 nem ALSA"): ~88% do monitor
+        // primário, com o canvas de referência como mínimo desejável.
+        //
+        // Abrir fixo em 1280×760 num monitor grande dava uma janela BAIXA
+        // demais — e era parte do "antes não tinha barra de rolagem com 3
+        // fileiras": o painel X11 abria alto o bastante pras três caberem,
+        // o app JUCE não.
+        {
+            rasgo::panel::MonitorRect mon;
+            if (const auto* d = juce::Desktop::getInstance().getDisplays()
+                                    .getPrimaryDisplay()) {
+                // `userBounds` (não o `userArea`, obsoleto): a área útil,
+                // já sem barra de tarefas e menu. É `Rectangle<float>`,
+                // então arredonda — pixel fracionário de monitor não
+                // existe, e truncar perderia uma linha em telas com
+                // escala fracionária.
+                const auto b = d->userBounds.toNearestInt();
+                mon.x = b.getX();      mon.y = b.getY();
+                mon.w = b.getWidth();  mon.h = b.getHeight();
+            }
+            const auto b = rasgo::panel::firstOpen(mon, 1280, 760, 0.88f);
+            setSize(b.w, b.h);
+        }
         setAudioChannels(0, 2);
 
         // ---- que patch abrir -------------------------------------------
@@ -2843,20 +3257,37 @@ public:
             return true;
         }
 
+        // Todo atalho que TEM botão passa por `header_.trigger`, que
+        // acende o botão correspondente por ~160 ms além de executar a
+        // ação. Sem isso o atalho agia sem sinal nenhum na tela.
         if (ctrl) {
-            if (c == 'S') { if (header_.onSave) header_.onSave(); return true; }
-            if (c == 'B') { if (header_.onBank) header_.onBank(); return true; }
-            if (c == 'R') { toggleRec(); return true; }
-            if (c == 'Z') { undoLast(); return true; }
-            if (c == 'O') { openPatchDialog(); return true; }
-            if (c == '+' || c == '=') { view_->nudgeZoom(+1); layoutRack(); return true; }
-            if (c == '-') { view_->nudgeZoom(-1); layoutRack(); return true; }
+            // Comparar por `KeyPress` e não pelo código cru: com um
+            // modificador segurado, o que chega em `getKeyCode()` varia
+            // entre sistema e layout — pode vir a letra, pode vir o
+            // caractere de controle (Ctrl+Z = 26). O `operator==` do
+            // `KeyPress` normaliza isso. Era por aqui que o Ctrl+Z não
+            // chegava enquanto o BOTÃO desfazer funcionava: o problema
+            // nunca esteve no desfazer, e sim na tecla.
+            const auto is = [&k](const char ch) {
+                return k == juce::KeyPress(ch, juce::ModifierKeys::commandModifier, 0);
+            };
+            if (is('s')) { header_.trigger(HeaderBar::Act::save); return true; }
+            if (is('b')) { header_.trigger(HeaderBar::Act::bank); return true; }
+            if (is('r')) { header_.trigger(HeaderBar::Act::rec); return true; }
+            if (is('z')) { header_.trigger(HeaderBar::Act::undo); return true; }
+            if (is('o')) { header_.trigger(HeaderBar::Act::open); return true; }
+            if (c == '+' || c == '=') { header_.trigger(HeaderBar::Act::zoomIn); return true; }
+            if (c == '-') { header_.trigger(HeaderBar::Act::zoomOut); return true; }
             if (c == '0') { view_->nudgeZoom(0);  layoutRack(); return true; }
             return false;
         }
 
         // if/else e não switch: as constantes de tecla do JUCE são
         // `static const int` de runtime, não expressões constantes
+        if (c == juce::KeyPress::escapeKey) {
+            view_->cancelInteraction();   // desistir é um gesto legítimo
+            return true;
+        }
         if (c == juce::KeyPress::spaceKey) {
             rack_.toggleRupture();      // rompe/reata TODOS os cabos
             view_->repaint();
@@ -2872,12 +3303,13 @@ public:
             return true;
         }
         switch (c) {
-        case 'G': if (header_.onSeed)   header_.onSeed();   return true;
-        case 'V': if (header_.onVary)   header_.onVary();   return true;
-        case 'M': if (header_.onMutate) header_.onMutate(); return true;
-        case 'E': if (header_.onEvolve) header_.onEvolve(); return true;
-        case 'C': if (header_.onCross)  header_.onCross();  return true;
-        case 'N': clearCablesAndRefresh(); return true;  // descabear tudo
+        case 'G': header_.trigger(HeaderBar::Act::seed);   return true;
+        case 'V': header_.trigger(HeaderBar::Act::vary);   return true;
+        case 'M': header_.trigger(HeaderBar::Act::mutate); return true;
+        case 'E': header_.trigger(HeaderBar::Act::evolve); return true;
+        case 'C': header_.trigger(HeaderBar::Act::cross);  return true;
+        case 'N': header_.trigger(HeaderBar::Act::uncable); return true;
+        case 'R': header_.trigger(HeaderBar::Act::restore); return true;
         case 'Q': juce::JUCEApplication::getInstance()->systemRequestedQuit();
                   return true;
         default: return false;
@@ -2931,6 +3363,34 @@ private:
     // com o `gmx`, a UI redesenha o snapshot anterior e segue — nunca
     // congela à espera do áudio (`redraw()` do painel X11 faz igual).
     void timerCallback() override {
+        // O TECLADO só chega aqui se este componente tiver o foco. O único
+        // filho focável é a caixa de seed (um TextEditor), e o JUCE dá o
+        // foco inicial ao primeiro filho que o queira — então, ao abrir, o
+        // campo ficava com ele e engolia tudo: `n` não é dígito e era
+        // ignorado, `Ctrl+Z` virava desfazer DO CAMPO. Os atalhos pareciam
+        // não existir até o músico clicar no rack por acaso.
+        // Reaver o foco a cada quadro é barato e se auto-corrige — menos
+        // isso quando a pessoa está de fato digitando um seed.
+        // GUARDAS, e a primeira delas é a que importa mais:
+        //
+        // `isForegroundProcess()` — sem isto o app reavia o teclado mesmo
+        // com a janela em SEGUNDO PLANO, 30 vezes por segundo, e roubava o
+        // foco de qualquer outra janela: o autor não conseguia digitar no
+        // terminal enquanto o app estivesse aberto. Uma correção que fazia
+        // os atalhos funcionarem tornou o resto do computador inutilizável
+        // — reaver foco só faz sentido quando a janela já é a ativa.
+        //
+        // `hasKeyboardFocus(true)` (com filhos) em vez de `false`: se
+        // QUALQUER filho já tem o foco, não há nada a reaver.
+        //
+        // As outras duas: não disputar com um diálogo modal nem com o
+        // seletor de arquivo nativo do ABRIR, que é assíncrono.
+        if (juce::Process::isForegroundProcess()
+            && isShowing() && !chooserOpen_
+            && juce::Component::getCurrentlyModalComponent() == nullptr
+            && !hasKeyboardFocus(true) && !header_.seedBoxFocused())
+            grabKeyboardFocus();
+
         if (rack_.gmx.try_lock()) {
             // atribui entrada a entrada em vez de `scopeSnap = scopes`:
             // reaproveita os vetores já alocados. A troca do mapa inteiro
@@ -3015,7 +3475,7 @@ private:
             learnSince_ = now;
             return;
         }
-        if (now - learnSince_ >= kLearnDwell)
+        if (now - learnSince_ >= kLearnDwell && !palette_.noticeActive())
             palette_.setLearn(hit.entry, hit.title);
     }
 
@@ -3076,6 +3536,7 @@ private:
 
     void addModule(const std::string& type) {
         rack_.pushUndo();
+        std::size_t newId = static_cast<std::size_t>(-1);
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             auto n = rasgo::panel::makeModule(type);
@@ -3085,7 +3546,9 @@ private:
             rack_.scopes[id];
             rack_.byType[type] = id;
             rack_.reprepare();
+            newId = id;
         }
+        if (newId != static_cast<std::size_t>(-1)) view_->markPending(newId);
         rack_.populateMotion();
         syncSignalIn();
         view_->refresh();
@@ -3105,19 +3568,29 @@ private:
     // voltando a ser o grafo.
     bool applyPatchText(const std::string& text, const juce::String& origem) {
 
-        // ordem de exibição, se o arquivo trouxer ("panel shown a b c…")
+        // ordem de exibição e SEED, se o arquivo trouxer
         std::vector<std::size_t> ord;
+        std::uint64_t seedInFile = 0;
         {
             std::istringstream is(text);
             std::string line;
-            while (std::getline(is, line))
+            while (std::getline(is, line)) {
                 if (line.rfind("panel shown", 0) == 0) {
                     std::istringstream ls(line);
                     std::string a, b;
                     std::size_t id = 0;
                     ls >> a >> b;
                     while (ls >> id) ord.push_back(id);
+                } else if (line.rfind("seed ", 0) == 0) {
+                    // `savePatch`/`snapshot` SEMPRE escreveram esta linha e
+                    // o carregador nunca a lia. Efeito: desfazer uma troca
+                    // de seed restaurava o patch certo e deixava o NÚMERO
+                    // do anterior na tela — a caixa passava a mentir sobre
+                    // qual patch está soando, que é justamente a única
+                    // coisa que ela existe pra dizer.
+                    seedInFile = std::strtoull(line.c_str() + 5, nullptr, 10);
                 }
+            }
         }
         try {
             SignalGraph g2 = SignalGraph::deserialize(text, patchFactory);
@@ -3153,6 +3626,7 @@ private:
                 rack_.graph.prepare(static_cast<float>(sampleRate_), 2, blockSize_);
                 // o move zerou o alvo ativo — reancorar, senão não sai som
                 rack_.graph.setActiveOutput(rack_.sink);
+                rack_.curSeed = seedInFile;   // 0 = patch editado à mão
             }
             rack_.allocScopes();
             rack_.populateMotion();
@@ -3260,12 +3734,15 @@ private:
     void openPatchDialog() {
         auto dir = dataDir().getChildFile("patches");
         dir.createDirectory();
+        chooserOpen_ = true;
         chooser_ = std::make_unique<juce::FileChooser>(
-            u8("Abrir patch"), dir, "*.rmp");
+            u8(rasgo::panel::tr(rasgo::panel::strings::openPatch, lang_)),
+            dir, "*.rmp");
         chooser_->launchAsync(
             juce::FileBrowserComponent::openMode
                 | juce::FileBrowserComponent::canSelectFiles,
             [this](const juce::FileChooser& fc) {
+                chooserOpen_ = false;
                 const juce::File f = fc.getResult();
                 if (f == juce::File{}) return;      // cancelou
                 rack_.pushUndo();                   // abrir é desfazível
@@ -3283,6 +3760,16 @@ private:
     // REC. As GRAVAÇÕES não vão pro diretório de dados: vão pra a pasta de
     // música do usuário, como no painel X11 (`RASGO_REC_DIR` sobrepõe) —
     // são obra, não estado interno do app.
+    // `RASGO_REC_TAP` = post (padrão) · pre · both
+    static Rack::RecTap tapFromEnv() {
+        const char* v = std::getenv("RASGO_REC_TAP");
+        if (v == nullptr) return Rack::RecTap::post;
+        const std::string t = v;
+        if (t == "pre")  return Rack::RecTap::pre;
+        if (t == "both") return Rack::RecTap::both;
+        return Rack::RecTap::post;
+    }
+
     static juce::File recDir() {
         if (const char* over = std::getenv("RASGO_REC_DIR"); over && *over) {
             juce::File d(juce::String::fromUTF8(over));
@@ -3318,7 +3805,10 @@ private:
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             rack_.recBuf.clear();
+            rack_.recPreBuf.clear();
+            rack_.recTap = tapFromEnv();
             rack_.reserveRec();
+            rack_.findMasterTap();
             // t = 0 da tomada: a fiação inteira, pra o score dizer de onde
             // o som partiu e não só o que mudou depois
             rack_.score.clear();
@@ -3336,14 +3826,15 @@ private:
     void finishRec() {
         rack_.recording.store(false);
         recWasOn_ = false;
-        std::vector<float> take;
+        std::vector<float> take, takePre;
         std::string scoreText;
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             take.swap(rack_.recBuf);
+            takePre.swap(rack_.recPreBuf);
             scoreText = rack_.score.toText();
         }
-        if (take.empty()) return;
+        if (take.empty() && takePre.empty()) return;
 
         ++recCount_;
         // nome por data/hora; se já existir (2ª tomada no mesmo segundo),
@@ -3356,9 +3847,22 @@ private:
 
         // dither TPDF ligado (seed != 0): é gravação real do usuário, não
         // um render de auditoria — mesma regra do painel X11
-        rasgo::modular::writeWav16(out.getFullPathName().toStdString(), take,
-                                   static_cast<std::uint32_t>(sampleRate_), 2,
-                                   static_cast<std::uint64_t>(recCount_));
+        const auto write = [&](const juce::File& f, const std::vector<float>& v) {
+            if (v.empty()) return;
+            rasgo::modular::writeWav16(f.getFullPathName().toStdString(), v,
+                                       static_cast<std::uint32_t>(sampleRate_), 2,
+                                       static_cast<std::uint64_t>(recCount_));
+        };
+        // O nome DIZ o tap. Um `.wav` sem essa marca seria uma armadilha:
+        // dois arquivos da mesma tomada soando diferente sem explicação.
+        if (!take.empty())
+            write(rack_.recTap == Rack::RecTap::post
+                      ? out
+                      : out.getSiblingFile(out.getFileNameWithoutExtension()
+                                           + ".post-safety.wav"), take);
+        if (!takePre.empty())
+            write(out.getSiblingFile(out.getFileNameWithoutExtension()
+                                     + ".pre-safety.wav"), takePre);
         // o .score.txt vai ao lado, com o MESMO nome — é o par do áudio
         const juce::File scoreFile =
             out.getSiblingFile(out.getFileNameWithoutExtension() + ".score.txt");
@@ -3445,12 +3949,33 @@ private:
         // REC: intercala L/R no buffer reservado. Para sozinho se a
         // reserva encher — realocar aqui seria alocação em tempo real.
         if (rack_.recording.load(std::memory_order_relaxed)) {
-            if (rack_.recBuf.size() + blockSize_ * 2 > rack_.recBuf.capacity()) {
+            const bool wantPost = rack_.recTap != Rack::RecTap::pre;
+            const bool wantPre  = rack_.recTap != Rack::RecTap::post;
+            const bool roomPost = !wantPost
+                || rack_.recBuf.size() + blockSize_ * 2 <= rack_.recBuf.capacity();
+            const bool roomPre = !wantPre
+                || rack_.recPreBuf.size() + blockSize_ * 2 <= rack_.recPreBuf.capacity();
+            if (!roomPost || !roomPre) {
                 rack_.recording.store(false, std::memory_order_relaxed);
             } else {
-                for (std::size_t i = 0; i < blockSize_; ++i) {
-                    rack_.recBuf.push_back(carryL_[i]);
-                    rack_.recBuf.push_back(carryR_[i]);
+                if (wantPost)
+                    for (std::size_t i = 0; i < blockSize_; ++i) {
+                        rack_.recBuf.push_back(carryL_[i]);
+                        rack_.recBuf.push_back(carryR_[i]);
+                    }
+                if (wantPre
+                    && rack_.masterTapNode != static_cast<std::size_t>(-1)) {
+                    if (auto* ms = dynamic_cast<rasgo::modular::Master*>(
+                            &rack_.graph.node(rack_.masterTapNode))) {
+                        const float* pl = ms->preSafety(0);
+                        const float* pr = ms->preSafety(1);
+                        const std::size_t n =
+                            std::min(blockSize_, ms->preSafetyFrames());
+                        for (std::size_t i = 0; i < n; ++i) {
+                            rack_.recPreBuf.push_back(pl[i]);
+                            rack_.recPreBuf.push_back(pr[i]);
+                        }
+                    }
                 }
             }
         }
@@ -3489,6 +4014,7 @@ private:
     int recCount_ = 0;
     bool recWasOn_ = false;
     std::unique_ptr<juce::FileChooser> chooser_;
+    bool chooserOpen_ = false;
     std::string learnKey_;
     std::chrono::steady_clock::time_point learnSince_{};
 

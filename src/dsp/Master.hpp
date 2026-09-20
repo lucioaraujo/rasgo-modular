@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <array>
 
 #include "core/SignalGraph.hpp"
 #include "dsp/OutputStage.hpp"
@@ -100,6 +102,7 @@ public:
         AudioBlock& level = outputs[1];
         const std::size_t frames = out.frames();
         const std::size_t channels = out.channels();
+        preTapFrames_ = std::min(frames, preTap_[0].size());
 
         const AudioBlock* in = inputs[0];
         const float gainTarget = dbToGain(parameterValue("gain"));
@@ -134,6 +137,18 @@ public:
             l *= muteGain_;
             r *= muteGain_;
 
+            // TAP `pre-safety` — o par DEPOIS do master criativo (ganho,
+            // largura, mono, mute) e ANTES da proteção de saída.
+            // `SAIDA_AUDIO_COMUM.md §3` pede taps de gravação nomeados
+            // (`pre-master-criativo`, `pre-safety`, `post-safety`) e o §4
+            // diz por quê: gravar só depois do limitador faz o limitador
+            // ESCONDER a dinâmica que se queria examinar. Aqui é só uma
+            // cópia — não muda uma amostra do que sai.
+            if (frame < preTap_[0].size()) {
+                preTap_[0][frame] = l;
+                preTap_[1][frame] = r;
+            }
+
             // proteção de saída: finitude + (DC) + guarda ultrassônica +
             // governador de corpo + limitador look-ahead + teto suave
             out_.process(l, r, dcBlock, limit, bodyGuard);
@@ -155,6 +170,15 @@ public:
         }
     }
 
+    // ---- tap `pre-safety` ------------------------------------------
+    // O último bloco ANTES da proteção de saída. Leia de fora do
+    // `process()` (o painel e o app leem do thread de áudio, logo depois
+    // de processar o grafo, sob o mesmo lock).
+    const float* preSafety(const std::size_t channel) const noexcept {
+        return preTap_[channel < 2 ? channel : 0].data();
+    }
+    std::size_t preSafetyFrames() const noexcept { return preTapFrames_; }
+
     // telemetria da proteção (leitura não RT-crítica; p/ um medidor de GR
     // no painel ou pra um módulo SEGUIR a própria redução de ganho)
     float gainReductionDb() const noexcept { return out_.gainReductionDb(); }
@@ -171,6 +195,12 @@ private:
     float peakDecay_ = 0.9999f;
     float muteGain_ = 1.0f;
     float muteCoef_ = 0.0f;
+    // pré-alocado no tamanho máximo de bloco do motor: o `process` não
+    // aloca nem redimensiona nada
+    std::array<std::vector<float>, 2> preTap_{
+        std::vector<float>(AudioBlock::maxFrames, 0.0f),
+        std::vector<float>(AudioBlock::maxFrames, 0.0f)};
+    std::size_t preTapFrames_ = 0;
     float paramCoef_ = 0.0f;      // rampa de GAIN/WIDTH (ver `prepare`)
     float gainSm_ = 1.0f;
     float widthSm_ = 1.0f;

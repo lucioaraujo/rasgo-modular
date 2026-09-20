@@ -128,16 +128,36 @@ respeitar a preferência é barato e não há desculpa para não fazê-lo.
 
 ## Imagem, áudio, vídeo, download
 
-Hoje: **nenhum**. Só o logotipo (SVG, ~4 KB) e os favicons. O site inteiro
-pesa menos de 120 KB, fontes incluídas.
+**Uma captura de tela**, do instrumento em execução real (18 set. 2026).
+Nada de áudio ou vídeo ainda; downloads, nenhum.
 
-Política para quando houver: screenshots precisam sair de execução real e
-com origem autorizada (item do gate editorial); áudio de demonstração
-precisa ser obra do autor, com seed e versão registrados; downloads só
-aparecem quando existir release, e apontando para o artefato versionado,
-nunca para um build solto.
+**Onde mora o quê.** O PNG ORIGINAL (1920×1006, 832 KB) fica em
+`../screenshots/`, no instrumento. O site guarda só derivados otimizados
+em `assets/images/`: WebP em 1000 e 1600 px de largura, com JPEG de
+reserva. É a regra do `WEBSITES.md §7` — "o website guarda derivados
+otimizados; logos master, screenshots originais e masters de áudio
+permanecem no instrumento ou acervo de origem" —, e ela existe pra o site
+não virar o arquivo de ninguém.
+
+Peso: ~1 MB no total, dos quais 240 KB são a captura grande, servida só a
+quem tem tela larga (`srcset`/`sizes`). Sem a imagem o site tem 192 KB.
+
+A compressão foi conferida, não presumida: a captura tem setenta cabos
+finos coloridos sobre fundo escuro, que é justamente onde compressão com
+perda costuma borrar. Comparei um recorte denso do original com o WebP a
+88 de qualidade — cabos nítidos, texto legível, sem artefato visível.
+
+Política para o que ainda não existe: áudio de demonstração precisa ser
+obra do autor, com seed e versão registrados; downloads só aparecem
+quando existir release, apontando pro artefato versionado e nunca pra um
+build solto.
 
 ## Qualidade e validação
+
+A captura tem **texto alternativo descritivo** nos quatro idiomas — não
+"captura de tela do app", mas o que se vê nela: as três fileiras, os
+setenta cabos curvos, a paleta à esquerda, a barra de comandos no topo.
+Quem usa leitor de tela precisa da imagem, não do rótulo dela.
 
 **Verificado:** estrutura HTML dos quatro idiomas (um `<title>`, uma faixa
 do portal, um `<main>`, um `<footer>`, seis seções em cada); seletor de

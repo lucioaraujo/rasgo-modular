@@ -13,7 +13,7 @@ do buraco. O que segue é o buraco inteiro.
 
 ---
 
-## Estado — atualizado 2026-09-15
+## Estado — atualizado 2026-09-18
 
 | Item | Estado |
 |---|---|
@@ -27,6 +27,33 @@ do buraco. O que segue é o buraco inteiro.
 | B1 · SYSTEM SCORE | ✅ **feito** — em par com o `.wav` |
 | B2 · inspector, arrastar módulo, seed editável, teclado, overlays, prefs | ✅ **feito** |
 | B3 · áudio in / MIDI in / REC | ✅ **feito** — pela API do JUCE, multiplataforma |
+
+### Divergência deliberada — auditada 2026-09-20
+
+A partir do momento em que a paridade fechou, o app passou a ganhar
+recursos que o painel não tem. Isso é esperado (papéis diferentes), mas
+**divergência não documentada vira surpresa** — foi a origem da maior
+parte dos relatos do autor. Esta tabela existe pra ela parar de crescer em
+silêncio.
+
+| Recurso | X11 | JUCE | Decisão |
+|---|---|---|---|
+| Halo por audibilidade + fonte muda | ✅ | ✅ | **portado** — é comportamento do instrumento, não da interface |
+| REPOR (volta ao seed atual) | ✅ `r` | ✅ `r` + botão | **portado**; no painel o `reprepare` de desenvolvimento foi pra `Shift+R` |
+| Descabear tudo | ✅ `n` | ✅ `n` + botão | portado |
+| Módulo novo visível na vista SAÍDA | ✅ | ✅ | portado |
+| Reordenar nas vistas filtradas | ✅ | ✅ | portado |
+| **Desfazer (`Ctrl+Z`)** | ❌ | ✅ | **só no JUCE** — o anel de fotografias serializadas é estrutura nova; portar exige o caminho de recarga inteiro no painel, que é ferramenta de teste |
+| **ABRIR com seletor de arquivo** | ❌ | ✅ | **só no JUCE** — em X11 puro seria escrever um navegador de arquivos à mão. No painel o caminho continua `RASGO_RESUME=1` |
+| **Taps de gravação (`pre-safety`)** | ❌ | ✅ | **só no JUCE** — o `MASTER` já expõe o tap nos dois; falta só a fiação do REC no painel. Portável a baixo custo se fizer falta |
+| **Atalho acende o botão** | ❌ | ✅ | **só no JUCE** — o painel tem o flash no clique; no teclado ele passa direto. Portável, não portado |
+| **Aviso pós-ligação no LEARN** | ❌ | ✅ | **só no JUCE** |
+
+O critério aplicado: **comportamento do instrumento** (como o som e o
+cabeamento respondem) é portado; **conveniência de interface** fica onde
+faz sentido pro papel de cada front-end. O painel é ferramenta de
+desenvolvimento e referência de comportamento; o app é o artefato que vai
+na release.
 
 **Paridade funcional alcançada.** Daqui em diante o app JUCE tem recursos
 que o painel X11 **não** tem, e isso deixa de ser dívida pra virar
@@ -48,7 +75,7 @@ Contra `RASGO_DOCUMENTATION/architecture/SAIDA_AUDIO_COMUM.md`.
 | Downmix mono e correlação | ✅ `test_output_excellence` |
 | Dither só em PCM fixo | ✅ TPDF no `writeWav16`, nada em float |
 | Medição BS.1770 M/S/I | ✅ `src/dsp/Loudness.hpp` + fixtures EBU |
-| Taps nomeados de gravação | ⬜ o REC grava só `post-safety` |
+| Taps nomeados de gravação | ✅ `post-safety` e `pre-safety`, por `RASGO_REC_TAP` |
 | Exportação PCM24 / float | ⬜ só PCM16 |
 | Perfil de loudness declarado | ⬜ **decisão do autor** — não existe alvo único pra palco, álbum e streaming |
 

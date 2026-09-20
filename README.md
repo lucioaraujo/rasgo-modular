@@ -180,9 +180,10 @@ governador de corpo, limitador look-ahead por pico verdadeiro, teto
 contornada nem desligada — o MASTER é um módulo, e dá pra cabear por fora
 dele. Medição BS.1770-4 (momentary, short-term, integrated com as duas
 portas) em `src/dsp/Loudness.hpp`, com fixtures de conformidade EBU no
-`ctest`. **Ainda fora:** taps nomeados de gravação
-(`pre-master-criativo`/`pre-safety`/`post-safety`) e exportação PCM24 e
-float — os dois dependem de um alvo de publicação declarado.
+`ctest`. Taps de gravação nomeados: o REC captura de `post-safety` (padrão) ou
+`pre-safety`, por `RASGO_REC_TAP` — gravar só depois do limitador faz ele
+esconder a dinâmica que se queria examinar. **Ainda fora:** exportação
+PCM24 e float, que depende de um alvo de publicação declarado.
 
 **Painel de teste (só Linux):** `./.run_rasgo_modular.sh` — precisa de
 `libX11` e `libasound`; o alvo é pulado automaticamente se faltarem.
