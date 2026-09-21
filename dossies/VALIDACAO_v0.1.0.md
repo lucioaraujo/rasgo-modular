@@ -37,8 +37,18 @@ Faça numa sentada só, com o app aberto e gravando:
 4. ✅ **FEITO em 22 set. 2026** — arrastar módulo pelo corpo na vista
    RACK·SAÍDA reposiciona. A correção que estava sem confirmação desde
    20 set. está validada.
-5. **`./run --rec-both` por um minuto.** Dois `.wav` com o tap no nome
-   mais um `.score.txt`; o `pre-safety` deve soar mais dinâmico.
+5. ✅ **FEITO em 22 set. 2026** — saíram os dois `.wav` com o tap no
+   nome e o `.score.txt`, em PCM 24 bits a 44,1 kHz.
+
+   **Cuidado ao julgar pelo ouvido:** o `pre-safety` só soa mais alto e
+   mais dinâmico quando o sinal está **quente o bastante** para a
+   proteção agir, E quando o MASTER é o único caminho até a saída. Nesta
+   tomada os picos ficaram em −10 dB (longe do teto) e havia **quatro**
+   fontes chegando no OUT — então o `post-safety` saiu 1,6 dB mais ALTO
+   que o `pre`, o que parece defeito e não é: o post é a soma final, e o
+   pre enxerga só o MASTER. Medido direto no MASTER com sinal quente, a
+   relação esperada aparece limpa: pre em +17,9 dB de pico contra post
+   cravado em −1,0 dB (o teto), com 11,9 dB de crista contra 6,2 dB.
 
 Se os cinco passarem, o instrumento está funcionalmente verificado.
 

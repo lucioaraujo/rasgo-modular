@@ -8980,3 +8980,59 @@ o caminho certo é o item "Estabilidade longa" da Parte B (20-30 min com
 VARIA ligado), que existe exatamente para defeitos raros assim. Fica
 registrado como **pendência aberta**, não como resolvido: é o tipo de
 defeito que some da memória e reaparece depois de publicado.
+
+## Registro da etapa — 2026-09-22: os dois taps, e a documentação que quase condenou um recurso correto
+
+Refeito o teste com uma instância limpa: saíram **dois `.wav`** com o tap
+no nome, mais o `.score.txt`. PCM 24 bits a **44,1 kHz** — que é a taxa
+do dispositivo do autor, e confirma na prática que o app adota a do
+sistema em vez de impor 48 k.
+
+Isso fecha o passo 5 e confirma o diagnóstico anterior: o arquivo único
+da primeira tentativa foi a **janela errada**, não defeito no código.
+
+### O resultado contrariou o que a documentação prometia
+
+Análise dos dois arquivos:
+
+| | pre-safety | post-safety | Δ |
+|---|---|---|---|
+| pico | −10,83 dB | −9,21 dB | post **mais alto** |
+| crista | 8,33 dB | 10,12 dB | post **mais dinâmico** |
+
+O documento dizia que o `pre-safety` deveria ser mais alto e mais
+dinâmico. Se eu tivesse parado aqui, teria aberto um bug no tap.
+
+**Medi direto no MASTER** em vez de deduzir pela tomada, com sinal quente
+(+8 dB) e transientes:
+
+| | pre-safety | post-safety |
+|---|---|---|
+| pico | **+17,90 dB** | −1,00 dB |
+| crista | **11,91 dB** | 6,16 dB |
+
+O post parou cravado em −1,00 dB, que é o teto. **A proteção está
+correta** e a relação esperada aparece limpa.
+
+### Por que a tomada deu o contrário — e por que isso não é defeito
+
+Duas razões que se somam:
+
+1. o sinal estava **baixo** (picos em −10 dB, longe do teto): a proteção
+   simplesmente não entrou em ação, então não havia o que o pre mostrasse
+   a mais;
+2. o `post-safety` é a **saída final somada**, e o score da tomada mostra
+   **quatro** fontes chegando no OUT — enquanto o `pre-safety` enxerga só
+   o MASTER. Som que não passa pelo MASTER aparece no post e nunca no
+   pre.
+
+**O defeito era da documentação**, e do tipo perigoso: ela descrevia uma
+relação que só vale sob duas condições (sinal quente E MASTER como único
+caminho até a saída) como se valesse sempre. Um usuário — ou eu — seguiria
+o documento e concluiria que o recurso está quebrado. Corrigido no
+`INSTALL.md` e no protocolo de validação, com os números medidos dos dois
+casos para que a comparação tenha referência.
+
+**Lição que se repete:** medir no ponto certo em vez de inferir pelo
+resultado composto. Foi a mesma coisa do teclado e do degrau no medidor
+de true-peak.
