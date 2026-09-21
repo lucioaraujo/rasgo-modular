@@ -148,7 +148,19 @@ O REC pode gravar de dois pontos da cadeia de saída:
 
 Gravar só o primeiro faz o limitador esconder justamente a dinâmica que
 se queria examinar; gravar só o segundo mente sobre o que saiu pelos
-alto-falantes. Com `RASGO_REC_TAP=both` a tomada sai nos dois arquivos,
+alto-falantes.
+
+**Os dois nem sempre se comparam como se espera, e saber disso evita
+diagnosticar defeito onde não há.** O `pre-safety` sai do MASTER, antes
+da proteção; o `post-safety` é a saída FINAL, já somada. Então o
+`pre-safety` só aparece mais alto e mais dinâmico quando duas condições
+valem ao mesmo tempo: o sinal está quente o bastante para a proteção
+agir, e o MASTER é o único caminho até a saída. Num patch em que outros
+módulos chegam ao OUT por fora do MASTER — o que é comum e legítimo — o
+`post-safety` pode sair mais alto, simplesmente porque contém som que o
+`pre` nunca viu. Com sinal quente e o MASTER no caminho, a diferença é
+inequívoca: pico em +17,9 dB no pre contra −1,0 dB no post (o teto), com
+11,9 dB de crista contra 6,2 dB. Com `RASGO_REC_TAP=both` a tomada sai nos dois arquivos,
 com o tap no nome (`rec-….post-safety.wav` e `rec-….pre-safety.wav`) —
 dois arquivos da mesma tomada soando diferente sem explicação seria uma
 armadilha. Ambos em PCM 24 bits.
