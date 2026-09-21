@@ -8716,3 +8716,42 @@ que é exatamente o que estava inerte.
 rodou 76 dos 77 testes (o `planar` ficou como "Not Run" por não ter
 compilado). Ou seja, este é o último item da lista do Windows, não o
 próximo de uma fila.
+
+## Registro da etapa — 2026-09-21 (4ª rodada): o mesmo erro meu, duas vezes
+
+Ubuntu e macOS verdes de novo, com `.deb` e `.dmg` gerados. O Windows
+falhou **pelo mesmo C3493 da rodada anterior** — ou seja, a minha
+correção com `constexpr` não funcionou.
+
+Vale registrar o erro, porque o padrão importa mais que o caso. Pelo
+padrão C++, ler uma `constexpr` dentro de uma lambda não é odr-use e não
+exige captura; eu apliquei isso, verifiquei no GCC e no Clang, e concluí
+que estava resolvido. **O MSVC recusa assim mesmo.** Duas rodadas de CI
+queimadas ajustando o adjetivo da variável local — `const`, depois
+`constexpr` — quando o problema era o escopo.
+
+Constante em **escopo de arquivo** encerra a questão: não existe captura
+de variável não-local, em compilador nenhum. Não depende de eu acertar
+qual regra cada compilador honra.
+
+A lição é a mesma que apareceu no teclado, em outra roupa: quando erro
+duas vezes no mesmo ponto, o caminho não é uma terceira variação da
+mesma ideia, e sim mudar a estrutura para que a pergunta deixe de
+existir.
+
+**Sobre o `.deb`** (inspecionado de fato, baixado da CI): binário ELF
+64-bit PIE em `/usr/bin/rasgo-modular`, entrada `.desktop` com categorias
+de áudio, ícone SVG escalável, e `ldd` sem nenhuma biblioteca pendente
+neste sistema. Duas limitações a declarar antes de publicar:
+
+1. **Exige Ubuntu 24.04+ / Debian 13+**: a dependência `libasound2t64`
+   vem da transição de `time_t` para 64 bits e não existe no Ubuntu
+   22.04, que tem suporte até 2027. Isso não foi decidido — vem de a CI
+   usar `ubuntu-latest`. Fixar o runner em `ubuntu-22.04` ampliaria o
+   alcance.
+2. **Só cobre a família Debian.** Fedora, Arch e openSUSE precisam
+   compilar do código; um AppImage cobriria todos de uma vez.
+
+O pacote também já declara `rasgo.instruments@gmail.com` como mantenedor
+— possivelmente o "contato oficial" pendente no gate, se o autor
+confirmar.

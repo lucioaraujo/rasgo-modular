@@ -23,6 +23,24 @@ void check(const bool c, const char* const e) {
 constexpr float kSr = 48000.0f;
 constexpr std::size_t kB = 256;
 
+// A varredura de `x` do teste de CV, em ESCOPO DE ARQUIVO — e a razão é
+// portabilidade, não organização.
+//
+// Como variável local, esta constante não tem forma que agrade aos três
+// compiladores. Sendo `const` e capturada pela lambda, o Clang acusa
+// `-Wunused-lambda-capture`; sendo `const` e não capturada, o MSVC acusa
+// C3493. Trocar por `constexpr` deveria bastar pelo padrão (ler uma
+// constante não é odr-use, logo não exige captura), mas o MSVC recusa
+// assim mesmo — tentei, e a CI mostrou o mesmo C3493 na rodada seguinte.
+//
+// Nome em escopo de arquivo encerra a discussão: não existe captura de
+// variável não-local, em compilador nenhum. Dois erros meus nesta mesma
+// linha ensinaram que o caminho não era achar o adjetivo certo, e sim
+// tirar o nome do escopo onde a captura é sequer uma pergunta.
+constexpr int kSweepBlocks = 24;
+constexpr std::size_t kSweepTotal =
+    static_cast<std::size_t>(kSweepBlocks) * kB;
+
 using Gen = std::function<float(std::size_t)>;
 
 struct Rec { std::vector<float> out, xo, yo; };
@@ -117,25 +135,20 @@ void testSweepAtoB() {
     p.setParameter("curve", 0.0f);
     p.setParameter("smooth", 0.0f);
     // A = +0,8 DC, B = −0,8 DC; x varre 0→1 pela CV
-    // `constexpr`, e não `const` — e a diferença aqui não é estilo, é o
-    // que faz os três compiladores concordarem. Sendo `const`, o Clang
-    // acusa `-Wunused-lambda-capture` quando a lambda captura `total`, e
-    // o MSVC acusa C3493 ("cannot be implicitly captured") quando ela
-    // NÃO captura: corrigir para um quebrava o outro, e foi exatamente o
-    // que aconteceu em 21 set. 2026 — só a CI de três sistemas mostrou.
-    // Sendo `constexpr`, o nome não precisa de captura em nenhum deles.
-    constexpr int blocks = 24;
-    constexpr std::size_t total = static_cast<std::size_t>(blocks) * kB;
-    const auto r = run(p, blocks,
+    // `kSweepBlocks`/`kSweepTotal` vivem no escopo de arquivo — ver a
+    // explicação lá em cima: é o que impede a lambda de precisar de
+    // captura em qualquer compilador.
+    const auto r = run(p, kSweepBlocks,
                        [](std::size_t) { return 0.8f; },
                        [](std::size_t) { return -0.8f; },
                        nullptr, nullptr,
                        [](std::size_t n) {
-                           return static_cast<float>(n) / static_cast<float>(total);
+                           return static_cast<float>(n)
+                                / static_cast<float>(kSweepTotal);
                        });
     EXPECT(r.out[40] > 0.7f);                  // x≈0 -> A
-    EXPECT(std::fabs(r.out[total / 2]) < 0.1f); // x≈0,5 -> meio
-    EXPECT(r.out[total - 40] < -0.7f);         // x≈1 -> B
+    EXPECT(std::fabs(r.out[kSweepTotal / 2]) < 0.1f); // x≈0,5 -> meio
+    EXPECT(r.out[kSweepTotal - 40] < -0.7f);          // x≈1 -> B
 }
 
 void testSmoothGlide() {
