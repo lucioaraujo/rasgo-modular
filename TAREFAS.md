@@ -8925,3 +8925,58 @@ O passo 3 ficou parcial de propósito: salvar e abrir funcionam, mas a
 falha que esse passo procura (patch abrindo MUDO porque o alvo de saída
 não reancorou) só aparece no ciclo completo — fechar o app e voltar por
 `--resume`, e o arquivamento no banco.
+
+## Registro da etapa — 2026-09-22: o teste dos dois taps e um travamento
+
+### Confirmados pelo autor
+
+`Ctrl+B` (banco) e `Ctrl+O` (abrir) funcionam — o passo 3 da sessão
+funcional fecha, faltando só o `./run --resume`.
+
+### `--rec-both` produziu UM arquivo, não dois
+
+E a causa mais provável **não é o código do tap**: o arquivo saiu como
+`rec-….wav`, sem o sufixo `.post-safety`. Pela lógica de nomes, isso só
+acontece quando o tap está em `post` — ou seja, aquela instância nunca
+recebeu `RASGO_REC_TAP=both`.
+
+Havia **duas instâncias do app abertas** no momento. As opções (seed,
+resume, taps) são lidas do ambiente **no arranque**: uma janela aberta
+antes não as tem, e as duas ficam visualmente idênticas. A gravação
+quase certamente aconteceu na janela errada — o `--rec-both` parecia
+quebrado e estava certo.
+
+**Duas correções na ferramenta, não no instrumento:**
+
+1. `./run` agora **avisa** quando já há instância aberta, explicando que
+   as opções valem só para a janela nova. Avisa e não mata: duas
+   instâncias são legítimas (comparar dois seeds, por exemplo), e quem
+   decide é quem está tocando;
+2. o **log passou a ser por instância** (`rasgo-modular-$$.log`). Era um
+   caminho fixo, então duas janelas escreviam no mesmo arquivo e a
+   segunda truncava o da primeira. O log que eu usei para diagnosticar o
+   travamento estava contaminado com linhas de outra sessão — a
+   ferramenta de diagnóstico corrompendo o próprio diagnóstico.
+
+**A refazer:** fechar tudo, `./run --rec-both`, gravar ~30 s. Devem sair
+dois `.wav` com o tap no nome.
+
+### Travamento temporário — em aberto, sem causa identificada
+
+O autor relatou "travou" e depois "voltou a funcionar, mas deu uma
+travada". Medido enquanto acontecia: o processo **não estava em
+deadlock** — girava a 67% de CPU, com a thread principal acumulando
+~119 s de CPU em 4 min de vida. Algo caro bloqueou o laço da interface e
+depois liberou.
+
+**Pista falsa descartada:** achei que o `.score.txt` de 45 KB (contra
+1,2 KB das tomadas anteriores) fosse anomalia. Não é — são 598 linhas
+para 78 s de tomada; os arquivos antigos eram pequenos porque as tomadas
+tinham segundos. Verificar antes de teorizar evitou perseguir o alvo
+errado.
+
+**Não tenho causa.** Para achá-la é preciso reproduzir com medição — e
+o caminho certo é o item "Estabilidade longa" da Parte B (20-30 min com
+VARIA ligado), que existe exatamente para defeitos raros assim. Fica
+registrado como **pendência aberta**, não como resolvido: é o tipo de
+defeito que some da memória e reaparece depois de publicado.
