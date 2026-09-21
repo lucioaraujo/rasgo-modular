@@ -37,10 +37,11 @@ precedente do Antitotem. A decisão fica registrada aqui, e a página
 editorial dirá o mesmo: o gate do RASGO exige que a limitação seja dita,
 não suposta.
 
-**Ressalva adicional:** o workflow está **inerte** enquanto o projeto vive
-dentro do monorepo `rasgo-instruments` — o GitHub Actions só lê
-`.github/workflows/` da raiz do repositório. Ele passa a valer no momento
-da extração pra repositório próprio.
+**Histórico dessa ressalva:** até 21 set. 2026 o workflow estava
+**inerte**, porque o projeto vivia dentro do monorepo `rasgo-instruments`
+e o GitHub Actions só lê `.github/workflows/` da raiz do repositório. Com
+a extração para [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/rasgo-modular)
+— preservando o histórico — ele passou a rodar de fato.
 
 ---
 

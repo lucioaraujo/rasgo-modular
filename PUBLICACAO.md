@@ -34,7 +34,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
 | testes automatizados e validações humanas **realmente executados** | 🟡 77 testes automatizados ✅ · validação humana ❌ |
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
-| links corretos para repositório, documentação e release | ❌ dependem da extração e da release |
+| links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links da release dependem da tag |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
 | contato oficial | ❌ decisão do autor |
 | correspondência entre versão publicada e página editorial | ❌ depende da página |
@@ -46,11 +46,15 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 ### Depende de mim (código/documento)
 
-- **extrair o projeto pra repositório próprio, preservando o histórico**
-  (decidido em 21 set. 2026) — é o que torna a CI de três sistemas viva
-  (hoje ela está inerte: o Actions só lê o `.github/workflows/` da raiz do
-  repositório). Preservar o histórico é a postura arquivística do resto do
-  RASGO: o rastro de como o instrumento chegou aqui é parte do acervo;
+- ~~extrair o projeto pra repositório próprio~~ **feito em 21 set. 2026**:
+  [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/rasgo-modular),
+  **privado por ora** — a estratégia manda liberar repositório, site e
+  portal juntos, e a v0.1.0 ainda não foi cortada. O histórico foi
+  preservado (`git subtree split`: 71 commits, só os que tocaram o
+  instrumento), que é a postura arquivística do resto do RASGO — o rastro
+  de como ele chegou aqui é parte do acervo. **A CI de três sistemas saiu
+  da inércia e passou a rodar de verdade.** Falta tornar público no
+  momento da publicação;
 - ~~`CHANGELOG.md` / notas da `v0.1.0`~~ **feito** — [`CHANGELOG.md`](CHANGELOG.md),
   escrito e marcado como *preparada, ainda não cortada*, com as limitações
   declaradas (Windows/macOS só na CI, CI inerte até a extração). Falta só
