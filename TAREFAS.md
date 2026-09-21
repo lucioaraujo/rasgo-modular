@@ -9036,3 +9036,50 @@ casos para que a comparação tenha referência.
 **Lição que se repete:** medir no ponto certo em vez de inferir pelo
 resultado composto. Foi a mesma coisa do teclado e do degrau no medidor
 de true-peak.
+
+## Registro da etapa — 2026-09-22: o motor não é o problema (medido, não suposto)
+
+O autor rodou `./travou` duas vezes e a captura trouxe um dado que a
+observação a olho nunca daria: **VmRSS de 51.604 kB aos 9 s para 60.956 kB
+aos 48 s** — 9,3 MB em 39 segundos.
+
+E a thread principal em 37–48% de CPU, com uma segunda em 10–20%.
+
+### Bissecção por medição
+
+Em vez de procurar o vazamento por leitura — método que já me falhou
+várias vezes esta semana — separei motor de interface com um banco de
+provas sem janela, carregando patches REAIS do banco do autor:
+
+| | resultado |
+|---|---|
+| Custo do motor (patches reais, 44,1 kHz, bloco 256) | **6,6% a 14,5%** de um núcleo |
+| Memória do motor em 5 min de áudio | **+72 kB no arranque, depois PLANO** |
+| Custo do app inteiro | 60–68% |
+
+**O motor não vaza e é barato.** O que consome ~50% de CPU e o que faz a
+memória crescer está na camada da interface. Isso reduz o campo de busca
+de 59 módulos de DSP para o front-end.
+
+### O que NÃO se pode concluir ainda, e por quê
+
+As duas amostras do autor foram colhidas aos **9 s e aos 48 s de vida** do
+app — plena fase de arranque, quando fontes, caches e o próprio JUCE
+carregam sob demanda. Crescimento nessa janela pode ser **aquecimento**,
+não vazamento, e estabilizar depois.
+
+Chamar aquilo de vazamento a partir de duas leituras seria o mesmo erro
+que cometi com o `.score.txt` de 45 KB — e com o teclado, três vezes.
+Então: `./travou --vigia` acompanha por 30 min e **compara o ritmo de
+crescimento do primeiro terço com o do último**. Se ainda sobe no mesmo
+ritmo, é vazamento; se achatou, era aquecimento. O script imprime o
+veredito.
+
+**Suspeitas já descartadas por leitura dirigida** (todas guardadas por
+`recording`, ou limitadas): `score.note`, `score.connection`,
+`score.parameterChange`, a fila do `NoteOut` (guarda UMA nota, não uma
+fila), o cache de imagem do chrome (só recriado se o tamanho mudar) e o
+`scopeSnap` (já reaproveita os vetores).
+
+**Próximo passo:** rodar `./travou --vigia` durante o teste de
+estabilidade longa — os dois querem a mesma meia hora de app aberto.

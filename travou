@@ -5,7 +5,9 @@
 # app apaga a única evidência que existe. Um travamento relatado de
 # memória, depois que passou, não dá para investigar.
 #
-#   ./travou
+#   ./travou            captura única, para usar DURANTE um travamento
+#   ./travou --vigia    acompanha memória e CPU por 30 min, em segundo
+#                       plano, e diz ao fim se a memória estabilizou
 #
 # Não mata nada e não mexe no áudio, exceto por uma pausa de instantes
 # se o gdb conseguir anexar.
@@ -22,6 +24,55 @@ cd "$(dirname "$0")"
 
 NOME="Rasgo Modular"
 SAIDA="${TMPDIR:-/tmp}/rasgo-travou-$(date +%Y%m%d-%H%M%S).txt"
+
+# ---- modo vigia ------------------------------------------------------
+# Existe porque duas amostras não distinguem VAZAMENTO de AQUECIMENTO: um
+# app recém-aberto cresce enquanto carrega fontes e caches sob demanda, e
+# isso estabiliza. Chamar aquilo de vazamento a partir de duas leituras
+# feitas aos 9 s e aos 48 s de vida seria concluir cedo demais — a curva
+# ao longo de meia hora é que responde.
+if [ "${1:-}" = "--vigia" ]; then
+  P=$(pgrep -x "$NOME" | head -1 || true)
+  if [ -z "$P" ]; then echo "Abra o app antes." >&2; exit 1; fi
+  V="${TMPDIR:-/tmp}/rasgo-vigia-$(date +%Y%m%d-%H%M%S).tsv"
+  echo "Acompanhando o pid $P por 30 min. Pode usar o app normalmente."
+  echo "Tabela: $V"
+  {
+    printf "minuto	RSS_kB	delta_kB	%%CPU
+"
+    BASE=""
+    for i in $(seq 0 180); do
+      [ -r "/proc/$P/status" ] || break
+      R=$(awk '/^VmRSS:/{print $2}' "/proc/$P/status")
+      [ -z "$BASE" ] && BASE=$R
+      C=$(ps -o %cpu= -p "$P" | tr -d ' ')
+      printf "%.1f	%s	%+d	%s
+" "$(echo "$i*10/60" | bc -l)" "$R" "$((R-BASE))" "$C"
+      sleep 10
+    done
+  } | tee "$V"
+  echo
+  echo "--- veredito ---"
+  # compara a primeira e a última TERÇA parte: se a memória ainda sobe no
+  # fim no mesmo ritmo do começo, é vazamento; se achatou, foi aquecimento
+  awk -F'	' 'NR>1{n++; r[n]=$2}
+    END{
+      if (n < 6) { print "amostras de menos para concluir"; exit }
+      t=int(n/3);
+      inicio=(r[t]-r[1])/t; fim=(r[n]-r[n-t])/t;
+      printf "  crescimento no 1o terço: %+.1f kB por amostra
+", inicio;
+      printf "  crescimento no ultimo  : %+.1f kB por amostra
+", fim;
+      printf "  total: %+d kB
+", r[n]-r[1];
+      if (fim > inicio*0.5 && fim > 20)
+        print "  => AINDA CRESCENDO no mesmo ritmo: vazamento provavel";
+      else
+        print "  => estabilizou: era aquecimento, nao vazamento";
+    }' "$V"
+  exit 0
+fi
 
 PIDS=$(pgrep -x "$NOME" || true)
 if [ -z "$PIDS" ]; then
