@@ -123,7 +123,9 @@ void testSweepAtoB() {
                        [](std::size_t) { return 0.8f; },
                        [](std::size_t) { return -0.8f; },
                        nullptr, nullptr,
-                       [total](std::size_t n) {
+                       // sem captura: `total` é constante de compilação,
+                       // e capturá-la vira -Wunused-lambda-capture no Clang
+                       [](std::size_t n) {
                            return static_cast<float>(n) / static_cast<float>(total);
                        });
     EXPECT(r.out[40] > 0.7f);                  // x≈0 -> A

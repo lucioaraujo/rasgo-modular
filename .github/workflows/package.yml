@@ -82,13 +82,24 @@ jobs:
       # mas até aqui só tinha sido compilado no Linux — esta é a primeira
       # prova real dessa portabilidade, e vale por si mesma
       # (independente do empacotamento).
+      # `--parallel` sem número usa todos os núcleos, e cada unidade de
+      # tradução do JUCE come muita memória. No runner do Ubuntu isso
+      # matou o compilador:
+      #
+      #   c++: fatal error: Killed signal terminated program cc1plus
+      #
+      # que é o OOM killer, não erro de código — e é fácil confundir os
+      # dois, porque a mensagem parece falha de compilação. Dois em
+      # paralelo cabem na memória do runner e ainda aproveitam os
+      # núcleos: o build demora um pouco mais e TERMINA, que é o que
+      # interessa numa CI.
       - name: Build & run engine tests
         run: |
-          cmake --build build --config Release --parallel
+          cmake --build build --config Release --parallel 2
           ctest --test-dir build -C Release --output-on-failure
 
       - name: Build the JUCE app
-        run: cmake --build build --target RasgoModularApp --config Release --parallel
+        run: cmake --build build --target RasgoModularApp --config Release --parallel 2
 
       # Sem Mac à mão pra testar na unha, isto substitui o teste manual:
       # falha o build se o .app não for realmente distribuível (Universal 2

@@ -234,6 +234,12 @@ void testMasterExcellenceGuard() {
                 ++total;
             }
     }
+    // `total` existia contado e nunca verificado — o Clang do macOS
+    // acusou como "set but not used". Apagá-lo seria o fácil; ele na
+    // verdade é o guarda que faltava: sem esta linha, se o laço interno
+    // nunca rodasse, `overCeiling == 0` passaria VAZIO e o teste diria
+    // que o limitador está bom sem ter olhado uma amostra sequer.
+    check(total > 0, "o laço de medição realmente rodou (teste não-vazio)");
     check(peak <= 0.9f, "look-ahead segura o pico abaixo do teto (~−1 dBFS)");
     check(overCeiling == 0, "nenhuma amostra estoura o teto");
     check(m.gainReductionDb() > 3.0f, "o limitador realmente reduziu o ganho");
