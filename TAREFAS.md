@@ -8788,3 +8788,28 @@ postura do projeto é acrescentar a correção, não sumir com o erro.
 
 **Camada 1 (candidato publicável) fechada.** Resta, para a camada 2, só
 a sessão de escuta da Parte A — que é humana e não tem atalho.
+
+## Registro da etapa — 2026-09-21: contato oficial definido
+
+O autor confirmou **`rasgo.instruments@gmail.com`** como canal oficial —
+o último item de uma frase que faltava no gate editorial.
+
+Coincidência que vale registrar: esse endereço **já era** o
+`CPACK_PACKAGE_CONTACT` dos três instaladores, desde antes da decisão.
+Isso é o certo e não é detalhe — quem recebe um pacote quebrado procura o
+contato que está DENTRO do pacote, não o da página. Se os dois
+divergissem, o relato iria para um endereço que ninguém lê.
+
+Registrado em: `PUBLICACAO.md` (linha do gate + seção de correção e
+retirada, que precisa de um canal nomeado para ter validade) e no rodapé
+das **quatro** versões do site, como linha própria — as outras linhas do
+rodapé informam, esta é acionável.
+
+Contraste conferido antes de fechar: link em `--accent` dá 8,6:1 sobre o
+fundo e o texto do rodapé 5,5:1, ambos acima de AA. Estrutura dos quatro
+HTML validada (nenhuma tag em aberto).
+
+**Nota do ambiente do autor:** Linux Mint 22 "Wilma", sobre Ubuntu 24.04
+"Noble". É a mesma base do `ubuntu-latest` da CI — o que explica por que
+nenhum dos cinco defeitos de portabilidade aparecia aqui, e confirma que
+o `.deb` gerado instala na máquina dele.
