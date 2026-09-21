@@ -8682,3 +8682,37 @@ por outra não verificada seria repetir o erro.
 
 **77/77 CTest** verdes localmente, build sem avisos próprios, e os testes
 também limpos sob Clang com `-Werror`.
+
+## Registro da etapa — 2026-09-21 (3ª rodada): Ubuntu e macOS verdes; o Windows expõe uma correção minha
+
+**Ubuntu e macOS passaram inteiros** — compilação, os 77 testes, o app
+JUCE, empacotamento, e no macOS a validação de `lipo`/`otool` que
+confirma Universal 2 de verdade com o deployment target do projeto. É a
+**primeira prova real** de que o instrumento constrói fora do Linux. Até
+hoje isso era afirmação não verificada na documentação.
+
+**O Windows falhou por causa da minha própria correção da rodada
+anterior**, e o caso é instrutivo:
+
+    test_planar.cpp(129): error C3493: 'total' cannot be implicitly
+    captured because no default capture mode has been specified
+
+Na 2ª rodada o Clang do macOS acusou `-Wunused-lambda-capture` e eu tirei
+a captura. O MSVC exige o contrário: sem captura, recusa compilar.
+**Corrigir para um compilador quebrou o outro** — e nenhum dos dois
+aparece no GCC daqui.
+
+A saída não é escolher um lado: é `constexpr` em vez de `const`. Sendo
+constante de compilação, o nome não precisa de captura em compilador
+nenhum, e os três concordam. Verificado localmente com `clang++` E `g++`,
+ambos com `-Werror`, antes de empurrar.
+
+Isso derruba a ilusão de que "compila no GCC e no Clang" cobre
+portabilidade: o MSVC discorda dos dois em regras de linguagem, não só
+de biblioteca. Único jeito de saber é a matriz de três sistemas rodando —
+que é exatamente o que estava inerte.
+
+**Nenhum outro defeito escondido:** o build do MSVC seguiu adiante e
+rodou 76 dos 77 testes (o `planar` ficou como "Not Run" por não ter
+compilado). Ou seja, este é o último item da lista do Windows, não o
+próximo de uma fila.

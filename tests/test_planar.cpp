@@ -117,14 +117,19 @@ void testSweepAtoB() {
     p.setParameter("curve", 0.0f);
     p.setParameter("smooth", 0.0f);
     // A = +0,8 DC, B = −0,8 DC; x varre 0→1 pela CV
-    const int blocks = 24;
-    const std::size_t total = static_cast<std::size_t>(blocks) * kB;
+    // `constexpr`, e não `const` — e a diferença aqui não é estilo, é o
+    // que faz os três compiladores concordarem. Sendo `const`, o Clang
+    // acusa `-Wunused-lambda-capture` quando a lambda captura `total`, e
+    // o MSVC acusa C3493 ("cannot be implicitly captured") quando ela
+    // NÃO captura: corrigir para um quebrava o outro, e foi exatamente o
+    // que aconteceu em 21 set. 2026 — só a CI de três sistemas mostrou.
+    // Sendo `constexpr`, o nome não precisa de captura em nenhum deles.
+    constexpr int blocks = 24;
+    constexpr std::size_t total = static_cast<std::size_t>(blocks) * kB;
     const auto r = run(p, blocks,
                        [](std::size_t) { return 0.8f; },
                        [](std::size_t) { return -0.8f; },
                        nullptr, nullptr,
-                       // sem captura: `total` é constante de compilação,
-                       // e capturá-la vira -Wunused-lambda-capture no Clang
                        [](std::size_t n) {
                            return static_cast<float>(n) / static_cast<float>(total);
                        });
