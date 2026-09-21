@@ -4,6 +4,7 @@
 
 #include "io/AudioFile.hpp"
 #include "io/WavWriter.hpp"
+#include "TempPath.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -21,10 +22,12 @@ void check(const bool c, const char* const e) {
 }
 #define EXPECT(x) check((x), #x)
 
+// Mesma correção do `test_wav_writer.cpp`: `/tmp` fixo não existe no
+// Windows, e a CI (que só passou a rodar em 21 set. 2026) mostrou o
+// estrago — escrita falha em silêncio e o teste ou estoura ou passa sem
+// testar nada. `TempPath.hpp` resolve pelos ambientes convencionais.
 std::string tmpPath(const char* name) {
-    const char* dir = std::getenv("CLAUDE_JOB_DIR");
-    std::string base = dir ? (std::string(dir) + "/tmp/") : std::string("/tmp/");
-    return base + "rasgo_af_" + name + ".wav";
+    return rasgo::test::tempPath(std::string("af_") + name);
 }
 
 void testRoundTripMono() {
@@ -61,6 +64,10 @@ void testRoundTripStereo() {
 
     const std::vector<float> m = toMono(f);
     EXPECT(m.size() == 2000);
+    // Sem esta saída o laço abaixo indexa fora quando a escrita falhou —
+    // foi assim que o job do Windows morreu com SEGFAULT em vez de dizer
+    // o que estava errado. Um teste que estoura não informa nada.
+    if (m.size() < 2000) { std::remove(p.c_str()); return; }
     // mono = (L + R) / 2
     double err = 0.0;
     for (std::size_t i = 0; i < 2000; ++i) {

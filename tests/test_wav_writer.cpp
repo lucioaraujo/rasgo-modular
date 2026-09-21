@@ -4,6 +4,7 @@
 // real que motivou esta correção: exportação PCM sem dither).
 
 #include "io/WavWriter.hpp"
+#include "TempPath.hpp"
 
 #include <cstdio>
 #include <cstring>
@@ -22,6 +23,21 @@ void check(const bool c, const char* const e) {
     if (!c) { std::cerr << "CHECK FALHOU: " << e << '\n'; ++g_failures; }
 }
 #define EXPECT(x) check((x), #x)
+
+// Guarda contra o defeito que a CI achou: se a escrita falhou (caminho
+// inválido, disco cheio), a leitura devolve vetor vazio. Sem isto um
+// teste ou estoura ao indexar, ou — pior — percorre zero elementos e
+// passa VERDE sem ter verificado nada.
+template <typename T>
+bool haveSamples(const std::vector<T>& v, const std::size_t n,
+                 const char* const what) {
+    if (v.size() >= n) return true;
+    std::cerr << "CHECK FALHOU: " << what << " — li " << v.size()
+              << " amostras, esperava ao menos " << n
+              << " (a escrita do arquivo falhou?)\n";
+    ++g_failures;
+    return false;
+}
 
 // lê o cabeçalho (bits por amostra) e os samples int24 do "data" de um WAV
 std::vector<std::int32_t> readPcm24(const std::string& path,
@@ -73,12 +89,14 @@ void testFinitenessGuard() {
         std::numeric_limits<float>::infinity(), -0.5f,
         -std::numeric_limits<float>::infinity(), 0.0f,
     };
-    const std::string path = "/tmp/rasgo_wavwriter_test_finite.wav";
+    const std::string path = rasgo::test::tempPath("finite");
     EXPECT(writeWav16(path, in, 48000, 1));
     const auto pcm = readPcm16(path);
-    check(pcm[0] == 0, "NaN vira 0, nao lixo indefinido");
-    check(pcm[2] == 0, "+Inf vira 0 (clamp de finitude, nao clamp de faixa)");
-    check(pcm[4] == 0, "-Inf vira 0");
+    if (haveSamples(pcm, 5, "16 bits: finitude")) {
+        check(pcm[0] == 0, "NaN vira 0, nao lixo indefinido");
+        check(pcm[2] == 0, "+Inf vira 0 (clamp de finitude, nao clamp de faixa)");
+        check(pcm[4] == 0, "-Inf vira 0");
+    }
     std::remove(path.c_str());
 }
 
@@ -86,21 +104,25 @@ void testRoundingNotTruncation() {
     // 0,00002 * 32767 ~ 0,655 -- arredonda pra 1, trunca pra 0. Escolhido
     // pra cair claramente de um lado da fronteira de 0,5.
     const std::vector<float> in = {0.00002f, -0.00002f};
-    const std::string path = "/tmp/rasgo_wavwriter_test_round.wav";
+    const std::string path = rasgo::test::tempPath("round");
     EXPECT(writeWav16(path, in, 48000, 1));
     const auto pcm = readPcm16(path);
-    check(pcm[0] == 1, "arredonda pra cima (nao trunca pra 0)");
-    check(pcm[1] == -1, "arredonda simetricamente pro lado negativo");
+    if (haveSamples(pcm, 2, "16 bits: arredondamento")) {
+        check(pcm[0] == 1, "arredonda pra cima (nao trunca pra 0)");
+        check(pcm[1] == -1, "arredonda simetricamente pro lado negativo");
+    }
     std::remove(path.c_str());
 }
 
 void testDitherBypassIsDeterministic() {
     const std::vector<float> in = {0.1f, 0.2f, -0.3f, 0.4f, -0.5f};
-    const std::string a = "/tmp/rasgo_wavwriter_test_nodither_a.wav";
-    const std::string b = "/tmp/rasgo_wavwriter_test_nodither_b.wav";
+    const std::string a = rasgo::test::tempPath("nodither_a");
+    const std::string b = rasgo::test::tempPath("nodither_b");
     EXPECT(writeWav16(a, in, 48000, 1));           // ditherSeed padrao = 0
     EXPECT(writeWav16(b, in, 48000, 1, 0));        // explicito
-    check(readPcm16(a) == readPcm16(b), "seed=0 e omitido dao o mesmo byte a byte");
+    const auto va = readPcm16(a);
+    if (haveSamples(va, 5, "16 bits: bypass de dither"))
+        check(va == readPcm16(b), "seed=0 e omitido dao o mesmo byte a byte");
     std::remove(a.c_str());
     std::remove(b.c_str());
 }
@@ -109,16 +131,21 @@ void testDitherChangesOutputButIsDeterministicPerSeed() {
     // silencio puro: sem dither, tudo 0; com dither TPDF, uma dispersao de
     // +-1 LSB aparece (e nao e tudo zero)
     const std::vector<float> silence(2000, 0.0f);
-    const std::string nodither = "/tmp/rasgo_wavwriter_test_dither_silence0.wav";
-    const std::string withDither1 = "/tmp/rasgo_wavwriter_test_dither_silence1.wav";
-    const std::string withDither1b = "/tmp/rasgo_wavwriter_test_dither_silence1b.wav";
-    const std::string withDither2 = "/tmp/rasgo_wavwriter_test_dither_silence2.wav";
+    const std::string nodither = rasgo::test::tempPath("dither_silence0");
+    const std::string withDither1 = rasgo::test::tempPath("dither_silence1");
+    const std::string withDither1b = rasgo::test::tempPath("dither_silence1b");
+    const std::string withDither2 = rasgo::test::tempPath("dither_silence2");
     EXPECT(writeWav16(nodither, silence, 48000, 1, 0));
     EXPECT(writeWav16(withDither1, silence, 48000, 1, 42));
     EXPECT(writeWav16(withDither1b, silence, 48000, 1, 42));
     EXPECT(writeWav16(withDither2, silence, 48000, 1, 43));
 
     const auto p0 = readPcm16(nodither);
+    if (!haveSamples(p0, 2000, "16 bits: dither determinístico")) {
+        for (const auto& f : {nodither, withDither1, withDither1b, withDither2})
+            std::remove(f.c_str());
+        return;
+    }
     bool allZero = true;
     for (const auto s : p0) if (s != 0) allZero = false;
     check(allZero, "sem dither, silencio digital continua exatamente 0");
@@ -141,9 +168,10 @@ void testStereoChannelsDoNotShareDitherNoise() {
     // do TPDF, os dois canais sairiam sempre com o MESMO valor em cada
     // frame -- confere que isso nao acontece (alguma diferenca aparece).
     const std::vector<float> silence(4000, 0.0f);  // 2000 frames estereo
-    const std::string path = "/tmp/rasgo_wavwriter_test_dither_stereo.wav";
+    const std::string path = rasgo::test::tempPath("dither_stereo");
     EXPECT(writeWav16(path, silence, 48000, 2, 7));
     const auto pcm = readPcm16(path);
+    if (!haveSamples(pcm, 2, "16 bits: dither estéreo")) { std::remove(path.c_str()); return; }
     bool anyChannelDiff = false;
     for (std::size_t i = 0; i + 1 < pcm.size(); i += 2)
         if (pcm[i] != pcm[i + 1]) anyChannelDiff = true;
@@ -158,12 +186,14 @@ void testStereoChannelsDoNotShareDitherNoise() {
 // toca como ruído — é o tipo de erro que só aparece no reprodutor de
 // outra pessoa.
 void test24HeaderDeclaresDepth() {
-    const std::string path = "/tmp/rasgo_wav24_header.wav";
+    const std::string path = rasgo::test::tempPath("header");
     EXPECT(writeWav24(path, {0.0f, 0.0f, 0.5f, -0.5f}, 48000, 2));
     std::uint16_t bits = 0;
     const auto pcm = readPcm24(path, &bits);
-    check(bits == 24, "o cabeçalho declara 24 bits");
-    check(pcm.size() == 4, "quatro amostras escritas");
+    if (haveSamples(pcm, 4, "24 bits: cabeçalho")) {
+        check(bits == 24, "o cabeçalho declara 24 bits");
+        check(pcm.size() == 4, "quatro amostras escritas");
+    }
     std::remove(path.c_str());
 }
 
@@ -171,13 +201,14 @@ void test24HeaderDeclaresDepth() {
 // depender da ordem da máquina. Se alguém "simplificar" para um fwrite de
 // int32 truncado, isto quebra.
 void test24IsLittleEndianAndSigned() {
-    const std::string path = "/tmp/rasgo_wav24_le.wav";
+    const std::string path = rasgo::test::tempPath("le");
     EXPECT(writeWav24(path, {1.0f, -1.0f}, 48000, 1));
     const auto pcm = readPcm24(path);
-    check(pcm.size() == 2, "duas amostras");
-    check(pcm[0] == 8388607, "fundo de escala positivo satura em +2^23-1");
-    check(pcm[1] == -8388607 || pcm[1] == -8388608,
-          "fundo de escala negativo satura no mínimo");
+    if (haveSamples(pcm, 2, "24 bits: little-endian")) {
+        check(pcm[0] == 8388607, "fundo de escala positivo satura em +2^23-1");
+        check(pcm[1] == -8388607 || pcm[1] == -8388608,
+              "fundo de escala negativo satura no mínimo");
+    }
     std::remove(path.c_str());
 }
 
@@ -185,7 +216,7 @@ void test24IsLittleEndianAndSigned() {
 // cast pra inteiro, porque as comparações de clamp são falsas pra NaN e o
 // resultado seria indefinido.
 void test24FinitenessGuard() {
-    const std::string path = "/tmp/rasgo_wav24_nan.wav";
+    const std::string path = rasgo::test::tempPath("nan");
     const float inf = std::numeric_limits<float>::infinity();
     const float nan = std::numeric_limits<float>::quiet_NaN();
     EXPECT(writeWav24(path, {nan, inf, -inf, 0.25f}, 48000, 1));
@@ -194,10 +225,12 @@ void test24FinitenessGuard() {
     // `writeWav16`. Um Inf é defeito, não uma amostra alta: saturá-lo
     // gravaria o bug como estouro audível no arquivo do músico, enquanto
     // zerar deixa um furo silencioso que se percebe e se investiga.
-    check(pcm[0] == 0, "NaN vira zero, não lixo");
-    check(pcm[1] == 0, "+Inf vira zero (é defeito, não sample alto)");
-    check(pcm[2] == 0, "-Inf vira zero");
-    check(pcm[3] > 2000000, "a amostra boa ao lado passa intacta");
+    if (haveSamples(pcm, 4, "24 bits: finitude")) {
+        check(pcm[0] == 0, "NaN vira zero, não lixo");
+        check(pcm[1] == 0, "+Inf vira zero (é defeito, não sample alto)");
+        check(pcm[2] == 0, "-Inf vira zero");
+        check(pcm[3] > 2000000, "a amostra boa ao lado passa intacta");
+    }
     std::remove(path.c_str());
 }
 
@@ -205,16 +238,19 @@ void test24FinitenessGuard() {
 // em −24 dB de propósito, então este é o caso REAL — tem que sobreviver
 // com resolução de sobra.
 void test24ResolvesQuietMaterial() {
-    const std::string p16 = "/tmp/rasgo_wav24_cmp16.wav";
-    const std::string p24 = "/tmp/rasgo_wav24_cmp24.wav";
+    const std::string p16 = rasgo::test::tempPath("cmp16");
+    const std::string p24 = rasgo::test::tempPath("cmp24");
     // ~-90 dBFS: abaixo de 1 LSB de 16 bits, bem acima do de 24
     const float tiny = 3.0e-5f;
     EXPECT(writeWav16(p16, {tiny, tiny, tiny, tiny}, 48000, 1, 0));
     EXPECT(writeWav24(p24, {tiny, tiny, tiny, tiny}, 48000, 1));
     const auto a = readPcm16(p16);
     const auto b = readPcm24(p24);
-    check(a[0] == 0 || a[0] == 1, "em 16 bits o sinal baixo quase some");
-    check(b[0] > 200, "em 24 bits ele ainda tem resolução de sobra");
+    if (haveSamples(a, 1, "16 bits: material baixo")
+        && haveSamples(b, 1, "24 bits: material baixo")) {
+        check(a[0] == 0 || a[0] == 1, "em 16 bits o sinal baixo quase some");
+        check(b[0] > 200, "em 24 bits ele ainda tem resolução de sobra");
+    }
     std::remove(p16.c_str());
     std::remove(p24.c_str());
 }
@@ -222,13 +258,15 @@ void test24ResolvesQuietMaterial() {
 // Sem dither, e isso é deliberado (ver WavWriter.hpp): duas escritas do
 // mesmo material têm que sair byte a byte idênticas.
 void test24IsDeterministic() {
-    const std::string a = "/tmp/rasgo_wav24_det_a.wav";
-    const std::string b = "/tmp/rasgo_wav24_det_b.wav";
+    const std::string a = rasgo::test::tempPath("det_a");
+    const std::string b = rasgo::test::tempPath("det_b");
     std::vector<float> v;
     for (int i = 0; i < 480; ++i) v.push_back(0.3f * std::sin(i * 0.05f));
     EXPECT(writeWav24(a, v, 48000, 1));
     EXPECT(writeWav24(b, v, 48000, 1));
-    check(readPcm24(a) == readPcm24(b), "24 bits é determinístico (sem dither)");
+    const auto va = readPcm24(a);
+    if (haveSamples(va, 480, "24 bits: determinismo"))
+        check(va == readPcm24(b), "24 bits é determinístico (sem dither)");
     std::remove(a.c_str());
     std::remove(b.c_str());
 }
