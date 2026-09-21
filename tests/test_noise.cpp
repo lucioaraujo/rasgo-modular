@@ -35,7 +35,6 @@ std::vector<float> render(Noise& n, const int outIdx, const int samples,
         trigHz > 0.0f ? &tin : nullptr,
         feedInput ? &sin_ : nullptr};
     std::vector<float> r;
-    long t = 0;
     double trPhase = 0.0;
     const double trStep = trigHz > 0.0f ? trigHz / kSr : 0.0;
     double inPhase = 0.0;
@@ -53,7 +52,6 @@ std::vector<float> render(Noise& n, const int outIdx, const int samples,
         n.process(ins, out);
         for (std::size_t i = 0; i < kBlock; ++i)
             r.push_back(out[static_cast<std::size_t>(outIdx)].at(0, i));
-        t += static_cast<long>(kBlock);
     }
     return r;
 }

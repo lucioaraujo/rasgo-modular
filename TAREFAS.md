@@ -8622,3 +8622,63 @@ a shutdown signal"), não falha nossa. `fail-fast: false` já estava
 correto. A re-execução confirma.
 
 **77/77 CTest** verdes localmente, build sem avisos próprios.
+
+## Registro da etapa — 2026-09-21 (2ª rodada): três defeitos de portabilidade, um por sistema
+
+A correção anterior destravou os jobs até a **compilação**, e aí cada
+sistema revelou um defeito próprio — nenhum deles visível no Linux, que é
+o único ambiente que existe aqui. O autor, que passou a receber os
+e-mails de falha, merece o contexto: cada e-mail é um achado real de algo
+que estava quebrado há semanas sem ninguém saber.
+
+**1. Windows — `M_PI` não existe no MSVC.** `M_PI` não é padrão C++: vem
+do POSIX, e GCC e Clang o expõem por hábito. O MSVC só o define com
+`_USE_MATH_DEFINES` antes de `<cmath>`.
+
+    test_additive.cpp(59): error C2065: 'M_PI': undeclared identifier
+    Loudness.hpp(117):     error C2065: 'M_PI': undeclared identifier
+
+São **83 usos em 28 arquivos** — DSP, testes, exemplos, painel. Ou seja:
+o projeto **nunca compilou no Windows**, exatamente como nunca compilou
+no macOS. Resolvido com um `add_compile_definitions(_USE_MATH_DEFINES)`
+global, que cobre os 83 de uma vez sem tocar em 28 arquivos nem inventar
+uma constante paralela à da biblioteca padrão.
+
+**2. macOS — quatro `-Werror` do Clang** que o GCC não dá. Consegui
+**reproduzir os quatro localmente** com o `clang++` instalado, em vez de
+corrigir no escuro e esperar a próxima rodada. E os quatro eram coisas
+diferentes:
+
+- `test_mix.cpp`: `total` contava amostras e nunca era verificado.
+  Apagá-lo era o fácil — mas ele é o **guarda que faltava**: sem
+  `check(total > 0)`, se o laço interno nunca rodasse, o
+  `check(overCeiling == 0)` passaria VAZIO e o teste diria que o
+  limitador está bom sem ter olhado uma amostra. É o mesmo defeito dos
+  testes de WAV de hoje cedo, em outra roupa;
+- `test_oscillator.cpp` e `test_noise.cpp`: `t` incrementado e nunca
+  lido — código morto, removido;
+- `test_planar.cpp`: captura de lambda desnecessária (a variável é
+  constante de compilação).
+
+Depois varri **os 77 testes** com `clang++ -Wall -Wextra -Wpedantic
+-Werror`: zero problemas. Melhor que descobrir o quinto na rodada
+seguinte.
+
+**3. Ubuntu — OOM, não erro de código.**
+
+    c++: fatal error: Killed signal terminated program cc1plus
+
+É o OOM killer, e a mensagem engana: parece falha de compilação.
+`cmake --build --parallel` sem número usa todos os núcleos, e cada
+unidade de tradução do JUCE come muita memória. Fixado em `--parallel 2`
+nos dois passos — o build demora um pouco mais e **termina**, que é o que
+interessa numa CI.
+
+**Nota sobre a documentação.** O `INSTALL.md` afirmava que a CI "prova
+que constrói e empacota" em Windows e macOS. Isso **nunca foi verdade** —
+ela nunca tinha rodado. A frase só pode ser corrigida quando houver um
+verde real; enquanto isso ela é uma afirmação não verificada, e trocá-la
+por outra não verificada seria repetir o erro.
+
+**77/77 CTest** verdes localmente, build sem avisos próprios, e os testes
+também limpos sob Clang com `-Werror`.

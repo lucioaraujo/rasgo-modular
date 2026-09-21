@@ -35,6 +35,22 @@ project(RasgoModularPrototype VERSION 0.1.0 LANGUAGES C CXX)
 
 include(CTest)
 
+# `M_PI` NÃO é padrão C++. Ele vem do POSIX, e o GCC e o Clang o expõem
+# por hábito — o MSVC, não, a menos que `_USE_MATH_DEFINES` esteja
+# definido ANTES de `<cmath>`. O projeto usa `M_PI` em 83 lugares, de 28
+# arquivos (DSP, testes, exemplos, o painel), então **nunca compilou no
+# Windows**:
+#
+#   test_additive.cpp(59): error C2065: 'M_PI': undeclared identifier
+#   Loudness.hpp(117):     error C2065: 'M_PI': undeclared identifier
+#
+# Achado da CI em 21 set. 2026, no primeiro dia em que ela rodou de
+# verdade. Uma definição global resolve os 83 usos de uma vez, sem tocar
+# em 28 arquivos nem inventar uma constante paralela à da biblioteca
+# padrão. É inofensiva fora do MSVC: nos outros compiladores a macro
+# simplesmente não muda nada.
+add_compile_definitions(_USE_MATH_DEFINES)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

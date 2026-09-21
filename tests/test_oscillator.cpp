@@ -41,7 +41,6 @@ std::vector<float> render(Oscillator& o, const int outIdx, const int samples,
         nullptr,
         syncHz != 0.0f ? &sin_ : nullptr};
     std::vector<float> r;
-    long t = 0;
     double fmPhase = 0.0;
     const double syncStep = syncHz > 0.0f ? syncHz / kSampleRate : 0.0;
     double syncPhase = 0.0;
@@ -63,7 +62,6 @@ std::vector<float> render(Oscillator& o, const int outIdx, const int samples,
         o.process(ins, out);
         for (std::size_t i = 0; i < kBlock; ++i)
             r.push_back(out[static_cast<std::size_t>(outIdx)].at(0, i));
-        t += static_cast<long>(kBlock);
     }
     return r;
 }
