@@ -27,7 +27,13 @@ BUILD_DIR=build
 APP="$BUILD_DIR/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular"
 DO_BUILD=0
 FOREGROUND=0
-LOG="${TMPDIR:-/tmp}/rasgo-modular.log"
+# Log POR INSTÂNCIA. Era um caminho fixo, e com duas janelas abertas as
+# duas escreviam no mesmo arquivo: a segunda truncava o da primeira, e o
+# que sobrava era um log impossível de ler — linhas de uma tomada
+# aparecendo no log de outra sessão. Em 22 set. 2026 isso atrapalhou o
+# diagnóstico de um travamento, que é justamente quando o log importa.
+# O `$$` é o PID do script; o do app vai impresso ao lado.
+LOG="${TMPDIR:-/tmp}/rasgo-modular-$$.log"
 
 for arg in "$@"; do
   case "$arg" in
@@ -102,6 +108,22 @@ if [ ! -x "$APP" ]; then
   echo "  $APP" >&2
   echo "rode './run --build', ou configure com -DRASGO_MODULAR_JUCE_PATH=..." >&2
   exit 1
+fi
+
+# AVISA se já houver instância aberta. As opções (seed, resume, taps de
+# gravação) são lidas do ambiente NO ARRANQUE: uma janela aberta antes
+# não as tem, e as duas janelas ficam visualmente idênticas. Em 22 set.
+# 2026 isto custou uma sessão de teste — `./run --rec-both` abriu uma
+# segunda janela, a gravação foi feita na primeira, e saiu UM arquivo em
+# vez de dois; o `--rec-both` parecia quebrado e estava certo.
+# Só avisa, não mata: duas instâncias são legítimas (comparar dois seeds,
+# por exemplo). Quem decide é quem está tocando.
+ABERTAS=$(pgrep -c -x "Rasgo Modular" 2>/dev/null || echo 0)
+if [ "$ABERTAS" -gt 0 ] 2>/dev/null; then
+  echo "aviso: já há $ABERTAS instância(s) do Rasgo Modular aberta(s)." >&2
+  echo "  As opções desta linha valem SÓ para a janela nova — a antiga" >&2
+  echo "  não grava com os dois taps nem retoma sessão." >&2
+  echo "  Para testar sem ambiguidade, feche as outras primeiro." >&2
 fi
 
 echo "-> abrindo${RASGO_SEED:+  seed=$RASGO_SEED}${RASGO_RESUME:+  resume}${RASGO_REC_TAP:+  tap=$RASGO_REC_TAP}"
