@@ -1,19 +1,23 @@
 name: Rasgo Modular — build, test & package
 
-# ATENÇÃO — este workflow está INERTE hoje.
+# Constrói, testa e empacota nos três sistemas. Existe porque o gate de
+# publicação exige "ao menos um caminho de build/execução verificável por
+# plataforma suportada", e sem máquina Windows ou macOS à mão é esta CI
+# que produz a evidência.
 #
-# O GitHub Actions só lê workflows do `.github/workflows/` da RAIZ do
-# repositório. O Rasgo Modular vive dentro do monorepo privado
-# `rasgo-instruments`, então este arquivo (em `RASGO_MODULAR/.github/`)
-# não é executado. Ele passa a valer no momento em que o projeto for
-# extraído pro seu próprio repositório público — exatamente o que
-# aconteceu com o Antitotem (27 ago. 2026) e com o Navalha 2, cujos
-# workflows moram na mesma posição relativa e só ficaram vivos depois da
-# extração. Ver `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`.
+# HISTÓRICO, porque a lição é cara: até 21 set. 2026 este arquivo estava
+# INERTE e ninguém sabia. O GitHub Actions só lê workflows do
+# `.github/workflows/` da RAIZ do repositório, e o projeto vivia dentro do
+# monorepo `rasgo-instruments` — o arquivo existia, parecia pronto, e
+# nunca tinha rodado uma única vez. Quando a extração pro repositório
+# próprio o acordou, os três jobs falharam e foi preciso corrigir CINCO
+# defeitos reais, dois deles impedindo a compilação por completo
+# (`std::filesystem` contra um deployment target de 10.13 no macOS;
+# `M_PI`, que o MSVC não define, em 83 lugares do código).
 #
-# Está aqui agora porque o gate de publicação exige "ao menos um caminho
-# de build/execução verificável por plataforma suportada", e sem máquina
-# Windows/macOS à mão é a CI que produz essa evidência.
+# Mesmo caminho do Antitotem (27 ago. 2026) e do Navalha 2, cujos
+# workflows moram na mesma posição relativa e também só ficaram vivos
+# depois da extração. Ver `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`.
 
 on:
   push:
@@ -27,7 +31,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          # `ubuntu-22.04` fixo, e NÃO `ubuntu-latest`. O `.deb` herda as
+          # versões de biblioteca da máquina que o compilou: com o
+          # `latest` (hoje 24.04) a dependência saía `libasound2t64` —
+          # nome que veio da transição do `time_t` para 64 bits e que não
+          # existe no Ubuntu 22.04, cujo suporte vai até 2027. O pacote
+          # simplesmente não instalava lá, e ninguém tinha decidido isso:
+          # era efeito colateral de seguir o `latest`.
+          #
+          # Compilar no 22.04 é a direção que funciona: binário feito
+          # contra bibliotecas mais antigas roda em sistema mais novo, o
+          # contrário não. Um único `.deb` passa a atender 22.04, 24.04 e
+          # derivados (Mint 21 e 22 inclusive).
+          - os: ubuntu-22.04
             generator: DEB
             artifact-glob: build/*.deb
           - os: windows-latest
@@ -65,8 +81,14 @@ jobs:
             libfreetype6-dev libfontconfig1-dev \
             libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
             libxinerama-dev libxrandr-dev libxrender-dev \
-            libwebkit2gtk-4.1-dev libgtk-3-dev \
+            libgtk-3-dev \
             libglu1-mesa-dev mesa-common-dev
+          # O WebKit mudou de nome entre as versões do Ubuntu: `4.1` a
+          # partir do 23.04, `4.0` no 22.04. Fixar um só quebraria a CI
+          # ao trocar de runner — que é exatamente a troca que acabamos
+          # de fazer. Tenta o novo e cai no antigo.
+          sudo apt-get install -y libwebkit2gtk-4.1-dev \
+            || sudo apt-get install -y libwebkit2gtk-4.0-dev
 
       - name: Install NSIS (Windows)
         if: runner.os == 'Windows'
