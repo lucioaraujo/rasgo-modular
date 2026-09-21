@@ -8562,3 +8562,63 @@ verdes, build sem avisos próprios.
 Documentos sincronizados: `INSTALL.md` (formato de saída e gravação,
 decisão sobre Windows/macOS), `PUBLICACAO.md` (as três decisões),
 `CHANGELOG.md`.
+
+## Registro da etapa — 2026-09-21: a CI rodou pela primeira vez e achou três coisas
+
+Extraído o projeto pra repositório próprio
+([`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/rasgo-modular),
+privado), o workflow de três sistemas saiu da inércia — o GitHub Actions
+só lê `.github/workflows/` da raiz do repositório, então enquanto o
+Modular fosse um subdiretório do monorepo o arquivo era decorativo.
+**Na primeira execução, os três jobs falharam.** Vale registrar o que
+isso significa: a CI existia há semanas, "pronta", e nunca tinha provado
+nada.
+
+**1. macOS — o projeto NUNCA compilou.** O job não passou da compilação:
+
+    ArchiveStorage.hpp:25: error: 'path' is unavailable:
+    introduced in macOS 10.15
+
+O `CMAKE_OSX_DEPLOYMENT_TARGET` estava em **10.13**, mas
+`std::filesystem` só existe na libc++ da Apple a partir do **10.15** — e
+o projeto o usa em `src/core/ArchiveStorage.hpp`, no painel X11 e num
+teste. O 10.13 era aspiracional: ninguém tinha como descobrir, porque não
+há máquina Apple aqui e a CI não rodava. Subi pra 10.15 em vez de
+arrancar o `std::filesystem` — 10.15 é de 2019, a fatia arm64 exige 11.0
+de qualquer forma, e trocar biblioteca padrão testada por manipulação de
+caminhos à mão seria arriscar defeito real por um alvo que nunca
+funcionou.
+
+Isto confirma, pela terceira vez nesta família, a lição já anotada: todo
+app JUCE do RASGO precisa ter o uso de stdlib conferido contra as lacunas
+de versão da libc++ da Apple.
+
+**2. Windows — SEGFAULT nos testes de WAV.** Eles escreviam em `/tmp/...`
+fixo. No Windows `/tmp` não existe: o `fopen` falha, o arquivo nunca é
+escrito, a leitura devolve vetor vazio. Dois defeitos de gravidade
+diferente saíram daí:
+
+- os testes **novos** de PCM24 indexavam `pcm[0]` direto e o job morreu —
+  barulhento, mas honesto;
+- os testes **antigos** percorriam com `i < pcm.size()`, então com zero
+  amostras o laço não rodava e eles **passavam verdes sem testar nada**.
+  Esse é o pior: um teste que mente para quem confia nele.
+
+Corrigido com `tests/TempPath.hpp` (zero-dep, pelos ambientes
+convencionais `TMPDIR`/`TEMP`/`TMP`) e com guardas de tamanho em **toda**
+leitura de arquivo, para que uma escrita falha REPORTE em vez de estourar
+ou passar calada. O mesmo se aplicou ao `test_audio_file.cpp` e ao
+`test_graph_engine.cpp`, que usava `std::filesystem::temp_directory_path()`
+— função que *lança* quando o diretório não existe, abortando o processo
+sem dizer qual verificação falhou.
+
+**Verificado reproduzindo o defeito**, não só lendo: com
+`TMPDIR=/nao/existe` (equivalente ao `/tmp` ausente do Windows) a suíte
+antes tinha 1 SEGFAULT, 1 abort e 1 falha; agora falha dizendo
+`li 0 amostras, esperava ao menos N (a escrita do arquivo falhou?)`.
+
+**3. Ubuntu — SIGTERM de infraestrutura** (exit 143, "runner has received
+a shutdown signal"), não falha nossa. `fail-fast: false` já estava
+correto. A re-execução confirma.
+
+**77/77 CTest** verdes localmente, build sem avisos próprios.

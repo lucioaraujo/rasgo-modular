@@ -1,5 +1,6 @@
 #include "core/Graph.hpp"
 #include "core/ArchiveStorage.hpp"
+#include "TempPath.hpp"
 
 #include <cmath>
 #include <filesystem>
@@ -127,8 +128,14 @@ int main() {
     envelope.provenance.source.clear();
     assert(!envelope.valid());
     envelope.provenance.source = "RASGO workspace";
-    const auto archiveDirectory = std::filesystem::temp_directory_path()
-        / "rasgo-modular-archive-test";
+    // `std::filesystem::temp_directory_path()` LANÇA se o diretório
+    // apontado por TMPDIR não existir, e uma exceção solta num teste
+    // aborta o processo sem dizer qual verificação falhou. O helper
+    // devolve um caminho sempre — caindo no diretório de trabalho como
+    // último recurso — e é o mesmo que os testes de WAV usam desde que a
+    // CI mostrou que `/tmp` fixo não existe no Windows.
+    const std::filesystem::path archiveDirectory =
+        std::filesystem::path(rasgo::test::tempDir()) / "rasgo-modular-archive-test";
     std::error_code archiveError;
     std::filesystem::remove_all(archiveDirectory, archiveError);
     assert(ArchiveStorage::writeEnvelope(envelope, archiveDirectory));

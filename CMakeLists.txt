@@ -3,11 +3,30 @@ cmake_minimum_required(VERSION 3.22)
 # PRECISA vir antes do `project()` (exigência do CMake/Apple). Mesmo bug
 # que o ANTITOTEM e o Navalha 2 pegaram ao vivo (26 ago. 2026): sem isto o
 # .dmg sai com uma fatia só (a arquitetura do runner) e com `minos` = a
-# versão do macOS do runner, e recusa abrir em Mac mais antigo. 10.13 é
-# alvo amplamente suportado pelo JUCE; x86_64;arm64 dá UM binário
-# Universal 2 em vez de obrigar a escolher entre dois downloads.
+# versão do macOS do runner, e recusa abrir em Mac mais antigo.
+# x86_64;arm64 dá UM binário Universal 2 em vez de obrigar a escolher
+# entre dois downloads.
+#
+# 10.15, e NÃO 10.13. Corrigido em 21 set. 2026, no primeiro dia em que a
+# CI rodou de verdade (até a extração pra repositório próprio o workflow
+# estava inerte, porque o Actions só lê `.github/workflows/` da raiz). O
+# job do macOS não passou nem da compilação:
+#
+#   ArchiveStorage.hpp:25: error: 'path' is unavailable:
+#   introduced in macOS 10.15
+#
+# `std::filesystem` só existe na libc++ da Apple a partir do 10.15, e o
+# projeto o usa em `src/core/ArchiveStorage.hpp`, `apps/panel/panel_main.cpp`
+# e num teste. Com alvo 10.13 este código NUNCA compilou pra macOS — o
+# número era aspiracional, e ninguém tinha como descobrir: não há máquina
+# Apple neste ambiente e a CI não rodava.
+#
+# Subir o alvo, e não arrancar o `std::filesystem`: 10.15 é de 2019, a
+# fatia arm64 exige 11.0 de qualquer forma, e trocar biblioteca padrão
+# testada por manipulação de caminhos à mão seria arriscar defeito real
+# para atender um alvo que nunca funcionou.
 if (APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum macOS version" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum macOS version" FORCE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build a Universal 2 binary" FORCE)
 endif()
 
