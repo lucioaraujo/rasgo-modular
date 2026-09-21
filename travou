@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Rasgo Modular — captura o estado do app QUANDO ELE TRAVA.
+#
+# Rode isto ENQUANTO a janela está travada, antes de fechá-la: fechar o
+# app apaga a única evidência que existe. Um travamento relatado de
+# memória, depois que passou, não dá para investigar.
+#
+#   ./travou
+#
+# Não mata nada e não mexe no áudio, exceto por uma pausa de instantes
+# se o gdb conseguir anexar.
+#
+# O que sai daqui responde às perguntas que separam as causas possíveis:
+#   - está GIRANDO (consumindo CPU) ou PARADO à espera de algo?
+#   - se está girando, QUAL thread, e em que função?
+#   - a memória está crescendo?
+# Deadlock e laço infinito têm a mesma cara pra quem olha a janela, e
+# tratamento completamente diferente.
+
+set -uo pipefail
+cd "$(dirname "$0")"
+
+NOME="Rasgo Modular"
+SAIDA="${TMPDIR:-/tmp}/rasgo-travou-$(date +%Y%m%d-%H%M%S).txt"
+
+PIDS=$(pgrep -x "$NOME" || true)
+if [ -z "$PIDS" ]; then
+  echo "Não há nenhuma instância do Rasgo Modular aberta." >&2
+  echo "Se ela acabou de ser fechada, a evidência foi embora com ela —" >&2
+  echo "rode isto da próxima vez ANTES de fechar a janela." >&2
+  exit 1
+fi
+
+exec > >(tee "$SAIDA") 2>&1
+
+echo "=== Rasgo Modular — captura de travamento ==="
+date -Is
+echo
+
+for P in $PIDS; do
+  echo "--- processo $P ---"
+  ps -o pid,stat,%cpu,%mem,etime,nlwp -p "$P" | sed 's/^/  /'
+  echo
+  grep -E "^(VmRSS|VmSize|Threads)" "/proc/$P/status" 2>/dev/null | sed 's/^/  /'
+  echo
+
+  # GIRANDO ou PARADO: a mesma janela congelada, causas opostas.
+  # Duas amostras do tempo de CPU por thread, com 2 s entre elas.
+  echo "  CPU por thread (2 s de amostragem):"
+  declare -A ANTES
+  for t in /proc/$P/task/*; do
+    id=$(basename "$t")
+    ANTES[$id]=$(awk '{print $14+$15}' "$t/stat" 2>/dev/null || echo 0)
+  done
+  sleep 2
+  # o cabeçalho FORA do `sort`, senão ele é ordenado junto e vai parar
+  # no fim da lista — foi o que aconteceu no primeiro teste
+  printf "    %-10s %-16s %-6s %s\n" THREAD NOME "%CPU" ONDE
+  {
+    for t in /proc/$P/task/*; do
+      id=$(basename "$t")
+      [ -r "$t/stat" ] || continue
+      depois=$(awk '{print $14+$15}' "$t/stat" 2>/dev/null || echo 0)
+      delta=$(( depois - ${ANTES[$id]:-0} ))
+      # ticks -> % de um núcleo em 2 s (100 ticks/s)
+      pct=$(( delta * 100 / 200 ))
+      nm=$(cat "$t/comm" 2>/dev/null)
+      wc=$(cat "$t/wchan" 2>/dev/null)
+      printf "    %-10s %-16s %-6s %s\n" "$id" "$nm" "$pct%" "${wc:-(rodando)}"
+    done
+  } | sort -k3 -rn -t' '
+  echo
+
+  # A pilha: é o que diz ONDE ele está preso. Sem isto, o resto é pista.
+  echo "  Pilhas das threads:"
+  if gdb -p "$P" -batch -ex "set pagination off" -ex "thread apply all bt 24" \
+         2>/dev/null | grep -qE "^#|^Thread"; then
+    gdb -p "$P" -batch -ex "set pagination off" \
+        -ex "thread apply all bt 24" 2>/dev/null | sed 's/^/    /'
+  else
+    echo "    (não foi possível anexar — este sistema tem"
+    echo "     kernel.yama.ptrace_scope=$(cat /proc/sys/kernel/yama/ptrace_scope 2>/dev/null))"
+    echo
+    echo "    Rode ESTA linha, com a janela ainda travada, e me mande a saída:"
+    echo
+    echo "      sudo gdb -p $P -batch -ex 'set pagination off' \\"
+    echo "           -ex 'thread apply all bt 24'"
+  fi
+  echo
+done
+
+echo "=== fim ==="
+echo
+echo "Relatório salvo em: $SAIDA"
