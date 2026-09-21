@@ -15,6 +15,58 @@ A **B** é verificação funcional do que mudou e eu não pude observar.
 
 ---
 
+## Por onde começar — a ordem que fecha a publicação
+
+Escrito em 21 set. 2026, quando o autor perguntou "o que preciso testar
+para validar de uma vez por todas a publicação?". A resposta honesta é
+que **só duas coisas travam**, e uma delas é curta.
+
+### Sessão 1 — uma hora, e destrava a camada 2 pela metade
+
+Faça numa sentada só, com o app aberto e gravando:
+
+1. **Abra o app e aperte `g` antes de clicar em qualquer coisa.** Se
+   sortear um seed, o defeito de foco está morto. (30 segundos.)
+2. **Desfazer, doze vezes seguidas.** É o recurso mais novo e mais
+   estrutural, e a falha dele é silenciosa — perde-se trabalho sem aviso.
+3. **Salvar, fechar, `./run --resume`.** Depois BANCO e ABRIR. Se o patch
+   abrir mudo, o alvo de saída não reancorou.
+4. **Arraste um módulo pelo corpo na vista RACK·SAÍDA.** Você relatou
+   esta falha e a correção nunca foi confirmada.
+5. **`./run --rec-both` por um minuto.** Dois `.wav` com o tap no nome
+   mais um `.score.txt`; o `pre-safety` deve soar mais dinâmico.
+
+Se os cinco passarem, o instrumento está funcionalmente verificado.
+
+### Sessão 2 — a que não tem atalho
+
+Os **quatro estudos de escuta da Parte A**. É o único bloqueio duro da
+camada 2, e nenhum trabalho de código o remove: alguém precisa ouvir e
+registrar o que ouviu. O Antitotem fechou quatro antes de publicar e
+**achou um bug de sinal real no processo**.
+
+Pode ser em dias diferentes. O que não pode é ser pulado, nem ser
+"escutei e achei bom" sem achado escrito — um estudo sem achado
+registrado é indistinguível de um estudo não feito.
+
+### O que NÃO precisa mais ser testado
+
+- **Teclado** — virou tabela única com teste que roda nos três sistemas;
+- **MATRIX** — confirmado no uso;
+- **Build e empacotamento nos três sistemas** — a CI provou, com
+  `.deb`/`.dmg`/`.exe` gerados e o `.app` verificado como Universal 2 de
+  verdade;
+- **Comportamento do motor** — 77 testes, executados em Linux, Windows e
+  macOS.
+
+### O que fica declarado como limitação, não testado
+
+O app **nunca foi aberto** em Windows nem em macOS, e não há como fazê-lo
+aqui. A decisão de publicar assim já foi tomada e registrada — o que o
+gate exige é que isso seja dito em voz alta, e está.
+
+---
+
 ## Parte A — escuta (4 estudos)
 
 ### Preparação comum
@@ -149,23 +201,29 @@ o som "afinando" ou perdendo corpo com o tempo, consumo de memória
 subindo. É o teste que nenhuma bateria automática substitui, porque o
 defeito é raro por definição.
 
-### Teclado (era o mais quebrado)
+### Teclado — ✅ **FECHADO em 21 set. 2026**
 
-O foco nunca chegava ao app: a caixa de seed ficava com ele e engolia
-tudo. Testar **logo ao abrir, sem clicar em nada antes** — era esse o
-caso que falhava.
+Era a área mais quebrada do app. Hoje não precisa mais ser testada tecla
+a tecla, e a razão é estrutural: o mapeamento saiu do `keyPressed` e
+virou **uma tabela única** (`src/ui/Shortcuts.hpp`) coberta por um teste
+que executa as 17 combinações em todas as formas em que o sistema pode
+entregar uma tecla — minúscula, maiúscula (Shift/CapsLock), sem
+caractere, e com Ctrl mandando caractere de controle. O teste foi
+verificado contra o bug (reintroduzindo a falha histórica ele acusa 31
+falhas), e roda nos três sistemas.
 
-- [ ] `g` sorteia seed · `v` liga/desliga VARIA
-- [ ] `m` muda · `e` evolui · `c` cruza
-- [ ] `[espaço]` rompe e reata todos os cabos
-- [ ] `n` descabeia tudo
-- [ ] `Ctrl+Z` desfaz — inclusive **um cabo recém-ligado**
-- [ ] `Ctrl+S` salva · `Ctrl+B` banco · `Ctrl+O` abre · `Ctrl+R` grava
-- [ ] `Ctrl+=` / `Ctrl+−` / `Ctrl+0` zoom · setas rolam
-- [ ] `Esc` cancela um cabo sendo puxado
-- [ ] `r` repõe o seed atual, desfazendo as edições à mão
-- [ ] **Todo atalho com botão ACENDE o botão** por um instante — é o sinal
-      de que a ação saiu
+Confirmado no uso pelo autor: `n`, `r`, `Ctrl+R`, `Ctrl+Z`, `Ctrl+O`, e
+"todos os botões acendem".
+
+**O que o teste NÃO prova, e só o uso mostra** — confira uma vez, ao
+abrir o app, sem clicar em nada antes (era esse o caso que falhava):
+
+- [ ] logo ao abrir, **antes de clicar em qualquer lugar**, `g` sorteia
+      um seed. Se nada acontecer, o foco ficou preso na caixa de seed —
+      foi o defeito original;
+- [ ] depois de **digitar** um número na caixa de seed, os atalhos voltam
+      a funcionar sem precisar clicar no rack;
+- [ ] `Esc` cancela um cabo que está sendo puxado.
 
 ### Afordância de cabeamento
 
@@ -176,13 +234,10 @@ caso que falhava.
       LEARN, que some sozinho
 - [ ] Depois de digitar na caixa de seed, os atalhos voltam a funcionar
 
-### Módulo MATRIX
+### Módulo MATRIX — ✅ confirmado pelo autor em 20 set. 2026
 
-Era desenhado como 16 knobs; agora é a grade de células do painel.
-
-- [ ] A grade 4×4 aparece como células, não knobs
-- [ ] Arrastar verticalmente numa célula muda o ganho
-- [ ] Barra sobe do centro (positivo) e desce (negativo)
+("matrix está funcionando"). A grade 4×4 aparece como células, o arrasto
+vertical muda o ganho e a barra sobe/desce do centro.
 
 ### Janela e layout
 
@@ -196,8 +251,11 @@ Era desenhado como 16 knobs; agora é a grade de células do painel.
 - [ ] Em RACK·SAÍDA, depois de `n`, aparece a **dica** em vez de tela vazia
 - [ ] Em RACK·SAÍDA, arrastar um módulo novo da paleta o deixa **visível**,
       com borda tracejada — e a borda some assim que ele é cabeado até o som
-- [ ] Em RACK·SAÍDA, arrastar um módulo pelo corpo **reposiciona** (antes o
-      arrasto era ignorado fora da vista TODOS)
+- [ ] Em RACK·SAÍDA, arrastar um módulo pelo corpo **reposiciona**. Este
+      tem prioridade: o autor relatou exatamente esta falha em 20 set.
+      2026 ("inseri o módulo com o rack saída, ele entrou por último,
+      porém tentei desloca-lo para uma outra posição e não consegui"), foi
+      corrigido, e a correção **nunca foi confirmada no uso**
 - [ ] Trocar para EN muda `RACK · OUTPUT`, `BREAK`/`RECONNECT` no
       inspector e `built` no SOBRE
 - [ ] `RING`/`FOLD`/`AMT`/`COND` seguem em inglês em qualquer idioma —
