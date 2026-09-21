@@ -8865,3 +8865,38 @@ foi copiar de uma pasta do disco para outra, para que a remoção não os
 destruísse. Continuam locais. Se forem só testes de desenvolvimento,
 podem ser apagados a pedido — não por iniciativa minha, porque áudio
 gerado é material que a governança manda não apagar sem palavra do autor.
+
+## Registro da etapa — 2026-09-21: `./run --build` quebrado por um `build/` sem JUCE
+
+O autor rodou `./run --build` e recebeu:
+
+    gmake: *** No rule to make target 'RasgoModularApp'.  Stop.
+
+Causa: **minha**. Ao verificar a restauração do diretório eu configurei
+`cmake -B build` sem `-DRASGO_MODULAR_JUCE_PATH`, para testar só o motor.
+Sem o JUCE apontado, o alvo do app **nem é criado** — e o cache do CMake
+guarda essa ausência, então o `./run --build` ficava quebrado para
+sempre, com um erro que não menciona JUCE em lugar nenhum e manda
+procurar no lugar errado.
+
+Corrigido na raiz, porque isto pega qualquer pessoa que rode `cmake -B
+build` uma vez só para os testes:
+
+- o `run` agora **procura o JUCE sozinho** — variável de ambiente, depois
+  o cache de um build anterior, depois os lugares onde ele vive nesta
+  árvore (`../RASGO_SYNTH/JUCE-master` e outros);
+- e **reconfigura** quando o alvo do app não existe, em vez de só
+  recompilar um build incompleto;
+- sem achar, diz o que falta e como apontar, em vez do erro do `gmake`.
+
+**O teste do conserto achou um defeito pior que o original.** Reproduzi a
+situação numa cópia e o script saiu com código 1 e **nenhuma mensagem**.
+O motivo é `set -e`: numa atribuição `JUCE=$(achar_juce)`, um status
+diferente de zero mata o processo ali mesmo — antes de executar a
+mensagem de erro logo abaixo, que era exatamente a que explicaria o
+problema. Um `return 0` explícito na função resolve, com o porquê escrito
+ao lado para ninguém "limpar" aquilo depois.
+
+Verificado nos três caminhos: sem JUCE alcançável (diz o que falta),
+com JUCE por variável (configura e compila), e no diretório real com
+build bom (reaproveita o cache, `Built target` sem recompilar).

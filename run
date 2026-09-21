@@ -44,14 +44,54 @@ for arg in "$@"; do
   esac
 done
 
-# Sem o JUCE apontado, o alvo do app nem existe — e o erro do CMake sobre
-# isso é obscuro. Melhor dizer o que falta.
+# Sem o JUCE apontado, o alvo `RasgoModularApp` NEM EXISTE, e o erro que
+# aparece é "No rule to make target 'RasgoModularApp'" — que não diz nada
+# sobre JUCE e manda a pessoa procurar no lugar errado. Pior: um `build/`
+# configurado sem JUCE (fácil de criar rodando só `cmake -B build` para
+# testar o motor) deixa o `./run --build` quebrado para sempre, porque o
+# cache do CMake guarda a ausência.
+#
+# Então: procurar o JUCE sozinho, e reconfigurar quando o alvo faltar.
+achar_juce() {
+  # 1) o que a pessoa disser, 2) o cache de um build anterior,
+  # 3) os lugares onde o JUCE vive nesta árvore.
+  if [ -n "${RASGO_MODULAR_JUCE_PATH:-}" ]; then
+    echo "$RASGO_MODULAR_JUCE_PATH"; return
+  fi
+  local doCache
+  doCache=$(sed -n 's/^RASGO_MODULAR_JUCE_PATH:PATH=//p' \
+            "$BUILD_DIR/CMakeCache.txt" 2>/dev/null | head -1)
+  if [ -n "$doCache" ] && [ -d "$doCache" ]; then echo "$doCache"; return; fi
+  local c
+  for c in ../RASGO_SYNTH/JUCE-master ../../JUCE ../JUCE "$HOME/JUCE"; do
+    [ -f "$c/CMakeLists.txt" ] && { (cd "$c" && pwd); return 0; }
+  done
+  # `return 0` mesmo sem achar, e isto NÃO é descuido: o script roda com
+  # `set -e`, e numa atribuição `JUCE=$(achar_juce)` um status != 0 mata o
+  # processo ali mesmo — sem executar a mensagem de erro logo abaixo, que
+  # é justamente a que explicaria o que falta. Quem chama decide pelo
+  # texto vazio.
+  return 0
+}
+
+alvo_existe() {
+  cmake --build "$BUILD_DIR" --target help 2>/dev/null \
+    | grep -q "RasgoModularApp"
+}
+
 if [ ! -x "$APP" ] || [ "$DO_BUILD" = 1 ]; then
-  if [ ! -d "$BUILD_DIR" ]; then
-    echo "-> configurando (primeira vez)"
-    echo "   se falhar por falta do JUCE, aponte-o:"
-    echo "   cmake -B build -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE"
-    cmake -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+  if [ ! -d "$BUILD_DIR" ] || ! alvo_existe; then
+    JUCE=$(achar_juce)
+    if [ -z "$JUCE" ]; then
+      echo "erro: não achei um checkout do JUCE." >&2
+      echo "  O app não pode ser construído sem ele (o motor e os testes," >&2
+      echo "  sim). Aponte-o e rode de novo:" >&2
+      echo "    RASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE ./run --build" >&2
+      exit 1
+    fi
+    echo "-> configurando  (JUCE: $JUCE)"
+    cmake -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release \
+          -DRASGO_MODULAR_JUCE_PATH="$JUCE" >/dev/null
   fi
   echo "-> compilando"
   cmake --build "$BUILD_DIR" --target RasgoModularApp -j"$(nproc 2>/dev/null || echo 4)"
