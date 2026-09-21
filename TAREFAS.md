@@ -8755,3 +8755,36 @@ neste sistema. Duas limitações a declarar antes de publicar:
 O pacote também já declara `rasgo.instruments@gmail.com` como mantenedor
 — possivelmente o "contato oficial" pendente no gate, se o autor
 confirmar.
+
+## Registro da etapa — 2026-09-21 (5ª rodada): os três sistemas verdes
+
+**Linux, Windows e macOS passaram inteiros** — compilação, os 77 testes,
+o app JUCE e o instalador de cada plataforma: `.deb` (5 MB), `.exe` NSIS
+(3 MB) e `.dmg` (9 MB).
+
+A verificação do macOS merece destaque porque é a que substitui o teste
+manual que ninguém pode fazer aqui: o binário saiu **Universal 2 de
+verdade**, com as duas fatias (x86_64 e arm64) e `minos 10.15` — o alvo
+do projeto, e **não** o da máquina que compilou, que é um runner macOS
+26. Era exatamente esse o erro que a checagem de `lipo`/`otool` existe
+para pegar, e que já mordeu o ANTITOTEM e o Navalha 2.
+
+**O custo do verde, para registro honesto:** cinco defeitos reais, todos
+presentes há semanas, nenhum visível no Linux.
+
+| # | Sistema | Defeito | Gravidade |
+|---|---|---|---|
+| 1 | macOS | `std::filesystem` exige 10.15; alvo era 10.13 | não compilava |
+| 2 | Windows | `M_PI` não existe no MSVC (83 usos, 28 arquivos) | não compilava |
+| 3 | Windows | testes gravando em `/tmp` fixo | SEGFAULT + testes verdes que não testavam nada |
+| 4 | Ubuntu | OOM por `--parallel` sem limite | build morto |
+| 5 | os três | captura de lambda tratada de 3 jeitos por GCC/Clang/MSVC | não compilava no MSVC |
+
+Dois deles impediam a compilação **por completo**. Ou seja: a afirmação
+que estava no `INSTALL.md` — de que a CI "prova que constrói e empacota"
+nos três sistemas — era falsa desde que foi escrita. O documento agora
+diz isso explicitamente, em vez de apenas corrigir a frase e seguir: a
+postura do projeto é acrescentar a correção, não sumir com o erro.
+
+**Camada 1 (candidato publicável) fechada.** Resta, para a camada 2, só
+a sessão de escuta da Parte A — que é humana e não tem atalho.
