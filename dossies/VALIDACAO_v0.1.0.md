@@ -25,14 +25,18 @@ que **só duas coisas travam**, e uma delas é curta.
 
 Faça numa sentada só, com o app aberto e gravando:
 
-1. **Abra o app e aperte `g` antes de clicar em qualquer coisa.** Se
-   sortear um seed, o defeito de foco está morto. (30 segundos.)
-2. **Desfazer, doze vezes seguidas.** É o recurso mais novo e mais
-   estrutural, e a falha dele é silenciosa — perde-se trabalho sem aviso.
-3. **Salvar, fechar, `./run --resume`.** Depois BANCO e ABRIR. Se o patch
-   abrir mudo, o alvo de saída não reancorou.
-4. **Arraste um módulo pelo corpo na vista RACK·SAÍDA.** Você relatou
-   esta falha e a correção nunca foi confirmada.
+1. ✅ **FEITO em 22 set. 2026** — `g` sorteia seed ao abrir, várias vezes
+   seguidas. O defeito de foco está morto.
+2. ✅ **FEITO em 22 set. 2026** — `Ctrl+Z` várias vezes seguidas,
+   funcionando.
+3. 🟡 **PARCIAL** — `Ctrl+S` (salvar) e `Ctrl+O` (abrir) confirmados em
+   22 set. 2026. **Falta:** fechar o app e reabrir com `./run --resume`,
+   e o `Ctrl+B` (arquivar no banco) seguido de abrir aquele arquivo. Se
+   o patch abrir mudo, o alvo de saída não reancorou — é a falha que
+   este passo procura, e ela só aparece no ciclo completo.
+4. ✅ **FEITO em 22 set. 2026** — arrastar módulo pelo corpo na vista
+   RACK·SAÍDA reposiciona. A correção que estava sem confirmação desde
+   20 set. está validada.
 5. **`./run --rec-both` por um minuto.** Dois `.wav` com o tap no nome
    mais um `.score.txt`; o `pre-safety` deve soar mais dinâmico.
 
@@ -218,9 +222,8 @@ Confirmado no uso pelo autor: `n`, `r`, `Ctrl+R`, `Ctrl+Z`, `Ctrl+O`, e
 **O que o teste NÃO prova, e só o uso mostra** — confira uma vez, ao
 abrir o app, sem clicar em nada antes (era esse o caso que falhava):
 
-- [ ] logo ao abrir, **antes de clicar em qualquer lugar**, `g` sorteia
-      um seed. Se nada acontecer, o foco ficou preso na caixa de seed —
-      foi o defeito original;
+- [x] ✅ logo ao abrir, **antes de clicar em qualquer lugar**, `g` sorteia
+      um seed — confirmado em 22 set. 2026;
 - [ ] depois de **digitar** um número na caixa de seed, os atalhos voltam
       a funcionar sem precisar clicar no rack;
 - [ ] `Esc` cancela um cabo que está sendo puxado.
