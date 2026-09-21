@@ -104,10 +104,11 @@ supostas:
   há Windows nem Mac no ambiente de desenvolvimento. **O autor decidiu
   publicar nessa condição** (21 set. 2026), com a limitação declarada —
   mesmo precedente do Antitotem. A matriz completa está em `INSTALL.md`.
-- **O workflow de CI está inerte** enquanto o projeto vive dentro do
-  monorepo `rasgo-instruments` — o GitHub Actions só lê o
-  `.github/workflows/` da raiz do repositório. Passa a valer na extração
-  para repositório próprio.
+- O instrumento vive agora em **repositório próprio**
+  (`lucioaraujo/rasgo-modular`, privado até a publicação), extraído do
+  monorepo com o histórico preservado. Foi o que tirou a **CI de três
+  sistemas da inércia**: enquanto o projeto era um subdiretório, o GitHub
+  Actions não lia o workflow.
 - **Linux ARM** não foi construído nem testado.
 - O catálogo de módulos **não é fechado** por desenho: a fase didática
   corre em paralelo com módulos novos.
@@ -158,8 +159,9 @@ environment that **sounds on load**, with no MIDI and no audio input.
 
 **Declared limitations.** Windows and macOS have **never been opened** —
 CI proves the build and the package, not the behaviour on real hardware;
-the author decided to publish under that condition, stated openly. The CI
-workflow is inert until the project is extracted to its own repository.
+the author decided to publish under that condition, stated openly. The project now lives in its own
+repository (private until publication), which is what made the
+three-platform CI actually run.
 Linux ARM is untested. The module catalogue is open by design.
 
 AGPL-3.0-or-later; JUCE under AGPLv3, no commercial licence.
