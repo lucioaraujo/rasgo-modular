@@ -4,9 +4,9 @@ Auditoria contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`: as
 cinco camadas e o gate editorial comum. Cada item está marcado com o que
 **foi feito**, não com o que deveria estar pronto.
 
-**Data:** 21 set. 2026 · **Camada atual: 1 (candidato publicável), quase
-fechada.** O que falta pra camada 2 depende de escuta humana, não de
-código.
+**Data:** 21 set. 2026 · **Camada 1 fechada; camada 2 a um passo.** A CI
+de três sistemas ficou verde e gera os três instaladores. O único
+bloqueio restante é escuta humana, não código.
 
 ---
 
@@ -15,8 +15,8 @@ código.
 | Camada | Critério | Estado |
 |---|---|---|
 | 0. Pesquisa local | estado documentado; nada apresentado como release | ✅ `RASGO_MODULAR.md`, `TAREFAS.md`, `dossies/`, `PESQUISA_MODULOS.md` |
-| 1. Candidato publicável | build/execução multiplataforma, licença, créditos, documentação e limitações revisados | 🟡 **quase** — ver abaixo |
-| 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | ❌ falta a sessão de escuta documentada |
+| 1. Candidato publicável | build/execução multiplataforma, licença, créditos, documentação e limitações revisados | ✅ **fechada em 21 set. 2026** — CI verde nos três sistemas, com instaladores gerados |
+| 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | 🟡 pacotes ✅ (.deb/.dmg/.exe) · testes ✅ (77, nos 3 sistemas) · **falta a sessão de escuta documentada** |
 | 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | 🟡 site **existe** em `website/` (4 idiomas, captura de execução real), em preparação — não publica antes do instrumento |
 | 4. Publicação | portal, repositório e página liberados juntos | ❌ |
 
@@ -32,7 +32,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | autoria, créditos, fontes e licença | ✅ `CREDITS_AND_SOURCES.md`, `LICENSE`, `apps/juce/LICENSE_STATUS.md` |
 | instruções de build/instalação e plataforma suportada | ✅ `INSTALL.md` |
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
-| testes automatizados e validações humanas **realmente executados** | 🟡 77 testes automatizados ✅ · validação humana ❌ |
+| testes automatizados e validações humanas **realmente executados** | 🟡 77 testes ✅ **executados nos três sistemas** (Linux, Windows, macOS) · validação humana ❌ |
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
 | links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links da release dependem da tag |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |

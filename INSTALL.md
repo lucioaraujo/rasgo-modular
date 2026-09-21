@@ -17,19 +17,34 @@ que deveria funcionar.
 |---|---|---|---|---|
 | Linux x86-64 | JUCE (`RasgoModularApp`) | ✅ local | ✅ local | ✅ em hardware real |
 | Linux x86-64 | painel X11 (teste) | ✅ local | ✅ local | ✅ em hardware real |
-| Windows x86-64 | JUCE | ⚠️ só na CI | ❌ nunca aberto | ❌ |
-| macOS (Universal 2) | JUCE | ⚠️ só na CI | ❌ nunca aberto | ❌ |
+| Windows x86-64 | JUCE | ✅ na CI (verde em 21 set. 2026) | ❌ nunca aberto | ❌ |
+| macOS (Universal 2) | JUCE | ✅ na CI (verde em 21 set. 2026) | ❌ nunca aberto | ❌ |
 | Linux ARM | — | ❌ | ❌ | ❌ |
 
-**O que "só na CI" quer dizer.** O workflow de três sistemas
-(`.github/workflows/package.yml`) compila o motor, roda os 76 testes,
-compila o app e gera o instalador em cada um — e, no macOS, verifica com
-`lipo` e `otool` que o `.app` é Universal 2 de verdade e carrega o
-deployment target do projeto. Isso prova que **constrói e empacota**. Não
-prova que abre, soa e se comporta bem numa máquina real, porque não há
-Windows nem Mac aqui. O Antitotem foi publicado nessa mesma condição, com
-a decisão registrada explicitamente; o mesmo vale ser dito aqui em vez de
+**O que "na CI" quer dizer, e o que NÃO quer.** O workflow de três
+sistemas (`.github/workflows/package.yml`) compila o motor, roda os 77
+testes, compila o app e gera o instalador em cada sistema. No macOS ele
+ainda confere com `file`/`lipo`/`otool` que o `.app` é Universal 2 de
+verdade — e a verificação passou com o binário trazendo as duas fatias
+(x86_64 e arm64) e `minos 10.15`, o alvo do projeto, e **não** o do
+runner, que roda macOS 26.
+
+Isso prova que **constrói, passa nos testes e empacota**. Não prova que
+abre, soa e se comporta bem numa máquina real, porque não há Windows nem
+Mac neste ambiente. O Antitotem foi publicado nessa mesma condição, com a
+decisão registrada explicitamente; o mesmo vale ser dito aqui em vez de
 deixar o leitor supor.
+
+**Correção de uma afirmação anterior.** Até 21 set. 2026 este documento
+dizia que a CI "prova que constrói e empacota" nos três sistemas. **Não
+provava**: o workflow nunca tinha rodado uma única vez, porque o GitHub
+Actions só lê `.github/workflows/` da raiz do repositório e o projeto
+vivia dentro do monorepo. Quando finalmente rodou, os três jobs falharam,
+e foi preciso corrigir cinco defeitos reais — dois deles impediam a
+compilação por completo (o `std::filesystem` contra o deployment target
+de 10.13 no macOS; o `M_PI`, que o MSVC não define, em 83 lugares do
+código). A frase acima só passou a ser verdadeira depois disso, e fica
+registrado que antes não era.
 
 **Decisão do autor (21 set. 2026):** publicar a `v0.1.0` **nessa
 condição**, com Windows e macOS verificados apenas pela CI — o mesmo
@@ -91,6 +106,21 @@ cmake --build build --target RasgoModularApp -j
 O executável fica em `build/apps/juce/RasgoModularApp_artefacts/Release/`.
 
 ### Pacote instalável
+
+**Limitações do `.deb`** (inspecionado no pacote que a CI gerou):
+
+- **exige Ubuntu 24.04+ / Debian 13+.** A dependência é `libasound2t64`,
+  nome que vem da transição do `time_t` para 64 bits; no Ubuntu 22.04
+  (suporte até 2027) o pacote ainda se chama `libasound2` e a instalação
+  falha. Isso não foi escolhido: vem de a CI usar `ubuntu-latest`. Fixar
+  o runner em `ubuntu-22.04` ampliaria o alcance, ao custo de compilar
+  contra bibliotecas mais antigas;
+- **só cobre a família Debian.** Fedora, Arch e openSUSE precisam
+  compilar do código — um AppImage cobriria todos de uma vez, se vier a
+  fazer falta.
+
+O pacote instala `/usr/bin/rasgo-modular`, uma entrada `.desktop` com as
+categorias de áudio e um ícone SVG escalável.
 
 ```sh
 cd build

@@ -90,9 +90,19 @@ sem-trava. Foi o que acabou com os cliques.
 - **Auditoria de teclado executável** (`tests/test_shortcuts.cpp`): as 17
   combinações, cada uma nas quatro formas em que o sistema pode entregar a
   tecla, mais a garantia de que o tutorial não diverge do código.
-- CI de três sistemas (`.github/workflows/package.yml`) compila, testa e
-  empacota em Linux, Windows e macOS, e confere com `lipo`/`otool` que o
-  `.app` é Universal 2 de verdade.
+- **CI de três sistemas verde** (21 set. 2026): compila, roda os 77
+  testes e empacota em Linux (`.deb`), Windows (`.exe`, NSIS) e macOS
+  (`.dmg`). No macOS a verificação com `file`/`lipo`/`otool` confirmou
+  Universal 2 real — as duas fatias (x86_64 e arm64) e `minos 10.15`, o
+  alvo do projeto e não o da máquina que compilou (um runner macOS 26).
+
+  Vale o registro de que esse verde custou cinco correções, porque o
+  workflow **nunca tinha rodado** antes da extração para repositório
+  próprio: `std::filesystem` contra um deployment target de 10.13 no
+  macOS; `M_PI` indefinido no MSVC em 83 lugares; testes gravando em
+  `/tmp` fixo, que não existe no Windows; um OOM por paralelismo sem
+  limite; e uma captura de lambda que GCC, Clang e MSVC tratam de três
+  jeitos. Dois desses defeitos impediam a compilação por completo.
 
 ### Limitações declaradas
 
