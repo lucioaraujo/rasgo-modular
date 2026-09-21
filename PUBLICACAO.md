@@ -36,7 +36,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
 | links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links da release dependem da tag |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
-| contato oficial | ❌ decisão do autor |
+| contato oficial | ✅ **`rasgo.instruments@gmail.com`** — confirmado pelo autor em 21 set. 2026; já era o `CPACK_PACKAGE_CONTACT` dos instaladores |
 | correspondência entre versão publicada e página editorial | ❌ depende da página |
 | **procedimento de correção/retirada conhecido** | ✅ ver abaixo |
 
@@ -84,7 +84,9 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
    **true-peak** que faltava, a leitura de distância até o alvo no cartão
    SOBRE, e a **gravação em PCM 24 bits** — que era o item que dependia
    justamente desta decisão.
-4. **Contato oficial** e, se aplicável, campanha de apoio.
+4. ~~**Contato oficial**~~ **DECIDIDO em 21 set. 2026:**
+   `rasgo.instruments@gmail.com`, o mesmo que os instaladores já
+   declaravam. Resta, se aplicável, decidir sobre campanha de apoio.
 5. **Mais screenshots**, se quiser mostrar o instrumento em outros
    estados (rack vazio, inspector de cabo aberto, vista SAÍDA). A
    primeira já existe — você a capturou em 18 set. 2026.
@@ -135,9 +137,14 @@ crédito, ou defeito que corrompa trabalho do usuário.
 
 ### Contatos e responsabilidade
 
-Autor e responsável pela decisão de retirada: **Lúcio de Araújo**. O
-canal oficial de contato entra aqui quando for definido (item pendente do
-gate).
+Autor e responsável pela decisão de retirada: **Lúcio de Araújo**.
+
+**Canal oficial de contato: `rasgo.instruments@gmail.com`** (confirmado em
+21 set. 2026). É por ele que chegam relatos de defeito, questões de
+licença ou crédito, e é o endereço que os instaladores já declaram como
+mantenedor — `CPACK_PACKAGE_CONTACT` no `.deb`, no `.dmg` e no `.exe`.
+Coincidirem não é detalhe: quem recebe um pacote quebrado procura o
+contato que está DENTRO dele, não o da página.
 
 ### Retenção
 
