@@ -8813,3 +8813,55 @@ HTML validada (nenhuma tag em aberto).
 "Noble". É a mesma base do `ubuntu-latest` da CI — o que explica por que
 nenhum dos cinco defeitos de portabilidade aparecia aqui, e confirma que
 o `.deb` gerado instala na máquina dele.
+
+## Registro da etapa — 2026-09-21: um repositório só, e o `.deb` alcança o 22.04
+
+Duas decisões do autor, executadas juntas.
+
+### 1. `.deb` compilado no Ubuntu 22.04
+
+A CI usava `ubuntu-latest` (hoje 24.04), e o `.deb` herdava dali a
+dependência `libasound2t64` — nome vindo da transição do `time_t` para 64
+bits, que **não existe** no Ubuntu 22.04, cujo suporte vai até 2027. O
+pacote simplesmente não instalava lá, e ninguém tinha decidido isso: era
+efeito colateral de seguir o `latest`.
+
+Fixado em `ubuntu-22.04`. A direção importa: binário compilado contra
+bibliotecas mais antigas roda em sistema mais novo, o contrário não — um
+`.deb` só passa a atender 22.04, 24.04 e derivados (Mint 21 e 22
+inclusive), sem perder nada.
+
+**Duas armadilhas dessa troca, pegas antes de a CI rodar:**
+
+- `libwebkit2gtk-4.1-dev` só existe do Ubuntu 23.04 em diante; no 22.04 o
+  pacote é `4.0`. Fixar um nome só quebraria a CI exatamente na troca de
+  runner que acabamos de fazer — agora tenta o novo e cai no antigo;
+- o cabeçalho do workflow ainda declarava, em letras garrafais, que ele
+  estava INERTE. Virou histórico datado, porque a lição é cara: o arquivo
+  existia, parecia pronto, e nunca tinha rodado.
+
+### 2. Repositório único
+
+O `RASGO_MODULAR/` do monorepo virou um ponteiro. O instrumento vive em
+`lucioaraujo/rasgo-modular`.
+
+**Verificado antes de remover** — remoção não se faz por confiança:
+
+| O quê | Resultado |
+|---|---|
+| Arquivos versionados | 352 no monorepo, 353 no novo; `comm` não achou nenhum só no antigo (o extra é `tests/TempPath.hpp`) |
+| Histórico | 71 commits preservados por `git subtree split` — a mesma linha do tempo, não um começo do zero |
+| Material local ignorado pelo git | `validation-output/` (19 MB) copiado antes, com `md5sum` comparado arquivo a arquivo: os 6 íntegros |
+| `build/` (191 MB) | regenerável, não preservado |
+
+O histórico do monorepo **fica intacto**: todo commit do Modular continua
+recuperável por lá (`git show <commit>:RASGO_MODULAR/<caminho>`). Saiu a
+árvore de trabalho, não a memória.
+
+**Sobre os `.wav`:** o autor pediu que nenhum áudio suba. Nenhum sobe nem
+nunca subiu — `git ls-files` não lista um único `.wav`, e o
+`.gitignore:19` (`*.wav`) os cobre nos dois repositórios. O que foi feito
+foi copiar de uma pasta do disco para outra, para que a remoção não os
+destruísse. Continuam locais. Se forem só testes de desenvolvimento,
+podem ser apagados a pedido — não por iniciativa minha, porque áudio
+gerado é material que a governança manda não apagar sem palavra do autor.
