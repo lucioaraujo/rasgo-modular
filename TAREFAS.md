@@ -8900,3 +8900,28 @@ ao lado para ninguém "limpar" aquilo depois.
 Verificado nos três caminhos: sem JUCE alcançável (diz o que falta),
 com JUCE por variável (configura e compila), e no diretório real com
 build bom (reaproveita o cache, `Built target` sem recompilar).
+
+## Registro da etapa — 2026-09-22: sessão funcional, 4 de 5 confirmados
+
+O autor executou a Sessão 1 do protocolo de validação. Resultados:
+
+| Passo | Resultado |
+|---|---|
+| 1. Foco ao abrir (`g` antes de clicar) | ✅ sorteia seed, várias vezes |
+| 2. Desfazer (`Ctrl+Z`) repetido | ✅ |
+| 3. Salvar / abrir | 🟡 `Ctrl+S` e `Ctrl+O` ✅; falta `--resume` e `Ctrl+B` |
+| 4. Arrastar módulo na vista RACK·SAÍDA | ✅ |
+| 5. REC com os dois taps | em execução |
+
+O passo 1 fecha o defeito mais grave da semana — a caixa de seed retinha
+o foco e o teclado inteiro parecia não existir até alguém clicar no rack
+por acaso.
+
+O passo 4 fecha uma correção que estava **sem confirmação desde 20 set.**
+— o autor tinha relatado que não conseguia reposicionar um módulo na
+vista SAÍDA, e a correção nunca havia sido exercitada no uso.
+
+O passo 3 ficou parcial de propósito: salvar e abrir funcionam, mas a
+falha que esse passo procura (patch abrindo MUDO porque o alvo de saída
+não reancorou) só aparece no ciclo completo — fechar o app e voltar por
+`--resume`, e o arquivamento no banco.
