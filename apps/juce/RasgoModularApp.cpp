@@ -201,6 +201,21 @@ struct Rack {
     std::atomic<float> lufsI{LoudnessMeter::kSilence};
     std::atomic<float> lufsTP{-120.0f};   // true-peak, dBTP
 
+    // BLOCOS FAMINTOS: quantas vezes o thread de áudio não conseguiu o
+    // grafo e teve de reemitir o bloco anterior.
+    //
+    // Existe porque isso acontecia em SILÊNCIO. O autor relatou estalos
+    // em 23 set. 2026; o render sem janela não os reproduziu (zero
+    // descontinuidades em 60 s, com e sem VARIA), então não são do DSP.
+    // Sobrou a suspeita de disputa pelo lock — a interface consome 47% de
+    // um núcleo repintando tudo a 30 Hz e toma o `gmx` para desenhar.
+    // Reemitir bloco é descontinuidade, e descontinuidade é estalo.
+    //
+    // Sem contador isso é hipótese; com contador é fato ou não é. O
+    // número aparece no cartão SOBRE, ao lado das leituras de loudness,
+    // para poder ser comparado com o que o ouvido escuta.
+    std::atomic<unsigned> starvedBlocks{0};
+
     // ---- taps de gravação (`SAIDA_AUDIO_COMUM.md §3/§4`) --------------
     // `post-safety` é o que se ouviu — depois do limitador, do teto, de
     // tudo. `pre-safety` é o mesmo sinal ANTES da proteção de saída.
@@ -2946,10 +2961,17 @@ public:
                 // taxa do dispositivo em vez de impor uma; sem esta linha
                 // a única forma de saber em que taxa se está tocando era
                 // ler o código.
+                // "blocos perdidos" em cor de aviso quando há algum: é o
+                // sinal de que a interface está atropelando o áudio, e a
+                // causa provável de estalo. Zero é o esperado.
+                if (lu.starved > 0) g.setColour(T.warning);
                 g.drawText(juce::String(juce::roundToInt(lu.sr)) + u8(" Hz")
-                               + u8("   \xc2\xb7   REC 24 bits PCM"),
+                               + u8("   \xc2\xb7   REC 24 bits PCM")
+                               + u8("   \xc2\xb7   blocos perdidos ")
+                               + juce::String((int)lu.starved),
                            px, py, wrapW, 17,
                            juce::Justification::topLeft, false);
+                g.setColour(T.textSecondary);
                 py += 19;
 
                 // Distância até o alvo declarado (streaming). Os dois
@@ -2996,7 +3018,7 @@ public:
     // app adota em vez de impor (foi a pergunta do autor em 21 set. 2026:
     // "a saída é 48 kHz?" — e a resposta só podia vir da tela, porque
     // depende do dispositivo).
-    struct Lufs { float m, s, i, tp; double sr; };
+    struct Lufs { float m, s, i, tp; double sr; unsigned starved; };
     std::function<Lufs()> onLoudness;
 
 private:
@@ -3216,7 +3238,8 @@ public:
                 rack_.lufsS.load(std::memory_order_relaxed),
                 rack_.lufsI.load(std::memory_order_relaxed),
                 rack_.lufsTP.load(std::memory_order_relaxed),
-                sampleRate_};
+                sampleRate_,
+                rack_.starvedBlocks.load(std::memory_order_relaxed)};
         };
 
         if (rackOutputPref_) view_->setOutputOnly(true);
@@ -4058,6 +4081,7 @@ private:
     void renderBlock() {
         std::unique_lock<std::mutex> lk(rack_.gmx, std::try_to_lock);
         if (!lk) {
+            rack_.starvedBlocks.fetch_add(1, std::memory_order_relaxed);
             starve_ *= 0.86f;
             if (starve_ < 1.0e-4f) starve_ = 0.0f;
             for (std::size_t i = 0; i < blockSize_; ++i) {
