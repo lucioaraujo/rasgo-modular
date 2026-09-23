@@ -9083,3 +9083,55 @@ fila), o cache de imagem do chrome (só recriado se o tamanho mudar) e o
 
 **Próximo passo:** rodar `./travou --vigia` durante o teste de
 estabilidade longa — os dois querem a mesma meia hora de app aberto.
+
+## Registro da etapa — 2026-09-23: a memória está limpa; a CPU não
+
+O autor rodou `./travou --vigia` por 30 minutos com o app aberto. O dado
+fecha a questão da memória e abre outra.
+
+### Memória — NÃO é vazamento
+
+| | |
+|---|---|
+| Primeiro minuto | **+12,1 MB** |
+| Dos 5 aos 30 min | +608 kB no total |
+| Últimos 5 minutos | **+28 kB** |
+
+Ritmo estável em ~16 kB/min e decaindo. Os 12,8 MB de crescimento total
+são quase todos do **primeiro minuto** — fontes, caches e o JUCE
+carregando sob demanda.
+
+As duas amostras que levantaram a suspeita foram colhidas aos 9 s e aos
+48 s de vida, exatamente dentro dessa janela. **Foi certo não ter
+concluído delas.** Teria sido o terceiro diagnóstico errado por amostra
+insuficiente nesta semana, depois do `.score.txt` de 45 KB e dos taps de
+gravação.
+
+### CPU — achado real, e ele é da interface
+
+Medido instantaneamente, com o app tocando há 46 min:
+
+| Thread | Custo |
+|---|---|
+| principal (interface) | **47%** de um núcleo |
+| áudio | 23% |
+
+E, para comparação, medido aqui sem janela nenhuma:
+
+| | |
+|---|---|
+| Motor inteiro, patches reais | **6,6% a 14,5%** |
+| Medição de loudness completa | **0,55%** |
+| — só o true-peak que entrei ontem | 0,44% |
+
+**O desenho custa mais que o som.** A medição que eu próprio acrescentei
+foi verificada antes de acusar qualquer outra parte: é desprezível.
+
+Para um instrumento que vai ser publicado, ~70% de CPU num patch comum é
+alto — numa máquina mais lenta isso quebra o áudio. E é a explicação mais
+plausível para a "travada" relatada: sem folga, qualquer operação cara a
+mais empurra a interface para o limite.
+
+**Não vou adivinhar onde.** `./travou --perfil` monta a linha do `perf`
+(este sistema tem `perf_event_paranoid=4`, que exige privilégio). Com o
+perfil na mão, o alvo deixa de ser suposição.
