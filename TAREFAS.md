@@ -9135,3 +9135,50 @@ mais empurra a interface para o limite.
 **Não vou adivinhar onde.** `./travou --perfil` monta a linha do `perf`
 (este sistema tem `perf_event_paranoid=4`, que exige privilégio). Com o
 perfil na mão, o alvo deixa de ser suposição.
+
+## Registro da etapa — 2026-09-23: o perfil, e a causa dos ~70% de CPU
+
+`perf` com 2947 amostras, 20 s, no app tocando há 46 min. Somado por
+categoria:
+
+| | |
+|---|---|
+| **Desenho** (renderizador de software do JUCE) | **~38%** |
+| DSP (Resonator, SignalGraph, renderBlock, expm1f) | ~11% |
+
+As funções, em ordem: `EdgeTable::iterate<SolidColour>` 10,5% ·
+`ImageFill::handleEdgeTableLine` 8,9% · `EdgeTable::EdgeTable(…Path…)`
+6,3% · `fillRectWithColour` 5,8% · `sanitiseLevels` 4,2% · `introsort`
+de `LineItem` 2,1%.
+
+**Causa, e ela é verificável:** o app tem **38 chamadas a `repaint()` e
+ZERO limitadas a região**. O timer de 30 Hz chama `view_->repaint()`, que
+repinta a view inteira do rack — os ~59 módulos, a janela toda — trinta
+vezes por segundo, embora só os osciloscópios, LEDs e o VU mudem entre
+um quadro e outro.
+
+Os números do perfil batem com isso: 12,5% só construindo tabelas de
+arestas (cada knob é uma elipse, cada moldura um `Path`), e 8,9%
+copiando as imagens de chrome de todos os módulos a cada quadro — o
+cache de chrome evita *desenhar* o conteúdo estático, mas não evita
+*copiá-lo* 30×/s.
+
+**Hipótese comum descartada antes:** não há transformação global no
+contexto gráfico (`addTransform` não aparece em lugar nenhum) — o zoom é
+aplicado no layout, em milímetros, não na matriz do `Graphics`. Seria a
+explicação típica para fills caírem no caminho lento, e não é o caso
+aqui.
+
+**Também descartado por medição:** o motor (6,6-14,5% sem janela) e a
+medição de loudness que entrei em 21 set. (0,55%, dos quais 0,44% é o
+true-peak).
+
+### Decisão pendente do autor
+
+Isto é **otimização, não defeito de correção** — o instrumento funciona.
+Mas ~70% de CPU num patch comum é alto para publicar: numa máquina mais
+lenta o áudio quebra, e é a explicação mais plausível da "travada".
+
+Mexer no caminho de desenho às vésperas da publicação é exatamente o
+tipo de mudança que já me fez introduzir regressão nesta semana. Fica
+para o autor decidir entre corrigir antes ou publicar e otimizar depois.
