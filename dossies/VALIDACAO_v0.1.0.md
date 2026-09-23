@@ -114,7 +114,22 @@ estridente a ponto de assustar? A faixa de volume entre seeds é aceitável
 sem mexer no MASTER? O limitador está trabalhando o tempo todo (indicador
 de clipe aceso com frequência)?
 
-**Achados:**
+**Achados** (autor, 23 set. 2026):
+
+- nenhum seed abre em silêncio total, mas **vários abrem muito fracos** —
+  foi preciso subir o volume das caixas para perceber que havia som.
+  **A faixa de volume entre seeds precisa ser revista.**
+- nenhum seed assustou.
+- seed gravado: **1276993369095270621**
+- **estalos** nesse seed.
+
+**Confirmação por medição (renderizado aqui, sem janela):** o seed
+1276993369095270621 tem pico em **−18,7 dBFS** em 60 s. Isso corrobora o
+achado de volume baixo com um número, e não só com impressão.
+
+Sobre os estalos: **não se reproduzem no render**, nem com VARIA ligado —
+zero descontinuidades em 60 s, nos dois casos. Ou seja, **não são do
+DSP**. Ver a seção "Estalos" no fim deste documento.
 
 ### Estudo 2 — Deriva
 
@@ -130,7 +145,34 @@ abrupto, clique ou estalo? O passo 3 é teste dirigido: GAIN e WIDTH não
 tinham rampa e clicavam — a bateria automática pegou e corrigiu, mas **o
 ouvido é o juiz**.
 
-**Achados:**
+**Achados** (autor, 23 set. 2026):
+
+- VARIA funciona; MUDA, EVOLUI e CRUZA funcionam;
+- a variação **continua musical**, mas **às vezes é discreta demais**.
+  Pedido do autor: **um knob para regular a intensidade do VARIA**;
+- **WIDTH: nenhuma diferença audível.** BODY: idem;
+- **estalos em alguns seeds.**
+
+**WIDTH — medido, e o achado é real:**
+
+| Fonte | WIDTH=0 | WIDTH=1 | WIDTH=2 | variação |
+|---|---|---|---|---|
+| **mono** | −13,46 dB | −13,46 dB | −13,46 dB | **0,00 dB** |
+| estéreo | −240 dB | −13,46 dB | −7,44 dB | 232 dB |
+
+O código está **correto**: WIDTH é mid/side, e num sinal mono o lado é
+zero — não há o que escalar. Mas o MASTER tem **uma** entrada e a maioria
+dos módulos é mono, então na prática o knob é **inerte na maior parte dos
+patches**. Não é defeito de implementação; é um problema de projeto e de
+expectativa, e precisa de decisão.
+
+**BODY — não é defeito, é desenho.** É o governador de corpo do
+`OutputStage`: só age sobre energia **alta, sustentada e concentrada** em
+2,5–8 kHz (a faixa de fadiga do ouvido), com ataque de ~250 ms e limiar
+alto. O próprio projeto diz que "música de ruído passa com zero redução
+na esmagadora maioria dos casos". Girar e não ouvir nada é o
+comportamento esperado. O que falta é a interface **mostrar quando ele
+está agindo** — a telemetria existe (`bodyGuardDb()`) e não é exibida.
 
 ### Estudo 3 — Cabo
 
@@ -147,7 +189,27 @@ ouvido é o juiz**.
 seco? A condutância probabilística produz variação musical ou intermitência
 irritante? As relações mudam o timbre de forma previsível?
 
-**Achados:**
+**Achados** (autor, 23 set. 2026):
+
+- `[espaço]` funciona: rompe e reata;
+- **"RING, FOLD, DIFF, AMT e COND — não achei esses módulos."**
+- **o `.score.txt` é ininteligível**: "não dá pra entender que cabo está
+  conectado onde, ou quais módulos estão acionados, nem qual a regulagem
+  empregada".
+
+**Os dois últimos são achados de verdade, e nenhum é do instrumento:**
+
+1. **RING/FOLD/DIFF/AMT/COND não são módulos** — são as propriedades do
+   CABO, no **inspector**, que abre ao clicar sobre um cabo. O autor
+   procurou entre os módulos porque nada o levou até lá. É falha de
+   descoberta: a ideia central do instrumento — o cabo como objeto com
+   estado — está escondida atrás de um clique que ninguém anuncia. **As
+   instruções que eu mesmo escrevi diziam "abra o inspector num cabo"
+   sem dizer que é clicando no cabo.**
+2. **o score usa números de nó crus** (`33:1 -> 38:2`), sem nome de
+   módulo, sem nome de porta, sem os parâmetros, **e sem o seed**. Para
+   um documento que o protocolo chama de "o documento principal" do
+   Estudo 3, isso é inútil: não se reconstrói nada a partir dele.
 
 ### Estudo 4 — Matéria e espaço
 
@@ -164,7 +226,14 @@ de segurança do sink**: por fora do MASTER, o som deve recortar de forma
 feia e audível — isso é proposital, é o aviso de que falta um MASTER — mas
 **nunca** estourar sem limite nem produzir estalo de NaN.
 
-**Achados:**
+**Achados** (autor, 23 set. 2026): **não conseguiu executar** — pediu um
+patch pronto para o teste.
+
+Isto é falha do protocolo, não do autor: o estudo pede que se monte à mão
+um patch com módulos específicos, num instrumento onde encontrar e cabear
+módulo por módulo é justamente o trabalho. **Pendente:** preparar
+arquivos `.rmp` prontos para cada caso do Estudo 4, abríveis por
+`Ctrl+O`.
 
 ### Fechamento
 
@@ -296,3 +365,59 @@ Fechada a Parte A, a camada 2 destrava e o caminho é: cortar `v0.1.0`,
 extrair o projeto pra repositório próprio (é o que torna a CI de três
 sistemas viva), gerar os instaladores e então publicar site e portal
 juntos.
+
+---
+
+## Síntese dos quatro estudos — 23 set. 2026
+
+**Os estudos funcionaram**: produziram sete achados que nem os 77 testes
+nem a minha leitura do código tinham encontrado. É exatamente o que o
+precedente do Antitotem previa — lá a sessão de escuta achou um bug de
+sinal real.
+
+### Estalos — a pista mais séria, e o que já se sabe
+
+Relatados em mais de um seed. **Não se reproduzem no render headless**:
+zero descontinuidades em 60 s do seed 1276993369095270621, com e sem
+VARIA. Logo, **não são do DSP**.
+
+O que sobra é o comportamento em tempo real, e há uma cadeia que liga os
+estalos ao achado de CPU do mesmo dia:
+
+1. a interface repinta tudo a 30 Hz e consome **47% de um núcleo**;
+2. para desenhar, ela toma o `gmx` (fotografia de osciloscópios e cabos);
+3. o thread de áudio usa `try_to_lock` e, **quando falha, reemite o
+   último bloco** com uma rampa (`starve_ *= 0.86`);
+4. reemitir bloco é descontinuidade — e descontinuidade é estalo.
+
+Isso explicaria por que são **intermitentes** e por que aparecem "em
+alguns seeds" (os mais pesados disputam mais o lock). **É hipótese, não
+conclusão** — falta contar quantas vezes o `try_to_lock` falha. É uma
+instrumentação pequena e decide a questão.
+
+**Consequência para a publicação:** se confirmada, os estalos e o custo de
+CPU são **o mesmo problema**, e a decisão de "publicar agora e otimizar
+depois" merece ser reconsiderada — estalo audível é defeito de
+qualidade, não questão de desempenho.
+
+### Tabela dos achados
+
+| # | Achado | Natureza | Onde |
+|---|---|---|---|
+| 1 | **Estalos** em alguns seeds | possível defeito de RT | hipótese do lock, a confirmar |
+| 2 | **Faixa de volume entre seeds** muito ampla; vários abrem fracos (medido: −18,7 dBFS) | ajuste de projeto | `PatchSeed.hpp` |
+| 3 | **WIDTH inerte** em fonte mono (medido: 0,00 dB de variação) | projeto/expectativa | `Master.hpp` + decisão |
+| 4 | **`.score.txt` ininteligível**: nós crus, sem nomes, sem parâmetros, **sem o seed** | defeito de utilidade | `ScoreRecorder` |
+| 5 | **Cabo como objeto não se descobre** — RING/FOLD/DIFF/AMT/COND escondidos atrás de um clique não anunciado | defeito de descoberta | UI + tutorial |
+| 6 | **BODY parece não fazer nada** (é desenho, mas não se vê) | falta telemetria na tela | UI |
+| 7 | **Estudo 4 inexecutável** sem patches prontos | falha do protocolo | preparar `.rmp` |
+
+### O que NÃO é defeito, verificado
+
+- **BODY**: governador de corpo, age só em energia alta/sustentada/
+  concentrada em 2,5–8 kHz, ataque de 250 ms, limiar alto. Não agir é o
+  comportamento correto na esmagadora maioria do material.
+- **WIDTH**: o código mid/side está certo; é inerte porque a fonte é
+  mono.
+- **Memória**: não vaza (30 min de vigia: +28 kB nos últimos 5 min).
+- **Motor**: 6,6–14,5% de um núcleo; medição de loudness 0,55%.
