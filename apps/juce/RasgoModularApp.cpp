@@ -3350,6 +3350,8 @@ public:
         carryUsed_ = blockSize_;   // vazio
         lastL_.assign(blockSize_, 0.0f);
         lastR_.assign(blockSize_, 0.0f);
+        lastOutL_ = 0.0f;
+        lastOutR_ = 0.0f;
         starve_ = 1.0f;
         // reserva da fila de entrada: quatro blocos do host, ou oito
         // sub-blocos, o que for maior — pra `push_back` nunca alocar
@@ -4082,12 +4084,37 @@ private:
         std::unique_lock<std::mutex> lk(rack_.gmx, std::try_to_lock);
         if (!lk) {
             rack_.starvedBlocks.fetch_add(1, std::memory_order_relaxed);
-            starve_ *= 0.86f;
-            if (starve_ < 1.0e-4f) starve_ = 0.0f;
+
+            // FOME: a interface está com o grafo e não há bloco novo.
+            //
+            // Antes isto REPRODUZIA o bloco anterior com ganho menor, e
+            // era essa a causa do estalo que o autor relatou em 23 set.
+            // 2026: a primeira amostra do bloco repetido não tem relação
+            // com a última que saiu, então há um SALTO na onda. Salto na
+            // onda é clique, por definição — o fade de 0,86 por bloco
+            // reduzia a amplitude do problema sem tocar na sua natureza.
+            //
+            // Agora o preenchimento CONTINUA de onde a onda parou e desce
+            // até zero dentro do bloco. Não há descontinuidade no início
+            // (começa exatamente no último valor emitido) nem no fim
+            // (chega a zero), então não há o que estalar. O custo é uma
+            // queda curta de volume em vez de um clique — que é o defeito
+            // certo a ter quando falta dado: audível se acontecer muito,
+            // inofensivo se acontecer pouco, e nunca confundível com som
+            // do instrumento.
+            //
+            // O contador acima existe justamente para dizer se acontece
+            // muito: ele aparece no cartão SOBRE.
+            const float l0 = lastOutL_, r0 = lastOutR_;
+            const float n = static_cast<float>(blockSize_);
             for (std::size_t i = 0; i < blockSize_; ++i) {
-                carryL_[i] = lastL_[i] * starve_;
-                carryR_[i] = lastR_[i] * starve_;
+                const float k = 1.0f - static_cast<float>(i + 1) / n;
+                carryL_[i] = l0 * k;
+                carryR_[i] = r0 * k;
             }
+            lastOutL_ = 0.0f;
+            lastOutR_ = 0.0f;
+            starve_ = 0.0f;   // a volta é por amostra, no bloco seguinte
             carryUsed_ = 0;
             return;
         }
@@ -4115,6 +4142,10 @@ private:
             const float gain = g0 + step * static_cast<float>(i);
             carryL_[i] = lastL_[i] = st_->at(0, i) * gain;
             carryR_[i] = lastR_[i] = st_->at(1, i) * gain;
+            // a última amostra emitida é o ponto de partida do
+            // preenchimento, se o bloco seguinte faltar
+            lastOutL_ = carryL_[i];
+            lastOutR_ = carryR_[i];
             sum += static_cast<double>(carryL_[i]) * carryL_[i];
         }
         starve_ = 1.0f;
@@ -4193,6 +4224,10 @@ private:
     bool standby_ = false;
     std::unique_ptr<AudioBlock> st_;
     std::vector<float> carryL_, carryR_, lastL_, lastR_;
+    // Última amostra que de fato saiu pelos alto-falantes. É a âncora do
+    // preenchimento quando falta bloco: começar dali é o que impede a
+    // descontinuidade — ou seja, o estalo.
+    float lastOutL_ = 0.0f, lastOutR_ = 0.0f;
     std::size_t blockSize_ = 256, carryUsed_ = 256;
     double sampleRate_ = 48000.0;
     float starve_ = 1.0f;
