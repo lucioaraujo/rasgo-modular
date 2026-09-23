@@ -119,6 +119,14 @@ supostas:
   monorepo com o histórico preservado. Foi o que tirou a **CI de três
   sistemas da inércia**: enquanto o projeto era um subdiretório, o GitHub
   Actions não lia o workflow.
+- **Custo de CPU alto: ~70% de um núcleo** num patch comum. Medido com
+  `perf`: ~38% é desenho da interface e ~11% é DSP — o desenho custa mais
+  que o som, porque a view inteira é repintada 30 vezes por segundo
+  embora só os osciloscópios e LEDs mudem. Numa máquina modesta o áudio
+  pode falhar; aumentar o buffer de saída ajuda. Correção prevista para a
+  v0.1.1, deixada de fora desta versão por decisão explícita — mexer no
+  caminho de desenho antes de publicar trocaria um problema medido por um
+  risco desconhecido.
 - **Linux ARM** não foi construído nem testado.
 - O catálogo de módulos **não é fechado** por desenho: a fase didática
   corre em paralelo com módulos novos.
