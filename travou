@@ -6,6 +6,7 @@
 # memória, depois que passou, não dá para investigar.
 #
 #   ./travou            captura única, para usar DURANTE um travamento
+#   ./travou --perfil   monta a linha que perfila a thread da interface
 #   ./travou --vigia    acompanha memória e CPU por 30 min, em segundo
 #                       plano, e diz ao fim se a memória estabilizou
 #
@@ -24,6 +25,24 @@ cd "$(dirname "$0")"
 
 NOME="Rasgo Modular"
 SAIDA="${TMPDIR:-/tmp}/rasgo-travou-$(date +%Y%m%d-%H%M%S).txt"
+
+# ---- modo perfil -----------------------------------------------------
+# A thread principal consome ~47% de um núcleo com o app apenas tocando,
+# enquanto o MOTOR inteiro custa 14% (medido sem janela, com patches
+# reais). Ou seja: o desenho custa mais que o som. Saber ONDE exige um
+# perfil de verdade — e este sistema tem `perf_event_paranoid=4`, que o
+# bloqueia sem privilégio. Em vez de falhar com um erro de permissão,
+# imprime a linha pronta.
+if [ "${1:-}" = "--perfil" ]; then
+  P=$(pgrep -x "$NOME" | head -1 || true)
+  if [ -z "$P" ]; then echo "Abra o app antes." >&2; exit 1; fi
+  echo "Rode isto e me mande a saída (20 s de amostragem, não atrapalha o áudio):"
+  echo
+  echo "  sudo perf record -F 199 -g -p $P -o /tmp/rasgo-perf.data -- sleep 20 \\"
+  echo "    && sudo perf report -i /tmp/rasgo-perf.data --stdio --no-children \\"
+  echo "         --percent-limit 0.8 2>/dev/null | head -50"
+  exit 0
+fi
 
 # ---- modo vigia ------------------------------------------------------
 # Existe porque duas amostras não distinguem VAZAMENTO de AQUECIMENTO: um
