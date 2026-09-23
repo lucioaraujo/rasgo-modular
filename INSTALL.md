@@ -181,6 +181,33 @@ na recodificação com perdas, e ela **não aparece** no pico de amostra.
 Nada disso normaliza a saída: o medidor não toca no sinal em lugar
 nenhum. O número é para quem está ouvindo decidir.
 
+### Custo de CPU — declarado, medido, e com correção prevista
+
+O app consome **cerca de 70% de um núcleo** num patch comum (medido num
+Intel de mesa, 44,1 kHz, bloco de 256). A repartição, por perfil de
+execução com `perf`:
+
+| | |
+|---|---|
+| Desenho da interface | **~38%** |
+| DSP (o instrumento em si) | ~11% |
+| Medição de loudness (BS.1770 + true-peak) | 0,55% |
+
+**O desenho custa mais que o som**, e a causa está localizada: a
+interface repinta a view inteira do rack 30 vezes por segundo, embora só
+os osciloscópios, os LEDs e o VU mudem entre um quadro e o outro. O
+motor, medido isoladamente sem janela, custa de 6,6% a 14,5% conforme o
+patch.
+
+**O que isso significa na prática:** numa máquina de desempenho modesto o
+áudio pode falhar. Se acontecer, aumentar o tamanho do buffer no
+dispositivo de saída dá mais folga.
+
+Está registrado como tarefa para a **v0.1.1** — repintar só as regiões
+que mudam. Não entrou na v0.1.0 por decisão explícita: mexer no caminho
+de desenho às vésperas da publicação troca um problema conhecido e
+medido por um risco de regressão desconhecido.
+
 ### Onde o instrumento guarda as coisas
 
 - **Estado e preferências:** `~/.local/share/rasgo-modular/`

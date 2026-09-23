@@ -9182,3 +9182,64 @@ lenta o áudio quebra, e é a explicação mais plausível da "travada".
 Mexer no caminho de desenho às vésperas da publicação é exatamente o
 tipo de mudança que já me fez introduzir regressão nesta semana. Fica
 para o autor decidir entre corrigir antes ou publicar e otimizar depois.
+
+## Tarefa aberta — v0.1.1: repintar só o que muda
+
+**Decisão do autor em 23 set. 2026:** publicar a v0.1.0 com o custo de
+CPU declarado e otimizar depois. Registrado aqui para não se perder, com
+os dados já levantados — quem pegar esta tarefa não precisa refazer a
+medição.
+
+### O que já se sabe (medido, não suposto)
+
+| | |
+|---|---|
+| App inteiro, patch comum | ~70% de um núcleo |
+| — desenho da interface | **~38%** |
+| — DSP | ~11% |
+| — medição de loudness | 0,55% |
+| Motor isolado, sem janela, patches reais | 6,6% a 14,5% |
+
+Perfil (`perf`, 2947 amostras): `EdgeTable::iterate<SolidColour>` 10,5% ·
+`ImageFill::handleEdgeTableLine` 8,9% · `EdgeTable::EdgeTable(…Path…)`
+6,3% · `fillRectWithColour` 5,8% · `sanitiseLevels` 4,2% · `introsort`
+de `LineItem` 2,1%.
+
+### A causa
+
+38 chamadas a `repaint()` no app, **nenhuma** limitada a região. O timer
+de 30 Hz repinta a view inteira do rack — ~59 módulos, a janela toda —
+embora entre um quadro e outro só mudem osciloscópios, LEDs e VU.
+
+O cache de chrome (uma `juce::Image` por módulo) evita **desenhar** o
+conteúdo estático, mas não evita **copiá-lo** 30×/s: daí os 8,9% em
+`ImageFill`.
+
+### Já descartado — não repetir o trabalho
+
+- **transformação global no `Graphics`**: não existe; o zoom é aplicado
+  no layout em milímetros, não na matriz. É a explicação típica para
+  fills caírem no caminho lento, e não se aplica aqui;
+- **o motor**: 6,6-14,5% sem janela, e memória plana em 5 min;
+- **a medição de loudness**: 0,55%, dos quais 0,44% é o true-peak;
+- **vazamento de memória**: não há. 30 min de `--vigia` mostram +12,1 MB
+  no primeiro minuto (aquecimento) e +28 kB nos últimos cinco.
+
+### Como atacar, e como validar
+
+Um passo por vez, com `perf` antes e depois — a mesma linha que
+`./travou --perfil` monta. Se um passo não melhorar de forma clara,
+reverter em vez de acumular.
+
+Ordem sugerida, do mais seguro ao mais invasivo:
+
+1. **repintar só as regiões dinâmicas** (retângulos dos osciloscópios,
+   LEDs, VU) em vez da view inteira;
+2. **chrome opaco**: a imagem é `ARGB`, o que obriga mistura por pixel.
+   Se o fundo do módulo for opaco, `RGB` permite cópia direta;
+3. reduzir a cadência do redesenho do que não precisa de 30 Hz.
+
+**Cuidado registrado:** o caminho de desenho é onde mais introduzi
+regressão nesta semana. Validar cada passo com os atalhos e a bateria de
+77 testes, e pedir confirmação de uso ao autor antes de seguir para o
+passo seguinte.
