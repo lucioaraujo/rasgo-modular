@@ -4,9 +4,10 @@ Auditoria contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`: as
 cinco camadas e o gate editorial comum. Cada item está marcado com o que
 **foi feito**, não com o que deveria estar pronto.
 
-**Data:** 21 set. 2026 · **Camada 1 fechada; camada 2 a um passo.** A CI
-de três sistemas ficou verde e gera os três instaladores. O único
-bloqueio restante é escuta humana, não código.
+**Data:** 24 set. 2026 · **Camadas 1 e 2 fechadas.** A CI de três
+sistemas está verde e gera os três instaladores; a sessão de escuta foi
+executada e documentada. O que falta é operacional: cortar a tag, tornar
+o repositório público e liberar site e portal juntos.
 
 ---
 
@@ -16,7 +17,7 @@ bloqueio restante é escuta humana, não código.
 |---|---|---|
 | 0. Pesquisa local | estado documentado; nada apresentado como release | ✅ `RASGO_MODULAR.md`, `TAREFAS.md`, `dossies/`, `PESQUISA_MODULOS.md` |
 | 1. Candidato publicável | build/execução multiplataforma, licença, créditos, documentação e limitações revisados | ✅ **fechada em 21 set. 2026** — CI verde nos três sistemas, com instaladores gerados |
-| 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | 🟡 pacotes ✅ (.deb/.dmg/.exe) · testes ✅ (77, nos 3 sistemas) · **falta a sessão de escuta documentada** |
+| 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | ✅ **destravada em 24 set. 2026** — pacotes ✅ (.deb/.dmg/.exe) · 78 testes ✅ nos 3 sistemas · **sessão de escuta documentada** ✅ (4 estudos com achados) |
 | 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | 🟡 site **existe** em `website/` (4 idiomas, captura de execução real), em preparação — não publica antes do instrumento |
 | 4. Publicação | portal, repositório e página liberados juntos | ❌ |
 
@@ -32,7 +33,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | autoria, créditos, fontes e licença | ✅ `CREDITS_AND_SOURCES.md`, `LICENSE`, `apps/juce/LICENSE_STATUS.md` |
 | instruções de build/instalação e plataforma suportada | ✅ `INSTALL.md` |
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
-| testes automatizados e validações humanas **realmente executados** | 🟡 77 testes ✅ **executados nos três sistemas** (Linux, Windows, macOS) · validação humana ❌ |
+| testes automatizados e validações humanas **realmente executados** | ✅ 78 testes **executados nos três sistemas** · **validação humana executada** (24 set. 2026): 4 estudos de escuta, 7 achados, 3 corrigidos antes de publicar |
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
 | links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links da release dependem da tag |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
@@ -67,13 +68,21 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 ### Depende de você
 
-1. **Sessão de escuta documentada.** É o bloqueio duro da camada 2, e
-   nenhum front-end resolve: alguém tem que ouvir e registrar o que
-   ouviu. O Antitotem fechou quatro estudos antes de publicar; o Modular
-   não tem nenhum. **O protocolo está pronto** em
-   [`dossies/VALIDACAO_v0.1.0.md`](dossies/VALIDACAO_v0.1.0.md): quatro
-   estudos (Semente, Deriva, Cabo, Matéria e espaço), com o que escutar em
-   cada um e espaço para os achados. Falta executá-lo.
+1. ~~**Sessão de escuta documentada.**~~ **FEITA em 23–24 set. 2026.** Os
+   quatro estudos executados e registrados em
+   [`dossies/VALIDACAO_v0.1.0.md`](dossies/VALIDACAO_v0.1.0.md), com
+   **sete achados** que nem os 78 testes nem revisão de código tinham
+   encontrado — o mesmo que aconteceu no Antitotem, onde a escuta achou um
+   bug de sinal real.
+
+   Três foram corrigidos antes de publicar, por decisão do autor: a faixa
+   de volume entre seeds (52,7 → 43,6 LU de dispersão), o `.score.txt`
+   ilegível (formato 2, com nomes, regulagem e o seed) e o cabo-objeto que
+   não se descobria (LEARN + tutorial nos 4 idiomas). Os outros quatro
+   estão registrados em `TAREFAS.md` e nenhum bloqueia.
+
+   Um caso não foi executado: o `signal-in` do Estudo 4, que depende de
+   hardware de entrada e é opcional no protocolo.
 2. ~~**Decisão sobre Windows e macOS.**~~ **DECIDIDO em 21 set. 2026:**
    publicar nessa condição, com verificação só pela CI — mesmo precedente
    do Antitotem. Registrado no `INSTALL.md`; a página editorial dirá o
