@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Copia os patches do Estudo 4 para o banco do app e CONFERE que chegaram.
+#
+# Existe porque em 24 set. 2026 o autor copiou os patches para o banco,
+# eu regenerei um deles no repositório depois, e ele reescutou a versão
+# VELHA sem que nada avisasse — os dois arquivos têm o mesmo nome, e o
+# app não tem como saber que um está desatualizado. Uma escuta perdida
+# por falta de um `cp`.
+#
+#   ./sincronizar
+set -euo pipefail
+cd "$(dirname "$0")"
+DEST="${XDG_CONFIG_HOME:-$HOME/.config}/rasgo-modular/patches"
+mkdir -p "$DEST"
+for f in *.rmp; do
+  cp -f "$f" "$DEST/$f"
+  if cmp -s "$f" "$DEST/$f"; then
+    printf "  ok   %-30s %s bytes\n" "$f" "$(wc -c < "$f")"
+  else
+    printf "  FALHOU %s\n" "$f" >&2; exit 1
+  fi
+done
+echo
+echo "No app: Ctrl+O -> os quatro estão na pasta padrão do banco."

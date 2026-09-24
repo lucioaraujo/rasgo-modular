@@ -282,8 +282,26 @@ isolado:
 MIXER de `out_gain` alto, o patch passou a 58,9% das amostras no teto —
 recorte constante — e continua **finito**: a guarda segura.
 
-**Pendente:** reescutar SÓ o caso 3, na versão nova. Os casos 1 e 2 estão
-fechados com achado escrito.
+**Reescutado em 24 set. 2026, versão corrigida:** "sem estalos, com uma
+onda repetitiva, irritante, pra mim noise também, bem estilo de teste."
+
+**É o resultado que o estudo procura, nos três aspectos:**
+
+| o relato | o que prova |
+|---|---|
+| "sem estalos" | a guarda segura — nada de NaN nem estouro sem limite |
+| "irritante" | o recorte **é** audível: o aviso funciona |
+| "bem estilo de teste" | soa como sinal de teste, não como música — é assim que se percebe que falta um MASTER |
+
+**Caso 3 FECHADO.** A guarda de segurança do sink está validada por
+escuta, e não só por medição.
+
+**Aviso de armadilha, registrado porque custou uma escuta:** o autor
+reescutou primeiro a versão VELHA do patch sem que nada avisasse. Ele
+havia copiado os arquivos para o banco do app, eu regenerei um deles no
+repositório depois, e os dois têm o mesmo nome — o app não tem como saber
+que um está desatualizado. A pasta ganhou um script `sincronizar`, que
+copia e **confere** que chegaram.
 
 **Nota sobre o texto do protocolo:** a frase "por fora do MASTER o som
 deve recortar de forma feia e audível" é verdadeira apenas quando o sinal
@@ -293,9 +311,13 @@ qualquer patch sem MASTER.
 
 ### Fechamento
 
-- [ ] Os quatro estudos têm achados escritos.
-- [ ] Ao menos uma tomada por estudo, com seed anotado.
-- [ ] Bugs achados viraram entrada em `TAREFAS.md`.
+- [x] ✅ Os quatro estudos têm achados escritos (24 set. 2026). O único
+      caso não executado é o `signal-in` do Estudo 4, que depende de
+      hardware de entrada e é opcional no próprio protocolo.
+- [ ] Ao menos uma tomada por estudo, com seed anotado — o Estudo 1 tem
+      (seed 1276993369095270621); os outros foram escutados sem gravar.
+- [x] ✅ Bugs achados viraram entrada em `TAREFAS.md` — sete achados, com
+      três já corrigidos antes da publicação por decisão do autor.
 - [ ] LUFS integrado e true-peak anotados por tomada.
 - [ ] Alguma tomada passou de −1 dBTP? Se sim, em que situação — é o dado
       que diz se a guarda de saída precisa de ajuste antes de publicar.

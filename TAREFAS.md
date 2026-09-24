@@ -9446,3 +9446,53 @@ gravação — afirmar como universal algo que depende de condição.
 achados. Do Estudo 4, os casos matéria e espaço fechados; falta
 reescutar o caso 3 na versão corrigida, e o caso 4 (signal-in) é
 opcional e depende de hardware.
+
+## Registro da etapa — 2026-09-24: a Parte A fechou
+
+Reescutado o caso 3 do Estudo 4 na versão corrigida. Relato do autor:
+*"sem estalos, com uma onda repetitiva, irritante, pra mim noise também,
+bem estilo de teste."*
+
+**É o resultado que o estudo procura, nos três aspectos:**
+
+| o relato | o que prova |
+|---|---|
+| "sem estalos" | a guarda segura — nada de NaN nem estouro sem limite |
+| "irritante" | o recorte **é** audível: o aviso funciona |
+| "bem estilo de teste" | soa como sinal de teste e não como música — é assim que se percebe que falta um MASTER |
+
+**A guarda de segurança do sink está validada por escuta**, e não só por
+medição. Era o último teste dirigido em aberto.
+
+**Armadilha que custou uma escuta, registrada:** o autor reescutou
+primeiro a versão VELHA do patch. Ele havia copiado os arquivos para o
+banco do app, eu regenerei um deles no repositório depois, e os dois têm
+o mesmo nome — o app não tem como saber que um está desatualizado, e eu
+não avisei para copiar de novo. A pasta ganhou um script `sincronizar`
+que copia e **confere** que chegaram.
+
+### Estado da publicação
+
+**Camadas 1 e 2 fechadas.** A sessão de escuta produziu **sete achados**
+que nem os 78 testes nem revisão de código tinham encontrado — mesmo
+padrão do Antitotem, onde a escuta achou um bug de sinal real. Três foram
+corrigidos antes de publicar por decisão do autor; quatro estão
+registrados e nenhum bloqueia.
+
+| Etapa | Estado |
+|---|---|
+| CI três sistemas, com instaladores | ✅ |
+| 78 testes nos três sistemas | ✅ |
+| Sessão de escuta documentada | ✅ |
+| Contato oficial | ✅ |
+| Alvo de publicação e limitações declaradas | ✅ |
+| Cortar a tag `v0.1.0` | ⏳ |
+| Repositório público | ⏳ decisão do autor |
+| Site + portal liberados junto | ⏳ |
+
+**Sequência que resta, e uma ressalva de custo:** cortar a tag DISPARA a
+CI (é o gatilho que ficou), e a cota de Actions está esgotada até 1º de
+outubro. Duas saídas, as duas sem gasto: esperar o ciclo virar, ou tornar
+o repositório público — que é o que a publicação exige de qualquer forma,
+e que devolve Actions gratuito e ilimitado. **Não vou criar a tag sem
+essa decisão**, para não gerar uma release sem instaladores.
