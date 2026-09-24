@@ -1,0 +1,9 @@
+rasgo-modular-patch 1
+node 0 CLOCK bpm=96 mult=2 length=8 fill=4 rotate=0 swing=0 drift=0 gate_len=0.5 accent_a=4 accent_b=3 accent_mode=0 feel=0
+node 1 ENVELOPE attack=0.00100000005 decay=0.25 sustain=0 release=0.400000006 curve=0.600000024 mode=0 vca_depth=1 level=1
+node 2 OSC freq=110 fine=0 pw=0.5 fm_amount=0 drift=0 sub_2=0 sync_enable=0 prox=0
+node 3 MASTER gain=-24 width=1 mono=0 dc_block=1 limit=1 mute=0 body_guard=1
+node 4 OUT
+cable 0:1 -> 1:1 gain=1 conductance=1 feedback=0 state=intact
+cable 2:2 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 4:0 gain=1 conductance=1 feedback=0 state=intact

@@ -9364,3 +9364,40 @@ Corrigido em três frentes:
   num cabo" sem dizer que é clicando.
 
 **78/78 CTest**, build sem avisos próprios.
+
+## Registro da etapa — 2026-09-24: Estudo 4 vira executável
+
+O autor não conseguiu executar o Estudo 4 e pediu um patch pronto. A
+falha era **do protocolo**: pedir que se cabeie dez módulos antes de
+ouvir a primeira nota, num instrumento onde ligar módulo a módulo é o
+trabalho inteiro, transforma um estudo de escuta em exercício de
+montagem.
+
+Quatro patches em `dossies/patches-estudo4/`, abríveis por `Ctrl+O`,
+**cada um medido antes de ser entregue** — patch de teste que não
+exercita o que devia é pior que nenhum:
+
+| patch | pico | LUFS | no teto | finito |
+|---|---|---|---|---|
+| 1 · matéria (STRING+MATTER+RESONATOR no limite) | −5,9 dBFS | −10,4 | 0 | sim |
+| 2 · espaço (SPACE→HALL→LOOPER, feedback 0,92) | −2,4 dBFS | −14,6 | 0 | sim |
+| 3 · **direto no OUT** | **−1,0 dBFS** | −13,0 | **368** | sim |
+| 4 · signal-in | mudo sem entrada (esperado) | — | 0 | sim |
+
+**O caso 3 já responde metade do estudo por medição:** por fora do MASTER
+o sinal bate no teto de segurança — −1,0 dBFS é exatamente `0,891251` — e
+recorta, **sem nunca estourar nem produzir NaN**. O recorte feio é
+proposital (é o aviso de que falta um MASTER); o que faltava provar era
+que ele não vira estouro, e está provado. Resta o julgamento do ouvido.
+
+**Duas iterações, por medição e não por palpite:** o patch do espaço saiu
+primeiro em −32,5 LUFS, fraco demais para julgar realimentação — as três
+caixas em `mix=1` deixavam só as caudas. Ajustados os `mix` e a densidade
+de excitação, foi para −14,6 LUFS.
+
+**Verificada a ida e volta** pelo mesmo caminho do `Ctrl+O`: os quatro
+carregam e reproduzem exatamente os picos da geração. Gerar um `.rmp` que
+o app não carrega seria inútil.
+
+`LEIA-ME.md` na pasta explica cada um, com o que escutar e os números
+medidos como referência.

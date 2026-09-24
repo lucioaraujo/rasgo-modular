@@ -1,0 +1,20 @@
+rasgo-modular-patch 1
+node 0 CLOCK bpm=84 mult=2 length=8 fill=6 rotate=0 swing=0 drift=0 gate_len=0.5 accent_a=4 accent_b=3 accent_mode=0 feel=0
+node 1 ENVELOPE attack=0.00200000009 decay=0.899999976 sustain=0 release=0.400000006 curve=0.600000024 mode=0 vca_depth=1 level=1
+node 2 NOISE rate=8 slew=0.300000012 spread=0 poisson=0
+node 3 STRING freq=110 decay=0.980000019 damping=0.400000006 position=0.140000001 exciter=0.899999976 drive=1 mix=1
+node 4 MATTER freq=110 structure=0.899999976 brightness=0.949999988 damping=0.0500000007 position=0.180000007 exciter=0.5 mix=1
+node 5 RESONATOR freq=220 structure=0 partials=1 decay=0.970000029 damp=0.0500000007 tilt=0 position=0.300000012 mix=1
+node 6 MIXER gain1=0 pan1=0 mute1=0 gain2=0 pan2=0 mute2=0 gain3=0 pan3=0 mute3=0 gain4=0 pan4=0 mute4=0 out_gain=0
+node 7 MASTER gain=-14 width=1 mono=0 dc_block=1 limit=1 mute=0 body_guard=1
+node 8 OUT
+cable 0:1 -> 1:1 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 3:1 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 4:1 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 5:1 gain=1 conductance=1 feedback=0 state=intact
+cable 3:0 -> 6:0 gain=1 conductance=1 feedback=0 state=intact
+cable 4:0 -> 6:1 gain=1 conductance=1 feedback=0 state=intact
+cable 5:1 -> 6:2 gain=1 conductance=1 feedback=0 state=intact
+cable 6:0 -> 7:0 gain=1 conductance=1 feedback=0 state=intact
+cable 7:0 -> 8:0 gain=1 conductance=1 feedback=0 state=intact
