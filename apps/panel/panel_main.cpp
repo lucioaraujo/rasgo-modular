@@ -55,6 +55,7 @@
 #include "panel/MotionEngine.hpp"
 #include "panel/PatchGenetics.hpp"
 #include "panel/PatchSeed.hpp"
+#include "panel/SeedBalance.hpp"
 #include "panel/ScoreRecorder.hpp"
 #include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
@@ -2555,6 +2556,10 @@ int main() {
                 graph.prepare(sr, 2, block);
             }
             graph.setActiveOutput(sink);
+            // mesmo equilíbrio de volume do app JUCE — é comportamento do
+            // instrumento, não conveniência de interface, então vale nos
+            // dois front-ends (ver `SeedBalance.hpp`)
+            rasgo::panel::balanceSeedLevel(graph, s, sr, block);
         }
         allRuptured = false;
         buildMods();

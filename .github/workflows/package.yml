@@ -19,11 +19,42 @@ name: Rasgo Modular — build, test & package
 # workflows moram na mesma posição relativa e também só ficaram vivos
 # depois da extração. Ver `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`.
 
+# NÃO roda a cada push — e isto foi aprendido caro.
+#
+# Em 24 set. 2026 a conta do autor bateu 100% dos 2.000 minutos mensais
+# incluídos. A causa: 22 execuções em dois dias, uma por push meu, a ~16
+# minutos cada. O que torna isso caro não é o tempo de parede e sim os
+# MULTIPLICADORES de cobrança da GitHub — macOS conta 10×, Windows 2×,
+# Linux 1×:
+#
+#     Ubuntu   x1   ~   265 min
+#     Windows  x2   ~   708 min
+#     macOS    x10  ~ 2.832 min
+#     TOTAL         ~ 3.805 min   (contra 2.000 incluídos)
+#
+# Ou seja, cada push custava ~160 minutos cobrados. Eu tratei a CI como
+# se rodar fosse de graça.
+#
+# Agora roda quando FAZ SENTIDO gastar: em tag de versão (que é quando os
+# instaladores importam), em pull request (revisão de mudança real) e à
+# mão, pelo botão "Run workflow". O trabalho do dia a dia é validado
+# localmente pelos 78 testes, que rodam em 40 segundos e não custam nada.
+#
+# NOTA: repositório PÚBLICO tem Actions gratuito e ilimitado nos runners
+# padrão. Quando este projeto for publicado, este problema desaparece
+# sozinho — e aí vale reconsiderar o gatilho por push.
 on:
   push:
-    branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch: {}
+
+# Um push novo cancela a execução anterior ainda em andamento. Sem isto,
+# corrigir um erro enquanto a CI roda paga pelas DUAS execuções — e as
+# duas primeiras rodadas deste projeto foram exatamente isso.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   package:
