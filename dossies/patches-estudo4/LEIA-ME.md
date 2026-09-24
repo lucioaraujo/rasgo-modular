@@ -50,14 +50,32 @@ dirigido da guarda de segurança do sink.
 
 | pico | LUFS | amostras no teto | finito |
 |---|---|---|---|
-| **−1,0 dBFS** | −13,0 | **368** | sim |
+| **−1,0 dBFS** | −1,1 | **58,9%** | sim |
 
-−1,0 dBFS é exatamente o teto (`0,891251`). **O recorte feio é
-proposital**: é o aviso de que falta um MASTER no caminho. O que a
-medição garante é o resto — nunca estoura sem limite, nunca produz NaN.
+−1,0 dBFS é exatamente o teto (`0,891251`), e **59% das amostras estão
+nele** — o recorte é constante e inegavelmente audível. Isso é
+proposital: é o aviso de que falta um MASTER no caminho. O que a medição
+garante é o resto — nunca estoura sem limite, nunca produz NaN.
+
+**CORREÇÃO (24 set. 2026).** A primeira versão deste patch punha um
+ENVELOPE direto no sink e media 368 amostras no teto em 20 s — **0,04%**.
+O autor escutou e relatou "sem clipes ou estalos", com razão: o patch mal
+TOCAVA o teto e não exercitava a guarda que devia testar. Medindo o sink
+isolado fica claro o que faltava:
+
+| sinal | amostras no teto | distorção |
+|---|---|---|
+| 0,89 (no teto) | 0,0% | 0,0% |
+| 1,2 | 46,7% | 18,0% |
+| 2,0 | 70,6% | 47,4% |
+| 5,0 | 88,6% | 77,9% |
+
+O sinal precisa **passar** do teto, não encostar nele. Um MIXER com
+`out_gain` alto faz isso agora.
 
 **Escutar:** recorta de forma suja e audível, mas sem estalo de estouro?
-Depois cabeie o mesmo ENVELOPE através de um MASTER e compare.
+Depois cabeie o mesmo caminho através de um MASTER e compare — é a
+diferença entre o limitador do MASTER e a guarda bruta do sink.
 
 ### 4. `estudo4-4-signal-in.rmp` — microfone ou instrumento
 

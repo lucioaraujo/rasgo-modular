@@ -246,13 +246,50 @@ caminho do `Ctrl+O` foi verificada:
 |---|---|---|---|---|
 | 1 · matéria (ressoadores no limite) | −5,9 dBFS | −10,4 | 0 | sim |
 | 2 · espaço (realimentação alta) | −2,4 dBFS | −14,6 | 0 | sim |
-| 3 · **direto no OUT** | **−1,0 dBFS** | −13,0 | **368** | sim |
+| 3 · **direto no OUT** | **−1,0 dBFS** | −1,1 | **58,9%** | sim |
 | 4 · signal-in | mudo sem entrada | — | 0 | sim |
 
-O caso 3 já confirma por medição o que o estudo procura: **por fora do
-MASTER o sinal bate no teto de segurança** (−1,0 dBFS é exatamente
-`0,891251`) e recorta, **sem nunca estourar nem produzir NaN**. Falta o
-julgamento do ouvido sobre se o recorte soa como aviso.
+### Achados do autor — 24 set. 2026
+
+**1 · matéria:** "não explode; não trava, nem emudece. as ressonâncias
+funcionam."
+
+**2 · espaço:** "não cresce sem parar, há ritmo que vai ficando cada vez
+mais curto, não some, vira timbre, é bem noise, mas normal dentro da
+ideia de noise. é musical."
+
+**3 · direto no OUT:** "é musical também, uma repetição rítmica de um
+timbre característico, com oscilações de ritmo. **sem clipes ou
+estalos**."
+
+**4 · signal-in:** não executado.
+
+### O relato do caso 3 expôs um defeito no MEU patch
+
+O autor ouviu certo, e o patch estava errado. A primeira versão media
+**368 amostras no teto em 20 s — 0,04% do total**: ela mal TOCAVA o teto,
+e portanto não exercitava a guarda que devia testar. Medindo o sink
+isolado:
+
+| sinal | amostras no teto | distorção |
+|---|---|---|
+| 0,89 (no teto) | 0,0% | 0,0% |
+| 1,2 | 46,7% | 18,0% |
+| 2,0 | 70,6% | 47,4% |
+| 5,0 | 88,6% | 77,9% |
+
+**O sinal precisa passar do teto, não encostar nele.** Refeito com um
+MIXER de `out_gain` alto, o patch passou a 58,9% das amostras no teto —
+recorte constante — e continua **finito**: a guarda segura.
+
+**Pendente:** reescutar SÓ o caso 3, na versão nova. Os casos 1 e 2 estão
+fechados com achado escrito.
+
+**Nota sobre o texto do protocolo:** a frase "por fora do MASTER o som
+deve recortar de forma feia e audível" é verdadeira apenas quando o sinal
+**excede** o teto. Um patch que encosta nele não recorta de forma audível
+— e era o caso do meu. A afirmação valia para a guarda, não para
+qualquer patch sem MASTER.
 
 ### Fechamento
 
