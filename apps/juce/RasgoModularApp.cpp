@@ -2285,6 +2285,16 @@ public:
     struct LearnHit { const rasgo::panel::LearnEntry* entry = nullptr;
                       juce::String title; std::string key; };
     LearnHit learnAt(juce::Point<int> p) const {
+        // O CABO vem ANTES dos módulos, pela mesma razão que o clique no
+        // cabo ganha do corpo do módulo: os cabos passam por cima, e se o
+        // módulo ganhasse aqui o cabo quase nunca seria explicado. Era o
+        // buraco que fez o autor procurar RING/FOLD/DIFF entre os
+        // módulos, onde eles não estão.
+        if (const int ci = cableUnder(p); ci >= 0)
+            return {&rasgo::panel::learnCable(),
+                    u8("CABO  \xc2\xb7  clique para abrir"),
+                    "cabo|" + std::to_string(ci)};
+
         for (const auto& m : mods_) {
             if (!m.bounds.contains(p)) continue;
             const std::string mt = rack_.graph.node(m.id).type();
@@ -4010,6 +4020,33 @@ private:
                 rack_.score.connection(0.0, c.source().node, c.source().port,
                                        c.target().node, c.target().port);
             }
+            // DICIONÁRIO da partitura: nomes de módulo, de porta e a
+            // regulagem. Sem isto o `.score.txt` sai como `33:1 -> 38:2`
+            // — cronologicamente correto e ilegível, que foi o relato do
+            // autor na sessão de escuta de 23 set. 2026.
+            rack_.score.setSeed(rack_.curSeed);
+            rack_.score.setSampleRate(sampleRate_);
+            for (const auto id : rack_.shown) {
+                auto& nd = rack_.graph.node(id);
+                rasgo::panel::ScoreNodeInfo info;
+                info.type = nd.type();
+                for (std::size_t p = 0; p < nd.inputCount(); ++p)
+                    info.inPorts.push_back(nd.inputDescriptor(p).name);
+                for (std::size_t p = 0; p < nd.outputCount(); ++p)
+                    info.outPorts.push_back(nd.outputDescriptor(p).name);
+                for (const auto& pr : nd.parameters())
+                    info.params.emplace_back(pr.descriptor.id, pr.value);
+                rack_.score.describe(id, std::move(info));
+            }
+            {   // o sink também aparece nas ligações, então precisa de nome
+                auto& so = rack_.graph.node(rack_.sink);
+                rasgo::panel::ScoreNodeInfo info;
+                info.type = so.type();
+                for (std::size_t p = 0; p < so.inputCount(); ++p)
+                    info.inPorts.push_back(so.inputDescriptor(p).name);
+                rack_.score.describe(rack_.sink, std::move(info));
+            }
+
             rack_.loudness.reset();   // o integrado é DA TOMADA
             rack_.recording.store(true);
         }

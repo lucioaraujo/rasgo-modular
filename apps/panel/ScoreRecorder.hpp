@@ -1,7 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iomanip>
+#include <map>
 #include <locale>
 #include <sstream>
 #include <string>
@@ -70,6 +73,23 @@ struct RasgoEvent {
     bool noteAccent = false;
 };
 
+// Descrição de um módulo para o texto da partitura.
+//
+// O `ScoreRecorder` não conhece `SignalGraph` — é decisão de projeto, e
+// continua valendo. Mas escrever `33:1 -> 38:2` e chamar aquilo de
+// partitura era inútil: na sessão de escuta de 23 set. 2026 o autor disse
+// "não dá pra entender que cabo está conectado onde ou quais módulos
+// estão acionados, nem qual a regulagem empregada" — sobre o documento
+// que o próprio protocolo chama de principal do Estudo 3.
+//
+// A saída é quem chama passar o dicionário. O gravador continua sem saber
+// o que é um oscilador; só sabe imprimir o nome que recebeu.
+struct ScoreNodeInfo {
+    std::string type;                                  // "OSC", "MIXER"…
+    std::vector<std::string> inPorts, outPorts;        // nomes das portas
+    std::vector<std::pair<std::string, float>> params; // a regulagem
+};
+
 class ScoreRecorder {
 public:
     void connection(const double t, const std::size_t sourceNode,
@@ -118,40 +138,88 @@ public:
 
     std::size_t eventCount() const noexcept { return events_.size(); }
     const std::vector<RasgoEvent>& events() const noexcept { return events_; }
-    void clear() noexcept { events_.clear(); }
+    void clear() noexcept { events_.clear(); nodes_.clear(); seed_ = 0;
+                            sampleRate_ = 0.0; }
 
-    // formato de texto próprio — uma linha por evento, em ordem de
-    // registro (não reordena por tempo: a ordem de chamada já É a
-    // ordem cronológica, porque quem chama processa o grafo em blocos
-    // crescentes). Não é MusicXML/MIDI — ver o comentário do topo.
+    // ---- dicionário, preenchido por quem chama ------------------------
+    void describe(const std::size_t id, ScoreNodeInfo info) {
+        nodes_[id] = std::move(info);
+    }
+    void setSeed(const std::uint64_t s) noexcept { seed_ = s; }
+    void setSampleRate(const double sr) noexcept { sampleRate_ = sr; }
+
+    // Texto da partitura, para ser LIDO por uma pessoa.
+    //
+    // Antes era uma lista de `33:1 -> 38:2`: cronologicamente correta,
+    // determinística, e ilegível. Agora traz, nesta ordem:
+    //
+    //   1. o SEED — sem ele a tomada não é reproduzível, e ele faltava;
+    //   2. os MÓDULOS que participam, com a regulagem de cada um;
+    //   3. as LIGAÇÕES com nome de módulo e de porta;
+    //   4. os eventos ao longo do tempo.
+    //
+    // Quando não há dicionário (chamador antigo, ou um módulo que não foi
+    // descrito), cai no número cru — degrada, não quebra.
     std::string toText() const {
         std::ostringstream out;
         out.imbue(std::locale::classic());
-        out << "rasgo-system-score 1\n";
+        out << std::fixed;
+
+        out << "rasgo-system-score 2\n";
+        if (seed_ != 0)       out << "seed " << seed_ << '\n';
+        if (sampleRate_ > 0.0)
+            out << "taxa " << std::setprecision(0) << sampleRate_ << " Hz\n";
+
+        // ---- módulos e regulagem -------------------------------------
+        // Só os que aparecem em algum evento: listar os 59 do rack
+        // afogaria o que importa. Partitura é o que TOCOU.
+        std::vector<std::size_t> usados;
         for (const auto& e : events_) {
-            out << "t=" << std::fixed << std::setprecision(6) << e.time << ' ';
+            usados.push_back(e.targetNode);
+            if (e.type == RasgoEvent::Type::Connection
+                || e.type == RasgoEvent::Type::Modulation)
+                usados.push_back(e.sourceNode);
+        }
+        std::sort(usados.begin(), usados.end());
+        usados.erase(std::unique(usados.begin(), usados.end()), usados.end());
+
+        if (!nodes_.empty()) {
+            out << "\n# módulos\n";
+            for (const std::size_t id : usados) {
+                const auto it = nodes_.find(id);
+                if (it == nodes_.end()) continue;
+                out << "modulo " << id << ' ' << it->second.type;
+                for (const auto& [nome, v] : it->second.params)
+                    out << ' ' << nome << '=' << std::setprecision(4) << v;
+                out << '\n';
+            }
+        }
+
+        out << "\n# eventos\n";
+        for (const auto& e : events_) {
+            out << "t=" << std::setprecision(6) << e.time << ' ';
             switch (e.type) {
             case RasgoEvent::Type::Connection:
-                out << "connection " << e.sourceNode << ':' << e.sourcePort
-                    << " -> " << e.targetNode << ':' << e.targetPort << '\n';
+                out << "cabo " << saida(e.sourceNode, e.sourcePort)
+                    << " -> " << entrada(e.targetNode, e.targetPort) << '\n';
                 break;
             case RasgoEvent::Type::Modulation:
-                out << "modulation " << e.sourceNode << ':' << e.sourcePort
-                    << " -> " << e.targetNode << '.' << e.targetParamId
-                    << " depth=" << std::setprecision(6) << e.depth
-                    << " offset=" << e.offset << '\n';
+                out << "modula " << saida(e.sourceNode, e.sourcePort)
+                    << " -> " << nome(e.targetNode) << '.' << e.targetParamId
+                    << " profundidade=" << std::setprecision(4) << e.depth
+                    << " deslocamento=" << e.offset << '\n';
                 break;
             case RasgoEvent::Type::ParameterChange:
-                out << "param " << e.targetNode << '.' << e.targetParamId
-                    << ' ' << std::setprecision(6) << e.fromValue << " -> "
+                out << "ajuste " << nome(e.targetNode) << '.' << e.targetParamId
+                    << ' ' << std::setprecision(4) << e.fromValue << " -> "
                     << e.toValue << '\n';
                 break;
             case RasgoEvent::Type::Note:
-                out << "note " << e.targetNode
-                    << " pitch=" << std::setprecision(6) << e.notePitch
-                    << " velocity=" << e.noteVelocity
-                    << " duration=" << e.noteDuration
-                    << " accent=" << (e.noteAccent ? 1 : 0) << '\n';
+                out << "nota " << nome(e.targetNode)
+                    << " altura=" << std::setprecision(4) << e.notePitch
+                    << " intensidade=" << e.noteVelocity
+                    << " duração=" << e.noteDuration
+                    << (e.noteAccent ? " acento" : "") << '\n';
                 break;
             }
         }
@@ -159,7 +227,38 @@ public:
     }
 
 private:
+    // "OSC[12]" quando há dicionário, "12" quando não há: o texto degrada
+    // para o formato antigo em vez de mentir ou falhar.
+    std::string nome(const std::size_t id) const {
+        const auto it = nodes_.find(id);
+        std::ostringstream o;
+        if (it == nodes_.end()) { o << id; return o.str(); }
+        o << it->second.type << '[' << id << ']';
+        return o.str();
+    }
+    std::string porta(const std::vector<std::string>& v,
+                      const std::size_t i) const {
+        std::ostringstream o;
+        if (i < v.size() && !v[i].empty()) o << v[i]; else o << i;
+        return o.str();
+    }
+    std::string saida(const std::size_t id, const std::size_t p) const {
+        const auto it = nodes_.find(id);
+        return nome(id) + '.'
+             + (it == nodes_.end() ? std::to_string(p)
+                                   : porta(it->second.outPorts, p));
+    }
+    std::string entrada(const std::size_t id, const std::size_t p) const {
+        const auto it = nodes_.find(id);
+        return nome(id) + '.'
+             + (it == nodes_.end() ? std::to_string(p)
+                                   : porta(it->second.inPorts, p));
+    }
+
     std::vector<RasgoEvent> events_;
+    std::map<std::size_t, ScoreNodeInfo> nodes_;
+    std::uint64_t seed_ = 0;
+    double sampleRate_ = 0.0;
 };
 
 }  // namespace rasgo::panel
