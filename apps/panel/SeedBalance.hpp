@@ -78,6 +78,32 @@ inline constexpr float kSeedPeakCeilingDb = -6.0f;
 inline constexpr float kSeedMaxLiftDb = 30.0f;
 inline constexpr float kSeedMaxCutDb  =  9.0f;
 
+// Quanto do patch medir antes de decidir o ganho — e a escolha é um
+// compromisso MEDIDO, não um número redondo.
+//
+// A janela curta engana: medindo 1,5 s e tocando 20 s, um seed que começa
+// quieto e cresce depois é elevado indevidamente, e o mais alto do lote
+// saltava para −9,7 LUFS (acima de onde estava sem correção nenhuma).
+// Janelas maiores corrigem isso, mas o pré-render custa tempo a cada
+// SEED, e o protocolo de escuta pede apertar SEED dez vezes seguidas.
+//
+//     janela   dispersão   custo por SEED
+//     1,5 s     36,0 LU        172 ms
+//     4,0 s     33,8 LU        505 ms
+//     8,0 s     31,7 LU       1088 ms
+//
+// 4 s é onde a curva vira: dobrar para 8 s compra 2,1 LU e cobra o dobro
+// do tempo. Meio segundo num gesto que já reconstrói o grafo inteiro
+// passa; um segundo inteiro, num botão feito para ser apertado em
+// sequência, não.
+//
+// Melhoria possível, registrada e NÃO feita: medir em segundo plano
+// enquanto o patch já toca, e aplicar pela rampa por amostra que o
+// `gain` do MASTER já tem. Some com a espera, mas troca uma pausa
+// previsível por um som que muda de nível depois de começar — e isso
+// precisa ser ouvido antes de ser adotado.
+inline constexpr double kSeedProbeSeconds = 4.0;
+
 // Mede um seed e devolve a correção de ganho, em dB.
 //
 // Monta um rack PRÓPRIO, descartável, só para medir — e é por isso que
@@ -96,7 +122,7 @@ inline constexpr float kSeedMaxCutDb  =  9.0f;
 inline float seedGainCorrection(const std::uint64_t seed,
                                 const float sampleRate,
                                 const std::size_t blockFrames,
-                                const double seconds = 1.5) {
+                                const double seconds = kSeedProbeSeconds) {
     using namespace rasgo::modular;
 
     SignalGraph prova;
@@ -142,8 +168,20 @@ inline float seedGainCorrection(const std::uint64_t seed,
     return correcao;
 }
 
-// Aplica a correção ao MASTER do grafo dado. NÃO roda o grafo: a medição
-// acontece no rack de prova de `seedGainCorrection`.
+// Aplica a correção, DISTRIBUÍDA pela folga que existe.
+//
+// Só o `gain` do MASTER não basta, e a medição mostrou por quê: um seed
+// precisava de +42 dB e o parâmetro satura em +12. Mas a folga existia em
+// outro lugar — o `out_gain` do MIXER vai de −24 a +12 dB e estava em 0.
+//
+// A ordem é do fim para o começo da cadeia: MASTER primeiro (é o controle
+// de saída, o lugar natural), e o que não couber vai para o `out_gain` do
+// MIXER. Não se mexe nos ganhos de CANAL do mixer: eles são a proporção
+// entre as camadas, e alterá-los mudaria a mistura que o seed compôs, não
+// só o volume dela.
+//
+// NÃO roda o grafo: a medição acontece no rack de prova de
+// `seedGainCorrection`.
 //
 // CONTRATO: `seed` precisa ser o seed de que ESTE grafo nasceu. A medição
 // é feita num rack de prova construído a partir dele, então passar outro
@@ -156,17 +194,44 @@ inline float balanceSeedLevel(rasgo::modular::SignalGraph& graph,
                               const std::uint64_t seed,
                               const float sampleRate,
                               const std::size_t blockFrames,
-                              const double seconds = 1.5) {
-    const float correcao =
-        seedGainCorrection(seed, sampleRate, blockFrames, seconds);
-    if (correcao == 0.0f) return 0.0f;
-    for (std::size_t i = 0; i < graph.nodeCount(); ++i) {
-        if (graph.node(i).type() != "MASTER") continue;
-        auto& mst = graph.node(i);
-        mst.setParameter("gain", mst.parameterValue("gain") + correcao);
-        return correcao;
-    }
-    return 0.0f;
+                              const double seconds = kSeedProbeSeconds) {
+    float resta = seedGainCorrection(seed, sampleRate, blockFrames, seconds);
+    if (resta == 0.0f) return 0.0f;
+    const float pedido = resta;
+
+    // Aplica o quanto o parâmetro aceitar e devolve o que sobrou. Sem
+    // isto, pedir +42 num parâmetro que satura em +12 perde 30 dB em
+    // silêncio — foi o caso que a medição de 40 seeds expôs.
+    const auto aplicar = [&graph](const char* tipo, const char* par,
+                                  float& falta) {
+        if (falta == 0.0f) return;
+        for (std::size_t i = 0; i < graph.nodeCount(); ++i) {
+            if (graph.node(i).type() != tipo) continue;
+            auto& nd = graph.node(i);
+            for (const auto& p : nd.parameters()) {
+                if (p.descriptor.id != par) continue;
+                // `antes` é lido ANTES de mexer, e isto não é estilo: `p`
+                // é referência para dentro do vetor de parâmetros, e
+                // `setParameter` altera `p.value` no lugar. Lendo depois,
+                // a diferença dava sempre zero — a função reportava "nada
+                // aplicado" e o estágio seguinte recebia o pedido inteiro
+                // outra vez. O teste pegou; a leitura do código, não.
+                const float antes = p.value;
+                const float lo = p.descriptor.minimum;
+                const float hi = p.descriptor.maximum;
+                const float alvo = antes + falta;
+                const float posto = alvo > hi ? hi : (alvo < lo ? lo : alvo);
+                nd.setParameter(par, posto);
+                falta -= (posto - antes);
+                return;
+            }
+            return;
+        }
+    };
+
+    aplicar("MASTER", "gain", resta);
+    aplicar("MIXER", "out_gain", resta);
+    return pedido - resta;   // o que de fato foi aplicado
 }
 
 }  // namespace rasgo::panel

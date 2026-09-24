@@ -102,11 +102,19 @@ void testDeterminismo() {
 void testGrafoRebobinado() {
     auto comBalanco = montar(12345), semBalanco = montar(12345);
     rasgo::panel::balanceSeedLevel(comBalanco.g, 12345, kSr, kB);
-    // força o mesmo ganho nos dois, pra comparar só o PONTO DE PARTIDA
-    for (std::size_t i = 0; i < comBalanco.g.nodeCount(); ++i)
-        if (comBalanco.g.node(i).type() == "MASTER")
+    // Devolve TODOS os ganhos que a função pode ter tocado, para comparar
+    // só o PONTO DE PARTIDA do áudio. A correção é distribuída entre o
+    // `gain` do MASTER e o `out_gain` do MIXER, então equalizar apenas o
+    // MASTER deixaria uma diferença que não é a que este caso investiga.
+    for (std::size_t i = 0; i < comBalanco.g.nodeCount(); ++i) {
+        const std::string t = comBalanco.g.node(i).type();
+        if (t == "MASTER")
             comBalanco.g.node(i).setParameter("gain",
-                ganhoDoMaster(semBalanco.g));
+                semBalanco.g.node(i).parameterValue("gain"));
+        else if (t == "MIXER")
+            comBalanco.g.node(i).setParameter("out_gain",
+                semBalanco.g.node(i).parameterValue("out_gain"));
+    }
 
     AudioBlock a(kSr, 2, kB), b(kSr, 2, kB);
     comBalanco.g.process(a, comBalanco.sink, 0);
@@ -167,15 +175,26 @@ void testSemMaster() {
 // se alguém mudar a função para ignorar o seed, ou os chamadores para
 // passar qualquer número, o teste cai aqui e não numa sessão de escuta.
 void testCorrecaoVemDoSeed() {
-    auto a = montar(1), b = montar(1);
-    const float certa  = rasgo::panel::balanceSeedLevel(a.g, 1, kSr, kB);
-    const float errada = rasgo::panel::balanceSeedLevel(b.g, 12345, kSr, kB);
-    check(certa != errada,
-          "seeds diferentes dão correções diferentes (a correção usa o seed)");
+    // `seedGainCorrection` é função PURA do seed: é aí que a dependência
+    // se verifica, sem interferência de saturação de parâmetro.
+    const float c1 = rasgo::panel::seedGainCorrection(1, kSr, kB);
+    const float c2 = rasgo::panel::seedGainCorrection(12345, kSr, kB);
+    check(c1 != c2, "seeds diferentes pedem correções diferentes");
 
-    // e a via direta, sem grafo nenhum, é a mesma conta
-    check(rasgo::panel::seedGainCorrection(1, kSr, kB) == certa,
-          "balanceSeedLevel aplica exatamente seedGainCorrection");
+    // `balanceSeedLevel` devolve o que FOI APLICADO, que pode ser menos
+    // que o pedido quando os parâmetros saturam — e é por isso que este
+    // caso não compara os dois por igualdade. A primeira versão do teste
+    // fazia isso e passou a falhar quando a correção passou a ser
+    // distribuída pela folga do MIXER: o teste fixava o contrato antigo.
+    auto a = montar(1);
+    const float aplicado = rasgo::panel::balanceSeedLevel(a.g, 1, kSr, kB);
+    const float pedido = c1;
+    check(std::fabs(aplicado) <= std::fabs(pedido) + 1.0e-4f,
+          "o aplicado nunca excede o pedido");
+    check((aplicado >= 0.0f) == (pedido >= 0.0f),
+          "o aplicado tem o mesmo sinal do pedido");
+    check(std::fabs(aplicado) > 0.0f,
+          "havendo pedido, algo é aplicado");
 }
 
 }  // namespace

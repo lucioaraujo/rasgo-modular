@@ -9318,11 +9318,8 @@ determinística. A mediana foi preservada porque o MASTER abrir em −24 dB
 - o limite fixo de +12 dB era cego. A régua certa é o **pico**: eleva
   muito material uniformemente fraco e pouco material esparso.
 
-**O que resta, com causa localizada:** um seed fica em −56,9 LUFS porque
-o filtro **WASP engole 60 dB** nele (`OSC 0,0 → PLANAR −1,2 → WASP −61,9
-→ OUT −57,6`). O `gain` do MASTER vai ao máximo do parâmetro e o sinal já
-morreu antes. Corrigir exige **estreitar as faixas de geração dos
-filtros**, o que muda como todo seed soa — decisão musical do autor.
+**O que resta, com causa localizada.** *(Corrigido em 25 set. 2026 — ver
+abaixo; a atribuição ao WASP estava errada.)*
 
 ### 2. `.score.txt` ininteligível — formato 2
 
@@ -9496,3 +9493,87 @@ outubro. Duas saídas, as duas sem gasto: esperar o ciclo virar, ou tornar
 o repositório público — que é o que a publicação exige de qualquer forma,
 e que devolve Actions gratuito e ilimitado. **Não vou criar a tag sem
 essa decisão**, para não gerar uma release sem instaladores.
+
+## Registro da etapa — 2026-09-25: o achado do volume, e um diagnóstico meu que estava errado
+
+### CORREÇÃO: não era o WASP
+
+Em 24 set. escrevi, aqui e no dossiê de validação, que "o filtro WASP
+engole 60 dB" no seed problemático. **Estava errado, e a origem do erro
+importa mais que o erro.**
+
+Eu li mal a saída da minha própria ferramenta de diagnóstico: ela
+percorria o grafo a partir da saída e imprimia os nós **por nível de
+busca**, indentados. A indentação sugere hierarquia, mas nós do mesmo
+nível **não alimentam um ao outro** — eles apenas estão à mesma distância
+da saída. Vi `PLANAR −1,2` seguido de `WASP −61,9` e concluí uma relação
+causal que a ferramenta não afirmava.
+
+Medida a resposta do WASP com os parâmetros exatos daquele seed, ele
+**amplifica** os graves e atenua no máximo 20 dB no agudo:
+
+| entrada | ganho |
+|---|---|
+| 110 Hz | +7,9 dB |
+| 1 kHz | +5,2 dB |
+| 4 kHz | −19,7 dB |
+
+E o WASP **nem estava no caminho de áudio** daquele patch.
+
+### A causa real, medida cabo a cabo
+
+Refeito o diagnóstico para medir cada LIGAÇÃO (pico na saída da fonte
+contra pico na saída do destino):
+
+```
+LPG → FILTER        −0,5 dB
+FILTER.2 → SPACE   −36,4 dB   ← a porta 2 do FILTER é a "high"
+SPACE → ENVELOPE   −40,0 dB
+ENVELOPE → MIXER   −51,5 dB   (−10,9 dB)
+MIXER → MASTER     −57,6 dB
+```
+
+O gerador escolheu a **saída passa-alta** de um conteúdo grave: 36 dB
+abaixo da saída principal. Não é defeito de filtro nenhum — é escolha de
+porta na geração.
+
+### O que foi feito, e por que não mexi na geração
+
+Mexer na escolha de porta muda como **todo** seed soa, e isso é decisão
+musical do autor. O que dava para fazer sem tocar na identidade do
+instrumento era **usar a folga de ganho que existia e estava parada**: o
+`out_gain` do MIXER vai de −24 a +12 dB e ficava em 0. A correção passou a
+ser distribuída — MASTER primeiro, o que não couber no `out_gain` do
+MIXER. Os ganhos de CANAL do mixer não são tocados: eles são a proporção
+entre as camadas, não o volume delas.
+
+| | sem | com |
+|---|---|---|
+| faixa | 52,7 LU | **32,6 LU** |
+| seeds >10 LU abaixo da mediana | 4 de 40 | **1 de 40** |
+| mais fraco | −68,4 LUFS | −45,7 |
+| mediana | −26,1 | −25,7 (preservada) |
+
+### A janela de medição, escolhida por medição
+
+| janela | dispersão | custo por SEED |
+|---|---|---|
+| 1,5 s | 36,0 LU | 172 ms |
+| **4,0 s** | **33,8 LU** | **505 ms** |
+| 8,0 s | 31,7 LU | 1088 ms |
+
+4 s é onde a curva vira. Janela curta engana: medindo 1,5 s e tocando
+20 s, um seed que começa quieto e cresce é elevado indevidamente — o mais
+alto do lote saltava para −9,7 LUFS, acima de onde estava sem correção
+nenhuma.
+
+### Terceiro erro meu pego por teste, não por leitura
+
+A distribuição não funcionava: eu lia `p.value` **depois** de já ter
+chamado `setParameter`, e `p` é referência para dentro do vetor de
+parâmetros. A diferença dava sempre zero, a função reportava "nada
+aplicado", e o segundo estágio recebia o pedido inteiro outra vez. O
+teste falhou em "havendo pedido, algo é aplicado"; a leitura do código
+não teria pegado.
+
+**78/78 CTest.**
