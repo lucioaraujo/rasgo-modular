@@ -9401,3 +9401,48 @@ o app não carrega seria inútil.
 
 `LEIA-ME.md` na pasta explica cada um, com o que escutar e os números
 medidos como referência.
+
+## Registro da etapa — 2026-09-24: o Estudo 4 escutado, e o patch que não testava nada
+
+Achados do autor nos três casos que executou:
+
+- **matéria:** "não explode; não trava, nem emudece. as ressonâncias
+  funcionam."
+- **espaço:** "não cresce sem parar, há ritmo que vai ficando cada vez
+  mais curto, não some, vira timbre, é bem noise, mas normal dentro da
+  ideia de noise. é musical."
+- **direto no OUT:** "é musical também… **sem clipes ou estalos**."
+- **signal-in:** não executado.
+
+### O terceiro relato expôs um defeito meu, não do instrumento
+
+O documento afirma que por fora do MASTER "o som deve recortar de forma
+feia e audível — é o aviso de que falta um MASTER". O autor ouviu algo
+musical e limpo. Em vez de supor qual dos dois estava errado, medi o sink
+isolado:
+
+| sinal | amostras no teto | distorção |
+|---|---|---|
+| 0,89 (no teto) | 0,0% | 0,0% |
+| 1,2 | 46,7% | 18,0% |
+| 2,0 | 70,6% | 47,4% |
+| 5,0 | 88,6% | 77,9% |
+
+A guarda funciona e é brutal **quando o sinal passa do teto**. O meu
+patch media 368 amostras no teto em 20 s — **0,04%**: ele mal encostava.
+Ou seja, **entreguei um patch de teste que não exercitava o que ele devia
+testar**, e o autor gastou uma escuta nele.
+
+Refeito com um MIXER de `out_gain` alto: 58,9% das amostras no teto,
+recorte constante, e ainda **finito**. Ida e volta pelo `Ctrl+O`
+verificada de novo.
+
+**Também corrigi a frase do protocolo**, que estava genérica demais: o
+recorte audível vale quando o sinal EXCEDE o teto, não para qualquer
+patch sem MASTER. É o mesmo tipo de erro da expectativa dos taps de
+gravação — afirmar como universal algo que depende de condição.
+
+**Estado da Parte A:** Estudos 1, 2 e 3 do protocolo fechados com
+achados. Do Estudo 4, os casos matéria e espaço fechados; falta
+reescutar o caso 3 na versão corrigida, e o caso 4 (signal-in) é
+opcional e depende de hardware.
