@@ -37,12 +37,15 @@ void testTextFormatContainsFields() {
     rec.modulation(0.25, 1, 0, 7, "spread", 0.3f, 0.0f);
     rec.parameterChange(0.5, 7, "spread", 0.15f, 0.22f);
     const std::string txt = rec.toText();
-    check(txt.find("rasgo-system-score 1") == 0, "cabeçalho do formato");
-    check(txt.find("connection 5:0 -> 7:2") != std::string::npos,
+    check(txt.find("rasgo-system-score 2") == 0, "cabeçalho do formato");
+    // Sem dicionário o texto DEGRADA para números crus em vez de falhar:
+    // é o que garante que um chamador antigo continue produzindo
+    // partitura válida, só menos legível.
+    check(txt.find("cabo 5.0 -> 7.2") != std::string::npos,
           "linha de conexão legível");
-    check(txt.find("modulation 1:0 -> 7.spread") != std::string::npos,
+    check(txt.find("modula 1.0 -> 7.spread") != std::string::npos,
           "linha de modulação legível");
-    check(txt.find("param 7.spread 0.15") != std::string::npos,
+    check(txt.find("ajuste 7.spread 0.15") != std::string::npos,
           "linha de mudança de parâmetro legível");
 }
 
@@ -76,11 +79,11 @@ void testNoteEvent() {
     check(rec.events()[1].noteDuration == 0.333, "duracao preservada");
     check(rec.events()[1].noteAccent, "acento preservado");
     const std::string txt = rec.toText();
-    check(txt.find("note 9 pitch=0.5") != std::string::npos,
+    check(txt.find("nota 9 altura=0.5") != std::string::npos,
           "linha de nota legivel (pitch)");
-    check(txt.find("velocity=0.8") != std::string::npos,
+    check(txt.find("intensidade=0.8") != std::string::npos,
           "linha de nota legivel (velocity)");
-    check(txt.find("accent=1") != std::string::npos,
+    check(txt.find("acento") != std::string::npos,
           "linha de nota legivel (acento)");
 }
 
@@ -90,7 +93,55 @@ void testClear() {
     EXPECT(rec.eventCount() == 1);
     rec.clear();
     EXPECT(rec.eventCount() == 0);
-    EXPECT(rec.toText().find("rasgo-system-score 1") == 0);
+    EXPECT(rec.toText().find("rasgo-system-score 2") == 0);
+}
+
+// ---- o dicionário (formato 2) ----------------------------------------
+//
+// Achado da sessão de escuta de 23 set. 2026: o autor não conseguia ler a
+// partitura — "não dá pra entender que cabo está conectado onde ou quais
+// módulos estão acionados, nem qual a regulagem empregada". O formato 1
+// era correto e inútil. Estes casos fixam o que o torna legível.
+void testDicionarioTornaLegivel() {
+    ScoreRecorder rec;
+    rec.setSeed(1276993369095270621ull);
+    rec.setSampleRate(44100.0);
+
+    ScoreNodeInfo osc;
+    osc.type = "OSC";
+    osc.outPorts = {"out", "sub"};
+    osc.params = {{"freq", 220.0f}, {"pw", 0.5f}};
+    rec.describe(5, osc);
+
+    ScoreNodeInfo mix;
+    mix.type = "MIXER";
+    mix.inPorts = {"in1", "in2", "in3"};
+    rec.describe(7, mix);
+
+    rec.connection(0.0, 5, 0, 7, 2);
+    const std::string t = rec.toText();
+
+    check(t.find("seed 1276993369095270621") != std::string::npos,
+          "o SEED aparece — sem ele a tomada não é reproduzível");
+    check(t.find("taxa 44100 Hz") != std::string::npos, "a taxa aparece");
+    check(t.find("modulo 5 OSC freq=220") != std::string::npos,
+          "o módulo aparece com a REGULAGEM");
+    check(t.find("cabo OSC[5].out -> MIXER[7].in3") != std::string::npos,
+          "a ligação diz módulo e porta, com nome");
+}
+
+// Só os módulos que participam entram na lista. Listar os 59 do rack
+// afogaria o que importa: partitura é o que TOCOU.
+void testSoOsModulosQueParticipam() {
+    ScoreRecorder rec;
+    ScoreNodeInfo a; a.type = "OSC";     rec.describe(5, a);
+    ScoreNodeInfo b; b.type = "MIXER";   rec.describe(7, b);
+    ScoreNodeInfo c; c.type = "SAMPLER"; rec.describe(9, c);  // não usado
+    rec.connection(0.0, 5, 0, 7, 0);
+    const std::string t = rec.toText();
+    check(t.find("OSC") != std::string::npos, "módulo usado aparece");
+    check(t.find("SAMPLER") == std::string::npos,
+          "módulo que não participou NÃO aparece");
 }
 
 }  // namespace
@@ -101,6 +152,8 @@ int main() {
     testDeterministicText();
     testNoteEvent();
     testClear();
+    testDicionarioTornaLegivel();
+    testSoOsModulosQueParticipam();
     if (g_failures == 0) {
         std::cout << "RASGO Modular score recorder tests passed\n";
         return 0;

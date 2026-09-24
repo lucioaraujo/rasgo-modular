@@ -9287,3 +9287,80 @@ workflow.
 **Lição para o resto da família RASGO:** o ANTITOTEM e o Navalha 2 têm
 workflows na mesma forma, com `on: push`. Se algum deles for privado,
 tem o mesmo risco.
+
+## Registro da etapa — 2026-09-24: os três achados atacados antes da publicação
+
+Decisão do autor: corrigir antes de publicar. Os três, com o que mudou.
+
+### 1. Faixa de volume entre seeds — reduzida, com o resto localizado
+
+Medido em 40 seeds: **52,7 LU** de dispersão, 4 deles mais de 10 LU
+abaixo da mediana. Criado `apps/panel/SeedBalance.hpp`, que mede o seed
+num rack de prova e escolhe o ganho INICIAL do MASTER.
+
+| | antes | depois |
+|---|---|---|
+| faixa | 52,7 LU | **43,6 LU** |
+| seeds >10 LU abaixo da mediana | 4 de 40 | **1 de 40** |
+| mediana | −26,1 | −25,6 (preservada de propósito) |
+
+**Não é normalização ao vivo** — roda uma vez, quando o patch nasce, e é
+determinística. A mediana foi preservada porque o MASTER abrir em −24 dB
+é pedido do autor; o objetivo era tirar a dispersão, não mudar o nível.
+
+**Dois erros meus, pegos pelo teste que escrevi:**
+
+- a primeira versão media rodando o grafo do músico e chamava
+  `prepare()` para "rebobinar". **Não rebobina** — o teste provou que o
+  primeiro bloco saía diferente, ou seja, o patch começaria adiantado e
+  dois racks com o mesmo seed soariam diferente. Passou a medir num rack
+  descartável;
+- o limite fixo de +12 dB era cego. A régua certa é o **pico**: eleva
+  muito material uniformemente fraco e pouco material esparso.
+
+**O que resta, com causa localizada:** um seed fica em −56,9 LUFS porque
+o filtro **WASP engole 60 dB** nele (`OSC 0,0 → PLANAR −1,2 → WASP −61,9
+→ OUT −57,6`). O `gain` do MASTER vai ao máximo do parâmetro e o sinal já
+morreu antes. Corrigir exige **estreitar as faixas de geração dos
+filtros**, o que muda como todo seed soa — decisão musical do autor.
+
+### 2. `.score.txt` ininteligível — formato 2
+
+O autor: "não dá pra entender que cabo está conectado onde ou quais
+módulos estão acionados, nem qual a regulagem empregada".
+
+Antes: `t=0.000000 connection 33:1 -> 38:2`
+Agora: `t=0.000000 cabo CLOCK[33].euclid -> QUANTIZER[38].trigger`
+
+Mais o **seed** (que faltava — ontem não consegui ligar a tomada do autor
+a patch nenhum), a taxa, e a seção `# módulos` com a regulagem completa,
+**só dos que participam** (listar os 59 do rack afogaria o que importa).
+
+O `ScoreRecorder` continua sem conhecer `SignalGraph`: quem chama passa o
+dicionário. Sem dicionário o texto **degrada** para números crus em vez
+de quebrar — há teste. O teste antigo falhou ao mudar o formato, que era
+o que ele devia fazer.
+
+### 3. O cabo como objeto não se descobre
+
+Pedido a experimentar RING, FOLD, DIFF, AMT e COND, o autor respondeu
+"não achei esses módulos" — e não achou porque **não são módulos**. São
+propriedades do cabo, no inspector que abre ao clicar sobre ele. Nada
+dizia isso: nem o tutorial, nem o LEARN, nem as instruções que eu mesmo
+escrevi no protocolo.
+
+É o mais caro dos três, porque o que estava escondido não é recurso
+lateral: é **a ideia que separa este instrumento de um modular comum**.
+
+Corrigido em três frentes:
+
+- **LEARN**: passar o mouse sobre um cabo agora explica o cabo — e vem
+  ANTES dos módulos na ordem de acerto, pela mesma razão que o clique no
+  cabo ganha do corpo do módulo (os cabos passam por cima);
+- **tutorial**, nos quatro idiomas: o cartão de cabeamento passou a dizer
+  "clique sobre um cabo para abrir o inspector", com o que cada relação
+  faz;
+- **protocolo de validação**: a minha instrução dizia "abra o inspector
+  num cabo" sem dizer que é clicando.
+
+**78/78 CTest**, build sem avisos próprios.

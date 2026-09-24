@@ -49,6 +49,37 @@ struct LearnEntry {
     std::string explore;
 };
 
+// O CABO, e não um módulo.
+//
+// Existe por um achado da sessão de escuta de 23 set. 2026: pedido a
+// experimentar RING, FOLD, DIFF, AMT e COND, o autor respondeu "não achei
+// esses módulos". E não achou porque não SÃO módulos — são propriedades
+// do cabo, no inspector que abre ao clicar sobre ele. Nada no instrumento
+// dizia isso: nem o tutorial, nem o LEARN, nem as instruções que eu mesmo
+// escrevi no protocolo de validação.
+//
+// É o defeito mais caro da lista, porque o que estava escondido não era
+// um recurso lateral: é a ideia que separa este instrumento de um modular
+// comum — o cabo como objeto com estado, e não um fio que só liga.
+inline const LearnEntry& learnCable() {
+    static const LearnEntry e{
+        "o cabo é um OBJETO, não um fio. Clique sobre ele para abrir o "
+        "inspector e mexer no que ele faz com o sinal que passa.",
+
+        "todo cabo tem ganho (AMT) e condutância (COND — a chance de "
+        "deixar passar em cada instante, de onde vem a intermitência "
+        "viva), e uma RELAÇÃO com o sinal que já chegava no destino: "
+        "SOMA é o normal; RING multiplica os dois; FOLD dobra a soma "
+        "sobre si mesma; DIFF usa a diferença. Um cabo também pode ser "
+        "ROMPIDO sem ser removido — o som decai numa cicatriz em vez de "
+        "cortar seco, e [espaço] rompe e reata todos de uma vez.",
+
+        "ligue dois sinais no mesmo destino e troque a relação de SOMA "
+        "para RING: a mesma fiação, outro instrumento. Depois baixe COND "
+        "pela metade e ouça a ligação piscar."};
+    return e;
+}
+
 namespace detail {
 using LearnTable =
     std::unordered_map<std::string, std::unordered_map<std::string, LearnEntry>>;

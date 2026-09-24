@@ -179,8 +179,11 @@ está agindo** — a telemetria existe (`bodyGuardDb()`) e não é exibida.
 *A ideia que separa este instrumento: o cabo como objeto.*
 
 1. `n` para descabear tudo. Construa um patch do zero, ligação por ligação.
-2. Abra o inspector num cabo: experimente RING, FOLD, DIFF; mexa em AMT e
-   COND.
+2. **CLIQUE SOBRE UM CABO** (no meio dele, não nos jacks) para abrir o
+   inspector. Ali estão RING, FOLD, DIFF, AMT e COND — eles **não são
+   módulos**, são propriedades do cabo. Esta instrução dizia só "abra o
+   inspector num cabo", sem dizer que é clicando, e foi por isso que o
+   autor os procurou no rack e não achou.
 3. Rompa e reate cabos, um a um e com `[espaço]`.
 4. Grave uma tomada do processo inteiro — aqui o `.score.txt` é o
    documento principal, porque registra cada ligação.

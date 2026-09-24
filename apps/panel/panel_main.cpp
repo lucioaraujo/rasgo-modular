@@ -2801,6 +2801,22 @@ int main() {
             std::lock_guard<std::mutex> lk(gmx);
             recBuf.clear();
             score.clear();
+            // mesmo dicionário do app JUCE — a partitura é do
+            // instrumento, não de um front-end (ver ScoreRecorder.hpp)
+            score.setSeed(curSeed);
+            score.setSampleRate(sr);
+            for (std::size_t id = 0; id < graph.nodeCount(); ++id) {
+                auto& nd = graph.node(id);
+                rasgo::panel::ScoreNodeInfo info;
+                info.type = nd.type();
+                for (std::size_t p = 0; p < nd.inputCount(); ++p)
+                    info.inPorts.push_back(nd.inputDescriptor(p).name);
+                for (std::size_t p = 0; p < nd.outputCount(); ++p)
+                    info.outPorts.push_back(nd.outputDescriptor(p).name);
+                for (const auto& pr : nd.parameters())
+                    info.params.emplace_back(pr.descriptor.id, pr.value);
+                score.describe(id, std::move(info));
+            }
             for (std::size_t i = 0; i < graph.cableCount(); ++i) {
                 const auto& c = graph.cable(i);
                 score.connection(0.0, c.source().node, c.source().port,
