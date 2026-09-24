@@ -232,11 +232,27 @@ feia e audível — isso é proposital, é o aviso de que falta um MASTER — ma
 **Achados** (autor, 23 set. 2026): **não conseguiu executar** — pediu um
 patch pronto para o teste.
 
-Isto é falha do protocolo, não do autor: o estudo pede que se monte à mão
-um patch com módulos específicos, num instrumento onde encontrar e cabear
-módulo por módulo é justamente o trabalho. **Pendente:** preparar
-arquivos `.rmp` prontos para cada caso do Estudo 4, abríveis por
-`Ctrl+O`.
+Era falha do protocolo, não de quem o executou: pedir que se cabeie dez
+módulos antes de ouvir a primeira nota, num instrumento onde ligar módulo
+a módulo é o trabalho inteiro, transforma um estudo de escuta em
+exercício de montagem.
+
+**RESOLVIDO em 24 set. 2026.** Os quatro casos viraram patches prontos em
+[`patches-estudo4/`](patches-estudo4/LEIA-ME.md), abríveis por `Ctrl+O`.
+Cada um foi **medido antes de ser entregue**, e a ida-e-volta pelo mesmo
+caminho do `Ctrl+O` foi verificada:
+
+| patch | pico | LUFS | no teto | finito |
+|---|---|---|---|---|
+| 1 · matéria (ressoadores no limite) | −5,9 dBFS | −10,4 | 0 | sim |
+| 2 · espaço (realimentação alta) | −2,4 dBFS | −14,6 | 0 | sim |
+| 3 · **direto no OUT** | **−1,0 dBFS** | −13,0 | **368** | sim |
+| 4 · signal-in | mudo sem entrada | — | 0 | sim |
+
+O caso 3 já confirma por medição o que o estudo procura: **por fora do
+MASTER o sinal bate no teto de segurança** (−1,0 dBFS é exatamente
+`0,891251`) e recorta, **sem nunca estourar nem produzir NaN**. Falta o
+julgamento do ouvido sobre se o recorte soa como aviso.
 
 ### Fechamento
 

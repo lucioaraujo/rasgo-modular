@@ -1,0 +1,13 @@
+rasgo-modular-patch 1
+node 0 SIGNAL-IN gain=1 bend=2 cc_num=1
+node 1 SPACE time=0.300000012 taps=4 spread=0.600000024 feedback=0.699999988 diffusion=0.400000006 tone=0.5 mod=0.150000006 mix=0.5
+node 2 STRING freq=110 decay=0.899999976 damping=0.400000006 position=0.140000001 exciter=1 drive=0 mix=0.600000024
+node 3 MIXER gain1=0 pan1=0 mute1=0 gain2=0 pan2=0 mute2=0 gain3=0 pan3=0 mute3=0 gain4=0 pan4=0 mute4=0 out_gain=0
+node 4 MASTER gain=-10 width=1 mono=0 dc_block=1 limit=1 mute=0 body_guard=1
+node 5 OUT
+cable 0:0 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 0:0 -> 2:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 3:0 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 3:1 gain=1 conductance=1 feedback=0 state=intact
+cable 3:0 -> 4:0 gain=1 conductance=1 feedback=0 state=intact
+cable 4:0 -> 5:0 gain=1 conductance=1 feedback=0 state=intact
