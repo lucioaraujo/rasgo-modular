@@ -9243,3 +9243,47 @@ Ordem sugerida, do mais seguro ao mais invasivo:
 regressão nesta semana. Validar cada passo com os atalhos e a bateria de
 77 testes, e pedir confirmação de uso ao autor antes de seguir para o
 passo seguinte.
+
+## Registro da etapa — 2026-09-24: estourei a cota de CI da conta do autor
+
+O GitHub avisou que a conta bateu **100% dos 2.000 minutos** mensais
+incluídos. A causa fui eu.
+
+**22 execuções em dois dias**, uma por push meu, ~16 min cada. O que
+torna isso caro não é o tempo de parede, e sim os multiplicadores de
+cobrança:
+
+| Sistema | Multiplicador | Minutos cobrados (estimados) |
+|---|---|---|
+| Ubuntu | ×1 | ~265 |
+| Windows | ×2 | ~708 |
+| **macOS** | **×10** | **~2.832** |
+| | | **~3.805** contra 2.000 incluídos |
+
+**Cada push custou ~160 minutos cobrados.** Eu tratei a CI como se rodar
+fosse de graça — empurrei depois de quase cada mudança, inclusive de
+mudanças só em documentação, que não precisavam compilar em três
+sistemas.
+
+Pior: nas duas primeiras rodadas, corrigi um erro enquanto a anterior
+ainda rodava, e paguei pelas duas.
+
+**Corrigido:**
+
+- o workflow **não roda mais a cada push**. Roda em **tag de versão**
+  (quando os instaladores importam de fato), em **pull request** e à
+  mão, pelo botão "Run workflow";
+- `concurrency` com `cancel-in-progress`: push novo cancela a execução
+  anterior, em vez de pagar pelas duas;
+- o trabalho do dia a dia continua validado pelos **78 testes locais**,
+  que rodam em 40 segundos e não custam nada.
+
+**Fato que muda o quadro:** repositório **público** tem Actions gratuito
+e ilimitado nos runners padrão. Como a publicação torna este repositório
+público de qualquer forma, o problema desaparece sozinho nesse momento —
+e aí vale reconsiderar o gatilho por push. Ficou registrado no próprio
+workflow.
+
+**Lição para o resto da família RASGO:** o ANTITOTEM e o Navalha 2 têm
+workflows na mesma forma, com `on: push`. Se algum deles for privado,
+tem o mesmo risco.

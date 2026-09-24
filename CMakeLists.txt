@@ -443,6 +443,14 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_shortcuts_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_shortcuts_tests COMMAND rasgo_modular_shortcuts_tests)
 
+    # Equilíbrio de volume entre seeds. Achado da sessão de ESCUTA, não
+    # dos testes — por isso ganhou teste depois, e o caso que mais importa
+    # é o determinismo: o seed é a identidade do patch.
+    add_executable(rasgo_modular_seed_balance_tests tests/test_seed_balance.cpp)
+    target_include_directories(rasgo_modular_seed_balance_tests PRIVATE src apps)
+    target_compile_options(rasgo_modular_seed_balance_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_seed_balance_tests COMMAND rasgo_modular_seed_balance_tests)
+
     add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
     target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})

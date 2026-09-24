@@ -35,6 +35,7 @@
 #include "panel/MotionEngine.hpp"    // VARIA
 #include "panel/PatchGenetics.hpp"   // MUTA / EVOLUI / CRUZA
 #include "panel/PatchSeed.hpp"
+#include "panel/SeedBalance.hpp"  // equilibra o volume entre seeds
 #include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"   // mesma política de abertura do painel X11
 #include "ui/CableGeometry.hpp"
@@ -451,6 +452,17 @@ struct Rack {
         invalidatePanels();
         reprepare();
         graph.setActiveOutput(sink);
+
+        // EQUILÍBRIO DE VOLUME entre seeds. Achado da sessão de escuta do
+        // autor (23 set. 2026): seeds abrindo tão fracos que era preciso
+        // subir as caixas para perceber que havia som. Medido em 40
+        // seeds: 52,7 LU de dispersão. Um instrumento cuja identidade é
+        // SOAR AO ABRIR não pode abrir inaudível.
+        //
+        // Roda UMA VEZ, aqui, quando o patch nasce — não é normalização
+        // ao vivo (ver a explicação longa em `SeedBalance.hpp`), e é
+        // determinística: o mesmo seed dá o mesmo ganho.
+        rasgo::panel::balanceSeedLevel(graph, s, sampleRate, blockFrames);
     }
 };
 
