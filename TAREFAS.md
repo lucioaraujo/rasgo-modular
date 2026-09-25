@@ -9775,3 +9775,55 @@ consegui provar que funciona"* não é *"não funciona"*.
 De 108 para 4, e **todos os 104 eram erro meu de medição**, não defeito do
 instrumento. Foi o que a auditoria mais ensinou: uma ferramenta de
 auditoria mal calibrada não acha bugs, ela os inventa.
+
+## Registro da etapa — 2026-09-25: as portas examinadas; auditoria encerrada
+
+**Todas as 13 portas que importavam funcionam.** As seis do `SIGNAL-IN`
+são silêncio esperado (sem entrada de áudio ligada, por desenho).
+
+| porta | faltava |
+|---|---|
+| `STAGES.eoc`, `step` | `loop = 1` e gate longo |
+| `SH.out1` | gatilho |
+| `SH.out2` | gatilho **fora de fase** com o sinal |
+| `LOGIC.and/or/xor/flip` | pulsos LARGOS em A e B, que se sobreponham |
+| `SEQUENCE.eos` | clock e voltas suficientes |
+| `TRIGSEQ.t4/accent/any` | `density4 = 1` |
+| `ABACUS.carry` | `modulus` baixo, para estourar |
+| `BOXCAR.geiger` | `geiger = 1` e limiar baixo |
+| `SWITCH.out_b/c/d` | `dir = 1` (demux) — em mux não recebem, por desenho |
+| `SCOPE.onset/trig/level` | transientes de ataque abrupto |
+
+### O caso mais instrutivo da auditoria inteira: `SH.out2`
+
+Eu alimentava `in2` com um seno de 5 Hz e `trig2` com pulso de **5 Hz** —
+travados na mesma frequência. O gatilho dispara no início de cada período,
+exatamente onde o seno vale **zero**. Ele amostrava zero, sempre, e a
+porta parecia morta. Com o gatilho a 6,5 Hz, sai 0,497.
+
+A excitação estava na porta certa, na grandeza certa, e **media a coisa
+errada por coincidência de fase**. É o tipo de erro que nenhuma revisão de
+código pega e nenhum aumento de rigor evita — só desconfiar do próprio
+instrumento de medida.
+
+### Balanço final da auditoria
+
+| | |
+|---|---|
+| Não-finitos (NaN/Inf) | **0** |
+| Parâmetros mortos | **0** |
+| Portas mortas | **0** |
+| Parâmetros sem prova (lidos no código, condição não encontrada) | 4 |
+
+Dos 32 parâmetros e 19 portas que a triagem acusou, **nenhum era
+defeito**. Todo item acusado e depois resolvido foi **erro da minha
+medição**: RMS que não vê timbre, clock externo mascarando o interno,
+entradas conectadas desligando vias alternativas, faixa de teste fora da
+faixa real do parâmetro, e gatilho em fase com o sinal.
+
+**O que a auditoria de fato entregou** não foi uma lista de bugs — foi a
+confirmação de que os 58 módulos estão íntegros, e três ferramentas
+versionadas (`tool_module_audit`, `tool_param_exam`, `tool_port_exam`)
+para refazer isso quando o catálogo crescer. Nenhuma entra no `ctest`: são
+instrumentos de investigação, e o dossiê registra por que um teste que
+acusa falso positivo ensina a ignorar falhas.
