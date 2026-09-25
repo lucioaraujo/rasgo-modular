@@ -14,7 +14,13 @@ módulos**, **458 parâmetros** e **154 portas de saída**:
 ## O resultado sólido
 
 **Zero não-finitos.** Nenhum módulo, em nenhum extremo de nenhum
-parâmetro, produziu NaN ou Inf. Para um instrumento com 58 módulos de DSP,
+parâmetro, produziu NaN ou Inf.
+
+**Zero parâmetros mortos e zero portas mortas.** Dos 32 parâmetros e 19
+portas que a triagem acusou, **nenhum** era defeito: 13 portas e 28
+parâmetros foram confirmados funcionando com excitação própria, 6 do
+`SIGNAL-IN` são silêncio esperado, e 4 parâmetros ficaram sem prova —
+lidos no código, mas exigindo condições que não consegui criar. Para um instrumento com 58 módulos de DSP,
 realimentação, auto-oscilação e folding, isso é o resultado que mais vale
 — é a classe de defeito que estraga uma gravação e assusta quem escuta.
 
@@ -66,16 +72,34 @@ específica antes de se afirmar qualquer coisa:
 `QUANTIZER.hysteresis` · `HARMONY.scale_hi` · `BOXCAR.delay`, `thresh` ·
 `SWITCH.mode` · `MATRIX.norm`, `ring` · `SCOPE.trigger`
 
-## Portas sem saída (19)
+## Portas sem saída (19) — examinadas (25 set. 2026)
 
-Também triagem. As seis do `SIGNAL-IN` são **esperadas**: sem entrada de
-áudio ligada ele não produz nada, por desenho. As outras —
-`STAGES.eoc`, `SH.out1/out2`, `LOGIC.and/flip`, `SEQUENCE.eos`,
-`TRIGSEQ.t4`, `ABACUS.carry`, `BOXCAR.geiger`, `SWITCH.out_b/c/d`,
-`SCOPE.onset` — são em boa parte saídas de **evento** (fim de ciclo, fim
-de sequência, carry, onset) ou de **roteamento** (`out_b/c/d` só recebem
-quando a chave aponta para elas). Precisam da condição que as dispara, que
-a excitação genérica não produz.
+**Todas as 13 que importam funcionam.** As seis do `SIGNAL-IN` são
+esperadas: sem entrada de áudio ligada ele não produz nada, por desenho.
+
+| porta | faltava | pico |
+|---|---|---|
+| `STAGES.eoc`, `step` | `loop = 1` e um gate longo | 1,00 |
+| `SH.out1` | gatilho | 0,49 |
+| `SH.out2` | **gatilho FORA DE FASE com o sinal** — ver abaixo | 0,50 |
+| `LOGIC.and`, `or`, `xor`, `flip` | pulsos LARGOS em A e B, que se sobreponham | 1,00 |
+| `SEQUENCE.eos` | clock e voltas suficientes | 1,00 |
+| `TRIGSEQ.t4`, `accent`, `any` | `density4 = 1` | 1,00 |
+| `ABACUS.carry` | `count_step` e `modulus` baixo, para estourar | 1,00 |
+| `BOXCAR.geiger` | `geiger = 1` e limiar baixo | 1,00 |
+| `SWITCH.out_b/c/d` | **`dir = 1`** (demux): em mux elas não recebem nada, por desenho | 0,27 |
+| `SCOPE.onset`, `trig`, `level` | transientes — rajadas com ataque abrupto | 1,00 |
+
+**O caso do `SH.out2` é o mais instrutivo da auditoria inteira.** Eu dava
+`in2` como seno de 5 Hz e `trig2` como pulso de 5 Hz: **travados na mesma
+frequência**. O gatilho dispara no início de cada período, exatamente onde
+o seno vale zero — então ele amostrava zero, sempre, e a porta parecia
+morta. Com o gatilho a 6,5 Hz, sai 0,497.
+
+Uma excitação pode ser da grandeza certa, na porta certa, e ainda assim
+**medir a coisa errada** por coincidência de fase. É o tipo de erro que
+nenhuma revisão de código pega e nenhum aumento de rigor evita — só
+desconfiar do próprio instrumento de medida.
 
 ## Como repetir
 

@@ -465,6 +465,10 @@ if(BUILD_TESTING)
     target_include_directories(rasgo_modular_param_exam PRIVATE src apps)
     target_compile_options(rasgo_modular_param_exam PRIVATE ${rasgo_modular_warnings})
 
+    add_executable(rasgo_modular_port_exam tests/tool_port_exam.cpp)
+    target_include_directories(rasgo_modular_port_exam PRIVATE src apps)
+    target_compile_options(rasgo_modular_port_exam PRIVATE ${rasgo_modular_warnings})
+
     add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
     target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})
