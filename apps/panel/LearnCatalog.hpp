@@ -843,12 +843,44 @@ inline const LearnTable& learnTable() {
                 "limitador teve mesmo que segurar algo.", ""}},
             {"width", {
                 "Largura estéreo (mid/side) — 0 é mono, 1 é normal, 2 é "
-                "o dobro de lado.", "", ""}},
+                "o dobro de lado.",
+                // Achado da escuta de 23 set. 2026: o autor girou o WIDTH
+                // e não ouviu diferença. Medido: em fonte MONO a variação
+                // é 0,00 dB em todo o curso, e em estéreo é 232 dB. O
+                // código está certo — mid/side não tem o que escalar
+                // quando os canais são iguais. O que faltava era DIZER
+                // isso, em vez de deixar o músico concluir que o knob
+                // está quebrado.
+                "Não faz nada quando a fonte é MONO, e isso não é "
+                "defeito: largura mexe no LADO (a diferença entre os "
+                "canais), e num sinal em que L = R o lado é zero. A "
+                "maioria dos módulos é mono — para ouvir o WIDTH, "
+                "alimente o MASTER com duas fontes diferentes, uma por "
+                "canal, ou com um módulo de saída estéreo como o HALL.",
+                ""}},
             {"mono", {"Força L=R=(L+R)/2 — checagem de compatibilidade "
                       "mono.", "", ""}},
             {"dc_block", {
                 "Bloqueio de DC (passa-alta ~5 Hz) — tira offset que "
                 "não é som, só aqueceria o limitador à toa.", "", ""}},
+            {"body_guard", {
+                "BODY — governador de corpo. Só age em som ALTO, "
+                "SUSTENTADO e CONCENTRADO na faixa de 2,5 a 8 kHz, que é "
+                "onde o ouvido cansa e dói.",
+                "Ataque lento (~250 ms) e limiar alto, de propósito: "
+                "transiente, ritmo e rajada de ruído passam intocados — "
+                "só o que fica PARADO, alto e concentrado ali dispara "
+                "(filtro auto-oscilando, quadrada segurada, folding "
+                "travado). Quando dispara, aplica poucos dB de "
+                "high-shelf, acompanhando. Na esmagadora maioria do "
+                "material ele NÃO age, e é por isso que girar o knob "
+                "costuma não mudar nada. A marca laranja na ponta "
+                "ESQUERDA do VU acende quando ele está agindo de fato — "
+                "sem ela, um controle que trabalha em silêncio é "
+                "indistinguível de um controle quebrado.",
+                "ponha um FILTER em auto-oscilação na faixa de 3–5 kHz e "
+                "deixe soando: é aí que o BODY mostra a que veio. Compare "
+                "com ele em 0 (bypass exato) e em 1."}},
             {"limit", {
                 "Limitador com look-ahead — segura o pico ANTES dele "
                 "chegar, sem distorcer o transiente.",

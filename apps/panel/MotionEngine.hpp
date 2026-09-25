@@ -173,11 +173,29 @@ public:
         }
     }
 
+    // Intensidade da mão: 0 congela (as fibras param no valor atual, sem
+    // saltar), 1 é o comportamento histórico, 2 dobra a excursão pedida —
+    // sempre sujeita ao teto de 0,48, que é o que impede a engine de
+    // varrer o curso inteiro de um parâmetro.
+    void setIntensity(const float v) noexcept {
+        intensity_ = v < 0.0f ? 0.0f : (v > 2.0f ? 2.0f : v);
+    }
+    float intensity() const noexcept { return intensity_; }
+
     // avança `dt` s. `energy` (0..1) do som acelera a mão (realimentação).
     void tick(rasgo::modular::SignalGraph& graph, const float dt,
               const float energy = 0.5f) noexcept {
         tickBindings(graph, dt);
         if (fibers_.empty()) return;
+
+        // Intensidade ZERO congela de verdade: não escreve parâmetro
+        // nenhum. Sem esta saída, a excursão ia a zero mas a primeira
+        // passada ainda ESCREVIA o centro da fibra sobre o valor que o
+        // patch tinha — um salto único, independente da amplitude. O
+        // comentário de `setIntensity` prometia congelar; o teste mostrou
+        // que não congelava. Quem gira o knob até o fim espera que a mão
+        // largue o instrumento, não que ela o arrume antes de largar.
+        if (intensity_ <= 0.0f) return;
 
         field_.step(dt, energy);
 
@@ -229,7 +247,17 @@ public:
                       + f.wz * static_cast<float>(fz);
             raw = std::tanh(raw);                       // [-1,1]
 
-            const float effAmp = std::min(0.48f, f.amp * f.boldMul);
+            // INTENSIDADE global da mão (knob VARIA).
+            //
+            // Pedido do autor na sessão de escuta de 23 set. 2026: "a
+            // variação continua musical, algumas vezes as variações são
+            // até discretas — o que acha de criarmos um knob para variar
+            // o varia?". Multiplica a excursão de TODAS as fibras, antes
+            // do teto de 0,48: em 1,0 é o comportamento que existia, e o
+            // teto continua valendo, então subir a intensidade não leva a
+            // engine a lugares que ela já não visitava.
+            const float effAmp =
+                std::min(0.48f, f.amp * f.boldMul * intensity_);
             const float cableK = f.cabled ? 0.45f : 1.0f;
 
             if (f.kind == 2) {
@@ -274,6 +302,7 @@ public:
     }
 
 private:
+    float intensity_ = 1.0f;   // knob VARIA — ver setIntensity
     void tickBindings(rasgo::modular::SignalGraph& graph, const float dt) noexcept {
         for (auto& b : bindings_) {
             float v = b.value;

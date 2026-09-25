@@ -750,6 +750,15 @@ public:
         onTutorial, onAbout, onRec, onOpen, onUndo, onUncable, onRestore;
     std::function<void(int)> onZoom;
 
+    // INTENSIDADE da mão do VARIA (0..2; 1,0 é o comportamento histórico).
+    // Pedido do autor na escuta de 23 set. 2026, e ele mesmo sugeriu que
+    // fosse um slider em vez de um knob escondido — sugestão melhor, pela
+    // razão que este projeto acabou de aprender caro: controle que não se
+    // vê é controle que ninguém usa.
+    std::function<void(float)> onVaryAmount;
+    void setVaryAmount(const float v) { varyAmount_ = v; repaint(); }
+    float varyAmount() const noexcept { return varyAmount_; }
+
     std::function<void(std::uint64_t)> onSeedTyped;
 
     HeaderBar() {
@@ -872,6 +881,7 @@ public:
                                   &S2::hdrCross, &S2::hdrBank, &S2::hdrSave,
                                   &S2::hdrOpen, &S2::hdrUndo, &S2::hdrUncable})
                 cmdsW_ += labelW(str(*l)) + 6;
+            cmdsW_ += kVaryW + 6;   // o slider do VARIA conta como botão
             cmdsW_ += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
             cmdsW_ += 28 + labelW(str(S2::hdrStandby)) + 6;
             // A fileira é decidida AQUI, antes de qualquer coisa que a
@@ -977,6 +987,42 @@ public:
             // como rede pra janela absurdamente estreita
             if (x + textW(g, L) + 14 > rx - 8) break;
             x += button(g, x, L, c.on || flashing(c.act), c.act);
+
+            // SLIDER DA INTENSIDADE, logo depois do VARIA.
+            //
+            // Pedido do autor na escuta de 23 set. 2026: "as variações são
+            // até discretas — o que acha de criarmos um knob para variar o
+            // varia?". Virou SLIDER por sugestão dele, e a sugestão é
+            // melhor: arrasto escondido num botão seria o mesmo pecado do
+            // inspector de cabo atrás de um clique que nada anuncia — o
+            // achado mais caro desta mesma sessão. Um slider se VÊ.
+            //
+            // Entra no `cmdsW_` como qualquer botão, então não pode
+            // empurrar nada para fora em silêncio: se não couber, o
+            // cabeçalho quebra em duas fileiras, que é a regra que já
+            // resolveu esse problema três vezes.
+            if (c.act == Act::vary && x + kVaryW + 6 < rx - 8) {
+                varySlider_ = {x, cmdY_ + 4, kVaryW, 14};
+                g.setColour(T.recessed);
+                g.fillRoundedRectangle(varySlider_.toFloat(), 3.0f);
+                const int fw = juce::roundToInt(
+                    (varyAmount_ * 0.5f) * static_cast<float>(kVaryW - 2));
+                if (fw > 0) {
+                    g.setColour(vary_ ? T.accent : T.line);
+                    g.fillRoundedRectangle(
+                        juce::Rectangle<int>(varySlider_.getX() + 1,
+                                             varySlider_.getY() + 1,
+                                             fw, varySlider_.getHeight() - 2)
+                            .toFloat(), 2.0f);
+                }
+                // a marca do 1,0 (o comportamento histórico) fica visível:
+                // sem ela não há como saber onde era o "normal"
+                g.setColour(T.textSecondary.withAlpha(0.7f));
+                const int mx = varySlider_.getX() + 1 + (kVaryW - 2) / 2;
+                g.drawVerticalLine(mx, static_cast<float>(varySlider_.getY() + 2),
+                                   static_cast<float>(varySlider_.getBottom() - 2));
+                x += kVaryW + 6;
+            }
         }
         // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
         // próprios `button`/`buttonR` acima, via `flashing`)
@@ -1010,8 +1056,37 @@ public:
         // atalhos de teclado continuam mudos depois de digitar um número
         if (seedBox_.hasKeyboardFocus(true))
             if (auto* p = getParentComponent()) p->grabKeyboardFocus();
+
+        // O slider vem ANTES dos botões no teste de acerto: ele é
+        // desenhado entre eles e é o alvo mais estreito dos dois.
+        // Alcance generoso na vertical (uma faixa de 22 px em torno),
+        // porque 14 px de altura é pouco para mirar — foi a reclamação
+        // "preciso clicar várias vezes até achar o ponto certo" do
+        // inspector de cabo, e não vou repetir.
+        if (!varySlider_.isEmpty()
+            && varySlider_.expanded(3, 6).contains(e.getPosition())) {
+            varyDragging_ = true;
+            setVaryFromX(e.getPosition().x);
+            return;
+        }
         for (const auto& h : hits_)
             if (h.bounds.contains(e.getPosition())) { trigger(h.act); return; }
+    }
+
+    void mouseDrag(const juce::MouseEvent& e) override {
+        if (varyDragging_) setVaryFromX(e.getPosition().x);
+    }
+    void mouseUp(const juce::MouseEvent&) override { varyDragging_ = false; }
+
+    // Valor a partir da posição: clicar em qualquer ponto do slider salta
+    // para lá, como em qualquer slider — não exige agarrar um punho.
+    void setVaryFromX(const int px) {
+        const float f = juce::jlimit(0.0f, 1.0f,
+            static_cast<float>(px - varySlider_.getX() - 1)
+                / static_cast<float>(kVaryW - 2));
+        varyAmount_ = f * 2.0f;
+        if (onVaryAmount) onVaryAmount(varyAmount_);
+        repaint();
     }
 
 
@@ -1089,6 +1164,13 @@ private:
                               &S::hdrCross, &S::hdrBank, &S::hdrSave,
                               &S::hdrOpen, &S::hdrUndo, &S::hdrUncable})
             need += labelW(str(*l)) + 6;
+        // o slider do VARIA. Esquecer esta linha é o erro que este
+        // cabeçalho já cometeu TRÊS vezes de formas diferentes: a conta de
+        // largura (`cmdsW_`) e a DECISÃO de quebrar em duas fileiras
+        // (`commandsFit`) medindo coisas diferentes. Quando divergem, algum
+        // botão desaparece em silêncio — foi assim que o DESCABEIA sumiu e
+        // o `n` pareceu quebrado por dois dias.
+        need += kVaryW + 6;
         need += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
         need += 28 + labelW(str(S::hdrStandby)) + 6;                   // ESPERA
         // cluster da direita (sem o VU e a leitura, que já têm guarda)
@@ -1161,6 +1243,11 @@ private:
     }
 
     juce::TextEditor seedBox_;
+    // slider da intensidade do VARIA: retângulo em tela e valor 0..2
+    static constexpr int kVaryW = 54;
+    juce::Rectangle<int> varySlider_;
+    float varyAmount_ = 1.0f;
+    bool varyDragging_ = false;
     int cmdY_ = 12;     // y da barra de comandos (12 = 1ª fileira)
     int cmdsW_ = 0;     // largura que a barra de comandos exige
     int btnY_ = 12;     // y do botão sendo desenhado agora
@@ -3254,6 +3341,12 @@ public:
         addAndMakeVisible(credits_);
         addChildComponent(overlay_);
         overlay_.onClose = [this] { header_.setOverlay(0); grabKeyboardFocus(); };
+        header_.onVaryAmount = [this](const float v) {
+            std::lock_guard<std::mutex> lk(rack_.gmx);
+            rack_.motion.setIntensity(v);
+        };
+        header_.setVaryAmount(rack_.motion.intensity());
+
         overlay_.onLoudness = [this] {
             return OverlayView::Lufs{
                 rack_.lufsM.load(std::memory_order_relaxed),

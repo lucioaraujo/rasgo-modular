@@ -4,6 +4,7 @@
 
 #include "core/SignalGraph.hpp"
 #include "panel/MotionEngine.hpp"
+#include "panel/ModuleCatalog.hpp"   // fibras do `inhabit` precisam de módulos reais
 
 #include <cmath>
 #include <iostream>
@@ -340,7 +341,58 @@ void testDeterminism() {
 
 }  // namespace
 
+// ---- intensidade (knob VARIA) ----------------------------------------
+//
+// Pedido do autor na sessão de escuta de 23 set. 2026: as variações às
+// vezes são discretas demais, e ele queria um controle. Estes casos fixam
+// as três propriedades que importam.
+void testIntensidade() {
+    // mede o quanto os parâmetros se movem em N segundos, para uma dada
+    // intensidade
+    auto excursao = [](float intens) {
+        SignalGraph g;
+        for (const auto& grp : rasgo::panel::moduleCatalog())
+            for (const char* t : grp.types)
+                if (auto n = rasgo::panel::makeModule(t)) g.add(std::move(n));
+        std::vector<std::size_t> vis;
+        for (std::size_t i = 0; i < g.nodeCount(); ++i) vis.push_back(i);
+        g.prepare(44100.0f, 2, 256);
+        rasgo::panel::MotionEngine m;
+        m.inhabit(g, 4242, vis);
+        m.setIntensity(intens);
+        // valores iniciais
+        std::vector<float> base;
+        for (std::size_t i = 0; i < g.nodeCount(); ++i)
+            for (const auto& p : g.node(i).parameters())
+                base.push_back(p.value);
+        double soma = 0.0;
+        for (int k = 0; k < 600; ++k) m.tick(g, 1.0f / 30.0f);
+        std::size_t j = 0;
+        for (std::size_t i = 0; i < g.nodeCount(); ++i)
+            for (const auto& p : g.node(i).parameters()) {
+                const float faixa = std::max(1e-6f,
+                    p.descriptor.maximum - p.descriptor.minimum);
+                soma += std::fabs(p.value - base[j++]) / faixa;
+            }
+        return soma;
+    };
+
+    const double zero = excursao(0.0f);
+    const double um   = excursao(1.0f);
+    const double dois = excursao(2.0f);
+
+    check(zero == 0.0, "intensidade 0 CONGELA — não escreve parâmetro nenhum");
+    check(dois > um * 1.15, "intensidade 2 move mais que 1");
+
+    // a faixa é limitada: nada de valor negativo nem explosão
+    rasgo::panel::MotionEngine m;
+    m.setIntensity(-5.0f);  check(m.intensity() == 0.0f, "não aceita negativo");
+    m.setIntensity(99.0f);  check(m.intensity() == 2.0f, "limita no topo");
+    m.setIntensity(0.6f);   check(m.intensity() == 0.6f, "guarda o valor dado");
+}
+
 int main() {
+    testIntensidade();
     testWalkStaysInRangeAndMoves();
     testOscillateSweepsBetweenBounds();
     testAttractChasesOtherParameter();

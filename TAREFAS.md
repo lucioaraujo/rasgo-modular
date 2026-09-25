@@ -9577,3 +9577,68 @@ teste falhou em "havendo pedido, algo é aplicado"; a leitura do código
 não teria pegado.
 
 **78/78 CTest.**
+
+## Registro da etapa — 2026-09-25: BODY visível, WIDTH explicado, VARIA regulável
+
+Três dos quatro achados restantes da escuta, atacados.
+
+### BODY — o controle que trabalhava em silêncio
+
+O autor girou o BODY e não percebeu diferença, e **estava certo**: por
+desenho ele só age em energia alta, sustentada e concentrada em 2,5–8 kHz,
+com ataque de ~250 ms e limiar alto. O projeto diz que "música de ruído
+passa com zero redução na esmagadora maioria dos casos".
+
+O defeito não era o knob — era **não haver como saber quando ele age**. A
+telemetria (`bodyGuardDb()`) já existia e não era exibida em lugar nenhum.
+Um controle que trabalha em silêncio é indistinguível de um controle
+quebrado.
+
+- marca no VU do MASTER, na ponta **esquerda** (oposta à do limitador, que
+  fica na direita — são coisas diferentes e não podem se confundir), em
+  cor de **acento** e não de aviso, porque agir é o trabalho correto dele;
+- latch de 2 s, igual ao do limitador: um evento de 250 ms não seria visto
+  num quadro de 33 ms;
+- entrada no LEARN, com os três níveis, dizendo em voz alta que **na
+  maioria do material ele NÃO age**, e um experimento (FILTER em
+  auto-oscilação em 3–5 kHz) onde ele mostra a que veio.
+
+### WIDTH — inerte por natureza, agora dito
+
+Medido: fonte mono dá **0,00 dB** de variação em todo o curso; estéreo dá
+232 dB. O código mid/side está correto — num sinal em que L = R o lado é
+zero e não há o que escalar. O que faltava era **dizer isso**, em vez de
+deixar o músico concluir que o knob está quebrado. Entrou no LEARN, com o
+caminho para ouvi-lo (duas fontes diferentes, ou um módulo de saída
+estéreo como o HALL).
+
+### VARIA — intensidade regulável, e virou SLIDER
+
+Pedido do autor: "as variações são até discretas — o que acha de criarmos
+um knob para variar o varia?". Ele mesmo sugeriu depois que fosse um
+**slider**, e a sugestão é melhor: arrasto escondido num botão seria o
+mesmo pecado do inspector de cabo atrás de um clique que nada anuncia — o
+achado mais caro desta mesma sessão.
+
+- `MotionEngine::setIntensity(0..2)` multiplica a excursão de todas as
+  fibras, antes do teto de 0,48 — então subir a intensidade não leva a
+  engine a lugares que ela já não visitava;
+- **intensidade 0 congela de verdade.** O teste pegou que não congelava: a
+  excursão ia a zero, mas a primeira passada ainda ESCREVIA o centro da
+  fibra sobre o valor do patch — um salto único, independente da
+  amplitude. Quem gira o knob até o fim espera que a mão largue o
+  instrumento, não que ela o arrume antes de largar;
+- slider no cabeçalho, logo depois do botão VARIA, com a marca do 1,0
+  visível (sem ela não há como saber onde era o "normal"). Clicar em
+  qualquer ponto salta para lá, e o alcance de acerto é folgado na
+  vertical — 14 px de altura é pouco para mirar, e "preciso clicar várias
+  vezes até achar o ponto certo" já foi reclamação neste app.
+
+**A armadilha do cabeçalho, pega a tempo pela quarta vez.** Eu havia
+somado o slider ao `cmdsW_` (a conta de largura) e **esquecido o
+`commandsFit`** (a decisão de quebrar em duas fileiras). Quando as duas
+divergem, algum botão desaparece em silêncio — foi assim que o DESCABEIA
+sumiu e o `n` pareceu quebrado por dois dias. Agora as quatro ocorrências
+estão alinhadas: guarda de desenho, avanço, conta e decisão.
+
+**78/78 CTest.**
