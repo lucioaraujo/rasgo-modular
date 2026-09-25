@@ -36,6 +36,34 @@
 // `rasgo_modular_core` continua sem saber o que é "aprendizado" — isto
 // vive em `apps/panel/`.
 //
+// ---- IDIOMA: este catálogo é MONOLÍNGUE (português) --------------------
+//
+// Achado da revisão de idiomas em 26 set. 2026. O app tem interface,
+// tutorial e cartões em QUATRO idiomas (en/pt/fr/es), mas o LEARN não tem
+// suporte a idioma nenhum: quem roda em inglês recebe interface inglesa,
+// tutorial inglês e explicações em PORTUGUÊS.
+//
+// Tamanho medido: 803 verbetes de widget + 58 de módulo, 86.328
+// caracteres. Traduzir para os outros três é escrever ~259.000
+// caracteres de prosa técnica.
+//
+// Não é trabalho de tradução automática. O comentário abaixo é explícito
+// sobre o que este conteúdo é — "descreve o comportamento REAL daquele
+// parâmetro naquele módulo", com coisas como a assimetria de vactrol do
+// LPG e o alcance de captura do PLL. Passar isso por máquina produziria
+// texto que parece explicação e não é.
+//
+// Decisão registrada em `PUBLICACAO.md` como limitação declarada. Se for
+// traduzido por etapas, a ordem que rende mais por caractere é: os 58
+// verbetes de MÓDULO primeiro (13.125 car., ~39.000 nos três idiomas) —
+// eles respondem "para que serve este módulo", que é a pergunta de quem
+// abre o rack pela primeira vez.
+//
+// A relação `Cable` (RingMod/Fold/Difference) TEM verbete desde 25 set.
+// 2026 (`learnCable()`), depois que a sessão de escuta mostrou que a ideia
+// central do instrumento estava escondida. O texto abaixo diz que ela
+// "fica de fora" e ficou desatualizado nessa parte:
+//
 // A relação `Cable` (RingMod/Fold/Difference, `PESQUISA_MODULOS.md`
 // item 3 da tabela de módulos) fica de fora — é propriedade do CABO, não
 // um tipo do catálogo com knobs/jacks próprios; não há widget de painel

@@ -9827,3 +9827,61 @@ versionadas (`tool_module_audit`, `tool_param_exam`, `tool_port_exam`)
 para refazer isso quando o catálogo crescer. Nenhuma entra no `ctest`: são
 instrumentos de investigação, e o dossiê registra por que um teste que
 acusa falso positivo ensina a ignorar falhas.
+
+## Registro da etapa — 2026-09-26: revisão dos idiomas
+
+### Strings de interface — limpas
+
+Ferramenta percorrendo as 48 `L4` exportadas: **zero campos vazios**, os
+quatro idiomas preenchidos em todas. Dos 15 campos idênticos ao português,
+todos são legítimos, verificados um a um: `SEED` e `REC` são termos
+universais; `BANCO`, `ABRIR`, `ESPERA`, `TODOS`, `TECLADO` e `compilado`
+coincidem de fato entre português e espanhol; `TUTORIAL` é igual em
+en/pt/es.
+
+### Tutorial — estava desatualizado por causa do meu trabalho de ontem
+
+Duas coisas que eu mesmo tornei falsas:
+
+- o cartão do VARIA dizia "VARIA **liga** a mão caótica" e o listava entre
+  os **botões** — mas ontem ele virou **slider**, com 0 = desligado.
+  Reescrito nos quatro idiomas, dizendo o que a marca central significa e
+  que baixar o slider deixa a estrutura quieta;
+- o **BODY** não aparecia em lugar nenhum do tutorial, e a marca nova no
+  VU tampouco. Acrescentados nos quatro idiomas, junto da descrição do
+  medidor: marca da direita = limitador segurou; marca da esquerda = BODY
+  agindo; **as duas são raras, e é isso que se espera**.
+
+Escrever isso um dia depois de mudar o comportamento é a regra que este
+projeto já tinha aprendido com o `.score.txt` e com os taps: documentação
+que descreve um estado que não existe mais é pior que documentação
+desatualizada, porque quem lê não tem como saber qual das duas está
+olhando.
+
+### O achado estrutural: o LEARN é monolíngue
+
+**O catálogo LEARN não tem suporte a idioma.** Interface, tutorial e
+cartões estão em quatro idiomas; a explicação de cada knob e cada jack de
+cada módulo está **só em português**. Quem roda em inglês recebe interface
+inglesa, tutorial inglês e explicações em português.
+
+Medido: **803 verbetes de widget + 58 de módulo, 86.328 caracteres**.
+Traduzir para os outros três é escrever ~259.000 caracteres.
+
+**Não fiz, e não por falta de tempo.** O próprio cabeçalho do catálogo diz
+o que esse conteúdo é: "descreve o comportamento REAL daquele parâmetro
+naquele módulo" — a assimetria de vactrol do LPG, o alcance de captura do
+PLL. Passar isso por tradução automática produziria texto que **parece**
+explicação e não é, e um instrumento didático com explicação falsa é pior
+que um sem explicação.
+
+Registrado como **limitação declarada** em `PUBLICACAO.md`, com o caminho
+por etapas: os 58 verbetes de MÓDULO primeiro (13.125 caracteres, ~39.000
+nos três idiomas), porque respondem "para que serve este módulo" — a
+pergunta de quem abre o rack pela primeira vez. O tutorial, que é a porta
+de entrada, já está traduzido.
+
+Corrigido também o comentário do `LearnCatalog.hpp` que dizia que a
+relação de cabo "fica de fora": ela tem verbete desde 25 set.
+
+**78/78 CTest.**

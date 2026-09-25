@@ -102,6 +102,43 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 ---
 
+## Limitações declaradas da v0.1.0
+
+O gate exige que as limitações sejam ditas, não supostas.
+
+### O LEARN é monolíngue
+
+Interface, tutorial e cartões estão nos **quatro** idiomas (en/pt/fr/es).
+O catálogo LEARN — a explicação de cada knob e cada jack de cada módulo,
+que aparece na caixa do canto inferior esquerdo — está **só em
+português**. Quem roda em inglês recebe interface inglesa, tutorial inglês
+e explicações em português.
+
+Medido em 26 set. 2026: **803 verbetes de widget + 58 de módulo, 86.328
+caracteres**. Traduzir para os outros três idiomas é escrever ~259.000
+caracteres de prosa técnica — e não é trabalho de tradução automática: o
+conteúdo descreve comportamento real de cada parâmetro em cada módulo (a
+assimetria de vactrol do LPG, o alcance de captura do PLL), e passar isso
+por máquina produziria texto que parece explicação e não é.
+
+**Se for traduzido por etapas**, a ordem que rende mais por caractere é os
+**58 verbetes de MÓDULO** primeiro — 13.125 caracteres, ~39.000 nos três
+idiomas. Eles respondem "para que serve este módulo", que é a pergunta de
+quem abre o rack pela primeira vez. O tutorial, que é a porta de entrada,
+já está traduzido.
+
+### Custo de CPU
+
+~70% de um núcleo num patch comum; ~38% é desenho da interface. Ver
+`INSTALL.md`, e a tarefa da v0.1.1 em `TAREFAS.md`.
+
+### Windows e macOS nunca foram abertos
+
+A CI prova que constrói, testa e empacota; não prova que abre e soa numa
+máquina real. Decisão do autor: publicar assim, com a limitação dita.
+
+---
+
 ## Procedimento de correção e retirada
 
 Exigido pelo gate ("procedimento de correção/retirada conhecido"). Vale a
