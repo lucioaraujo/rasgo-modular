@@ -384,6 +384,44 @@ void testIntensidade() {
     check(zero == 0.0, "intensidade 0 CONGELA — não escreve parâmetro nenhum");
     check(dois > um * 1.15, "intensidade 2 move mais que 1");
 
+    // O dwell dos toggles responde à intensidade: VARIA suave deixa a
+    // ESTRUTURA quieta. Achado do uso — os parâmetros que mais chamam
+    // atenção sob VARIA são os toggles, porque mudam em um quadro.
+    auto trocasDeToggle = [](float intens) {
+        SignalGraph g;
+        for (const auto& grp : rasgo::panel::moduleCatalog())
+            for (const char* t : grp.types)
+                if (auto n = rasgo::panel::makeModule(t)) g.add(std::move(n));
+        std::vector<std::size_t> vis;
+        for (std::size_t i = 0; i < g.nodeCount(); ++i) vis.push_back(i);
+        g.prepare(44100.0f, 2, 256);
+        rasgo::panel::MotionEngine m;
+        m.inhabit(g, 4242, vis);
+        m.setIntensity(intens);
+        // conta trocas em parâmetros binários (faixa 0..1 exata)
+        std::vector<float> ant;
+        for (std::size_t i = 0; i < g.nodeCount(); ++i)
+            for (const auto& p : g.node(i).parameters())
+                ant.push_back(p.value);
+        long trocas = 0;
+        for (int k = 0; k < 3600; ++k) {      // 2 min a 30 Hz
+            m.tick(g, 1.0f / 30.0f);
+            std::size_t j = 0;
+            for (std::size_t i = 0; i < g.nodeCount(); ++i)
+                for (const auto& p : g.node(i).parameters()) {
+                    const bool bin = p.descriptor.minimum == 0.0f
+                                  && p.descriptor.maximum == 1.0f;
+                    if (bin && std::fabs(p.value - ant[j]) > 0.5f) ++trocas;
+                    ant[j++] = p.value;
+                }
+        }
+        return trocas;
+    };
+    const long suave = trocasDeToggle(0.35f);
+    const long forte = trocasDeToggle(2.0f);
+    check(suave < forte,
+          "VARIA suave troca MENOS toggles que VARIA forte");
+
     // a faixa é limitada: nada de valor negativo nem explosão
     rasgo::panel::MotionEngine m;
     m.setIntensity(-5.0f);  check(m.intensity() == 0.0f, "não aceita negativo");

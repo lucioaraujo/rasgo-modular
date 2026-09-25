@@ -9642,3 +9642,67 @@ sumiu e o `n` pareceu quebrado por dois dias. Agora as quatro ocorrências
 estão alinhadas: guarda de desenho, avanço, conta e decisão.
 
 **78/78 CTest.**
+
+## Registro da etapa — 2026-09-25: VARIA vira slider, e a auditoria dos módulos
+
+### O botão VARIA deixou de existir; sobrou o slider
+
+Sugestão do autor, apontando o precedente do ANTITOTEM: *"há sliders que
+se desligam quando estão zerados, isso elimina a necessidade de botão +
+slider"*. Verifiquei o precedente em vez de supor: está documentado lá
+como vocabulário **dele** — "0 = off entirely", usado em
+`excitationAmount`, `grooveAmount` e `metaSequencerAmount`.
+
+Ganha três coisas: um controle em vez de dois para um conceito só;
+consistência com o irmão da família; e espaço no cabeçalho, que já
+estourou quatro vezes nesta semana. E o estado ligado/desligado deixa de
+ser um dado separado que podia divergir do valor — **0 passa a ser a única
+fonte da verdade**. O rótulo VARIA continua, a pedido do autor.
+
+### "Botões que se movem extremamente rápido e outros que não se mexem"
+
+Os dois relatos se confirmaram, com causas diferentes.
+
+**Os "rápidos" são TOGGLES.** Medido em 60 s: os mais velozes são `g8`,
+`track2`, `loop`, `sync_enable`, `hold`, `freeze`, `dir` — todos binários,
+com 100% de excursão. A frequência é baixa (~2 trocas por minuto, o dwell
+já existia: 5 s livre, 9 s quente, 25 s estrutural). O que salta aos olhos
+é que um toggle muda em **um quadro**: ele não pode varrer.
+
+Como não há como suavizar a troca, o que se pode dar é **controle**: o
+dwell passou a responder à intensidade. Abaixo de 1,0 ele cresce na
+proporção inversa — VARIA suave deixa a estrutura quieta e mexe só no que
+varre. Nunca desce abaixo da metade: trocar `freeze` a cada segundo não é
+variação, é outra música a cada segundo. Com teste.
+
+**Os que nunca se movem: 62 de 458 (14%), e a maioria é deliberada.**
+Todo o MASTER, todo o MIXER, e parâmetros estruturais (`length`, `mult`,
+`ratio`, `mode`, `bits`, `voices`). O autor confirmou que MASTER e MIXER
+ficam como estão, e acrescentou o **SIGNAL-IN** à exclusão — os parâmetros
+dele governam a entrada de fora, e mexer neles sozinho é mexer no aparelho
+de outra pessoa no meio da execução.
+
+### Auditoria dos módulos — `dossies/AUDITORIA_MODULOS.md`
+
+58 módulos, 458 parâmetros, 154 portas, medidos.
+
+**Zero não-finitos.** Nenhum módulo produziu NaN ou Inf em nenhum extremo
+de nenhum parâmetro. Para um instrumento com realimentação,
+auto-oscilação e folding, é o resultado que mais vale.
+
+A lista de "sem efeito" é **triagem, não veredito**, e a honestidade sobre
+isso custou três refinamentos da métrica: 108 → 56 → 32. O RMS não vê
+timbre; injetar clock externo mascara o interno. E o caso demonstrativo:
+`ENVELOPE.decay`/`sustain` estavam na lista final e **funcionam** — a
+falha era da minha excitação, que dava um gate de 27 ms e não deixava o
+envelope chegar ao decay.
+
+Dos 32: **13 explicados** como comportamento correto, **2 verificados à
+mão**, **19 em aberto** para exame caso a caso. Nenhum está provado
+defeituoso.
+
+A ferramenta entrou como `tests/tool_module_audit.cpp` e **não** no
+`ctest`: um teste que acusa 32 itens dos quais 13 se explicam falharia
+sempre e ensinaria a ignorar falhas.
+
+**78/78 CTest.**

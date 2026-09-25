@@ -451,6 +451,14 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_seed_balance_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_seed_balance_tests COMMAND rasgo_modular_seed_balance_tests)
 
+    # FERRAMENTA de auditoria dos módulos — não é teste de regressão, e
+    # por isso NÃO entra no ctest. Ela acusa 32 itens dos quais 13 já se
+    # explicam como comportamento correto; um teste que falha sempre
+    # ensina a ignorar falhas. Ver `dossies/AUDITORIA_MODULOS.md`.
+    add_executable(rasgo_modular_module_audit tests/tool_module_audit.cpp)
+    target_include_directories(rasgo_modular_module_audit PRIVATE src apps)
+    target_compile_options(rasgo_modular_module_audit PRIVATE ${rasgo_modular_warnings})
+
     add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
     target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})
