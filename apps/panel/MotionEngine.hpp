@@ -113,7 +113,13 @@ public:
             if (id >= graph.nodeCount()) continue;
             auto& node = graph.node(id);
             const std::string t = node.type();
-            if (t == "MIXER" || t == "MASTER") continue;   // o músico mistura
+            // MIXER e MASTER: o músico mistura, a engine não.
+            // SIGNAL-IN também fica de fora, por decisão do autor em 25
+            // set. 2026: os parâmetros dele (`gain`, `bend`, `cc_num`)
+            // governam a ENTRADA de fora — microfone, instrumento, MIDI.
+            // Mexer neles sozinho não é variar a música: é mexer no
+            // aparelho de outra pessoa no meio da execução.
+            if (t == "MIXER" || t == "MASTER" || t == "SIGNAL-IN") continue;
             for (const auto& w : node.panel().widgets) {
                 int kind;
                 switch (w.kind) {
@@ -263,8 +269,23 @@ public:
             if (f.kind == 2) {
                 // toggle: histerese + dwell mínimo (estrutural = dwell longo)
                 f.toggleDwell += dt;
-                const float minDwell = (f.reach == MotionReach::Structural)
+                float minDwell = (f.reach == MotionReach::Structural)
                     ? 25.0f : (f.reach == MotionReach::Hot ? 9.0f : 5.0f);
+                // O dwell responde à INTENSIDADE, e o motivo vem do uso:
+                // o autor relatou em 25 set. 2026 que "há botões que se
+                // movem extremamente rápido". Medido, a frequência é
+                // baixa (~2 trocas por minuto) — o que salta aos olhos é
+                // que um toggle muda em UM quadro. Ele não pode varrer:
+                // é binário.
+                //
+                // Como não há como suavizar a troca, o que se pode dar é
+                // CONTROLE sobre ela. Abaixo de 1,0 o dwell cresce na
+                // proporção inversa, então um VARIA suave deixa a
+                // estrutura quieta e mexe só no que varre; acima de 1,0 o
+                // dwell encurta, mas nunca abaixo da metade — trocar
+                // `freeze` ou `hold` a cada segundo não é variação, é
+                // outra música a cada segundo.
+                minDwell /= std::max(0.5f, std::min(2.0f, intensity_));
                 const float thr = 0.58f;
                 if (f.toggleDwell >= minDwell) {
                     if (raw > thr && f.value < 0.5f) {

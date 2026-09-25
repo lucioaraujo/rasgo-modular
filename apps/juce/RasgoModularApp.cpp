@@ -877,11 +877,11 @@ public:
         {
             namespace S2 = rasgo::panel::strings;
             cmdsW_ = 0;
-            for (const auto* l : {&S2::hdrVary, &S2::hdrChange, &S2::hdrEvolve,
+            for (const auto* l : {&S2::hdrChange, &S2::hdrEvolve,
                                   &S2::hdrCross, &S2::hdrBank, &S2::hdrSave,
                                   &S2::hdrOpen, &S2::hdrUndo, &S2::hdrUncable})
                 cmdsW_ += labelW(str(*l)) + 6;
-            cmdsW_ += kVaryW + 6;   // o slider do VARIA conta como botão
+            cmdsW_ += 38 + kVaryW + 6;   // rótulo VARIA + slider
             cmdsW_ += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
             cmdsW_ += 28 + labelW(str(S2::hdrStandby)) + 6;
             // A fileira é decidida AQUI, antes de qualquer coisa que a
@@ -965,8 +965,21 @@ public:
         // Segunda fileira (decidida acima): recomeça da margem esquerda,
         // com a largura toda disponível. Nada é cortado.
         if (cmdY_ != 12) { x = 14; rx = getWidth() - 12; }
+        // VARIA não é botão: é o SLIDER desenhado logo abaixo, e ZERO
+        // significa desligado.
+        //
+        // Sugestão do autor em 25 set. 2026, apontando o precedente do
+        // ANTITOTEM: "há sliders que se desligam quando estão zerados,
+        // isso elimina a necessidade de botão + slider". O precedente está
+        // documentado lá como vocabulário DELE — "0 = off entirely", usado
+        // em `excitationAmount`, `grooveAmount` e `metaSequencerAmount`.
+        //
+        // Ganha três coisas: um controle em vez de dois para um conceito
+        // só; consistência com o irmão da família; e espaço no cabeçalho,
+        // que já estourou quatro vezes nesta semana. O estado ligado/
+        // desligado deixa de ser um dado separado que podia divergir do
+        // valor — 0 é a ÚNICA fonte da verdade.
         const struct { const rasgo::panel::L4* label; bool on; Act act; } cmds[] = {
-            {&S::hdrVary,   vary_, Act::vary},
             {&S::hdrChange, false, Act::mutate},
             {&S::hdrEvolve, false, Act::evolve},
             {&S::hdrCross,  false, Act::cross},
@@ -981,6 +994,35 @@ public:
         };
         g.setFont(juce::FontOptions(11.0f));
         btnY_ = cmdY_;
+
+        // VARIA: rótulo + slider, no lugar onde o botão ficava. Zero à
+        // esquerda é desligado; a marca do meio é o 1,0, o comportamento
+        // histórico. Sem isto não há como saber onde era o "normal".
+        if (x + 38 + kVaryW + 6 < rx - 8) {
+            g.setColour(varyAmount_ > 0.0f ? T.textPrimary : T.textSecondary);
+            g.drawText(str(rasgo::panel::strings::hdrVary), x, cmdY_, 36, 22,
+                       juce::Justification::centredLeft, false);
+            x += 38;
+            varySlider_ = {x, cmdY_ + 4, kVaryW, 14};
+            g.setColour(T.recessed);
+            g.fillRoundedRectangle(varySlider_.toFloat(), 3.0f);
+            const int fw = juce::roundToInt(
+                (varyAmount_ * 0.5f) * static_cast<float>(kVaryW - 2));
+            if (fw > 0) {
+                g.setColour(flashing(Act::vary) ? T.textPrimary : T.accent);
+                g.fillRoundedRectangle(
+                    juce::Rectangle<int>(varySlider_.getX() + 1,
+                                         varySlider_.getY() + 1,
+                                         fw, varySlider_.getHeight() - 2)
+                        .toFloat(), 2.0f);
+            }
+            g.setColour(T.textSecondary.withAlpha(0.7f));
+            const int mx = varySlider_.getX() + 1 + (kVaryW - 2) / 2;
+            g.drawVerticalLine(mx, static_cast<float>(varySlider_.getY() + 2),
+                               static_cast<float>(varySlider_.getBottom() - 2));
+            x += kVaryW + 6;
+        }
+
         for (const auto& c : cmds) {
             const juce::String L = str(*c.label);
             // com duas fileiras o corte nunca acontece; a guarda fica só
@@ -988,41 +1030,6 @@ public:
             if (x + textW(g, L) + 14 > rx - 8) break;
             x += button(g, x, L, c.on || flashing(c.act), c.act);
 
-            // SLIDER DA INTENSIDADE, logo depois do VARIA.
-            //
-            // Pedido do autor na escuta de 23 set. 2026: "as variações são
-            // até discretas — o que acha de criarmos um knob para variar o
-            // varia?". Virou SLIDER por sugestão dele, e a sugestão é
-            // melhor: arrasto escondido num botão seria o mesmo pecado do
-            // inspector de cabo atrás de um clique que nada anuncia — o
-            // achado mais caro desta mesma sessão. Um slider se VÊ.
-            //
-            // Entra no `cmdsW_` como qualquer botão, então não pode
-            // empurrar nada para fora em silêncio: se não couber, o
-            // cabeçalho quebra em duas fileiras, que é a regra que já
-            // resolveu esse problema três vezes.
-            if (c.act == Act::vary && x + kVaryW + 6 < rx - 8) {
-                varySlider_ = {x, cmdY_ + 4, kVaryW, 14};
-                g.setColour(T.recessed);
-                g.fillRoundedRectangle(varySlider_.toFloat(), 3.0f);
-                const int fw = juce::roundToInt(
-                    (varyAmount_ * 0.5f) * static_cast<float>(kVaryW - 2));
-                if (fw > 0) {
-                    g.setColour(vary_ ? T.accent : T.line);
-                    g.fillRoundedRectangle(
-                        juce::Rectangle<int>(varySlider_.getX() + 1,
-                                             varySlider_.getY() + 1,
-                                             fw, varySlider_.getHeight() - 2)
-                            .toFloat(), 2.0f);
-                }
-                // a marca do 1,0 (o comportamento histórico) fica visível:
-                // sem ela não há como saber onde era o "normal"
-                g.setColour(T.textSecondary.withAlpha(0.7f));
-                const int mx = varySlider_.getX() + 1 + (kVaryW - 2) / 2;
-                g.drawVerticalLine(mx, static_cast<float>(varySlider_.getY() + 2),
-                                   static_cast<float>(varySlider_.getBottom() - 2));
-                x += kVaryW + 6;
-            }
         }
         // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
         // próprios `button`/`buttonR` acima, via `flashing`)
@@ -1160,7 +1167,7 @@ private:
         int need = kBrandW + 6 + kSeedBoxW + 6
                  + labelW(u8("\xE2\x9A\x84 ") + str(S::hdrSeed)) + 6;
         if (seed_ != 0) need += labelW(str(S::hdrRestore)) + 6;
-        for (const auto* l : {&S::hdrVary, &S::hdrChange, &S::hdrEvolve,
+        for (const auto* l : {&S::hdrChange, &S::hdrEvolve,
                               &S::hdrCross, &S::hdrBank, &S::hdrSave,
                               &S::hdrOpen, &S::hdrUndo, &S::hdrUncable})
             need += labelW(str(*l)) + 6;
@@ -1170,7 +1177,7 @@ private:
         // (`commandsFit`) medindo coisas diferentes. Quando divergem, algum
         // botão desaparece em silêncio — foi assim que o DESCABEIA sumiu e
         // o `n` pareceu quebrado por dois dias.
-        need += kVaryW + 6;
+        need += 38 + kVaryW + 6;   // rótulo VARIA + slider (não mais botão)
         need += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
         need += 28 + labelW(str(S::hdrStandby)) + 6;                   // ESPERA
         // cluster da direita (sem o VU e a leitura, que já têm guarda)
@@ -2372,16 +2379,27 @@ public:
     struct LearnHit { const rasgo::panel::LearnEntry* entry = nullptr;
                       juce::String title; std::string key; };
     LearnHit learnAt(juce::Point<int> p) const {
-        // O CABO vem ANTES dos módulos, pela mesma razão que o clique no
-        // cabo ganha do corpo do módulo: os cabos passam por cima, e se o
-        // módulo ganhasse aqui o cabo quase nunca seria explicado. Era o
-        // buraco que fez o autor procurar RING/FOLD/DIFF entre os
-        // módulos, onde eles não estão.
-        if (const int ci = cableUnder(p); ci >= 0)
-            return {&rasgo::panel::learnCable(),
-                    u8("CABO  \xc2\xb7  clique para abrir"),
-                    "cabo|" + std::to_string(ci)};
+        // PRIORIDADE, e ela é a MESMA do clique do mouse — não por
+        // simetria estética, mas porque foi corrigida aqui depois de eu
+        // quebrá-la:
+        //
+        //   1. widget (knob, slider, toggle, jack) — alvo pequeno e
+        //      intencional, ganha sempre;
+        //   2. cabo — ganha do CORPO do módulo;
+        //   3. corpo/nome do módulo.
+        //
+        // Em 25 set. 2026 eu pus o cabo em PRIMEIRO lugar, para que a
+        // ideia do cabo-objeto deixasse de ficar escondida. Quebrou o
+        // LEARN de vários controles de uma vez: os cabos são desenhados
+        // POR CIMA dos módulos e a tolerância de acerto é folgada (5 mm +
+        // 3 px), então todo knob com um cabo passando perto passou a
+        // explicar o cabo em vez de si mesmo. O autor reportou no BODY e
+        // disse que "outros itens também".
+        //
+        // O cabo continua alcançável: sobra todo o comprimento dele que
+        // não cruza um widget, que é a maior parte.
 
+        // 1. widget
         for (const auto& m : mods_) {
             if (!m.bounds.contains(p)) continue;
             const std::string mt = rack_.graph.node(m.id).type();
@@ -2391,8 +2409,20 @@ public:
                 if (const auto* e = rasgo::panel::lookupLearn(mt, w.bind))
                     return {e, u8(mt) + u8("  \xc2\xb7  ") + u8(w.label),
                             std::to_string(m.id) + "|" + w.bind};
-                break;
+                break;   // widget sem verbete: cai pro módulo, adiante
             }
+        }
+
+        // 2. cabo
+        if (const int ci = cableUnder(p); ci >= 0)
+            return {&rasgo::panel::learnCable(),
+                    u8("CABO  \xc2\xb7  clique para abrir"),
+                    "cabo|" + std::to_string(ci)};
+
+        // 3. corpo do módulo
+        for (const auto& m : mods_) {
+            if (!m.bounds.contains(p)) continue;
+            const std::string mt = rack_.graph.node(m.id).type();
             if (const auto* e = rasgo::panel::lookupLearnModule(mt))
                 return {e, u8(mt), std::to_string(m.id) + "|\x01mod"};
             return {};
