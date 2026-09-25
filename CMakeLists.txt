@@ -459,6 +459,12 @@ if(BUILD_TESTING)
     target_include_directories(rasgo_modular_module_audit PRIVATE src apps)
     target_compile_options(rasgo_modular_module_audit PRIVATE ${rasgo_modular_warnings})
 
+    # Exame caso a caso dos itens que a triagem deixa em aberto, com
+    # excitação própria de cada módulo. Também ferramenta, não teste.
+    add_executable(rasgo_modular_param_exam tests/tool_param_exam.cpp)
+    target_include_directories(rasgo_modular_param_exam PRIVATE src apps)
+    target_compile_options(rasgo_modular_param_exam PRIVATE ${rasgo_modular_warnings})
+
     add_executable(rasgo_modular_wav_writer_tests tests/test_wav_writer.cpp)
     target_link_libraries(rasgo_modular_wav_writer_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_wav_writer_tests PRIVATE ${rasgo_modular_warnings})

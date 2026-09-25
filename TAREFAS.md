@@ -9706,3 +9706,72 @@ A ferramenta entrou como `tests/tool_module_audit.cpp` e **não** no
 sempre e ensinaria a ignorar falhas.
 
 **78/78 CTest.**
+
+## Registro da etapa — 2026-09-25: os 19 em aberto, examinados um por um
+
+**Resultado: nenhum parâmetro morto no instrumento.** Nenhum dos 458.
+
+Antes de examinar, verifiquei o que decide a questão: **todos os nove mais
+suspeitos são lidos no `process()`**. Não há código morto — o que havia
+era excitação inadequada da minha parte.
+
+**13 confirmados funcionando**, com o que faltava em cada caso:
+
+| item | faltava |
+|---|---|
+| `PLL.feedback_type` | `feedback_amount > 0` |
+| `CONTROL.curve1/2`, `SH.slope` | `slew > 0` — a curva molda o SLEW; com slew 0 o trecho de código nem executa |
+| `SH.track1/2` | gatilho e CV para amostrar |
+| `TRIGSEQ.density1/2`, `swing` | clock externo |
+| `HARMONY.scale_hi` | **testar na faixa real (1..10)** — eu comparava 0 contra 1, que o clamp interno torna o mesmo valor |
+| `MATRIX.norm`, `ring` | ganhos cruzados não-zero |
+| `SWITCH.mode` | desconectar a entrada `addr` |
+
+### O caso do SWITCH, e a lição que ele dá
+
+O SWITCH nunca saía do passo 0, e por isso o `mode` não mudava nada. A
+causa: o clock só avança `else if` a entrada `addr` estiver
+**desconectada** — comportamento documentado no módulo. Como a auditoria
+conecta TODAS as entradas, a `addr` em zero constante prendia o switch.
+
+Com a `addr` livre, os quatro modos são inequívocos:
+
+```
+mode 0 (adiante)       1 2 3 0 1 2 3 0
+mode 1 (pingue-pongue) 1 2 3 2 1 0 1 2
+mode 2 (aleatório)     2 1 2 3 1 3 0 2
+mode 3 (só por CV)     0        ← não avança por clock, por desenho
+```
+
+**Conectar todas as entradas não é excitação neutra.** Em módulos com vias
+alternativas — clock OU endereço, interno OU externo — conectar tudo
+DESLIGA caminhos. Uma auditoria automática que faça isso acusa
+comportamento correto de defeito. É a fonte sistemática de falso positivo
+desta ferramenta, e está registrada no dossiê.
+
+### Os 4 sem resposta
+
+`QUANTIZER.hysteresis` · `BOXCAR.delay` · `BOXCAR.thresh` ·
+`SCOPE.trigger`
+
+Todos lidos no `process()`. O `hysteresis` entra como
+`deadband = hysteresis × 0,5 × passo_médio_da_escala`: só se manifesta
+quando a CV **hesita exatamente numa fronteira** entre graus, e uma rampa
+com tremor cruza sem demorar. Os outros dependem de estados internos que
+a excitação genérica não estabelece.
+
+**Não estão marcados como defeito**, e a distinção importa: *"não
+consegui provar que funciona"* não é *"não funciona"*.
+
+### O caminho da métrica, para quem repetir
+
+| passo | acusados |
+|---|---|
+| RMS nos extremos | 108 |
+| forma de onda amostra a amostra | 56 |
+| com e sem entradas conectadas | 32 |
+| excitação própria por módulo | 4 |
+
+De 108 para 4, e **todos os 104 eram erro meu de medição**, não defeito do
+instrumento. Foi o que a auditoria mais ensinou: uma ferramenta de
+auditoria mal calibrada não acha bugs, ela os inventa.
