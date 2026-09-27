@@ -9990,9 +9990,31 @@ Consequência aceita: acrescentar um widget passa a exigir seus três
 idiomas no mesmo incremento — a regra que o RASGO já aplica ao Atlas e ao
 inventário, agora executável em vez de lembrada.
 
-**Validação:** 79/79 no `ctest` (78 anteriores + o guarda), build completo
-limpo. A tradução não toca DSP: `LearnWidgetI18n.hpp` é conteúdo textual
-gerado, e nenhum teste de áudio mudou de resultado.
+### O erro que quase deixou tudo isto invisível
+
+Com o medidor em 100% e os oito lotes commitados, as duas chamadas nos
+front-ends ainda eram `lookupLearn(tipo, bind)` — **sem idioma**. O
+parâmetro tem padrão `Lang::pt`, então tudo compilava, os 79 testes
+passavam, o medidor dizia 100%, e quem rodasse o instrumento em inglês
+continuaria lendo português. A tradução estava escrita e invisível.
+
+Nada avisava, e é isso que torna o caso perigoso: o compilador não avisa
+(o padrão é comportamento **pedido** — verbete faltando deve cair no texto
+certo em outra língua, não numa caixa vazia); a interface não avisa (a
+caixa aparece, só na língua errada); o medidor não avisa (mede o
+**catálogo**, não quem o consulta).
+
+Consertado nos dois front-ends, e coberto por
+`tests/test_learn_idioma_ligado.cpp` — varredura de fonte que falha se
+qualquer chamada de `lookupLearn`/`lookupLearnModule` omitir a língua.
+Varredura de fonte é grosseiro, e é deliberado: testar o caminho real
+exigiria instanciar janela, contexto gráfico e loop de eventos, que é o que
+os testes deste projeto não fazem. Verificado removendo o `lang_` de
+propósito — falhou, nomeou o arquivo e imprimiu a chamada.
+
+**Validação:** 80/80 no `ctest` (78 anteriores + os dois guardas novos),
+build completo limpo. A tradução não toca DSP: `LearnWidgetI18n.hpp` é
+conteúdo textual gerado, e nenhum teste de áudio mudou de resultado.
 
 **Próximo passo:** o que falta para a v0.1.0 não é mais tradução — é
 cortar a tag e abrir o repositório, depois de 1 out. 2026 (a cota de

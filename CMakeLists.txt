@@ -429,6 +429,18 @@ if(BUILD_TESTING)
     add_test(NAME rasgo_modular_learn_catalog_tests COMMAND rasgo_modular_learn_catalog_tests)
 
     # usa apps/panel/UiLanguage.hpp
+    # Guarda de FIAÇÃO: o catálogo traduzido só serve se os front-ends
+    # passarem o idioma na consulta. Em 27 set. 2026 eles não passavam, e
+    # nada avisou — compilava, o ctest passava e o medidor dizia 100%,
+    # porque o parâmetro tem padrão `Lang::pt`. Ver o cabeçalho do teste.
+    add_executable(rasgo_modular_learn_idioma_tests
+                   tests/test_learn_idioma_ligado.cpp)
+    target_compile_definitions(rasgo_modular_learn_idioma_tests PRIVATE
+                   RASGO_MODULAR_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_options(rasgo_modular_learn_idioma_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_learn_idioma_tests
+             COMMAND rasgo_modular_learn_idioma_tests)
+
     add_executable(rasgo_modular_ui_language_tests tests/test_ui_language.cpp)
     target_include_directories(rasgo_modular_ui_language_tests PRIVATE src apps)
     target_compile_options(rasgo_modular_ui_language_tests PRIVATE ${rasgo_modular_warnings})
