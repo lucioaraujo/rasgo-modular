@@ -1,0 +1,1769 @@
+[
+ [
+  "CLOCK",
+  "bpm",
+  [
+   "Tempo in beats per minute.",
+   "",
+   ""
+  ],
+  [
+   "Tempo en battements par minute.",
+   "",
+   ""
+  ],
+  [
+   "Tempo en pulsaciones por minuto.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "mult",
+  [
+   "Multiplier of steps per beat (0.25–8) — how many CLOCK steps fit in one beat.",
+   "",
+   ""
+  ],
+  [
+   "Multiplicateur de pas par temps (0,25–8) — combien de pas de CLOCK tiennent dans un temps.",
+   "",
+   ""
+  ],
+  [
+   "Multiplicador de pasos por tiempo (0,25–8) — cuántos pasos de CLOCK caben en un pulso.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "length",
+  [
+   "Number of steps of the euclidean grid (for EUC/ACC).",
+   "",
+   ""
+  ],
+  [
+   "Nombre de pas de la grille euclidienne (pour EUC/ACC).",
+   "",
+   ""
+  ],
+  [
+   "Nº de pasos de la rejilla euclidiana (para EUC/ACC).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "fill",
+  [
+   "How many of the LENGTH steps trigger in EUC.",
+   "Spread as evenly as possible (Bresenham, the cyclic equivalent of Bjorklund).",
+   "A low FILL (e.g. 3 of 16) sounds sparse; close to LENGTH it sounds almost continuous."
+  ],
+  [
+   "Combien des LENGTH pas déclenchent dans EUC.",
+   "Répartis le plus uniformément possible (Bresenham, équivalent cyclique de Bjorklund).",
+   "Un FILL faible (par ex. 3 sur 16) sonne épars ; près de LENGTH il sonne presque continu."
+  ],
+  [
+   "Cuántos de los LENGTH pasos disparan en EUC.",
+   "Distribuidos lo más uniformemente posible (Bresenham, equivalente cíclico de Bjorklund).",
+   "Un FILL bajo (p. ej. 3 de 16) suena disperso; cerca de LENGTH suena casi continuo."
+  ]
+ ],
+ [
+  "CLOCK",
+  "rotate",
+  [
+   "Rotates the euclidean pattern — same density, different phase.",
+   "",
+   ""
+  ],
+  [
+   "Fait tourner le motif euclidien — même densité, phase différente.",
+   "",
+   ""
+  ],
+  [
+   "Gira el patrón euclidiano — misma densidad, fase distinta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "swing",
+  [
+   "Delays the ODD steps within their own slice of time.",
+   "",
+   ""
+  ],
+  [
+   "Retarde les pas IMPAIRS à l’intérieur de leur propre tranche de temps.",
+   "",
+   ""
+  ],
+  [
+   "Retrasa los pasos IMPARES dentro de su propia rodaja de tiempo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "drift",
+  [
+   "Slow walk in the effective tempo (±~12%).",
+   "drift=0 → deterministic.",
+   ""
+  ],
+  [
+   "Marche lente dans le tempo effectif (±~12 %).",
+   "drift=0 → déterministe.",
+   ""
+  ],
+  [
+   "Paseo lento en el tempo efectivo (±~12%).",
+   "drift=0 → determinista.",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "gate_len",
+  [
+   "Fraction of each step in which CLOCK stays high.",
+   "",
+   ""
+  ],
+  [
+   "Fraction de chaque pas pendant laquelle CLOCK reste haut.",
+   "",
+   ""
+  ],
+  [
+   "Fracción de cada paso en que CLOCK se mantiene alto.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "accent_a",
+  [
+   "1st accent divisor — ACC triggers when the step is a multiple of ACC-A (and/or of ACC-B, see AND).",
+   "",
+   ""
+  ],
+  [
+   "1ᵉʳ diviseur de l’accent — ACC déclenche quand le pas est multiple d’ACC-A (et/ou d’ACC-B, voir AND).",
+   "",
+   ""
+  ],
+  [
+   "1.er divisor del acento — ACC dispara cuando el paso es múltiplo de ACC-A (y/o de ACC-B, ver AND).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "accent_b",
+  [
+   "2nd accent divisor.",
+   "",
+   ""
+  ],
+  [
+   "2ᵉ diviseur de l’accent.",
+   "",
+   ""
+  ],
+  [
+   "2.º divisor del acento.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "accent_mode",
+  [
+   "AND: the accent needs a multiple of A AND of B. Off: a multiple of A OR of B.",
+   "",
+   "Compare AND on/off with ACC-A=3, ACC-B=4 — polyrhythm \"for free\"."
+  ],
+  [
+   "AND : l’accent exige un multiple d’A ET de B. Éteint : un multiple d’A OU de B.",
+   "",
+   "Comparez AND allumé/éteint avec ACC-A=3, ACC-B=4 — de la polyrythmie « gratuite »."
+  ],
+  [
+   "AND: el acento exige múltiplo de A Y de B. Apagado: múltiplo de A O de B.",
+   "",
+   "Compare AND encendido/apagado con ACC-A=3, ACC-B=4 — polirritmia \"de regalo\"."
+  ]
+ ],
+ [
+  "CLOCK",
+  "feel",
+  [
+   "Step grouping: straight / triplet / quintuplet / septuplet / nonuplet / 11-tuplet / glitch.",
+   "Multiplies MULT by 1/3/5/7/9/11 (quantised and named, no need to hit the number by ear); glitch draws a time factor per step (~0.7–1.4×) instead of multiplying by a fixed number — the clock stops being regular.",
+   "Compare FEEL=straight and FEEL=triplet at the same MULT: the triplet sounds 3× faster, grouped in threes."
+  ],
+  [
+   "Groupement du pas : droit / triolet / quintolet / septolet / nonolet / onzolet / glitch.",
+   "Multiplie MULT par 1/3/5/7/9/11 (quantifié et nommé, pas besoin de trouver le nombre à l’oreille) ; glitch tire un facteur de temps par pas (~0,7–1,4×) au lieu de multiplier par un nombre fixe — l’horloge cesse d’être régulière.",
+   "Comparez FEEL=droit et FEEL=triolet au même MULT : le triolet sonne 3× plus vite, groupé par trois."
+  ],
+  [
+   "Agrupamiento del paso: recto / tresillo / quintillo / septillo / nonillo / oncillo / glitch.",
+   "Multiplica MULT por 1/3/5/7/9/11 (cuantizado y nombrado, no hace falta acertar el número de oído); glitch sortea un factor de tiempo por paso (~0,7–1,4×) en vez de multiplicar por un número fijo — el reloj deja de ser regular.",
+   "Compare FEEL=recto y FEEL=tresillo con el mismo MULT: el tresillo suena 3× más rápido, agrupado de tres en tres."
+  ]
+ ],
+ [
+  "CLOCK",
+  "in:ext_clock",
+  [
+   "External clock — when connected, CLOCK follows its rising edges instead of the internal BPM.",
+   "",
+   ""
+  ],
+  [
+   "Horloge externe — si elle est branchée, CLOCK suit ses fronts montants au lieu du BPM interne.",
+   "",
+   ""
+  ],
+  [
+   "Reloj externo — si está conectado, CLOCK sigue sus flancos de subida en vez del BPM interno.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "in:reset",
+  [
+   "Zeroes the position of the euclidean step.",
+   "",
+   ""
+  ],
+  [
+   "Remet à zéro la position du pas euclidien.",
+   "",
+   ""
+  ],
+  [
+   "Pone a cero la posición del paso euclidiano.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "in:bpm_mod",
+  [
+   "CV that adds to the BPM.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute au BPM.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma al BPM.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "out:clock",
+  [
+   "Steady step pulse at bpm·mult.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion de pas stable à bpm·mult.",
+   "",
+   ""
+  ],
+  [
+   "Pulso de paso estable en bpm·mult.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "out:euclid",
+  [
+   "Euclidean gate (FILL of LENGTH steps).",
+   "",
+   ""
+  ],
+  [
+   "Gate euclidien (FILL de LENGTH pas).",
+   "",
+   ""
+  ],
+  [
+   "Gate euclidiano (FILL de LENGTH pasos).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CLOCK",
+  "out:accent",
+  [
+   "Accent — AND/OR of ACC-A and ACC-B.",
+   "",
+   ""
+  ],
+  [
+   "Accent — AND/OR d’ACC-A et ACC-B.",
+   "",
+   ""
+  ],
+  [
+   "Acento — AND/OR de ACC-A y ACC-B.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "rate",
+  [
+   "Internal clock, used only when CLK is free — LOGIC on its own becomes a rhythm generator.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement quand CLK est libre — LOGIC seul devient un générateur de rythme.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo cuando CLK está libre — LOGIC por sí solo se vuelve un generador de ritmo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "divide",
+  [
+   "Modulo-N counter over the edges of CLK — DIV pulses once every N.",
+   "",
+   ""
+  ],
+  [
+   "Compteur modulo-N sur les fronts de CLK — DIV pulse une fois sur N.",
+   "",
+   ""
+  ],
+  [
+   "Contador módulo-N sobre los flancos de CLK — DIV pulsa 1 vez cada N.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "multiply",
+  [
+   "Measures the period between CLK edges and schedules sub-ticks inside it — multiplies the density without needing a faster clock from outside.",
+   "It extrapolates the previous period a little ahead (Pamela's style) — the first cycle after switching on has no measured period yet.",
+   ""
+  ],
+  [
+   "Mesure la période entre les fronts de CLK et planifie des sous-tics à l’intérieur — multiplie la densité sans avoir besoin d’une horloge plus rapide venue de l’extérieur.",
+   "Elle extrapole un peu la période précédente vers l’avant (à la manière du Pamela’s) — le premier cycle après l’allumage n’a pas encore de période mesurée.",
+   ""
+  ],
+  [
+   "Mide el período entre flancos de CLK y agenda subtics dentro de él — multiplica la densidad sin necesitar un reloj más rápido de fuera.",
+   "Extrapola el período anterior un poco hacia adelante (estilo Pamela's) — el primer ciclo tras encender aún no tiene período medido.",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "gate_len",
+  [
+   "Duty of the DIV pulse.",
+   "",
+   ""
+  ],
+  [
+   "Rapport cyclique de l’impulsion DIV.",
+   "",
+   ""
+  ],
+  [
+   "Duty del pulso DIV.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "delay",
+  [
+   "Delay of the DIV pulse (0-200 ms), in a sample ring.",
+   "",
+   ""
+  ],
+  [
+   "Retard de l’impulsion DIV (0-200 ms), dans un anneau d’échantillons.",
+   "",
+   ""
+  ],
+  [
+   "Retardo del pulso DIV (0-200 ms), en un anillo de muestras.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "in:clock",
+  [
+   "External clock — when connected, it replaces the internal clock.",
+   "",
+   ""
+  ],
+  [
+   "Horloge externe — si elle est branchée, elle remplace l’horloge interne.",
+   "",
+   ""
+  ],
+  [
+   "Reloj externo — si está conectado, sustituye al reloj interno.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "in:a",
+  [
+   "Input A of the AND/OR/XOR logic and of the flip-flop.",
+   "",
+   ""
+  ],
+  [
+   "Entrée A de la logique AND/OR/XOR et de la bascule.",
+   "",
+   ""
+  ],
+  [
+   "Entrada A de la lógica AND/OR/XOR y del biestable.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "in:b",
+  [
+   "Input B of the AND/OR/XOR logic.",
+   "",
+   ""
+  ],
+  [
+   "Entrée B de la logique AND/OR/XOR.",
+   "",
+   ""
+  ],
+  [
+   "Entrada B de la lógica AND/OR/XOR.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "in:reset",
+  [
+   "Zeroes the division counter and the flip-flop.",
+   "",
+   ""
+  ],
+  [
+   "Remet à zéro le compteur de division et la bascule.",
+   "",
+   ""
+  ],
+  [
+   "Pone a cero el contador de división y el biestable.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "out:and",
+  [
+   "A AND B, level by level.",
+   "",
+   ""
+  ],
+  [
+   "A AND B, niveau par niveau.",
+   "",
+   ""
+  ],
+  [
+   "A AND B, nivel a nivel.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "out:or",
+  [
+   "A OR B.",
+   "",
+   ""
+  ],
+  [
+   "A OR B.",
+   "",
+   ""
+  ],
+  [
+   "A OR B.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "out:xor",
+  [
+   "A XOR B.",
+   "",
+   ""
+  ],
+  [
+   "A XOR B.",
+   "",
+   ""
+  ],
+  [
+   "A XOR B.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "out:div",
+  [
+   "Pulse of the divider/multiplier, with DELAY and GATE applied.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion du diviseur/multiplicateur, avec DELAY et GATE appliqués.",
+   "",
+   ""
+  ],
+  [
+   "Pulso del divisor/multiplicador, con DELAY y GATE aplicados.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOGIC",
+  "out:flip",
+  [
+   "T-type flip-flop — toggles state on every rising edge of A.",
+   "",
+   ""
+  ],
+  [
+   "Bascule de type T — change d’état à chaque front montant d’A.",
+   "",
+   ""
+  ],
+  [
+   "Biestable tipo T — alterna estado en cada flanco de subida de A.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "rate",
+  [
+   "Internal clock, used only if CLK is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si CLK est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si CLK está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "length",
+  [
+   "Number of stages of the shift register — the size of the loop that can get locked.",
+   "",
+   ""
+  ],
+  [
+   "Nombre d’étages du registre à décalage — la taille de la boucle qui peut se verrouiller.",
+   "",
+   ""
+  ],
+  [
+   "Nº de etapas del registro de desplazamiento — el tamaño del lazo que puede quedar trabado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "lock",
+  [
+   "Probability of the loop being PRESERVED instead of changing at each step — 0 is pure chance, 1 is a locked loop (repeats forever).",
+   "",
+   ""
+  ],
+  [
+   "Probabilité que la boucle soit PRÉSERVÉE au lieu de changer à chaque pas — 0 c’est le hasard pur, 1 c’est une boucle verrouillée (elle se répète à l’infini).",
+   "",
+   ""
+  ],
+  [
+   "Probabilidad de que el lazo se PRESERVE en vez de cambiar en cada paso — 0 es azar puro, 1 es lazo trabado (se repite para siempre).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "mutate",
+  [
+   "When the loop changes, how much: near 0 it is a small mutation (noise over the old value), 1 is a completely new draw.",
+   "",
+   ""
+  ],
+  [
+   "Quand la boucle change, de combien : près de 0 c’est une petite mutation (du bruit sur l’ancienne valeur), 1 c’est un tirage entièrement nouveau.",
+   "",
+   ""
+  ],
+  [
+   "Cuando el lazo cambia, cuánto: cerca de 0 es una mutación pequeña (ruido sobre el valor antiguo), 1 es un sorteo totalmente nuevo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "range",
+  [
+   "Span of the CV output, around OFST.",
+   "",
+   ""
+  ],
+  [
+   "Amplitude de la sortie CV, autour d’OFST.",
+   "",
+   ""
+  ],
+  [
+   "Alcance de la salida CV, alrededor de OFST.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "steps",
+  [
+   "Quantises CV into STEPS levels — 1 is continuous.",
+   "",
+   ""
+  ],
+  [
+   "Quantifie la CV en STEPS paliers — 1 c’est continu.",
+   "",
+   ""
+  ],
+  [
+   "Cuantiza la CV en STEPS escalones — 1 es continuo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "offset",
+  [
+   "Centre of the CV output.",
+   "",
+   ""
+  ],
+  [
+   "Centre de la sortie CV.",
+   "",
+   ""
+  ],
+  [
+   "Centro de la salida CV.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "in:clock",
+  [
+   "Advances the register one step on the rising edge — present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avance le registre d’un pas sur le front montant — présente, elle remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avanza un paso del registro en el flanco de subida — si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "in:lock_mod",
+  [
+   "CV that adds to LOCK.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à LOCK.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a LOCK.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "out:cv",
+  [
+   "The front of the register, bipolar, scaled by RANGE/OFST and quantised by STEPS.",
+   "",
+   ""
+  ],
+  [
+   "La tête du registre, bipolaire, mise à l’échelle par RANGE/OFST et quantifiée par STEPS.",
+   "",
+   ""
+  ],
+  [
+   "El frente del registro, bipolar, escalado por RANGE/OFST y cuantizado por STEPS.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "out:cv2",
+  [
+   "Weighted sum of 4 stages of the register — a second CV correlated with CV, but different (the original Turing Machine's \"Volts expander\").",
+   "",
+   ""
+  ],
+  [
+   "Somme pondérée de 4 étages du registre — une deuxième CV corrélée à CV, mais différente (l’« expandeur Volts » du Turing Machine original).",
+   "",
+   ""
+  ],
+  [
+   "Suma ponderada de 4 etapas del registro — una segunda CV correlacionada con CV, pero distinta (el \"expansor Volts\" del Turing Machine original).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURING",
+  "out:pulse",
+  [
+   "The front stage as a bit (0 or 1) — a gate derived from the same chance/memory (the \"Pulses expander\").",
+   "",
+   ""
+  ],
+  [
+   "L’étage de tête en bit (0 ou 1) — un gate issu du même hasard/mémoire (l’« expandeur Pulses »).",
+   "",
+   ""
+  ],
+  [
+   "La etapa del frente como bit (0 o 1) — un gate derivado del mismo azar/memoria (el \"expansor Pulses\").",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p1",
+  [
+   "Pitch of step 1 (−1..1, scaled by RANGE).",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 1 (−1..1, mise à l’échelle par RANGE).",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 1 (−1..1, escalada por RANGE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g1",
+  [
+   "Turns the gate of step 1 on/off — off, the step plays the pitch but stays mute.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 1 — désactivé, le pas joue la hauteur mais reste muet.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 1 — desactivado, el paso toca la altura pero queda mudo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p2",
+  [
+   "Pitch of step 2.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 2.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g2",
+  [
+   "Turns the gate of step 2 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 2.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p3",
+  [
+   "Pitch of step 3.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 3.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g3",
+  [
+   "Turns the gate of step 3 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 3.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p4",
+  [
+   "Pitch of step 4.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 4.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g4",
+  [
+   "Turns the gate of step 4 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 4.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p5",
+  [
+   "Pitch of step 5.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 5.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 5.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g5",
+  [
+   "Turns the gate of step 5 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 5.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 5.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p6",
+  [
+   "Pitch of step 6.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 6.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 6.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g6",
+  [
+   "Turns the gate of step 6 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 6.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 6.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p7",
+  [
+   "Pitch of step 7.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 7.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 7.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g7",
+  [
+   "Turns the gate of step 7 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 7.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 7.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "p8",
+  [
+   "Pitch of step 8.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas 8.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso 8.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "g8",
+  [
+   "Turns the gate of step 8 on/off.",
+   "",
+   ""
+  ],
+  [
+   "Active/désactive le gate du pas 8.",
+   "",
+   ""
+  ],
+  [
+   "Activa/desactiva el gate del paso 8.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "length",
+  [
+   "How many of the 8 steps enter the pattern.",
+   "",
+   ""
+  ],
+  [
+   "Combien des 8 pas entrent dans le motif.",
+   "",
+   ""
+  ],
+  [
+   "Cuántos de los 8 pasos entran en el patrón.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "mode",
+  [
+   "Reading direction: forward / backward / ping-pong / random / brownian.",
+   "",
+   ""
+  ],
+  [
+   "Sens de lecture : avant / arrière / ping-pong / aléatoire / brownien.",
+   "",
+   ""
+  ],
+  [
+   "Dirección de lectura: adelante / atrás / ping-pong / aleatorio / browniano.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "rate",
+  [
+   "Internal clock, used only if CLK is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si CLK est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si CLK está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "gate_len",
+  [
+   "Duty of each step's gate (internal clock) or the gate window (external clock).",
+   "",
+   ""
+  ],
+  [
+   "Rapport cyclique du gate de chaque pas (horloge interne) ou fenêtre du gate (horloge externe).",
+   "",
+   ""
+  ],
+  [
+   "Duty del gate de cada paso (reloj interno) o ventana del gate (reloj externo).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "glide",
+  [
+   "Portamento between the pitch of one step and the next.",
+   "",
+   ""
+  ],
+  [
+   "Portamento entre la hauteur d’un pas et la suivante.",
+   "",
+   ""
+  ],
+  [
+   "Portamento entre la altura de un paso y la siguiente.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "range",
+  [
+   "How many octaves the P1-8 values cover.",
+   "",
+   ""
+  ],
+  [
+   "Combien d’octaves couvrent les valeurs P1-8.",
+   "",
+   ""
+  ],
+  [
+   "Cuántas octavas cubren los valores P1-8.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "in:clock",
+  [
+   "Advances one step on the rising edge — present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avance d’un pas sur le front montant — présente, elle remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avanza un paso en el flanco de subida — si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "in:reset",
+  [
+   "Back to step 0 and restarts the direction (ping-pong/etc).",
+   "",
+   ""
+  ],
+  [
+   "Retour au pas 0 et redémarre le sens (ping-pong/etc).",
+   "",
+   ""
+  ],
+  [
+   "Vuelve al paso 0 y reinicia la dirección (ping-pong/etc).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "out:pitch",
+  [
+   "Pitch of the current step, with GLIDE applied.",
+   "",
+   ""
+  ],
+  [
+   "Hauteur du pas actuel, avec GLIDE appliqué.",
+   "",
+   ""
+  ],
+  [
+   "Altura del paso actual, con GLIDE aplicado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "out:gate",
+  [
+   "Gate of the current step (if its G_N is on).",
+   "",
+   ""
+  ],
+  [
+   "Gate du pas actuel (si son G_N est activé).",
+   "",
+   ""
+  ],
+  [
+   "Gate del paso actual (si su G_N está activado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SEQUENCE",
+  "out:eos",
+  [
+   "Short pulse every time the sequence comes back to step 0 (end of cycle).",
+   "",
+   ""
+  ],
+  [
+   "Brève impulsion chaque fois que la séquence revient au pas 0 (fin de cycle).",
+   "",
+   ""
+  ],
+  [
+   "Pulso corto cada vez que la secuencia vuelve al paso 0 (fin de ciclo).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "length",
+  [
+   "How many of the 16 steps enter the cycle.",
+   "",
+   ""
+  ],
+  [
+   "Combien des 16 pas entrent dans le cycle.",
+   "",
+   ""
+  ],
+  [
+   "Cuántos de los 16 pasos entran en el ciclo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "rate",
+  [
+   "Internal clock, used only if CLK is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si CLK est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si CLK está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "map",
+  [
+   "Morphs between 4 rhythmic characters: straight (rock/house) / broken (breakbeat) / swung (hip-hop) / sparse (minimal/dub).",
+   "",
+   "Sweep MAP slowly with CLK running: the groove changes personality in real time, without swapping patterns by brute force."
+  ],
+  [
+   "Fait un morphing entre 4 caractères rythmiques : droit (rock/house) / cassé (breakbeat) / swingué (hip-hop) / épars (minimal/dub).",
+   "",
+   "Balayez MAP lentement avec CLK en marche : le groove change de personnalité en temps réel, sans changer de motif de force."
+  ],
+  [
+   "Morfa entre 4 caracteres rítmicos: recto (rock/house) / quebrado (breakbeat) / con swing (hip-hop) / disperso (minimal/dub).",
+   "",
+   "Barra MAP despacio con CLK corriendo: el groove cambia de personalidad en tiempo real, sin cambiar de patrón a la fuerza."
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "swing",
+  [
+   "Delays the odd steps.",
+   "",
+   ""
+  ],
+  [
+   "Retarde les pas impairs.",
+   "",
+   ""
+  ],
+  [
+   "Retrasa los pasos impares.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "density1",
+  [
+   "Trigger threshold of line 1 (kick) — the higher it is, the more steps trigger.",
+   "",
+   ""
+  ],
+  [
+   "Seuil de déclenchement de la ligne 1 (grosse caisse) — plus il est haut, plus de pas déclenchent.",
+   "",
+   ""
+  ],
+  [
+   "Umbral de disparo de la línea 1 (bombo) — cuanto más alto, más pasos disparan.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "density2",
+  [
+   "Threshold of line 2 (snare).",
+   "",
+   ""
+  ],
+  [
+   "Seuil de la ligne 2 (caisse claire).",
+   "",
+   ""
+  ],
+  [
+   "Umbral de la línea 2 (caja).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "density3",
+  [
+   "Threshold of line 3 (hi-hat).",
+   "",
+   ""
+  ],
+  [
+   "Seuil de la ligne 3 (charleston).",
+   "",
+   ""
+  ],
+  [
+   "Umbral de la línea 3 (charles).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "density4",
+  [
+   "Threshold of line 4 (perc).",
+   "",
+   ""
+  ],
+  [
+   "Seuil de la ligne 4 (perc).",
+   "",
+   ""
+  ],
+  [
+   "Umbral de la línea 4 (perc).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "chaos",
+  [
+   "Probability of ghost notes appearing or expected triggers failing — it humanises, it is not a raw flip.",
+   "",
+   ""
+  ],
+  [
+   "Probabilité que des notes fantômes apparaissent ou que des déclenchements prévus manquent — cela humanise, ce n’est pas un flip brut.",
+   "",
+   ""
+  ],
+  [
+   "Probabilidad de que aparezcan notas fantasma o fallen disparos previstos — humaniza, no es un flip crudo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "ratchet",
+  [
+   "Probability of a trigger turning into a burst of fast repetitions.",
+   "",
+   ""
+  ],
+  [
+   "Probabilité qu’un déclenchement devienne une rafale de répétitions rapides.",
+   "",
+   ""
+  ],
+  [
+   "Probabilidad de que un disparo se vuelva una ráfaga de repeticiones rápidas.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "fill_amt",
+  [
+   "How much FILL pushes the densities up, temporarily.",
+   "",
+   ""
+  ],
+  [
+   "De combien FILL pousse les densités vers le haut, temporairement.",
+   "",
+   ""
+  ],
+  [
+   "Cuánto empuja FILL las densidades hacia arriba, temporalmente.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "drift",
+  [
+   "Slow, bounded walk in MAP and in the densities — the groove evolves on its own, little by little.",
+   "",
+   ""
+  ],
+  [
+   "Marche lente et bornée dans MAP et dans les densités — le groove évolue tout seul, peu à peu.",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento y acotado en MAP y en las densidades — el groove evoluciona solo, poco a poco.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "in:clock",
+  [
+   "Advances one step on the rising edge — present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avance d’un pas sur le front montant — présente, elle remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avanza un paso en el flanco de subida — si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "in:reset",
+  [
+   "Back to step 0.",
+   "",
+   ""
+  ],
+  [
+   "Retour au pas 0.",
+   "",
+   ""
+  ],
+  [
+   "Vuelve al paso 0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "in:fill",
+  [
+   "Gate — a high level pushes the densities up (FILL_AMT), for a turnaround.",
+   "",
+   ""
+  ],
+  [
+   "Gate — un niveau haut pousse les densités vers le haut (FILL_AMT), pour une relance.",
+   "",
+   ""
+  ],
+  [
+   "Gate — un nivel alto empuja las densidades hacia arriba (FILL_AMT), para un remate.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "in:map_cv",
+  [
+   "CV that adds to MAP.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à MAP.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a MAP.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:t1",
+  [
+   "Gate of line 1 (kick).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la ligne 1 (grosse caisse).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la línea 1 (bombo).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:t2",
+  [
+   "Gate of line 2 (snare).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la ligne 2 (caisse claire).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la línea 2 (caja).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:t3",
+  [
+   "Gate of line 3 (hi-hat).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la ligne 3 (charleston).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la línea 3 (charles).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:t4",
+  [
+   "Gate of line 4 (perc).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la ligne 4 (perc).",
+   "",
+   ""
+  ],
+  [
+   "Gate de la línea 4 (perc).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:accent",
+  [
+   "Triggers when 2 or more lines coincide on the same step.",
+   "",
+   ""
+  ],
+  [
+   "Déclenche quand 2 lignes ou plus coïncident sur le même pas.",
+   "",
+   ""
+  ],
+  [
+   "Dispara cuando 2 o más líneas coinciden en el mismo paso.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TRIGSEQ",
+  "out:any",
+  [
+   "OR of the 4 lines — triggers if any of them plays.",
+   "",
+   ""
+  ],
+  [
+   "OR des 4 lignes — déclenche si n’importe laquelle joue.",
+   "",
+   ""
+  ],
+  [
+   "OR de las 4 líneas — dispara si toca cualquiera.",
+   "",
+   ""
+  ]
+ ]
+]
