@@ -126,19 +126,24 @@ inline const L4 rdMuted    {"MUTE", "MUDO", "COUPÉ","MUDO"};
 // ---- tutorial (overlay do botão TUTORIAL — rolável) ------------------
 inline const L4 tutTitle {
     "HOW TO USE", "COMO USAR", "MODE D’EMPLOI", "CÓMO USAR"};
+// Correção de moldura pedida pelo autor (28 set. 2026): o instrumento NÃO
+// é "um modular que toca sozinho". Quem toca é o músico; o que o
+// instrumento faz é APRESENTAR um patch como ponto de partida, em vez de
+// abrir em branco. A diferença não é de estilo — a primeira versão dava ao
+// programa o papel do músico, e era o oposto do que o instrumento é.
 inline const L4 tutSubtitle {
-    "a generative modular — it sounds on its own; you steer it   ·   scroll / ↑↓",
-    "um modular generativo — soa sozinho; você conduz   ·   role / ↑↓",
-    "un modulaire génératif — il sonne seul ; vous le dirigez   ·   défilez / ↑↓",
-    "un modular generativo — suena solo; usted lo guía   ·   desplace / ↑↓"};
+    "patches as a starting point — you play it   ·   scroll / ↑↓",
+    "patches como ponto de partida — quem toca é você   ·   role / ↑↓",
+    "des patches comme point de départ — c’est vous qui jouez   ·   défilez / ↑↓",
+    "patches como punto de partida — quien toca es usted   ·   desplace / ↑↓"};
 
 inline const L4 tutWhatTitle {
     "WHAT THIS IS", "O QUE É ISTO", "CE QUE C’EST", "QUÉ ES ESTO"};
 inline const L4 tutWhatBody {
-    "RASGO Modular is a modular synth that plays by itself: it makes sound the moment it opens, with no keyboard and no audio input. You shape what you hear by drawing a random patch (SEED), letting it drift, and re-patching modules by hand. MIDI, audio-in and instrument coupling are optional adapter modules, never required.",
-    "O RASGO Modular é um sintetizador modular que toca sozinho: faz som no instante em que abre, sem teclado e sem entrada de áudio. Você molda o que ouve sorteando um patch (SEED), deixando ele derivar e recabeando os módulos à mão. MIDI, entrada de áudio e acoplamento de instrumento são módulos adaptadores opcionais, nunca obrigatórios.",
-    "RASGO Modular est un synthé modulaire qui joue tout seul : il produit du son dès l’ouverture, sans clavier ni entrée audio. On façonne ce qu’on entend en tirant un patch aléatoire (SEED), en le laissant dériver et en recâblant les modules à la main. MIDI, entrée audio et couplage d’instrument sont des modules adaptateurs optionnels, jamais requis.",
-    "RASGO Modular es un sintetizador modular que suena solo: hace sonido en el momento en que se abre, sin teclado ni entrada de audio. Usted moldea lo que oye sorteando un patch (SEED), dejándolo derivar y recableando los módulos a mano. MIDI, entrada de audio y acoplamiento de instrumento son módulos adaptadores opcionales, nunca obligatorios."};
+    "RASGO Modular is a modular synth that never opens blank: it offers a patch already built and sounding, as a starting point. You are the one who plays it — drawing another patch (SEED), adjusting, letting it drift, re-patching modules by hand, or taking it all apart and building from scratch. No keyboard and no audio input are needed; MIDI, audio-in and instrument coupling are optional adapter modules, never required.",
+    "O RASGO Modular é um sintetizador modular que nunca abre em branco: ele apresenta um patch já montado e soando, como ponto de partida. Quem toca é você — sorteando outro patch (SEED), ajustando, deixando derivar, recabeando os módulos à mão, ou desmontando tudo e construindo do zero. Não precisa de teclado nem de entrada de áudio; MIDI, entrada de áudio e acoplamento de instrumento são módulos adaptadores opcionais, nunca obrigatórios.",
+    "RASGO Modular est un synthé modulaire qui ne s’ouvre jamais sur une page blanche : il propose un patch déjà monté et sonnant, comme point de départ. C’est vous qui jouez — en tirant un autre patch (SEED), en ajustant, en laissant dériver, en recâblant les modules à la main, ou en démontant tout pour construire depuis zéro. Ni clavier ni entrée audio ne sont nécessaires ; MIDI, entrée audio et couplage d’instrument sont des modules adaptateurs optionnels, jamais requis.",
+    "RASGO Modular es un sintetizador modular que nunca abre en blanco: ofrece un patch ya montado y sonando, como punto de partida. Quien toca es usted — sorteando otro patch (SEED), ajustando, dejando derivar, recableando los módulos a mano, o desmontándolo todo y construyendo desde cero. No hace falta teclado ni entrada de audio; MIDI, entrada de audio y acoplamiento de instrumento son módulos adaptadores opcionales, nunca obligatorios."};
 
 inline const L4 tutSeedTitle {
     "SEED — DRAW A PATCH", "SEED — SORTEAR UM PATCH", "SEED — TIRER UN PATCH", "SEED — SORTEAR UN PATCH"};
@@ -224,8 +229,9 @@ inline const L4 tutFamBody {
 // (seed, REC, navegação) e as teclas de uma letra — g, v, m, e, c — não
 // apareciam em lugar nenhum: quem só lesse o tutorial não descobria que
 // existiam. Reunidos aqui, sem tirar as menções em contexto.
-// Os dois caminhos de uso. O instrumento toca sozinho por omissão, mas
-// construir o patch à mão é caminho de primeira classe, não gambiarra —
+// Os dois caminhos de uso. Por omissão o instrumento já APRESENTA um
+// patch, mas construir o patch à mão é caminho de primeira classe, não
+// gambiarra —
 // e faltava dizer isso em algum lugar (o autor perguntou se a opção
 // existia; existia só como dezenas de cliques, por isso veio o [n]).
 inline const L4 tutScratchTitle {

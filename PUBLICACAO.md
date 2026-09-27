@@ -68,8 +68,11 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
   expunha o endereço. O guia é **gerado** do catálogo do instrumento
   (`--despejar-modulos` + `gerar_modulos.py`), então página e programa não
   divergem. Falta só abri-lo num navegador de cada motor antes de publicar;
-- entrada do Modular no portal da família — mas o portal é território do
-  Codex, então é combinação, não tarefa minha.
+- entrada do Modular no portal da família — o portal é território do
+  Codex, então é combinação, não tarefa minha. O **texto pronto** do card
+  nos quatro idiomas, no formato exato dos cards que já existem lá, está em
+  [`website/PORTAL.md`](website/PORTAL.md), com a moldura correta e a
+  indicação de que só entra no ar junto com o resto.
 
 ### Depende de você
 

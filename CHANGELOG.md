@@ -9,16 +9,18 @@ pronto.
 
 ## v0.1.0 — **preparada, ainda não cortada**
 
-> **Por que ainda não é uma release.** Falta a **sessão de escuta
-> documentada** (`dossies/VALIDACAO_v0.1.0.md`, Parte A — quatro estudos),
-> que é o bloqueio duro da camada 2 da
-> `ESTRATEGIA_DE_PUBLICACAO.md`. Nenhum trabalho de código destrava isso:
-> alguém precisa ouvir e registrar o que ouviu. Estas notas ficam prontas
-> para o momento em que a tag for criada.
+> **Por que ainda não é uma release.** A sessão de escuta documentada —
+> que era o bloqueio duro da camada 2 da `ESTRATEGIA_DE_PUBLICACAO.md` —
+> **foi feita** em 23–24 set. 2026 (`dossies/VALIDACAO_v0.1.0.md`: quatro
+> estudos, sete achados, três corrigidos antes de publicar). O que falta é
+> operacional: cortar a tag e abrir o repositório junto com o site e o
+> portal, depois de 1 out. 2026.
 
 Primeira versão publicável do instrumento. O que ela é: um ambiente
-modular generativo que **soa ao abrir**, sem MIDI e sem entrada de áudio —
-MIDI, áudio e acoplamento de instrumento são nós adaptadores opcionais.
+modular generativo que **nunca abre em branco** — ele apresenta um patch
+já montado e soando, como **ponto de partida**, e quem toca é o músico.
+Não precisa de MIDI nem de entrada de áudio; MIDI, áudio e acoplamento de
+instrumento são nós adaptadores opcionais.
 
 ### O instrumento
 
