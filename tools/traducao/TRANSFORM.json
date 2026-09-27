@@ -1,0 +1,3669 @@
+[
+ [
+  "FILTER",
+  "cutoff",
+  [
+   "Cutoff frequency — above it, the sound is attenuated.",
+   "A subtractive filter takes energy away above (or near) the cutoff; below it the signal passes almost unchanged.",
+   "Turn it slowly and hear the timbre darken. Then connect ENVELOPE.env to FC — the cutoff opens on its own at every note."
+  ],
+  [
+   "Fréquence de coupure — au-dessus d’elle, le son est atténué.",
+   "Un filtre soustractif retire de l’énergie au-dessus (ou près) de la coupure ; en dessous le signal passe presque inchangé.",
+   "Tournez-le lentement et écoutez le timbre s’assombrir. Puis branchez ENVELOPE.env sur FC — la coupure s’ouvre toute seule à chaque note."
+  ],
+  [
+   "Frecuencia de corte — por encima de ella, el sonido se atenúa.",
+   "Un filtro sustractivo quita energía por encima (o cerca) del corte; por debajo la señal pasa casi sin cambio.",
+   "Gírelo despacio y oiga el timbre oscurecerse. Después conecte ENVELOPE.env en FC — el corte se abre solo en cada nota."
+  ]
+ ],
+ [
+  "FILTER",
+  "resonance",
+  [
+   "Lifts the frequencies near the cutoff.",
+   "High resonance pushes the filter close to self-oscillation — it starts to sound almost like an oscillator.",
+   "Raise RESO close to maximum with CUT on a low note: the filter starts singing on its own, even with no input."
+  ],
+  [
+   "Relève les fréquences près de la coupure.",
+   "Une résonance élevée pousse le filtre près de l’auto-oscillation — il se met à sonner presque comme un oscillateur.",
+   "Montez RESO près du maximum avec CUT sur une note grave : le filtre commence à chanter tout seul, même sans entrée."
+  ],
+  [
+   "Realza las frecuencias cerca del corte.",
+   "Una resonancia alta empuja el filtro cerca de la autooscilación — pasa a sonar casi como un oscilador.",
+   "Suba RESO cerca del máximo con CUT en una nota grave: el filtro empieza a cantar solo, incluso sin entrada."
+  ]
+ ],
+ [
+  "FILTER",
+  "spread",
+  [
+   "Spreads the 3 outputs (low/center/high) across different frequencies.",
+   "They are 3 \"sibling\" filters on the same base, moved apart by SPRD — it gives a multimode body without needing 3 modules.",
+   "Compare the ALL output with SPRD=0 (a single filter) and SPRD=1 (three well separated)."
+  ],
+  [
+   "Écarte les 3 sorties (low/center/high) sur des fréquences différentes.",
+   "Ce sont 3 filtres « frères » sur la même base, écartés par SPRD — cela donne un corps multimode sans avoir besoin de 3 modules.",
+   "Comparez la sortie ALL avec SPRD=0 (un seul filtre) et SPRD=1 (trois bien séparés)."
+  ],
+  [
+   "Separa las 3 salidas (low/center/high) en frecuencias distintas.",
+   "Son 3 filtros \"hermanos\" en la misma base, apartados por SPRD — da cuerpo de multimodo sin necesitar 3 módulos.",
+   "Compare la salida ALL con SPRD=0 (un solo filtro) y SPRD=1 (tres bien separados)."
+  ]
+ ],
+ [
+  "FILTER",
+  "drive",
+  [
+   "Input gain — it pushes the signal into gentle saturation.",
+   "It saturates BEFORE the filter: bass that comes in saturated changes what is left to filter.",
+   "Raise DRIVE with a low CUT: the bass fattens before it is cut."
+  ],
+  [
+   "Gain d’entrée — il pousse le signal vers une saturation douce.",
+   "Il sature AVANT le filtre : un grave qui entre saturé change ce qu’il reste à filtrer.",
+   "Montez DRIVE avec un CUT bas : le grave s’étoffe avant d’être coupé."
+  ],
+  [
+   "Ganancia de entrada — empuja la señal a una saturación suave.",
+   "Satura ANTES del filtro: el grave que entra saturado cambia lo que queda por filtrar.",
+   "Suba DRIVE con CUT bajo: el grave engorda antes de ser cortado."
+  ]
+ ],
+ [
+  "FILTER",
+  "in:in",
+  [
+   "Audio input to filter.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio à filtrer.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio a filtrar.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "in:cutoff_mod",
+  [
+   "CV (1 V/oct) that ADDS to the CUT knob.",
+   "The cable modulates the cutoff on top of the knob's value — turning CUT still works with the cable plugged in (an additive engine).",
+   ""
+  ],
+  [
+   "CV (1 V/oct) qui S’AJOUTE au potentiomètre CUT.",
+   "Le câble module la coupure par-dessus la valeur du potentiomètre — tourner CUT fonctionne toujours avec le câble branché (moteur additif).",
+   ""
+  ],
+  [
+   "CV (1 V/oct) que SE SUMA al mando CUT.",
+   "El cable modula el corte por encima del valor del mando — girar CUT sigue funcionando con el cable conectado (motor aditivo).",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "in:res_mod",
+  [
+   "CV that adds to RESO.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à RESO.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a RESO.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "in:spread_mod",
+  [
+   "CV that adds to SPRD.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à SPRD.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a SPRD.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "out:low",
+  [
+   "Isolated bass output (low-pass).",
+   "",
+   ""
+  ],
+  [
+   "Sortie grave isolée (passe-bas).",
+   "",
+   ""
+  ],
+  [
+   "Salida grave aislada (paso bajo).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "out:center",
+  [
+   "Central resonant output (band-pass).",
+   "",
+   ""
+  ],
+  [
+   "Sortie résonante centrale (passe-bande).",
+   "",
+   ""
+  ],
+  [
+   "Salida resonante central (paso banda).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "out:high",
+  [
+   "Isolated treble output (high-pass).",
+   "",
+   ""
+  ],
+  [
+   "Sortie aiguë isolée (passe-haut).",
+   "",
+   ""
+  ],
+  [
+   "Salida aguda aislada (paso alto).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FILTER",
+  "out:all",
+  [
+   "The sum of the 3 outputs — the one most used to leave the filter.",
+   "",
+   ""
+  ],
+  [
+   "La somme des 3 sorties — la plus utilisée pour sortir du filtre.",
+   "",
+   ""
+  ],
+  [
+   "La suma de las 3 salidas — la más usada para salir del filtro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "vowel",
+  [
+   "Position in the vowel sequence A → E → I → O → U. Each vowel is a set of 5 formants (spectral peaks); the knob interpolates between the neighbours.",
+   "Source-filter theory (Fant): the voice is a source × the vocal tract's filter; the vowel is where the 5 formants are. Phonetic data from a bass voice.",
+   "Patch SEQUENCE → VOW: a melody of vowels over a drone."
+  ],
+  [
+   "Position dans la suite de voyelles A → E → I → O → U. Chaque voyelle est un ensemble de 5 formants (pics spectraux) ; le potentiomètre interpole entre les voisines.",
+   "Théorie source-filtre (Fant) : la voix est une source × le filtre du conduit vocal ; la voyelle est l’endroit où se trouvent les 5 formants. Données phonétiques d’une voix de basse.",
+   "Branchez SEQUENCE → VOW : une mélodie de voyelles sur un drone."
+  ],
+  [
+   "Posición en la secuencia de vocales A → E → I → O → U. Cada vocal es un conjunto de 5 formantes (picos espectrales); el mando interpola entre las vecinas.",
+   "Teoría fuente-filtro (Fant): la voz es una fuente × el filtro del tracto vocal; la vocal es donde están los 5 formantes. Datos fonéticos de voz de bajo.",
+   "Cablee SEQUENCE → VOW: una melodía de vocales sobre un drone."
+  ]
+ ],
+ [
+  "FORMANT",
+  "shift",
+  [
+   "Scales ALL the formant frequencies (2^(shift·1.5), ≈ 0.35× to 2.8×) — the length of the vocal tract: down = a big/low voice, up = a small/high voice.",
+   "It is the formant shift — it changes the voice's timbre without changing the source's pitch.",
+   ""
+  ],
+  [
+   "Met à l’échelle TOUTES les fréquences de formant (2^(shift·1,5), ≈ 0,35× à 2,8×) — la longueur du conduit vocal : vers le bas = voix grande/grave, vers le haut = voix petite/aiguë.",
+   "C’est le formant shift — il change le timbre de la voix sans changer la hauteur de la source.",
+   ""
+  ],
+  [
+   "Escala TODAS las frecuencias de formante (2^(shift·1,5), ≈ 0,35× a 2,8×) — la longitud del tracto vocal: hacia abajo = voz grande/grave, hacia arriba = voz pequeña/aguda.",
+   "Es el formant shift — cambia el timbre de la voz sin cambiar la altura de la fuente.",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "res",
+  [
+   "Narrows the 5 bands (width ÷ (1 + res·8)). 0 = a subtle colouration; 1 = bands that sing/whistle.",
+   "Q = frequency ÷ bandwidth. With res high and noise at the input, each vowel becomes 5 sine tones.",
+   "ENVELOPE → RES: the voice 'tightens' on the attack and relaxes."
+  ],
+  [
+   "Resserre les 5 bandes (largeur ÷ (1 + res·8)). 0 = une coloration subtile ; 1 = des bandes qui chantent/sifflent.",
+   "Q = fréquence ÷ largeur de bande. Avec res élevé et du bruit à l’entrée, chaque voyelle devient 5 sons sinusoïdaux.",
+   "ENVELOPE → RES : la voix se « serre » à l’attaque puis se relâche."
+  ],
+  [
+   "Estrecha las 5 bandas (anchura ÷ (1 + res·8)). 0 = coloración sutil; 1 = bandas que cantan/pitan.",
+   "Q = frecuencia ÷ ancho de banda. Con res alto y ruido en la entrada, cada vocal se vuelve 5 tonos senoidales.",
+   "ENVELOPE → RES: la voz se 'aprieta' en el ataque y se relaja."
+  ]
+ ],
+ [
+  "FORMANT",
+  "mix",
+  [
+   "Dry ↔ resonated. 0 = straight through.",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ résonné. 0 = passage direct.",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ resonado. 0 = paso directo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "drift",
+  [
+   "Each formant gets a slow, independent wobble (±drift·3 %) — the voice breathes. Deterministic (sines, no RNG). 0 = static.",
+   "",
+   ""
+  ],
+  [
+   "Chaque formant reçoit un wobble lent et indépendant (±drift·3 %) — la voix respire. Déterministe (des sinus, sans RNG). 0 = statique.",
+   "",
+   ""
+  ],
+  [
+   "Cada formante recibe un bamboleo lento e independiente (±drift·3 %) — la voz respira. Determinista (senos, sin RNG). 0 = estático.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "vocoder",
+  [
+   "Blends towards VOCODER mode: the GAINS of the 5 bands start following the energy of the MODULATOR (the MOD jack) at each formant frequency, instead of the vowel table. 0 = classic FORMANT; 1 = a 5-band vocoder.",
+   "Homer Dudley's vocoder (1938): (modulator → a bank of per-band envelope followers) × (carrier → a filter bank). Here the 5 formant bands are the vocoder's bands — coarse but vocalic. With no MOD patched, it has no effect.",
+   "Speech into MOD, a rich OSC/PAD into IN, VOCODER=1: the pad 'speaks'. VOWEL chooses WHICH 5 frequencies get vocoded."
+  ],
+  [
+   "Fait passer au mode VOCODER : les GAINS des 5 bandes se mettent à suivre l’énergie du MODULATEUR (le jack MOD) à chaque fréquence de formant, au lieu de la table de voyelle. 0 = FORMANT classique ; 1 = un vocodeur à 5 bandes.",
+   "Vocodeur de Homer Dudley (1938) : (modulateur → un banc de suiveurs d’enveloppe par bande) × (porteuse → un banc de filtres). Ici les 5 bandes de formant sont les bandes du vocodeur — grossier mais vocalique. Sans MOD câblé, aucun effet.",
+   "De la parole dans MOD, un OSC/PAD riche dans IN, VOCODER=1 : le pad « parle ». VOWEL choisit QUELLES 5 fréquences sont vocodées."
+  ],
+  [
+   "Mezcla hacia el modo VOCODER: las GANANCIAS de las 5 bandas pasan a seguir la energía del MODULADOR (el jack MOD) en cada frecuencia de formante, en vez de la tabla de vocal. 0 = FORMANT clásico; 1 = un vocoder de 5 bandas.",
+   "Vocoder de Homer Dudley (1938): (modulador → un banco de seguidores de envolvente por banda) × (portadora → un banco de filtros). Aquí las 5 bandas de formante son las bandas del vocoder — grueso pero vocálico. Sin MOD cableado, no hace efecto.",
+   "Habla en MOD, un OSC/PAD rico en IN, VOCODER=1: el pad 'habla'. VOWEL elige CUÁLES 5 frecuencias se vocodan."
+  ]
+ ],
+ [
+  "FORMANT",
+  "in:in",
+  [
+   "The CARRIER — what is going to be shaped (a saw OSC, a pad, NOISE). In vocoder mode it is the 'synthetic' voice that speaks.",
+   "",
+   ""
+  ],
+  [
+   "La PORTEUSE — ce qui va être façonné (un OSC scie, un pad, NOISE). En mode vocodeur c’est la voix « synthétique » qui parle.",
+   "",
+   ""
+  ],
+  [
+   "La PORTADORA — lo que va a ser moldeado (un OSC sierra, un pad, NOISE). En modo vocoder es la voz 'sintética' que habla.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "in:vowel",
+  [
+   "CV added to VOWEL (an LFO, a SEQUENCE, an envelope…).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à VOWEL (un LFO, un SEQUENCE, une enveloppe…).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a VOWEL (un LFO, un SEQUENCE, una envolvente…).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "in:shift",
+  [
+   "CV added to SHIFT.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à SHIFT.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a SHIFT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "in:mod",
+  [
+   "The vocoder's MODULATOR — the sound whose spectral envelope will control the 5 bands (a voice, a DRUM, a recording). It only has an effect with VOCODER > 0.",
+   "",
+   ""
+  ],
+  [
+   "Le MODULATEUR du vocodeur — le son dont l’enveloppe spectrale va contrôler les 5 bandes (une voix, un DRUM, un enregistrement). Il n’a d’effet qu’avec VOCODER > 0.",
+   "",
+   ""
+  ],
+  [
+   "El MODULADOR del vocoder — el sonido cuya envolvente espectral controlará las 5 bandas (una voz, un DRUM, una grabación). Sólo hace efecto con VOCODER > 0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FORMANT",
+  "out:out",
+  [
+   "Dry + the 5 bands, mixed by MIX, with a gentle limiter.",
+   "",
+   ""
+  ],
+  [
+   "Sec + les 5 bandes, mélangés par MIX, avec un limiteur doux.",
+   "",
+   ""
+  ],
+  [
+   "Seco + las 5 bandas, mezclados por MIX, con limitador suave.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "bands",
+  [
+   "How many frequency bands (4–20). Few = a coarse 'robot'; many (16–20) = intelligible speech.",
+   "Homer Dudley's vocoder (1938): the MODULATOR's per-band energy controls the gain of the same band on the CARRIER. `FORMANT` does the same with 5 vowel bands; this is the dedicated, wide-band vocoder.",
+   "A voice into MOD, a pad/saw into CAR, BANDS=16: the pad speaks. BANDS=6 = the vocoder of the 70s."
+  ],
+  [
+   "Combien de bandes de fréquence (4–20). Peu = un « robot » grossier ; beaucoup (16–20) = de la parole intelligible.",
+   "Vocodeur de Homer Dudley (1938) : l’énergie par bande du MODULATEUR contrôle le gain de la même bande sur la PORTEUSE. Le `FORMANT` fait la même chose avec 5 bandes de voyelle ; celui-ci est le vocodeur dédié, à large bande.",
+   "Une voix dans MOD, un pad/scie dans CAR, BANDS=16 : le pad parle. BANDS=6 = le vocodeur des années 70."
+  ],
+  [
+   "Cuántas bandas de frecuencia (4–20). Pocas = 'robot' grueso; muchas (16–20) = habla inteligible.",
+   "Vocoder de Homer Dudley (1938): la energía por banda del MODULADOR controla la ganancia de la misma banda en la PORTADORA. El `FORMANT` hace lo mismo con 5 bandas de vocal; este es el vocoder dedicado, de banda ancha.",
+   "Una voz en MOD, un pad/sierra en CAR, BANDS=16: el pad habla. BANDS=6 = el vocoder de los años 70."
+  ]
+ ],
+ [
+  "VOCODER",
+  "shift",
+  [
+   "Shifts the SYNTHESIS frequencies relative to the analysis (2^(shift·1.2)) — a formant shift: up = a small voice, down = a big voice, without changing the speech.",
+   "",
+   "LFO → nothing (it is not an input); move it by hand for a voice that 'grows' across the phrase."
+  ],
+  [
+   "Décale les fréquences de la SYNTHÈSE par rapport à l’analyse (2^(shift·1,2)) — formant shift : vers le haut = petite voix, vers le bas = grande voix, sans changer la parole.",
+   "",
+   "LFO → rien (ce n’est pas une entrée) ; bougez-le à la main pour une voix qui « grandit » au fil de la phrase."
+  ],
+  [
+   "Desplaza las frecuencias de la SÍNTESIS respecto al análisis (2^(shift·1,2)) — formant shift: hacia arriba = voz pequeña, hacia abajo = voz grande, sin cambiar el habla.",
+   "",
+   "LFO → nada (no es una entrada); muévalo a mano para una voz que 'crece' a lo largo de la frase."
+  ]
+ ],
+ [
+  "VOCODER",
+  "sibilance",
+  [
+   "How much of the modulator's TREBLE (> ~3.5 kHz) passes STRAIGHT through — the fricatives (s, f, sh) that band analysis does not catch. 0 = a lisp; high = crisp speech.",
+   "",
+   ""
+  ],
+  [
+   "Quelle part de l’AIGU du modulateur (> ~3,5 kHz) passe DIRECTEMENT — les fricatives (s, f, ch) que l’analyse par bandes ne capte pas. 0 = un cheveu sur la langue ; élevé = parole nette.",
+   "",
+   ""
+  ],
+  [
+   "Cuánto del AGUDO del modulador (> ~3,5 kHz) pasa DIRECTO — las fricativas (s, f, ch) que el análisis de banda no capta. 0 = ceceo; alto = habla nítida.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "attack",
+  [
+   "Attack of the envelope followers (1–60 ms). Short = the consonants cut dry; long = everything softens.",
+   "",
+   ""
+  ],
+  [
+   "Attaque des suiveurs d’enveloppe (1–60 ms). Courte = les consonnes coupent sec ; longue = tout s’adoucit.",
+   "",
+   ""
+  ],
+  [
+   "Ataque de los seguidores de envolvente (1–60 ms). Corto = las consonantes cortan secas; largo = todo se ablanda.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "release",
+  [
+   "Release (20–600 ms). Short = staccato/intelligible; long = the syllables blur into one another (a spoken pad).",
+   "",
+   ""
+  ],
+  [
+   "Relâchement (20–600 ms). Court = staccato/intelligible ; long = les syllabes se fondent l’une dans l’autre (un pad parlé).",
+   "",
+   ""
+  ],
+  [
+   "Release (20–600 ms). Corto = staccato/inteligible; largo = las sílabas se difuminan una en otra (pad hablado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "mix",
+  [
+   "Dry carrier ↔ vocoded. 0 = bypass.",
+   "",
+   ""
+  ],
+  [
+   "Porteuse sèche ↔ vocodée. 0 = bypass.",
+   "",
+   ""
+  ],
+  [
+   "Portadora seca ↔ vocodada. 0 = bypass.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "freeze",
+  [
+   "Freezes the bands' envelopes — the carrier stays 'speaking the last syllable' forever. Remove the MOD after freezing and the pad holds.",
+   "",
+   ""
+  ],
+  [
+   "Gèle les enveloppes des bandes — la porteuse reste à « dire la dernière syllabe » indéfiniment. Retirez le MOD après le gel et le pad tient.",
+   "",
+   ""
+  ],
+  [
+   "Congela las envolventes de las bandas — la portadora queda 'diciendo la última sílaba' para siempre. Quite el MOD después de congelar y el pad se sostiene.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "in:carrier",
+  [
+   "The CARRIER — what is going to 'speak' (a rich saw, a pad, a chord, noise). Left free → an internal saw tunable by PIT.",
+   "",
+   ""
+  ],
+  [
+   "La PORTEUSE — ce qui va « parler » (une scie riche, un pad, un accord, du bruit). Laissée libre → une scie interne accordable par PIT.",
+   "",
+   ""
+  ],
+  [
+   "La PORTADORA — lo que va a 'hablar' (una sierra rica, un pad, un acorde, ruido). Libre → una sierra interna afinable por PIT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "in:mod",
+  [
+   "The MODULATOR — the voice/speech (or a DRUM, or any rhythmic sound) whose spectral envelope shapes the carrier.",
+   "",
+   ""
+  ],
+  [
+   "Le MODULATEUR — la voix/la parole (ou un DRUM, ou tout son rythmique) dont l’enveloppe spectrale façonne la porteuse.",
+   "",
+   ""
+  ],
+  [
+   "El MODULADOR — la voz/habla (o un DRUM, o cualquier sonido rítmico) cuya envolvente espectral moldea la portadora.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "in:pitch",
+  [
+   "1 V/oct CV for the internal saw (only when CAR is free).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct pour la scie interne (seulement quand CAR est libre).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct para la sierra interna (sólo cuando CAR está libre).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VOCODER",
+  "out:out",
+  [
+   "The carrier shaped by the modulator's bands + sibilance, with softclip.",
+   "",
+   ""
+  ],
+  [
+   "La porteuse façonnée par les bandes du modulateur + sibilance, avec softclip.",
+   "",
+   ""
+  ],
+  [
+   "La portadora moldeada por las bandas del modulador + sibilancia, con softclip.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "freq",
+  [
+   "Fundamental of the mode bank (20–5000 Hz, +1 V/oct CV). The partials are multiples of it (stretched by STRC).",
+   "",
+   ""
+  ],
+  [
+   "Fondamentale du banc de modes (20–5000 Hz, +CV 1 V/oct). Les partiels sont des multiples de celle-ci (étirés par STRC).",
+   "",
+   ""
+  ],
+  [
+   "Fundamental del banco de modos (20–5000 Hz, +CV 1 V/oct). Los parciales son múltiplos de ella (estirados por STRC).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "structure",
+  [
+   "The partials' ratios: 0 exactly harmonic (1, 2, 3…), up to 1 stretched/inharmonic (k·√(1+B·k²) — the stiffness of a bar/bell/thick string).",
+   "The same stretching formula as ADDITIVE.stretch.",
+   ""
+  ],
+  [
+   "Les rapports des partiels : 0 exactement harmonique (1, 2, 3…), jusqu’à 1 étiré/inharmonique (k·√(1+B·k²) — la rigidité d’une barre/cloche/corde épaisse).",
+   "La même formule d’étirement qu’ADDITIVE.stretch.",
+   ""
+  ],
+  [
+   "Las razones de los parciales: 0 exactamente armónico (1, 2, 3…), hasta 1 estirado/inarmónico (k·√(1+B·k²) — la rigidez de una barra/campana/cuerda gruesa).",
+   "La misma fórmula de estiramiento de ADDITIVE.stretch.",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "partials",
+  [
+   "How many modes in the bank (1–24). 1 = almost a very resonant BP FILTER.",
+   "",
+   ""
+  ],
+  [
+   "Combien de modes dans le banc (1–24). 1 = presque un FILTER BP très résonant.",
+   "",
+   ""
+  ],
+  [
+   "Cuántos modos en el banco (1–24). 1 = casi un FILTER BP muy resonante.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "decay",
+  [
+   "Ring time (the resonators' Q): short = a pluck, long = a bow/drone. It never self-oscillates (poles < 1).",
+   "",
+   ""
+  ],
+  [
+   "Temps de résonance (le Q des résonateurs) : court = un pluck, long = un archet/drone. Il n’auto-oscille jamais (pôles < 1).",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de anillo (la Q de los resonadores): corto = pluck, largo = arco/drone. Nunca autooscila (polos < 1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "damp",
+  [
+   "Damping of the TREBLE in the ring — the high partials decay before the low ones (a real string: bright attack, dark tail).",
+   "",
+   ""
+  ],
+  [
+   "Amortissement des AIGUS dans la résonance — les partiels hauts décroissent avant les graves (une vraie corde : attaque brillante, queue sombre).",
+   "",
+   ""
+  ],
+  [
+   "Amortiguamiento de los AGUDOS en el anillo — los parciales altos decaen antes que los graves (una cuerda de verdad: ataque brillante, cola oscura).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "tilt",
+  [
+   "Spectral tilt of the amplitudes: <0 strong bass (the LOW output dominates), >0 strong treble (HIGH dominates), 0 flat. **Sweeping TILT crosses LOW↔HIGH** — the relation between the outputs is the process (Three Sisters).",
+   "",
+   "RESONATOR.low → MIXER and .high → SWIRL; sweep TILT and hear the energy migrate between the destinations."
+  ],
+  [
+   "Inclinaison spectrale des amplitudes : <0 grave fort (la sortie LOW domine), >0 aigu fort (HIGH domine), 0 plat. **Balayer TILT croise LOW↔HIGH** — la relation entre les sorties est le processus (Three Sisters).",
+   "",
+   "RESONATOR.low → MIXER et .high → SWIRL ; balayez TILT et écoutez l’énergie migrer entre les destinations."
+  ],
+  [
+   "Inclinación espectral de las amplitudes: <0 grave fuerte (la salida LOW domina), >0 agudo fuerte (HIGH domina), 0 plano. **Barrer TILT cruza LOW↔HIGH** — la relación entre las salidas es el proceso (Three Sisters).",
+   "",
+   "RESONATOR.low → MIXER y .high → SWIRL; barra TILT y oiga la energía migrar entre los destinos."
+  ]
+ ],
+ [
+  "RESONATOR",
+  "position",
+  [
+   "Where the excitation 'hits' — a comb over the input that zeroes some partials (the pluck point of a string; 0.5 = no even harmonics).",
+   "",
+   ""
+  ],
+  [
+   "Où l’excitation « frappe » — un peigne sur l’entrée qui annule certains partiels (le point de pincement d’une corde ; 0,5 = pas d’harmoniques paires).",
+   "",
+   ""
+  ],
+  [
+   "Dónde 'golpea' la excitación — un peine sobre la entrada que anula algunos parciales (el punto de pulsación de una cuerda; 0,5 = sin armónicos pares).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "mix",
+  [
+   "Dry (the raw excitation) ↔ resonated. 0 = exact bypass.",
+   "",
+   ""
+  ],
+  [
+   "Sec (l’excitation brute) ↔ résonné. 0 = bypass exact.",
+   "",
+   ""
+  ],
+  [
+   "Seco (la excitación cruda) ↔ resonado. 0 = bypass exacto.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "in:in",
+  [
+   "The EXCITATION — hit it with whatever you like (a DRUM, NOISE, a voice). Left free → an internal noise of −36 dB bows the bank (an autonomous mode — the singing of a glass).",
+   "",
+   ""
+  ],
+  [
+   "L’EXCITATION — frappez avec ce que vous voulez (un DRUM, NOISE, une voix). Laissée libre → un bruit interne de −36 dB frotte le banc à l’archet (mode autonome — le chant d’un verre).",
+   "",
+   ""
+  ],
+  [
+   "La EXCITACIÓN — golpee con lo que quiera (un DRUM, NOISE, una voz). Libre → un ruido interno de −36 dB arquea el banco (modo autónomo — canto de copa).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "in:strike",
+  [
+   "Built-in exciter: each rising edge injects a burst of noise of ~3 ms (a mallet). TRIGSEQ → STRK = the bank plays a rhythm.",
+   "",
+   ""
+  ],
+  [
+   "Exciteur intégré : chaque front montant injecte une rafale de bruit de ~3 ms (une mailloche). TRIGSEQ → STRK = le banc joue un rythme.",
+   "",
+   ""
+  ],
+  [
+   "Excitador incorporado: cada flanco de subida inyecta una ráfaga de ruido de ~3 ms (un mazo). TRIGSEQ → STRK = el banco toca un ritmo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "in:freq_mod",
+  [
+   "1 V/oct CV added to FREQ.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct ajoutée à FREQ.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct sumada a FREQ.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "out:low",
+  [
+   "Sum of the lowest 1/3 of the partials (with MIX).",
+   "",
+   ""
+  ],
+  [
+   "Somme du tiers grave des partiels (avec MIX).",
+   "",
+   ""
+  ],
+  [
+   "Suma del 1/3 grave de los parciales (con MIX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "out:mid",
+  [
+   "The middle 1/3.",
+   "",
+   ""
+  ],
+  [
+   "Le tiers du milieu.",
+   "",
+   ""
+  ],
+  [
+   "El 1/3 del medio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "RESONATOR",
+  "out:high",
+  [
+   "The top 1/3 — it crosses with LOW when you sweep TILT.",
+   "",
+   ""
+  ],
+  [
+   "Le tiers aigu — il croise LOW quand vous balayez TILT.",
+   "",
+   ""
+  ],
+  [
+   "El 1/3 agudo — cruza con LOW cuando barre TILT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "cutoff",
+  [
+   "Cutoff frequency.",
+   "",
+   ""
+  ],
+  [
+   "Fréquence de coupure.",
+   "",
+   ""
+  ],
+  [
+   "Frecuencia de corte.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "resonance",
+  [
+   "Resonance — near 1 the filter self-oscillates, more \"reedy\" than the ordinary FILTER.",
+   "",
+   ""
+  ],
+  [
+   "Résonance — près de 1 le filtre auto-oscille, plus « anché » que le FILTER ordinaire.",
+   "",
+   ""
+  ],
+  [
+   "Resonancia — cerca de 1 el filtro autooscila, más \"acañado\" que el FILTER común.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "mode",
+  [
+   "LP ↔ BP ↔ HP.",
+   "",
+   ""
+  ],
+  [
+   "LP ↔ BP ↔ HP.",
+   "",
+   ""
+  ],
+  [
+   "LP ↔ BP ↔ HP.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "drive",
+  [
+   "Input gain — it pushes the signal into the clipper BEFORE the filter.",
+   "",
+   ""
+  ],
+  [
+   "Gain d’entrée — il pousse le signal vers l’écrêteur AVANT le filtre.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de entrada — empuja la señal al recortador ANTES del filtro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "grit",
+  [
+   "Knee of the clipper in the loop — the more GRIT, the earlier and harder it clips.",
+   "Studied from the EDP Wasp (1978): a CMOS 4069 inverter used as gain inside a non-linear Sallen-Key.",
+   ""
+  ],
+  [
+   "Coude de l’écrêteur dans la boucle — plus de GRIT, plus tôt et plus dur il écrête.",
+   "Étudié d’après l’EDP Wasp (1978) : un inverseur CMOS 4069 utilisé comme gain dans un Sallen-Key non linéaire.",
+   ""
+  ],
+  [
+   "Rodilla del recortador en el lazo — cuanto más GRIT, más pronto y más duro recorta.",
+   "Estudiado del EDP Wasp (1978): un inversor CMOS 4069 usado como ganancia dentro de un Sallen-Key no lineal.",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "bias",
+  [
+   "Asymmetric ceiling — it adds even harmonics (more \"buzz\") and blocks DC.",
+   "",
+   ""
+  ],
+  [
+   "Plafond asymétrique — il ajoute des harmoniques paires (plus de « buzz ») et bloque la DC.",
+   "",
+   ""
+  ],
+  [
+   "Techo asimétrico — suma armónicos pares (más \"buzz\") y bloquea la DC.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "drift",
+  [
+   "Slow, correlated walk in the cutoff/resonance.",
+   "",
+   ""
+  ],
+  [
+   "Marche lente et corrélée dans la coupure/résonance.",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento y correlacionado en el corte/resonancia.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "in:in",
+  [
+   "Audio input.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "in:cutoff_mod",
+  [
+   "CV that adds to CUT.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à CUT.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a CUT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "in:res_mod",
+  [
+   "CV that adds to RESO.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à RESO.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a RESO.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "WASP",
+  "out:out",
+  [
+   "Filtered/clipped output.",
+   "",
+   ""
+  ],
+  [
+   "Sortie filtrée/écrêtée.",
+   "",
+   ""
+  ],
+  [
+   "Salida filtrada/recortada.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "mode",
+  [
+   "Filter↔VCA crossfade — 0 filter only, 1 VCA only, 0.5 both fully active (the classic LPG, it closes completely when the envelope falls to 0).",
+   "",
+   ""
+  ],
+  [
+   "Crossfade filtre↔VCA — 0 filtre seul, 1 VCA seul, 0,5 les deux pleinement actifs (le LPG classique, il se ferme complètement quand l’enveloppe tombe à 0).",
+   "",
+   ""
+  ],
+  [
+   "Crossfade filtro↔VCA — 0 sólo filtro, 1 sólo VCA, 0,5 los dos totalmente activos (el LPG clásico, se cierra del todo cuando la envolvente cae a 0).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "response",
+  [
+   "Time of the post-strike tail (~30 ms to 2.5 s) — the \"memory\" of the simulated LDR.",
+   "It rises fast (~2 ms) always; it falls slowly and brakes near 0 — an asymmetric vactrol response, not an ordinary symmetric envelope.",
+   ""
+  ],
+  [
+   "Temps de la queue après la frappe (~30 ms à 2,5 s) — la « mémoire » de la LDR simulée.",
+   "Elle monte vite (~2 ms) toujours ; elle descend lentement et freine près de 0 — une réponse de vactrol asymétrique, pas une enveloppe symétrique ordinaire.",
+   ""
+  ],
+  [
+   "Tiempo de la cola tras el golpe (~30 ms a 2,5 s) — la \"memoria\" del LDR simulado.",
+   "Sube rápido (~2 ms) siempre; baja despacio y frena cerca de 0 — respuesta asimétrica de vactrol, no una envolvente simétrica común.",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "offset",
+  [
+   "Resting opening — how far the LPG stays open even with no strike.",
+   "",
+   ""
+  ],
+  [
+   "Ouverture de repos — à quel point le LPG reste ouvert même sans frappe.",
+   "",
+   ""
+  ],
+  [
+   "Apertura de reposo — cuánto queda abierto el LPG incluso sin golpe.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "resonance",
+  [
+   "Resonance of the 2-pole filter.",
+   "",
+   ""
+  ],
+  [
+   "Résonance du filtre à 2 pôles.",
+   "",
+   ""
+  ],
+  [
+   "Resonancia del filtro de 2 polos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "bounce",
+  [
+   "Post-strike overshoot — a damped sinusoid adds to the envelope right after the STRIKE, simulating the vactrol's \"bounce\".",
+   "",
+   ""
+  ],
+  [
+   "Dépassement après la frappe — une sinusoïde amortie s’ajoute à l’enveloppe juste après le STRIKE, simulant le « rebond » du vactrol.",
+   "",
+   ""
+  ],
+  [
+   "Sobreoscilación tras el golpe — una senoide amortiguada se suma a la envolvente justo después del STRIKE, simulando el \"repique\" del vactrol.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "drift",
+  [
+   "Slow, correlated walk in the response tail.",
+   "",
+   ""
+  ],
+  [
+   "Marche lente et corrélée dans la queue de réponse.",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento y correlacionado en la cola de respuesta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "in:in",
+  [
+   "Audio input to strike.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio à frapper.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio a golpear.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "in:strike",
+  [
+   "Trigger — it opens the envelope on the rising edge, the \"strike\".",
+   "",
+   ""
+  ],
+  [
+   "Trigger — il ouvre l’enveloppe au front montant, la « frappe ».",
+   "",
+   ""
+  ],
+  [
+   "Trigger — abre la envolvente en el flanco de subida, el \"golpe\".",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "in:cv",
+  [
+   "CV that adds to STRIKE — it opens the LPG from outside, with no trigger.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à STRIKE — elle ouvre le LPG de l’extérieur, sans trigger.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a STRIKE — abre el LPG desde fuera, sin trigger.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LPG",
+  "out:out",
+  [
+   "Audio × the vactrol envelope — the plucky west-coast timbre.",
+   "",
+   ""
+  ],
+  [
+   "Audio × l’enveloppe de vactrol — le timbre plucky de la côte ouest.",
+   "",
+   ""
+  ],
+  [
+   "Audio × la envolvente de vactrol — el timbre plucky de la costa oeste.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "level1",
+  [
+   "Manual gain of channel 1.",
+   "gain = LVL1 + CV1_AMOUNT · cv1 — the knob stays alive with CV connected (a sum by PORT, not by connectToParameter).",
+   ""
+  ],
+  [
+   "Gain manuel du canal 1.",
+   "gain = LVL1 + CV1_AMOUNT · cv1 — le potentiomètre reste vivant avec une CV branchée (une somme par PORT, pas par connectToParameter).",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 1.",
+   "ganancia = LVL1 + CV1_AMOUNT · cv1 — el mando sigue vivo con la CV conectada (suma por PUERTO, no por connectToParameter).",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "cv1_amount",
+  [
+   "Attenuverter of the CV1 input (−1..1) — it adds to LVL1.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de l’entrée CV1 (−1..1) — il s’ajoute à LVL1.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la entrada CV1 (−1..1) — se suma a LVL1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "response1",
+  [
+   "0 = linear (good for summing CV), 1 = exponential (\"dB-linear\", good for audio volume).",
+   "final_gain = gain^(1+3·resp).",
+   ""
+  ],
+  [
+   "0 = linéaire (bon pour additionner de la CV), 1 = exponentiel (« dB-linéaire », bon pour le volume audio).",
+   "gain_final = gain^(1+3·resp).",
+   ""
+  ],
+  [
+   "0 = lineal (bueno para sumar CV), 1 = exponencial (\"dB-lineal\", bueno para volumen de audio).",
+   "ganancia_final = ganancia^(1+3·resp).",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "in:in1",
+  [
+   "Audio or CV input of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio ou CV du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio o CV del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "in:cv1",
+  [
+   "CV controlling the gain of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "CV de contrôle du gain du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "CV de control de la ganancia del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "out:out1",
+  [
+   "Output of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "level2",
+  [
+   "Manual gain of channel 2 (the same as channel 1).",
+   "",
+   ""
+  ],
+  [
+   "Gain manuel du canal 2 (comme le canal 1).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 2 (igual que el canal 1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "cv2_amount",
+  [
+   "Attenuverter of the CV2 input (−1..1) — it adds to LVL2.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de l’entrée CV2 (−1..1) — il s’ajoute à LVL2.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la entrada CV2 (−1..1) — se suma a LVL2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "response2",
+  [
+   "The same as RSP1, for channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme RSP1, pour le canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que RSP1, para el canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "in:in2",
+  [
+   "Audio or CV input of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio ou CV du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio o CV del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "in:cv2",
+  [
+   "CV controlling the gain of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "CV de contrôle du gain du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "CV de control de la ganancia del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "out:out2",
+  [
+   "Output of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "drift",
+  [
+   "Slow, correlated oscillation in both gains (±~3% at most) — \"the VCA breathes\".",
+   "",
+   ""
+  ],
+  [
+   "Oscillation lente et corrélée dans les deux gains (±~3 % au maximum) — « le VCA respire ».",
+   "",
+   ""
+  ],
+  [
+   "Oscilación lenta y correlacionada en las dos ganancias (±~3% como máximo) — \"el VCA respira\".",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA",
+  "out:sum",
+  [
+   "out1 + out2, with a soft ceiling — a free 2-channel mini-mixer.",
+   "",
+   ""
+  ],
+  [
+   "out1 + out2, avec un plafond doux — un mini-mixeur 2 canaux offert.",
+   "",
+   ""
+  ],
+  [
+   "out1 + out2, con techo suave — un minimezclador de 2 canales de regalo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "level1",
+  [
+   "Manual gain of channel 1 (the knob that CV1 adds to — modulation by PORT, the knob stays alive).",
+   "A bank of 4 VCAs + a mixer — Mutable Veils / Intellijel Quad VCA. The `VCA` (#20) is dual; this is the bank for a big patch.",
+   ""
+  ],
+  [
+   "Gain manuel du canal 1 (le potentiomètre auquel CV1 s’ajoute — modulation par PORT, le potentiomètre reste vivant).",
+   "Un banc de 4 VCA + un mixeur — Mutable Veils / Intellijel Quad VCA. Le `VCA` (#20) est double ; celui-ci est le banc pour un gros patch.",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 1 (el mando al que CV1 se suma — modulación por PUERTO, el mando sigue vivo).",
+   "Un banco de 4 VCA + un mezclador — Mutable Veils / Intellijel Quad VCA. El `VCA` (#20) es doble; este es el banco para patch grande.",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "cv1_amt",
+  [
+   "Attenuverter of CV1 (−1..1) — it adds to LVL1. Negative INVERTS the CV's action.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de CV1 (−1..1) — il s’ajoute à LVL1. Négatif INVERSE l’action de la CV.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de CV1 (−1..1) — se suma a LVL1. Negativo INVIERTE la acción de la CV.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:in1",
+  [
+   "Audio (or CV) of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Audio (ou CV) du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Audio (o CV) del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:cv1",
+  [
+   "CV of the gain of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "CV du gain du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "CV de la ganancia del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "out:out1",
+  [
+   "Output of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "level2",
+  [
+   "Manual gain of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Gain manuel du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "cv2_amt",
+  [
+   "Attenuverter of CV2.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de CV2.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de CV2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:in2",
+  [
+   "Audio of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Audio du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Audio del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:cv2",
+  [
+   "CV of the gain of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "CV du gain du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "CV de la ganancia del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "out:out2",
+  [
+   "Output of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "level3",
+  [
+   "Manual gain of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Gain manuel du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "cv3_amt",
+  [
+   "Attenuverter of CV3.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de CV3.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de CV3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:in3",
+  [
+   "Audio of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Audio du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Audio del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:cv3",
+  [
+   "CV of the gain of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "CV du gain du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "CV de la ganancia del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "out:out3",
+  [
+   "Output of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "level4",
+  [
+   "Manual gain of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Gain manuel du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia manual del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "cv4_amt",
+  [
+   "Attenuverter of CV4.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de CV4.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de CV4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:in4",
+  [
+   "Audio of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Audio du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Audio del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "in:cv4",
+  [
+   "CV of the gain of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "CV du gain du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "CV de la ganancia del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "out:out4",
+  [
+   "Output of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Sortie du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Salida del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "curve",
+  [
+   "SHARED: 0 = linear (good for summing CV), 1 = exponential (dB-linear, good for perceived audio volume). `gain^(1+3·curve)`.",
+   "",
+   ""
+  ],
+  [
+   "PARTAGÉ : 0 = linéaire (bon pour additionner de la CV), 1 = exponentiel (dB-linéaire, bon pour le volume audio perçu). `gain^(1+3·curve)`.",
+   "",
+   ""
+  ],
+  [
+   "COMPARTIDO: 0 = lineal (bueno para sumar CV), 1 = exponencial (dB-lineal, bueno para volumen percibido de audio). `ganancia^(1+3·curve)`.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "mix_gain",
+  [
+   "Gain of the MIX output (0–2×) — the sum of the 4 channels with a soft ceiling. A free 4-channel mixer.",
+   "",
+   ""
+  ],
+  [
+   "Gain de la sortie MIX (0–2×) — la somme des 4 canaux avec un plafond doux. Un mixeur 4 canaux offert.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de la salida MIX (0–2×) — la suma de los 4 canales con techo suave. Un mezclador de 4 canales de regalo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "drift",
+  [
+   "Slow, SEEDED oscillation in the 4 gains (±~3 %) — the bank breathes. Deterministic. 0 = static.",
+   "",
+   ""
+  ],
+  [
+   "Oscillation lente et SEMÉE dans les 4 gains (±~3 %) — le banc respire. Déterministe. 0 = statique.",
+   "",
+   ""
+  ],
+  [
+   "Oscilación lenta y SEMBRADA en las 4 ganancias (±~3 %) — el banco respira. Determinista. 0 = estático.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "VCA4",
+  "out:mix",
+  [
+   "Sum of the 4 channels × MIXG, with a soft ceiling.",
+   "",
+   ""
+  ],
+  [
+   "Somme des 4 canaux × MIXG, avec un plafond doux.",
+   "",
+   ""
+  ],
+  [
+   "Suma de los 4 canales × MIXG, con techo suave.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "ring",
+  [
+   "Mixes IN with IN×MOD (four-quadrant ring-mod).",
+   "",
+   ""
+  ],
+  [
+   "Mélange IN avec IN×MOD (ring-mod quatre quadrants).",
+   "",
+   ""
+  ],
+  [
+   "Mezcla IN con IN×MOD (ring-mod de cuatro cuadrantes).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "fold",
+  [
+   "Amount of folding — a waveshaper that reflects the signal instead of cutting it (a wavefolder).",
+   "",
+   ""
+  ],
+  [
+   "Quantité de repliement — un waveshaper qui réfléchit le signal au lieu de le couper (un wavefolder).",
+   "",
+   ""
+  ],
+  [
+   "Cantidad de doblez — un waveshaper que refleja la señal en vez de cortarla (un wavefolder).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "symmetry",
+  [
+   "Shifts the centre of the fold — it adds even harmonics (\"buzz\") instead of only odd ones.",
+   "",
+   ""
+  ],
+  [
+   "Décale le centre du repliement — il ajoute des harmoniques paires (« buzz ») au lieu des seules impaires.",
+   "",
+   ""
+  ],
+  [
+   "Desplaza el centro del doblez — suma armónicos pares (\"buzz\") en vez de sólo impares.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "wrap",
+  [
+   "Mixes the triangular fold (it reflects) with dry wrap-around (it cuts and re-enters from the other side).",
+   "",
+   ""
+  ],
+  [
+   "Mélange le repliement triangulaire (il réfléchit) avec le wrap-around sec (il coupe et rentre de l’autre côté).",
+   "",
+   ""
+  ],
+  [
+   "Mezcla el doblez triangular (refleja) con wrap-around seco (corta y reentra por el otro lado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "sat",
+  [
+   "Saturation (tanh) after the fold.",
+   "",
+   ""
+  ],
+  [
+   "Saturation (tanh) après le repliement.",
+   "",
+   ""
+  ],
+  [
+   "Saturación (tanh) después del doblez.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "level",
+  [
+   "Output gain (a built-in VCA).",
+   "",
+   ""
+  ],
+  [
+   "Gain de sortie (un VCA intégré).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de salida (un VCA incorporado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "drift",
+  [
+   "Slow, correlated walk in the amount of folding.",
+   "",
+   ""
+  ],
+  [
+   "Marche lente et corrélée dans la quantité de repliement.",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento y correlacionado en la cantidad de doblez.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "in:in",
+  [
+   "Audio input to shape.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio à façonner.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio a moldear.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "in:mod",
+  [
+   "Signal for the ring-mod (multiplied by IN, mixed in via RING).",
+   "",
+   ""
+  ],
+  [
+   "Signal pour le ring-mod (multiplié par IN, mélangé via RING).",
+   "",
+   ""
+  ],
+  [
+   "Señal para el ring-mod (multiplicada por IN, mezclada vía RING).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "in:fold_mod",
+  [
+   "CV that adds to FOLD.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à FOLD.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a FOLD.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHAPE",
+  "out:out",
+  [
+   "Audio processed by the ring→fold→wrap→sat→level chain.",
+   "",
+   ""
+  ],
+  [
+   "Audio traité par la chaîne ring→fold→wrap→sat→level.",
+   "",
+   ""
+  ],
+  [
+   "Audio procesado por la cadena ring→fold→wrap→sat→level.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "shift",
+  [
+   "Moves the WHOLE spectrum by so many HERTZ (−2000..2000, +CV on SFT: 1 unit = 1000 Hz). 0 = straight through. Because the shift is in Hz and not a ratio, the partials stop being harmonic → metallic, bell-like.",
+   "Frequency shifter (SSB — single sideband): unlike SHAPE's ring-mod, which gives BOTH sidebands (sum and difference) symmetrically. Here `up` = spectrum + shift, `down` = spectrum − shift, each on its own output.",
+   "A small Δf (5–20 Hz) = a 'phaser' that never closes (the two copies beat slowly). A large Δf = inharmonic clangour."
+  ],
+  [
+   "Déplace le spectre ENTIER de tant de HERTZ (−2000..2000, +CV sur SFT : 1 unité = 1000 Hz). 0 = passage direct. Comme le décalage est en Hz et non en rapport, les partiels cessent d’être harmoniques → métallique, cloche.",
+   "Décaleur de fréquence (SSB — bande latérale unique) : différent du ring-mod du SHAPE, qui donne les DEUX bandes (somme et différence) symétriques. Ici `up` = spectre + shift, `down` = spectre − shift, chacun sur sa sortie.",
+   "Un Δf petit (5–20 Hz) = un « phaser » qui ne se referme jamais (les deux copies battent lentement). Un Δf grand = un fracas inharmonique."
+  ],
+  [
+   "Mueve el espectro ENTERO tantos HERCIOS (−2000..2000, +CV en SFT: 1 unidad = 1000 Hz). 0 = paso directo. Como el desplazamiento es en Hz y no en razón, los parciales dejan de ser armónicos → metálico, campanil.",
+   "Desplazador de frecuencia (SSB — banda lateral única): distinto del ring-mod del SHAPE, que da las DOS bandas (suma y diferencia) simétricas. Aquí `up` = espectro + shift, `down` = espectro − shift, cada uno en su salida.",
+   "Un Δf pequeño (5–20 Hz) = un 'phaser' que nunca cierra (las dos copias baten despacio). Un Δf grande = fragor inarmónico."
+  ]
+ ],
+ [
+  "SHIFTER",
+  "feedback",
+  [
+   "Part of the `up` output goes back into the input → the spectrum rises again, and again: an infinite glissando (Shepard's 'barber pole' / shimmer). A negative `feedback` pulls from `down` (it falls without stopping). `tanh` in the loop — it never blows up.",
+   "",
+   "SHIFT ~8 Hz + FEEDBACK ~0.8 = Risset's rope, rising eternally."
+  ],
+  [
+   "Une partie de la sortie `up` revient à l’entrée → le spectre remonte, encore et encore : un glissando infini (le « barber pole » / shimmer de Shepard). Un `feedback` négatif tire depuis `down` (il descend sans fin). Un `tanh` dans la boucle — cela n’explose jamais.",
+   "",
+   "SHIFT ~8 Hz + FEEDBACK ~0,8 = la corde de Risset qui monte éternellement."
+  ],
+  [
+   "Parte de la salida `up` vuelve a la entrada → el espectro sube otra vez, y otra: un glissando infinito (el 'barber pole' / shimmer de Shepard). Un `feedback` negativo tira de `down` (baja sin parar). Un `tanh` en el lazo — nunca explota.",
+   "",
+   "SHIFT ~8 Hz + FEEDBACK ~0,8 = la cuerda de Risset que sube eternamente."
+  ]
+ ],
+ [
+  "SHIFTER",
+  "tone",
+  [
+   "Tilts the wet (1 pole): <0 it dulls the treble of the shifted signal, >0 it lifts it. 0 = neutral.",
+   "",
+   ""
+  ],
+  [
+   "Incline le mouillé (1 pôle) : <0 il atténue l’aigu du signal décalé, >0 il le relève. 0 = neutre.",
+   "",
+   ""
+  ],
+  [
+   "Inclina el mojado (1 polo): <0 apaga el agudo de la señal desplazada, >0 lo realza. 0 = neutro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "drift",
+  [
+   "Slow, SEEDED wobble in the Δf (±drift·50 %) — the shift 'breathes', never fixed. Deterministic. 0 = static.",
+   "",
+   ""
+  ],
+  [
+   "Wobble lent et SEMÉ dans le Δf (±drift·50 %) — le décalage « respire », jamais fixe. Déterministe. 0 = statique.",
+   "",
+   ""
+  ],
+  [
+   "Bamboleo lento y SEMBRADO en el Δf (±drift·50 %) — el desplazamiento 'respira', nunca fijo. Determinista. 0 = estático.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "mix",
+  [
+   "Dry (IN) ↔ shifted, on BOTH outputs. 0 = bypass.",
+   "",
+   ""
+  ],
+  [
+   "Sec (IN) ↔ décalé, sur les DEUX sorties. 0 = bypass.",
+   "",
+   ""
+  ],
+  [
+   "Seco (IN) ↔ desplazado, en las DOS salidas. 0 = bypass.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "in:in",
+  [
+   "The sound to shift — a voice, a chord, a pad.",
+   "",
+   ""
+  ],
+  [
+   "Le son à décaler — une voix, un accord, un pad.",
+   "",
+   ""
+  ],
+  [
+   "El sonido a desplazar — una voz, un acorde, un pad.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "in:shift_mod",
+  [
+   "CV added to SHIFT, in Hz (1 unit = 1000 Hz). An LFO → a spectrum vibrato.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à SHIFT, en Hz (1 unité = 1000 Hz). Un LFO → un vibrato de spectre.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a SHIFT, en Hz (1 unidad = 1000 Hz). Un LFO → un vibrato de espectro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "out:up",
+  [
+   "Spectrum + SHIFT (the upper sideband).",
+   "",
+   ""
+  ],
+  [
+   "Spectre + SHIFT (la bande latérale supérieure).",
+   "",
+   ""
+  ],
+  [
+   "Espectro + SHIFT (la banda lateral superior).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SHIFTER",
+  "out:down",
+  [
+   "Spectrum − SHIFT (the lower band). Patch the two into different destinations — the relation between them is the process.",
+   "",
+   ""
+  ],
+  [
+   "Spectre − SHIFT (la bande inférieure). Branchez les deux vers des destinations différentes — la relation entre elles est le processus.",
+   "",
+   ""
+  ],
+  [
+   "Espectro − SHIFT (la banda inferior). Cablee las dos a destinos distintos — la relación entre ellas es el proceso.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "rate",
+  [
+   "Rate of the internal sample-and-hold (100 Hz–24 kHz, +CV). Low = a coarse staircase + strong aliasing (the 8-bit 'robot voice') — there is NO anti-alias filter, the aliasing IS the sound.",
+   "",
+   "LFO → RATE sweeps the rate: the 'tape-swallow in reverse'."
+  ],
+  [
+   "Taux du sample-and-hold interne (100 Hz–24 kHz, +CV). Bas = un escalier grossier + un aliasing fort (la « voix de robot » 8-bit) — il n’y a PAS de filtre anti-alias, l’aliasing EST le son.",
+   "",
+   "LFO → RATE balaie le taux : le « mange-bande à l’envers »."
+  ],
+  [
+   "Tasa del sample-and-hold interno (100 Hz–24 kHz, +CV). Baja = escalera gruesa + aliasing fuerte (la 'voz de robot' de 8 bits) — NO hay filtro antialias, el aliasing ES el sonido.",
+   "",
+   "LFO → RATE barre la tasa: el 'traga-cinta al revés'."
+  ]
+ ],
+ [
+  "CRUSH",
+  "bits",
+  [
+   "Quantises the amplitude to 2^bits levels (round(x·L)/L). bits=1 ≈ a square wave; bits=16 ≈ transparent.",
+   "",
+   "ENVELOPE → BITS: the resolution drops in the tail of the note."
+  ],
+  [
+   "Quantifie l’amplitude à 2^bits niveaux (round(x·L)/L). bits=1 ≈ une onde carrée ; bits=16 ≈ transparent.",
+   "",
+   "ENVELOPE → BITS : la résolution chute dans la queue de la note."
+  ],
+  [
+   "Cuantiza la amplitud a 2^bits niveles (round(x·L)/L). bits=1 ≈ onda cuadrada; bits=16 ≈ transparente.",
+   "",
+   "ENVELOPE → BITS: la resolución cae en la cola de la nota."
+  ]
+ ],
+ [
+  "CRUSH",
+  "drive",
+  [
+   "Gain BEFORE the quantisation — it pushes the signal into overflow (see WRAP).",
+   "",
+   ""
+  ],
+  [
+   "Gain AVANT la quantification — il pousse le signal vers le débordement (voir WRAP).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia ANTES de la cuantización — empuja la señal al desbordamiento (ver WRAP).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "wrap",
+  [
+   "How the signal that goes past ±1 behaves: 0 CLIPS (it limits), 1 WRAPS (mod(x+1,2)−1 — integer overflow, a brutal sawtooth), between the two a blend.",
+   "With a high DRIVE + WRAP=1 the signal wraps several times → harmonics up to Nyquist, it aliases (accepted — it is the effect).",
+   ""
+  ],
+  [
+   "Comment se comporte le signal qui dépasse ±1 : 0 ÉCRÊTE (il limite), 1 ENROULE (mod(x+1,2)−1 — le débordement d’entier, une dent de scie brutale), entre les deux un mélange.",
+   "Avec un DRIVE élevé + WRAP=1 le signal s’enroule plusieurs fois → des harmoniques jusqu’à Nyquist, cela aliase (accepté — c’est l’effet).",
+   ""
+  ],
+  [
+   "Cómo se comporta la señal que pasa de ±1: 0 RECORTA (limita), 1 ENVUELVE (mod(x+1,2)−1 — el desbordamiento de entero, diente de sierra brutal), entre los dos una mezcla.",
+   "Con DRIVE alto + WRAP=1 la señal se envuelve varias veces → armónicos hasta Nyquist, aliasa (aceptado — es el efecto).",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "glitch",
+  [
+   "Probability, per hold-sample, of a FAULT: a stuck sample (it stays at the previous value), a dropout (silence) or a spike (the previous one amplified). It simulates a bad digital connection / a scratched CD.",
+   "Seeded (xorshift) — the same patch sounds the same twice. REPRODUCIBLE damage, unlike a bug.",
+   ""
+  ],
+  [
+   "Probabilité, par échantillon de maintien, d’un DÉFAUT : un échantillon bloqué (il reste à la valeur précédente), un dropout (silence) ou un pic (le précédent amplifié). Cela simule une mauvaise connexion numérique / un CD rayé.",
+   "Semé (xorshift) — le même patch sonne pareil deux fois. Des dégâts REPRODUCTIBLES, contrairement à un bug.",
+   ""
+  ],
+  [
+   "Probabilidad, por muestra de retención, de un FALLO: muestra atascada (se queda en el valor anterior), dropout (silencio) o pico (el anterior amplificado). Simula una conexión digital mala / un CD rayado.",
+   "Sembrado (xorshift) — el mismo patch suena igual dos veces. Daño REPRODUCIBLE, al contrario de un bug.",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "jitter",
+  [
+   "Instability of the S&H's rate — the clock trembles → pitch instability (the digital 'wow'). Seeded.",
+   "",
+   ""
+  ],
+  [
+   "Instabilité du taux du S&H — l’horloge tremble → instabilité de hauteur (le « wow » numérique). Semé.",
+   "",
+   ""
+  ],
+  [
+   "Inestabilidad de la tasa del S&H — el reloj tiembla → inestabilidad de afinación (el 'wow' digital). Sembrado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "tone",
+  [
+   "A 1-pole filter on the output (the reconstruction filter, or the lack of it): <0 low-pass (docile), >0 high-pass (only the high-frequency rubbish), 0 neutral.",
+   "",
+   ""
+  ],
+  [
+   "Un filtre à 1 pôle en sortie (le filtre de reconstruction, ou son absence) : <0 passe-bas (docile), >0 passe-haut (seulement les déchets aigus), 0 neutre.",
+   "",
+   ""
+  ],
+  [
+   "Un filtro de 1 polo en la salida (el filtro de reconstrucción, o su falta): <0 paso bajo (dócil), >0 paso alto (sólo la basura aguda), 0 neutro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "mix",
+  [
+   "Dry ↔ destroyed. 0 = straight through (an exact bypass).",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ détruit. 0 = passage direct (un bypass exact).",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ destruido. 0 = paso directo (bypass exacto).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "in:in",
+  [
+   "Audio to destroy. Disconnected + MIX>0 → the S&H samples its own white noise → a lo-fi/glitch noise source.",
+   "",
+   ""
+  ],
+  [
+   "Audio à détruire. Débranchée + MIX>0 → le S&H échantillonne son propre bruit blanc → une source de bruit lo-fi/glitch.",
+   "",
+   ""
+  ],
+  [
+   "Audio a destruir. Desconectada + MIX>0 → el S&H muestrea su propio ruido blanco → una fuente de ruido lo-fi/glitch.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "in:rate_mod",
+  [
+   "CV added to RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "in:mix_mod",
+  [
+   "CV added to MIX (the damage comes in by dose, via an ENVELOPE).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à MIX (les dégâts entrent par doses, via une ENVELOPE).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a MIX (el daño entra por dosis, vía un ENVELOPE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CRUSH",
+  "out:out",
+  [
+   "The destroyed signal, mixed with the dry by MIX. Safety clamp at ±4.",
+   "",
+   ""
+  ],
+  [
+   "Le signal détruit, mélangé au sec par MIX. Clamp de sécurité à ±4.",
+   "",
+   ""
+  ],
+  [
+   "La señal destruida, mezclada con el seco por MIX. Clamp de seguridad a ±4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "type1",
+  [
+   "Type of stage 1: off / low cut / low shelf / peak / high shelf / high cut.",
+   "",
+   ""
+  ],
+  [
+   "Type de l’étage 1 : éteint / coupe-bas / shelf grave / cloche (peak) / shelf aigu / coupe-haut.",
+   "",
+   ""
+  ],
+  [
+   "Tipo de la etapa 1: apagado / corte grave / estante grave / realce (peak) / estante agudo / corte agudo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "freq1",
+  [
+   "Centre frequency of stage 1.",
+   "",
+   ""
+  ],
+  [
+   "Fréquence centrale de l’étage 1.",
+   "",
+   ""
+  ],
+  [
+   "Frecuencia central de la etapa 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "gain1",
+  [
+   "Gain of stage 1 — it only affects shelves and peak, cuts have no gain.",
+   "",
+   ""
+  ],
+  [
+   "Gain de l’étage 1 — il n’affecte que les shelfs et la cloche, les coupes n’ont pas de gain.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de la etapa 1 — sólo afecta a estantes y realce, los cortes no tienen ganancia.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "q1",
+  [
+   "Q of stage 1 — it controls the width on the peak, reinterpreted as \"slope S\" on the shelves (the RBJ formula).",
+   "",
+   ""
+  ],
+  [
+   "Q de l’étage 1 — il contrôle la largeur sur la cloche, réinterprété comme « slope S » sur les shelfs (formule RBJ).",
+   "",
+   ""
+  ],
+  [
+   "Q de la etapa 1 — controla la anchura en el realce, reinterpretado como \"slope S\" en los estantes (fórmula RBJ).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "slope1",
+  [
+   "Slope of stage 1's cut: 12/24/48 dB/octave (1/2/4 cascaded biquads; it only affects the cut types).",
+   "",
+   ""
+  ],
+  [
+   "Pente de la coupe de l’étage 1 : 12/24/48 dB/octave (1/2/4 biquads en cascade ; n’affecte que les types de coupe).",
+   "",
+   ""
+  ],
+  [
+   "Inclinación del corte de la etapa 1: 12/24/48 dB/octava (1/2/4 biquads en cascada; sólo afecta a los tipos de corte).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "type2",
+  [
+   "Type of stage 2 (the same options as TYPE1).",
+   "",
+   ""
+  ],
+  [
+   "Type de l’étage 2 (les mêmes options que TYPE1).",
+   "",
+   ""
+  ],
+  [
+   "Tipo de la etapa 2 (las mismas opciones de TYPE1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "freq2",
+  [
+   "Centre frequency of stage 2.",
+   "",
+   ""
+  ],
+  [
+   "Fréquence centrale de l’étage 2.",
+   "",
+   ""
+  ],
+  [
+   "Frecuencia central de la etapa 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "gain2",
+  [
+   "Gain of stage 2.",
+   "",
+   ""
+  ],
+  [
+   "Gain de l’étage 2.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de la etapa 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "q2",
+  [
+   "Q of stage 2.",
+   "",
+   ""
+  ],
+  [
+   "Q de l’étage 2.",
+   "",
+   ""
+  ],
+  [
+   "Q de la etapa 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "slope2",
+  [
+   "Slope of stage 2's cut.",
+   "",
+   ""
+  ],
+  [
+   "Pente de la coupe de l’étage 2.",
+   "",
+   ""
+  ],
+  [
+   "Inclinación del corte de la etapa 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "type3",
+  [
+   "Type of stage 3.",
+   "",
+   ""
+  ],
+  [
+   "Type de l’étage 3.",
+   "",
+   ""
+  ],
+  [
+   "Tipo de la etapa 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "freq3",
+  [
+   "Centre frequency of stage 3.",
+   "",
+   ""
+  ],
+  [
+   "Fréquence centrale de l’étage 3.",
+   "",
+   ""
+  ],
+  [
+   "Frecuencia central de la etapa 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "gain3",
+  [
+   "Gain of stage 3.",
+   "",
+   ""
+  ],
+  [
+   "Gain de l’étage 3.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de la etapa 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "q3",
+  [
+   "Q of stage 3.",
+   "",
+   ""
+  ],
+  [
+   "Q de l’étage 3.",
+   "",
+   ""
+  ],
+  [
+   "Q de la etapa 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "slope3",
+  [
+   "Slope of stage 3's cut.",
+   "",
+   ""
+  ],
+  [
+   "Pente de la coupe de l’étage 3.",
+   "",
+   ""
+  ],
+  [
+   "Inclinación del corte de la etapa 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "type4",
+  [
+   "Type of stage 4.",
+   "",
+   ""
+  ],
+  [
+   "Type de l’étage 4.",
+   "",
+   ""
+  ],
+  [
+   "Tipo de la etapa 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "freq4",
+  [
+   "Centre frequency of stage 4.",
+   "",
+   ""
+  ],
+  [
+   "Fréquence centrale de l’étage 4.",
+   "",
+   ""
+  ],
+  [
+   "Frecuencia central de la etapa 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "gain4",
+  [
+   "Gain of stage 4.",
+   "",
+   ""
+  ],
+  [
+   "Gain de l’étage 4.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de la etapa 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "q4",
+  [
+   "Q of stage 4.",
+   "",
+   ""
+  ],
+  [
+   "Q de l’étage 4.",
+   "",
+   ""
+  ],
+  [
+   "Q de la etapa 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "slope4",
+  [
+   "Slope of stage 4's cut.",
+   "",
+   ""
+  ],
+  [
+   "Pente de la coupe de l’étage 4.",
+   "",
+   ""
+  ],
+  [
+   "Inclinación del corte de la etapa 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "output",
+  [
+   "Output gain, after the 4 stages.",
+   "",
+   ""
+  ],
+  [
+   "Gain de sortie, après les 4 étages.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de salida, después de las 4 etapas.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "drive",
+  [
+   "Saturates the output gently, before the safety soft-clip.",
+   "",
+   ""
+  ],
+  [
+   "Sature doucement la sortie, avant le soft-clip de sécurité.",
+   "",
+   ""
+  ],
+  [
+   "Satura suavemente la salida, antes del soft-clip de seguridad.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "mix",
+  [
+   "Dry ↔ processed.",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ traité.",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ procesado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "in:in",
+  [
+   "Audio input.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "in:sweep",
+  [
+   "1 V/oct CV that shifts the 4 stages TOGETHER, as a group.",
+   "The relation between the bands as process (not an isolated stage) — modulate SWEEP with a slow LFO and the whole EQ \"sweeps\" the spectrum keeping its shape.",
+   ""
+  ],
+  [
+   "CV 1 V/oct qui déplace les 4 étages ENSEMBLE, en groupe.",
+   "La relation entre les bandes comme processus (pas un étage isolé) — modulez SWEEP avec un LFO lent et tout l’EQ « balaie » le spectre en gardant sa forme.",
+   ""
+  ],
+  [
+   "CV 1 V/oct que desplaza las 4 etapas JUNTAS, como grupo.",
+   "La relación entre las bandas como proceso (no una etapa aislada) — module SWEEP con un LFO lento y el EQ entero \"barre\" el espectro manteniendo su forma.",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "in:amount",
+  [
+   "CV that scales the 4 gains at the same time.",
+   "",
+   ""
+  ],
+  [
+   "CV qui met à l’échelle les 4 gains en même temps.",
+   "",
+   ""
+  ],
+  [
+   "CV que escala las 4 ganancias a la vez.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PARAMETRIC",
+  "out:out",
+  [
+   "Output of the 4 stages in series, with DRIVE/MIX/OUTPUT applied.",
+   "",
+   ""
+  ],
+  [
+   "Sortie des 4 étages en série, avec DRIVE/MIX/OUTPUT appliqués.",
+   "",
+   ""
+  ],
+  [
+   "Salida de las 4 etapas en serie, con DRIVE/MIX/OUTPUT aplicados.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "time",
+  [
+   "Time of the glide on the WAY UP — for a change of 1.0 (one octave). 0 = a dry jump.",
+   "It is the base; the fall comes from here multiplied by FALL.",
+   ""
+  ],
+  [
+   "Temps du glissement à la MONTÉE — pour un changement de 1,0 (une octave). 0 = un saut sec.",
+   "C’est la base ; la descente en découle, multipliée par FALL.",
+   ""
+  ],
+  [
+   "Tiempo del deslizamiento en la SUBIDA — para un cambio de 1,0 (una octava). 0 = salto seco.",
+   "Es la base; la bajada sale de aquí multiplicada por FALL.",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "fall",
+  [
+   "Asymmetry: fall time = TIME·6^FALL. −1 = a fall 6× faster than the rise; +1 = 6× slower; 0 = symmetric.",
+   "",
+   ""
+  ],
+  [
+   "Asymétrie : temps de descente = TIME·6^FALL. −1 = une descente 6× plus rapide que la montée ; +1 = 6× plus lente ; 0 = symétrique.",
+   "",
+   ""
+  ],
+  [
+   "Asimetría: tiempo de bajada = TIME·6^FALL. −1 = bajada 6× más rápida que la subida; +1 = 6× más lenta; 0 = simétrico.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "curve",
+  [
+   "Shape of the glide: 0 = linear (constant speed, it arrives at the exact time — MS-20/Minimoog); 1 = exponential (RC, it drags at the arrival).",
+   "The same slope at the start; the exponential decelerates and only touches the target after ~3 TIME.",
+   ""
+  ],
+  [
+   "Forme du glissement : 0 = linéaire (vitesse constante, il arrive au temps exact — MS-20/Minimoog) ; 1 = exponentiel (RC, il traîne à l’arrivée).",
+   "La même pente au départ ; l’exponentiel décélère et n’atteint la cible qu’après ~3 TIME.",
+   ""
+  ],
+  [
+   "Forma del deslizamiento: 0 = lineal (velocidad constante, llega en el tiempo exacto — MS-20/Minimoog); 1 = exponencial (RC, arrastra en la llegada).",
+   "La misma inclinación al principio; la exponencial desacelera y sólo roza el objetivo después de ~3 TIME.",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "mode",
+  [
+   "0 = it always glides (classic portamento); 1 = only while SLIDE is high (the TB-303's slide, each step decides); 2 = legato (it glides only if GATE stays high through the change; a new gate jumps).",
+   "",
+   ""
+  ],
+  [
+   "0 = il glisse toujours (portamento classique) ; 1 = seulement tant que SLIDE est haut (le slide de la TB-303, chaque pas décide) ; 2 = legato (il glisse seulement si GATE reste haut au changement ; un nouveau gate saute).",
+   "",
+   ""
+  ],
+  [
+   "0 = siempre desliza (portamento clásico); 1 = sólo mientras SLIDE está alto (el slide del TB-303, cada paso decide); 2 = legato (desliza sólo si GATE sigue alto en el cambio; un gate nuevo salta).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "in:pitch",
+  [
+   "Note CV to lead (1 V/oct or anything). With no cable, the output freezes at the last value.",
+   "",
+   ""
+  ],
+  [
+   "CV de note à conduire (1 V/oct ou autre). Sans câble, la sortie gèle à la dernière valeur.",
+   "",
+   ""
+  ],
+  [
+   "CV de nota a conducir (1 V/oct o cualquiera). Sin cable, la salida se congela en el último valor.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "in:slide",
+  [
+   "Gate that enables the glide in MODE 1 — bring it from a TRIGSEQ/TURING line for generative slide.",
+   "",
+   ""
+  ],
+  [
+   "Gate qui active le glissement en MODE 1 — amenez-le d’une ligne de TRIGSEQ/TURING pour un slide génératif.",
+   "",
+   ""
+  ],
+  [
+   "Gate que habilita el deslizamiento en MODE 1 — tráigalo de una línea de TRIGSEQ/TURING para un slide generativo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "in:gate",
+  [
+   "Note gate, for MODE 2 (legato): a rising edge = a detached attack (it jumps); sustained = it glides.",
+   "",
+   ""
+  ],
+  [
+   "Gate de la note, pour le MODE 2 (legato) : un front montant = une attaque détachée (il saute) ; soutenu = il glisse.",
+   "",
+   ""
+  ],
+  [
+   "Gate de la nota, para el MODE 2 (legato): un flanco de subida = ataque destacado (salta); sostenido = desliza.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "out:out",
+  [
+   "The note CV, now led.",
+   "",
+   ""
+  ],
+  [
+   "La CV de note, maintenant conduite.",
+   "",
+   ""
+  ],
+  [
+   "La CV de nota, ahora conducida.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "out:moving",
+  [
+   "High while it is gliding.",
+   "",
+   ""
+  ],
+  [
+   "Haut pendant qu’il glisse.",
+   "",
+   ""
+  ],
+  [
+   "Alto mientras está deslizando.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "GLIDE",
+  "out:done",
+  [
+   "A ~2 ms pulse when it reaches the target — for an accent, a ratchet or a timbre change to react to \"arrived\".",
+   "",
+   ""
+  ],
+  [
+   "Une impulsion de ~2 ms à l’arrivée sur la cible — pour qu’un accent, un ratchet ou un changement de timbre réagisse à « arrivé ».",
+   "",
+   ""
+  ],
+  [
+   "Un pulso de ~2 ms al llegar al objetivo — para que un acento, un ratchet o un cambio de timbre reaccione a \"llegó\".",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "scale1",
+  [
+   "Attenuverter of channel 1 — gain from −2 to 2 (negative inverts).",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur du canal 1 — gain de −2 à 2 (négatif inverse).",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor del canal 1 — ganancia de −2 a 2 (negativo invierte).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "offset1",
+  [
+   "Constant added after SCALE — with SCALE=0 it becomes a manual voltage source.",
+   "",
+   ""
+  ],
+  [
+   "Constante ajoutée après SCALE — avec SCALE=0 cela devient une source de tension manuelle.",
+   "",
+   ""
+  ],
+  [
+   "Constante sumada después de SCALE — con SCALE=0 se vuelve una fuente de tensión manual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "rectify1",
+  [
+   "Continuous rectification: 0 passes, 0.5 half-wave (= exactly max(x,0)), 1 full wave.",
+   "",
+   ""
+  ],
+  [
+   "Redressement continu : 0 passe, 0,5 demi-onde (= max(x,0) exact), 1 onde complète.",
+   "",
+   ""
+  ],
+  [
+   "Rectificación continua: 0 pasa, 0,5 media onda (= max(x,0) exacto), 1 onda completa.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "slew1",
+  [
+   "Slew time of channel 1 (0-2 s).",
+   "",
+   ""
+  ],
+  [
+   "Temps de slew du canal 1 (0-2 s).",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de deslizamiento del canal 1 (0-2 s).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "curve1",
+  [
+   "Shape of the slew: 0 linear (constant slope — portamento), 1 exponential (RC — an envelope follower).",
+   "RECT + SLEW = the classic envelope follower (rectify, then low-pass).",
+   ""
+  ],
+  [
+   "Forme du slew : 0 linéaire (pente constante — portamento), 1 exponentiel (RC — un suiveur d’enveloppe).",
+   "RECT + SLEW = le suiveur d’enveloppe classique (redresser, puis passe-bas).",
+   ""
+  ],
+  [
+   "Forma del deslizamiento: 0 lineal (inclinación constante — portamento), 1 exponencial (RC — un seguidor de envolvente).",
+   "RECT + SLEW = el seguidor de envolvente clásico (rectificar, luego paso bajo).",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "scale2",
+  [
+   "Attenuverter of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "offset2",
+  [
+   "The same as OFFSET1, channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme OFFSET1, canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que OFFSET1, canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "rectify2",
+  [
+   "The same as RECT1, channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme RECT1, canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que RECT1, canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "slew2",
+  [
+   "Slew time of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Temps de slew du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de deslizamiento del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "curve2",
+  [
+   "The same as CRV1, channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme CRV1, canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que CRV1, canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "drift",
+  [
+   "Slow opt-in walk in both offsets — it \"humanises\" a standing voltage.",
+   "",
+   ""
+  ],
+  [
+   "Marche lente opt-in dans les deux offsets — elle « humanise » une tension immobile.",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento opt-in en los dos offsets — \"humaniza\" una tensión quieta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "sum_mode",
+  [
+   "SUM = the sum (with a ceiling) or the average of the two channels.",
+   "",
+   ""
+  ],
+  [
+   "SUM = la somme (avec plafond) ou la moyenne des deux canaux.",
+   "",
+   ""
+  ],
+  [
+   "SUM = la suma (con techo) o el promedio de los dos canales.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "in:in1",
+  [
+   "Input of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrée du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrada del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "in:in2",
+  [
+   "Input of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrée du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrada del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "out:out1",
+  [
+   "Processed output of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Sortie traitée du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Salida procesada del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "out:out2",
+  [
+   "Processed output of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Sortie traitée du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Salida procesada del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CONTROL",
+  "out:sum",
+  [
+   "out1+out2, sum or average according to SUM.",
+   "",
+   ""
+  ],
+  [
+   "out1+out2, somme ou moyenne selon SUM.",
+   "",
+   ""
+  ],
+  [
+   "out1+out2, suma o promedio según SUM.",
+   "",
+   ""
+  ]
+ ]
+]

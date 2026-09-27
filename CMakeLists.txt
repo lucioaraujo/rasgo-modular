@@ -465,6 +465,19 @@ if(BUILD_TESTING)
     target_include_directories(rasgo_modular_param_exam PRIVATE src apps)
     target_compile_options(rasgo_modular_param_exam PRIVATE ${rasgo_modular_warnings})
 
+    # Medidor de cobertura da tradução do LEARN. Ferramenta, não teste:
+    # enquanto os lotes avançam ele reporta progresso parcial, e um teste
+    # que falha por estar "em andamento" ensina a ignorar falhas.
+    add_executable(rasgo_modular_learn_coverage tests/tool_learn_coverage.cpp)
+    target_include_directories(rasgo_modular_learn_coverage PRIVATE src apps)
+    target_compile_options(rasgo_modular_learn_coverage PRIVATE ${rasgo_modular_warnings})
+    # Entra no ctest como GUARDA: `--exigir` falha se algum verbete de widget
+    # perder a tradução. Sem cabo no ctest, os 803 verbetes apodreciam em
+    # silêncio no primeiro módulo novo. Sem o argumento continua sendo o
+    # medidor legível de sempre (`./build/rasgo_modular_learn_coverage`).
+    add_test(NAME rasgo_modular_learn_coverage_tests
+             COMMAND rasgo_modular_learn_coverage --exigir)
+
     add_executable(rasgo_modular_port_exam tests/tool_port_exam.cpp)
     target_include_directories(rasgo_modular_port_exam PRIVATE src apps)
     target_compile_options(rasgo_modular_port_exam PRIVATE ${rasgo_modular_warnings})
