@@ -198,3 +198,57 @@ jobs:
           name: rasgo-modular-${{ matrix.os }}
           path: ${{ matrix.artifact-glob }}
           if-no-files-found: error
+
+  # ---- release: onde a tag vira algo que alguém consegue BAIXAR --------
+  #
+  # Faltava este passo, e a falta era séria: `upload-artifact` guarda os
+  # pacotes como ARTEFATO DO ACTIONS, que exige estar logado no GitHub,
+  # vem zipado por cima do instalador e EXPIRA em 90 dias. Não é download
+  # público, e o site não pode apontar para ele. Sem este job, criar a tag
+  # v0.1.0 não produziria nada que um músico consiga instalar.
+  #
+  # Roda só em tag (`v*`), depois dos três empacotamentos, e em Linux —
+  # multiplicador 1 no faturamento, alguns segundos de execução. O custo é
+  # desprezível ao lado dos ~160 minutos cobrados dos três builds.
+  #
+  # `gh` já vem nos runners: sem ação de terceiro no caminho de publicação,
+  # que é onde proveniência importa mais.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write        # criar a release e anexar os pacotes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download the three packages
+        uses: actions/download-artifact@v4
+        with:
+          path: pacotes
+
+      - name: Conferir o que chegou
+        run: |
+          find pacotes -type f -print
+          # os três precisam estar aqui: uma release com dois instaladores
+          # é pior que nenhuma, porque parece completa
+          for ext in deb dmg exe; do
+            if ! find pacotes -type f -name "*.$ext" | grep -q .; then
+              echo "::error::nenhum pacote .$ext entre os artefatos"
+              exit 1
+            fi
+          done
+
+      - name: Criar a release com os três instaladores
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "Rasgo Modular ${GITHUB_REF_NAME}" \
+            --verify-tag \
+            --notes "Notas desta versão: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) · instalação por plataforma: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
+
+          **Limitação declarada:** Windows e macOS foram construídos, empacotados e testados **somente pela integração contínua** — o autor nunca abriu o aplicativo nesses dois sistemas. O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
+            $(find pacotes -type f \( -name '*.deb' -o -name '*.dmg' -o -name '*.exe' \))

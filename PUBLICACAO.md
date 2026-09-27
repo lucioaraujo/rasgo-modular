@@ -35,7 +35,7 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 | matriz de plataformas (testada / parcial / planejada) | ✅ `INSTALL.md` — e ela diz que Windows e macOS **nunca foram abertos** |
 | testes automatizados e validações humanas **realmente executados** | ✅ 78 testes **executados nos três sistemas** · **validação humana executada** (24 set. 2026): 4 estudos de escuta, 7 achados, 3 corrigidos antes de publicar |
 | screenshots com origem autorizada | ✅ uma, de execução real (18 set. 2026) — original em `screenshots/`, derivados no site |
-| links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links da release dependem da tag |
+| links corretos para repositório, documentação e release | 🟡 repositório existe (`lucioaraujo/rasgo-modular`, privado); os links de download **já estão escritos e conferidos** (`website/estado.py --depois`, nomes amarrados ao `CPACK_PACKAGE_FILE_NAME` por `website/verificar.py`) e passam a funcionar quando a tag criar a release |
 | ausência de áudio privado, recordings, testes | ✅ verificado: nenhum áudio rastreado pelo git; os 19 MB de renders de referência passaram a ser ignorados explicitamente |
 | contato oficial | ✅ **`rasgo.instruments@gmail.com`** — confirmado pelo autor em 21 set. 2026; já era o `CPACK_PACKAGE_CONTACT` dos instaladores |
 | correspondência entre versão publicada e página editorial | ❌ depende da página |
@@ -56,6 +56,20 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
   de como ele chegou aqui é parte do acervo. **A CI de três sistemas saiu
   da inércia e passou a rodar de verdade.** Falta tornar público no
   momento da publicação;
+- ~~**a tag não produziria nada baixável**~~ **corrigido em 28 set. 2026**:
+  a CI só fazia `upload-artifact`, que exige login no GitHub, vem zipado por
+  cima do instalador e expira em 90 dias — não é download público, e o site
+  não podia apontar para ele. O workflow ganhou um job `release` que, na
+  tag, cria a release e anexa os três instaladores; e o
+  `CPACK_PACKAGE_FILE_NAME` passou a ser explícito e com arquitetura, porque
+  esses nomes são o link da página. Era um buraco entre "CI verde" e
+  "alguém consegue instalar";
+- ~~**área de download no site**~~ **feita**: `website/estado.py` tem as
+  duas versões da página (antes e depois da release) nos quatro idiomas, e
+  trocar no dia de publicar é `python3 estado.py --depois 0.1.0`. A versão
+  pós-release traz link direto por plataforma e diz ali mesmo que Windows e
+  macOS nunca foram abertos pelo autor e que o `.dmg` tem assinatura
+  ad-hoc — a limitação onde a decisão de baixar é tomada;
 - ~~`CHANGELOG.md` / notas da `v0.1.0`~~ **feito** — [`CHANGELOG.md`](CHANGELOG.md),
   escrito e marcado como *preparada, ainda não cortada*, com as limitações
   declaradas (Windows/macOS só na CI, CI inerte até a extração). Falta só
