@@ -17,6 +17,7 @@ pt = {(m, b): t for m, b, t in json.load(open(dump, encoding='utf-8'))}
 lote = json.load(open(raiz / (familia + '.json'), encoding='utf-8'))
 
 erros = []
+avisos = []
 vistos = set()
 for i, linha in enumerate(lote):
     if len(linha) != 5:
@@ -37,15 +38,23 @@ for i, linha in enumerate(lote):
             if p.strip() and not x.strip():
                 erros.append('%s.%s [%s]: nível %d vazio e o pt tem texto'
                              % (mod, bind, nome, nivel))
+            # Identidade NÃO é erro: "A OR B." é a mesma frase em pt, en,
+            # fr e es, e forçar uma diferença só para satisfazer o
+            # verificador pioraria o texto. Mas também não é invisível —
+            # sai como aviso, para eu confirmar que foi intencional e não
+            # uma linha esquecida no copiar-colar.
             if x.strip() and x.strip() == p.strip():
-                erros.append('%s.%s [%s]: nível %d idêntico ao português'
-                             % (mod, bind, nome, nivel))
+                avisos.append('%s.%s [%s]: nível %d idêntico ao português'
+                              % (mod, bind, nome, nivel))
 
 faltando = sorted(set(pt) - vistos)
 for mod, bind in faltando:
     erros.append('%s.%s sem tradução no lote' % (mod, bind))
 
+for a in avisos:
+    print('  aviso: ' + a)
 for e in erros:
-    print('  ' + e)
-print('%s: %d/%d verbetes, %d problema(s)' % (familia, len(vistos), len(pt), len(erros)))
+    print('  ERRO: ' + e)
+print('%s: %d/%d verbetes, %d erro(s), %d aviso(s)'
+      % (familia, len(vistos), len(pt), len(erros), len(avisos)))
 sys.exit(1 if erros else 0)
