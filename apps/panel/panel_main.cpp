@@ -1275,7 +1275,10 @@ int main() {
                 // título: o LEARN mostra o que o MÓDULO é (pedido do autor
                 // 2026-09-07).
                 if (!widgetHit) {
-                    if (const auto* e = rasgo::panel::lookupLearnModule(mt)) {
+                    // com o IDIOMA: verbetes de módulo traduzidos desde
+                    // 27 set. 2026 (ver LearnCatalog.hpp)
+                    if (const auto* e =
+                            rasgo::panel::lookupLearnModule(mt, uiLang)) {
                         rawHit = e;
                         rawTitle = mt;
                         rawKey = std::to_string(m.id) + "|\x01mod";

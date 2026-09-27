@@ -9885,3 +9885,49 @@ Corrigido também o comentário do `LearnCatalog.hpp` que dizia que a
 relação de cabo "fica de fora": ela tem verbete desde 25 set.
 
 **78/78 CTest.**
+
+## Registro da etapa — 2026-09-27: os 58 verbetes de módulo traduzidos
+
+A pedido do autor, depois que a revisão de idiomas mostrou que o LEARN era
+monolíngue enquanto interface e tutorial já estavam em quatro línguas.
+
+**Feito:** os 58 verbetes de MÓDULO em inglês, francês e espanhol —
+13.070, 14.332 e 13.593 caracteres. O catálogo LEARN não tinha **suporte a
+idioma nenhum**, então foi preciso criar a estrutura antes de traduzir:
+três tabelas irmãs da portuguesa, e `lookupLearnModule(tipo, lang)` com
+**queda para o português** quando faltar verbete.
+
+A queda é comportamento pedido, não descuido: um verbete faltando numa
+tradução deve mostrar o texto **certo** em outra língua, não uma caixa
+vazia. Há teste para isso, e outro para o apelido `AUDIO-IN`, que precisa
+herdar a tradução do `SIGNAL-IN` — sem ele, quem roda em inglês perderia
+justamente o verbete do módulo de entrada.
+
+**Ligado nos dois front-ends.** Os três pontos de chamada passavam sem
+idioma; agora passam. Traduzir sem ligar teria deixado o trabalho
+invisível.
+
+### O que ficou em português, e por quê
+
+Os **803 verbetes de widget** — a explicação de cada knob e cada jack
+individual. São 73.000 caracteres, ~220.000 nos três idiomas.
+
+Quem roda em inglês, francês ou espanhol tem agora: interface, tutorial e
+"o que é este módulo" na sua língua; "o que faz este knob específico" em
+português. A limitação declarada em `PUBLICACAO.md` foi reescrita para
+dizer exatamente isso, em vez do "LEARN é monolíngue" de ontem.
+
+### Duas decisões de tradução, registradas
+
+**À mão, não por máquina.** O conteúdo descreve comportamento real — a
+assimetria de vactrol do LPG, o alcance de captura do PLL, o cruzamento
+das saídas do RESONATOR ao varrer TILT. Tradução automática produziria
+texto que **parece** explicação sem ser, e num instrumento didático isso é
+pior que não ter texto.
+
+**Nomes de módulo, siglas e rótulos de knob ficam como estão** em todas as
+línguas (OSC, VCA, 1 V/oct, TORQ, SCR, S&H): são o vocabulário do modular
+em qualquer idioma, e traduzi-los esconderia o que o painel mostra. Um
+francês lendo "TORQ" no texto acha o knob; lendo "COUPLE", não.
+
+**78/78 CTest.**

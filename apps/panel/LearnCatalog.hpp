@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "panel/UiLanguage.hpp"   // Lang, para o LEARN de módulo traduzido
 
 // ============================================================================
 // LearnCatalog — hover-learn (protótipo)
@@ -2845,12 +2846,763 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
     return table;
 }
 
+// Definição do módulo (hover sobre o corpo/título). nullptr se não há.
+// ---- os 58 verbetes de MÓDULO em EN / FR / ES --------------------------
+//
+// Traduzidos em 27 set. 2026, a pedido do autor, depois que a revisão de
+// idiomas mostrou que o LEARN era monolíngue enquanto interface e tutorial
+// já estavam em quatro línguas.
+//
+// Só o nível de MÓDULO ("para que serve isto") — é a pergunta de quem abre
+// o rack pela primeira vez, e rende mais por caractere: 13 mil caracteres
+// em vez dos 86 mil do catálogo inteiro. Os verbetes de WIDGET seguem em
+// português, e isso está declarado em `PUBLICACAO.md` como limitação.
+//
+// Traduzido À MÃO, não por máquina. O conteúdo descreve comportamento real
+// de cada módulo — a assimetria de vactrol do LPG, o alcance de captura do
+// PLL, o cruzamento das saídas do RESONATOR ao varrer TILT — e tradução
+// automática produziria texto que PARECE explicação sem ser. Num
+// instrumento didático isso é pior que não ter texto.
+//
+// Nomes de módulo, siglas e unidades ficam como estão (OSC, VCA, 1 V/oct,
+// S&H): são o vocabulário do modular em qualquer língua, e traduzi-los
+// esconderia o que o painel mostra.
+
+inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
+    static const std::unordered_map<std::string, LearnEntry> table = {
+        {"OSC", {
+            "Subtractive oscillator — the starting voice. Saw/square/triangle/sine with PW and organic drift; tracks 1 V/oct.",
+            "This is the 'classic' source; WAVETABLE sweeps tables, ADDITIVE sums partials, OPERATOR does FM.",
+            "OSC → FILTER → VCA with an ENVELOPE on the gate: the minimum chain of a synthesiser."}},
+        {"WAVETABLE", {
+            "Wavetable oscillator — a POS knob sweeps a bank of waveforms, from smooth to spectral, anti-aliased.",
+            "",
+            "Slow LFO → POS: the timbre 'breathes' between the waves."}},
+        {"ADDITIVE", {
+            "Additive oscillator — sums up to 64 partials; TILT/ODD-EVEN/STRETCH sculpt the spectrum directly.",
+            "Builds timbre by adding sines, the opposite of FILTER (which takes away from a rich sound).",
+            ""}},
+        {"OPERATOR", {
+            "4-operator FM, 8 algorithms, DX7-style feedback — brass, bells and basses the subtractive path will not make.",
+            "",
+            "Whole-number RATIO = harmonic; fractional = inharmonic (bell)."}},
+        {"PULSAR", {
+            "Pulsar synthesis (Curtis Roads) — a train of pulsarets (grain + silence) with TWO independent frequencies: FREQ is the pitch, FORMANT the timbre. Between granular and formant synthesis.",
+            "OPERATOR/ADDITIVE pin the spectrum to the pitch; here FORMANT slides the spectral envelope WITHOUT detuning. MASK/JITTER thin out and misalign the train (burlesque patterns, seeded).",
+            "LFO → FQM: 'wah' with no filter. MASK ~0.7 + JITTER ~0.4 = an irregular rhythmic cloud over the same note."}},
+        {"SPECTRA", {
+            "Spectral resynthesis — it LISTENS to a sound, finds the strongest partials and re-oscillates as a bank of sines that follows it. The analysis → synthesis bridge (Panharmonium / phase vocoder).",
+            "ADDITIVE builds the spectrum from nothing; MEMORY grains in time; here the material is the short-term spectrum of the input. FREEZE = an endless pad from any sound. With no IN, seeded noise feeds the analysis → a drone that evolves on its own.",
+            "DRUM → IN, low VOICE, STRETCH = a bell-like shadow of the rhythm; FRZ ← gate = frozen spectrum alternating with the live one."}},
+        {"PLL", {
+            "Phase-locked loop — locks phase to an input and generates divisions/multiplications of it; left free, it self-oscillates.",
+            "It is oscillator AND clock extractor — it follows what it hears, within a capture window.",
+            ""}},
+        {"CHORD", {
+            "Chord voice — 3–4 oscillators tuned by an interval/inversion; one note in, a chord out.",
+            "",
+            ""}},
+        {"NOISE", {
+            "Noise and continuous chance — white/pink/brown/blue/violet/bit + S&H + a wandering voltage, 8 outputs at once.",
+            "DECISION decides events; NOISE gives the floor and the random CVs. POIS swaps the internal clock for free Poisson.",
+            ""}},
+        {"MATTER", {
+            "Physical-modelling voice — matter excited (blown/rubbed/struck) and ringing; stiffness/tension/wear as knobs.",
+            "",
+            ""}},
+        {"STRING", {
+            "Extended Karplus-Strong string — pluck/bow/hammer into a delay line with damping and material.",
+            "",
+            ""}},
+        {"DRUM", {
+            "Percussion voice — body with pitch sweep + attack click; an 808 ↔ 909 ↔ acoustic map, and ROLL.",
+            "",
+            ""}},
+        {"SIGNAL-IN", {
+            "The way in from the world — live audio (ALSA) + MIDI in a single adapter; monophonic last-note voice with pitch/gate/vel/cc outputs.",
+            "It is the INPUT counterpart of NOTE-OUT. With nothing connected, deterministic silence.",
+            ""}},
+        {"FILTER", {
+            "Resonant multimode filter — LP/BP/HP, with resonance reaching self-oscillation (it becomes a sine).",
+            "Takes energy away from a rich sound (subtractive); WASP distorts on the way, LPG closes with a vactrol.",
+            "ENVELOPE → cutoff_mod: the classic 'wah'. RES near the top + low cutoff = a tunable sine voice."}},
+        {"FORMANT", {
+            "Bank of 5 parallel bandpasses — the resonances of vowels; VOWEL morphs A→E→I→O→U. VOCODER>0 + the MOD jack = a 5-band vocoder (the bands follow the modulator's envelope instead of the vowel table).",
+            "Fant's source-filter model; in vocoder mode, Dudley's channel (1938).",
+            "On noise or pulses: synthetic speech. On a chord: a choir. Voice into MOD + saw into IN + VOCODER=1: the synth 'speaks'. For intelligible wideband speech, use the dedicated VOCODER."}},
+        {"VOCODER", {
+            "N-band vocoder (4–20) — the MODULATOR's energy per band controls the gain of that same band in the CARRIER: the carrier 'speaks' the modulator. Homer Dudley, 1938.",
+            "FORMANT has a 5-band (vowel) vocoder mode; this is the dedicated, wideband one (intelligible speech). SIBIL passes the fricatives; FREEZE = an endless spoken pad; SHIFT = formant shift.",
+            "Voice into MOD + saw or pad into CAR + BANDS=16 = the classic. With no CAR, the internal saw is tuned by PIT."}},
+        {"RESONATOR", {
+            "Bank of up to 24 modes TUNED to a series, excited by an EXTERNAL signal (you strike it with whatever you like). Rings/Elements in resonator mode.",
+            "MATTER is a closed voice (its own exciter); here you bring the excitation. The 3 outputs LOW/MID/HIGH CROSS OVER as you sweep TILT — the relation between them is the process (Three Sisters).",
+            "DRUM → IN (a marimba played by the kick); TRIGSEQ → STRK; RESONATOR.low and .high into different destinations."}},
+        {"WASP", {
+            "Filter-distortion — the dirty, shouted character of the EDP Wasp; the non-linearity sits IN the filter path.",
+            "",
+            ""}},
+        {"LPG", {
+            "Low-pass gate — filter + VCA in one control, with vactrol asymmetry (fast attack, slow tail). The Buchla 'bongo'.",
+            "",
+            "Ping it with a short trigger: the LPG gives body and decay in one gesture."}},
+        {"VCA", {
+            "Voltage-controlled amplifier — volume/level as CV; linear or exponential response.",
+            "",
+            ""}},
+        {"VCA4", {
+            "Bank of 4 VCAs plus a summed mixer (MIX). `VCA` (#20) is dual; this is the bank for a large patch — Mutable Veils / Intellijel Quad VCA.",
+            "The linear/exp CURVE is SHARED. Each channel: LVL + attenuverted CV (summed at the port). MIXG sets the gain of the sum.",
+            "The 3 low/mid/high outputs of RESONATOR/FILTER into 3 channels + an envelope on each CV = a spectrum that moves; MIX brings it together."}},
+        {"SHAPE", {
+            "Waveshaper — folds/saturates/rectifies the waveform to create harmonics; from subtle warmth to destruction.",
+            "",
+            ""}},
+        {"SHIFTER", {
+            "Frequency shifter — moves the WHOLE spectrum by so many Hz (not by a ratio). The partials stop being harmonic → metallic, bell-like. SSB: `up` (+Δf) and `down` (−Δf) outputs.",
+            "SHAPE's ring-mod gives BOTH symmetric sidebands; SHIFTER gives one per output. FEEDBACK = Risset's 'barber pole' (endless glissando). Bode/Moog frequency shifter.",
+            "SHIFT ~8 Hz = a phase that never closes; large SHIFT + FEEDBACK = the Shepard spiral; `up`/`down` into different destinations."}},
+        {"CRUSH", {
+            "Lo-fi destroyer / decimator — DIGITAL rubbish: rate reduction (aliasing), bit reduction, wrapping overflow, glitch (dropout/stuck/stutter) and clock jitter.",
+            "This is where the verb DAMAGE lives. SHAPE/WASP distort in an ANALOGUE way (fold, tanh); here it is quantisation, integer overflow, a bad connection. All seeded → reproducible damage.",
+            "ENVELOPE → BITS (resolution falls away in the tail); LFO → RATE; no IN + MIX=1 = a lo-fi noise source."}},
+        {"PARAMETRIC", {
+            "Parametric EQ — bell and shelf bands to sculpt the spectrum surgically, without filter resonance.",
+            "",
+            ""}},
+        {"GLIDE", {
+            "Portamento/slew — slides between values instead of jumping; separate time for rise and fall, constant or proportional mode.",
+            "",
+            ""}},
+        {"CONTROL", {
+            "Continuous CV utilities — attenuverter, offset, rectification as a lerp, slew. The pocket knife of the control signal.",
+            "",
+            ""}},
+        {"ENVELOPE", {
+            "Envelope generator — AD/ADSR/AR and loops; the shape of amplitude (or of any CV) over time, fired by a gate.",
+            "",
+            "ENVELOPE → VCA + ENVELOPE → cutoff: the contour of the sound."}},
+        {"FUNCTION", {
+            "Maths-style function generator — a deformable ramp/envelope/LFO with derived outputs; it sums, integrates, fires.",
+            "It is envelope AND LFO AND slew, all in the curve. DRIFT is a slow walk; CHAOS is genuinely chaotic.",
+            ""}},
+        {"STAGES", {
+            "Generator of N configurable segments (2–8) whose FUNCTION EMERGES from how they chain: ramps → envelope/LFO, steps → a CV sequence. Mutable Stages / Rossum Control Forge.",
+            "FUNCTION is ONE ramp; STAGES is the COMPOUND shape, sculpted by CONTOUR/TILT/HOLD (a generator, not an editor). HOLD=0 slides (env), HOLD=1 jumps (seq); LOOP runs ↔ fires.",
+            "STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = an envelope; STAGES.step → ENVELOPE.gate chains them."}},
+        {"DRIFT", {
+            "Field of organic drift — several correlated CVs wandering slowly (on the scale of minutes), with momentum and an anchor to recorded landmarks.",
+            "It gives LIFE without direction — nothing stays still. Deterministic (seeded).",
+            ""}},
+        {"CHAOS", {
+            "Double-well chaotic field — a deterministic ODE that settles in one well, oscillates between two, or 'hunts' unpredictably.",
+            "Genuinely chaotic, not pseudo-random (DECISION/TURING) nor a filtered walk (DRIFT).",
+            ""}},
+        {"SH", {
+            "Dual sample & hold — holds a value on a pulse; 2 channels with CORRELATION (twins ↔ mirror ↔ independent) and slew.",
+            "",
+            "CLOCK → SH · out1 → pitch · out2 → cutoff: a melody and a timbre that 'go together'."}},
+        {"CLOCK", {
+            "Euclidean master clock — a pulse with divisions, euclidean fill, swing and drift; the beat of the whole patch.",
+            "",
+            "CLOCK → everything with a gate or trigger. FILL spreads the pulses across the bar (Toussaint's patterns)."}},
+        {"LOGIC", {
+            "Clock logic — divide/multiply, AND/OR/XOR of gates, delay; it recombines TIME.",
+            "The partner of ABACUS (which does CV arithmetic). Here it is gates and triggers only.",
+            ""}},
+        {"TURING", {
+            "Random shift register (Turing Machine) — a loop of bits that LOCK holds and MUTATE reshuffles; melody/rhythm that repeats with variation.",
+            "",
+            ""}},
+        {"SEQUENCE", {
+            "8-step sequencer — pitch sliders + direction (forward/back/ping-pong/random/brownian), with a gate per step.",
+            "",
+            "The sliders are the score — the Motion Engine barely touches them. Use MUTATE/EVOLVE to reshuffle on purpose."}},
+        {"TRIGSEQ", {
+            "TRIGGER sequencer — 4 lanes of euclidean density with chaos/ratchet/fill/swing; the generative percussion.",
+            "",
+            ""}},
+        {"QUANTIZER", {
+            "Scale quantiser — snaps a CV to the degrees of a scale and key; slew and hysteresis so it will not flutter at the edge.",
+            "",
+            "SH/TURING/DRIFT → QUANTIZER → pitch: a random walk becomes a melody in the scale."}},
+        {"HARMONY", {
+            "Harmoniser — from one note it generates intervals and chords coherent with a key and with a voice leading.",
+            "",
+            ""}},
+        {"ABACUS", {
+            "CV arithmetic — add/subtract/multiply/modulo and bitwise AND/OR/XOR between two signals, plus a binary counter whose bits become rhythm (Numeric Repetitor).",
+            "The partner of LOGIC (which recombines time). On its own, the counter already plays a sequence and a rhythm.",
+            ""}},
+        {"DECISION", {
+            "Source of STRUCTURED chance, Marbles-style — distribution (bias/spread/shape), déjà-vu (repeats the pattern), steps and slew; it makes CV and gates with 'intent'.",
+            "",
+            ""}},
+        {"BOXCAR", {
+            "Boxcar averager — a window samples one point of the period, and the average of N captures reveals the signal inside the noise; SCAN reconstructs the wave; GEIG = Poisson gates.",
+            "It is the SCOPE in reverse: it measures in order to BUILD a wave. mode 0 = windowed S&H, 1 = reconstructs, 2 = reads its own buffer back as an oscillator.",
+            "Noise plus a weak tone synchronised to TRIG, mode 1, high SCAN: the tone 'draws itself' over seconds."}},
+        {"SWITCH", {
+            "Switch/router — N inputs → 1 output (or 1 → N), by clock step, CV or at random; it sequences SOURCES instead of notes.",
+            "",
+            ""}},
+        {"MATRIX", {
+            "4×4 routing matrix — any input to any output with a gain per cell; a programmable CV/audio mixer.",
+            "",
+            ""}},
+        {"MULT", {
+            "Buffered multiple — copies a signal to several destinations with no level drop; dual mode and optional slew.",
+            "",
+            ""}},
+        {"PLANAR", {
+            "XY vector morph — slides between 4 sources on a plane; the gesture (the path across the plane) can be recorded and replayed.",
+            "",
+            ""}},
+        {"SPACE", {
+            "Reverberation — a multitap Schroeder/Dattorro network, from short ambience to a long tail; pre-delay and damping.",
+            "SPACE is the 'classic' reverb; HALL is an 8-line FDN (denser, stereo); MEMORY is granular.",
+            ""}},
+        {"HALL", {
+            "8-line FDN reverb with a Householder matrix — a dense stereo tail, with FREEZE (endless hold) and pre-delay.",
+            "",
+            ""}},
+        {"LOOPER", {
+            "Delay line with HOLD (freezes and repeats), REVERSE (plays backwards without a click), AGE (tape/BBD character) and HEADS (multi-head echo, Space Echo style).",
+            "The old 'TAPE' became this HEADS. FBK near 1 + a long TIME + several heads = Frippertronics.",
+            ""}},
+        {"SWIRL", {
+            "MODULATION effects — chorus, flanger, ensemble and phaser in one module (TYPE). SHORT delays modulated by an LFO (plus the phaser, a cascade of all-passes), with BBD character in AGE.",
+            "RASGO had none of these. Distinct from LOOPER (a delay line, audible echoes) and from reverb — here you hear the MOVEMENT, not the echo.",
+            "voice → SWIRL → MASTER thickens it; LFO → RATE lets the sweep breathe off the bar; FBK near ±1 + AGE = it self-oscillates."}},
+        {"MEMORY", {
+            "Granular — a buffer chopped into grains (grain/cloud/spray), with position, size, density and FREEZE; textures and time-stretch.",
+            "",
+            ""}},
+        {"SAMPLER", {
+            "Slice player (MPC/Akai) — TRIG fires a passage recorded live (REC gate) or from a file; varispeed, slices + POS, repitch, wear.",
+            "SAMPLER jumps the read position (a slice); TURNTABLE reads continuously with inertia; MEMORY is granular.",
+            ""}},
+        {"TURNTABLE", {
+            "Turntable with a platter that has mass — the SAMPLER's buffer read by an angular velocity with INERTIA: the motor pulls slowly (TORQ), the hand pushes (SCR), the brake lets it coast (BRK).",
+            "NO BPM quantisation — beatmatching is a gesture, as on vinyl.",
+            "LFO → SCR: the record scratches in time. ENVELOPE → BRK: a tape-stop on the turnaround."}},
+        {"MIXER", {
+            "4-channel mixer — level (slider), pan and mute per channel plus a master out. Where the musician does the balance.",
+            "Exempt from the Motion Engine — the pans and levels are yours.",
+            ""}},
+        {"MASTER", {
+            "Stereo output stage — width, body guard and a true-peak limiter; the ceiling of the patch.",
+            "Exempt from the Motion Engine. The header's STANDBY button is this module's mute.",
+            ""}},
+        {"SCOPE", {
+            "Oscilloscope and meter that GIVES BACK as CV — pitch (YIN), envelope, spectral centroid, ONSET (a pulse on the attack); the patch hears itself.",
+            "SCOPE measures in order to reduce (→ a scalar); BOXCAR measures in order to reconstruct (→ a wave).",
+            "SCOPE.onset ← drums → fires an ENVELOPE in time with the audio; SCOPE.pitch → OSC.pitch tunes to whatever comes in."}},
+        {"NOTE-OUT", {
+            "MIDI out — converts gate + 1 V/oct into note on/off, with channel, velocity and a score log.",
+            "The OUTPUT counterpart of SIGNAL-IN.",
+            ""}},
+    };
+    return table;
+}
+
+inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
+    static const std::unordered_map<std::string, LearnEntry> table = {
+        {"OSC", {
+            "Oscillateur soustractif — la voix de départ. Dent de scie/carré/triangle/sinus avec PW et dérive organique ; suit le 1 V/oct.",
+            "C’est la source « classique » ; WAVETABLE balaie des tables, ADDITIVE somme des partiels, OPERATOR fait de la FM.",
+            "OSC → FILTER → VCA avec une ENVELOPPE sur le gate : la chaîne minimale d’un synthétiseur."}},
+        {"WAVETABLE", {
+            "Oscillateur à table d’ondes — un POS balaie une banque de formes d’onde, du doux au spectral, anti-aliasé.",
+            "",
+            "LFO lent → POS : le timbre « respire » entre les ondes."}},
+        {"ADDITIVE", {
+            "Oscillateur additif — somme jusqu’à 64 partiels ; TILT/ODD-EVEN/STRETCH sculptent le spectre directement.",
+            "Construit le timbre en ajoutant des sinus, l’inverse du FILTER (qui retire d’un son riche).",
+            ""}},
+        {"OPERATOR", {
+            "FM à 4 opérateurs, 8 algorithmes, feedback à la DX7 — cuivres, cloches et basses que le soustractif ne fait pas.",
+            "",
+            "RATIO entier = harmonique ; fractionnaire = inharmonique (cloche)."}},
+        {"PULSAR", {
+            "Synthèse pulsar (Curtis Roads) — un train de pulsarets (grain + silence) avec DEUX fréquences indépendantes : FREQ est la hauteur, FORMANT le timbre. Entre le granulaire et la synthèse par formants.",
+            "OPERATOR/ADDITIVE fixent le spectre sur la hauteur ; ici FORMANT fait glisser l’enveloppe spectrale SANS désaccorder. MASK/JITTER raréfient et désalignent le train (motifs burlesques, semés).",
+            "LFO → FQM : un « wah » sans filtre. MASK ~0,7 + JITTER ~0,4 = un nuage rythmique irrégulier sur la même note."}},
+        {"SPECTRA", {
+            "Resynthèse spectrale — elle ÉCOUTE un son, trouve les partiels les plus forts et ré-oscille en banc de sinus qui le suit. Le pont analyse → synthèse (Panharmonium / vocodeur de phase).",
+            "ADDITIVE construit le spectre de rien ; MEMORY granule dans le temps ; ici la matière est le spectre à court terme de l’entrée. FREEZE = un pad infini à partir de n’importe quel son. Sans IN, un bruit semé alimente l’analyse → un drone qui évolue seul.",
+            "DRUM → IN, VOICE bas, STRETCH = une ombre de cloches du rythme ; FRZ ← gate = spectre gelé alternant avec le vivant."}},
+        {"PLL", {
+            "Boucle à verrouillage de phase — se verrouille sur un signal d’entrée et en génère divisions et multiplications ; laissée libre, elle auto-oscille.",
+            "C’est un oscillateur ET un extracteur d’horloge — elle suit ce qu’elle entend, dans une fenêtre de capture.",
+            ""}},
+        {"CHORD", {
+            "Voix d’accord — 3 à 4 oscillateurs accordés par un intervalle/renversement ; une note entre, un accord sort.",
+            "",
+            ""}},
+        {"NOISE", {
+            "Bruit et hasard continu — blanc/rose/brown/bleu/violet/bit + S&H + une tension qui erre, 8 sorties à la fois.",
+            "DECISION décide des événements ; NOISE donne le plancher et les CV aléatoires. POIS remplace l’horloge interne par un Poisson libre.",
+            ""}},
+        {"MATTER", {
+            "Voix de modélisation physique — matière excitée (soufflée/frottée/frappée) qui résonne ; raideur/tension/usure comme potentiomètres.",
+            "",
+            ""}},
+        {"STRING", {
+            "Corde Karplus-Strong étendue — pincée/archet/marteau dans une ligne à retard avec amortissement et matière.",
+            "",
+            ""}},
+        {"DRUM", {
+            "Voix de percussion — corps avec balayage de hauteur + clic d’attaque ; une carte 808 ↔ 909 ↔ acoustique, et ROLL.",
+            "",
+            ""}},
+        {"SIGNAL-IN", {
+            "L’entrée du monde — audio en direct (ALSA) + MIDI dans un seul adaptateur ; voix monophonique last-note avec sorties pitch/gate/vel/cc.",
+            "C’est la contrepartie d’ENTRÉE de NOTE-OUT. Sans rien de branché, silence déterministe.",
+            ""}},
+        {"FILTER", {
+            "Filtre multimode résonant — LP/BP/HP, la résonance allant jusqu’à l’auto-oscillation (il devient un sinus).",
+            "Retire de l’énergie à un son riche (soustractif) ; WASP distord en chemin, LPG referme avec un vactrol.",
+            "ENVELOPPE → cutoff_mod : le « wah » classique. RES près du maximum + cutoff bas = une voix de sinus accordable."}},
+        {"FORMANT", {
+            "Banc de 5 passe-bande parallèles — les résonances des voyelles ; VOWEL fait le morphing A→E→I→O→U. VOCODER>0 + le jack MOD = un vocodeur à 5 bandes (les bandes suivent l’enveloppe du modulateur au lieu de la table de voyelles).",
+            "Le modèle source-filtre de Fant ; en mode vocodeur, le canal de Dudley (1938).",
+            "Sur du bruit ou des impulsions : parole synthétique. Sur un accord : un chœur. Voix dans MOD + scie dans IN + VOCODER=1 : le synthé « parle ». Pour une parole intelligible à large bande, le VOCODER dédié."}},
+        {"VOCODER", {
+            "Vocodeur à N bandes (4–20) — l’énergie du MODULATEUR par bande commande le gain de cette même bande dans la PORTEUSE : la porteuse « parle » le modulateur. Homer Dudley, 1938.",
+            "FORMANT a un mode vocodeur à 5 bandes (vocalique) ; celui-ci est le dédié, à large bande (parole intelligible). SIBIL laisse passer les fricatives ; FREEZE = un pad parlé infini ; SHIFT = décalage de formants.",
+            "Voix dans MOD + scie ou pad dans CAR + BANDS=16 = le classique. Sans CAR, la scie interne s’accorde par PIT."}},
+        {"RESONATOR", {
+            "Banc de 24 modes au plus ACCORDÉS sur une série, excité par un signal EXTERNE (vous frappez avec ce que vous voulez). Rings/Elements en mode résonateur.",
+            "MATTER est une voix fermée (son propre exciteur) ; ici vous apportez l’excitation. Les 3 sorties LOW/MID/HIGH se CROISENT quand vous balayez TILT — la relation entre elles est le processus (Three Sisters).",
+            "DRUM → IN (un marimba joué par la grosse caisse) ; TRIGSEQ → STRK ; RESONATOR.low et .high vers des destinations différentes."}},
+        {"WASP", {
+            "Filtre-distorsion — le caractère sale et criard de l’EDP Wasp ; la non-linéarité est DANS le chemin du filtre.",
+            "",
+            ""}},
+        {"LPG", {
+            "Low-pass gate — filtre + VCA en une seule commande, avec l’asymétrie du vactrol (attaque rapide, queue lente). Le « bongo » Buchla.",
+            "",
+            "Un ping avec un trigger court : le LPG donne le corps et la décroissance d’un seul geste."}},
+        {"VCA", {
+            "Amplificateur commandé en tension — le volume/niveau comme CV ; réponse linéaire ou exponentielle.",
+            "",
+            ""}},
+        {"VCA4", {
+            "Banc de 4 VCA plus un mélangeur sommé (MIX). `VCA` (#20) est double ; celui-ci est le banc pour un grand patch — Mutable Veils / Intellijel Quad VCA.",
+            "La CURVE linéaire/exp est PARTAGÉE. Chaque canal : LVL + CV atténuversée (sommée au port). MIXG donne le gain de la somme.",
+            "Les 3 sorties low/mid/high du RESONATOR/FILTER dans 3 canaux + une enveloppe sur chaque CV = un spectre qui bouge ; MIX rassemble le tout."}},
+        {"SHAPE", {
+            "Waveshaper — replie/sature/redresse la forme d’onde pour créer des harmoniques ; de la chaleur subtile à la destruction.",
+            "",
+            ""}},
+        {"SHIFTER", {
+            "Décaleur de fréquence — déplace le spectre ENTIER de tant de Hz (pas d’un rapport). Les partiels cessent d’être harmoniques → métallique, de cloche. BLU : sorties `up` (+Δf) et `down` (−Δf).",
+            "Le ring-mod de SHAPE donne LES DEUX bandes symétriques ; le SHIFTER n’en donne qu’une par sortie. FEEDBACK = le « barber pole » de Risset (glissando infini). Frequency shifter Bode/Moog.",
+            "SHIFT ~8 Hz = une phase qui ne se referme jamais ; grand SHIFT + FEEDBACK = la spirale de Shepard ; `up`/`down` vers des destinations différentes."}},
+        {"CRUSH", {
+            "Destructeur lo-fi / décimateur — la saleté NUMÉRIQUE : réduction de fréquence d’échantillonnage (aliasing), de bits, débordement qui s’enroule, glitch (dropout/bloqué/bégaiement) et gigue d’horloge.",
+            "C’est ici qu’habite le verbe DAMAGE. SHAPE/WASP distordent de façon ANALOGIQUE (fold, tanh) ; ici c’est de la quantification, du débordement d’entier, une mauvaise connexion. Tout est semé → dommage reproductible.",
+            "ENVELOPPE → BITS (la résolution tombe dans la queue) ; LFO → RATE ; sans IN + MIX=1 = une source de bruit lo-fi."}},
+        {"PARAMETRIC", {
+            "Égaliseur paramétrique — bandes en cloche et en plateau pour sculpter le spectre chirurgicalement, sans résonance de filtre.",
+            "",
+            ""}},
+        {"GLIDE", {
+            "Portamento/slew — glisse entre les valeurs au lieu de sauter ; temps séparé pour la montée et la descente, mode constant ou proportionnel.",
+            "",
+            ""}},
+        {"CONTROL", {
+            "Utilitaires de CV continue — atténuverseur, décalage, redressement en interpolation, slew. Le couteau de poche du signal de commande.",
+            "",
+            ""}},
+        {"ENVELOPE", {
+            "Générateur d’enveloppe — AD/ADSR/AR et boucles ; la forme de l’amplitude (ou de n’importe quelle CV) dans le temps, déclenchée par un gate.",
+            "",
+            "ENVELOPPE → VCA + ENVELOPPE → cutoff : le contour du son."}},
+        {"FUNCTION", {
+            "Générateur de fonction à la Maths — rampe/enveloppe/LFO déformable avec sorties dérivées ; il somme, intègre, déclenche.",
+            "C’est une enveloppe ET un LFO ET un slew, tout dans la courbe. DRIFT est une marche lente ; CHAOS est vraiment chaotique.",
+            ""}},
+        {"STAGES", {
+            "Générateur de N segments configurables (2–8) dont la FONCTION ÉMERGE de la façon dont ils s’enchaînent : rampes → enveloppe/LFO, marches → une séquence de CV. Mutable Stages / Rossum Control Forge.",
+            "FUNCTION est UNE rampe ; STAGES est la forme COMPOSÉE, sculptée par CONTOUR/TILT/HOLD (un générateur, pas un éditeur). HOLD=0 glisse (env), HOLD=1 saute (séq) ; LOOP tourne ↔ déclenche.",
+            "STAGES → FILTER.cutoff ; CLOCK → GATE (loop off) = une enveloppe ; STAGES.step → ENVELOPE.gate les enchaîne."}},
+        {"DRIFT", {
+            "Champ de dérive organique — plusieurs CV corrélées qui errent lentement (à l’échelle des minutes), avec inertie et ancrage à des repères enregistrés.",
+            "Il donne de la VIE sans direction — rien ne reste immobile. Déterministe (semé).",
+            ""}},
+        {"CHAOS", {
+            "Champ chaotique à double puits — une EDO déterministe qui se pose dans un puits, oscille entre deux, ou « chasse » de façon imprévisible.",
+            "Vraiment chaotique, ni pseudo-aléatoire (DECISION/TURING) ni marche filtrée (DRIFT).",
+            ""}},
+        {"SH", {
+            "Sample & hold double — retient une valeur sur une impulsion ; 2 canaux avec CORRELATION (jumeaux ↔ miroir ↔ indépendants) et slew.",
+            "",
+            "CLOCK → SH · out1 → pitch · out2 → cutoff : une mélodie et un timbre qui « vont ensemble »."}},
+        {"CLOCK", {
+            "Horloge maîtresse euclidienne — une impulsion avec divisions, remplissage euclidien, swing et dérive ; le battement de tout le patch.",
+            "",
+            "CLOCK → tout ce qui a un gate ou un trigger. FILL répartit les impulsions dans la mesure (les motifs de Toussaint)."}},
+        {"LOGIC", {
+            "Logique d’horloge — divise/multiplie, AND/OR/XOR de gates, retard ; elle recombine le TEMPS.",
+            "Le pendant d’ABACUS (qui fait l’arithmétique de CV). Ici, uniquement gates et triggers.",
+            ""}},
+        {"TURING", {
+            "Registre à décalage aléatoire (Turing Machine) — une boucle de bits que LOCK retient et que MUTATE rebat ; mélodie/rythme qui se répète avec variation.",
+            "",
+            ""}},
+        {"SEQUENCE", {
+            "Séquenceur à 8 pas — curseurs de hauteur + direction (avant/arrière/ping-pong/aléatoire/brownien), avec un gate par pas.",
+            "",
+            "Les curseurs sont la partition — la Motion Engine y touche à peine. Utilisez MUTATE/EVOLVE pour rebattre exprès."}},
+        {"TRIGSEQ", {
+            "Séquenceur de TRIGGERS — 4 pistes de densité euclidienne avec chaos/ratchet/fill/swing ; la percussion générative.",
+            "",
+            ""}},
+        {"QUANTIZER", {
+            "Quantificateur de gamme — cale une CV sur les degrés d’une gamme et d’une tonique ; slew et hystérésis pour qu’elle ne tremble pas à la frontière.",
+            "",
+            "SH/TURING/DRIFT → QUANTIZER → pitch : une marche aléatoire devient une mélodie dans la gamme."}},
+        {"HARMONY", {
+            "Harmoniseur — d’une seule note il engendre des intervalles et des accords cohérents avec une tonalité et une conduite des voix.",
+            "",
+            ""}},
+        {"ABACUS", {
+            "Arithmétique de CV — addition/soustraction/multiplication/modulo et AND/OR/XOR bit à bit entre deux signaux, plus un compteur binaire dont les bits deviennent du rythme (Numeric Repetitor).",
+            "Le pendant de LOGIC (qui recombine le temps). Seul, le compteur joue déjà une séquence et un rythme.",
+            ""}},
+        {"DECISION", {
+            "Source de hasard STRUCTURÉ, à la Marbles — distribution (bias/spread/shape), déjà-vu (répète le motif), steps et slew ; elle fait des CV et des gates avec une « intention ».",
+            "",
+            ""}},
+        {"BOXCAR", {
+            "Moyenneur à porte (boxcar averager) — une fenêtre échantillonne un point de la période, et la moyenne de N captures révèle le signal dans le bruit ; SCAN reconstruit l’onde ; GEIG = gates de Poisson.",
+            "C’est le SCOPE à l’envers : il mesure pour CONSTRUIRE une onde. mode 0 = S&H fenêtré, 1 = reconstruit, 2 = relit son propre tampon comme oscillateur.",
+            "Du bruit plus un ton faible synchronisé au TRIG, mode 1, SCAN élevé : le ton « se dessine » au fil des secondes."}},
+        {"SWITCH", {
+            "Commutateur/routeur — N entrées → 1 sortie (ou 1 → N), par pas d’horloge, CV ou au hasard ; il séquence des SOURCES au lieu de notes.",
+            "",
+            ""}},
+        {"MATRIX", {
+            "Matrice de routage 4×4 — n’importe quelle entrée vers n’importe quelle sortie avec un gain par cellule ; un mélangeur CV/audio programmable.",
+            "",
+            ""}},
+        {"MULT", {
+            "Multiple bufferisé — copie un signal vers plusieurs destinations sans perte de niveau ; mode double et slew optionnel.",
+            "",
+            ""}},
+        {"PLANAR", {
+            "Morphing vectoriel XY — glisse entre 4 sources sur un plan ; le geste (le chemin sur le plan) s’enregistre et se rejoue.",
+            "",
+            ""}},
+        {"SPACE", {
+            "Réverbération — un réseau Schroeder/Dattorro multitap, de l’ambiance courte à la longue queue ; pre-delay et amortissement.",
+            "SPACE est la réverbe « classique » ; HALL est un FDN à 8 lignes (plus dense, stéréo) ; MEMORY est granulaire.",
+            ""}},
+        {"HALL", {
+            "Réverbe FDN à 8 lignes avec matrice de Householder — une queue dense et stéréo, avec FREEZE (maintien infini) et pre-delay.",
+            "",
+            ""}},
+        {"LOOPER", {
+            "Ligne à retard avec HOLD (gèle et répète), REVERSE (lit à l’envers sans clic), AGE (caractère bande/BBD) et HEADS (écho multi-têtes, façon Space Echo).",
+            "L’ancien « TAPE » est devenu ce HEADS. FBK près de 1 + un TIME long + plusieurs têtes = Frippertronics.",
+            ""}},
+        {"SWIRL", {
+            "Effets de MODULATION — chorus, flanger, ensemble et phaser dans un seul module (TYPE). Des retards COURTS modulés par LFO (plus le phaser, une cascade de passe-tout), avec un caractère BBD dans AGE.",
+            "RASGO n’en avait aucun. Distinct du LOOPER (ligne à retard, échos audibles) et de la réverbe — ici on entend le MOUVEMENT, pas l’écho.",
+            "voix → SWIRL → MASTER épaissit ; LFO → RATE laisse le balayage respirer hors mesure ; FBK près de ±1 + AGE = il auto-oscille."}},
+        {"MEMORY", {
+            "Granulaire — un tampon découpé en grains (grain/nuage/spray), avec position, taille, densité et FREEZE ; textures et time-stretch.",
+            "",
+            ""}},
+        {"SAMPLER", {
+            "Lecteur de tranches (MPC/Akai) — TRIG déclenche un passage enregistré en direct (gate REC) ou depuis un fichier ; varispeed, tranches + POS, repitch, usure.",
+            "Le SAMPLER saute la position de lecture (une tranche) ; le TURNTABLE lit en continu avec inertie ; MEMORY est granulaire.",
+            ""}},
+        {"TURNTABLE", {
+            "Tourne-disque à plateau qui a une masse — le tampon du SAMPLER lu par une vitesse angulaire avec INERTIE : le moteur tire lentement (TORQ), la main pousse (SCR), le frein laisse filer (BRK).",
+            "AUCUNE quantification de BPM — le beatmatch est un geste, comme sur vinyle.",
+            "LFO → SCR : le disque scratche dans la mesure. ENVELOPPE → BRK : un tape-stop au retournement."}},
+        {"MIXER", {
+            "Mélangeur 4 canaux — niveau (curseur), panoramique et mute par canal, plus une sortie générale. Là où le musicien fait l’équilibre.",
+            "Exempt de la Motion Engine — les panoramiques et les niveaux sont à vous.",
+            ""}},
+        {"MASTER", {
+            "Étage de sortie stéréo — largeur, garde de corps et limiteur true-peak ; le plafond du patch.",
+            "Exempt de la Motion Engine. Le bouton VEILLE de l’en-tête est le mute de ce module.",
+            ""}},
+        {"SCOPE", {
+            "Oscilloscope et mesureur qui REND en CV — hauteur (YIN), enveloppe, centroïde spectral, ONSET (une impulsion à l’attaque) ; le patch s’entend lui-même.",
+            "Le SCOPE mesure pour réduire (→ un scalaire) ; le BOXCAR mesure pour reconstruire (→ une onde).",
+            "SCOPE.onset ← batterie → déclenche une ENVELOPPE au rythme de l’audio ; SCOPE.pitch → OSC.pitch accorde sur ce qui entre."}},
+        {"NOTE-OUT", {
+            "Sortie MIDI — convertit gate + 1 V/oct en note on/off, avec canal, vélocité et un journal de partition.",
+            "La contrepartie de SORTIE de SIGNAL-IN.",
+            ""}},
+    };
+    return table;
+}
+
+inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
+    static const std::unordered_map<std::string, LearnEntry> table = {
+        {"OSC", {
+            "Oscilador sustractivo — la voz de partida. Diente/cuadrada/triángulo/seno con PW y deriva orgánica; sigue 1 V/oct.",
+            "Es la fuente «clásica»; WAVETABLE barre tablas, ADDITIVE suma parciales, OPERATOR hace FM.",
+            "OSC → FILTER → VCA con una ENVOLVENTE en el gate: la cadena mínima de un sintetizador."}},
+        {"WAVETABLE", {
+            "Oscilador de tabla de ondas — un POS barre un banco de formas de onda, de suave a espectral, con antialias.",
+            "",
+            "LFO lento → POS: el timbre «respira» entre las ondas."}},
+        {"ADDITIVE", {
+            "Oscilador aditivo — suma hasta 64 parciales; TILT/ODD-EVEN/STRETCH esculpen el espectro directamente.",
+            "Construye el timbre sumando senos, lo contrario del FILTER (que quita de un sonido rico).",
+            ""}},
+        {"OPERATOR", {
+            "FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — metales, campanas y bajos que el sustractivo no hace.",
+            "",
+            "RATIO entero = armónico; fraccionario = inarmónico (campana)."}},
+        {"PULSAR", {
+            "Síntesis pulsar (Curtis Roads) — un tren de pulsarets (grano + silencio) con DOS frecuencias independientes: FREQ es la altura, FORMANT el timbre. Entre lo granular y la síntesis por formantes.",
+            "OPERATOR/ADDITIVE fijan el espectro a la altura; aquí FORMANT desliza la envolvente espectral SIN desafinar. MASK/JITTER ralean y desalinean el tren (patrones burlescos, sembrados).",
+            "LFO → FQM: un «wah» sin filtro. MASK ~0,7 + JITTER ~0,4 = una nube rítmica irregular sobre la misma nota."}},
+        {"SPECTRA", {
+            "Resíntesis espectral — ESCUCHA un sonido, halla los parciales más fuertes y vuelve a oscilar como un banco de senos que lo sigue. El puente análisis → síntesis (Panharmonium / vocoder de fase).",
+            "ADDITIVE construye el espectro desde cero; MEMORY granula en el tiempo; aquí la materia es el espectro de corto plazo de la entrada. FREEZE = un pad infinito de cualquier sonido. Sin IN, un ruido sembrado alimenta el análisis → un drone que evoluciona solo.",
+            "DRUM → IN, VOICE bajo, STRETCH = una sombra de campanas del ritmo; FRZ ← gate = espectro congelado alternando con el vivo."}},
+        {"PLL", {
+            "Lazo de enganche de fase — se engancha a la fase de una entrada y genera divisiones y multiplicaciones de ella; libre, auto-oscila.",
+            "Es oscilador Y extractor de reloj — sigue lo que oye, dentro de una ventana de captura.",
+            ""}},
+        {"CHORD", {
+            "Voz de acorde — 3 o 4 osciladores afinados por un intervalo/inversión; entra una nota, sale un acorde.",
+            "",
+            ""}},
+        {"NOISE", {
+            "Ruido y azar continuo — blanco/rosa/brown/azul/violeta/bit + S&H + una tensión que pasea, 8 salidas a la vez.",
+            "DECISION decide eventos; NOISE da el suelo y las CV aleatorias. POIS cambia el reloj interno por un Poisson libre.",
+            ""}},
+        {"MATTER", {
+            "Voz de modelado físico — materia excitada (soplada/frotada/golpeada) resonando; rigidez/tensión/desgaste como mandos.",
+            "",
+            ""}},
+        {"STRING", {
+            "Cuerda Karplus-Strong extendida — pulsada/con arco/con martillo en una línea de retardo con amortiguación y material.",
+            "",
+            ""}},
+        {"DRUM", {
+            "Voz de percusión — cuerpo con barrido de altura + chasquido de ataque; un mapa 808 ↔ 909 ↔ acústico, y ROLL.",
+            "",
+            ""}},
+        {"SIGNAL-IN", {
+            "La entrada del mundo — audio en vivo (ALSA) + MIDI en un solo adaptador; voz monofónica last-note con salidas pitch/gate/vel/cc.",
+            "Es la contraparte de ENTRADA de NOTE-OUT. Sin nada conectado, silencio determinista.",
+            ""}},
+        {"FILTER", {
+            "Filtro multimodo resonante — LP/BP/HP, con la resonancia llegando a la auto-oscilación (se vuelve un seno).",
+            "Quita energía a un sonido rico (sustractivo); WASP distorsiona en el camino, LPG cierra con un vactrol.",
+            "ENVOLVENTE → cutoff_mod: el «wah» clásico. RES cerca del tope + cutoff bajo = una voz de seno afinable."}},
+        {"FORMANT", {
+            "Banco de 5 pasabanda en paralelo — las resonancias de las vocales; VOWEL hace el morfismo A→E→I→O→U. VOCODER>0 + el jack MOD = un vocoder de 5 bandas (las bandas siguen la envolvente del modulador en vez de la tabla de vocales).",
+            "El modelo fuente-filtro de Fant; en modo vocoder, el canal de Dudley (1938).",
+            "Sobre ruido o pulsos: habla sintética. Sobre un acorde: un coro. Voz en MOD + diente en IN + VOCODER=1: el sinte «habla». Para habla inteligible de banda ancha, el VOCODER dedicado."}},
+        {"VOCODER", {
+            "Vocoder de N bandas (4–20) — la energía del MODULADOR por banda controla la ganancia de esa misma banda en la PORTADORA: la portadora «habla» el modulador. Homer Dudley, 1938.",
+            "FORMANT tiene un modo vocoder de 5 bandas (vocálico); éste es el dedicado, de banda ancha (habla inteligible). SIBIL pasa las fricativas; FREEZE = un pad hablado infinito; SHIFT = desplazamiento de formantes.",
+            "Voz en MOD + diente o pad en CAR + BANDS=16 = el clásico. Sin CAR, el diente interno se afina con PIT."}},
+        {"RESONATOR", {
+            "Banco de hasta 24 modos AFINADOS a una serie, excitado por una señal EXTERNA (usted golpea con lo que quiera). Rings/Elements en modo resonador.",
+            "MATTER es una voz cerrada (con su propio excitador); aquí usted trae la excitación. Las 3 salidas LOW/MID/HIGH se CRUZAN al barrer TILT — la relación entre ellas es el proceso (Three Sisters).",
+            "DRUM → IN (una marimba tocada por el bombo); TRIGSEQ → STRK; RESONATOR.low y .high a destinos distintos."}},
+        {"WASP", {
+            "Filtro-distorsión — el carácter sucio y chillón del EDP Wasp; la no linealidad está EN el camino del filtro.",
+            "",
+            ""}},
+        {"LPG", {
+            "Low-pass gate — filtro + VCA en un solo mando, con la asimetría del vactrol (ataque rápido, cola lenta). El «bongó» Buchla.",
+            "",
+            "Un ping con un trigger corto: el LPG da el cuerpo y la caída de una vez."}},
+        {"VCA", {
+            "Amplificador controlado por tensión — el volumen/nivel como CV; respuesta lineal o exponencial.",
+            "",
+            ""}},
+        {"VCA4", {
+            "Banco de 4 VCA más un mezclador sumado (MIX). `VCA` (#20) es doble; éste es el banco para un patch grande — Mutable Veils / Intellijel Quad VCA.",
+            "La CURVE lineal/exp es COMPARTIDA. Cada canal: LVL + CV atenuvertida (sumada en el puerto). MIXG da la ganancia de la suma.",
+            "Las 3 salidas low/mid/high del RESONATOR/FILTER en 3 canales + una envolvente en cada CV = un espectro que se mueve; MIX lo junta todo."}},
+        {"SHAPE", {
+            "Waveshaper — pliega/satura/rectifica la forma de onda para crear armónicos; de un calor sutil a la destrucción.",
+            "",
+            ""}},
+        {"SHIFTER", {
+            "Desplazador de frecuencia — mueve el espectro ENTERO tantos Hz (no por una razón). Los parciales dejan de ser armónicos → metálico, de campana. BLU: salidas `up` (+Δf) y `down` (−Δf).",
+            "El ring-mod de SHAPE da LAS DOS bandas simétricas; el SHIFTER da una por salida. FEEDBACK = el «barber pole» de Risset (glissando infinito). Frequency shifter Bode/Moog.",
+            "SHIFT ~8 Hz = una fase que nunca cierra; SHIFT grande + FEEDBACK = la espiral de Shepard; `up`/`down` a destinos distintos."}},
+        {"CRUSH", {
+            "Destructor lo-fi / diezmador — la basura DIGITAL: reducción de frecuencia de muestreo (aliasing), de bits, desborde que se envuelve, glitch (dropout/trabado/tartamudeo) y jitter de reloj.",
+            "Aquí vive el verbo DAMAGE. SHAPE/WASP distorsionan de forma ANALÓGICA (fold, tanh); aquí es cuantización, desborde de entero, una conexión mala. Todo sembrado → daño reproducible.",
+            "ENVOLVENTE → BITS (la resolución cae en la cola); LFO → RATE; sin IN + MIX=1 = una fuente de ruido lo-fi."}},
+        {"PARAMETRIC", {
+            "Ecualizador paramétrico — bandas de campana y de estante para esculpir el espectro con precisión, sin resonancia de filtro.",
+            "",
+            ""}},
+        {"GLIDE", {
+            "Portamento/slew — desliza entre valores en vez de saltar; tiempo separado para la subida y la bajada, modo constante o proporcional.",
+            "",
+            ""}},
+        {"CONTROL", {
+            "Utilidades de CV continua — atenuversor, desplazamiento, rectificación como interpolación, slew. La navaja del señal de control.",
+            "",
+            ""}},
+        {"ENVELOPE", {
+            "Generador de envolvente — AD/ADSR/AR y bucles; la forma de la amplitud (o de cualquier CV) en el tiempo, disparada por un gate.",
+            "",
+            "ENVOLVENTE → VCA + ENVOLVENTE → cutoff: el contorno del sonido."}},
+        {"FUNCTION", {
+            "Generador de función estilo Maths — rampa/envolvente/LFO deformable con salidas derivadas; suma, integra, dispara.",
+            "Es envolvente Y LFO Y slew, todo en la curva. DRIFT es un paseo lento; CHAOS es de verdad caótico.",
+            ""}},
+        {"STAGES", {
+            "Generador de N segmentos configurables (2–8) cuya FUNCIÓN EMERGE de cómo se encadenan: rampas → envolvente/LFO, escalones → una secuencia de CV. Mutable Stages / Rossum Control Forge.",
+            "FUNCTION es UNA rampa; STAGES es la forma COMPUESTA, esculpida por CONTOUR/TILT/HOLD (un generador, no un editor). HOLD=0 desliza (env), HOLD=1 salta (sec); LOOP corre ↔ dispara.",
+            "STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = una envolvente; STAGES.step → ENVELOPE.gate los encadena."}},
+        {"DRIFT", {
+            "Campo de deriva orgánica — varias CV correlacionadas que pasean despacio (en escala de minutos), con inercia y anclaje a marcas grabadas.",
+            "Da VIDA sin dirección — nada se queda quieto. Determinista (sembrado).",
+            ""}},
+        {"CHAOS", {
+            "Campo caótico de doble pozo — una EDO determinista que se asienta en un pozo, oscila entre dos, o «caza» de forma imprevisible.",
+            "Genuinamente caótico, ni pseudoaleatorio (DECISION/TURING) ni paseo filtrado (DRIFT).",
+            ""}},
+        {"SH", {
+            "Sample & hold doble — retiene un valor en el pulso; 2 canales con CORRELATION (gemelos ↔ espejo ↔ independientes) y slew.",
+            "",
+            "CLOCK → SH · out1 → pitch · out2 → cutoff: una melodía y un timbre que «combinan»."}},
+        {"CLOCK", {
+            "Reloj maestro euclidiano — un pulso con divisiones, relleno euclidiano, swing y deriva; el latido de todo el patch.",
+            "",
+            "CLOCK → todo lo que tenga gate o trigger. FILL reparte los pulsos por el compás (los patrones de Toussaint)."}},
+        {"LOGIC", {
+            "Lógica de reloj — divide/multiplica, AND/OR/XOR de gates, retardo; recombina el TIEMPO.",
+            "La pareja de ABACUS (que hace aritmética de CV). Aquí sólo gates y triggers.",
+            ""}},
+        {"TURING", {
+            "Registro de desplazamiento aleatorio (Turing Machine) — un bucle de bits que LOCK retiene y MUTATE vuelve a mezclar; melodía/ritmo que se repite con variación.",
+            "",
+            ""}},
+        {"SEQUENCE", {
+            "Secuenciador de 8 pasos — deslizadores de altura + dirección (adelante/atrás/ping-pong/aleatorio/browniano), con un gate por paso.",
+            "",
+            "Los deslizadores son la partitura — la Motion Engine casi no los toca. Use MUTATE/EVOLVE para remezclar a propósito."}},
+        {"TRIGSEQ", {
+            "Secuenciador de TRIGGERS — 4 pistas de densidad euclidiana con chaos/ratchet/fill/swing; la percusión generativa.",
+            "",
+            ""}},
+        {"QUANTIZER", {
+            "Cuantizador de escala — encaja una CV en los grados de una escala y tónica; slew e histéresis para que no tiemble en el borde.",
+            "",
+            "SH/TURING/DRIFT → QUANTIZER → pitch: un paseo aleatorio se vuelve melodía en la escala."}},
+        {"HARMONY", {
+            "Armonizador — de una nota genera intervalos y acordes coherentes con una tonalidad y una conducción de voces.",
+            "",
+            ""}},
+        {"ABACUS", {
+            "Aritmética de CV — suma/resta/multiplicación/módulo y AND/OR/XOR bit a bit entre dos señales, más un contador binario cuyos bits se vuelven ritmo (Numeric Repetitor).",
+            "La pareja de LOGIC (que recombina el tiempo). Por sí solo, el contador ya toca una secuencia y un ritmo.",
+            ""}},
+        {"DECISION", {
+            "Fuente de azar ESTRUCTURADO, estilo Marbles — distribución (bias/spread/shape), déjà-vu (repite el patrón), steps y slew; hace CV y gates con «intención».",
+            "",
+            ""}},
+        {"BOXCAR", {
+            "Promediador de puerta (boxcar averager) — una ventana muestrea un punto del período, y el promedio de N capturas revela la señal dentro del ruido; SCAN reconstruye la onda; GEIG = gates de Poisson.",
+            "Es el SCOPE al revés: mide para CONSTRUIR una onda. mode 0 = S&H de ventana, 1 = reconstruye, 2 = relee su propio búfer como oscilador.",
+            "Ruido más un tono débil sincronizado al TRIG, mode 1, SCAN alto: el tono «se dibuja» a lo largo de segundos."}},
+        {"SWITCH", {
+            "Conmutador/enrutador — N entradas → 1 salida (o 1 → N), por paso de reloj, CV o al azar; secuencia FUENTES en vez de notas.",
+            "",
+            ""}},
+        {"MATRIX", {
+            "Matriz de enrutamiento 4×4 — cualquier entrada a cualquier salida con una ganancia por celda; un mezclador de CV/audio programable.",
+            "",
+            ""}},
+        {"MULT", {
+            "Múltiple con búfer — copia una señal a varios destinos sin caída de nivel; modo doble y slew opcional.",
+            "",
+            ""}},
+        {"PLANAR", {
+            "Morfismo vectorial XY — desliza entre 4 fuentes en un plano; el gesto (el camino en el plano) se graba y se reproduce.",
+            "",
+            ""}},
+        {"SPACE", {
+            "Reverberación — una red Schroeder/Dattorro multitap, de una ambiencia corta a una cola larga; pre-delay y amortiguación.",
+            "SPACE es la reverb «clásica»; HALL es un FDN de 8 líneas (más densa, estéreo); MEMORY es granular.",
+            ""}},
+        {"HALL", {
+            "Reverb FDN de 8 líneas con matriz de Householder — una cola densa y estéreo, con FREEZE (retención infinita) y pre-delay.",
+            "",
+            ""}},
+        {"LOOPER", {
+            "Línea de retardo con HOLD (congela y repite), REVERSE (lee al revés sin clic), AGE (carácter de cinta/BBD) y HEADS (eco multicabeza, estilo Space Echo).",
+            "El viejo «TAPE» se volvió este HEADS. FBK cerca de 1 + un TIME largo + varias cabezas = Frippertronics.",
+            ""}},
+        {"SWIRL", {
+            "Efectos de MODULACIÓN — chorus, flanger, ensemble y phaser en un solo módulo (TYPE). Retardos CORTOS modulados por LFO (más el phaser, una cascada de pasa-todo), con carácter BBD en AGE.",
+            "RASGO no tenía ninguno. Distinto del LOOPER (línea de retardo, ecos audibles) y de la reverb — aquí se oye el MOVIMIENTO, no el eco.",
+            "voz → SWIRL → MASTER engorda; LFO → RATE deja que el barrido respire fuera del compás; FBK cerca de ±1 + AGE = auto-oscila."}},
+        {"MEMORY", {
+            "Granular — un búfer picado en granos (grano/nube/spray), con posición, tamaño, densidad y FREEZE; texturas y time-stretch.",
+            "",
+            ""}},
+        {"SAMPLER", {
+            "Reproductor de rodajas (MPC/Akai) — TRIG dispara un pasaje grabado en vivo (gate REC) o de archivo; varispeed, rodajas + POS, repitch, desgaste.",
+            "El SAMPLER salta la posición de lectura (una rodaja); el TURNTABLE lee continuo con inercia; MEMORY es granular.",
+            ""}},
+        {"TURNTABLE", {
+            "Tocadiscos con un plato que tiene masa — el búfer del SAMPLER leído por una velocidad angular con INERCIA: el motor tira despacio (TORQ), la mano empuja (SCR), el freno lo deja rodar (BRK).",
+            "SIN cuantización de BPM — el beatmatch es un gesto, como en el vinilo.",
+            "LFO → SCR: el disco rasca en compás. ENVOLVENTE → BRK: un tape-stop en la vuelta."}},
+        {"MIXER", {
+            "Mezclador de 4 canales — nivel (deslizador), paneo y mute por canal, más una salida general. Donde el músico hace el balance.",
+            "Exento de la Motion Engine — los paneos y los niveles son suyos.",
+            ""}},
+        {"MASTER", {
+            "Etapa de salida estéreo — anchura, guarda de cuerpo y limitador true-peak; el techo del patch.",
+            "Exento de la Motion Engine. El botón ESPERA del encabezado es el mute de este módulo.",
+            ""}},
+        {"SCOPE", {
+            "Osciloscopio y medidor que DEVUELVE como CV — altura (YIN), envolvente, centroide espectral, ONSET (un pulso en el ataque); el patch se oye a sí mismo.",
+            "El SCOPE mide para reducir (→ un escalar); el BOXCAR mide para reconstruir (→ una onda).",
+            "SCOPE.onset ← batería → dispara una ENVOLVENTE al compás del audio; SCOPE.pitch → OSC.pitch afina por lo que entra."}},
+        {"NOTE-OUT", {
+            "Salida MIDI — convierte gate + 1 V/oct en note on/off, con canal, velocidad y un registro de partitura.",
+            "La contraparte de SALIDA de SIGNAL-IN.",
+            ""}},
+    };
+    return table;
+}
+
 }  // namespace detail
 
-// Definição do módulo (hover sobre o corpo/título). nullptr se não há.
-inline const LearnEntry* lookupLearnModule(const std::string& moduleType) {
+// Verbete de MÓDULO no idioma pedido, caindo no português quando faltar.
+//
+// A queda é deliberada e não é preguiça: o português é a língua em que o
+// catálogo foi escrito e revisado, e um verbete faltando numa tradução
+// deve mostrar o texto CERTO em outra língua, não uma caixa vazia. Só o
+// nível de módulo está traduzido; os verbetes de widget continuam em
+// português — declarado em `PUBLICACAO.md`.
+inline const LearnEntry* lookupLearnModule(const std::string& moduleType,
+                                           const Lang lang = Lang::pt) {
     const std::string key =
         (moduleType == "AUDIO-IN") ? std::string("SIGNAL-IN") : moduleType;
+
+    if (lang != Lang::pt) {
+        const auto& t = (lang == Lang::en) ? detail::moduleLearnTableEn()
+                      : (lang == Lang::fr) ? detail::moduleLearnTableFr()
+                                           : detail::moduleLearnTableEs();
+        const auto i = t.find(key);
+        if (i != t.end() && !i->second.quick.empty()) return &i->second;
+    }
     const auto& table = detail::moduleLearnTable();
     const auto it = table.find(key);
     return it == table.end() ? nullptr : &it->second;

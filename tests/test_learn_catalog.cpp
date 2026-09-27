@@ -3,6 +3,7 @@
 // `dossies/ESTUDO_seed_composicao_generativa.md §6`.
 
 #include "panel/LearnCatalog.hpp"
+#include "panel/ModuleCatalog.hpp"
 
 #include <iostream>
 #include <string>
@@ -284,9 +285,62 @@ void testEveryCatalogModuleHasBlurb() {
           "módulo desconhecido -> nullptr");
 }
 
+
+// ---- os 58 verbetes de MÓDULO traduzidos (27 set. 2026) --------------
+//
+// A revisão de idiomas mostrou que o LEARN era monolíngue enquanto
+// interface e tutorial já estavam em quatro línguas: quem rodava em inglês
+// via explicações em português. Só o nível de MÓDULO foi traduzido, e estes
+// casos fixam as três propriedades que importam.
+void testModuloTraduzido() {
+    using rasgo::panel::Lang;
+    using rasgo::panel::lookupLearnModule;
+    using rasgo::panel::moduleCatalog;
+    using rasgo::panel::makeModule;
+
+    int total = 0, faltando = 0, iguaisAoPt = 0;
+    for (const auto& grp : moduleCatalog())
+        for (const char* t : grp.types) {
+            if (!makeModule(t)) continue;
+            const auto* pt = lookupLearnModule(t, Lang::pt);
+            if (pt == nullptr) continue;
+            ++total;
+            for (const Lang l : {Lang::en, Lang::fr, Lang::es}) {
+                const auto* e = lookupLearnModule(t, l);
+                if (e == nullptr) { ++faltando; continue; }
+                // caiu no português? (o `quick` é o campo sempre preenchido)
+                if (e->quick == pt->quick) ++iguaisAoPt;
+            }
+        }
+    check(total >= 58, "os 58 módulos do catálogo têm verbete em português");
+    check(faltando == 0, "nenhum idioma devolve nullptr");
+    check(iguaisAoPt == 0,
+          "nenhum módulo cai no português nos três idiomas traduzidos");
+}
+
+// A QUEDA para o português é comportamento pedido, não descuido: um
+// verbete faltando numa tradução deve mostrar o texto CERTO em outra
+// língua, não uma caixa vazia. Testado com um tipo que não existe em
+// tabela nenhuma e com um que existe só na portuguesa.
+void testQuedaParaOPortugues() {
+    using rasgo::panel::Lang;
+    using rasgo::panel::lookupLearnModule;
+    check(lookupLearnModule("NAO-EXISTE", Lang::en) == nullptr,
+          "tipo inexistente devolve nullptr em vez de inventar texto");
+
+    // o `AUDIO-IN` é apelido de `SIGNAL-IN` — a tradução precisa herdar o
+    // apelido, senão quem roda em inglês perde o verbete desse módulo
+    const auto* a = lookupLearnModule("AUDIO-IN", Lang::en);
+    const auto* b = lookupLearnModule("SIGNAL-IN", Lang::en);
+    check(a != nullptr && b != nullptr && a->quick == b->quick,
+          "o apelido AUDIO-IN resolve para SIGNAL-IN em qualquer idioma");
+}
+
 }  // namespace
 
 int main() {
+    testModuloTraduzido();
+    testQuedaParaOPortugues();
     testKnownEntriesResolve();
     testUnknownModuleReturnsNull();
     testUnknownParamOnKnownModuleReturnsNull();

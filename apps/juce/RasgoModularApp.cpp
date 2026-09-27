@@ -2423,7 +2423,10 @@ public:
         for (const auto& m : mods_) {
             if (!m.bounds.contains(p)) continue;
             const std::string mt = rack_.graph.node(m.id).type();
-            if (const auto* e = rasgo::panel::lookupLearnModule(mt))
+            // passa o IDIOMA: os verbetes de módulo estão traduzidos
+            // desde 27 set. 2026, e chamar sem língua devolveria português
+            // a quem escolheu outra
+            if (const auto* e = rasgo::panel::lookupLearnModule(mt, lang_))
                 return {e, u8(mt), std::to_string(m.id) + "|\x01mod"};
             return {};
         }
@@ -3782,7 +3785,7 @@ private:
         if (hit.entry == nullptr) {
             const std::string& t = palette_.hoveredType();
             if (!t.empty())
-                if (const auto* e = rasgo::panel::lookupLearnModule(t))
+                if (const auto* e = rasgo::panel::lookupLearnModule(t, lang_))
                     hit = {e, u8(t), "pal|" + t};
         }
 
