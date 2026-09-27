@@ -135,6 +135,102 @@ void testFixedPointSAndH() {
     finiteBounded(r);
 }
 
+// ---- DELAY e THRESH: os dois que a auditoria não conseguiu provar ------
+//
+// Ambos entraram na lista de parâmetros SEM PROVA de 25 set. 2026. Nenhum
+// é defeito — faltava montar a condição em que eles são o que decide a
+// saída, e essa condição é a mesma para os dois: modo FOLLOWER, `scan` em
+// zero (janela parada) e abertura estreita. Aí a saída é o valor da onda
+// numa fase ÚNICA, e `delay`/`thresh` são exatamente o que escolhe essa
+// fase.
+//
+// Valor médio da saída no trecho final (depois de a média assentar).
+double mediaFinal(const std::vector<float>& v) {
+    double s = 0.0;
+    std::size_t c = 0;
+    for (std::size_t i = v.size() / 2; i < v.size(); ++i, ++c) s += v[i];
+    return s / std::max<std::size_t>(1, c);
+}
+
+// `delay` é a fração do PERÍODO em que a janela abre. Com o trigger
+// marcando o começo do período, a saída tem de ser o valor da senoide
+// naquela fração — ou seja A·sin(2π·delay). É prova quantitativa, não
+// "mudou alguma coisa": o parâmetro não tem por onde acertar quatro
+// valores previstos por acidente.
+void testDelayEscolheAFaseLida() {
+    const double hz = 100.0;
+    const float amp = 0.6f;
+    std::cout << "  BOXCAR.delay (amp " << amp << "):\n";
+    for (const float d : {0.0f, 0.25f, 0.5f, 0.75f}) {
+        Boxcar b;
+        b.setParameter("delay", d);
+        b.setParameter("aperture", 0.0f);   // amostra pontual
+        b.setParameter("average", 1.0f);    // sem média entre capturas
+        b.setParameter("scan", 0.0f);       // janela PARADA
+        b.setParameter("mode", 0.0f);       // follower
+        b.setParameter("blend", 1.0f);      // só o processado
+        Ins g;
+        // o trigger marca o começo de cada período da MESMA senoide, então
+        // a fase 0 da janela é a fase 0 da onda
+        g.in = sine(hz, amp);
+        g.trig = pulses(hz);
+        const double medido = mediaFinal(run(b, 120, g));
+        const double previsto = amp * std::sin(2.0 * M_PI * d);
+        std::cout << "    delay=" << d << " -> " << medido
+                  << "  (previsto " << previsto << ")\n";
+        check(std::fabs(medido - previsto) < 0.08,
+              "delay lê a fase prevista da onda");
+    }
+}
+
+// `thresh` só age quando TRIG está livre: é o nível cujo cruzamento
+// ascendente serve de referência de repetição (edge trigger de
+// osciloscópio). Com `delay` em 0 a janela abre EM CIMA do cruzamento,
+// então a saída tem de ser o próprio limiar — e é isso que este caso mede.
+void testThreshEscolheOPontoDeReferencia() {
+    const double hz = 100.0;
+    const float amp = 0.8f;
+    std::cout << "  BOXCAR.thresh (amp " << amp << ", delay 0):\n";
+    for (const float t : {-0.4f, 0.0f, 0.4f}) {
+        Boxcar b;
+        b.setParameter("thresh", t);
+        b.setParameter("delay", 0.0f);      // a janela abre no cruzamento
+        b.setParameter("aperture", 0.0f);
+        b.setParameter("average", 1.0f);
+        b.setParameter("scan", 0.0f);
+        b.setParameter("mode", 0.0f);
+        b.setParameter("blend", 1.0f);
+        Ins g;
+        g.in = sine(hz, amp);              // TRIG livre: quem dispara é THRESH
+        const double medido = mediaFinal(run(b, 120, g));
+        std::cout << "    thresh=" << t << " -> " << medido << "\n";
+        check(std::fabs(medido - static_cast<double>(t)) < 0.12,
+              "com delay 0, a saída é o próprio limiar de disparo");
+    }
+}
+
+// E a outra metade: um limiar ACIMA do pico não pode ser cruzado, então o
+// auto-trigger nunca dispara e a janela nunca reabre. Sem este caso,
+// "a saída segue o limiar" poderia ser satisfeito por um módulo que apenas
+// copiasse o parâmetro para a saída.
+void testThreshAcimaDoPicoNaoDisparaNunca() {
+    Boxcar b;
+    b.setParameter("thresh", 0.95f);   // pico do sinal é 0,5
+    b.setParameter("delay", 0.0f);
+    b.setParameter("aperture", 0.0f);
+    b.setParameter("average", 1.0f);
+    b.setParameter("scan", 0.0f);
+    b.setParameter("mode", 0.0f);
+    b.setParameter("blend", 1.0f);
+    Ins g;
+    g.in = sine(100.0, 0.5f);
+    const auto r = run(b, 60, g);
+    // nada capturado: a saída fica no seu valor inicial e NÃO acompanha a
+    // onda. Se `thresh` fosse ignorado, ela oscilaria como no caso acima.
+    EXPECT(stdev(r, r.size() / 2, r.size()) < 1.0e-4);
+    finiteBounded(r);
+}
+
 void testWindowMeanReducesNoise() {
     Boxcar b;
     b.setParameter("delay", 0.25f);
@@ -309,6 +405,9 @@ void testPanel() {
 
 int main() {
     testFixedPointSAndH();
+    testDelayEscolheAFaseLida();
+    testThreshEscolheOPontoDeReferencia();
+    testThreshAcimaDoPicoNaoDisparaNunca();
     testWindowMeanReducesNoise();
     testReconstruct();
     testPureNoiseAveragesDown();
