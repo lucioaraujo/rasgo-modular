@@ -85,6 +85,16 @@ void despejar(const char* familia) {
 
 int main(int argc, char** argv) {
     if (argc > 2 && std::string(argv[1]) == "--despejar") { despejar(argv[2]); return 0; }
+    // `--exigir` transforma o medidor em GUARDA DE REGRESSÃO, e é assim que
+    // ele entra no ctest. Sem isso, os 803 verbetes traduzidos apodrecem em
+    // silêncio: o próximo módulo novo entra com o painel em português e mais
+    // nada avisa — nem o compilador (o `lookupLearn` cai no pt por projeto),
+    // nem a interface (a caixa aparece, só na língua errada).
+    //
+    // Consequência aceita: acrescentar um widget passa a exigir seus três
+    // idiomas no MESMO incremento. É a regra que o RASGO já aplica ao Atlas
+    // e ao inventário, agora executável em vez de lembrada.
+    const bool exigir = (argc > 1 && std::string(argv[1]) == "--exigir");
 
     const char* nomes[3] = {"en", "fr", "es"};
     const Lang langs[3] = {Lang::en, Lang::fr, Lang::es};
@@ -143,6 +153,18 @@ int main(int argc, char** argv) {
         std::printf("\n");
     } else {
         std::printf("\nTodas as famílias traduzidas.\n");
+    }
+
+    if (exigir) {
+        long falta = 0;
+        for (int i = 0; i < 3; ++i) falta += geral[i].total - geral[i].feitos;
+        if (falta > 0) {
+            std::printf("\nFALHOU: %ld verbete-idioma sem tradução.\n"
+                        "Escreva o lote em tools/traducao/<FAMILIA>.json e rode\n"
+                        "  python3 tools/traducao/gerar.py\n", falta);
+            return 1;
+        }
+        std::printf("tool_learn_coverage: OK (803 verbetes × 3 idiomas)\n");
     }
     return 0;
 }
