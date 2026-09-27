@@ -9,6 +9,7 @@
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
+<script src="assets/contact.js" defer></script>
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — famille d'instruments et de recherche sonore</a></div>
@@ -22,7 +23,11 @@
     <span>MODULAR</span>
   </a>
   <div class="header-nav">
-    <nav class="lang-switch" aria-label="Idioma">
+    <nav class="page-nav" aria-label="Sections">
+      <a href="fr.html" aria-current="page">Concept</a>
+      <a href="modulos-fr.html">Modules</a>
+    </nav>
+    <nav class="lang-switch" aria-label="Langue">
       <a href="index.html">PT</a>
       <a href="en.html">EN</a>
       <a href="fr.html" aria-current="true">FR</a>
@@ -165,6 +170,23 @@
     s'ouvre et sonne sur une machine réelle — et cela ne sera pas formulé
     autrement ici.</p>
 </section>
+
+<section class="section" id="guia">
+  <h2>Guide des modules</h2>
+  <p>Les 58 modules, famille par famille : ce qu’est chacun, où il se situe parmi ses voisins, et une chaîne à essayer. C’est le texte que la boîte LEARN affiche dans l’instrument.</p>
+  <div class="contact-row">
+    <a class="button button-primary" href="modulos-fr.html">Ouvrir le guide des modules</a>
+  </div>
+</section>
+
+<section class="section section-dark" id="contato">
+  <h2>Contact</h2>
+  <p>Lúcio Araújo — écriture et développement. Défauts, licence, crédit :</p>
+  <div class="contact-row">
+    <button type="button" class="button button-primary" data-contact-trigger>rasgo.instruments@gmail.com</button>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular">GitHub</a>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -173,8 +195,14 @@
   <p>Fait partie de la famille RASGO d'instruments et de recherche sonore. Les
     crédits, les sources tierces et la politique de recherche accompagnent le
     dépôt de l'instrument.</p>
-  <p class="contato">Contact — anomalies, licence, crédit :
-    <a href="mailto:rasgo.instruments@gmail.com">rasgo.instruments@gmail.com</a></p>
 </footer>
+<dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">
+  <button class="dialog-close" type="button" data-contact-close aria-label="Fermer la fenêtre de contact">&times;</button>
+  <h2 id="contact-title">CONTACT</h2>
+  <p>Copiez l’adresse e-mail :</p>
+  <code data-contact-address></code>
+  <button class="button button-primary" type="button" data-contact-copy>Copier l’e-mail</button>
+  <p class="contact-feedback" data-contact-feedback data-copied="E-mail copié." data-fallback="Sélectionnez et copiez l’adresse ci-dessus." aria-live="polite"></p>
+</dialog>
 </body>
 </html>
