@@ -10038,7 +10038,34 @@ conteúdo textual gerado, e nenhum teste de áudio mudou de resultado.
 
 **Próximo passo:** o que falta para a v0.1.0 não é mais tradução — é
 cortar a tag e abrir o repositório, depois de 1 out. 2026 (a cota de
-Actions reseta; a tag dispara a CI dos três sistemas). Segue aberto para a
-v0.1.1: redesenhar só as regiões sujas (~38% de CPU em desenho) e provar
-os 4 parâmetros sem prova (`QUANTIZER.hysteresis`, `BOXCAR.delay`,
-`BOXCAR.thresh`, `SCOPE.trigger`).
+Actions reseta; a tag dispara a CI dos três sistemas).
+
+---
+
+## Registro da etapa — 2026-09-27: os 4 parâmetros sem prova, fechados
+
+Últimos itens abertos da auditoria de módulos. **Três funcionavam; um
+estava quebrado.** Cada um ganhou teste no `ctest` (80/80), e a condição
+que faltava era sempre exercitar o parâmetro no seu próprio idioma.
+
+**`QUANTIZER.hysteresis` era defeito.** A banda-morta comparava duas saídas
+**já quantizadas**, e como `snap()` devolve semitons inteiros, a banda
+máxima é menor que o menor passo de 11 das 12 escalas: 39 trocas de nota
+com a banda em 0 e 39 com a banda em 1. Sobreviveu porque todos os casos
+de `test_quantizer.cpp` fixavam `hysteresis = 0.0f` para isolar o que
+mediam. Agora mede quanto a ENTRADA passou da fronteira, relativa ao passo
+LOCAL — pelo passo médio travaria E→F e B→C na escala maior. Muda o som de
+patches com QUANTIZER, e é o momento de mudar: a v0.1.0 não saiu.
+
+**`SCOPE.trigger`, `BOXCAR.delay` e `.thresh` funcionam**, provados
+quantitativamente contra previsão analítica (a fase de disparo em
+`asin(L/A)`, a fase lida em `A·sin(2π·delay)`, e a saída igual ao próprio
+limiar). Detalhes e tabelas em `dossies/AUDITORIA_MODULOS.md`.
+
+Erro meu no caminho, registrado no teste: medi a fase do disparo do SCOPE
+só com `% periodo`, e um nível NEGATIVO — cruzado antes do zero, no fim do
+ciclo anterior — apareceu como 416 de 480. A sequência parecia cair quando
+subia, e acusei o parâmetro de quebrado. A fase agora é assinada.
+
+**Pendente para a v0.1.1:** redesenhar só as regiões sujas (~38% de CPU em
+desenho).
