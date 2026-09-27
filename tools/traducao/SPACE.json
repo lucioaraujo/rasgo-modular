@@ -1,0 +1,1693 @@
+[
+ [
+  "SPACE",
+  "time",
+  [
+   "Base delay time.",
+   "",
+   ""
+  ],
+  [
+   "Temps de base du retard.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo base del retardo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "taps",
+  [
+   "How many taps sum into the wet output — more taps is denser.",
+   "",
+   ""
+  ],
+  [
+   "Combien de prises s’additionnent à la sortie mouillée — plus de prises, plus dense.",
+   "",
+   ""
+  ],
+  [
+   "Cuántas tomas suman en la salida mojada — más tomas es más denso.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "spread",
+  [
+   "Spreads the tap times apart — 0 all together (a simple echo), 1 well distributed (a rhythmic texture).",
+   "",
+   ""
+  ],
+  [
+   "Écarte les temps des prises entre eux — 0 toutes ensemble (écho simple), 1 bien réparties (texture rythmique).",
+   "",
+   ""
+  ],
+  [
+   "Separa los tiempos de las tomas entre sí — 0 todas juntas (eco simple), 1 bien distribuidas (textura rítmica).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "feedback",
+  [
+   "How much of the output comes back into the delay input — more repetitions, a longer tail.",
+   "",
+   ""
+  ],
+  [
+   "Quelle part de la sortie revient à l’entrée du retard — plus de répétitions, une queue plus longue.",
+   "",
+   ""
+  ],
+  [
+   "Cuánto de la salida vuelve a la entrada del retardo — más repeticiones, cola más larga.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "diffusion",
+  [
+   "Mixes the raw wet output with the same output passed through a chain of all-passes — from a discrete echo to a spread-out reverb tail.",
+   "",
+   ""
+  ],
+  [
+   "Mélange la sortie mouillée brute avec la même sortie passée par une chaîne de all-pass — de l’écho discret à la queue de réverbération étalée.",
+   "",
+   ""
+  ],
+  [
+   "Mezcla la salida mojada cruda con la misma salida pasada por una cadena de all-pass — de eco discreto a cola de reverb esparcida.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "tone",
+  [
+   "Brightness of the feedback — low darkens the tail at each repetition (more natural), high keeps the brightness.",
+   "",
+   ""
+  ],
+  [
+   "Brillance de la rétroaction — basse, elle assombrit la queue à chaque répétition (plus naturel) ; haute, elle garde la brillance.",
+   "",
+   ""
+  ],
+  [
+   "Brillo de la realimentación — bajo oscurece la cola en cada repetición (más natural), alto mantiene el brillo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "mod",
+  [
+   "Depth of a slow LFO on the read time — chorus/ensemble on the echoes.",
+   "",
+   ""
+  ],
+  [
+   "Profondeur d’un LFO lent sur le temps de lecture — chorus/ensemble sur les échos.",
+   "",
+   ""
+  ],
+  [
+   "Profundidad de un LFO lento en el tiempo de lectura — chorus/ensemble en los ecos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "mix",
+  [
+   "Dry ↔ wet.",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ mouillé.",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ mojado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "in:in",
+  [
+   "Audio input.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "in:time_mod",
+  [
+   "CV that adds to TIME.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à TIME.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a TIME.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "in:feedback_mod",
+  [
+   "CV that adds to FBK.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à FBK.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a FBK.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "out:out",
+  [
+   "Dry + wet, mixed by MIX.",
+   "",
+   ""
+  ],
+  [
+   "Sec + mouillé, mélangés par MIX.",
+   "",
+   ""
+  ],
+  [
+   "Seco + mojado, mezclados por MIX.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SPACE",
+  "out:wet",
+  [
+   "Only the wet part (taps + diffusion), without the dry — useful for routing the space separately from the direct signal.",
+   "",
+   ""
+  ],
+  [
+   "Seulement la partie mouillée (prises + diffusion), sans le sec — utile pour router l’espace séparément du signal direct.",
+   "",
+   ""
+  ],
+  [
+   "Sólo la parte mojada (tomas + difusión), sin el seco — útil para enrutar el espacio aparte de la señal directa.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "size",
+  [
+   "Size of the space — it scales the 8 line lengths from ~8 ms (a room) to ~88 ms (a hall).",
+   "It is a feedback delay network (FDN): 8 lines + a Householder matrix (lossless) recombines them at every round. SPACE is comb+allpass; this is the network.",
+   "Patch a slow LFO into SIZE: the room 'breathes' and detunes the tail (a tape effect)."
+  ],
+  [
+   "Taille de l’espace — elle met à l’échelle les 8 longueurs de ligne, de ~8 ms (une pièce) à ~88 ms (un hall).",
+   "C’est un réseau de retards rebouclés (FDN) : 8 lignes + une matrice de Householder (sans perte) les recombine à chaque tour. SPACE c’est comb+allpass ; ceci, c’est le réseau.",
+   "Branchez un LFO lent sur SIZE : la salle « respire » et désaccorde la queue (effet de bande)."
+  ],
+  [
+   "Tamaño del espacio — escala las 8 longitudes de línea de ~8 ms (una sala) a ~88 ms (un hall).",
+   "Es una red de retardos realimentada (FDN): 8 líneas + una matriz de Householder (sin pérdida) las recombina en cada vuelta. SPACE es comb+allpass; esto es la red.",
+   "Cablee un LFO lento en SIZE: la sala 'respira' y desafina la cola (efecto de cinta)."
+  ]
+ ],
+ [
+  "HALL",
+  "decay",
+  [
+   "Tail time (RT60): 0.2 s to 15 s. Close to maximum the tail hardly decays at all.",
+   "The gain of each line comes from RT60: g = 10^(−3·time/RT60). Householder is orthogonal, so g < 1 always decays, it never blows up.",
+   ""
+  ],
+  [
+   "Temps de queue (RT60) : 0,2 s à 15 s. Près du maximum la queue ne décroît presque plus.",
+   "Le gain de chaque ligne découle du RT60 : g = 10^(−3·temps/RT60). Householder est orthogonale, donc g < 1 décroît toujours, cela n’explose jamais.",
+   ""
+  ],
+  [
+   "Tiempo de cola (RT60): 0,2 s a 15 s. Cerca del máximo la cola casi no decae.",
+   "La ganancia de cada línea sale del RT60: g = 10^(−3·tiempo/RT60). Householder es ortogonal, así que g < 1 siempre decae, nunca explota.",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "damp",
+  [
+   "A low-pass inside each line's loop — the treble decays before the bass, as in a real room. 0 = bright, 1 = dark.",
+   "",
+   ""
+  ],
+  [
+   "Un passe-bas à l’intérieur de la boucle de chaque ligne — l’aigu décroît avant le grave, comme dans une vraie salle. 0 = brillant, 1 = sombre.",
+   "",
+   ""
+  ],
+  [
+   "Un paso bajo dentro del lazo de cada línea — el agudo decae antes que el grave, como en una sala real. 0 = brillante, 1 = oscuro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "mod",
+  [
+   "Depth of the modulation of each line's read point (slow LFOs, distinct phases) — chorus on the tail, it breaks the metallic 'whistle'. Deterministic, no RNG.",
+   "",
+   ""
+  ],
+  [
+   "Profondeur de la modulation du point de lecture de chaque ligne (LFOs lents, phases distinctes) — chorus sur la queue, cela casse le « sifflement » métallique. Déterministe, sans RNG.",
+   "",
+   ""
+  ],
+  [
+   "Profundidad de la modulación del punto de lectura de cada línea (LFOs lentos, fases distintas) — chorus en la cola, rompe el 'pitido' metálico. Determinista, sin RNG.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "pre",
+  [
+   "Pre-delay: 0 to ~120 ms before the network. It separates the direct sound from the reverberation — what defines the perceived size.",
+   "",
+   ""
+  ],
+  [
+   "Pré-retard : 0 à ~120 ms avant le réseau. Il sépare le son direct de la réverbération — ce qui définit la taille perçue.",
+   "",
+   ""
+  ],
+  [
+   "Pre-retardo: 0 a ~120 ms antes de la red. Separa el sonido directo de la reverberación — lo que define el tamaño percibido.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "mix",
+  [
+   "Dry ↔ wet. 0 = straight through.",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ mouillé. 0 = passage direct.",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ mojado. 0 = paso directo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "in:in",
+  [
+   "Audio to reverberate (summed to mono).",
+   "",
+   ""
+  ],
+  [
+   "Audio à réverbérer (sommé en mono).",
+   "",
+   ""
+  ],
+  [
+   "Audio a reverberar (sumado a mono).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "in:size",
+  [
+   "CV added to SIZE.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à SIZE.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a SIZE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "in:decay",
+  [
+   "CV added to DECAY.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à DECAY.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a DECAY.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "in:freeze",
+  [
+   "Gate: while high, the tail becomes infinite (g = 1, the network preserves energy) and new input stops coming in — like the LOOPER's HOLD, but for the space.",
+   "",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, la queue devient infinie (g = 1, le réseau conserve l’énergie) et la nouvelle entrée cesse d’entrer — comme le HOLD du LOOPER, mais pour l’espace.",
+   "",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, la cola se vuelve infinita (g = 1, la red conserva la energía) y la entrada nueva deja de entrar — como el HOLD del LOOPER, pero para el espacio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "out:l",
+  [
+   "Left channel (a combination of the even lines).",
+   "",
+   ""
+  ],
+  [
+   "Canal gauche (combinaison des lignes paires).",
+   "",
+   ""
+  ],
+  [
+   "Canal izquierdo (combinación de las líneas pares).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HALL",
+  "out:r",
+  [
+   "Right channel (odd lines) — decorrelated from L so the image comes out wide.",
+   "",
+   ""
+  ],
+  [
+   "Canal droit (lignes impaires) — décorrélé du L pour que l’image soit large.",
+   "",
+   ""
+  ],
+  [
+   "Canal derecho (líneas impares) — descorrelacionado del L para que la imagen quede ancha.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "time",
+  [
+   "Length of the delay — from a short echo to a 2 s loop.",
+   "It is the distance between the write head and the read head in the circular buffer; changes are smoothed so it does not click.",
+   "With FBK high, turn TIME slowly: the loop 'stretches' and 'shrinks' like tape pulled by hand."
+  ],
+  [
+   "Longueur du retard — de l’écho court à la boucle de 2 s.",
+   "C’est la distance entre la tête d’écriture et la tête de lecture dans le tampon circulaire ; les changements sont lissés pour éviter les clics.",
+   "Avec FBK élevé, tournez TIME lentement : la boucle « s’étire » et « se resserre » comme une bande tirée à la main."
+  ],
+  [
+   "Longitud del retardo — de eco corto a lazo de 2 s.",
+   "Es la distancia entre el cabezal de escritura y el de lectura en el búfer circular; los cambios se suavizan para que no chasquee.",
+   "Con FBK alto, gire TIME despacio: el lazo se 'estira' y se 'encoge' como cinta tirada a mano."
+  ]
+ ],
+ [
+  "LOOPER",
+  "feedback",
+  [
+   "How much of the output comes back into the loop — above 1 it self-oscillates.",
+   "The fed-back signal passes through the AGE filter and through a tanh that holds the level before summing back in.",
+   "Set it to ~1.05 with no input: the loop sustains itself and AGE becomes the timbre of the tail."
+  ],
+  [
+   "Quelle part de la sortie revient dans la boucle — au-delà de 1 elle auto-oscille.",
+   "Le signal rebouclé passe par le filtre d’AGE et par un tanh qui retient le niveau avant de le réadditionner.",
+   "Mettez-la à ~1,05 sans entrée : la boucle se soutient et l’AGE devient le timbre de la queue."
+  ],
+  [
+   "Cuánto de la salida vuelve al lazo — por encima de 1 autooscila.",
+   "La señal realimentada pasa por el filtro de AGE y por un tanh que retiene el nivel antes de volver a sumarse.",
+   "Póngala en ~1,05 sin entrada: el lazo se sostiene y el AGE se vuelve el timbre de la cola."
+  ]
+ ],
+ [
+  "LOOPER",
+  "age",
+  [
+   "Tape/BBD character: loss of treble in the loop, wow & flutter, saturation and hiss.",
+   "A low-pass inside the feedback darkens it at each round; two slow LFOs (~0.9 and ~6.5 Hz) modulate the read; seeded noise sums into the loop.",
+   "Hold with HOLD and raise AGE: each repetition becomes a little darker and more tremulous, like a copy of a copy."
+  ],
+  [
+   "Caractère bande/BBD : perte d’aigu dans la boucle, wow & flutter, saturation et souffle.",
+   "Un passe-bas à l’intérieur de la rétroaction l’assombrit à chaque tour ; deux LFOs lents (~0,9 et ~6,5 Hz) modulent la lecture ; un bruit semé s’additionne dans la boucle.",
+   "Figez avec HOLD et montez l’AGE : chaque répétition devient un peu plus sombre et tremblante, comme une copie de copie."
+  ],
+  [
+   "Carácter de cinta/BBD: pérdida de agudo en el lazo, wow & flutter, saturación y siseo.",
+   "Un paso bajo dentro de la realimentación oscurece en cada vuelta; dos LFO lentos (~0,9 y ~6,5 Hz) modulan la lectura; un ruido sembrado se suma al lazo.",
+   "Sostenga con HOLD y suba el AGE: cada repetición queda un poco más oscura y trémula, como copia de copia."
+  ]
+ ],
+ [
+  "LOOPER",
+  "mix",
+  [
+   "Dry ↔ wet on the OUT output.",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ mouillé sur la sortie OUT.",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ mojado en la salida OUT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "heads",
+  [
+   "1 head = a simple echo. 2–4 = a MULTI-HEAD tape echo (Space Echo): the extra heads read fractions of TIME (0.75 / 0.5 / 0.25×) and sum — a dense, rhythmic echo.",
+   "Like the playback heads of the Roland RE-201 before the erase head; the feedback regenerates them all.",
+   "FBK close to 1 + a long TIME + several heads = dense Frippertronics."
+  ],
+  [
+   "1 tête = un écho simple. 2–4 = un écho à bande MULTI-TÊTES (Space Echo) : les têtes supplémentaires lisent des fractions de TIME (0,75 / 0,5 / 0,25×) et s’additionnent — un écho dense et rythmique.",
+   "Comme les têtes de lecture du Roland RE-201 avant la tête d’effacement ; la rétroaction les régénère toutes.",
+   "FBK près de 1 + un TIME long + plusieurs têtes = du Frippertronics dense."
+  ],
+  [
+   "1 cabezal = eco simple. 2–4 = eco de cinta MULTICABEZAL (Space Echo): los cabezales extra leen fracciones de TIME (0,75 / 0,5 / 0,25×) y suman — eco denso y rítmico.",
+   "Como los cabezales de reproducción del Roland RE-201 antes del cabezal de borrado; la realimentación los regenera todos.",
+   "FBK cerca de 1 + TIME largo + varios cabezales = Frippertronics denso."
+  ]
+ ],
+ [
+  "LOOPER",
+  "hold",
+  [
+   "Freezes the loop: it stops writing and repeats the current window forever.",
+   "On the rising edge it anchors the window at the current write position; the read then circulates only in that stretch, with no new feedback.",
+   "Play a phrase, switch HOLD on at the end of it and improvise over the top — the stretch becomes a bed."
+  ],
+  [
+   "Gèle la boucle : elle cesse d’écrire et répète la fenêtre actuelle indéfiniment.",
+   "Sur le front montant elle ancre la fenêtre à la position d’écriture actuelle ; la lecture ne circule plus que dans ce passage, sans nouvelle rétroaction.",
+   "Jouez une phrase, activez HOLD à sa fin et improvisez par-dessus — le passage devient un fond."
+  ],
+  [
+   "Congela el lazo: deja de escribir y repite la ventana actual para siempre.",
+   "En el flanco de subida ancla la ventana en la posición de escritura actual; la lectura pasa a circular sólo en ese tramo, sin realimentación nueva.",
+   "Toque una frase, active HOLD al final de ella e improvise encima — el tramo se vuelve base."
+  ]
+ ],
+ [
+  "LOOPER",
+  "reverse",
+  [
+   "Reads the loop backwards, with no click.",
+   "Two Hann-windowed reads, half a round out of phase, cross over (a crossfade), so the turn at the end of the buffer does not pop.",
+   "Combine REV + HOLD: a fixed stretch playing backwards in a loop."
+  ],
+  [
+   "Lit la boucle à l’envers, sans clic.",
+   "Deux lectures en fenêtre de Hann, déphasées d’un demi-tour, se croisent (crossfade), donc le retournement en fin de tampon ne claque pas.",
+   "Combinez REV + HOLD : un passage fixe joué à l’envers en boucle."
+  ],
+  [
+   "Lee el lazo al revés, sin clic.",
+   "Dos lecturas en ventana de Hann desfasadas media vuelta se cruzan (crossfade), así que el giro al final del búfer no chasquea.",
+   "Combine REV + HOLD: un tramo fijo sonando al revés en bucle."
+  ]
+ ],
+ [
+  "LOOPER",
+  "in:in",
+  [
+   "Audio input.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "in:time",
+  [
+   "CV that adds to TIME (in seconds).",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à TIME (en secondes).",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a TIME (en segundos).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "in:freeze",
+  [
+   "Gate: while high, it is the same as HOLD on.",
+   "",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, cela équivaut à HOLD activé.",
+   "",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, equivale a HOLD activado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "in:rev",
+  [
+   "Gate: while high, it is the same as REV on.",
+   "",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, cela équivaut à REV activé.",
+   "",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, equivale a REV activado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "out:out",
+  [
+   "Dry + wet, mixed by MIX.",
+   "",
+   ""
+  ],
+  [
+   "Sec + mouillé, mélangés par MIX.",
+   "",
+   ""
+  ],
+  [
+   "Seco + mojado, mezclados por MIX.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "LOOPER",
+  "out:wet",
+  [
+   "Only the loop, without the dry.",
+   "",
+   ""
+  ],
+  [
+   "Seulement la boucle, sans le sec.",
+   "",
+   ""
+  ],
+  [
+   "Sólo el lazo, sin el seco.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "type",
+  [
+   "0 CHORUS (2 voices, it fattens) · 1 FLANGER (1 short delay + feedback, jet/comb) · 2 ENSEMBLE (3 voices, Juno/Solina) · 3 PHASER (a cascade of all-passes, a moving notch).",
+   "The first three are modulated SHORT delays; the phaser swaps the delay line for 6 first-order all-passes — a hollower, less metallic timbre.",
+   "Compare FLANGER and PHASER at the same RATE/DEPTH: the comb sweeps metallic, the notch sweeps hollow."
+  ],
+  [
+   "0 CHORUS (2 voix, ça étoffe) · 1 FLANGER (1 retard court + rétroaction, jet/peigne) · 2 ENSEMBLE (3 voix, Juno/Solina) · 3 PHASER (cascade de all-pass, notch mobile).",
+   "Les trois premiers sont des retards COURTS modulés ; le phaser remplace la ligne à retard par 6 all-pass du 1er ordre — timbre plus creux, moins métallique.",
+   "Comparez FLANGER et PHASER au même RATE/DEPTH : le peigne balaie métallique, le notch balaie creux."
+  ],
+  [
+   "0 CHORUS (2 voces, engorda) · 1 FLANGER (1 retardo corto + realimentación, chorro/peine) · 2 ENSEMBLE (3 voces, Juno/Solina) · 3 PHASER (cascada de all-pass, notch móvil).",
+   "Los tres primeros son retardos CORTOS modulados; el phaser cambia la línea de retardo por 6 all-pass de 1.er orden — timbre más hueco, menos metálico.",
+   "Compare FLANGER y PHASER con el mismo RATE/DEPTH: el peine barre metálico, el notch barre hueco."
+  ]
+ ],
+ [
+  "SWIRL",
+  "rate",
+  [
+   "Speed of the (triangular) LFO that sweeps the modulation. 0.02 Hz = almost still; 8 Hz = vibrato.",
+   "",
+   ""
+  ],
+  [
+   "Vitesse du LFO (triangulaire) qui balaie la modulation. 0,02 Hz = presque immobile ; 8 Hz = vibrato.",
+   "",
+   ""
+  ],
+  [
+   "Velocidad del LFO (triangular) que barre la modulación. 0,02 Hz = casi quieto; 8 Hz = vibrato.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "depth",
+  [
+   "Depth of the sweep — how far the delay (or the all-passes' cutoff) moves. 0 = static colouration.",
+   "",
+   ""
+  ],
+  [
+   "Profondeur du balayage — de combien le retard (ou la coupure des all-pass) se déplace. 0 = coloration statique.",
+   "",
+   ""
+  ],
+  [
+   "Profundidad del barrido — cuánto se mueve el retardo (o el corte de los all-pass). 0 = coloración estática.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "feedback",
+  [
+   "Feedback (−1..1). In FLANGER/PHASER it creates the resonance (positive = a sharp comb/notch, negative = inverted). In CHORUS/ENSEMBLE a touch gives vibrato.",
+   "A tanh in the loop holds the level; close to ±1 it self-oscillates (the autonomous mode, starting from the AGE noise floor).",
+   ""
+  ],
+  [
+   "Rétroaction (−1..1). En FLANGER/PHASER elle crée la résonance (positive = peigne/notch aigu, négative = inversé). En CHORUS/ENSEMBLE un filet donne du vibrato.",
+   "Un tanh dans la boucle retient le niveau ; près de ±1 elle auto-oscille (le mode autonome, à partir du plancher de bruit de l’AGE).",
+   ""
+  ],
+  [
+   "Realimentación (−1..1). En FLANGER/PHASER crea la resonancia (positiva = peine/notch agudo, negativa = invertido). En CHORUS/ENSEMBLE un hilo da vibrato.",
+   "Un tanh en el lazo retiene el nivel; cerca de ±1 autooscila (el modo autónomo, a partir del suelo de ruido del AGE).",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "tone",
+  [
+   "A 1-pole filter ON the wet: <0 low-pass (the 'velvety' BBD sound), >0 high-pass (it thins out, removes the bass), 0 neutral.",
+   "",
+   ""
+  ],
+  [
+   "Un filtre à 1 pôle SUR le mouillé : <0 passe-bas (le « velouté » du BBD), >0 passe-haut (cela affine, retire le grave), 0 neutre.",
+   "",
+   ""
+  ],
+  [
+   "Un filtro de 1 polo EN el mojado: <0 paso bajo (lo 'aterciopelado' del BBD), >0 paso alto (afina, quita el grave), 0 neutro.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "spread",
+  [
+   "Stereo width: the R channel's LFO is offset by spread·¼ of a cycle from the L; on the multiple voices it also spreads the detune. 0 = mono.",
+   "",
+   ""
+  ],
+  [
+   "Largeur stéréo : le LFO du canal R est décalé de spread·¼ de cycle par rapport au L ; sur les voix multiples il étale aussi le désaccord. 0 = mono.",
+   "",
+   ""
+  ],
+  [
+   "Anchura estéreo: el LFO del canal R se desfasa spread·¼ de ciclo respecto al L; en las voces múltiples también esparce el desafine. 0 = mono.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "age",
+  [
+   "BBD (bucket-brigade) character: companding (it compresses before the line, expands after), a thread of seeded noise and a touch of aliasing. 0 = clean.",
+   "Deterministic — two renders with the same AGE are byte-identical.",
+   ""
+  ],
+  [
+   "Caractère BBD (bucket-brigade) : compansion (il comprime avant la ligne, étend après), un filet de bruit semé et une pointe d’aliasing. 0 = propre.",
+   "Déterministe — deux rendus au même AGE sont identiques à l’octet.",
+   ""
+  ],
+  [
+   "Carácter BBD (bucket-brigade): compansión (comprime antes de la línea, expande después), un hilo de ruido sembrado y una pizca de aliasing. 0 = limpio.",
+   "Determinista — dos renders con el mismo AGE son idénticos byte a byte.",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "mix",
+  [
+   "Dry ↔ wet. 0 = straight through (an exact bypass).",
+   "",
+   ""
+  ],
+  [
+   "Sec ↔ mouillé. 0 = passage direct (un bypass exact).",
+   "",
+   ""
+  ],
+  [
+   "Seco ↔ mojado. 0 = paso directo (bypass exacto).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "in:in",
+  [
+   "Audio to process.",
+   "",
+   ""
+  ],
+  [
+   "Audio à traiter.",
+   "",
+   ""
+  ],
+  [
+   "Audio a procesar.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "in:rate_mod",
+  [
+   "CV added to RATE (a sweep off the beat).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à RATE (un balayage hors mesure).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a RATE (barrido fuera del compás).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "in:mix_mod",
+  [
+   "CV added to MIX (the effect comes in on the attack/tail, via an ENVELOPE).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à MIX (l’effet entre sur l’attaque/la queue, via une ENVELOPE).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a MIX (el efecto entra en el ataque/la cola, vía un ENVELOPE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "out:l",
+  [
+   "Left channel (dry + wet by MIX).",
+   "",
+   ""
+  ],
+  [
+   "Canal gauche (sec + mouillé par MIX).",
+   "",
+   ""
+  ],
+  [
+   "Canal izquierdo (seco + mojado por MIX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWIRL",
+  "out:r",
+  [
+   "Right channel — the LFO offset by SPREAD makes the image open up.",
+   "",
+   ""
+  ],
+  [
+   "Canal droit — le LFO décalé par SPREAD fait s’ouvrir l’image.",
+   "",
+   ""
+  ],
+  [
+   "Canal derecho — el LFO desfasado por SPREAD hace que la imagen se abra.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "grain",
+  [
+   "Duration of each grain.",
+   "",
+   ""
+  ],
+  [
+   "Durée de chaque grain.",
+   "",
+   ""
+  ],
+  [
+   "Duración de cada grano.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "density",
+  [
+   "How many new grains are born per second.",
+   "",
+   ""
+  ],
+  [
+   "Combien de nouveaux grains naissent par seconde.",
+   "",
+   ""
+  ],
+  [
+   "Cuántos granos nuevos nacen por segundo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "position",
+  [
+   "Where in the buffer (0=most recent, up to 3 s ago; 1=oldest) the grains start reading.",
+   "",
+   ""
+  ],
+  [
+   "Où dans le tampon (0=le plus récent, jusqu’à 3 s en arrière ; 1=le plus ancien) les grains commencent à lire.",
+   "",
+   ""
+  ],
+  [
+   "Dónde en el búfer (0=más reciente, hasta 3 s atrás; 1=más antiguo) empiezan a leer los granos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "spray",
+  [
+   "Spreads each grain's starting position — from an exact read to a cloud blurred in time.",
+   "",
+   ""
+  ],
+  [
+   "Étale la position de départ de chaque grain — de la lecture exacte au nuage flouté dans le temps.",
+   "",
+   ""
+  ],
+  [
+   "Esparce la posición de inicio de cada grano — de lectura exacta a nube difuminada en el tiempo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "pitch",
+  [
+   "Transposition of the grains' read, in semitones (±24).",
+   "",
+   ""
+  ],
+  [
+   "Transposition de la lecture des grains, en demi-tons (±24).",
+   "",
+   ""
+  ],
+  [
+   "Transposición de la lectura de los granos, en semitonos (±24).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "feedback",
+  [
+   "Feeds the output back into the buffer before recording — the material accumulates/degenerates.",
+   "",
+   ""
+  ],
+  [
+   "Réinjecte la sortie dans le tampon avant l’enregistrement — le matériau s’accumule/dégénère.",
+   "",
+   ""
+  ],
+  [
+   "Realimenta la salida de vuelta al búfer antes de grabar — el material se acumula/degenera.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "blend",
+  [
+   "Dry (raw input) ↔ wet (the cloud of grains).",
+   "",
+   ""
+  ],
+  [
+   "Sec (entrée brute) ↔ mouillé (le nuage de grains).",
+   "",
+   ""
+  ],
+  [
+   "Seco (entrada cruda) ↔ mojado (la nube de granos).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "freeze",
+  [
+   "Stops the recording — the buffer becomes a fixed texture, only the grains keep re-reading.",
+   "",
+   "Switch FREEZE on in the middle of a phrase: the captured material becomes a static granular loop, with no gate to hold at all."
+  ],
+  [
+   "Arrête l’enregistrement — le tampon devient une texture fixe, seuls les grains continuent de relire.",
+   "",
+   "Activez FREEZE au milieu d’une phrase : le matériau capturé devient une boucle granulaire statique, sans aucun gate à tenir."
+  ],
+  [
+   "Detiene la grabación — el búfer se vuelve una textura fija, sólo los granos siguen releyendo.",
+   "",
+   "Active FREEZE en medio de una frase: el material capturado se vuelve un bucle granular estático, sin tener que sostener ningún gate."
+  ]
+ ],
+ [
+  "MEMORY",
+  "in:in",
+  [
+   "Audio input, recorded continuously into the buffer (except with FREEZE).",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio, enregistrée en continu dans le tampon (sauf avec FREEZE).",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio, grabada continuamente en el búfer (excepto con FREEZE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "in:position_mod",
+  [
+   "CV that adds to POS.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à POS.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a POS.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "in:pitch_mod",
+  [
+   "1 V/oct CV that adds to PITCH (in octaves).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct qui s’ajoute à PITCH (en octaves).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct que se suma a PITCH (en octavas).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "in:freeze_gate",
+  [
+   "Gate — a high level freezes the buffer, the same as the HOLD toggle.",
+   "",
+   ""
+  ],
+  [
+   "Gate — un niveau haut gèle le tampon, comme l’interrupteur HOLD.",
+   "",
+   ""
+  ],
+  [
+   "Gate — un nivel alto congela el búfer, igual que el interruptor HOLD.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MEMORY",
+  "out:out",
+  [
+   "Mix between the raw input and the cloud of grains.",
+   "",
+   ""
+  ],
+  [
+   "Mélange entre l’entrée brute et le nuage de grains.",
+   "",
+   ""
+  ],
+  [
+   "Mezcla entre la entrada cruda y la nube de granos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "start",
+  [
+   "Starting point of playback, inside the selected slice (0 = beginning, 1 = end).",
+   "",
+   ""
+  ],
+  [
+   "Point de départ de la lecture, à l’intérieur de la tranche sélectionnée (0 = début, 1 = fin).",
+   "",
+   ""
+  ],
+  [
+   "Punto de partida de la reproducción, dentro de la rodaja seleccionada (0 = principio, 1 = final).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "speed",
+  [
+   "Bipolar varispeed: sign·2^(|speed|·2) → ±0.25× to ±4×. Negative = play backwards.",
+   "Without REPIT, speed and pitch move together (like a tape machine). 2× faster = one octave up.",
+   "Patch SEQUENCE → PIT and play the same slice at several pitches."
+  ],
+  [
+   "Varispeed bipolaire : signe·2^(|speed|·2) → ±0,25× à ±4×. Négatif = lecture à l’envers.",
+   "Sans REPIT, la vitesse et la hauteur avancent ensemble (comme un magnétophone). 2× plus vite = une octave au-dessus.",
+   "Branchez SEQUENCE → PIT et jouez la même tranche à plusieurs hauteurs."
+  ],
+  [
+   "Varispeed bipolar: signo·2^(|speed|·2) → ±0,25× a ±4×. Negativo = tocar al revés.",
+   "Sin REPIT, la velocidad y la altura van juntas (como un magnetófono). 2× más rápido = una octava arriba.",
+   "Cablee SEQUENCE → PIT y toque la misma rodaja en varias alturas."
+  ]
+ ],
+ [
+  "SAMPLER",
+  "slices",
+  [
+   "Divides the recorded buffer into N equal slices (1–16). The POS CV chooses which one to fire.",
+   "It is the MPC 'chop' — record a bar, cut it into 8, fire the slices out of order from a TRIGSEQ.",
+   ""
+  ],
+  [
+   "Divise le tampon enregistré en N tranches égales (1–16). La CV de POS choisit laquelle déclencher.",
+   "C’est le « chop » du MPC — enregistrez une mesure, coupez-la en 8, déclenchez les tranches dans le désordre depuis un TRIGSEQ.",
+   ""
+  ],
+  [
+   "Divide el búfer grabado en N rodajas iguales (1–16). La CV de POS elige cuál disparar.",
+   "Es el 'chop' del MPC — grabe un compás, córtelo en 8, dispare las rodajas desordenadas desde un TRIGSEQ.",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "repitch",
+  [
+   "0 = the transposition (PIT) changes the speed (varispeed). 1 = the speed is left free and the pitch comes from a pitch-shifter (the slice's duration is preserved).",
+   "The pitch-shifter is the one from G09.pitchshift.pd in Pure Data, ported from Navalha 2 (credit: Glerm Soares / Lúcio Araújo).",
+   ""
+  ],
+  [
+   "0 = la transposition (PIT) change la vitesse (varispeed). 1 = la vitesse est laissée libre et la hauteur vient d’un pitch-shifter (la durée de la tranche est préservée).",
+   "Le pitch-shifter est celui du G09.pitchshift.pd de Pure Data, porté depuis Navalha 2 (crédit : Glerm Soares / Lúcio Araújo).",
+   ""
+  ],
+  [
+   "0 = la transposición (PIT) cambia la velocidad (varispeed). 1 = la velocidad queda libre y la altura viene de un pitch-shifter (se preserva la duración de la rodaja).",
+   "El pitch-shifter es el de G09.pitchshift.pd de Pure Data, portado desde Navalha 2 (crédito: Glerm Soares / Lúcio Araújo).",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "wear",
+  [
+   "Wear per trigger: jitter at the starting point, sample-rate reduction and bit-crush that grow with the knob. Each trigger sounds a little different.",
+   "Deterministic — an xorshift seeded ON the trigger, so the same sequence of triggers gives the same audio.",
+   ""
+  ],
+  [
+   "Usure par déclenchement : jitter au point de départ, réduction du taux d’échantillonnage et bit-crush qui croissent avec le potentiomètre. Chaque déclenchement sonne un peu différemment.",
+   "Déterministe — un xorshift semé SUR le déclenchement, donc la même suite de triggers donne le même audio.",
+   ""
+  ],
+  [
+   "Desgaste por disparo: jitter en el punto de inicio, reducción de la tasa de muestreo y bit-crush que crecen con el mando. Cada disparo suena un poco distinto.",
+   "Determinista — un xorshift sembrado EN el disparo, así que la misma secuencia de triggers da el mismo audio.",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "loop",
+  [
+   "One-shot (off) ↔ loop of the slice (on). The loop point has no crossfade yet — it may click on a very short slice.",
+   "",
+   ""
+  ],
+  [
+   "One-shot (éteint) ↔ boucle de la tranche (allumé). Le point de boucle n’a pas encore de crossfade — il peut claquer sur une tranche très courte.",
+   "",
+   ""
+  ],
+  [
+   "One-shot (apagado) ↔ bucle de la rodaja (encendido). El punto de bucle aún no tiene crossfade — puede chasquear en una rodaja muy corta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "in:trig",
+  [
+   "Fires the current slice.",
+   "",
+   ""
+  ],
+  [
+   "Déclenche la tranche actuelle.",
+   "",
+   ""
+  ],
+  [
+   "Dispara la rodaja actual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "in:in",
+  [
+   "Audio to record (while REC is high).",
+   "",
+   ""
+  ],
+  [
+   "Audio à enregistrer (tant que REC est haut).",
+   "",
+   ""
+  ],
+  [
+   "Audio a grabar (mientras REC esté alto).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "in:rec",
+  [
+   "Gate: while high, it records IN into the buffer (up to ~8 s). On the falling edge, it freezes the recorded length.",
+   "With nothing recorded and no file loaded from the panel, the SAMPLER stays silent.",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, il enregistre IN dans le tampon (jusqu’à ~8 s). Au front descendant, il gèle la longueur enregistrée.",
+   "Sans enregistrement et sans fichier chargé depuis le panneau, le SAMPLER reste silencieux.",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, graba IN en el búfer (hasta ~8 s). En el flanco de bajada, congela la longitud grabada.",
+   "Sin grabar y sin archivo cargado desde el panel, el SAMPLER queda en silencio.",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "in:pos",
+  [
+   "CV (0–1) that chooses the slice.",
+   "",
+   ""
+  ],
+  [
+   "CV (0–1) qui choisit la tranche.",
+   "",
+   ""
+  ],
+  [
+   "CV (0–1) que elige la rodaja.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "in:pitch",
+  [
+   "1 V/oct CV — transposition (via speed or the pitch-shifter, according to REPIT).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct — transposition (par la vitesse ou le pitch-shifter, selon REPIT).",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct — transposición (vía velocidad o pitch-shifter, según REPIT).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SAMPLER",
+  "out:out",
+  [
+   "The slice as played, with adaptive de-click at the edges.",
+   "",
+   ""
+  ],
+  [
+   "La tranche jouée, avec un de-click adaptatif aux bords.",
+   "",
+   ""
+  ],
+  [
+   "La rodaja tocada, con de-click adaptativo en los bordes.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "speed",
+  [
+   "Target speed of the platter: sign·2^|speed| → ±0.5× to ±2× (33⅓ ↔ 45 ↔ slow). Negative = the record spinning backwards.",
+   "It is only the TARGET — the platter has mass and takes time to get there (see TORQ).",
+   "Negative + BRK: the record decelerates from −2× to a standstill, 'rising' in pitch on the way."
+  ],
+  [
+   "Vitesse cible du plateau : signe·2^|speed| → ±0,5× à ±2× (33⅓ ↔ 45 ↔ lent). Négatif = le disque tourne à l’envers.",
+   "Ce n’est que la CIBLE — le plateau a une masse et met du temps à y arriver (voir TORQ).",
+   "Négatif + BRK : le disque décélère de −2× jusqu’à l’arrêt, en « montant » en hauteur au passage."
+  ],
+  [
+   "Velocidad objetivo del plato: signo·2^|speed| → ±0,5× a ±2× (33⅓ ↔ 45 ↔ lento). Negativo = el disco girando al revés.",
+   "Es sólo el OBJETIVO — el plato tiene masa y tarda en llegar allí (ver TORQ).",
+   "Negativo + BRK: el disco desacelera de −2× hasta parar, 'subiendo' de afinación por el camino."
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "torque",
+  [
+   "Strength of the motor: how fast the platter REACHES the speed. Low = a long start-up 'wow' (~1 s); high = almost instant.",
+   "The time constant of a 1st-order system: motorCoef = 0.00002 + torque²·0.0022.",
+   "TORQ at minimum: the motor barely pulls — the platter only moves if the hand (SCR) pushes it. A 'vinyl without a motor' mode."
+  ],
+  [
+   "Force du moteur : à quelle vitesse le plateau ATTEINT la vitesse. Faible = un long « wow » de démarrage (~1 s) ; élevée = presque instantané.",
+   "La constante de temps d’un système du 1er ordre : motorCoef = 0,00002 + torque²·0,0022.",
+   "TORQ au minimum : le moteur tire à peine — le plateau ne bouge que si la main (SCR) le pousse. Un mode « vinyle sans moteur »."
+  ],
+  [
+   "Fuerza del motor: con qué rapidez el plato ALCANZA la velocidad. Baja = un 'wow' largo de arranque (~1 s); alta = casi instantáneo.",
+   "Constante de tiempo de un sistema de 1.er orden: motorCoef = 0,00002 + torque²·0,0022.",
+   "TORQ al mínimo: el motor apenas tira — el plato sólo anda si la mano (SCR) lo empuja. Modo 'vinilo sin motor'."
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "friction",
+  [
+   "Friction: how fast the platter stops on BRK (a short or long coast) and how much it 'comes back' on its own after a scratch.",
+   "",
+   ""
+  ],
+  [
+   "Frottement : à quelle vitesse le plateau s’arrête sur BRK (roue libre courte ou longue) et à quel point il « revient » tout seul après un scratch.",
+   "",
+   ""
+  ],
+  [
+   "Roce: con qué rapidez el plato para en BRK (deriva corta o larga) y cuánto 'vuelve' solo después de un scratch.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "grab",
+  [
+   "Firmness of the hand: how much the SCR CV throws the platter. A small SCR = pitch-bend (a little push for beatmatching); a large, oscillating SCR = a real scratch.",
+   "grip = clamp01(|scratch|·5)·grab; the hand pulls the speed towards scratch·4 with a coupling of ·0.3.",
+   "The hand acts even with the motor stopped — LFO → SCR makes the record scratch in time with no trigger at all."
+  ],
+  [
+   "Fermeté de la main : à quel point la CV SCR lance le plateau. Un SCR petit = pitch-bend (une poussée pour le beatmatch) ; un SCR grand et oscillant = un vrai scratch.",
+   "grip = clamp01(|scratch|·5)·grab ; la main tire la vitesse vers scratch·4 avec un couplage de ·0,3.",
+   "La main agit même moteur arrêté — LFO → SCR fait scratcher le disque en mesure sans aucun trigger."
+  ],
+  [
+   "Firmeza de la mano: cuánto lanza la CV SCR al plato. Un SCR pequeño = pitch-bend (un empujoncito para el beatmatch); un SCR grande y oscilante = un scratch de verdad.",
+   "grip = clamp01(|scratch|·5)·grab; la mano tira la velocidad hacia scratch·4 con un acoplamiento de ·0,3.",
+   "La mano actúa incluso con el motor parado — LFO → SCR hace que el disco rasque en compás sin ningún trigger."
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "start",
+  [
+   "Where the needle drops (the position on the record) on the rising edge of TRIG.",
+   "",
+   ""
+  ],
+  [
+   "Où l’aiguille se pose (la position sur le disque) au front montant de TRIG.",
+   "",
+   ""
+  ],
+  [
+   "Dónde cae la aguja (la posición en el disco) en el flanco de subida de TRIG.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "wear",
+  [
+   "Vinyl wear: growing crackle/clicks + a slight instability of rotation + a minimal drop in level.",
+   "Deterministic — a seeded xorshift; wear=0 zeroes the term. Two renders with the same parameters are byte-identical.",
+   ""
+  ],
+  [
+   "Usure du vinyle : craquements/clics croissants + une légère instabilité de rotation + une chute minimale de niveau.",
+   "Déterministe — un xorshift semé ; wear=0 annule le terme. Deux rendus aux mêmes paramètres sont identiques à l’octet.",
+   ""
+  ],
+  [
+   "Desgaste del vinilo: chasquidos/clics que crecen + leve inestabilidad de rotación + caída mínima de nivel.",
+   "Determinista — xorshift sembrado; wear=0 anula el término. Dos renders con los mismos parámetros son idénticos byte a byte.",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "loop",
+  [
+   "One-shot (the record 'ends' and locks on the last sample) ↔ a locked groove (the read goes round the buffer).",
+   "",
+   ""
+  ],
+  [
+   "One-shot (le disque « finit » et se bloque sur le dernier échantillon) ↔ un sillon fermé (la lecture fait le tour du tampon).",
+   "",
+   ""
+  ],
+  [
+   "One-shot (el disco 'acaba' y se traba en la última muestra) ↔ surco cerrado (la lectura da la vuelta al búfer).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "in:trig",
+  [
+   "Drops the needle: readPos = START·length, a ramp of ~5 ms (no click) and it TURNS the motor on. After the 1st trig the motor stays on.",
+   "",
+   ""
+  ],
+  [
+   "Pose l’aiguille : readPos = START·longueur, une rampe de ~5 ms (sans clic) et cela ALLUME le moteur. Après le 1er trig le moteur reste allumé.",
+   "",
+   ""
+  ],
+  [
+   "Pone la aguja: readPos = START·longitud, rampa de ~5 ms (sin clic) y ENCIENDE el motor. Después del 1.er trig el motor queda encendido.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "in:in",
+  [
+   "Audio to record (while REC is high).",
+   "",
+   ""
+  ],
+  [
+   "Audio à enregistrer (tant que REC est haut).",
+   "",
+   ""
+  ],
+  [
+   "Audio a grabar (mientras REC esté alto).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "in:rec",
+  [
+   "Gate: while high, it records IN into the buffer (up to ~8 s). On the falling edge, it freezes the length — you cannot play and record at the same time.",
+   "With nothing recorded and no file loaded from the panel, the TURNTABLE stays silent.",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, il enregistre IN dans le tampon (jusqu’à ~8 s). Au front descendant, il gèle la longueur — impossible de jouer et d’enregistrer en même temps.",
+   "Sans enregistrement et sans fichier chargé depuis le panneau, le TURNTABLE reste silencieux.",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, graba IN en el búfer (hasta ~8 s). En el flanco de bajada, congela la longitud — no se puede tocar y grabar a la vez.",
+   "Sin grabar y sin archivo cargado desde el panel, el TURNTABLE queda en silencio.",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "in:scratch",
+  [
+   "The hand, as bipolar CV. An LFO and a DJ's hand are interchangeable here.",
+   "handTgt = scratch·4 (±4× the speed); the firmness comes from GRAB.",
+   "SEQUENCE → SCR: a rhythmic scratch phrase. ENVELOPE → BRK: a tape-stop on the turnaround."
+  ],
+  [
+   "La main, en CV bipolaire. Un LFO et la main d’un DJ sont interchangeables ici.",
+   "handTgt = scratch·4 (±4× la vitesse) ; la fermeté vient de GRAB.",
+   "SEQUENCE → SCR : une phrase de scratch rythmique. ENVELOPE → BRK : un tape-stop sur la relance."
+  ],
+  [
+   "La mano, como CV bipolar. Un LFO y la mano de un DJ son intercambiables aquí.",
+   "handTgt = scratch·4 (±4× la velocidad); la firmeza viene de GRAB.",
+   "SEQUENCE → SCR: una frase de scratch rítmica. ENVELOPE → BRK: un tape-stop en el remate."
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "in:brake",
+  [
+   "Gate: while high, the motor lets go and the platter stops (a coast governed by FRIC). Release the gate and the motor pulls it back.",
+   "",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, le moteur lâche et le plateau s’arrête (une roue libre gouvernée par FRIC). Relâchez le gate et le moteur le ramène.",
+   "",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, el motor suelta y el plato para (una deriva gobernada por FRIC). Suelte el gate y el motor lo trae de vuelta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "TURNTABLE",
+  "out:out",
+  [
+   "The recorded material as read by the platter, with AC coupling (no DC step when the platter stops).",
+   "",
+   ""
+  ],
+  [
+   "Le matériau enregistré tel que lu par le plateau, avec couplage AC (pas de marche de DC quand le plateau s’arrête).",
+   "",
+   ""
+  ],
+  [
+   "El material grabado leído por el plato, con acoplamiento AC (sin escalón de DC cuando el plato para).",
+   "",
+   ""
+  ]
+ ]
+]
