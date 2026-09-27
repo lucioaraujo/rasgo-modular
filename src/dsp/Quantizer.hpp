@@ -146,14 +146,55 @@ public:
 
             if (update) {
                 const float snapped = snap(wantSemi, sc, root);
-                // histerese: só troca se afastou o bastante do valor preso
-                const float deadband = hysteresis * 0.5f * averageStep(sc);
-                if (!initialized_
-                    || std::fabs(snapped - heldSemi_) > deadband) {
-                    if (!initialized_ || snapped != heldSemi_) {
+                if (!initialized_) {
+                    gateCountdown_ = gateSamples;
+                    heldSemi_ = snapped;
+                    initialized_ = true;
+                } else if (snapped != heldSemi_) {
+                    // A banda-morta mede quanto a ENTRADA passou da
+                    // fronteira entre a nota presa e a candidata.
+                    //
+                    // A versão anterior comparava `|snapped - heldSemi_|`
+                    // com a banda — duas saídas JÁ QUANTIZADAS — e por isso
+                    // não fazia nada: `snap` devolve semitons inteiros, a
+                    // diferença entre duas notas é no mínimo o menor passo
+                    // da escala, e a banda máxima (0,5·12/graus) é MENOR
+                    // que esse passo em 11 das 12 escalas. O parâmetro
+                    // existia, era lido, e nunca bloqueava uma troca. A
+                    // auditoria de 25 set. 2026 o listou como "sem prova"
+                    // justamente por isso; medido em
+                    // `test_quantizer.cpp`: 39 trocas com a banda em 0 e
+                    // 39 com a banda em 1.
+                    //
+                    // Medir a entrada é o que histerese significa: segurar
+                    // a nota atual até o sinal andar ALÉM da fronteira, e
+                    // não julgar pela distância entre as notas.
+                    // A banda é uma fração do passo LOCAL — a distância
+                    // entre a nota presa e a candidata — e não do passo
+                    // MÉDIO da escala (`12/graus`), que era o que a versão
+                    // anterior usava.
+                    //
+                    // A diferença importa porque as escalas são desiguais.
+                    // Na maior, o passo médio é 1,71 semitom, mas E→F e
+                    // B→C são de 1 semitom: uma banda medida pelo médio
+                    // chegaria a 0,857 e travaria justamente esses dois
+                    // intervalos, deixando dois graus da escala
+                    // inalcançáveis. Na cromática o médio é 1, a banda
+                    // máxima batia exatamente em meio passo, e a histerese
+                    // no máximo travava TODA melodia cromática.
+                    //
+                    // 0,45 é o teto, não 0,5, e a margem é o ponto: quando
+                    // a entrada cai EM CIMA de um grau, ela está a meio
+                    // passo da fronteira, e 0,45·passo < 0,50·passo garante
+                    // que um movimento deliberado sempre passa. O que fica
+                    // barrado é só o tremor perto da fronteira, que é o que
+                    // o parâmetro promete.
+                    const float passo = std::fabs(snapped - heldSemi_);
+                    const float deadband = hysteresis * 0.45f * passo;
+                    const float fronteira = 0.5f * (heldSemi_ + snapped);
+                    if (std::fabs(wantSemi - fronteira) > deadband) {
                         gateCountdown_ = gateSamples;
                         heldSemi_ = snapped;
-                        initialized_ = true;
                     }
                 }
             }
@@ -182,10 +223,6 @@ public:
 private:
     static int clampi(const int v, const int lo, const int hi) noexcept {
         return v < lo ? lo : (v > hi ? hi : v);
-    }
-
-    static float averageStep(const ScaleDef& sc) noexcept {
-        return 12.0f / static_cast<float>(sc.length);
     }
 
     // acha o pitch da escala (em qualquer oitava) mais próximo de `semi`
