@@ -10117,3 +10117,66 @@ depois de 1 out.
 **Validação:** 80/80 no `ctest`, build limpo, e as oito páginas do site
 conferidas por script (marcação, links internos, ausência de recurso
 externo).
+
+---
+
+## Registro da etapa — 2026-09-28: a tag passa a produzir download público
+
+Pedido: "verifique o que podemos avançar; também a parte de download no site
+(para cada plataforma)".
+
+**Ao escrever os links de download, apareceu um buraco entre "CI verde" e
+"alguém consegue instalar".** A CI só fazia `upload-artifact`, e artefato do
+Actions exige login no GitHub, vem zipado por cima do instalador e **expira
+em 90 dias**. Não é download público. Criar a tag `v0.1.0` não produziria
+nada que um músico conseguisse instalar — e o site não tinha para onde
+apontar.
+
+**Feito:**
+
+- **job `release` no workflow** — roda só em tag, confere que os três
+  pacotes chegaram (uma release com dois instaladores é pior que nenhuma,
+  porque parece completa) e cria a release com os três anexados. Usa `gh`,
+  já presente nos runners: sem ação de terceiro no caminho de publicação,
+  que é onde proveniência importa mais. Segundos em Linux, multiplicador 1 —
+  desprezível ao lado dos ~160 minutos cobrados dos três builds;
+- **`CPACK_PACKAGE_FILE_NAME` explícito e com arquitetura** —
+  `rasgo-modular-0.1.0-linux-x86_64.deb`, `-windows-x64.exe`,
+  `-macos-universal.dmg`. O padrão do CPack daria `-Linux.deb`, que não diz
+  a arquitetura e pode mudar entre versões do CPack. Esses nomes agora são
+  **contrato**, porque são o link da página. Conferido no
+  `CPackConfig.cmake` real, não presumido;
+- **`website/estado.py`** — dono das duas versões da página, antes e depois
+  da release, nos quatro idiomas. São duas regiões × quatro idiomas = oito
+  trechos que precisam mudar juntos, e à mão é assim que uma página fica
+  anunciando "ainda não há release" com o resto do site no ar;
+- **`website/verificar.py`** — confere as oito páginas e **amarra os nomes
+  de download ao empacotamento**. Uma versão que subisse para 0.2.0 sem o
+  site saber deixaria três botões apontando para o vazio, e isso não se
+  descobre lendo o HTML: só clicando, depois de publicado. Verificado
+  subindo a versão de propósito — acusou nas quatro páginas.
+
+A versão pós-release diz, **no próprio bloco de download**, que Windows e
+macOS nunca foram abertos pelo autor e que o `.dmg` tem assinatura ad-hoc
+sem notarização. O gate editorial exige que a limitação seja dita onde a
+decisão é tomada, e a decisão de baixar é tomada ali.
+
+## Sequência do dia de publicar (a partir de 1 out. 2026)
+
+Nesta ordem, porque cada passo depende do anterior:
+
+1. `cd website && python3 estado.py --depois 0.1.0 && python3 verificar.py`
+   — vira a página e confere os nomes;
+2. commit e push da virada;
+3. `git tag -a v0.1.0 -m "Rasgo Modular v0.1.0" && git push origin v0.1.0`
+   — **é isto que dispara a CI dos três sistemas** (~160 minutos cobrados,
+   uma vez) e cria a release com os três instaladores;
+4. conferir a release: os três anexos presentes, com os nomes esperados;
+5. tornar o repositório **público**;
+6. publicar o site;
+7. entrada no portal com o texto de `website/PORTAL.md` — combinação com o
+   Codex.
+
+**O que continua dependendo de você:** abrir as oito páginas num navegador
+de cada motor (Blink, Gecko, WebKit), em desktop e telefone, antes do passo
+6. Nenhum navegador real viu estas páginas.
