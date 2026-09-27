@@ -2406,7 +2406,11 @@ public:
             for (const auto& w : m.panel.widgets) {
                 if (w.bind.empty()) continue;
                 if (!widgetBounds(m, w).contains(p)) continue;
-                if (const auto* e = rasgo::panel::lookupLearn(mt, w.bind))
+                // com o IDIOMA, pelo mesmo motivo do verbete de módulo
+                // adiante: sem a língua, os 803 verbetes de widget
+                // traduzidos ficariam escritos e invisíveis.
+                if (const auto* e =
+                        rasgo::panel::lookupLearn(mt, w.bind, lang_))
                     return {e, u8(mt) + u8("  \xc2\xb7  ") + u8(w.label),
                             std::to_string(m.id) + "|" + w.bind};
                 break;   // widget sem verbete: cai pro módulo, adiante

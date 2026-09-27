@@ -1263,7 +1263,13 @@ int main() {
                     fp.x += bx; fp.y += by;
                     if (mouseX < fp.x || mouseX > fp.x + fp.w
                         || mouseY < fp.y || mouseY > fp.y + fp.h) continue;
-                    if (const auto* e = rasgo::panel::lookupLearn(mt, w.bind)) {
+                    // com o IDIOMA, pelo mesmo motivo do verbete de módulo
+                    // abaixo: os 803 verbetes de widget foram traduzidos em
+                    // 27 set. 2026, e omitir a língua aqui devolveria
+                    // português a quem escolheu outra — a tradução ficaria
+                    // escrita e invisível.
+                    if (const auto* e =
+                            rasgo::panel::lookupLearn(mt, w.bind, uiLang)) {
                         rawHit = e;
                         rawTitle = mt + "  \xC2\xB7  " + w.label;
                         rawKey = std::to_string(m.id) + "|" + w.bind;
