@@ -160,6 +160,133 @@ void testGlideIsGradual() {
     check(maxJump < 0.02f, "glide suaviza os saltos de altura");
 }
 
+// ---- histerese: o tremor que ela existe para evitar ------------------
+//
+// Este caso nasceu da auditoria de módulos (25 set. 2026), que listou
+// `hysteresis` entre os parâmetros SEM PROVA — lidos no código, mas sem
+// condição conhecida que os fizesse agir. A condição existe e é simples:
+// uma CV que oscila em cima da FRONTEIRA entre dois graus. Sem
+// banda-morta, a nota pula a cada travessia; com banda-morta, ela segura.
+//
+// Detalhe que explica por que o defeito sobreviveu tanto tempo: TODOS os
+// outros casos deste arquivo fixam `hysteresis = 0.0f`, para isolar o que
+// estavam medindo. A histerese nunca foi exercitada.
+//
+// Conta as TROCAS de nota, não os valores: é o tremor que incomoda quem
+// toca, e é o que a banda-morta promete remover.
+int contarTrocas(Quantizer& q, const float hysteresis,
+                 const float centro, const float amplitude,
+                 const int travessias) {
+    q.setParameter("scale", 0.0f);        // cromática: o pior caso, passo 1
+    q.setParameter("root", 0.0f);
+    // `range` é declarado em OITAVAS, faixa [1, 6] — pedir 1/12 seria
+    // saturado para 1, e a primeira versão deste caso media um tremor 12×
+    // maior do que eu pensava (por isso "39 trocas" nos dois lados: o
+    // salto era de 2 semitons, longe de qualquer banda-morta). Com
+    // range = 1, `wantSemi = cv·12`, então a conversão é explícita abaixo.
+    q.setParameter("range", 1.0f);
+    q.setParameter("glide", 0.0f);
+    q.setParameter("hysteresis", hysteresis);
+    q.prepare(kSampleRate, kBlock);
+
+    std::vector<AudioBlock> out(3, AudioBlock(kSampleRate, 1, kBlock));
+    AudioBlock cv(kSampleRate, 1, kBlock);
+    std::vector<const AudioBlock*> ins{&cv, nullptr, nullptr};
+
+    int trocas = 0;
+    float anterior = 0.0f;
+    bool primeiro = true;
+    for (int t = 0; t < travessias; ++t) {
+        // alterna em torno do centro: o tremor de uma CV instável
+        const float semi = centro + ((t % 2 == 0) ? amplitude : -amplitude);
+        const float valor = semi / 12.0f;   // semitons -> CV, com range = 1
+        for (std::size_t i = 0; i < kBlock; ++i) cv.at(0, i) = valor;
+        q.process(ins, out);
+        const float nota = out[0].at(0, kBlock - 1);
+        if (!primeiro && std::fabs(nota - anterior) > 1.0e-6f) ++trocas;
+        anterior = nota;
+        primeiro = false;
+    }
+    return trocas;
+}
+
+void testHysteresisSeguraOTremor() {
+    Quantizer q;
+    // `centro` e `amplitude` estão em SEMITONS. A fronteira entre os
+    // graus 0 e 1 da cromática está em 0,5 semitom; oscilar ±0,12 semitom
+    // em cima dela faz a nota pular a cada bloco quando não há
+    // banda-morta, e é exatamente o tremor de uma CV instável.
+    const float centro = 0.5f, amplitude = 0.12f;
+    const int travessias = 40;
+
+    const int semBanda = contarTrocas(q, 0.0f, centro, amplitude, travessias);
+    const int comBanda = contarTrocas(q, 1.0f, centro, amplitude, travessias);
+
+    // sem banda-morta o tremor tem de aparecer — se não aparecer, o caso
+    // não está medindo o que diz medir
+    EXPECT(semBanda > travessias / 2);
+
+    // com banda-morta, o tremor tem de PARAR. A banda no máximo é
+    // 0,45·passo = 0,45 semitom na cromática, e a oscilação de ±0,12 fica
+    // inteira dentro dela: zero trocas é o resultado correto, não "menos
+    // trocas".
+    EXPECT(comBanda == 0);
+
+    std::cout << "  histerese: " << semBanda << " trocas sem banda, "
+              << comBanda << " com banda (de " << travessias
+              << " travessias)\n";
+}
+
+// A banda-morta não pode virar TRAVA: um movimento real de melodia tem de
+// passar. Sem este caso, "comBanda == 0" acima seria satisfeito por um
+// quantizador que simplesmente parou de trocar de nota.
+void testHysteresisNaoTravaMovimentoReal() {
+    Quantizer q;
+    // cinco semitons de subida, em passos de um: toda troca é muito maior
+    // que a banda-morta e tem de acontecer
+    q.setParameter("scale", 0.0f);
+    q.setParameter("root", 0.0f);
+    q.setParameter("range", 1.0f);
+    q.setParameter("glide", 0.0f);
+    q.setParameter("hysteresis", 1.0f);
+    const std::vector<float> cvs{0.0f, 1.0f / 12.0f, 2.0f / 12.0f,
+                                 3.0f / 12.0f, 4.0f / 12.0f, 5.0f / 12.0f};
+    const auto notas = quantizeRamp(q, cvs);
+    for (std::size_t i = 1; i < notas.size(); ++i)
+        EXPECT(std::fabs(notas[i] - notas[i - 1] - 1.0f / 12.0f) < 1.0e-4f);
+}
+
+// A escala MAIOR é o caso que condenou a versão anterior da banda-morta, e
+// por isso tem caso próprio: seus passos são desiguais (2,2,1,2,2,2,1), e
+// E→F e B→C valem 1 semitom contra um passo médio de 1,71. Uma banda
+// medida pelo passo MÉDIO chegaria a 0,857 e travaria justamente esses
+// dois intervalos — dois graus da escala ficariam inalcançáveis com a
+// histerese alta, e o instrumento pareceria desafinado sem motivo visível.
+//
+// Este caso sobe a escala inteira, grau por grau, com a histerese no
+// MÁXIMO, e exige que todos os sete apareçam.
+void testHysteresisNaoTrancaOsMeiosTonsDaEscalaMaior() {
+    Quantizer q;
+    q.setParameter("scale", 1.0f);        // Major
+    q.setParameter("root", 0.0f);
+    q.setParameter("range", 1.0f);        // wantSemi = cv·12
+    q.setParameter("glide", 0.0f);
+    q.setParameter("hysteresis", 1.0f);   // o pior caso de propósito
+
+    // pede exatamente cada grau: 0 2 4 5 7 9 11 (o 5 e o 11 são os
+    // meios-tons, logo depois de um passo de 1)
+    const std::vector<int> graus{0, 2, 4, 5, 7, 9, 11};
+    std::vector<float> cvs;
+    for (const int g : graus) cvs.push_back(static_cast<float>(g) / 12.0f);
+
+    const auto notas = quantizeRamp(q, cvs);
+    for (std::size_t i = 0; i < graus.size(); ++i) {
+        const float esperado = static_cast<float>(graus[i]) / 12.0f;
+        check(std::fabs(notas[i] - esperado) < 1.0e-4f,
+              "cada grau da escala maior é alcançável com histerese no máximo");
+    }
+}
+
 void testDeterminism() {
     Quantizer a, b;
     for (Quantizer* q : {&a, &b}) {
@@ -222,6 +349,9 @@ int main() {
     testRootShifts();
     testSampleHold();
     testGlideIsGradual();
+    testHysteresisSeguraOTremor();
+    testHysteresisNaoTravaMovimentoReal();
+    testHysteresisNaoTrancaOsMeiosTonsDaEscalaMaior();
     testDeterminism();
     testInGraph();
     testPanel();
