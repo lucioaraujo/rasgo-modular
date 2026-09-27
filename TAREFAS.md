@@ -10012,8 +10012,28 @@ exigiria instanciar janela, contexto gráfico e loop de eventos, que é o que
 os testes deste projeto não fazem. Verificado removendo o `lang_` de
 propósito — falhou, nomeou o arquivo e imprimiu a chamada.
 
+### O segundo erro: a infraestrutura ficou fora do commit
+
+Ao conferir o estado antes de encerrar, `git status` mostrou
+`apps/panel/LearnCatalog.hpp` **modificado e não commitado** — e era a
+estrutura de que tudo depende: as três tabelas por idioma, o
+`lookupLearn(tipo, bind, lang)` e a inclusão do header gerado. Os oito
+commits de família foram escritos contra ela e **não compilariam num
+checkout limpo**. Na minha árvore tudo passava, porque o arquivo estava
+ali; num clone, nenhum dos oito construía.
+
+Corrigido reordenando a série (ela ainda não havia sido empurrada): a
+estrutura virou um commit próprio ANTES do primeiro lote, e os dez commits
+seguintes foram replicados na ordem. Verificado que a árvore final é
+idêntica à anterior e que **cada um dos onze commits compila** — não só a
+ponta. Rede de segurança em `backup/antes-reordenar-i18n`.
+
+É o mesmo erro do parágrafo anterior visto de outro ângulo: a verificação
+que eu tinha rodava sempre na minha árvore, e a minha árvore tinha coisas
+que o repositório não tinha.
+
 **Validação:** 80/80 no `ctest` (78 anteriores + os dois guardas novos),
-build completo limpo. A tradução não toca DSP: `LearnWidgetI18n.hpp` é
+build completo limpo, e os onze commits da série verificados um a um. A tradução não toca DSP: `LearnWidgetI18n.hpp` é
 conteúdo textual gerado, e nenhum teste de áudio mudou de resultado.
 
 **Próximo passo:** o que falta para a v0.1.0 não é mais tradução — é
