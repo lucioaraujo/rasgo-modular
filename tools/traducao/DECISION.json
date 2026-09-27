@@ -1,0 +1,1332 @@
+[
+ [
+  "QUANTIZER",
+  "scale",
+  [
+   "Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave).",
+   "",
+   ""
+  ],
+  [
+   "Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave).",
+   "",
+   ""
+  ],
+  [
+   "Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "root",
+  [
+   "Tonic of the scale (0=C ... 11=B).",
+   "",
+   ""
+  ],
+  [
+   "Tonique de la gamme (0=C ... 11=B).",
+   "",
+   ""
+  ],
+  [
+   "Tónica de la escala (0=C ... 11=B).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "range",
+  [
+   "How many octaves the input CV covers before quantising.",
+   "",
+   ""
+  ],
+  [
+   "Combien d’octaves couvre la CV d’entrée avant la quantification.",
+   "",
+   ""
+  ],
+  [
+   "Cuántas octavas cubre la CV de entrada antes de cuantizar.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "glide",
+  [
+   "Portamento time between one quantised note and the next.",
+   "",
+   ""
+  ],
+  [
+   "Temps de portamento entre une note quantifiée et la suivante.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de portamento entre una nota cuantizada y la siguiente.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "hysteresis",
+  [
+   "Dead zone before changing degree — avoids flickering between two neighbouring degrees with unstable CV.",
+   "",
+   ""
+  ],
+  [
+   "Zone morte avant de changer de degré — évite le papillotement entre deux degrés voisins avec une CV instable.",
+   "",
+   ""
+  ],
+  [
+   "Zona muerta antes de cambiar de grado — evita el temblor entre dos grados vecinos con CV inestable.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "in:cv",
+  [
+   "Continuous CV to quantise.",
+   "",
+   ""
+  ],
+  [
+   "CV continue à quantifier.",
+   "",
+   ""
+  ],
+  [
+   "CV continua a cuantizar.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "in:transpose",
+  [
+   "1 V/oct CV that adds before quantising — transposes the whole scale.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct qui s’ajoute avant la quantification — transpose la gamme entière.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct que se suma antes de cuantizar — transpone la escala entera.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "in:trigger",
+  [
+   "Sample & hold — present, the note only updates on the pulse (that is how TURING/DECISION become melody).",
+   "",
+   ""
+  ],
+  [
+   "Sample & hold — présent, la note ne se met à jour que sur l’impulsion (c’est ainsi que TURING/DECISION deviennent mélodie).",
+   "",
+   ""
+  ],
+  [
+   "Sample & hold — si está presente, la nota sólo se actualiza en el pulso (así TURING/DECISION se vuelven melodía).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "out:pitch",
+  [
+   "Quantised CV, in 1 V/oct — ready to feed OSC.pitch.",
+   "",
+   ""
+  ],
+  [
+   "CV quantifiée, en 1 V/oct — prête à alimenter OSC.pitch.",
+   "",
+   ""
+  ],
+  [
+   "CV cuantizada, en 1 V/oct — lista para alimentar OSC.pitch.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "out:gate",
+  [
+   "Short pulse (~5 ms) every time the note really changes.",
+   "",
+   ""
+  ],
+  [
+   "Brève impulsion (~5 ms) chaque fois que la note change vraiment.",
+   "",
+   ""
+  ],
+  [
+   "Pulso corto (~5 ms) cada vez que la nota cambia de verdad.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "out:semitone",
+  [
+   "The same note, normalised to ±1 instead of octaves — useful as a control CV.",
+   "",
+   ""
+  ],
+  [
+   "La même note, normalisée à ±1 au lieu des octaves — utile comme CV de contrôle.",
+   "",
+   ""
+  ],
+  [
+   "La misma nota, normalizada a ±1 en vez de octavas — útil como CV de control.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "movement",
+  [
+   "Harmonic movement technique: Coltrane / tritone substitution+ii-V / chromatic mediant / modal interchange / modal jazz / backdoor ii-V.",
+   "Each technique has its own root-interval pattern — Coltrane is always +4 st (a cycle of 3), backdoor always +2 st, modal jazz almost always standing still.",
+   "Compare MOVE=Coltrane (moves fast, cyclic) with MOVE=modal jazz (stands still, takes a rare step)."
+  ],
+  [
+   "Technique de mouvement harmonique : Coltrane / substitution tritonique+ii-V / médiante chromatique / échange modal / jazz modal / ii-V backdoor.",
+   "Chaque technique a son propre motif d’intervalle de fondamentale — Coltrane fait toujours +4 demi-tons (un cycle de 3), le backdoor toujours +2, le jazz modal reste presque toujours immobile.",
+   "Comparez MOVE=Coltrane (avance vite, cyclique) et MOVE=jazz modal (reste immobile, fait un pas rare)."
+  ],
+  [
+   "Técnica de movimiento armónico: Coltrane / sustitución tritonal+ii-V / mediante cromática / intercambio modal / jazz modal / ii-V backdoor.",
+   "Cada técnica tiene su propio patrón de intervalo de fundamental — Coltrane siempre +4 semitonos (un ciclo de 3), el backdoor siempre +2, el jazz modal casi siempre quieto.",
+   "Compare MOVE=Coltrane (avanza rápido, cíclico) con MOVE=jazz modal (se queda quieto, da un paso raro)."
+  ]
+ ],
+ [
+  "HARMONY",
+  "rate",
+  [
+   "Internal clock, used only if ADV is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si ADV est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si ADV está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "root_start",
+  [
+   "Root note at reset/start (0=C ... 11=B).",
+   "",
+   ""
+  ],
+  [
+   "Note fondamentale au reset/démarrage (0=C ... 11=B).",
+   "",
+   ""
+  ],
+  [
+   "Nota fundamental en el reset/inicio (0=C ... 11=B).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "scale_lo",
+  [
+   "Lowest scale index that can be drawn on a change.",
+   "",
+   ""
+  ],
+  [
+   "Plus petit indice de gamme tirable lors des changements.",
+   "",
+   ""
+  ],
+  [
+   "Menor índice de escala sorteable en los cambios.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "scale_hi",
+  [
+   "Highest scale index that can be drawn on a change.",
+   "",
+   ""
+  ],
+  [
+   "Plus grand indice de gamme tirable lors des changements.",
+   "",
+   ""
+  ],
+  [
+   "Mayor índice de escala sorteable en los cambios.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "hold",
+  [
+   "Probability of SKIPPING a scheduled change, keeping the current tonal centre.",
+   "",
+   ""
+  ],
+  [
+   "Probabilité de SAUTER un changement prévu, en gardant le centre tonal actuel.",
+   "",
+   ""
+  ],
+  [
+   "Probabilidad de SALTARSE un cambio previsto, manteniendo el centro tonal actual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "in:advance",
+  [
+   "Trigger — moves on to the next tonal centre on the rising edge; present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Trigger — passe au centre tonal suivant sur le front montant ; présent, il remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Trigger — avanza al siguiente centro tonal en el flanco de subida; si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "in:reset",
+  [
+   "Back to the initial ROOT/scale.",
+   "",
+   ""
+  ],
+  [
+   "Retour au ROOT/gamme de départ.",
+   "",
+   ""
+  ],
+  [
+   "Vuelve al ROOT/escala inicial.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "out:root",
+  [
+   "New root, as CV (semitone/12) — plug it into QUANTIZER.root.",
+   "",
+   ""
+  ],
+  [
+   "Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur QUANTIZER.root.",
+   "",
+   ""
+  ],
+  [
+   "Nueva fundamental, como CV (semitono/12) — conéctela a QUANTIZER.root.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "out:scale",
+  [
+   "New scale index, as CV (index/11) — plug it into QUANTIZER.scale.",
+   "",
+   ""
+  ],
+  [
+   "Nouvel indice de gamme, en CV (indice/11) — à brancher sur QUANTIZER.scale.",
+   "",
+   ""
+  ],
+  [
+   "Nuevo índice de escala, como CV (índice/11) — conéctelo a QUANTIZER.scale.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "HARMONY",
+  "out:change",
+  [
+   "Short pulse (~20 ms) every time ROOT or SCALE really change.",
+   "",
+   ""
+  ],
+  [
+   "Brève impulsion (~20 ms) chaque fois que ROOT ou SCALE changent vraiment.",
+   "",
+   ""
+  ],
+  [
+   "Pulso corto (~20 ms) cada vez que ROOT o SCALE cambian de verdad.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "op",
+  [
+   "Operation between A and B: 0 add, 1 subtract, 2 multiply, 3 remainder (mod RANGE), 4-7 bitwise (AND/OR/XOR/NAND).",
+   "0-3 is continuous arithmetic; 4-7 treats A/B as 5-bit integers (the ±RANGE window → 0..31) and operates on the bits — a Lunetta idea (Numeric Repetitor).",
+   "Compare OP=add with OP=XOR on the same input — the bitwise version breaks the signal into unpredictable steps."
+  ],
+  [
+   "Opération entre A et B : 0 addition, 1 soustraction, 2 multiplication, 3 reste (mod RANGE), 4-7 bit à bit (AND/OR/XOR/NAND).",
+   "0-3 c’est de l’arithmétique continue ; 4-7 traite A/B comme des entiers de 5 bits (la fenêtre ±RANGE → 0..31) et opère sur les bits — une idée Lunetta (Numeric Repetitor).",
+   "Comparez OP=addition et OP=XOR sur la même entrée — la version bit à bit casse le signal en paliers imprévisibles."
+  ],
+  [
+   "Operación entre A y B: 0 suma, 1 resta, 2 multiplica, 3 resto (mod RANGE), 4-7 bit a bit (AND/OR/XOR/NAND).",
+   "0-3 es aritmética continua; 4-7 trata A/B como enteros de 5 bits (la ventana ±RANGE → 0..31) y opera en los bits — idea Lunetta (Numeric Repetitor).",
+   "Compare OP=suma con OP=XOR en la misma entrada — la versión bit a bit rompe la señal en escalones imprevisibles."
+  ]
+ ],
+ [
+  "ABACUS",
+  "modulus",
+  [
+   "Modulus of the binary counter — it restarts every MOD ticks of CLOCK.",
+   "",
+   ""
+  ],
+  [
+   "Module du compteur binaire — il redémarre à chaque MOD tics de CLOCK.",
+   "",
+   ""
+  ],
+  [
+   "Módulo del contador binario — se reinicia cada MOD tics de CLOCK.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "steps",
+  [
+   "Number of quantisation steps in QNT.",
+   "",
+   ""
+  ],
+  [
+   "Nombre de paliers de la quantification dans QNT.",
+   "",
+   ""
+  ],
+  [
+   "Nº de escalones de la cuantización en QNT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "range",
+  [
+   "Voltage window (±RNG) used by MATH/QNT/RECT and by the counter's internal ramp (when A is not connected).",
+   "",
+   ""
+  ],
+  [
+   "Fenêtre de tension (±RNG) utilisée par MATH/QNT/RECT et par la rampe interne du compteur (quand A n’est pas branchée).",
+   "",
+   ""
+  ],
+  [
+   "Ventana de tensión (±RNG) usada por MATH/QNT/RECT y por la rampa interna del contador (cuando A no está conectada).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "rect_mode",
+  [
+   "Rectifier mode: positive half-wave, negative half-wave, full wave, or sign (±RANGE/0).",
+   "",
+   ""
+  ],
+  [
+   "Mode du redresseur : demi-onde positive, demi-onde négative, onde complète, ou signe (±RANGE/0).",
+   "",
+   ""
+  ],
+  [
+   "Modo del rectificador: media onda positiva, media onda negativa, onda completa, o signo (±RANGE/0).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "count_step",
+  [
+   "How much the counter adds (or subtracts, if negative) at each CLOCK.",
+   "",
+   ""
+  ],
+  [
+   "De combien le compteur ajoute (ou retire, si négatif) à chaque CLOCK.",
+   "",
+   ""
+  ],
+  [
+   "Cuánto suma (o resta, si es negativo) el contador en cada CLOCK.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "pattern",
+  [
+   "Chooses which bit of the counter becomes P1 (and the P1/P2 pair).",
+   "PAT shifts the 2-bit window read from the counter — low bits change fast (a fine divider), high bits change slowly (a coarse divider).",
+   ""
+  ],
+  [
+   "Choisit quel bit du compteur devient P1 (et la paire P1/P2).",
+   "PAT décale la fenêtre de 2 bits lue dans le compteur — les bits bas changent vite (diviseur fin), les bits hauts changent lentement (diviseur grossier).",
+   ""
+  ],
+  [
+   "Elige qué bit del contador se vuelve P1 (y el par P1/P2).",
+   "PAT desplaza la ventana de 2 bits leída del contador — los bits bajos cambian rápido (divisor fino), los altos cambian despacio (divisor grueso).",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "slew",
+  [
+   "Smooths MATH and QNT — 0 is an instant step.",
+   "",
+   ""
+  ],
+  [
+   "Adoucit MATH et QNT — 0 c’est un palier instantané.",
+   "",
+   ""
+  ],
+  [
+   "Suaviza MATH y QNT — 0 es escalón instantáneo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "rate",
+  [
+   "Internal clock of the counter, used only if CLK is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne du compteur, utilisée seulement si CLK est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno del contador, usado sólo si CLK está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "in:a",
+  [
+   "Input A — with no cable, the source is the counter's own ramp (the ABACUS plays melody and rhythm on its own).",
+   "",
+   ""
+  ],
+  [
+   "Entrée A — sans câble, la source est la rampe du compteur lui-même (l’ABACUS joue mélodie et rythme tout seul).",
+   "",
+   ""
+  ],
+  [
+   "Entrada A — sin cable, la fuente es la propia rampa del contador (el ABACUS toca melodía y ritmo solo).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "in:b",
+  [
+   "Input B — used in add/subtract/multiply and in the bitwise operations.",
+   "",
+   ""
+  ],
+  [
+   "Entrée B — utilisée en addition/soustraction/multiplication et dans les opérations bit à bit.",
+   "",
+   ""
+  ],
+  [
+   "Entrada B — usada en suma/resta/multiplicación y en las operaciones bit a bit.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "in:clock",
+  [
+   "Advances the counter on the rising edge — if free, it uses RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avance le compteur sur le front montant — si elle est libre, il utilise RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avanza el contador en el flanco de subida — si está libre, usa RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "in:reset",
+  [
+   "Zeroes the counter and the internal phase.",
+   "",
+   ""
+  ],
+  [
+   "Remet à zéro le compteur et la phase interne.",
+   "",
+   ""
+  ],
+  [
+   "Pone a cero el contador y la fase interna.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:math",
+  [
+   "A ⊕ B by OP.",
+   "",
+   ""
+  ],
+  [
+   "A ⊕ B selon OP.",
+   "",
+   ""
+  ],
+  [
+   "A ⊕ B según OP.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:quant",
+  [
+   "A quantised into STEPS steps within RANGE.",
+   "",
+   ""
+  ],
+  [
+   "A quantifiée en STEPS paliers à l’intérieur de RANGE.",
+   "",
+   ""
+  ],
+  [
+   "A cuantizada en STEPS escalones dentro de RANGE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:rect",
+  [
+   "A rectified according to RECT.",
+   "",
+   ""
+  ],
+  [
+   "A redressée selon RECT.",
+   "",
+   ""
+  ],
+  [
+   "A rectificada según RECT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:p1",
+  [
+   "Bit of the counter chosen by PAT — a clean pulse, a divider.",
+   "",
+   ""
+  ],
+  [
+   "Bit du compteur choisi par PAT — une impulsion propre, un diviseur.",
+   "",
+   ""
+  ],
+  [
+   "Bit del contador elegido por PAT — pulso limpio, divisor.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:p2",
+  [
+   "P1 XOR the next bit — syncopated.",
+   "",
+   ""
+  ],
+  [
+   "P1 XOR le bit suivant — syncopé.",
+   "",
+   ""
+  ],
+  [
+   "P1 XOR el bit siguiente — sincopado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ABACUS",
+  "out:carry",
+  [
+   "Short pulse whenever the counter crosses a multiple of MOD — the \"turnaround\" of the rhythm.",
+   "",
+   ""
+  ],
+  [
+   "Brève impulsion chaque fois que le compteur franchit un multiple de MOD — la « relance » du rythme.",
+   "",
+   ""
+  ],
+  [
+   "Pulso corto siempre que el contador cruza un múltiplo de MOD — el \"remate\" del ritmo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "rate",
+  [
+   "Internal clock, used only if TRIG is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si TRIG est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si TRIG está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "bias",
+  [
+   "Probability of the GATE firing at each step (0 never, 1 always).",
+   "",
+   ""
+  ],
+  [
+   "Probabilité que le GATE déclenche à chaque pas (0 jamais, 1 toujours).",
+   "",
+   ""
+  ],
+  [
+   "Probabilidad de que el GATE dispare en cada paso (0 nunca, 1 siempre).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "spread",
+  [
+   "Span of X/Y — 0 locks close to 0, 1 uses the whole ±1 range.",
+   "",
+   ""
+  ],
+  [
+   "Amplitude de X/Y — 0 verrouille près de 0, 1 utilise toute la plage ±1.",
+   "",
+   ""
+  ],
+  [
+   "Alcance de X/Y — 0 traba cerca de 0, 1 usa todo el rango ±1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "shape",
+  [
+   "Shape of the X/Y distribution: 0 uniform, 1 bell-shaped (a sum of 4 uniforms — central limit, no log/cos).",
+   "",
+   ""
+  ],
+  [
+   "Forme de la distribution de X/Y : 0 uniforme, 1 en cloche (une somme de 4 uniformes — limite centrale, sans log/cos).",
+   "",
+   ""
+  ],
+  [
+   "Forma de la distribución de X/Y: 0 uniforme, 1 en campana (una suma de 4 uniformes — límite central, sin log/cos).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "steps",
+  [
+   "Quantises X/Y into STEPS steps — 1 is continuous.",
+   "",
+   ""
+  ],
+  [
+   "Quantifie X/Y en STEPS paliers — 1 c’est continu.",
+   "",
+   ""
+  ],
+  [
+   "Cuantiza X/Y en STEPS escalones — 1 es continuo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "slew",
+  [
+   "Smooths the transition between drawn values.",
+   "",
+   ""
+  ],
+  [
+   "Adoucit la transition entre les valeurs tirées.",
+   "",
+   ""
+  ],
+  [
+   "Suaviza la transición entre valores sorteados.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "dejavu",
+  [
+   "Probability of RE-READING the memory instead of drawing again — the \"déjà-vu\".",
+   "With DEJA high, the same stretch of LOOP steps tends to repeat; with DEJA=0 it is always a new draw.",
+   "Raise DEJA little by little with a short LOOP: the patch starts repeating phrases, like a loop that locks on its own."
+  ],
+  [
+   "Probabilité de RELIRE la mémoire au lieu de tirer de nouveau — le « déjà-vu ».",
+   "Avec DEJA élevé, le même passage de LOOP pas tend à se répéter ; avec DEJA=0 c’est toujours un nouveau tirage.",
+   "Montez DEJA peu à peu avec un LOOP court : le patch se met à répéter des phrases, comme une boucle qui se verrouille toute seule."
+  ],
+  [
+   "Probabilidad de RELEER la memoria en vez de sortear otra vez — el \"déjà-vu\".",
+   "Con DEJA alto, el mismo tramo de LOOP pasos tiende a repetirse; con DEJA=0 siempre es un sorteo nuevo.",
+   "Suba DEJA poco a poco con un LOOP corto: el patch empieza a repetir frases, como un bucle que se traba solo."
+  ]
+ ],
+ [
+  "DECISION",
+  "loop_length",
+  [
+   "Size of the circular memory re-read by the déjà-vu.",
+   "",
+   ""
+  ],
+  [
+   "Taille de la mémoire circulaire relue par le déjà-vu.",
+   "",
+   ""
+  ],
+  [
+   "Tamaño de la memoria circular releída por el déjà-vu.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "in:trigger",
+  [
+   "Advances one step on the rising edge — present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avance d’un pas sur le front montant — présent, il remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Avanza un paso en el flanco de subida — si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "in:bias_mod",
+  [
+   "CV that adds to BIAS.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à BIAS.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a BIAS.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "in:spread_mod",
+  [
+   "CV that adds to SPRD.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à SPRD.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a SPRD.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "out:x",
+  [
+   "Drawn CV (or re-read from the déjà-vu), channel X.",
+   "",
+   ""
+  ],
+  [
+   "CV tirée (ou relue depuis le déjà-vu), canal X.",
+   "",
+   ""
+  ],
+  [
+   "CV sorteada (o releída del déjà-vu), canal X.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "out:y",
+  [
+   "Drawn CV (or re-read), channel Y — independent of X.",
+   "",
+   ""
+  ],
+  [
+   "CV tirée (ou relue), canal Y — indépendante de X.",
+   "",
+   ""
+  ],
+  [
+   "CV sorteada (o releída), canal Y — independiente de X.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DECISION",
+  "out:gate",
+  [
+   "Bernoulli gate — fires with probability BIAS at each step.",
+   "",
+   ""
+  ],
+  [
+   "Gate de Bernoulli — déclenche avec la probabilité BIAS à chaque pas.",
+   "",
+   ""
+  ],
+  [
+   "Gate de Bernoulli — dispara con probabilidad BIAS en cada paso.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "delay",
+  [
+   "Where the sampling window opens, as a fraction of the period measured by TRIG. It turns a \"read head\" around inside the captured waveform.",
+   "Inspired by the boxcar averager (a gated integrator) — nuclear test equipment. DELAY is the instrument's \"aperture delay\".",
+   ""
+  ],
+  [
+   "Où s’ouvre la fenêtre d’échantillonnage, en fraction de la période mesurée par TRIG. Elle fait tourner une « tête de lecture » à l’intérieur de la forme d’onde capturée.",
+   "Inspiré du boxcar averager (intégrateur à porte) — un appareil de test nucléaire. Le DELAY est l’« aperture delay » de l’instrument.",
+   ""
+  ],
+  [
+   "Dónde se abre la ventana de muestreo, como fracción del período medido por TRIG. Gira una \"cabeza de lectura\" por dentro de la forma de onda capturada.",
+   "Inspirado en el boxcar averager (integrador de puerta) — equipo de ensayo nuclear. El DELAY es el \"aperture delay\" del instrumento.",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "aperture",
+  [
+   "Width of the window, a fraction of the period. →0 = a point sample (it becomes a fixed-phase S&H); wide = the average blurs an arc of the wave.",
+   "",
+   ""
+  ],
+  [
+   "Largeur de la fenêtre, en fraction de la période. →0 = un échantillon ponctuel (cela devient un S&H à phase fixe) ; large = la moyenne floute un arc de l’onde.",
+   "",
+   ""
+  ],
+  [
+   "Anchura de la ventana, fracción del período. →0 = muestra puntual (se vuelve un S&H de fase fija); ancha = el promedio difumina un arco de la onda.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "average",
+  [
+   "Depth N of the average: how many captures stack up on the same phase point. A high N = uncorrelated noise disappears (~1/√N), the coherent signal stays.",
+   "A running average with a floor of 1/min(N, captures) — the first captures count for more, then it settles.",
+   ""
+  ],
+  [
+   "Profondeur N de la moyenne : combien de captures s’empilent sur un même point de phase. Un N élevé = le bruit décorrélé disparaît (~1/√N), le signal cohérent reste.",
+   "Une moyenne glissante avec un plancher de 1/min(N, captures) — les premières captures comptent davantage, puis cela se stabilise.",
+   ""
+  ],
+  [
+   "Profundidad N del promedio: cuántas capturas se apilan en un mismo punto de fase. Un N alto = el ruido descorrelacionado desaparece (~1/√N), la señal coherente se queda.",
+   "Promedio corriente con suelo de 1/min(N, capturas) — las primeras capturas cuentan más, después se estabiliza.",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "scan",
+  [
+   "Speed and direction with which DELAY sweeps the period on its own. 0 = static (a single point). ≠0 = the window strolls and reconstructs the WHOLE wave (a scanning boxcar).",
+   "The RECONSTRUCT and OSC modes need SCAN≠0 for the phase buffer to fill.",
+   ""
+  ],
+  [
+   "Vitesse et direction avec lesquelles DELAY balaie la période tout seul. 0 = statique (un seul point). ≠0 = la fenêtre se promène et reconstruit TOUTE l’onde (scanning boxcar).",
+   "Les modes RECONSTRUCT et OSC ont besoin de SCAN≠0 pour que le tampon de phase se remplisse.",
+   ""
+  ],
+  [
+   "Velocidad y dirección con que DELAY barre el período por sí solo. 0 = estático (un solo punto). ≠0 = la ventana pasea y reconstruye TODA la onda (scanning boxcar).",
+   "Los modos RECONSTRUCT y OSC necesitan SCAN≠0 para que el búfer de fase se llene.",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "mode",
+  [
+   "0 FOLLOWER — the output holds the average of the last window (a window S&H). 1 RECONSTRUCT — it plays the reconstructed wave in sync with TRIG. 2 OSC — it re-reads the reconstructed buffer at RATE, free of TRIG.",
+   "In mode 2 the \"wavetable\" is what the module heard, averaged — the wave comes from its own history (a Warps/Rings deviation: the relation is the process).",
+   ""
+  ],
+  [
+   "0 FOLLOWER — la sortie maintient la moyenne de la dernière fenêtre (un S&H de fenêtre). 1 RECONSTRUCT — elle joue l’onde reconstruite en synchronie avec TRIG. 2 OSC — elle relit le tampon reconstruit à RATE, libérée de TRIG.",
+   "En mode 2 la « wavetable » est ce que le module a entendu, moyenné — l’onde vient de sa propre histoire (un écart Warps/Rings : la relation est le processus).",
+   ""
+  ],
+  [
+   "0 FOLLOWER — la salida sostiene el promedio de la última ventana (un S&H de ventana). 1 RECONSTRUCT — toca la onda reconstruida en sincronía con TRIG. 2 OSC — relee el búfer reconstruido a RATE, libre de TRIG.",
+   "En el modo 2 la \"wavetable\" es lo que el módulo oyó, promediado — la onda viene de su propia historia (desvío Warps/Rings: la relación es el proceso).",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "rate",
+  [
+   "Internal clock (if TRIG is free) and re-reading frequency in OSC mode.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne (si TRIG est libre) et fréquence de relecture en mode OSC.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno (si TRIG está libre) y frecuencia de relectura en modo OSC.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "thresh",
+  [
+   "Threshold of the auto-trigger: with no cable in TRIG, a rising crossing of IN through this level is the repetition reference (an oscilloscope edge trigger). The THR jack adds CV.",
+   "",
+   ""
+  ],
+  [
+   "Seuil de l’auto-trigger : sans câble dans TRIG, un franchissement ascendant d’IN à ce niveau sert de référence de répétition (edge trigger d’oscilloscope). Le jack THR ajoute de la CV.",
+   "",
+   ""
+  ],
+  [
+   "Umbral del autodisparo: sin cable en TRIG, un cruce ascendente de IN por este nivel es la referencia de repetición (edge trigger de osciloscopio). El jack THR suma CV.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "geiger",
+  [
+   "Density of a free POISSON gate train on the GEIG output — not tied to any clock. 0 = the output is mute.",
+   "t = −ln(U)/λ, λ ≈ 0.5 + geiger²·40 ev/s. Seeded (xorshift) — two identical renders. It is the \"Geiger counter\"; NOISE has the same mode (POIS).",
+   ""
+  ],
+  [
+   "Densité d’un train de gates de POISSON libre sur la sortie GEIG — non asservi à une horloge. 0 = la sortie est muette.",
+   "t = −ln(U)/λ, λ ≈ 0,5 + geiger²·40 év/s. Semé (xorshift) — deux rendus identiques. C’est le « compteur Geiger » ; le NOISE a le même mode (POIS).",
+   ""
+  ],
+  [
+   "Densidad de un tren de gates de POISSON libre en la salida GEIG — no atado a ningún reloj. 0 = la salida queda muda.",
+   "t = −ln(U)/λ, λ ≈ 0,5 + geiger²·40 ev/s. Sembrado (xorshift) — dos renders idénticos. Es el \"contador Geiger\"; el NOISE tiene el mismo modo (POIS).",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "blend",
+  [
+   "IN ↔ result. 0 = the dry passes through (bypass); 1 = only the processed.",
+   "",
+   ""
+  ],
+  [
+   "IN ↔ résultat. 0 = le sec passe (bypass) ; 1 = seulement le traité.",
+   "",
+   ""
+  ],
+  [
+   "IN ↔ resultado. 0 = pasa el seco (bypass); 1 = sólo el procesado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "in:in",
+  [
+   "Signal to analyse (audio or CV). Disconnected, the module uses an internal noise floor of −34 dB so it has something to reconstruct (it sounds on load).",
+   "",
+   ""
+  ],
+  [
+   "Signal à analyser (audio ou CV). Débranchée, le module utilise un plancher de bruit interne de −34 dB pour avoir quelque chose à reconstruire (il sonne au chargement).",
+   "",
+   ""
+  ],
+  [
+   "Señal a analizar (audio o CV). Desconectada, el módulo usa un suelo de ruido interno de −34 dB para tener qué reconstruir (suena al cargar).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "in:trig",
+  [
+   "Repetition reference — the event the captures lock onto. With no cable: crossings of the threshold (THRSH) or the internal clock (RATE).",
+   "",
+   ""
+  ],
+  [
+   "Référence de répétition — l’événement auquel les captures se verrouillent. Sans câble : les franchissements du seuil (THRSH) ou l’horloge interne (RATE).",
+   "",
+   ""
+  ],
+  [
+   "Referencia de repetición — el evento al que se traban las capturas. Sin cable: cruces del umbral (THRSH) o el reloj interno (RATE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "in:sweep",
+  [
+   "CV added to DELAY — sweeps the position of the window across the wave (a phrase of positions coming from a SEQUENCE).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à DELAY — balaie la position de la fenêtre le long de l’onde (une phrase de positions venue d’un SEQUENCE).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a DELAY — barre la posición de la ventana por la onda (una frase de posiciones venida de un SEQUENCE).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "in:thr",
+  [
+   "CV added to the auto-trigger's THRSH threshold.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée au seuil THRSH de l’auto-trigger.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada al umbral THRSH del autodisparo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "out:out",
+  [
+   "The followed / reconstructed signal, mixed with the dry by BLEND. Safety clamp at ±8.",
+   "",
+   ""
+  ],
+  [
+   "Le signal suivi / reconstruit, mélangé au sec par BLEND. Clamp de sécurité à ±8.",
+   "",
+   ""
+  ],
+  [
+   "La señal seguida / reconstruida, mezclada con el seco por BLEND. Clamp de seguridad a ±8.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "BOXCAR",
+  "out:geiger",
+  [
+   "Free Poisson gate train (see GEI). A gate of ~5 ms.",
+   "",
+   ""
+  ],
+  [
+   "Train de gates de Poisson libre (voir GEI). Un gate d’environ 5 ms.",
+   "",
+   ""
+  ],
+  [
+   "Tren de gates de Poisson libre (ver GEI). Gate de ~5 ms.",
+   "",
+   ""
+  ]
+ ]
+]
