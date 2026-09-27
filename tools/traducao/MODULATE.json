@@ -1,0 +1,1313 @@
+[
+ [
+  "ENVELOPE",
+  "attack",
+  [
+   "Rise time — how long it takes to reach the peak after the gate.",
+   "",
+   ""
+  ],
+  [
+   "Temps de montée — combien il faut pour atteindre le sommet après le gate.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de subida — cuánto tarda en llegar al pico tras el gate.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "decay",
+  [
+   "Fall time after the peak (or down to SUS, if there is one).",
+   "",
+   ""
+  ],
+  [
+   "Temps de chute après le sommet (ou jusqu’au SUS, s’il y en a un).",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de caída tras el pico (o hasta SUS, si lo hay).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "sustain",
+  [
+   "Level at which the envelope holds while the gate stays on.",
+   "SUS=0 removes the plateau — it becomes an AD (pluck envelope, rises and falls on its own).",
+   ""
+  ],
+  [
+   "Niveau auquel l’enveloppe se maintient tant que le gate reste ouvert.",
+   "SUS=0 retire le plateau — cela devient un AD (enveloppe de pluck, monte et retombe toute seule).",
+   ""
+  ],
+  [
+   "Nivel en el que la envolvente se sostiene mientras el gate está activo.",
+   "SUS=0 quita el plató — se vuelve un AD (envolvente de pluck, sube y cae sola).",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "release",
+  [
+   "Fall time after the gate turns off.",
+   "",
+   ""
+  ],
+  [
+   "Temps de chute après la fermeture du gate.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de caída después de que el gate se apaga.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "curve",
+  [
+   "Shape of the curve — from concave to convex.",
+   "Convex curves sound more \"hit\" (fast perceived attack); concave ones, softer.",
+   ""
+  ],
+  [
+   "Forme de la courbe — de concave à convexe.",
+   "Les courbes convexes sonnent plus « frappées » (attaque perçue rapide) ; les concaves, plus douces.",
+   ""
+  ],
+  [
+   "Forma de la curva — de cóncava a convexa.",
+   "Las curvas convexas suenan más \"golpeadas\" (ataque percibido rápido); las cóncavas, más suaves.",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "mode",
+  [
+   "TRIG: toggles ADSR ↔ AD (trigger).",
+   "ADSR holds while the gate stays high; AD/trigger always completes the whole contour, ignoring how long the gate stays on.",
+   ""
+  ],
+  [
+   "TRIG : bascule ADSR ↔ AD (trigger).",
+   "L’ADSR se maintient tant que le gate est haut ; AD/trigger achève toujours le contour entier, sans tenir compte de la durée du gate.",
+   ""
+  ],
+  [
+   "TRIG: alterna ADSR ↔ AD (trigger).",
+   "El ADSR se sostiene mientras el gate está alto; AD/trigger siempre completa el contorno entero, ignorando cuánto dura el gate.",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "in:in",
+  [
+   "Audio input — the ENVELOPE has a VCA built in: it multiplies the audio by the contour.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio — l’ENVELOPE intègre un VCA : elle multiplie l’audio par le contour.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio — el ENVELOPE lleva un VCA incorporado: multiplica el audio por el contorno.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "in:gate",
+  [
+   "Gate/trigger that fires the envelope.",
+   "",
+   ""
+  ],
+  [
+   "Gate/trigger qui déclenche l’enveloppe.",
+   "",
+   ""
+  ],
+  [
+   "Gate/trigger que dispara la envolvente.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "in:time_mod",
+  [
+   "CV that adds to the times (ATK/DEC/REL).",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute aux temps (ATK/DEC/REL).",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a los tiempos (ATK/DEC/REL).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "out:out",
+  [
+   "Audio × the contour (the built-in VCA).",
+   "",
+   ""
+  ],
+  [
+   "Audio × le contour (le VCA intégré).",
+   "",
+   ""
+  ],
+  [
+   "Audio × el contorno (el VCA incorporado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "ENVELOPE",
+  "out:env",
+  [
+   "The contour itself, as CV — patchable to modulate another parameter (e.g. FILTER.cutoff).",
+   "",
+   ""
+  ],
+  [
+   "Le contour lui-même, en CV — à brancher pour moduler un autre paramètre (par ex. FILTER.cutoff).",
+   "",
+   ""
+  ],
+  [
+   "El contorno en sí, como CV — conectable para modular otro parámetro (p. ej. FILTER.cutoff).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "rate",
+  [
+   "Speed of the ramp — from an LFO (0.01 Hz) to an audio oscillator (12 kHz).",
+   "The same maths at any rate: envelope, LFO and oscillator are one function, only the speed changes.",
+   "Raise RATE little by little in a patch wired as an envelope — at some point the ramp turns into an audible tone."
+  ],
+  [
+   "Vitesse de la rampe — d’un LFO (0,01 Hz) à un oscillateur audio (12 kHz).",
+   "Les mêmes maths à toute vitesse : enveloppe, LFO et oscillateur sont une seule fonction, seule la vitesse change.",
+   "Montez RATE peu à peu dans un patch câblé comme une enveloppe — à un moment la rampe devient un son audible."
+  ],
+  [
+   "Velocidad de la rampa — de LFO (0,01 Hz) a oscilador de audio (12 kHz).",
+   "La misma matemática a cualquier velocidad: envolvente, LFO y oscilador son la misma función, sólo cambia la velocidad.",
+   "Suba RATE poco a poco en un patch cableado como envolvente — en algún punto la rampa se vuelve tono audible."
+  ]
+ ],
+ [
+  "FUNCTION",
+  "slope",
+  [
+   "Shape of the ramp: 0 falling sawtooth, 0.5 triangle, 1 rising sawtooth.",
+   "",
+   ""
+  ],
+  [
+   "Forme de la rampe : 0 dent de scie descendante, 0,5 triangle, 1 dent de scie montante.",
+   "",
+   ""
+  ],
+  [
+   "Forma de la rampa: 0 diente de sierra descendente, 0,5 triángulo, 1 diente de sierra ascendente.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "drift",
+  [
+   "Slow, correlated walk in the effective rate — time \"breathes\" with no input at all.",
+   "drift=0 is deterministic.",
+   ""
+  ],
+  [
+   "Marche lente et corrélée dans la vitesse effective — le temps « respire » sans aucune entrée.",
+   "drift=0 est déterministe.",
+   ""
+  ],
+  [
+   "Paseo lento y correlacionado en la velocidad efectiva — el tiempo \"respira\" sin ninguna entrada.",
+   "drift=0 es determinista.",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "sync_enable",
+  [
+   "Turns on the response to the SYNC jack (it restarts the phase).",
+   "",
+   ""
+  ],
+  [
+   "Active la réponse au jack SYNC (il redémarre la phase).",
+   "",
+   ""
+  ],
+  [
+   "Activa la respuesta al jack SYNC (reinicia la fase).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "in:rate_mod",
+  [
+   "1 V/oct CV that multiplies RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct qui multiplie RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct que multiplica RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "in:slope_mod",
+  [
+   "CV that adds to SLOPE.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à SLOPE.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a SLOPE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "in:sync",
+  [
+   "Hard sync trigger (needs SYNC on).",
+   "",
+   ""
+  ],
+  [
+   "Trigger de hard sync (nécessite SYNC activé).",
+   "",
+   ""
+  ],
+  [
+   "Trigger de hard sync (necesita SYNC activado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "out:uni",
+  [
+   "Unipolar output (0..1) — good for an amplitude envelope/LFO.",
+   "",
+   ""
+  ],
+  [
+   "Sortie unipolaire (0..1) — bonne pour une enveloppe/LFO d’amplitude.",
+   "",
+   ""
+  ],
+  [
+   "Salida unipolar (0..1) — buena para envolvente/LFO de amplitud.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "FUNCTION",
+  "out:bi",
+  [
+   "Bipolar output (−1..1) — good for pitch/FM CV.",
+   "",
+   ""
+  ],
+  [
+   "Sortie bipolaire (−1..1) — bonne pour une CV de hauteur/FM.",
+   "",
+   ""
+  ],
+  [
+   "Salida bipolar (−1..1) — buena para CV de altura/FM.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "segments",
+  [
+   "How many steps/ramps in one round (2–8). More segments = more resolution in the shape.",
+   "",
+   ""
+  ],
+  [
+   "Combien de paliers/rampes dans un tour (2–8). Plus de segments = plus de résolution dans la forme.",
+   "",
+   ""
+  ],
+  [
+   "Cuántos escalones/rampas en la vuelta (2–8). Más segmentos = más resolución en la forma.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "rate",
+  [
+   "Speed of the round in LOOP mode (0.02–20 Hz, +CV). Each segment takes (1/rate)/segments, adjusted by TILT.",
+   "",
+   ""
+  ],
+  [
+   "Vitesse du tour en mode LOOP (0,02–20 Hz, +CV). Chaque segment prend (1/rate)/segments, ajusté par TILT.",
+   "",
+   ""
+  ],
+  [
+   "Velocidad de la vuelta en modo LOOP (0,02–20 Hz, +CV). Cada segmento tarda (1/rate)/segments, ajustado por TILT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "contour",
+  [
+   "The SHAPE of the target levels: 0 a rising staircase (0→1), 0.5 an arch (0→1→0), 1 a falling staircase — a continuous blend. It is the 'drawing' of the function.",
+   "A generator, not a breakpoint editor (RASGO identity): you sculpt the shape with macros.",
+   ""
+  ],
+  [
+   "La FORME des niveaux cibles : 0 un escalier montant (0→1), 0,5 une arche (0→1→0), 1 un escalier descendant — un mélange continu. C’est le « dessin » de la fonction.",
+   "Un générateur, pas un éditeur de points de rupture (identité RASGO) : on sculpte la forme avec des macros.",
+   ""
+  ],
+  [
+   "La FORMA de los niveles objetivo: 0 una escalera ascendente (0→1), 0,5 un arco (0→1→0), 1 una escalera descendente — una mezcla continua. Es el 'dibujo' de la función.",
+   "Un generador, no un editor de puntos de ruptura (identidad RASGO): la forma se esculpe con macros.",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "curve",
+  [
+   "Transition curve of each segment: <0 exponential (fast→slow), 0 linear, >0 logarithmic (slow→fast). It does nothing with HOLD=1 (there is no transition).",
+   "",
+   ""
+  ],
+  [
+   "Courbe de transition de chaque segment : <0 exponentielle (rapide→lent), 0 linéaire, >0 logarithmique (lent→rapide). Elle ne fait rien avec HOLD=1 (il n’y a pas de transition).",
+   "",
+   ""
+  ],
+  [
+   "Curva de transición de cada segmento: <0 exponencial (rápido→lento), 0 lineal, >0 logarítmica (lento→rápido). No hace nada con HOLD=1 (no hay transición).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "hold",
+  [
+   "0 = each segment SLIDES smoothly to the next level (a ramp — envelope/LFO); 1 = it JUMPS and holds (a step — S&H/sequence); in between, it ramps part of the way and holds the rest.",
+   "It is the knob that turns STAGES into an envelope OR a sequencer without changing module.",
+   ""
+  ],
+  [
+   "0 = chaque segment GLISSE en douceur vers le niveau suivant (une rampe — enveloppe/LFO) ; 1 = il SAUTE et se maintient (un palier — S&H/séquence) ; entre les deux, il monte en rampe une partie du chemin et maintient le reste.",
+   "C’est le potentiomètre qui fait du STAGES une enveloppe OU un séquenceur sans changer de module.",
+   ""
+  ],
+  [
+   "0 = cada segmento DESLIZA suave hasta el nivel siguiente (una rampa — envolvente/LFO); 1 = SALTA y se sostiene (un escalón — S&H/secuencia); en medio, sube en rampa parte del camino y sostiene el resto.",
+   "Es el mando que convierte el STAGES en envolvente O en secuenciador sin cambiar de módulo.",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "tilt",
+  [
+   "Distortion of the durations: <0 the segments at the beginning are longer (slow attack), >0 those at the end (slow release).",
+   "",
+   ""
+  ],
+  [
+   "Distorsion des durées : <0 les segments du début sont plus longs (attaque lente), >0 ceux de la fin (relâchement lent).",
+   "",
+   ""
+  ],
+  [
+   "Distorsión de las duraciones: <0 los segmentos del principio más largos (ataque lento), >0 los del final (relajo lento).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "jitter",
+  [
+   "Slow SEEDED walk in the levels and durations — the shape 'breathes' without ceasing to be reproducible (jitter=0 → no term at all, byte-identical).",
+   "",
+   ""
+  ],
+  [
+   "Marche lente SEMÉE dans les niveaux et les durées — la forme « respire » sans cesser d’être reproductible (jitter=0 → aucun terme, identique à l’octet).",
+   "",
+   ""
+  ],
+  [
+   "Paseo lento SEMBRADO en los niveles y las duraciones — la forma 'respira' sin dejar de ser reproducible (jitter=0 → sin término, idéntico byte a byte).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "loop",
+  [
+   "Runs free (a complex LFO of N segments) ↔ one shot (an envelope — it needs the GATE; it freezes at the last level until the next gate).",
+   "",
+   ""
+  ],
+  [
+   "Tourne librement (un LFO complexe de N segments) ↔ un coup unique (une enveloppe — elle a besoin du GATE ; elle gèle au dernier niveau jusqu’au gate suivant).",
+   "",
+   ""
+  ],
+  [
+   "Corre libre (un LFO complejo de N segmentos) ↔ un disparo (una envolvente — necesita el GATE; se congela en el último nivel hasta el próximo gate).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "in:gate",
+  [
+   "One-shot mode (LOOP off): the rising edge starts a pass. Ignored in loop mode.",
+   "",
+   ""
+  ],
+  [
+   "Mode one-shot (LOOP éteint) : le front montant lance un passage. Ignoré en mode loop.",
+   "",
+   ""
+  ],
+  [
+   "Modo one-shot (LOOP apagado): el flanco de subida inicia una pasada. Ignorado en modo loop.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "in:reset",
+  [
+   "Back to segment 0.",
+   "",
+   ""
+  ],
+  [
+   "Retour au segment 0.",
+   "",
+   ""
+  ],
+  [
+   "Vuelve al segmento 0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "in:rate_mod",
+  [
+   "CV added to RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "out:out",
+  [
+   "The function — the contour of the N segments.",
+   "",
+   ""
+  ],
+  [
+   "La fonction — le contour des N segments.",
+   "",
+   ""
+  ],
+  [
+   "La función — el contorno de los N segmentos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "out:eoc",
+  [
+   "Pulse at the end of the round (end-of-cycle) — chain it into the RESET of another instance.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion à la fin du tour (end-of-cycle) — à enchaîner sur le RESET d’une autre instance.",
+   "",
+   ""
+  ],
+  [
+   "Pulso al final de la vuelta (end-of-cycle) — encadénelo al RESET de otra instancia.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "STAGES",
+  "out:step",
+  [
+   "Pulse at every segment boundary — STEP → ENVELOPE.gate chains one AD per segment.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion à chaque frontière de segment — STEP → ENVELOPE.gate enchaîne un AD par segment.",
+   "",
+   ""
+  ],
+  [
+   "Pulso en cada frontera de segmento — STEP → ENVELOPE.gate encadena un AD por segmento.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "rate",
+  [
+   "Pace of the shared field's walk — on the scale of MINUTES, not of audio.",
+   "",
+   ""
+  ],
+  [
+   "Rythme de la marche du champ partagé — à l’échelle des MINUTES, pas de l’audio.",
+   "",
+   ""
+  ],
+  [
+   "Ritmo del paseo del campo compartido — en escala de MINUTOS, no de audio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "depth",
+  [
+   "Span of the walk — how far the field may move away from rest.",
+   "",
+   ""
+  ],
+  [
+   "Amplitude de la marche — jusqu’où le champ peut s’éloigner du repos.",
+   "",
+   ""
+  ],
+  [
+   "Alcance del paseo — cuánto puede alejarse el campo del reposo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "momentum",
+  [
+   "How much the speed of the walk tends to carry on instead of reacting on the spot.",
+   "vel = vel·(0.2+0.78·momentum) + impulse·(1.1−0.75·momentum) — high momentum = a smoother, less nervous trajectory.",
+   ""
+  ],
+  [
+   "À quel point la vitesse de la marche tend à continuer au lieu de réagir sur le coup.",
+   "vel = vel·(0,2+0,78·momentum) + impulsion·(1,1−0,75·momentum) — un momentum élevé = une trajectoire plus douce, moins nerveuse.",
+   ""
+  ],
+  [
+   "Cuánto tiende la velocidad del paseo a continuar en vez de reaccionar al instante.",
+   "vel = vel·(0,2+0,78·momentum) + impulso·(1,1−0,75·momentum) — momentum alto = trayectoria más suave, menos nerviosa.",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "stride",
+  [
+   "0 = the 4 outputs (A-D) walk almost together; 1 = each goes its own way.",
+   "Each output reads the same field with different WEIGHTS — STRIDE controls how far those weights diverge.",
+   ""
+  ],
+  [
+   "0 = les 4 sorties (A-D) marchent presque ensemble ; 1 = chacune part de son côté.",
+   "Chaque sortie lit le même champ avec des POIDS différents — STRIDE contrôle à quel point ces poids divergent.",
+   ""
+  ],
+  [
+   "0 = las 4 salidas (A-D) andan casi juntas; 1 = cada una por su lado.",
+   "Cada salida lee el mismo campo con PESOS distintos — STRIDE controla cuánto divergen esos pesos.",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "bias",
+  [
+   "Pushes the field's rest point to one side (it does not stay centred on 0).",
+   "",
+   ""
+  ],
+  [
+   "Pousse le point de repos du champ d’un côté (il ne reste pas centré sur 0).",
+   "",
+   ""
+  ],
+  [
+   "Empuja el reposo del campo hacia un lado (no queda centrado en 0).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "anchor",
+  [
+   "Topology memory — every 8 ticks it records the state as a landmark; with probability ∝ anchor², it returns to the landmark instead of taking a new step.",
+   "anchor=0 is a free walk (it never returns); a high anchor makes the drift orbit landscapes it has already visited instead of wandering forever.",
+   ""
+  ],
+  [
+   "Mémoire de topologie — tous les 8 tics il enregistre l’état comme repère ; avec une probabilité ∝ anchor², il revient au repère au lieu de faire un nouveau pas.",
+   "anchor=0 c’est une marche libre (il ne revient jamais) ; un anchor élevé fait orbiter la dérive autour de paysages déjà visités au lieu d’errer indéfiniment.",
+   ""
+  ],
+  [
+   "Memoria de topología — cada 8 tics graba el estado como hito; con probabilidad ∝ anchor², vuelve al hito en vez de dar un paso nuevo.",
+   "anchor=0 es paseo libre (nunca vuelve); un anchor alto hace que la deriva orbite paisajes ya visitados en vez de vagar para siempre.",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "in:advance",
+  [
+   "Trigger — forces a step (a cadence per bar/phrase instead of the internal RATE).",
+   "",
+   ""
+  ],
+  [
+   "Trigger — force un pas (une cadence par mesure/phrase au lieu du RATE interne).",
+   "",
+   ""
+  ],
+  [
+   "Trigger — fuerza un paso (una cadencia por compás/frase en vez del RATE interno).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "in:rate_mod",
+  [
+   "CV that adds to RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:a",
+  [
+   "Correlated output A — it reads the field with a weight of its own.",
+   "",
+   ""
+  ],
+  [
+   "Sortie corrélée A — elle lit le champ avec un poids qui lui est propre.",
+   "",
+   ""
+  ],
+  [
+   "Salida correlacionada A — lee el campo con un peso propio.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:b",
+  [
+   "Correlated output B — a different weight from A.",
+   "",
+   ""
+  ],
+  [
+   "Sortie corrélée B — un poids différent d’A.",
+   "",
+   ""
+  ],
+  [
+   "Salida correlacionada B — peso distinto de A.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:c",
+  [
+   "Correlated output C.",
+   "",
+   ""
+  ],
+  [
+   "Sortie corrélée C.",
+   "",
+   ""
+  ],
+  [
+   "Salida correlacionada C.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:d",
+  [
+   "Correlated output D.",
+   "",
+   ""
+  ],
+  [
+   "Sortie corrélée D.",
+   "",
+   ""
+  ],
+  [
+   "Salida correlacionada D.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:field",
+  [
+   "The raw shared walk, without the per-output weights.",
+   "",
+   ""
+  ],
+  [
+   "La marche partagée brute, sans les poids par sortie.",
+   "",
+   ""
+  ],
+  [
+   "El paseo crudo compartido, sin los pesos por salida.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "DRIFT",
+  "out:event",
+  [
+   "Pulse at every tick of the walk.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion à chaque tic de la marche.",
+   "",
+   ""
+  ],
+  [
+   "Pulso en cada tic del paseo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "rate",
+  [
+   "Speed of the dynamics — from very slow CV (0.02 Hz) to an audio texture (400 Hz).",
+   "",
+   ""
+  ],
+  [
+   "Vitesse de la dynamique — d’une CV très lente (0,02 Hz) à une texture audio (400 Hz).",
+   "",
+   ""
+  ],
+  [
+   "Velocidad de la dinámica — de CV muy lenta (0,02 Hz) a textura de audio (400 Hz).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "drive",
+  [
+   "Strength of the non-linearity — the higher it is, the harder the system is pulled between the two stable wells.",
+   "",
+   ""
+  ],
+  [
+   "Force de la non-linéarité — plus elle est élevée, plus le système est tiré fort entre les deux puits stables.",
+   "",
+   ""
+  ],
+  [
+   "Fuerza de la no linealidad — cuanto más alta, con más fuerza se tira el sistema entre los dos pozos estables.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "damping",
+  [
+   "Damping — high settles into a single well; low lets the system oscillate/\"hunt\" between the two.",
+   "",
+   ""
+  ],
+  [
+   "Amortissement — élevé, il se pose dans un seul puits ; faible, il laisse le système osciller/« chasser » entre les deux.",
+   "",
+   ""
+  ],
+  [
+   "Amortiguamiento — alto se asienta en un solo pozo; bajo deja al sistema oscilar/\"cazar\" entre los dos.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "freeze",
+  [
+   "Freezes the dynamics at the current value.",
+   "",
+   ""
+  ],
+  [
+   "Gèle la dynamique à la valeur actuelle.",
+   "",
+   ""
+  ],
+  [
+   "Congela la dinámica en el valor actual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "in:reseed",
+  [
+   "Trigger — repositions x/y at a new random point, without waiting for the system to escape on its own.",
+   "",
+   ""
+  ],
+  [
+   "Trigger — repositionne x/y en un nouveau point aléatoire, sans attendre que le système s’échappe tout seul.",
+   "",
+   ""
+  ],
+  [
+   "Trigger — reposiciona x/y en un punto nuevo aleatorio, sin esperar a que el sistema escape solo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "in:rate_mod",
+  [
+   "CV that adds to RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV qui s’ajoute à RATE.",
+   "",
+   ""
+  ],
+  [
+   "CV que se suma a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "CHAOS",
+  "out:out",
+  [
+   "The position of the system, always in [−1,1] — the double-well chaotic signal.",
+   "Without the periodic \"kick\" (tied to RATE), the system never crosses from one well to the other on its own — it is a deterministic ODE with no forcing.",
+   "Raise DRIVE close to maximum with DAMP low: the system \"hunts\" between the two wells unpredictably."
+  ],
+  [
+   "La position du système, toujours dans [−1,1] — le signal chaotique à double puits.",
+   "Sans le « coup de pied » périodique (lié à RATE), le système ne passe jamais d’un puits à l’autre tout seul — c’est une EDO déterministe sans forçage.",
+   "Montez DRIVE près du maximum avec DAMP faible : le système « chasse » entre les deux puits de façon imprévisible."
+  ],
+  [
+   "La posición del sistema, siempre en [−1,1] — la señal caótica de pozo doble.",
+   "Sin el \"empujón\" periódico (ligado a RATE), el sistema nunca cruza de un pozo al otro por sí solo — es una EDO determinista sin forzamiento.",
+   "Suba DRIVE cerca del máximo con DAMP bajo: el sistema \"caza\" entre los dos pozos de forma imprevisible."
+  ]
+ ],
+ [
+  "SH",
+  "rate",
+  [
+   "Internal clock, used only if TRIG1/2 is free.",
+   "",
+   ""
+  ],
+  [
+   "Horloge interne, utilisée seulement si TRIG1/2 est libre.",
+   "",
+   ""
+  ],
+  [
+   "Reloj interno, usado sólo si TRIG1/2 está libre.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "spread",
+  [
+   "Pulls the internal draw from uniform towards bell-shaped — it only affects the channels with no IN connected.",
+   "",
+   ""
+  ],
+  [
+   "Tire le tirage interne de l’uniforme vers la cloche — il n’affecte que les canaux sans IN branchée.",
+   "",
+   ""
+  ],
+  [
+   "Tira el sorteo interno de uniforme hacia campana — sólo afecta a los canales sin IN conectada.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "slope",
+  [
+   "Asymmetry of the slew: >0 it slides down slowly and rises fast (pluck portamento), <0 the opposite, 0 symmetric.",
+   "",
+   ""
+  ],
+  [
+   "Asymétrie du slew : >0 il descend lentement et monte vite (portamento de pluck), <0 l’inverse, 0 symétrique.",
+   "",
+   ""
+  ],
+  [
+   "Asimetría del deslizamiento: >0 baja despacio y sube rápido (portamento de pluck), <0 lo contrario, 0 simétrico.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "slew1",
+  [
+   "Slew time of channel 1 up to the sampled value — 0 is an instant step.",
+   "",
+   ""
+  ],
+  [
+   "Temps de slew du canal 1 jusqu’à la valeur échantillonnée — 0 c’est un palier instantané.",
+   "",
+   ""
+  ],
+  [
+   "Tiempo de deslizamiento del canal 1 hasta el valor muestreado — 0 es escalón instantáneo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "slew2",
+  [
+   "Same as SLW1, channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme SLW1, canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que SLW1, canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "correlation",
+  [
+   "Correlation between the two internal chances: −1 mirrored, 0 independent, 1 twins.",
+   "It only affects the channels using the internal draw (with no IN connected) — with IN1/IN2 patched, CORR has no effect.",
+   "Raise CORR to 1 with both channels on internal: the two start drawing exactly the same value at each pulse."
+  ],
+  [
+   "Corrélation entre les deux hasards internes : −1 en miroir, 0 indépendants, 1 jumeaux.",
+   "Elle n’affecte que les canaux qui utilisent le tirage interne (sans IN branchée) — avec IN1/IN2 câblées, CORR n’a aucun effet.",
+   "Montez CORR à 1 avec les deux canaux en interne : tous deux se mettent à tirer exactement la même valeur à chaque impulsion."
+  ],
+  [
+   "Correlación entre los dos azares internos: −1 en espejo, 0 independientes, 1 gemelos.",
+   "Sólo afecta a los canales que usan el sorteo interno (sin IN conectada) — con IN1/IN2 cableadas, CORR no tiene efecto.",
+   "Suba CORR a 1 con los dos canales en interno: los dos pasan a sortear exactamente el mismo valor en cada pulso."
+  ]
+ ],
+ [
+  "SH",
+  "track1",
+  [
+   "TRK1 on: while the trigger stays high, it follows IN1 live (track & hold) instead of sampling only on the edge.",
+   "",
+   ""
+  ],
+  [
+   "TRK1 activé : tant que le trigger reste haut, il suit IN1 en direct (track & hold) au lieu d’échantillonner seulement sur le front.",
+   "",
+   ""
+  ],
+  [
+   "TRK1 activado: mientras el trigger está alto, sigue IN1 en vivo (track & hold) en vez de muestrear sólo en el flanco.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "track2",
+  [
+   "Same as TRK1, channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Comme TRK1, canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Igual que TRK1, canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "in:in1",
+  [
+   "Source of channel 1 — with no cable, it uses the internal draw.",
+   "",
+   ""
+  ],
+  [
+   "Source du canal 1 — sans câble, il utilise le tirage interne.",
+   "",
+   ""
+  ],
+  [
+   "Fuente del canal 1 — sin cable, usa el sorteo interno.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "in:trig1",
+  [
+   "Trigger of channel 1 — present, it replaces RATE.",
+   "",
+   ""
+  ],
+  [
+   "Trigger du canal 1 — présent, il remplace RATE.",
+   "",
+   ""
+  ],
+  [
+   "Trigger del canal 1 — si está presente, sustituye a RATE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "in:in2",
+  [
+   "Source of channel 2 — with no cable, it uses the internal draw (correlatable with channel 1 via CORR).",
+   "",
+   ""
+  ],
+  [
+   "Source du canal 2 — sans câble, il utilise le tirage interne (corrélable au canal 1 via CORR).",
+   "",
+   ""
+  ],
+  [
+   "Fuente del canal 2 — sin cable, usa el sorteo interno (correlacionable con el canal 1 vía CORR).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "in:trig2",
+  [
+   "Trigger of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Trigger du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Trigger del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "out:out1",
+  [
+   "Sampled value of channel 1, with SLW1/SLOPE applied.",
+   "",
+   ""
+  ],
+  [
+   "Valeur échantillonnée du canal 1, avec SLW1/SLOPE appliqués.",
+   "",
+   ""
+  ],
+  [
+   "Valor muestreado del canal 1, con SLW1/SLOPE aplicados.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SH",
+  "out:out2",
+  [
+   "Sampled value of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Valeur échantillonnée du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Valor muestreado del canal 2.",
+   "",
+   ""
+  ]
+ ]
+]
