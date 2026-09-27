@@ -16,11 +16,15 @@ módulos**, **458 parâmetros** e **154 portas de saída**:
 **Zero não-finitos.** Nenhum módulo, em nenhum extremo de nenhum
 parâmetro, produziu NaN ou Inf.
 
-**Zero parâmetros mortos e zero portas mortas.** Dos 32 parâmetros e 19
-portas que a triagem acusou, **nenhum** era defeito: 13 portas e 28
-parâmetros foram confirmados funcionando com excitação própria, 6 do
-`SIGNAL-IN` são silêncio esperado, e 4 parâmetros ficaram sem prova —
-lidos no código, mas exigindo condições que não consegui criar. Para um instrumento com 58 módulos de DSP,
+**Zero portas mortas, e um parâmetro defeituoso encontrado.** Dos 32
+parâmetros e 19 portas que a triagem acusou: 13 portas e 28 parâmetros
+foram confirmados funcionando com excitação própria, 6 do `SIGNAL-IN` são
+silêncio esperado, e os 4 que ficaram sem prova em 25 set. foram fechados
+em 27 set. — **três funcionavam** e **um estava quebrado**
+(`QUANTIZER.hysteresis`). Ver "Os 4 sem prova — fechados" abaixo.
+
+A correção da frase anterior deste resumo, que dizia "nenhum era defeito",
+é o ponto: a auditoria tinha razão em não afirmar. Para um instrumento com 58 módulos de DSP,
 realimentação, auto-oscilação e folding, isso é o resultado que mais vale
 — é a classe de defeito que estraga uma gravação e assusta quem escuta.
 
@@ -71,6 +75,62 @@ específica antes de se afirmar qualquer coisa:
 `track2` · `TRIGSEQ.density1`, `density2`, `swing` ·
 `QUANTIZER.hysteresis` · `HARMONY.scale_hi` · `BOXCAR.delay`, `thresh` ·
 `SWITCH.mode` · `MATRIX.norm`, `ring` · `SCOPE.trigger`
+
+## Os 4 sem prova — fechados (27 set. 2026)
+
+Os últimos quatro da lista acima. Cada um ganhou teste no `ctest`, e a
+condição que faltava era sempre a mesma coisa: **exercitar o parâmetro no
+seu próprio idioma**.
+
+### `QUANTIZER.hysteresis` — DEFEITO, corrigido
+
+Não era falta de condição. A banda-morta comparava
+`|snapped − heldSemi_|` — duas saídas **já quantizadas**. Como `snap()`
+devolve semitons inteiros, essa diferença é no mínimo o menor passo da
+escala, e a banda máxima (0,5·12/graus) é **menor que esse passo em 11 das
+12 escalas**. Medido: **39 trocas de nota com a banda em 0 e 39 com a banda
+em 1**.
+
+Sobreviveu porque todos os casos de `test_quantizer.cpp` fixavam
+`hysteresis = 0.0f`, para isolar o que mediam. O parâmetro nunca foi
+exercitado.
+
+Corrigido: a banda agora mede quanto a **entrada** passou da fronteira
+entre a nota presa e a candidata, e é relativa ao passo **local** e não ao
+médio da escala — pelo médio ela travaria E→F e B→C na maior (passo 1
+contra médio 1,71), deixando dois graus inalcançáveis. Teto 0,45·passo,
+não 0,50, para que movimento deliberado sempre passe. Tremor: 39 → 0
+trocas.
+
+### `SCOPE.trigger` — funciona
+
+A auditoria contava pulsos, e contar pulsos não pode provar o nível: numa
+senoide, qualquer nível dentro da amplitude dá um pulso por ciclo. O nível
+move a **fase**, que é para o que um osciloscópio o usa. Senoide de 100 Hz,
+amplitude 0,8, período 480 amostras:
+
+| trigger | fase medida | prevista por asin(L/A) |
+|---|---|---|
+| −0,6 | −64 | −64 |
+| −0,3 | −29 | −28 |
+| 0,0 | 1 | 0 |
+| +0,3 | 30 | 29 |
+| +0,6 | 65 | 65 |
+
+### `BOXCAR.delay` e `.thresh` — funcionam
+
+Condição comum: modo follower, `scan` em zero (janela parada), abertura
+pontual. Aí a saída é o valor da onda numa fase única.
+
+`delay` é a fração do período em que a janela abre, e a saída tem de ser
+A·sin(2π·delay) — amplitude 0,6: **0,000 · 0,5999 · −0,008 · −0,5999**
+para delay 0 · ¼ · ½ · ¾ (previsto 0 · 0,600 · 0 · −0,600).
+
+`thresh` é o nível cujo cruzamento ascendente serve de referência quando
+`TRIG` está livre. Com `delay` em 0 a janela abre em cima do cruzamento, e
+a saída é o próprio limiar: **−0,400 · 0,005 · 0,400** para limiares −0,4 ·
+0 · 0,4. Limiar acima do pico não dispara nunca, e a saída então nem
+oscila — o que descarta um módulo que só copiasse o parâmetro.
 
 ## Portas sem saída (19) — examinadas (25 set. 2026)
 
