@@ -56,6 +56,45 @@ std::string json(const std::string& s) {
 // da minha lembrança: um bind digitado errado no JSON entra como verbete
 // órfão, nunca é consultado, e o medidor continua mostrando 0% sem dizer
 // por quê.
+// Despeja os verbetes de MÓDULO nos quatro idiomas, agrupados por família,
+// como JSON — a fonte de dados das páginas de guia do site.
+//
+// O site NÃO deve ter uma segunda cópia desses textos escrita à mão: eles
+// já existem no catálogo, traduzidos e testados, e duas cópias divergem na
+// primeira correção. O gerador do site lê este despejo.
+void despejarModulos() {
+    const char* nomes[4] = {"pt", "en", "fr", "es"};
+    const Lang langs[4] = {Lang::pt, Lang::en, Lang::fr, Lang::es};
+    std::printf("[\n");
+    bool primeiraFam = true;
+    for (const auto& grp : rasgo::panel::moduleCatalog()) {
+        if (!primeiraFam) std::printf(",\n");
+        primeiraFam = false;
+        std::printf(" {\"familia\": %s, \"modulos\": [\n", json(grp.family).c_str());
+        bool primeiro = true;
+        for (const char* t : grp.types) {
+            // só o que existe de verdade: um tipo sem módulo construível
+            // não deve aparecer numa página pública
+            auto n = rasgo::panel::makeModule(t);
+            if (!n) continue;
+            if (!primeiro) std::printf(",\n");
+            primeiro = false;
+            std::printf("  {\"tipo\": %s", json(t).c_str());
+            for (int i = 0; i < 4; ++i) {
+                const auto* e = rasgo::panel::lookupLearnModule(t, langs[i]);
+                std::printf(", %s: ", json(nomes[i]).c_str());
+                if (e == nullptr) { std::printf("null"); continue; }
+                std::printf("[%s, %s, %s]", json(e->quick).c_str(),
+                            json(e->understand).c_str(),
+                            json(e->explore).c_str());
+            }
+            std::printf("}");
+        }
+        std::printf("\n ]}");
+    }
+    std::printf("\n]\n");
+}
+
 void despejar(const char* familia) {
     std::printf("[\n");
     bool primeiro = true;
@@ -85,6 +124,10 @@ void despejar(const char* familia) {
 
 int main(int argc, char** argv) {
     if (argc > 2 && std::string(argv[1]) == "--despejar") { despejar(argv[2]); return 0; }
+    if (argc > 1 && std::string(argv[1]) == "--despejar-modulos") {
+        despejarModulos();
+        return 0;
+    }
     // `--exigir` transforma o medidor em GUARDA DE REGRESSÃO, e é assim que
     // ele entra no ctest. Sem isso, os 803 verbetes traduzidos apodrecem em
     // silêncio: o próximo módulo novo entra com o painel em português e mais

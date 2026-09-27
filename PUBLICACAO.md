@@ -18,7 +18,7 @@ o repositório público e liberar site e portal juntos.
 | 0. Pesquisa local | estado documentado; nada apresentado como release | ✅ `RASGO_MODULAR.md`, `TAREFAS.md`, `dossies/`, `PESQUISA_MODULOS.md` |
 | 1. Candidato publicável | build/execução multiplataforma, licença, créditos, documentação e limitações revisados | ✅ **fechada em 21 set. 2026** — CI verde nos três sistemas, com instaladores gerados |
 | 2. Release do instrumento | pacote por plataforma, testes relevantes, **evidência de validação** | ✅ **destravada em 24 set. 2026** — pacotes ✅ (.deb/.dmg/.exe) · 78 testes ✅ nos 3 sistemas · **sessão de escuta documentada** ✅ (4 estudos com achados) |
-| 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | 🟡 site **existe** em `website/` (4 idiomas, captura de execução real), em preparação — não publica antes do instrumento |
+| 3. Página editorial | texto, autoria, imagens, links e estado correspondem à release | 🟡 site **existe** em `website/` (4 idiomas, captura de execução real, **guia dos 58 módulos** e contato no padrão da família), em preparação — não publica antes do instrumento |
 | 4. Publicação | portal, repositório e página liberados juntos | ❌ |
 
 A regra é explícita: **não se pula da camada 0 para a 4.**
@@ -61,8 +61,13 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
   declaradas (Windows/macOS só na CI, CI inerte até a extração). Falta só
   criar a tag quando a Parte A fechar;
 - ~~site do instrumento~~ **feito** (`website/`, 4 idiomas, faixa
-  `.rasgo-strip`, DejaVu auto-hospedada, captura de execução real). Falta
-  só abri-lo num navegador de cada motor antes de publicar;
+  `.rasgo-strip`, DejaVu auto-hospedada, captura de execução real).
+  Ampliado em 27 set. 2026 com **o guia dos 58 módulos** (`modulos.html` +
+  três traduções) e com **o contato no padrão da família** — `<dialog>` e
+  `contact.js` como no Antitotem e no portal, em lugar do `mailto:` que
+  expunha o endereço. O guia é **gerado** do catálogo do instrumento
+  (`--despejar-modulos` + `gerar_modulos.py`), então página e programa não
+  divergem. Falta só abri-lo num navegador de cada motor antes de publicar;
 - entrada do Modular no portal da família — mas o portal é território do
   Codex, então é combinação, não tarefa minha.
 
