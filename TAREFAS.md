@@ -9931,3 +9931,72 @@ em qualquer idioma, e traduzi-los esconderia o que o painel mostra. Um
 francês lendo "TORQ" no texto acha o knob; lendo "COUPLE", não.
 
 **78/78 CTest.**
+
+---
+
+## Registro da etapa — 2026-09-27: os 803 verbetes de widget do LEARN em en/fr/es
+
+Pedido: "faça o que for necessário para resolvermos da forma correta e com
+qualidade a parte de traduções, tutoriais e learn".
+
+**Feito:** os **803 verbetes de widget** nos três idiomas — 100% nas oito
+famílias, medido. Com os 58 verbetes de módulo de mais cedo, o instrumento
+fica inteiro em português, inglês, francês e espanhol. A limitação
+declarada em `PUBLICACAO.md` foi reescrita de "os widgets seguem em
+português" para "RESOLVIDO".
+
+Ordem dos lotes, cada um um commit: ROUTE 78 · OUT 47 · TIME 93 ·
+MODULATE 69 · DECISION 70 · SPACE 89 · SOURCE 164 · TRANSFORM 193.
+
+### Por que o caminho é um gerador, e não edição direta
+
+A primeira tentativa montava o C++ por **substituição de texto**: eu
+procurava o `;` que fecha o bloco de cada idioma e inseria o lote antes
+dele. Quebrou no primeiro lote, e a causa é do tipo que não se percebe
+lendo o código — vários textos traduzidos **contêm** `;`, então a inserção
+caiu no meio de uma string. Revertido e substituído por
+`tools/traducao/gerar.py`, que **escreve o header inteiro** a partir de
+`tools/traducao/<FAMILIA>.json`. Um gerador nunca procura texto dentro de
+código.
+
+### Duas ferramentas que existem por erro cometido
+
+**`rasgo_modular_learn_coverage --despejar FAMILIA`** despeja o português
+real do binário como JSON. Existe porque eu estava escrevendo os nomes de
+`bind` **de memória**, e um bind errado entra como verbete órfão: nunca é
+consultado, e o medidor continua mostrando a família incompleta sem dizer
+qual linha está errada.
+
+**`tools/traducao/conferir.py`** recusa bind inexistente, verbete
+repetido, nível vazio onde o português tem texto, e avisa quando o texto
+sai idêntico ao português. Foi ele que pegou o único problema real do
+caminho — `LOGIC.out:or` e `out:xor`. Identidade ficou como **aviso**, não
+erro: "A OR B." e "LP ↔ BP ↔ HP." são a mesma frase nos quatro idiomas, e
+forçar uma diferença só para satisfazer o verificador pioraria o texto.
+
+### O guarda de regressão, e por que ele é a parte que importa
+
+`rasgo_modular_learn_coverage --exigir` entra no `ctest`. Sem esse cabo os
+803 verbetes apodreciam em silêncio: o próximo módulo novo entraria com o
+painel em português e **nada avisaria** — nem o compilador (o
+`lookupLearn` cai no português por projeto, que é comportamento pedido),
+nem a interface (a caixa aparece, só na língua errada).
+
+Verificado de propósito: removi `MASTER.gain` do lote OUT, regerei, e o
+teste **falhou**, nomeou a família e imprimiu o comando de conserto.
+Restaurado em seguida. Um guarda que nunca falhou não é guarda.
+
+Consequência aceita: acrescentar um widget passa a exigir seus três
+idiomas no mesmo incremento — a regra que o RASGO já aplica ao Atlas e ao
+inventário, agora executável em vez de lembrada.
+
+**Validação:** 79/79 no `ctest` (78 anteriores + o guarda), build completo
+limpo. A tradução não toca DSP: `LearnWidgetI18n.hpp` é conteúdo textual
+gerado, e nenhum teste de áudio mudou de resultado.
+
+**Próximo passo:** o que falta para a v0.1.0 não é mais tradução — é
+cortar a tag e abrir o repositório, depois de 1 out. 2026 (a cota de
+Actions reseta; a tag dispara a CI dos três sistemas). Segue aberto para a
+v0.1.1: redesenhar só as regiões sujas (~38% de CPU em desenho) e provar
+os 4 parâmetros sem prova (`QUANTIZER.hysteresis`, `BOXCAR.delay`,
+`BOXCAR.thresh`, `SCOPE.trigger`).
