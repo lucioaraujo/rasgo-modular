@@ -1,0 +1,325 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Gera as páginas de guia dos módulos, uma por idioma.
+
+POR QUE É GERADO, e não escrito à mão: os 58 verbetes de módulo já existem
+no catálogo do instrumento (`apps/panel/LearnCatalog.hpp`), traduzidos nos
+quatro idiomas e cobertos por teste. Escrever uma segunda cópia no site
+criaria duas versões do mesmo texto, que divergem na primeira correção — e
+a que o público lê seria a que ninguém testa.
+
+    ../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
+    python3 gerar_modulos.py
+
+A moldura (fonte, faixa RASGO, cabeçalho, troca de idioma, contato) segue o
+padrão dos outros sites da família — Antitotem e o portal RASGO —, e o
+wordmark é LIDO de `index.html` em vez de copiado para cá, pelo mesmo
+motivo do parágrafo acima.
+"""
+import html
+import json
+import pathlib
+import re
+import sys
+
+AQUI = pathlib.Path(__file__).parent
+
+# --- textos de moldura, por idioma ------------------------------------
+# Os que já existiam nas páginas principais foram copiados de lá para
+# manter uma voz só no site.
+IDIOMAS = {
+    "pt": {
+        "arquivo": "modulos.html",
+        "lang": "pt-BR",
+        "faixa": "RASGO — família de instrumentos e pesquisa sonora",
+        "pular": "Pular para o conteúdo",
+        "idioma_label": "Idioma",
+        "secoes_label": "Seções",
+        "nav_conceito": "Conceito",
+        "nav_modulos": "Módulos",
+        "titulo": "Rasgo Modular — guia dos módulos",
+        "descricao": "Os 58 módulos do Rasgo Modular, família por família: "
+                     "o que cada um é, onde fica entre os vizinhos, e uma "
+                     "cadeia para experimentar.",
+        "pill": "58 módulos · 8 famílias",
+        "h1": "Guia dos módulos",
+        "lead": "Cada módulo do Rasgo Modular explicado em três níveis — o "
+                "que é, onde fica entre os vizinhos, e uma cadeia para "
+                "experimentar. É o mesmo texto que a caixa LEARN mostra "
+                "dentro do instrumento quando você passa o mouse sobre o "
+                "corpo de um módulo; aqui ele está todo junto, para ler "
+                "antes ou depois de tocar.",
+        "indice": "Famílias",
+        "n_modulos": "%d módulos",
+        "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
+                    "Código sob GNU AGPL-3.0-or-later.",
+        "rodape_2": "Estes verbetes são gerados do catálogo do próprio "
+                    "instrumento, então a página e o programa nunca "
+                    "divergem.",
+        "contato_h": "Contato",
+        "contato_p": "Lúcio Araújo — autoria e desenvolvimento. Defeitos, "
+                     "licença, crédito:",
+        "dlg_fechar": "Fechar janela de contato",
+        "dlg_titulo": "CONTATO",
+        "dlg_copie": "Copie o endereço de e-mail:",
+        "dlg_botao": "Copiar e-mail",
+        "dlg_copiado": "E-mail copiado.",
+        "dlg_fallback": "Selecione e copie o endereço acima.",
+    },
+    "en": {
+        "arquivo": "modulos-en.html",
+        "lang": "en",
+        "faixa": "RASGO — family of instruments and sound research",
+        "pular": "Skip to content",
+        "idioma_label": "Language",
+        "secoes_label": "Sections",
+        "nav_conceito": "Concept",
+        "nav_modulos": "Modules",
+        "titulo": "Rasgo Modular — module guide",
+        "descricao": "The 58 modules of Rasgo Modular, family by family: "
+                     "what each one is, where it sits among its neighbours, "
+                     "and a chain to try.",
+        "pill": "58 modules · 8 families",
+        "h1": "Module guide",
+        "lead": "Every module of Rasgo Modular explained on three levels — "
+                "what it is, where it sits among its neighbours, and a chain "
+                "to try. It is the same text the LEARN box shows inside the "
+                "instrument when you hover a module's body; here it is all "
+                "together, to read before or after playing.",
+        "indice": "Families",
+        "n_modulos": "%d modules",
+        "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
+                    "Code under GNU AGPL-3.0-or-later.",
+        "rodape_2": "These entries are generated from the instrument's own "
+                    "catalogue, so the page and the program never diverge.",
+        "contato_h": "Contact",
+        "contato_p": "Lúcio Araújo — authorship and development. Bugs, "
+                     "licence, credit:",
+        "dlg_fechar": "Close contact window",
+        "dlg_titulo": "CONTACT",
+        "dlg_copie": "Copy the email address:",
+        "dlg_botao": "Copy email",
+        "dlg_copiado": "Email copied.",
+        "dlg_fallback": "Select and copy the address above.",
+    },
+    "fr": {
+        "arquivo": "modulos-fr.html",
+        "lang": "fr",
+        "faixa": "RASGO — famille d'instruments et de recherche sonore",
+        "pular": "Aller au contenu",
+        "idioma_label": "Langue",
+        "secoes_label": "Sections",
+        "nav_conceito": "Concept",
+        "nav_modulos": "Modules",
+        "titulo": "Rasgo Modular — guide des modules",
+        "descricao": "Les 58 modules du Rasgo Modular, famille par famille : "
+                     "ce qu’est chacun, où il se situe parmi ses voisins, et "
+                     "une chaîne à essayer.",
+        "pill": "58 modules · 8 familles",
+        "h1": "Guide des modules",
+        "lead": "Chaque module du Rasgo Modular expliqué sur trois niveaux — "
+                "ce qu’il est, où il se situe parmi ses voisins, et une "
+                "chaîne à essayer. C’est le texte que la boîte LEARN affiche "
+                "dans l’instrument quand on survole le corps d’un module ; "
+                "ici il est rassemblé, à lire avant ou après avoir joué.",
+        "indice": "Familles",
+        "n_modulos": "%d modules",
+        "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
+                    "Code sous GNU AGPL-3.0-or-later.",
+        "rodape_2": "Ces notices sont générées depuis le catalogue de "
+                    "l’instrument lui-même : la page et le programme ne "
+                    "divergent jamais.",
+        "contato_h": "Contact",
+        "contato_p": "Lúcio Araújo — écriture et développement. Défauts, "
+                     "licence, crédit :",
+        "dlg_fechar": "Fermer la fenêtre de contact",
+        "dlg_titulo": "CONTACT",
+        "dlg_copie": "Copiez l’adresse e-mail :",
+        "dlg_botao": "Copier l’e-mail",
+        "dlg_copiado": "E-mail copié.",
+        "dlg_fallback": "Sélectionnez et copiez l’adresse ci-dessus.",
+    },
+    "es": {
+        "arquivo": "modulos-es.html",
+        "lang": "es",
+        "faixa": "RASGO — familia de instrumentos e investigación sonora",
+        "pular": "Saltar al contenido",
+        "idioma_label": "Idioma",
+        "secoes_label": "Secciones",
+        "nav_conceito": "Concepto",
+        "nav_modulos": "Módulos",
+        "titulo": "Rasgo Modular — guía de los módulos",
+        "descricao": "Los 58 módulos del Rasgo Modular, familia por familia: "
+                     "qué es cada uno, dónde queda entre sus vecinos, y una "
+                     "cadena para probar.",
+        "pill": "58 módulos · 8 familias",
+        "h1": "Guía de los módulos",
+        "lead": "Cada módulo del Rasgo Modular explicado en tres niveles — "
+                "qué es, dónde queda entre sus vecinos, y una cadena para "
+                "probar. Es el mismo texto que la caja LEARN muestra dentro "
+                "del instrumento al pasar el ratón sobre el cuerpo de un "
+                "módulo; aquí está todo junto, para leer antes o después de "
+                "tocar.",
+        "indice": "Familias",
+        "n_modulos": "%d módulos",
+        "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
+                    "Código bajo GNU AGPL-3.0-or-later.",
+        "rodape_2": "Estas entradas se generan del catálogo del propio "
+                    "instrumento, así que la página y el programa nunca "
+                    "divergen.",
+        "contato_h": "Contacto",
+        "contato_p": "Lúcio Araújo — autoría y desarrollo. Defectos, "
+                     "licencia, crédito:",
+        "dlg_fechar": "Cerrar ventana de contacto",
+        "dlg_titulo": "CONTACTO",
+        "dlg_copie": "Copie la dirección de correo:",
+        "dlg_botao": "Copiar correo",
+        "dlg_copiado": "Correo copiado.",
+        "dlg_fallback": "Seleccione y copie la dirección de arriba.",
+    },
+}
+
+# Rótulos dos três níveis, com as MESMAS palavras que o tutorial do
+# instrumento usa ("rápido, como funciona, e um experimento") — quem leu o
+# tutorial reconhece a estrutura na página.
+NIVEIS = {
+    "pt": ("Rápido", "Como funciona", "Experimente"),
+    "en": ("Quick", "How it works", "Try this"),
+    "fr": ("Rapide", "Comment ça marche", "À essayer"),
+    "es": ("Rápido", "Cómo funciona", "Pruebe esto"),
+}
+
+PAGINA_PRINCIPAL = {"pt": "index.html", "en": "en.html",
+                    "fr": "fr.html", "es": "es.html"}
+
+
+def wordmark():
+    """Lê o SVG do wordmark de `index.html` — uma cópia só no site."""
+    fonte = (AQUI / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'(<svg class="wordmark".*?</svg>)', fonte, re.S)
+    if not m:
+        sys.exit("não achei o <svg class=\"wordmark\"> em index.html")
+    return m.group(1)
+
+
+def e(texto):
+    return html.escape(texto, quote=False)
+
+
+def pagina(codigo, dados, familias, marca):
+    t = dados
+    niveis = NIVEIS[codigo]
+    L = []
+    L.append("<!doctype html>")
+    L.append('<html lang="%s">' % t["lang"])
+    L.append("<head>")
+    L.append('<meta charset="utf-8" />')
+    L.append('<meta name="viewport" content="width=device-width, initial-scale=1" />')
+    L.append("<title>%s</title>" % e(t["titulo"]))
+    L.append('<meta name="description" content="%s" />' % html.escape(t["descricao"]))
+    L.append('<link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />')
+    L.append('<link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />')
+    L.append('<link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />')
+    L.append('<link rel="stylesheet" href="styles.css" />')
+    L.append('<script src="assets/contact.js" defer></script>')
+    L.append("</head>")
+    L.append("<body>")
+    L.append('<div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">%s</a></div>'
+             % e(t["faixa"]))
+    L.append('<a class="skip-link" href="#conteudo">%s</a>' % e(t["pular"]))
+    L.append("")
+    L.append('<div class="site-header">')
+    L.append('  <a class="brand" href="#top" aria-label="Rasgo Modular">')
+    L.append(marca)
+    L.append("    <span>MODULAR</span>")
+    L.append("  </a>")
+    L.append('  <div class="header-nav">')
+    L.append('    <nav class="page-nav" aria-label="%s">' % e(t["secoes_label"]))
+    L.append('      <a href="%s">%s</a>' % (PAGINA_PRINCIPAL[codigo], e(t["nav_conceito"])))
+    L.append('      <a href="%s" aria-current="page">%s</a>' % (t["arquivo"], e(t["nav_modulos"])))
+    L.append("    </nav>")
+    L.append('    <nav class="lang-switch" aria-label="%s">' % e(t["idioma_label"]))
+    for c in ("pt", "en", "fr", "es"):
+        atual = ' aria-current="true"' if c == codigo else ""
+        L.append('      <a href="%s"%s>%s</a>'
+                 % (IDIOMAS[c]["arquivo"], atual, c.upper()))
+    L.append("    </nav>")
+    L.append("  </div>")
+    L.append("</div>")
+    L.append("")
+    L.append('<main id="conteudo">')
+    L.append('<section class="hero" id="top">')
+    L.append('  <span class="status-pill">%s</span>' % e(t["pill"]))
+    L.append("  <h1>%s</h1>" % e(t["h1"]))
+    L.append('  <p class="lead">%s</p>' % e(t["lead"]))
+    L.append("</section>")
+    L.append("")
+    # índice das famílias: 58 módulos numa página só precisam de atalho
+    L.append('<nav class="familias" aria-label="%s">' % e(t["indice"]))
+    for fam in familias:
+        L.append('  <a href="#fam-%s">%s <span>%d</span></a>'
+                 % (fam["familia"], e(fam["familia"]), len(fam["modulos"])))
+    L.append("</nav>")
+    L.append("")
+    escuro = False
+    for fam in familias:
+        classe = "section section-dark" if escuro else "section"
+        escuro = not escuro
+        L.append('<section class="%s" id="fam-%s">' % (classe, fam["familia"]))
+        L.append("  <h2>%s <small>%s</small></h2>"
+                 % (e(fam["familia"]), e(t["n_modulos"] % len(fam["modulos"]))))
+        for mod in fam["modulos"]:
+            verbete = mod[codigo] or mod["pt"]
+            L.append('  <article class="modulo" id="mod-%s">' % mod["tipo"])
+            L.append("    <h3>%s</h3>" % e(mod["tipo"]))
+            for i, texto in enumerate(verbete):
+                if not texto.strip():
+                    continue
+                L.append('    <p><span class="nivel">%s</span> %s</p>'
+                         % (e(niveis[i]), e(texto)))
+            L.append("  </article>")
+        L.append("</section>")
+    L.append("")
+    L.append('<section class="section" id="contato">')
+    L.append("  <h2>%s</h2>" % e(t["contato_h"]))
+    L.append("  <p>%s</p>" % e(t["contato_p"]))
+    L.append('  <div class="contact-row">')
+    L.append('    <button type="button" class="button button-primary" data-contact-trigger>rasgo.instruments@gmail.com</button>')
+    L.append('    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular">GitHub</a>')
+    L.append("  </div>")
+    L.append("</section>")
+    L.append("</main>")
+    L.append("")
+    L.append("<footer>")
+    L.append("  <p>%s</p>" % t["rodape_1"])
+    L.append("  <p>%s</p>" % e(t["rodape_2"]))
+    L.append("</footer>")
+    L.append('<dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">')
+    L.append('  <button class="dialog-close" type="button" data-contact-close aria-label="%s">&times;</button>'
+             % e(t["dlg_fechar"]))
+    L.append('  <h2 id="contact-title">%s</h2>' % e(t["dlg_titulo"]))
+    L.append("  <p>%s</p>" % e(t["dlg_copie"]))
+    L.append("  <code data-contact-address></code>")
+    L.append('  <button class="button button-primary" type="button" data-contact-copy>%s</button>'
+             % e(t["dlg_botao"]))
+    L.append('  <p class="contact-feedback" data-contact-feedback data-copied="%s" data-fallback="%s" aria-live="polite"></p>'
+             % (html.escape(t["dlg_copiado"]), html.escape(t["dlg_fallback"])))
+    L.append("</dialog>")
+    L.append("</body>")
+    L.append("</html>")
+    return "\n".join(L) + "\n"
+
+
+def main():
+    familias = json.loads((AQUI / "modulos.json").read_text(encoding="utf-8"))
+    marca = wordmark()
+    total = sum(len(f["modulos"]) for f in familias)
+    for codigo, dados in IDIOMAS.items():
+        destino = AQUI / dados["arquivo"]
+        destino.write_text(pagina(codigo, dados, familias, marca), encoding="utf-8")
+        print("%-18s %d módulos em %d famílias"
+              % (dados["arquivo"], total, len(familias)))
+
+
+if __name__ == "__main__":
+    main()

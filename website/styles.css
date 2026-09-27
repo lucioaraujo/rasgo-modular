@@ -184,6 +184,94 @@ th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--
 th { color: var(--muted); font: 700 .72rem "DejaVu Sans Mono", monospace; letter-spacing: .06em; text-transform: uppercase; }
 .wrap { overflow-x: auto; }
 
+/* ---- botões e contato -------------------------------------------------
+   Mesmo padrão do Antitotem e do portal RASGO: não há `href="mailto:"` em
+   lugar nenhum. O endereço aparece como TEXTO do botão (visível, legível,
+   copiável à mão) e `assets/contact.js` o remonta a partir de códigos de
+   caractere para o diálogo e para a área de transferência.
+   O que isso evita é o link `mailto:` — que coletor ingênuo segue e que
+   exige um cliente de e-mail configurado no visitante. NÃO esconde o
+   endereço de quem lê o HTML, e não é para isso que serve.
+   Os tokens são os do Modular, então o bloco tem a cor deste instrumento e
+   não a do irmão. */
+.button {
+  display: inline-block; padding: .65rem 1.1rem; border: 1px solid var(--line);
+  color: var(--ink); text-decoration: none; font-size: .88rem; cursor: pointer;
+  font-family: inherit; background: none;
+}
+.button:hover { border-color: var(--accent); color: var(--accent); }
+.button-primary {
+  border-color: var(--accent); background: var(--accent); color: var(--recessed);
+  font-weight: 700;
+}
+.button-primary:hover { background: var(--warning); border-color: var(--warning); }
+.contact-row { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.4rem; }
+
+.contact-dialog {
+  width: min(100% - 40px, 380px); padding: 1.4rem; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink);
+}
+.contact-dialog::backdrop { background: rgba(0, 0, 0, .72); backdrop-filter: blur(4px); }
+.contact-dialog h2 {
+  margin: 0 0 .6rem; font-size: 1rem; letter-spacing: .06em;
+  font-family: "DejaVu Sans Mono", monospace;
+}
+.contact-dialog p { margin-bottom: 0; color: var(--muted); font-size: .82rem; }
+.contact-dialog code {
+  display: block; margin: .9rem 0 .8rem; padding: .65rem;
+  border: 1px solid var(--line); background: var(--ground); color: var(--accent);
+  font-size: .82rem; overflow-wrap: anywhere;
+}
+.contact-dialog .button { padding: .6rem .8rem; font-size: .78rem; }
+.contact-feedback {
+  min-height: 1.3em; margin: .6rem 0 0; font-size: .76rem; color: var(--muted);
+}
+.dialog-close {
+  position: absolute; top: .6rem; right: .7rem; border: 0; background: transparent;
+  color: var(--muted); font-size: 1.7rem; line-height: 1; cursor: pointer;
+}
+.dialog-close:hover { color: var(--accent); }
+
+/* ---- guia dos módulos ------------------------------------------------
+   São 58 verbetes numa página só, então o índice de famílias não é enfeite:
+   sem ele, chegar ao SPACE exige rolar por metade do catálogo. */
+.page-nav { display: flex; gap: .9rem; }
+
+.familias {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin: 0 0 2.5rem;
+}
+.familias a {
+  display: inline-flex; align-items: baseline; gap: .45rem;
+  padding: .45rem .8rem; border: 1px solid var(--line);
+  color: var(--ink); text-decoration: none;
+  font: 700 .74rem "DejaVu Sans Mono", monospace; letter-spacing: .06em;
+}
+.familias a:hover { border-color: var(--accent); color: var(--accent); }
+.familias a span { color: var(--muted); font-weight: 400; }
+
+.section h2 small {
+  margin-left: .6rem; color: var(--muted);
+  font: 400 .8rem "DejaVu Sans Mono", monospace; letter-spacing: .04em;
+}
+
+.modulo { border-top: 1px solid var(--line); padding: 1.3rem 0 .4rem; }
+.modulo:first-of-type { border-top: 0; }
+.modulo h3 {
+  margin: 0 0 .6rem; color: var(--accent);
+  font: 700 .95rem "DejaVu Sans Mono", monospace; letter-spacing: .06em;
+}
+.modulo p { margin: 0 0 .7rem; max-width: 48rem; }
+/* O rótulo do nível fica na mesma linha do texto de propósito: empilhado,
+   cada verbete ocuparia seis linhas e a página viraria uma escada de
+   títulos com o conteúdo perdido no meio. */
+.nivel {
+  color: var(--cable-ctrl);
+  font: 700 .7rem "DejaVu Sans Mono", monospace;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-right: .5rem;
+}
+
 footer {
   border-top: 1px solid var(--line); margin-top: 3rem;
   padding: 2rem clamp(1rem, 4vw, 3rem) 3rem;

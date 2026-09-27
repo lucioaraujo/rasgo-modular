@@ -9,6 +9,7 @@
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
+<script src="assets/contact.js" defer></script>
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — família de instrumentos e pesquisa sonora</a></div>
@@ -22,6 +23,10 @@
     <span>MODULAR</span>
   </a>
   <div class="header-nav">
+    <nav class="page-nav" aria-label="Seções">
+      <a href="index.html" aria-current="page">Conceito</a>
+      <a href="modulos.html">Módulos</a>
+    </nav>
     <nav class="lang-switch" aria-label="Idioma">
       <a href="index.html" aria-current="true">PT</a>
       <a href="en.html">EN</a>
@@ -161,6 +166,23 @@
     macOS é Universal 2 de verdade. Ela não prova que o app abre e soa numa
     máquina real — e isso não será dito de outro jeito aqui.</p>
 </section>
+
+<section class="section" id="guia">
+  <h2>Guia dos módulos</h2>
+  <p>Os 58 módulos, família por família: o que cada um é, onde fica entre os vizinhos, e uma cadeia para experimentar. É o mesmo texto que a caixa LEARN mostra dentro do instrumento.</p>
+  <div class="contact-row">
+    <a class="button button-primary" href="modulos.html">Abrir o guia dos módulos</a>
+  </div>
+</section>
+
+<section class="section section-dark" id="contato">
+  <h2>Contato</h2>
+  <p>Lúcio Araújo — autoria e desenvolvimento. Defeitos, licença, crédito:</p>
+  <div class="contact-row">
+    <button type="button" class="button button-primary" data-contact-trigger>rasgo.instruments@gmail.com</button>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular">GitHub</a>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -169,8 +191,14 @@
   <p>Parte da família RASGO de instrumentos e pesquisa sonora. Créditos, fontes
     de terceiros e política de pesquisa acompanham o repositório do
     instrumento.</p>
-  <p class="contato">Contato — defeitos, licença, crédito:
-    <a href="mailto:rasgo.instruments@gmail.com">rasgo.instruments@gmail.com</a></p>
 </footer>
+<dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">
+  <button class="dialog-close" type="button" data-contact-close aria-label="Fechar janela de contato">&times;</button>
+  <h2 id="contact-title">CONTATO</h2>
+  <p>Copie o endereço de e-mail:</p>
+  <code data-contact-address></code>
+  <button class="button button-primary" type="button" data-contact-copy>Copiar e-mail</button>
+  <p class="contact-feedback" data-contact-feedback data-copied="E-mail copiado." data-fallback="Selecione e copie o endereço acima." aria-live="polite"></p>
+</dialog>
 </body>
 </html>

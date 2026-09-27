@@ -12,10 +12,11 @@ deve documentar).
 
 ## Propósito, públicos, idiomas
 
-**Propósito:** apresentar o instrumento a quem nunca o viu, em uma página
-só, e ser honesto sobre o que ele ainda não é. Não é documentação de uso
-— essa mora no repositório (`guia/`, `INSTALL.md`) e no tutorial embutido
-no próprio app.
+**Propósito:** apresentar o instrumento a quem nunca o viu e ser honesto
+sobre o que ele ainda não é — uma página de apresentação por idioma, mais
+uma de guia dos módulos. Não é documentação de uso: instalação e variáveis
+seguem no repositório (`INSTALL.md`), e o guia do site é o mesmo material
+que o LEARN mostra dentro do app, reunido para leitura corrida.
 
 **Públicos:** músicos e pessoas interessadas em síntese modular e em
 sistemas generativos; secundariamente, quem chega pelo portal da família.
@@ -30,13 +31,48 @@ site em menos idiomas que o produto seria uma regressão.
 |---|---|---|
 | `index.html` (pt) | apresentação completa | esta página |
 | `en.html` · `fr.html` · `es.html` | traduções integrais | `index.html` |
+| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia dos 58 módulos, família por família | **o catálogo do app** — ver abaixo |
 
-Uma página por idioma, sem subpáginas. Quando houver release, entram:
-página de instalação (traduzindo `INSTALL.md`), downloads e obras.
+Duas páginas por idioma. A segunda segue o precedente do Antitotem, que já
+tem `install.html` por idioma: `.page-nav` no cabeçalho ao lado do seletor
+de idioma, com `aria-current="page"` na página aberta.
+
+Quando houver release, entram: página de instalação (traduzindo
+`INSTALL.md`), downloads e obras.
 
 **O que o site NÃO duplica:** matriz de plataformas detalhada, variáveis
 de ambiente, créditos completos e procedimento de retirada seguem no
 repositório. O site resume e aponta; cópia editada à mão diverge.
+
+## O guia dos módulos é GERADO, e por quê
+
+As quatro páginas de guia não são escritas aqui. Os 58 verbetes de módulo
+já existem em `apps/panel/LearnCatalog.hpp`, nos quatro idiomas, cobertos
+por teste — são o mesmo texto que a caixa LEARN mostra quando o mouse passa
+sobre o corpo de um módulo dentro do instrumento.
+
+Escrever uma segunda cópia no site criaria duas versões do mesmo texto, e
+duas versões divergem na primeira correção — sendo que a que o público lê
+seria justamente a que nenhum teste cobre. Então:
+
+```sh
+../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
+python3 gerar_modulos.py
+```
+
+O primeiro comando despeja o catálogo do BINÁRIO (não de uma leitura do
+código-fonte): tipos, famílias, ordem e os quatro idiomas vêm de onde o
+instrumento os lê. O segundo escreve as quatro páginas. O wordmark é lido
+de `index.html` em vez de copiado para o script, pelo mesmo motivo.
+
+`modulos.json` fica versionado de propósito: com ele, o site se regenera
+sem compilar o instrumento.
+
+Isto também cumpre uma promessa que o app já fazia. O tutorial embutido
+diz, nos quatro idiomas, que *"um guia escrito mais completo e receitas de
+patch estão a caminho, como site e PDF"*. O guia é essa primeira metade.
+Quando o site for publicado, esse texto do tutorial precisa passar de "a
+caminho" para um apontamento.
 
 ## Tipografia
 
@@ -88,6 +124,21 @@ Antitotem: cada instrumento mantém identidade visual própria
 | `--muted` sobre `--recessed` | 5,93:1 |
 | `--muted` sobre `--ground` | 5,50:1 |
 
+Pares acrescentados pelo guia dos módulos, medidos do mesmo jeito:
+
+| Par | Razão | Onde |
+|---|---|---|
+| `--accent` sobre `--surface` | 6,87:1 | nome do módulo em seção escura |
+| `--cable-ctrl` sobre `--ground` | 7,24:1 | rótulo do nível (RÁPIDO / COMO FUNCIONA / EXPERIMENTE) |
+| `--cable-ctrl` sobre `--surface` | 5,82:1 | o mesmo rótulo em seção escura |
+| `--recessed` sobre `--accent` | 9,22:1 | texto do botão primário |
+
+O rótulo do nível usa `--cable-ctrl` — o azul frio que no rack marca
+*controle*, não áudio. Não é decoração: o rótulo é metadado sobre o texto,
+da mesma natureza que um cabo de controle é sobre o sinal, e reusar a cor
+que o instrumento já deu a esse papel mantém uma gramática só entre app e
+site.
+
 Uma combinação **reprovava**: `--muted` sobre `--surface`, 4,42:1. Hoje ela
 não ocorre — o texto secundário vive em cartões e notas, que têm fundo
 `--recessed` —, mas bastaria mover uma tabela ou uma nota para uma seção
@@ -123,6 +174,17 @@ respeitar a preferência é barato e não há desculpa para não fazê-lo.
   receber foco;
 - **`:focus-visible`** — anel de 2px no acento, com deslocamento, em todo
   elemento interativo. Nada de `outline: none`;
+- **contato** (`.contact-row` + `.contact-dialog`) — padrão da família,
+  igual ao do Antitotem e ao do portal: **não há `href="mailto:"` em lugar
+  nenhum**. O endereço aparece como texto do botão e `assets/contact.js` o
+  remonta a partir de códigos de caractere, para o diálogo e para a área de
+  transferência.
+
+  O que isso evita é o link `mailto:` — que coletor ingênuo segue, e que
+  exige um cliente de e-mail configurado no visitante. **Não** esconde o
+  endereço de quem lê o HTML, e não é para isso que serve; dizer o
+  contrário seria vender uma proteção que não existe. O `<dialog>` nativo
+  traz foco preso e fechamento por Esc de graça;
 - **estados vazios/erro:** o site é estático e sem formulário, então não
   há nenhum. Quando entrar a página de downloads, ela precisa de um.
 
@@ -159,10 +221,13 @@ A captura tem **texto alternativo descritivo** nos quatro idiomas — não
 setenta cabos curvos, a paleta à esquerda, a barra de comandos no topo.
 Quem usa leitor de tela precisa da imagem, não do rótulo dela.
 
-**Verificado:** estrutura HTML dos quatro idiomas (um `<title>`, uma faixa
-do portal, um `<main>`, um `<footer>`, seis seções em cada); seletor de
-idioma marcando a página certa em todas; nenhum arquivo referenciado
-ausente; nenhum resíduo de português nas traduções.
+**Verificado** nas **oito** páginas, por script: marcação bem-formada
+(nenhuma tag fechada fora de ordem, nenhuma aberta sem fechar); todo
+`href`/`src` interno aponta para arquivo que existe; **nenhum recurso
+externo** além dos links para o portal e para o GitHub — nada de CDN, nada
+de fonte remota; seletor de idioma e `.page-nav` marcando a página certa em
+cada uma; os 58 módulos presentes nas quatro páginas de guia; nenhum
+resíduo de português nas traduções.
 
 **Ainda não verificado, e é honesto dizer:** nenhum navegador real abriu
 esta página. Não há navegador gráfico neste ambiente, e não abro janela na
@@ -172,7 +237,13 @@ mais uma passada de leitor de tela na ordem de foco.
 
 ## Build
 
-Não há build. São arquivos estáticos que funcionam abrindo o
-`index.html` — e essa simplicidade é deliberada: um site que precisa de
+Não há build para servir: são arquivos estáticos que funcionam abrindo o
+`index.html`, e essa simplicidade é deliberada — um site que precisa de
 pipeline para existir é um site que apodrece quando o pipeline quebra.
 `dist/` não existe porque não é necessário.
+
+Há **um** passo de geração, e só para as páginas de guia
+(`gerar_modulos.py`, seção acima). Ele não é obrigatório para servir o
+site: as páginas geradas ficam versionadas e prontas. Só se roda quando um
+verbete de módulo muda no instrumento — e é isso que faz o site seguir o
+programa em vez de divergir dele.

@@ -9,6 +9,7 @@
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
+<script src="assets/contact.js" defer></script>
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — family of instruments and sound research</a></div>
@@ -22,7 +23,11 @@
     <span>MODULAR</span>
   </a>
   <div class="header-nav">
-    <nav class="lang-switch" aria-label="Idioma">
+    <nav class="page-nav" aria-label="Sections">
+      <a href="en.html" aria-current="page">Concept</a>
+      <a href="modulos-en.html">Modules</a>
+    </nav>
+    <nav class="lang-switch" aria-label="Language">
       <a href="index.html">PT</a>
       <a href="en.html" aria-current="true">EN</a>
       <a href="fr.html">FR</a>
@@ -160,6 +165,23 @@
     sounds on a real machine — and that will not be phrased any other way
     here.</p>
 </section>
+
+<section class="section" id="guia">
+  <h2>Module guide</h2>
+  <p>All 58 modules, family by family: what each one is, where it sits among its neighbours, and a chain to try. It is the same text the LEARN box shows inside the instrument.</p>
+  <div class="contact-row">
+    <a class="button button-primary" href="modulos-en.html">Open the module guide</a>
+  </div>
+</section>
+
+<section class="section section-dark" id="contato">
+  <h2>Contact</h2>
+  <p>Lúcio Araújo — authorship and development. Bugs, licence, credit:</p>
+  <div class="contact-row">
+    <button type="button" class="button button-primary" data-contact-trigger>rasgo.instruments@gmail.com</button>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular">GitHub</a>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -168,8 +190,14 @@
   <p>Part of the RASGO family of instruments and sound research. Credits,
     third-party sources and the research policy ship with the instrument's
     repository.</p>
-  <p class="contato">Contact — bugs, licence, credit:
-    <a href="mailto:rasgo.instruments@gmail.com">rasgo.instruments@gmail.com</a></p>
 </footer>
+<dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">
+  <button class="dialog-close" type="button" data-contact-close aria-label="Close contact window">&times;</button>
+  <h2 id="contact-title">CONTACT</h2>
+  <p>Copy the email address:</p>
+  <code data-contact-address></code>
+  <button class="button button-primary" type="button" data-contact-copy>Copy email</button>
+  <p class="contact-feedback" data-contact-feedback data-copied="Email copied." data-fallback="Select and copy the address above." aria-live="polite"></p>
+</dialog>
 </body>
 </html>
