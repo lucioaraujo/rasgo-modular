@@ -647,6 +647,41 @@ if(RASGO_MODULAR_BUILD_JUCE_APP AND TARGET RasgoModularApp)
         "Rasgo Modular — instrumento modular generativo")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
+    # Nome de arquivo DETERMINÍSTICO e que diz a arquitetura.
+    #
+    # O padrão do CPack daria `rasgo-modular-0.1.0-Linux.deb`,
+    # `-Windows.exe` e `-Darwin.dmg`: previsível, mas silencioso sobre a
+    # arquitetura — e é justamente o que alguém precisa saber antes de
+    # baixar. Pior: o site publica esses nomes como link direto de
+    # download, então eles passam a ser CONTRATO. Um nome que mude entre
+    # versões do CPack quebraria a página sem avisar.
+    #
+    # `universal` no macOS não é enfeite: o alvo fixa
+    # `CMAKE_OSX_ARCHITECTURES` com as duas arquiteturas e a CI verifica
+    # que o binário é Universal 2 de verdade. O nome diz o que foi
+    # verificado.
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        list(LENGTH CMAKE_OSX_ARCHITECTURES _rasgo_n_arch)
+        if(_rasgo_n_arch GREATER 1)
+            set(_rasgo_plat "macos-universal")
+        elseif(CMAKE_OSX_ARCHITECTURES)
+            set(_rasgo_plat "macos-${CMAKE_OSX_ARCHITECTURES}")
+        else()
+            set(_rasgo_plat "macos-${CMAKE_SYSTEM_PROCESSOR}")
+        endif()
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(_rasgo_plat "windows-x64")
+        else()
+            set(_rasgo_plat "windows-x86")
+        endif()
+    else()
+        string(TOLOWER "${CMAKE_SYSTEM_NAME}" _rasgo_os)
+        set(_rasgo_plat "${_rasgo_os}-${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+    set(CPACK_PACKAGE_FILE_NAME
+        "rasgo-modular-${PROJECT_VERSION}-${_rasgo_plat}")
+
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
         set(CPACK_GENERATOR "DEB")

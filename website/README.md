@@ -210,9 +210,11 @@ perda costuma borrar. Comparei um recorte denso do original com o WebP a
 88 de qualidade — cabos nítidos, texto legível, sem artefato visível.
 
 Política para o que ainda não existe: áudio de demonstração precisa ser
-obra do autor, com seed e versão registrados; downloads só aparecem
+obra do autor, com seed e versão registrados. **Downloads** só aparecem
 quando existir release, apontando pro artefato versionado e nunca pra um
-build solto.
+build solto — a versão pós-release de `estado.py` aponta exatamente para
+os anexos da release da tag, e `verificar.py` confere que os nomes batem
+com o empacotamento.
 
 ## Qualidade e validação
 
@@ -235,6 +237,73 @@ máquina do autor. Antes de publicar, é preciso conferir em pelo menos um
 navegador de cada motor (Blink, Gecko, WebKit), em desktop e em telefone,
 mais uma passada de leitor de tela na ordem de foco.
 
+## Os dois estados da página: antes e depois da release
+
+A seção de estado e a pílula do topo existem em **duas versões**, e
+`estado.py` é o dono das duas:
+
+```sh
+python3 estado.py --antes          # sem release — o estado de hoje
+python3 estado.py --depois 0.1.0   # com release — downloads por plataforma
+```
+
+São duas regiões × quatro idiomas = **oito trechos que precisam mudar
+juntos**. No dia de publicar, editar isso à mão é como se erra: uma página
+fica anunciando "ainda não há release" com o resto do site já no ar, e
+ninguém nota porque ninguém relê as quatro línguas. Com o script, o estado
+é um comando e não uma lembrança.
+
+Fora das regiões marcadas (`<!-- PILULA:… -->`, `<!-- ESTADO:… -->`) o
+script não toca em nada.
+
+### Os downloads, e por que os nomes são contrato
+
+A versão pós-release publica **link direto para cada instalador**:
+
+| Sistema | Arquivo |
+|---|---|
+| Linux | `rasgo-modular-<versão>-linux-x86_64.deb` |
+| Windows | `rasgo-modular-<versão>-windows-x64.exe` |
+| macOS | `rasgo-modular-<versão>-macos-universal.dmg` |
+
+Esses nomes vêm do `CPACK_PACKAGE_FILE_NAME` do `CMakeLists.txt`, que
+passou a ser **explícito** por causa desta página: o padrão do CPack daria
+`rasgo-modular-0.1.0-Linux.deb`, que não diz a arquitetura e poderia mudar
+entre versões do CPack, quebrando três botões sem avisar.
+
+Duas coisas foram consertadas no instrumento para que esses links possam
+existir:
+
+- o `CMakeLists.txt` fixa o nome do pacote, com arquitetura;
+- o workflow ganhou um job **`release`**: até 28 set. 2026 a CI só fazia
+  `upload-artifact`, que exige login no GitHub, vem zipado por cima do
+  instalador e expira em 90 dias. Não era download público — criar a tag
+  não produziria nada instalável. Agora a tag cria a release e anexa os
+  três pacotes.
+
+A versão pós-release também diz, no próprio bloco de download, que Windows
+e macOS nunca foram abertos pelo autor e que o `.dmg` tem assinatura
+ad-hoc. O gate editorial exige que a limitação seja dita onde a decisão é
+tomada — e a decisão de baixar é tomada ali.
+
+## Verificação
+
+```sh
+python3 verificar.py
+```
+
+Confere as oito páginas (marcação bem-formada, todo `href`/`src` interno
+existindo, nenhum recurso externo além do portal e do GitHub) **e** os
+nomes dos downloads contra o empacotamento: a versão do `project()` do
+`CMakeLists.txt`, os moldes do `estado.py` e — quando há `build/` — o nome
+que o CPack gerou de fato.
+
+Esta segunda parte é a que justifica o arquivo. Uma versão que sobe para
+0.2.0 sem que o site saiba deixaria os três botões apontando para o vazio,
+e isso não se descobre lendo o HTML: só clicando, depois de publicado.
+Verificado que o guarda acusa — subi a versão de propósito e ele reclamou
+nas quatro páginas.
+
 ## Build
 
 Não há build para servir: são arquivos estáticos que funcionam abrindo o
@@ -242,8 +311,6 @@ Não há build para servir: são arquivos estáticos que funcionam abrindo o
 pipeline para existir é um site que apodrece quando o pipeline quebra.
 `dist/` não existe porque não é necessário.
 
-Há **um** passo de geração, e só para as páginas de guia
-(`gerar_modulos.py`, seção acima). Ele não é obrigatório para servir o
-site: as páginas geradas ficam versionadas e prontas. Só se roda quando um
-verbete de módulo muda no instrumento — e é isso que faz o site seguir o
-programa em vez de divergir dele.
+Há **dois** scripts, e nenhum é obrigatório para servir o site (as páginas
+ficam versionadas e prontas): `gerar_modulos.py`, quando um verbete de
+módulo muda no instrumento, e `estado.py`, no dia de publicar.
