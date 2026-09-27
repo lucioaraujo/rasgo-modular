@@ -106,31 +106,34 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 O gate exige que as limitações sejam ditas, não supostas.
 
-### O LEARN está traduzido no nível de MÓDULO; os widgets seguem em português
+### ~~O LEARN segue em português~~ — RESOLVIDO em 27 set. 2026
 
-Interface, tutorial, cartões **e a explicação de cada módulo** estão nos
-quatro idiomas (en/pt/fr/es). Os **58 verbetes de módulo** — "para que
-serve isto", a pergunta de quem abre o rack pela primeira vez — foram
-traduzidos à mão em 27 set. 2026: 13.070 caracteres em inglês, 14.332 em
-francês, 13.593 em espanhol.
+Esta era a limitação mais séria da v0.1.0, e deixou de existir. O
+instrumento está **inteiro** em português, inglês, francês e espanhol:
+interface, tutorial, cartões, os 58 verbetes de módulo e os **803 verbetes
+de widget** — a explicação de cada knob e cada jack individual, a camada
+mais profunda do LEARN.
 
-**Continua em português** a camada mais profunda: os **803 verbetes de
-widget**, a explicação de cada knob e cada jack individual. São 73.000
-caracteres, ~220.000 nos três idiomas.
+São 73.000 caracteres de origem, ~220.000 escritos nos três idiomas. O
+medidor `rasgo_modular_learn_coverage` reporta 100% nas oito famílias.
 
-Quem roda em inglês, francês ou espanhol tem portanto: interface,
-tutorial e "o que é este módulo" na sua língua, e "o que faz este knob
-específico" em português.
-
-**A tradução foi feita à mão, não por máquina**, e isso é o que a torna
-lenta: o conteúdo descreve comportamento real — a assimetria de vactrol do
-LPG, o alcance de captura do PLL, o cruzamento das saídas do RESONATOR ao
-varrer TILT. Tradução automática produziria texto que **parece** explicação
-sem ser, e num instrumento didático isso é pior que não ter texto.
+**A tradução foi feita à mão, não por máquina**, e é o que a tornou lenta:
+o conteúdo descreve comportamento real — a assimetria de vactrol do LPG, o
+alcance de captura do PLL, o cruzamento das saídas do RESONATOR ao varrer
+TILT. Tradução automática produziria texto que **parece** explicação sem
+ser, e num instrumento didático isso é pior que não ter texto.
 
 Nomes de módulo, siglas e rótulos de knob ficam como estão em todas as
 línguas (OSC, VCA, 1 V/oct, TORQ, SCR): são o vocabulário do modular em
-qualquer idioma, e traduzi-los esconderia o que o painel mostra.
+qualquer idioma, e traduzi-los esconderia o que o painel mostra. Um francês
+lendo "TORQ" no texto acha o knob; lendo "COUPLE", não.
+
+**O que impede o trabalho de apodrecer.** O medidor entra no `ctest` como
+guarda (`--exigir`): acrescentar um widget passa a exigir seus três idiomas
+no mesmo incremento. Sem esse cabo, o próximo módulo novo entraria com o
+painel em português e nada avisaria — nem o compilador (o `lookupLearn`
+cai no português por projeto), nem a interface (a caixa aparece, só na
+língua errada).
 
 ### Custo de CPU
 
