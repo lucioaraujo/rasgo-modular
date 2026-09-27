@@ -2506,8 +2506,69 @@ inline const LearnTable& learnTable() {
 
 // nullptr se não há conteúdo pra esse `moduleType`/`bind` — chamador
 // trata como "sem nota ainda" (silencioso, não é erro).
+namespace detail {
+
+// ---- verbetes de WIDGET traduzidos, por família -----------------------
+//
+// Preenchidos por LOTES, uma família de módulos por vez, começada em
+// 27 set. 2026. Traduzir 803 verbetes de uma vez seria uma mudança
+// impossível de revisar e fácil de abandonar pela metade; por família,
+// cada lote é verificável e o medidor de cobertura
+// (`tool_learn_coverage`) mostra o que falta.
+//
+// REGRA DO LOTE: quando um verbete é traduzido, TODOS os seus campos
+// preenchidos no português são traduzidos juntos. A queda é por VERBETE,
+// não por campo — traduzir só o `quick` e deixar o `understand` cair no
+// português daria uma caixa com duas línguas dentro, que é pior que uma
+// caixa numa língua só.
+inline LearnTable& learnTableEnMutable() { static LearnTable t; return t; }
+inline LearnTable& learnTableFrMutable() { static LearnTable t; return t; }
+inline LearnTable& learnTableEsMutable() { static LearnTable t; return t; }
+
+// Registro dos lotes. Cada família chama isto uma vez, na primeira
+// consulta — `std::call_once` seria exagero aqui porque as tabelas são
+// preenchidas por funções `inline` chamadas de um inicializador estático
+// local, que o C++ já garante rodar uma vez só.
+void registrarLotesTraduzidos();
+
+inline const LearnTable& learnTableEn() {
+    static const bool feito = (registrarLotesTraduzidos(), true);
+    (void)feito;
+    return learnTableEnMutable();
+}
+inline const LearnTable& learnTableFr() {
+    static const bool feito = (registrarLotesTraduzidos(), true);
+    (void)feito;
+    return learnTableFrMutable();
+}
+inline const LearnTable& learnTableEs() {
+    static const bool feito = (registrarLotesTraduzidos(), true);
+    (void)feito;
+    return learnTableEsMutable();
+}
+
+}  // namespace detail
+
+// Verbete de WIDGET no idioma pedido, caindo no português quando faltar.
+//
+// A tradução dos 803 verbetes de widget é feita por LOTES (uma família de
+// módulos por vez), então a queda não é temporária por acidente: é o
+// estado normal enquanto o trabalho avança, e tem de mostrar o texto
+// CERTO em português em vez de uma caixa vazia.
 inline const LearnEntry* lookupLearn(const std::string& moduleType,
-                                     const std::string& bind) {
+                                     const std::string& bind,
+                                     const Lang lang = Lang::pt) {
+    if (lang != Lang::pt) {
+        const auto& t = (lang == Lang::en) ? detail::learnTableEn()
+                      : (lang == Lang::fr) ? detail::learnTableFr()
+                                           : detail::learnTableEs();
+        const auto m = t.find(moduleType);
+        if (m != t.end()) {
+            const auto b = m->second.find(bind);
+            if (b != m->second.end() && !b->second.quick.empty())
+                return &b->second;
+        }
+    }
     const auto& table = detail::learnTable();
     const auto mi = table.find(moduleType);
     if (mi == table.end()) return nullptr;
@@ -3609,3 +3670,9 @@ inline const LearnEntry* lookupLearnModule(const std::string& moduleType,
 }
 
 }  // namespace rasgo::panel
+
+// Os lotes de tradução dos verbetes de widget vivem em arquivo próprio —
+// eles crescem muito, e misturá-los aqui tornaria este catálogo ilegível.
+// A inclusão vai no FIM de propósito: o arquivo de lotes precisa de
+// `LearnEntry`, de `LearnTable` e das tabelas mutáveis já declaradas.
+#include "panel/LearnWidgetI18n.hpp"
