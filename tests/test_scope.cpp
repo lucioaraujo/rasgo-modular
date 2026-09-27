@@ -121,6 +121,91 @@ void testTriggerEdgeMatters() {
     check(ed > 95 && ed < 145, "descida ~1x/ciclo");
 }
 
+// ---- o NÍVEL de trigger: o que a auditoria não conseguiu provar --------
+//
+// `SCOPE.trigger` entrou na lista de parâmetros SEM PROVA da auditoria de
+// 25 set. 2026, e os casos acima explicam por quê: todos usam o nível
+// PADRÃO (0) e contam pulsos. Contar pulsos não pode provar o nível —
+// numa senoide, qualquer nível dentro da amplitude dá exatamente um pulso
+// por ciclo. O que o nível move é a FASE em que o pulso cai, e é isso que
+// um osciloscópio usa o nível para fazer: escolher onde a varredura começa
+// dentro da onda.
+//
+// Devolve a posição do primeiro disparo dentro do ciclo, em amostras,
+// medida em relação ao CRUZAMENTO POR ZERO SUBINDO da senoide — que é onde
+// o ciclo começa, porque `run` arranca a fase em 0.
+//
+// O resultado é ASSINADO, e isso não é detalhe: um nível NEGATIVO é
+// cruzado ANTES do zero, ou seja no fim do ciclo anterior. Medido só com
+// `% periodo`, ele aparece como 416 de 480 — um número grande — e a
+// sequência de fases parece cair quando na verdade sobe. A primeira versão
+// deste caso tropeçou exatamente nisso e acusou o parâmetro de não
+// funcionar: 416, 451, 1, 30, 65. Dobrar a metade superior para o negativo
+// devolve a leitura física: −64, −29, 1, 30, 65.
+int faseDoDisparo(const std::vector<float>& trig, const int periodo,
+                  const int aquecimento) {
+    for (std::size_t i = static_cast<std::size_t>(aquecimento) + 1;
+         i < trig.size(); ++i)
+        if (trig[i] > 0.5f && trig[i - 1] <= 0.5f) {
+            int fase = static_cast<int>(i) % periodo;
+            if (fase > periodo / 2) fase -= periodo;
+            return fase;
+        }
+    return -periodo;   // sentinela fora de qualquer fase válida
+}
+
+void testTriggerLevelMovesThePhase() {
+    const float hz = 100.0f, amp = 0.8f;
+    const int periodo = static_cast<int>(kSr / hz);   // 480 amostras
+    const int aquecimento = periodo * 3;
+
+    // Numa senoide subindo, um nível mais alto é cruzado MAIS TARDE. A
+    // fase do disparo tem portanto de crescer com o nível, monotonicamente.
+    const float niveis[] = {-0.6f, -0.3f, 0.0f, 0.3f, 0.6f};
+    int anterior = -periodo;
+    bool primeiro = true;
+    for (const float nivel : niveis) {
+        Scope sc;
+        sc.setParameter("trigger", nivel);
+        sc.setParameter("reject", 0.0f);   // sem histerese, a fase é limpa
+        const Out r = run(sc, 200, hz, amp);
+        const int fase = faseDoDisparo(r.trig, periodo, aquecimento);
+        check(fase > -periodo, "com nível dentro da amplitude, o trig dispara");
+        if (!primeiro)
+            check(fase > anterior,
+                  "nível mais alto = disparo mais tarde no ciclo");
+        primeiro = false;
+        // E a fase não é só monotônica: ela é a PREVISTA. Uma senoide de
+        // amplitude A cruza o nível L subindo em asin(L/A) radianos, então
+        // a fase em amostras é asin(L/A)·periodo/2π. Comparar com a
+        // previsão fecha a porta para um comparador que respondesse ao
+        // nível de um jeito qualquer — monotônico por acidente.
+        const double previsto = std::asin(static_cast<double>(nivel / amp))
+                              / (2.0 * M_PI) * periodo;
+        check(std::fabs(fase - previsto) <= 2.0,
+              "a fase do disparo é a que a senoide prevê para aquele nível");
+        std::cout << "  trigger=" << nivel << " -> fase " << fase
+                  << " (previsto " << static_cast<int>(previsto + 0.5)
+                  << ") de " << periodo << " amostras\n";
+        anterior = fase;
+    }
+}
+
+// A outra metade da prova: um nível ACIMA do pico do sinal não pode
+// disparar nunca. Sem este caso, "a fase cresce" seria satisfeito por um
+// comparador que ignora o nível e responde só à forma da onda.
+void testTriggerLevelAbovePeakNeverFires() {
+    Scope dentro, acima;
+    dentro.setParameter("trigger", 0.5f);
+    dentro.setParameter("reject", 0.0f);
+    acima.setParameter("trigger", 0.95f);   // hiThr = 0,95 > pico 0,8
+    acima.setParameter("reject", 0.0f);
+    const Out rd = run(dentro, 200, 100.0f, 0.8f);
+    const Out ra = run(acima, 200, 100.0f, 0.8f);
+    check(risingEdges(rd.trig) > 30, "nível dentro do sinal: dispara");
+    check(risingEdges(ra.trig) == 0, "nível acima do pico: nunca dispara");
+}
+
 void testRejectSuppressesNoise() {
     // senoide lenta perto do nível + ruído: reject alto deve evitar disparos
     // múltiplos por cruzamento
@@ -342,6 +427,8 @@ int main() {
     testThruIsClean();
     testTriggerRisingCountsCycles();
     testTriggerEdgeMatters();
+    testTriggerLevelMovesThePhase();
+    testTriggerLevelAbovePeakNeverFires();
     testRejectSuppressesNoise();
     testExtIsTriggerSource();
     testLevelFollows();
