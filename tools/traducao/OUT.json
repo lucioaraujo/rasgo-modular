@@ -1,0 +1,895 @@
+[
+ [
+  "MIXER",
+  "gain1",
+  [
+   "Gain of channel 1, in dB.",
+   "",
+   ""
+  ],
+  [
+   "Gain du canal 1, en dB.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia del canal 1, en dB.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "pan1",
+  [
+   "Stereo position of channel 1 (constant-power law).",
+   "",
+   ""
+  ],
+  [
+   "Position stéréo du canal 1 (loi de puissance constante).",
+   "",
+   ""
+  ],
+  [
+   "Posición estéreo del canal 1 (ley de potencia constante).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "mute1",
+  [
+   "Silences channel 1 without touching GAIN.",
+   "",
+   ""
+  ],
+  [
+   "Coupe le canal 1 sans toucher au GAIN.",
+   "",
+   ""
+  ],
+  [
+   "Silencia el canal 1 sin tocar el GAIN.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "in:ch1",
+  [
+   "Audio input of channel 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio du canal 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio del canal 1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "gain2",
+  [
+   "Gain of channel 2, in dB.",
+   "",
+   ""
+  ],
+  [
+   "Gain du canal 2, en dB.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia del canal 2, en dB.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "pan2",
+  [
+   "Stereo position of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Position stéréo du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Posición estéreo del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "mute2",
+  [
+   "Silences channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Coupe le canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Silencia el canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "in:ch2",
+  [
+   "Audio input of channel 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio du canal 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio del canal 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "gain3",
+  [
+   "Gain of channel 3, in dB.",
+   "",
+   ""
+  ],
+  [
+   "Gain du canal 3, en dB.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia del canal 3, en dB.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "pan3",
+  [
+   "Stereo position of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Position stéréo du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Posición estéreo del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "mute3",
+  [
+   "Silences channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Coupe le canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Silencia el canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "in:ch3",
+  [
+   "Audio input of channel 3.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio du canal 3.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio del canal 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "gain4",
+  [
+   "Gain of channel 4, in dB.",
+   "",
+   ""
+  ],
+  [
+   "Gain du canal 4, en dB.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia del canal 4, en dB.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "pan4",
+  [
+   "Stereo position of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Position stéréo du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Posición estéreo del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "mute4",
+  [
+   "Silences channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Coupe le canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Silencia el canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "in:ch4",
+  [
+   "Audio input of channel 4.",
+   "",
+   ""
+  ],
+  [
+   "Entrée audio du canal 4.",
+   "",
+   ""
+  ],
+  [
+   "Entrada de audio del canal 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "out_gain",
+  [
+   "Output bus gain — after the sum of the 4 channels.",
+   "",
+   ""
+  ],
+  [
+   "Gain du bus de sortie — après la somme des 4 canaux.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia del bus de salida — después de la suma de los 4 canales.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MIXER",
+  "out:out",
+  [
+   "Stereo sum of the 4 channels — normally goes to the MASTER.",
+   "",
+   ""
+  ],
+  [
+   "Somme stéréo des 4 canaux — va normalement au MASTER.",
+   "",
+   ""
+  ],
+  [
+   "Suma estéreo de los 4 canales — normalmente va al MASTER.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "gain",
+  [
+   "Final gain — after it, only the output protection (DC block + limiter) and the speakers.",
+   "The VU meter shows the recent peak relative to the −1 dBFS ceiling; the square on the right lights up when the limiter really did have to hold something back.",
+   ""
+  ],
+  [
+   "Gain final — après lui, seulement la protection de sortie (blocage DC + limiteur) et les enceintes.",
+   "Le vumètre montre le pic récent par rapport au plafond de −1 dBFS ; le carré à droite s’allume quand le limiteur a vraiment dû retenir quelque chose.",
+   ""
+  ],
+  [
+   "Ganancia final — después de ella sólo la protección de salida (bloqueo de DC + limitador) y los altavoces.",
+   "El vúmetro muestra el pico reciente respecto al techo de −1 dBFS; el cuadrado de la derecha se enciende cuando el limitador realmente tuvo que retener algo.",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "width",
+  [
+   "Stereo width (mid/side) — 0 is mono, 1 is normal, 2 is double the side.",
+   "It does nothing when the source is MONO, and that is not a fault: width works on the SIDE (the difference between the channels), and in a signal where L = R the side is zero. Most modules are mono — to hear WIDTH, feed the MASTER with two different sources, one per channel, or with a stereo output module such as the HALL.",
+   ""
+  ],
+  [
+   "Largeur stéréo (mid/side) — 0 c’est mono, 1 c’est normal, 2 c’est le double de côté.",
+   "Elle ne fait rien quand la source est MONO, et ce n’est pas un défaut : la largeur agit sur le CÔTÉ (la différence entre les canaux), et dans un signal où L = R le côté vaut zéro. La plupart des modules sont mono — pour entendre le WIDTH, alimentez le MASTER avec deux sources différentes, une par canal, ou avec un module de sortie stéréo comme le HALL.",
+   ""
+  ],
+  [
+   "Anchura estéreo (mid/side) — 0 es mono, 1 es normal, 2 es el doble de lado.",
+   "No hace nada cuando la fuente es MONO, y eso no es un defecto: la anchura actúa sobre el LADO (la diferencia entre los canales), y en una señal donde L = R el lado es cero. La mayoría de los módulos son mono — para oír el WIDTH, alimente el MASTER con dos fuentes distintas, una por canal, o con un módulo de salida estéreo como el HALL.",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "mono",
+  [
+   "Forces L=R=(L+R)/2 — mono compatibility check.",
+   "",
+   ""
+  ],
+  [
+   "Force L=R=(L+R)/2 — vérification de compatibilité mono.",
+   "",
+   ""
+  ],
+  [
+   "Fuerza L=R=(L+R)/2 — comprobación de compatibilidad mono.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "dc_block",
+  [
+   "DC block (high-pass ~5 Hz) — removes offset that is not sound, it would only heat the limiter for nothing.",
+   "",
+   ""
+  ],
+  [
+   "Blocage DC (passe-haut ~5 Hz) — retire l’offset qui n’est pas du son, il ne ferait que chauffer le limiteur pour rien.",
+   "",
+   ""
+  ],
+  [
+   "Bloqueo de DC (paso alto ~5 Hz) — quita el offset que no es sonido, sólo calentaría el limitador en vano.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "limit",
+  [
+   "Look-ahead limiter — it holds the peak BEFORE it arrives, without distorting the transient.",
+   "The detector looks at the LARGER of the sample peak and an estimate of the peak BETWEEN samples — a peak that the sample alone would not see is caught too.",
+   ""
+  ],
+  [
+   "Limiteur à look-ahead — il retient le pic AVANT son arrivée, sans déformer le transitoire.",
+   "Le détecteur regarde le PLUS GRAND entre le pic d’échantillon et une estimation du pic ENTRE les échantillons — un pic que l’échantillon seul ne verrait pas est attrapé aussi.",
+   ""
+  ],
+  [
+   "Limitador con look-ahead — retiene el pico ANTES de que llegue, sin distorsionar el transitorio.",
+   "El detector mira el MAYOR entre el pico de muestra y una estimación del pico ENTRE muestras — un pico que la muestra sola no vería también se atrapa.",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "body_guard",
+  [
+   "BODY — body governor. It only acts on sound that is LOUD, SUSTAINED and CONCENTRATED in the 2.5 to 8 kHz band, which is where the ear tires and hurts.",
+   "Slow attack (~250 ms) and a high threshold, on purpose: transient, rhythm and bursts of noise go through untouched — only what STAYS PUT, loud and concentrated there, trips it (a self-oscillating filter, a held square, locked folding). When it trips, it applies a few dB of high-shelf, following along. On the overwhelming majority of material it does NOT act, and that is why turning the knob usually changes nothing. The orange mark on the LEFT tip of the VU lights up when it really is acting — without it, a control that works in silence is indistinguishable from a broken one.",
+   "put a FILTER into self-oscillation in the 3–5 kHz band and let it ring: that is where BODY shows what it is for. Compare it at 0 (exact bypass) and at 1."
+  ],
+  [
+   "BODY — gouverneur de corps. Il n’agit que sur un son FORT, SOUTENU et CONCENTRÉ dans la bande de 2,5 à 8 kHz, là où l’oreille se fatigue et souffre.",
+   "Attaque lente (~250 ms) et seuil élevé, exprès : transitoire, rythme et rafale de bruit passent intacts — seul ce qui RESTE FIXE, fort et concentré là, le déclenche (filtre en auto-oscillation, carrée tenue, folding bloqué). Quand il se déclenche, il applique quelques dB de high-shelf, en accompagnant. Sur l’immense majorité du matériau il n’agit PAS, et c’est pourquoi tourner le potentiomètre ne change souvent rien. La marque orange à la pointe GAUCHE du vumètre s’allume quand il agit vraiment — sans elle, un contrôle qui travaille en silence est indiscernable d’un contrôle cassé.",
+   "mettez un FILTER en auto-oscillation dans la bande 3–5 kHz et laissez-le sonner : c’est là que le BODY montre à quoi il sert. Comparez-le à 0 (bypass exact) et à 1."
+  ],
+  [
+   "BODY — gobernador de cuerpo. Sólo actúa sobre sonido FUERTE, SOSTENIDO y CONCENTRADO en la banda de 2,5 a 8 kHz, que es donde el oído se cansa y duele.",
+   "Ataque lento (~250 ms) y umbral alto, a propósito: transitorio, ritmo y ráfaga de ruido pasan intactos — sólo lo que se QUEDA QUIETO, fuerte y concentrado ahí, lo dispara (filtro autooscilando, cuadrada sostenida, folding trabado). Cuando dispara, aplica unos pocos dB de high-shelf, acompañando. En la inmensa mayoría del material NO actúa, y por eso girar el mando suele no cambiar nada. La marca naranja en la punta IZQUIERDA del vúmetro se enciende cuando está actuando de verdad — sin ella, un control que trabaja en silencio es indistinguible de un control roto.",
+   "ponga un FILTER en autooscilación en la banda de 3–5 kHz y déjelo sonar: ahí es donde el BODY muestra para qué vino. Compárelo en 0 (bypass exacto) y en 1."
+  ]
+ ],
+ [
+  "MASTER",
+  "in:in",
+  [
+   "Stereo input — normally comes from the MIXER.",
+   "",
+   ""
+  ],
+  [
+   "Entrée stéréo — vient normalement du MIXER.",
+   "",
+   ""
+  ],
+  [
+   "Entrada estéreo — normalmente viene del MIXER.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "out:out",
+  [
+   "Final output, stereo.",
+   "",
+   ""
+  ],
+  [
+   "Sortie finale, stéréo.",
+   "",
+   ""
+  ],
+  [
+   "Salida final, estéreo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MASTER",
+  "out:level",
+  [
+   "Output peak with decay (~300 ms), 0..1 — CV for a module to FOLLOW the master's own volume.",
+   "",
+   ""
+  ],
+  [
+   "Pic de sortie avec décroissance (~300 ms), 0..1 — CV pour qu’un module SUIVE le volume du master lui-même.",
+   "",
+   ""
+  ],
+  [
+   "Pico de salida con caída (~300 ms), 0..1 — CV para que un módulo SIGA el propio volumen del master.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "trigger",
+  [
+   "Trigger level of the comparator.",
+   "",
+   ""
+  ],
+  [
+   "Niveau de déclenchement du comparateur.",
+   "",
+   ""
+  ],
+  [
+   "Nivel de disparo del comparador.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "edge",
+  [
+   "Triggers on the falling edge (on) or the rising edge (off).",
+   "",
+   ""
+  ],
+  [
+   "Déclenche sur le front descendant (activé) ou montant (désactivé).",
+   "",
+   ""
+  ],
+  [
+   "Dispara en el flanco de bajada (activado) o de subida (desactivado).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "reject",
+  [
+   "Hysteresis zone around the trigger level — avoids multiple triggering from noise near the threshold.",
+   "",
+   ""
+  ],
+  [
+   "Zone d’hystérésis autour du niveau de déclenchement — évite les déclenchements multiples dus au bruit près du seuil.",
+   "",
+   ""
+  ],
+  [
+   "Zona de histéresis alrededor del nivel de disparo — evita disparos múltiples por ruido cerca del umbral.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "response",
+  [
+   "Speed of the LVL/BRT/PIT followers — attack always much faster than the release.",
+   "",
+   ""
+  ],
+  [
+   "Vitesse des suiveurs LVL/BRT/PIT — attaque toujours bien plus rapide que le relâchement.",
+   "",
+   ""
+  ],
+  [
+   "Velocidad de los seguidores LVL/BRT/PIT — ataque siempre mucho más rápido que el relajo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "hold",
+  [
+   "Freezes LVL/BRT/PIT at the current value.",
+   "",
+   ""
+  ],
+  [
+   "Gèle LVL/BRT/PIT à la valeur actuelle.",
+   "",
+   ""
+  ],
+  [
+   "Congela LVL/BRT/PIT en el valor actual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "sens",
+  [
+   "Sensitivity of the ONSET (attack) detector: high = triggers on any rise in amplitude; low = only on strong attacks. Fast envelope vs slow.",
+   "",
+   ""
+  ],
+  [
+   "Sensibilité du détecteur d’ONSET (attaque) : élevée = déclenche à toute montée d’amplitude ; basse = seulement sur les attaques fortes. Enveloppe rapide contre lente.",
+   "",
+   ""
+  ],
+  [
+   "Sensibilidad del detector de ONSET (ataque): alta = dispara en cualquier subida de amplitud; baja = sólo en los ataques fuertes. Envolvente rápida frente a lenta.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "in:in",
+  [
+   "Signal to analyse/display.",
+   "",
+   ""
+  ],
+  [
+   "Signal à analyser/afficher.",
+   "",
+   ""
+  ],
+  [
+   "Señal a analizar/mostrar.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "in:ext",
+  [
+   "External trigger source — with no cable, TRIG uses IN itself.",
+   "",
+   ""
+  ],
+  [
+   "Source de déclenchement externe — sans câble, TRIG utilise IN lui-même.",
+   "",
+   ""
+  ],
+  [
+   "Fuente externa de disparo — sin cable, TRIG usa el propio IN.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:thru",
+  [
+   "IN copied unchanged — it is what the panel Display draws.",
+   "",
+   ""
+  ],
+  [
+   "IN copiée sans modification — c’est ce que dessine l’afficheur du panneau.",
+   "",
+   ""
+  ],
+  [
+   "IN copiado sin alteración — es lo que dibuja el Display del panel.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:trig",
+  [
+   "Pulse when IN crosses TRIGGER in the direction of EDGE.",
+   "",
+   ""
+  ],
+  [
+   "Impulsion quand IN traverse TRIGGER dans le sens d’EDGE.",
+   "",
+   ""
+  ],
+  [
+   "Pulso cuando IN cruza TRIGGER en la dirección de EDGE.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:level",
+  [
+   "Signal peak, as CV — the scope's measurement goes back into the patch.",
+   "",
+   ""
+  ],
+  [
+   "Pic du signal, en CV — la mesure du scope retourne dans le patch.",
+   "",
+   ""
+  ],
+  [
+   "Pico de la señal, como CV — la medición del scope vuelve al patch.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:bright",
+  [
+   "Spectral centroid (treble↔bass), as CV — the higher it is, the brighter the signal.",
+   "Computed by a simple differentiator (derivative energy / signal energy, Parseval) — no FFT, RT-safe.",
+   ""
+  ],
+  [
+   "Centroïde spectral (aigu↔grave), en CV — plus il est haut, plus le signal est brillant.",
+   "Calculé par un différenciateur simple (énergie de la dérivée / énergie du signal, Parseval) — sans FFT, sûr en temps réel.",
+   ""
+  ],
+  [
+   "Centroide espectral (agudo↔grave), como CV — cuanto más alto, más brillante la señal.",
+   "Calculado por un diferenciador simple (energía de la derivada / energía de la señal, Parseval) — sin FFT, seguro en tiempo real.",
+   ""
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:pitch",
+  [
+   "Detected pitch in 1 V/oct — autocorrelation (YIN) on a decimated signal, robust to harmonics (saw, chord). Range ~53–1000 Hz; noise → 0.",
+   "The earlier ZCR reported the wrong octave on rich sound; YIN finds the period through the normalised cumulative difference.",
+   "SCOPE.pitch → OSC.pitch: a second oscillator tunes to the pitch of the input."
+  ],
+  [
+   "Hauteur détectée en 1 V/oct — autocorrélation (YIN) sur un signal décimé, robuste aux harmoniques (scie, accord). Plage ~53–1000 Hz ; bruit → 0.",
+   "Le ZCR précédent annonçait la mauvaise octave sur un son riche ; le YIN trouve la période par la différence cumulée normalisée.",
+   "SCOPE.pitch → OSC.pitch : un second oscillateur s’accorde sur la hauteur de l’entrée."
+  ],
+  [
+   "Altura detectada en 1 V/oct — autocorrelación (YIN) en una señal diezmada, robusta a los armónicos (sierra, acorde). Rango ~53–1000 Hz; ruido → 0.",
+   "El ZCR anterior informaba la octava equivocada en sonido rico; el YIN halla el período por la diferencia acumulada normalizada.",
+   "SCOPE.pitch → OSC.pitch: un segundo oscilador se afina por la altura de la entrada."
+  ]
+ ],
+ [
+  "SCOPE",
+  "out:onset",
+  [
+   "Pulse at every ATTACK/transient of the signal (fast envelope > slow × SENS). A gate of ~2 ms; it does not trigger on a steady tone.",
+   "It is the classic transient detector (Maths ch2/3 for audio). Steady noise does not trigger it.",
+   "SCOPE.onset ← a drum line → triggers an ENVELOPE/LPG in the metre of the audio; or re-triggers the SAMPLER."
+  ],
+  [
+   "Impulsion à chaque ATTAQUE/transitoire du signal (enveloppe rapide > lente × SENS). Un gate d’environ 2 ms ; il ne déclenche pas sur un son stable.",
+   "C’est le détecteur de transitoire classique (Maths ch2/3 pour l’audio). Un bruit stable ne le déclenche pas.",
+   "SCOPE.onset ← une ligne de batterie → déclenche une ENVELOPE/LPG dans la mesure de l’audio ; ou redéclenche le SAMPLER."
+  ],
+  [
+   "Pulso en cada ATAQUE/transitorio de la señal (envolvente rápida > lenta × SENS). Un gate de ~2 ms; no dispara en un tono estable.",
+   "Es el detector de transitorio clásico (Maths ch2/3 para audio). El ruido estable no lo dispara.",
+   "SCOPE.onset ← una línea de batería → dispara una ENVELOPE/LPG en el compás del audio; o redispara el SAMPLER."
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "in:gate",
+  [
+   "Gate/trigger of the voice to capture — the falling edge closes the complete note.",
+   "",
+   ""
+  ],
+  [
+   "Gate/trigger de la voix à capturer — le front descendant ferme la note complète.",
+   "",
+   ""
+  ],
+  [
+   "Gate/trigger de la voz a capturar — el flanco de bajada cierra la nota completa.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "in:pitch",
+  [
+   "1 V/oct CV of the voice — captured at the instant the gate turns on.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct de la voix — capturée à l’instant où le gate s’ouvre.",
+   "",
+   ""
+  ],
+  [
+   "CV 1 V/oct de la voz — capturada en el instante en que el gate se activa.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "in:velocity",
+  [
+   "Velocity (0-1) — captured at the instant the gate turns on; with no cable, 1.0.",
+   "",
+   ""
+  ],
+  [
+   "Vélocité (0-1) — capturée à l’instant où le gate s’ouvre ; sans câble, 1,0.",
+   "",
+   ""
+  ],
+  [
+   "Velocidad (0-1) — capturada en el instante en que el gate se activa; sin cable, 1,0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "in:accent",
+  [
+   "Accent — captured at the instant the gate turns on.",
+   "",
+   ""
+  ],
+  [
+   "Accent — capturé à l’instant où le gate s’ouvre.",
+   "",
+   ""
+  ],
+  [
+   "Acento — capturado en el instante en que el gate se activa.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "out:gate_thru",
+  [
+   "Exact copy of GATE — you need to chain through here for the NOTE-OUT to sit on the patch's real path.",
+   "The engine only processes modules that reach the active sink (orphans cost no DSP) — without that chaining, the NOTE-OUT never runs.",
+   "Patch SOMETHING.gate → NOTE-OUT.gate → NOTE-OUT.gate_thru → ENVELOPE.gate: the note keeps sounding the same, and now it is recorded in the MUSICAL SCORE."
+  ],
+  [
+   "Copie exacte de GATE — il faut enchaîner ici pour que le NOTE-OUT soit sur le vrai chemin du patch.",
+   "Le moteur ne traite que les modules qui atteignent le sink actif (les orphelins ne coûtent pas de DSP) — sans cet enchaînement, le NOTE-OUT ne tourne jamais.",
+   "Câblez QUELQUE CHOSE.gate → NOTE-OUT.gate → NOTE-OUT.gate_thru → ENVELOPE.gate : la note continue de sonner pareil, et la voilà consignée dans la MUSICAL SCORE."
+  ],
+  [
+   "Copia exacta de GATE — hay que encadenar por aquí para que el NOTE-OUT quede en el camino real del patch.",
+   "El motor sólo procesa módulos que llegan al sink activo (los huérfanos no cuestan DSP) — sin ese encadenamiento, el NOTE-OUT nunca se ejecuta.",
+   "Cablee ALGO.gate → NOTE-OUT.gate → NOTE-OUT.gate_thru → ENVELOPE.gate: la nota sigue sonando igual, y ahora queda registrada en la MUSICAL SCORE."
+  ]
+ ],
+ [
+  "NOTE-OUT",
+  "out:pitch_thru",
+  [
+   "Exact copy of PITCH — same reason as GTHR.",
+   "",
+   ""
+  ],
+  [
+   "Copie exacte de PITCH — même raison que GTHR.",
+   "",
+   ""
+  ],
+  [
+   "Copia exacta de PITCH — el mismo motivo que GTHR.",
+   "",
+   ""
+  ]
+ ]
+]
