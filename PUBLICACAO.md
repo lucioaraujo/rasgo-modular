@@ -106,26 +106,31 @@ A regra é explícita: **não se pula da camada 0 para a 4.**
 
 O gate exige que as limitações sejam ditas, não supostas.
 
-### O LEARN é monolíngue
+### O LEARN está traduzido no nível de MÓDULO; os widgets seguem em português
 
-Interface, tutorial e cartões estão nos **quatro** idiomas (en/pt/fr/es).
-O catálogo LEARN — a explicação de cada knob e cada jack de cada módulo,
-que aparece na caixa do canto inferior esquerdo — está **só em
-português**. Quem roda em inglês recebe interface inglesa, tutorial inglês
-e explicações em português.
+Interface, tutorial, cartões **e a explicação de cada módulo** estão nos
+quatro idiomas (en/pt/fr/es). Os **58 verbetes de módulo** — "para que
+serve isto", a pergunta de quem abre o rack pela primeira vez — foram
+traduzidos à mão em 27 set. 2026: 13.070 caracteres em inglês, 14.332 em
+francês, 13.593 em espanhol.
 
-Medido em 26 set. 2026: **803 verbetes de widget + 58 de módulo, 86.328
-caracteres**. Traduzir para os outros três idiomas é escrever ~259.000
-caracteres de prosa técnica — e não é trabalho de tradução automática: o
-conteúdo descreve comportamento real de cada parâmetro em cada módulo (a
-assimetria de vactrol do LPG, o alcance de captura do PLL), e passar isso
-por máquina produziria texto que parece explicação e não é.
+**Continua em português** a camada mais profunda: os **803 verbetes de
+widget**, a explicação de cada knob e cada jack individual. São 73.000
+caracteres, ~220.000 nos três idiomas.
 
-**Se for traduzido por etapas**, a ordem que rende mais por caractere é os
-**58 verbetes de MÓDULO** primeiro — 13.125 caracteres, ~39.000 nos três
-idiomas. Eles respondem "para que serve este módulo", que é a pergunta de
-quem abre o rack pela primeira vez. O tutorial, que é a porta de entrada,
-já está traduzido.
+Quem roda em inglês, francês ou espanhol tem portanto: interface,
+tutorial e "o que é este módulo" na sua língua, e "o que faz este knob
+específico" em português.
+
+**A tradução foi feita à mão, não por máquina**, e isso é o que a torna
+lenta: o conteúdo descreve comportamento real — a assimetria de vactrol do
+LPG, o alcance de captura do PLL, o cruzamento das saídas do RESONATOR ao
+varrer TILT. Tradução automática produziria texto que **parece** explicação
+sem ser, e num instrumento didático isso é pior que não ter texto.
+
+Nomes de módulo, siglas e rótulos de knob ficam como estão em todas as
+línguas (OSC, VCA, 1 V/oct, TORQ, SCR): são o vocabulário do modular em
+qualquer idioma, e traduzi-los esconderia o que o painel mostra.
 
 ### Custo de CPU
 
