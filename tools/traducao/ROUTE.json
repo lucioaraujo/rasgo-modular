@@ -1,0 +1,1484 @@
+[
+ [
+  "SWITCH",
+  "steps",
+  [
+   "How many positions the switch uses (2-4).",
+   "",
+   ""
+  ],
+  [
+   "Combien de positions le commutateur utilise (2-4).",
+   "",
+   ""
+  ],
+  [
+   "Cuántas posiciones usa el conmutador (2-4).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "mode",
+  [
+   "Advance order: forward / ping-pong / random (never the same twice in a row) / by ADR only (ignores CLK).",
+   "",
+   ""
+  ],
+  [
+   "Ordre d’avancement : avant / ping-pong / aléatoire (jamais deux fois de suite le même) / par ADR seulement (ignore CLK).",
+   "",
+   ""
+  ],
+  [
+   "Orden de avance: adelante / ping-pong / aleatorio (nunca el mismo dos veces seguidas) / sólo por ADR (ignora CLK).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "glide",
+  [
+   "Crossfade at the switching point — MUX mode only.",
+   "",
+   ""
+  ],
+  [
+   "Fondu enchaîné au point de bascule — mode MUX uniquement.",
+   "",
+   ""
+  ],
+  [
+   "Fundido cruzado en el punto de cambio — sólo en modo MUX.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "slew",
+  [
+   "Always smooths the step of the switch (~1 ms more), anti-click in any mode.",
+   "",
+   ""
+  ],
+  [
+   "Adoucit toujours la marche de la bascule (~1 ms de plus), anti-clic dans tous les modes.",
+   "",
+   ""
+  ],
+  [
+   "Suaviza siempre el escalón del cambio (~1 ms más), anticlic en cualquier modo.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "dir",
+  [
+   "DEMUX on: 1 input (A) distributed to N outputs according to the step. Off (MUX): N inputs to 1 output.",
+   "",
+   ""
+  ],
+  [
+   "DEMUX activé : 1 entrée (A) distribuée vers N sorties selon le pas. Désactivé (MUX) : N entrées vers 1 sortie.",
+   "",
+   ""
+  ],
+  [
+   "DEMUX activado: 1 entrada (A) distribuida a N salidas según el paso. Desactivado (MUX): N entradas a 1 salida.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:a",
+  [
+   "Input A (MUX), or the single distributed input (DEMUX).",
+   "",
+   ""
+  ],
+  [
+   "Entrée A (MUX), ou l’unique entrée distribuée (DEMUX).",
+   "",
+   ""
+  ],
+  [
+   "Entrada A (MUX), o la única entrada distribuida (DEMUX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:b",
+  [
+   "Input B (MUX only).",
+   "",
+   ""
+  ],
+  [
+   "Entrée B (MUX uniquement).",
+   "",
+   ""
+  ],
+  [
+   "Entrada B (sólo MUX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:c",
+  [
+   "Input C (MUX only).",
+   "",
+   ""
+  ],
+  [
+   "Entrée C (MUX uniquement).",
+   "",
+   ""
+  ],
+  [
+   "Entrada C (sólo MUX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:d",
+  [
+   "Input D (MUX only).",
+   "",
+   ""
+  ],
+  [
+   "Entrée D (MUX uniquement).",
+   "",
+   ""
+  ],
+  [
+   "Entrada D (sólo MUX).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:clock",
+  [
+   "Advances one step on the rising edge (ignored if ADR is connected).",
+   "",
+   ""
+  ],
+  [
+   "Avance d’un pas sur le front montant (ignoré si ADR est branchée).",
+   "",
+   ""
+  ],
+  [
+   "Avanza un paso en el flanco de subida (ignorado si ADR está conectada).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:reset",
+  [
+   "Back to step 0.",
+   "",
+   ""
+  ],
+  [
+   "Retour au pas 0.",
+   "",
+   ""
+  ],
+  [
+   "Vuelve al paso 0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "in:addr",
+  [
+   "CV that picks the step directly (0..1 mapped over STEPS) — when present it rules, and CLK/MODE are ignored.",
+   "",
+   ""
+  ],
+  [
+   "CV qui choisit le pas directement (0..1 réparti sur STEPS) — présente, elle commande et CLK/MODE sont ignorés.",
+   "",
+   ""
+  ],
+  [
+   "CV que elige el paso directamente (0..1 repartido en STEPS) — si está presente manda, y CLK/MODE se ignoran.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "out:out",
+  [
+   "MUX output (the selected A/B/C/D) — or, in DEMUX, the slice of step 0.",
+   "",
+   ""
+  ],
+  [
+   "Sortie MUX (le A/B/C/D sélectionné) — ou, en DEMUX, la tranche du pas 0.",
+   "",
+   ""
+  ],
+  [
+   "Salida MUX (el A/B/C/D seleccionado) — o, en DEMUX, la rodaja del paso 0.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "out:out_b",
+  [
+   "In DEMUX, the slice of step 1 (otherwise always 0).",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la tranche du pas 1 (sinon toujours 0).",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la rodaja del paso 1 (si no, siempre 0).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "out:out_c",
+  [
+   "In DEMUX, the slice of step 2.",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la tranche du pas 2.",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la rodaja del paso 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "out:out_d",
+  [
+   "In DEMUX, the slice of step 3.",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la tranche du pas 3.",
+   "",
+   ""
+  ],
+  [
+   "En DEMUX, la rodaja del paso 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SWITCH",
+  "out:step",
+  [
+   "Current position, normalised (0..1).",
+   "",
+   ""
+  ],
+  [
+   "Position actuelle, normalisée (0..1).",
+   "",
+   ""
+  ],
+  [
+   "Posición actual, normalizada (0..1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g11",
+  [
+   "Gain of IN1 → OUT1 (the diagonal — default 1, straight through).",
+   "Each cell is an attenuverter (−1..1); negative inverts the phase. Two non-zero cells in the same COLUMN (same destination) add — or, with RING high, multiply (four-quadrant ring-mod).",
+   ""
+  ],
+  [
+   "Gain de IN1 → OUT1 (la diagonale — par défaut 1, passage direct).",
+   "Chaque cellule est un atténuverseur (−1..1) ; négatif inverse la phase. Deux cellules non nulles dans la même COLONNE (même destination) s’additionnent — ou, avec RING élevé, se multiplient (ring-mod quatre quadrants).",
+   ""
+  ],
+  [
+   "Ganancia de IN1 → OUT1 (la diagonal — por defecto 1, paso directo).",
+   "Cada celda es un atenuversor (−1..1); negativo invierte la fase. Dos celdas no nulas en la misma COLUMNA (mismo destino) se suman — o, con RING alto, se multiplican (ring-mod de cuatro cuadrantes).",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g12",
+  [
+   "Gain of IN1 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN1 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN1 → OUT2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g13",
+  [
+   "Gain of IN1 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN1 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN1 → OUT3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g14",
+  [
+   "Gain of IN1 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN1 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN1 → OUT4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "in:in1",
+  [
+   "Matrix input 1.",
+   "",
+   ""
+  ],
+  [
+   "Entrée 1 de la matrice.",
+   "",
+   ""
+  ],
+  [
+   "Entrada 1 de la matriz.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g21",
+  [
+   "Gain of IN2 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN2 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN2 → OUT1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g22",
+  [
+   "Gain of IN2 → OUT2 (the diagonal — default 1).",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN2 → OUT2 (la diagonale — par défaut 1).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN2 → OUT2 (la diagonal — por defecto 1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g23",
+  [
+   "Gain of IN2 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN2 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN2 → OUT3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g24",
+  [
+   "Gain of IN2 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN2 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN2 → OUT4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "in:in2",
+  [
+   "Matrix input 2.",
+   "",
+   ""
+  ],
+  [
+   "Entrée 2 de la matrice.",
+   "",
+   ""
+  ],
+  [
+   "Entrada 2 de la matriz.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g31",
+  [
+   "Gain of IN3 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN3 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN3 → OUT1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g32",
+  [
+   "Gain of IN3 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN3 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN3 → OUT2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g33",
+  [
+   "Gain of IN3 → OUT3 (the diagonal — default 1).",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN3 → OUT3 (la diagonale — par défaut 1).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN3 → OUT3 (la diagonal — por defecto 1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g34",
+  [
+   "Gain of IN3 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN3 → OUT4.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN3 → OUT4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "in:in3",
+  [
+   "Matrix input 3.",
+   "",
+   ""
+  ],
+  [
+   "Entrée 3 de la matrice.",
+   "",
+   ""
+  ],
+  [
+   "Entrada 3 de la matriz.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g41",
+  [
+   "Gain of IN4 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN4 → OUT1.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN4 → OUT1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g42",
+  [
+   "Gain of IN4 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN4 → OUT2.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN4 → OUT2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g43",
+  [
+   "Gain of IN4 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN4 → OUT3.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN4 → OUT3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "g44",
+  [
+   "Gain of IN4 → OUT4 (the diagonal — default 1).",
+   "",
+   ""
+  ],
+  [
+   "Gain de IN4 → OUT4 (la diagonale — par défaut 1).",
+   "",
+   ""
+  ],
+  [
+   "Ganancia de IN4 → OUT4 (la diagonal — por defecto 1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "in:in4",
+  [
+   "Matrix input 4.",
+   "",
+   ""
+  ],
+  [
+   "Entrée 4 de la matrice.",
+   "",
+   ""
+  ],
+  [
+   "Entrada 4 de la matriz.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "out:out1",
+  [
+   "Weighted sum of column 1 (every input × its g_1 gains).",
+   "",
+   ""
+  ],
+  [
+   "Somme pondérée de la colonne 1 (chaque entrée × ses gains g_1).",
+   "",
+   ""
+  ],
+  [
+   "Suma ponderada de la columna 1 (cada entrada × sus ganancias g_1).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "out:out2",
+  [
+   "Weighted sum of column 2.",
+   "",
+   ""
+  ],
+  [
+   "Somme pondérée de la colonne 2.",
+   "",
+   ""
+  ],
+  [
+   "Suma ponderada de la columna 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "out:out3",
+  [
+   "Weighted sum of column 3.",
+   "",
+   ""
+  ],
+  [
+   "Somme pondérée de la colonne 3.",
+   "",
+   ""
+  ],
+  [
+   "Suma ponderada de la columna 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "out:out4",
+  [
+   "Weighted sum of column 4.",
+   "",
+   ""
+  ],
+  [
+   "Somme pondérée de la colonne 4.",
+   "",
+   ""
+  ],
+  [
+   "Suma ponderada de la columna 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "level",
+  [
+   "Overall output gain, before SAT.",
+   "",
+   ""
+  ],
+  [
+   "Gain de sortie général, avant SAT.",
+   "",
+   ""
+  ],
+  [
+   "Ganancia general de salida, antes de SAT.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "norm",
+  [
+   "Per-column normalisation — keeps the output level steady even with several high gains summed into the same destination.",
+   "",
+   ""
+  ],
+  [
+   "Normalisation par colonne — garde le niveau de sortie stable même avec plusieurs gains élevés additionnés vers la même destination.",
+   "",
+   ""
+  ],
+  [
+   "Normalización por columna — mantiene el nivel de salida estable incluso con varias ganancias altas sumadas al mismo destino.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "ring",
+  [
+   "Crosses each column between linear sum (0) and four-quadrant ring-mod (1) — two non-zero inputs into the same destination start to multiply instead of adding.",
+   "",
+   ""
+  ],
+  [
+   "Fait passer chaque colonne de la somme linéaire (0) au ring-mod quatre quadrants (1) — deux entrées non nulles vers la même destination se multiplient au lieu de s’additionner.",
+   "",
+   ""
+  ],
+  [
+   "Cruza cada columna entre suma lineal (0) y ring-mod de cuatro cuadrantes (1) — dos entradas no nulas al mismo destino pasan a multiplicarse en vez de sumarse.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "sat",
+  [
+   "Saturates the matrix gently — it holds even inside a feedback loop.",
+   "",
+   ""
+  ],
+  [
+   "Sature doucement la matrice — elle tient même dans une boucle de rétroaction.",
+   "",
+   ""
+  ],
+  [
+   "Satura suavemente la matriz — se sostiene incluso dentro de un lazo de realimentación.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MATRIX",
+  "drift",
+  [
+   "The 16 gains breathe slowly (a sum of sines, no RNG) — the matrix is never 100% static.",
+   "",
+   ""
+  ],
+  [
+   "Les 16 gains respirent lentement (une somme de sinus, sans RNG) — la matrice n’est jamais 100 % statique.",
+   "",
+   ""
+  ],
+  [
+   "Las 16 ganancias respiran despacio (una suma de senos, sin RNG) — la matriz nunca queda 100% estática.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "in:in",
+  [
+   "Input — feeds the 4 outputs (or only out1/2 in DUAL mode).",
+   "",
+   ""
+  ],
+  [
+   "Entrée — alimente les 4 sorties (ou seulement out1/2 en mode DUAL).",
+   "",
+   ""
+  ],
+  [
+   "Entrada — alimenta las 4 salidas (o sólo out1/2 en modo DUAL).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "in:in2",
+  [
+   "2nd input — used only in DUAL mode, feeds out3/4.",
+   "",
+   ""
+  ],
+  [
+   "2ᵉ entrée — utilisée seulement en mode DUAL, alimente out3/4.",
+   "",
+   ""
+  ],
+  [
+   "2.ª entrada — usada sólo en modo DUAL, alimenta out3/4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "dual",
+  [
+   "1→4 mode (off) or two independent 1→2 multiples (on, A-180-2): out1/2 follow IN, out3/4 follow IN2.",
+   "",
+   ""
+  ],
+  [
+   "Mode 1→4 (éteint) ou deux multiples 1→2 indépendants (allumé, A-180-2) : out1/2 suivent IN, out3/4 suivent IN2.",
+   "",
+   ""
+  ],
+  [
+   "Modo 1→4 (apagado) o dos múltiples 1→2 independientes (encendido, A-180-2): out1/2 siguen IN, out3/4 siguen IN2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "slew",
+  [
+   "Smooths the 4 outputs (shared).",
+   "",
+   ""
+  ],
+  [
+   "Adoucit les 4 sorties (partagé).",
+   "",
+   ""
+  ],
+  [
+   "Suaviza las 4 salidas (compartido).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "scale1",
+  [
+   "Attenuverter for output 1 (negative inverts).",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de la sortie 1 (négatif inverse).",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la salida 1 (negativo invierte).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "offset1",
+  [
+   "Constant added to output 1 — with no IN connected, it becomes a manual voltage source.",
+   "",
+   ""
+  ],
+  [
+   "Constante ajoutée à la sortie 1 — sans IN branchée, elle devient une source de tension manuelle.",
+   "",
+   ""
+  ],
+  [
+   "Constante sumada a la salida 1 — sin IN conectada, se vuelve una fuente de tensión manual.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "scale2",
+  [
+   "Attenuverter for output 2.",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de la sortie 2.",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la salida 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "offset2",
+  [
+   "Constant added to output 2.",
+   "",
+   ""
+  ],
+  [
+   "Constante ajoutée à la sortie 2.",
+   "",
+   ""
+  ],
+  [
+   "Constante sumada a la salida 2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "scale3",
+  [
+   "Attenuverter for output 3 (in DUAL, it follows IN2).",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de la sortie 3 (en DUAL, elle suit IN2).",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la salida 3 (en DUAL, sigue IN2).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "offset3",
+  [
+   "Constant added to output 3.",
+   "",
+   ""
+  ],
+  [
+   "Constante ajoutée à la sortie 3.",
+   "",
+   ""
+  ],
+  [
+   "Constante sumada a la salida 3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "scale4",
+  [
+   "Attenuverter for output 4 (in DUAL, it follows IN2).",
+   "",
+   ""
+  ],
+  [
+   "Atténuverseur de la sortie 4 (en DUAL, elle suit IN2).",
+   "",
+   ""
+  ],
+  [
+   "Atenuversor de la salida 4 (en DUAL, sigue IN2).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "offset4",
+  [
+   "Constant added to output 4.",
+   "",
+   ""
+  ],
+  [
+   "Constante ajoutée à la sortie 4.",
+   "",
+   ""
+  ],
+  [
+   "Constante sumada a la salida 4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "out:out1",
+  [
+   "Output 1: SCALE1·input + OFFSET1.",
+   "",
+   ""
+  ],
+  [
+   "Sortie 1 : SCALE1·entrée + OFFSET1.",
+   "",
+   ""
+  ],
+  [
+   "Salida 1: SCALE1·entrada + OFFSET1.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "out:out2",
+  [
+   "Output 2: SCALE2·input + OFFSET2.",
+   "",
+   ""
+  ],
+  [
+   "Sortie 2 : SCALE2·entrée + OFFSET2.",
+   "",
+   ""
+  ],
+  [
+   "Salida 2: SCALE2·entrada + OFFSET2.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "out:out3",
+  [
+   "Output 3: SCALE3·input + OFFSET3.",
+   "",
+   ""
+  ],
+  [
+   "Sortie 3 : SCALE3·entrée + OFFSET3.",
+   "",
+   ""
+  ],
+  [
+   "Salida 3: SCALE3·entrada + OFFSET3.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "MULT",
+  "out:out4",
+  [
+   "Output 4: SCALE4·input + OFFSET4.",
+   "",
+   ""
+  ],
+  [
+   "Sortie 4 : SCALE4·entrée + OFFSET4.",
+   "",
+   ""
+  ],
+  [
+   "Salida 4: SCALE4·entrada + OFFSET4.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "x",
+  [
+   "Horizontal position of the point in the square (0 = the A/C side, 1 = the B/D side). Adds to the X CV.",
+   "With a gesture playing, the knob becomes a bipolar nudge: 0.5 = no offset, below 0.5 pushes to the left.",
+   ""
+  ],
+  [
+   "Position horizontale du point dans le carré (0 = côté A/C, 1 = côté B/D). S’ajoute à la CV de X.",
+   "Avec un geste en lecture, le potentiomètre devient un décalage bipolaire : 0,5 = aucun décalage, en dessous de 0,5 il pousse vers la gauche.",
+   ""
+  ],
+  [
+   "Posición horizontal del punto en el cuadrado (0 = lado A/C, 1 = lado B/D). Se suma a la CV de X.",
+   "Con un gesto en reproducción, el mando se vuelve un empuje bipolar: 0,5 = sin desvío, por debajo de 0,5 empuja a la izquierda.",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "y",
+  [
+   "Vertical position (0 = the A/B side at the top, 1 = the C/D side at the bottom). Adds to the Y CV.",
+   "",
+   ""
+  ],
+  [
+   "Position verticale (0 = côté A/B en haut, 1 = côté C/D en bas). S’ajoute à la CV de Y.",
+   "",
+   ""
+  ],
+  [
+   "Posición vertical (0 = lado A/B arriba, 1 = lado C/D abajo). Se suma a la CV de Y.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "curve",
+  [
+   "Linear (0) ↔ constant power (1). Linear: the weights sum to 1 — the honest morph for CV. Constant power: scales the weights by 1/√Σw² so the AUDIO output does not dip ~6 dB in the middle of the square.",
+   "",
+   ""
+  ],
+  [
+   "Linéaire (0) ↔ puissance constante (1). Linéaire : les poids font 1 — le morphing honnête pour la CV. Puissance constante : met les poids à l’échelle par 1/√Σw² pour que la sortie AUDIO ne creuse pas d’environ 6 dB au centre du carré.",
+   "",
+   ""
+  ],
+  [
+   "Lineal (0) ↔ potencia constante (1). Lineal: los pesos suman 1 — el morfismo honesto para CV. Potencia constante: escala los pesos por 1/√Σw² para que la salida de AUDIO no caiga unos 6 dB en el centro del cuadrado.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "smooth",
+  [
+   "One-pole glide on the point — τ from ~1 ms to ~0.5 s. From immediate response to a slew that drags the trajectory.",
+   "",
+   ""
+  ],
+  [
+   "Glissement à un pôle sur le point — τ de ~1 ms à ~0,5 s. De la réponse immédiate à un slew qui traîne la trajectoire.",
+   "",
+   ""
+  ],
+  [
+   "Deslizamiento de un polo en el punto — τ de ~1 ms a ~0,5 s. De la respuesta inmediata a un slew que arrastra la trayectoria.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "rate",
+  [
+   "Speed of the gesture loop AND of the drift. 0.5 = 1×; 2^((rate−0.5)·4), so 1/16× to 16×.",
+   "",
+   ""
+  ],
+  [
+   "Vitesse de la boucle du geste ET de la dérive. 0,5 = 1× ; 2^((rate−0,5)·4), donc de 1/16× à 16×.",
+   "",
+   ""
+  ],
+  [
+   "Velocidad del bucle del gesto Y de la deriva. 0,5 = 1×; 2^((rate−0,5)·4), o sea de 1/16× a 16×.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "drift",
+  [
+   "Autonomous 2D walk of the point when there is no gesture — a Lissajous of three slow incommensurable sines. Deterministic, no RNG. 0 = the point stands still.",
+   "",
+   ""
+  ],
+  [
+   "Marche 2D autonome du point en l’absence de geste — une Lissajous de trois sinus lents incommensurables. Déterministe, sans RNG. 0 = le point reste immobile.",
+   "",
+   ""
+  ],
+  [
+   "Paseo 2D autónomo del punto cuando no hay gesto — una Lissajous de tres senos lentos inconmensurables. Determinista, sin RNG. 0 = el punto se queda quieto.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:a",
+  [
+   "Source at the top-left corner.",
+   "",
+   ""
+  ],
+  [
+   "Source du coin supérieur gauche.",
+   "",
+   ""
+  ],
+  [
+   "Fuente de la esquina superior izquierda.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:b",
+  [
+   "Source at the top-right corner.",
+   "",
+   ""
+  ],
+  [
+   "Source du coin supérieur droit.",
+   "",
+   ""
+  ],
+  [
+   "Fuente de la esquina superior derecha.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:c",
+  [
+   "Source at the bottom-left corner.",
+   "",
+   ""
+  ],
+  [
+   "Source du coin inférieur gauche.",
+   "",
+   ""
+  ],
+  [
+   "Fuente de la esquina inferior izquierda.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:d",
+  [
+   "Source at the bottom-right corner.",
+   "",
+   ""
+  ],
+  [
+   "Source du coin inférieur droit.",
+   "",
+   ""
+  ],
+  [
+   "Fuente de la esquina inferior derecha.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:x",
+  [
+   "CV added to X (an LFO, an envelope, another x_out…).",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à X (un LFO, une enveloppe, un autre x_out…).",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a X (un LFO, una envolvente, otro x_out…).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:y",
+  [
+   "CV added to Y.",
+   "",
+   ""
+  ],
+  [
+   "CV ajoutée à Y.",
+   "",
+   ""
+  ],
+  [
+   "CV sumada a Y.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "in:gesture",
+  [
+   "Gate: while high, it RECORDS the trajectory of the point (decimated 32×, up to ~4 s).",
+   "On the falling edge, if it recorded enough, the gesture starts playing in a loop. A short tap (under ~2 ms) clears it and returns to live.",
+   ""
+  ],
+  [
+   "Gate : tant qu’il est haut, il ENREGISTRE la trajectoire du point (décimée 32×, jusqu’à ~4 s).",
+   "Au front descendant, s’il a enregistré assez, le geste se met à jouer en boucle. Une brève impulsion (moins de ~2 ms) l’effface et revient au direct.",
+   ""
+  ],
+  [
+   "Gate: mientras está alto, GRABA la trayectoria del punto (diezmada 32×, hasta ~4 s).",
+   "En el flanco de bajada, si grabó lo suficiente, el gesto empieza a tocar en bucle. Un toque corto (menos de ~2 ms) lo borra y vuelve al vivo.",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "out:out",
+  [
+   "The bilinear mix of the 4 sources, with a safety softclip.",
+   "",
+   ""
+  ],
+  [
+   "Le mélange bilinéaire des 4 sources, avec un softclip de sécurité.",
+   "",
+   ""
+  ],
+  [
+   "La mezcla bilineal de las 4 fuentes, con un softclip de seguridad.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "out:x_out",
+  [
+   "The effective X position (already smoothed) as CV — patch it into a FILTER cutoff, a WAVETABLE pos… the gesture drives the patch.",
+   "",
+   ""
+  ],
+  [
+   "La position X effective (déjà lissée) en CV — branchez-la sur le cutoff d’un FILTER, le pos d’un WAVETABLE… le geste conduit le patch.",
+   "",
+   ""
+  ],
+  [
+   "La posición X efectiva (ya suavizada) como CV — conéctela al cutoff de un FILTER, al pos de un WAVETABLE… el gesto dirige el patch.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "PLANAR",
+  "out:y_out",
+  [
+   "The effective Y position as CV.",
+   "",
+   ""
+  ],
+  [
+   "La position Y effective en CV.",
+   "",
+   ""
+  ],
+  [
+   "La posición Y efectiva como CV.",
+   "",
+   ""
+  ]
+ ]
+]
