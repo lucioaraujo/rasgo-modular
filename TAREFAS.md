@@ -10069,3 +10069,51 @@ subia, e acusei o parâmetro de quebrado. A fase agora é assinada.
 
 **Pendente para a v0.1.1:** redesenhar só as regiões sujas (~38% de CPU em
 desenho).
+
+---
+
+## Registro da etapa — 2026-09-28: a moldura errada, corrigida em todo lugar
+
+O autor recusou o título do site: *"não gosto dessa frase — 'Um modular que
+toca sozinho'. A essência do Rasgo Modular não é que ele toque sozinho, o
+músico toca ele, porém ele apresenta características de apresentar patches
+como ponto de partida."*
+
+Ele está certo, e o achado é que **o projeto já dizia isso corretamente**.
+`RASGO_MODULAR.md` sempre teve a formulação certa — *"pode propor um patch
+de partida determinístico que o músico modifica; a folha em branco continua
+válida"*. Foram o site e o tutorial do app que divergiram do design doc,
+dando ao programa o papel do músico.
+
+**Moldura escolhida pelo autor:** "Patches como ponto de partida".
+
+**Aplicada em:** título, descrição, `<h1>` e parágrafo de abertura das
+quatro páginas do site; subtítulo e "o que é isto" do tutorial embutido,
+nos quatro idiomas; abertura do `CHANGELOG.md`; um comentário do
+`UiLanguage.hpp` que repetia a moldura antiga. Texto do card do portal
+preparado em `website/PORTAL.md`, com a razão registrada para quem escrever
+texto público do Modular depois.
+
+**O que NÃO mudou, e é diferente:** "o módulo toca sozinho" no LEARN do
+`DRUM.roll` e do `ABACUS` — ali é um módulo que se auto-dispara sem
+entrada, afirmação verdadeira e de outra natureza. E o comentário do
+`syncSignalIn`, onde "soa sem entrada externa" é justamente a razão técnica
+de não pedir microfone.
+
+**Dois erros de fato encontrados no caminho**, ambos em página pública:
+
+- o site dizia **60 módulos** numa seção e 58 na outra. São 58 no catálogo
+  (o que o binário reporta e o que o guia mostra); os 64 arquivos em
+  `src/dsp/` incluem auxiliares que não são módulos de rack (medição de
+  loudness e true-peak, oversampler, pitch-shifter, estágio de saída) e
+  classes cujo nome difere do tipo (`Oscillator` → `OSC`, `StepSequencer`
+  → `SEQUENCE`). Corrigido para 58 no site e no README;
+- o `README.md` anunciava **72 alvos CTest**; são 80. Corrigido.
+
+E o `CHANGELOG.md` ainda dizia que faltava a sessão de escuta, feita em
+23–24 set. — a nota foi reescrita para o que realmente falta: cortar a tag
+depois de 1 out.
+
+**Validação:** 80/80 no `ctest`, build limpo, e as oito páginas do site
+conferidas por script (marcação, links internos, ausência de recurso
+externo).

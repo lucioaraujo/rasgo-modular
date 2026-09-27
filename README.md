@@ -123,8 +123,8 @@ de aprofundamento didático (o conceito por trás de cada parâmetro, não
 só a fórmula). Falta só a tradução, quando o site for construído.
 + **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
 de partida completo**;
-60 módulos DSP,
-72 alvos CTest
+58 módulos DSP,
+80 alvos CTest
 verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
 Lúcio de Araújo.
 **Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
@@ -216,7 +216,7 @@ conceitual, não como um projeto separado.
 - [`guia/`](guia/00_indice.md) — guia de referência **para quem toca**:
   uma página em prosa por módulo (fase didática, `PESQUISA_MODULOS.md
   §2.7`; iniciada 2026-09-09, piloto `OSC`/`MULT`/`SPACE`);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 60 módulos
+- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 58 módulos de rack (mais alguns auxiliares que não aparecem no catálogo: medição de loudness e true-peak, oversampler, pitch-shifter, estágio de saída)
   (+ `Oversampler.hpp`, helper 2× compartilhado);
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver

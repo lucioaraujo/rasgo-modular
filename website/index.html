@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rasgo Modular — um modular que toca sozinho</title>
-<meta name="description" content="Rasgo Modular: ambiente modular generativo da família RASGO. Soa no arranque, sem teclado e sem entrada de áudio — e o cabo é um objeto com estado, não um fio." />
+<title>Rasgo Modular — patches como ponto de partida</title>
+<meta name="description" content="Rasgo Modular: ambiente modular generativo da família RASGO. Abre com um patch já montado e soando, como ponto de partida — e o cabo é um objeto com estado, não um fio." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -39,11 +39,10 @@
 <main id="conteudo">
 <section class="hero" id="top">
   <span class="status-pill">Em desenvolvimento — ainda sem release</span>
-  <h1>Um modular que toca sozinho</h1>
-  <p class="lead">O Rasgo Modular faz som no instante em que abre. Sem teclado,
-    sem entrada de áudio, sem folha em branco: ele sorteia um patch e começa a
-    tocar, e a partir daí você conduz — recabeando à mão, deixando derivar, ou
-    construindo tudo do zero se preferir.</p>
+  <h1>Patches como ponto de partida</h1>
+  <p class="lead">O Rasgo Modular não abre em branco: ele apresenta um patch
+    já montado e soando, para você tocar a partir dele — recabeando à mão,
+    ajustando, deixando derivar, ou desmontando tudo e construindo do zero.</p>
 </section>
 
 <figure class="shot">
@@ -62,7 +61,7 @@
 
 <section class="section">
   <h2>O que ele é</h2>
-  <p>Um ambiente modular generativo com <strong>60 módulos</strong>, escrito em
+  <p>Um ambiente modular generativo com <strong>58 módulos</strong>, escrito em
     C++17 sem dependências no núcleo. Os módulos são descritos por dados — cada
     um declara seu painel em milímetros —, e o mesmo motor alimenta dois
     front-ends: um app multiplataforma em JUCE e um painel de teste em X11.</p>
