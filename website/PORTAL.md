@@ -86,3 +86,13 @@ figura principal):
 repositório, site e portal são liberados juntos — ver
 [`../PUBLICACAO.md`](../PUBLICACAO.md). O link do card só funciona depois
 que o site do instrumento estiver no ar.
+
+## Aplicado em 29 set. 2026
+
+O autor pediu a inserção do card; está nas quatro páginas de
+`RASGO_WEBSITE`, só no disco. Kicker traduzido por idioma, como os irmãos
+fazem de fato (a nota acima dizendo "o mesmo nos quatro" não confere com o
+portal). Link: `https://lucioaraujo.github.io/rasgo-modular/` — confirmar ou
+trocar quando o endereço do site for decidido. O upload do portal acompanha a
+publicação (passo 7 da sequência em `../TAREFAS.md`). Registro completo em
+`RASGO_WEBSITE/README.md`.
