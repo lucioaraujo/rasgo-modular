@@ -1,0 +1,51 @@
+# Publica website/ no GitHub Pages — lucioaraujo.github.io/rasgo-modular/.
+#
+# Cópia do deploy-site.yml do Antitotem, que já publica assim: a pasta
+# website/ vai inteira, sem etapa de build. Só roda quando website/ ou este
+# arquivo mudam, então commit de código, teste ou documentação não gasta
+# nada aqui. Em repositório público o Actions é gratuito; em privado o Pages
+# nem existe — por isso este workflow só faz sentido depois de o repositório
+# ser aberto e de o Pages ser ligado com a fonte "GitHub Actions".
+#
+# O site tem duas versões (antes e depois da release), trocadas por
+# website/estado.py. Publicar a versão "depois" antes de a release existir
+# deixa três botões de download apontando para o vazio: ver a sequência do
+# dia de publicar em TAREFAS.md.
+name: Deploy public site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - website/**
+      - .github/workflows/deploy-site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

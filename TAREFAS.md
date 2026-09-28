@@ -10214,3 +10214,57 @@ do passo 6.
 mesma cor coral do aviso "Ainda não há release" — o bloco é o mesmo callout.
 Lido como alerta, pode ser intencional (o texto logo abaixo é uma ressalva);
 fica para o autor decidir.
+
+---
+
+## Registro da etapa — 2026-09-29: auditoria para abrir o repositório, e o workflow do site
+
+**Achado que muda a sequência:** o próprio `package.yml` anota que
+repositório **público** tem Actions gratuito e ilimitado. A sequência de 28
+set. cortava a tag com o repositório ainda privado — ~160 minutos cobrados e
+espera até 1 out. Abrindo **antes** da tag, a CI dos três sistemas sai de
+graça e a publicação não depende mais da cota.
+
+**Auditoria do histórico (tudo o que ficará público, não só o estado atual):**
+
+- 137 commits, `.git` com 14 MB; maior blob é a captura de 0,8 MB;
+- nenhum áudio (`wav/aif/flac/mp3/ogg/m4a`), nada de `0_BRAINSTORM`, nenhum
+  arquivo com nome de chave/segredo em nenhum commit;
+- `git log --all -p -G` por tokens (GitHub, AWS, Slack, OpenAI/Anthropic,
+  Google), chaves privadas e atribuições de senha/api_key: **zero ocorrências**;
+- `build/` e `validation-output/` não rastreados; `travou` e `run` são os dois
+  scripts de uso;
+- terceiros: só `third_party/dr_wav` (domínio público / MIT-0, texto de licença
+  no próprio header) e dois trechos GPL-3.0-or-later do Navalha, compatíveis
+  com a AGPL-3.0 e já creditados em `CREDITS_AND_SOURCES.md`;
+- dois caminhos locais em texto (`TAREFAS.md:6008`, `apps/panel/design.md:517`)
+  — revelam só nome de usuário e pasta; inofensivos, deixados;
+- **decisão do autor:** os 137 commits têm autor `lucio.matema@gmail.com`,
+  que ficará público. O Antitotem, já público, usa `luciodearaujo@gmail.com`.
+  Trocar exigiria reescrever o histórico inteiro (irreversível para quem já
+  clonou — hoje ninguém, pois é privado). Não feito sem pedido.
+
+**Feito:** `.github/workflows/deploy-site.yml`, cópia do workflow que publica
+o site do Antitotem (pasta `website/` inteira no Pages, só quando `website/`
+muda). YAML validado; o site só usa caminhos relativos, então funciona sob
+`/rasgo-modular/`; `verificar.py` sem problemas.
+
+## Sequência do dia de publicar — revisada em 29 set. (substitui a de 28 set.)
+
+1. ~~auditoria do histórico~~ e ~~workflow do site~~ — feitos acima;
+2. **autor:** tornar público —
+   `gh repo edit lucioaraujo/rasgo-modular --visibility public --accept-visibility-change-consequences`;
+3. ligar o Pages com fonte Actions —
+   `gh api -X POST repos/lucioaraujo/rasgo-modular/pages -f build_type=workflow`
+   — **antes** do push seguinte, senão o deploy-site falha por falta de Pages;
+4. `git push` — publica o site na versão **"antes"** ("ainda não há
+   release"), que é verdadeira nesse momento: nunca há botão apontando para o
+   vazio;
+5. `git tag -a v0.1.0 -m "Rasgo Modular v0.1.0" && git push origin v0.1.0` —
+   CI dos três sistemas, agora gratuita, e release com os três instaladores;
+6. conferir a release: três anexos, nomes do contrato do CPack;
+7. `cd website && python3 estado.py --depois 0.1.0 && python3 verificar.py`,
+   commit, push — o site republica com os downloads;
+8. portal: subir `RASGO_WEBSITE` (card já inserido em 29 set.) à HostGator.
+
+Pendente do autor antes do passo 7: Safari/WebKit (Blink e Gecko já vistos).
