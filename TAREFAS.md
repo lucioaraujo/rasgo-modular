@@ -10180,3 +10180,37 @@ Nesta ordem, porque cada passo depende do anterior:
 **O que continua dependendo de você:** abrir as oito páginas num navegador
 de cada motor (Blink, Gecko, WebKit), em desktop e telefone, antes do passo
 6. Nenhum navegador real viu estas páginas.
+
+---
+
+## Registro da etapa — 2026-09-28: as oito páginas vistas em Blink e Gecko
+
+Pedido: "avance". A tag só pode sair depois de 1 out. (cota de Actions), então
+o que avançava sem gastar CI era o item que dependia de navegador real.
+
+**Feito, headless, servido por HTTP local (não `file://`):** as oito páginas
+em Chrome (Blink) e Firefox (Gecko), em 1440×900 e 390×844 — 32 capturas —,
+mais a página inteira do `index`. A versão **pós-release** foi gerada numa
+cópia temporária (`estado.py --depois 0.1.0`) e também capturada, em desktop
+e telefone; o repositório não foi virado.
+
+**Medido a 390 px** (página dentro de iframe de 390 px, porque o Chrome
+headless não desce abaixo de 500 px de janela): nenhuma das oito páginas rola
+na horizontal. A tabela de plataformas passa da borda em PT e ES (406 e
+411 px), mas está dentro de `.wrap { overflow-x: auto }` e rola na própria
+caixa — comportamento previsto, não defeito. As fontes carregadas são as
+DejaVu Sans/Mono auto-hospedadas em `assets/fonts/`.
+
+**Pós-release:** os três botões quebram em duas linhas no telefone sem
+cortar; os links apontam para `github.com/lucioaraujo/rasgo-modular/releases/
+download/v0.1.0/…` com os nomes do contrato do CPack, e esse é o remoto real
+(`gh repo view` confirma, hoje `PRIVATE` — por isso o passo 5 vem antes do 6).
+
+**Não verificado:** WebKit/Safari (não há motor WebKit nesta máquina) e
+dispositivo real. Isso continua com o autor — basta um iPhone ou Mac antes
+do passo 6.
+
+**Observação de design, sem mudança:** o destaque "v0.1.0 disponível." usa a
+mesma cor coral do aviso "Ainda não há release" — o bloco é o mesmo callout.
+Lido como alerta, pode ser intencional (o texto logo abaixo é uma ressalva);
+fica para o autor decidir.
