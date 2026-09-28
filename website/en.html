@@ -39,7 +39,7 @@
 <main id="conteudo">
 <section class="hero" id="top">
   <!-- PILULA:INICIO -->
-  <span class="status-pill">In development — no release yet</span>
+  <span class="status-pill">v0.1.0 — available for Linux, Windows and macOS</span>
   <!-- PILULA:FIM -->
   <h1>Patches as a starting point</h1>
   <p class="lead">Rasgo Modular does not open on a blank page: it offers a
@@ -148,14 +148,27 @@
   <h2>Status</h2>
   <!-- ESTADO:INICIO -->
   <div class="note">
-    <p><strong>There is no release yet.</strong> The instrument runs, is
-      reproducible from source, and continuous integration already packages
-      all three installers — but none has been published yet.</p>
-    <p>This page is finished and waiting: by the RASGO family's editorial
-      rule, an instrument's site goes live together with the instrument
-      itself. To run it now, build from source — the per-system instructions
-      are in <a href="https://github.com/lucioaraujo/rasgo-modular/blob/main/INSTALL.md">INSTALL.md</a>.</p>
+    <p><strong>v0.1.0 is available.</strong> One installer per system, built
+      and packaged by continuous integration from the <code>v0.1.0</code>
+      tag.</p>
   </div>
+
+  <div class="contact-row">
+    <a class="button button-primary" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-linux-x86_64.deb">Linux &middot; .deb</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-windows-x64.exe">Windows &middot; .exe</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-macos-universal.dmg">macOS &middot; .dmg</a>
+  </div>
+
+  <p><strong>Two things said in full before you download.</strong> The
+    Windows and macOS packages were built, packaged and tested <em>by
+    continuous integration only</em> — the author has never opened the
+    application on either system. And the <code>.dmg</code> is ad-hoc
+    signed, with no Developer ID and no notarisation: Gatekeeper will warn
+    about an unidentified developer on first launch.</p>
+
+  <p>Installation, requirements and how to build from source are in
+    <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.0/INSTALL.md">INSTALL.md</a>; what changed is
+    in <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.0/CHANGELOG.md">CHANGELOG.md</a>.</p>
   <!-- ESTADO:FIM -->
 
   <div class="wrap">

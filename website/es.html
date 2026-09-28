@@ -39,7 +39,7 @@
 <main id="conteudo">
 <section class="hero" id="top">
   <!-- PILULA:INICIO -->
-  <span class="status-pill">En desarrollo — todavía sin release</span>
+  <span class="status-pill">v0.1.0 — disponible para Linux, Windows y macOS</span>
   <!-- PILULA:FIM -->
   <h1>Patches como punto de partida</h1>
   <p class="lead">El Rasgo Modular no abre en blanco: ofrece un patch ya
@@ -150,15 +150,27 @@
   <h2>Estado</h2>
   <!-- ESTADO:INICIO -->
   <div class="note">
-    <p><strong>Todavía no hay release.</strong> El instrumento funciona, es
-      reproducible desde el código y la integración continua ya empaqueta los
-      tres instaladores — pero ninguno se ha publicado aún.</p>
-    <p>Esta página está lista y en espera: por la regla editorial de la
-      familia RASGO, el sitio de un instrumento se publica junto con el
-      propio instrumento. Para usarlo ya, compile desde el código — las
-      instrucciones por sistema están en
-      <a href="https://github.com/lucioaraujo/rasgo-modular/blob/main/INSTALL.md">INSTALL.md</a>.</p>
+    <p><strong>v0.1.0 disponible.</strong> Un instalador por sistema,
+      construido y empaquetado por la integración continua desde la etiqueta
+      <code>v0.1.0</code>.</p>
   </div>
+
+  <div class="contact-row">
+    <a class="button button-primary" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-linux-x86_64.deb">Linux &middot; .deb</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-windows-x64.exe">Windows &middot; .exe</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.0/rasgo-modular-0.1.0-macos-universal.dmg">macOS &middot; .dmg</a>
+  </div>
+
+  <p><strong>Dos cosas dichas por entero antes de descargar.</strong> Los
+    paquetes de Windows y de macOS fueron construidos, empaquetados y
+    probados <em>sólo por la integración continua</em> — el autor nunca abrió
+    la aplicación en esos dos sistemas. Y el <code>.dmg</code> tiene firma
+    ad-hoc, sin Developer ID ni notarización: Gatekeeper mostrará un aviso
+    de desarrollador no identificado en la primera apertura.</p>
+
+  <p>Instalación, requisitos y cómo compilar desde el código están en
+    <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.0/INSTALL.md">INSTALL.md</a>; lo que cambió,
+    en <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.0/CHANGELOG.md">CHANGELOG.md</a>.</p>
   <!-- ESTADO:FIM -->
 
   <div class="wrap">
