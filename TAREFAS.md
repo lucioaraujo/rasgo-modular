@@ -10276,3 +10276,30 @@ terminou `success` e `https://lucioaraujo.github.io/rasgo-modular/` responde
 200 com a versão "antes" ("Ainda não há release"). **Parado no passo 5** (a
 tag `v0.1.0`), que aguarda confirmação explícita do autor por criar a release
 pública.
+
+---
+
+## Registro da etapa — 2026-09-29: v0.1.0 publicada
+
+Tag `v0.1.0` criada e enviada com autorização explícita do autor. A CI (run
+`36492203403`) passou nos três sistemas — `ubuntu-22.04/DEB`,
+`windows-latest/NSIS`, `macos-latest/DragNDrop` — e o job `release` criou
+<https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0> com:
+
+| Anexo | Bytes |
+|---|---|
+| `rasgo-modular-0.1.0-linux-x86_64.deb` | 7 053 480 |
+| `rasgo-modular-0.1.0-windows-x64.exe` | 4 182 595 |
+| `rasgo-modular-0.1.0-macos-universal.dmg` | 12 325 697 |
+
+Os três URLs de download respondem publicamente (206 em requisição parcial),
+assim como `INSTALL.md` na tag. Custo de CI: zero — repositório já público.
+
+Site virado com `estado.py --depois 0.1.0` (`verificar.py` sem problemas),
+commit `b662c92`; `Deploy public site` `success`, e as quatro páginas
+publicadas em <https://lucioaraujo.github.io/rasgo-modular/> trazem os três
+links da release.
+
+**Falta:** passo 8 — subir `RASGO_WEBSITE` (card do Modular inserido em 29
+set.) à HostGator; Safari/WebKit ainda não visto; Windows e macOS continuam
+sem teste em máquina real (declarado no bloco de download).
