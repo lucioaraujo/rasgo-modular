@@ -10268,3 +10268,11 @@ muda). YAML validado; o site só usa caminhos relativos, então funciona sob
 8. portal: subir `RASGO_WEBSITE` (card já inserido em 29 set.) à HostGator.
 
 Pendente do autor antes do passo 7: Safari/WebKit (Blink e Gecko já vistos).
+
+**Estado em 29 set. 2026 (noite):** passos 2–4 feitos — repositório
+**público** (autorizado pelo autor, que manteve o e-mail dos commits), Pages
+ligado com fonte Actions, push de `main` (`9d7ed0d`); o `Deploy public site`
+terminou `success` e `https://lucioaraujo.github.io/rasgo-modular/` responde
+200 com a versão "antes" ("Ainda não há release"). **Parado no passo 5** (a
+tag `v0.1.0`), que aguarda confirmação explícita do autor por criar a release
+pública.
