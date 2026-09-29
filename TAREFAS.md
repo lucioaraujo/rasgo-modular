@@ -10332,3 +10332,9 @@ desatualizado (o `gerar_modulos.py` o apaga) e `VERSAO` diferente do CMake.
 Webmaster Tools e enviar os sitemaps; subir o zip do portal. **Limitação
 achada:** no Navalha, `pt/`, `fr/`, `es/` chegam vazias no HTML (texto
 montado por JavaScript) — invisíveis para leitores de IA que não executam JS.
+
+**30 set. 2026 — primeira instalação a partir da release:** o autor instalou
+`rasgo-modular-0.1.0-linux-x86_64.deb`, baixado da release pública v0.1.0, no
+Linux Mint, com êxito. É a primeira evidência de que o pacote publicado (e não
+um build local) instala numa máquina real. Windows e macOS continuam sem teste
+em máquina real.
