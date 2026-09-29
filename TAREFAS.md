@@ -10303,3 +10303,32 @@ links da release.
 **Falta:** passo 8 — subir `RASGO_WEBSITE` (card do Modular inserido em 29
 set.) à HostGator; Safari/WebKit ainda não visto; Windows e macOS continuam
 sem teste em máquina real (declarado no bloco de download).
+
+---
+
+## Registro da etapa — 2026-09-29: metadados de busca em toda a família
+
+Pedido do autor: metadados, sitemap, JSON-LD e link no GitHub "para todos os
+sites da família RASGO". Um `seo.py` igual nos quatro sites (só a
+configuração no topo muda): bloco `<!-- SEO:INICIO/FIM -->` com canonical,
+hreflang, Open Graph/Twitter e JSON-LD, lendo título e descrição da própria
+página; `sitemap.xml` sempre, `robots.txt` só onde o site é raiz de domínio
+(portal e Navalha — em github.io/<projeto>/ seria ignorado).
+
+| Site | Commit | Publicado |
+|---|---|---|
+| Rasgo Modular | `2a4c738` | deploy `success` |
+| Antitotem | `ae762d5` | deploy `success` (build de pacote disparado pelo push, cancelado: mudança só de site) |
+| Navalha 2 | `ac1110d` | deploy `success` |
+| Portal rasgosound | `f0d797c` (repo RASGO) | **só no disco** — `RASGO_WEBSITE/rasgo-website.zip` pronto para a HostGator |
+
+Validado: 25 URLs com canonical igual ao `<loc>` do sitemap, hreflang
+recíproco, JSON-LD que faz parse, og:image existente; nos três sites no ar,
+canonical/JSON-LD/sitemap/imagem respondem 200. Campo *Website* dos três
+repositórios preenchido. `verificar.py` do Modular agora acusa bloco
+desatualizado (o `gerar_modulos.py` o apaga) e `VERSAO` diferente do CMake.
+
+**Com o autor:** cadastrar os quatro sites no Google Search Console e no Bing
+Webmaster Tools e enviar os sitemaps; subir o zip do portal. **Limitação
+achada:** no Navalha, `pt/`, `fr/`, `es/` chegam vazias no HTML (texto
+montado por JavaScript) — invisíveis para leitores de IA que não executam JS.
