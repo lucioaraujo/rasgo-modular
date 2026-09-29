@@ -314,3 +314,20 @@ pipeline para existir é um site que apodrece quando o pipeline quebra.
 Há **dois** scripts, e nenhum é obrigatório para servir o site (as páginas
 ficam versionadas e prontas): `gerar_modulos.py`, quando um verbete de
 módulo muda no instrumento, e `estado.py`, no dia de publicar.
+
+## Metadados de busca e compartilhamento — `seo.py`
+
+Desde 29 set. 2026. Em cada página, um bloco entre `<!-- SEO:INICIO -->` e
+`<!-- SEO:FIM -->` antes de `</head>`: canonical, hreflang entre os idiomas,
+Open Graph/Twitter (prévia ao compartilhar) e JSON-LD schema.org (o que o site
+é, para buscadores e IAs). Título e descrição são lidos da própria página.
+Gera também `sitemap.xml`. **Não editar o bloco à mão:** mudar a
+configuração no topo de `seo.py` e rodar `python3 seo.py`
+(`--verificar` só confere). A imagem de compartilhamento é `assets/images/og-rasgo-modular.jpg`,
+1200×630, derivada de `../screenshots/rack-completo-2026-09-18.png`. O mesmo `seo.py` existe nos sites de toda a família
+RASGO; só a configuração muda.
+
+Ordem ao mexer nas páginas: `gerar_modulos.py` → `estado.py` → `seo.py`. O
+`gerar_modulos.py` reescreve as páginas de módulos inteiras e apaga o bloco;
+`verificar.py` acusa isso, e acusa também `VERSAO` do `seo.py` diferente do
+CMake.
