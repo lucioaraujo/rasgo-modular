@@ -141,6 +141,9 @@ def bloco(pagina, grupo, titulo, descricao):
     if SITE.get("google_verificacao") and pagina["url"] == "":
         L.append('<meta name="google-site-verification" content="%s">'
                  % a(SITE["google_verificacao"]))
+    # Verificação do Bing Webmaster Tools, mesma regra.
+    if SITE.get("bing_verificacao") and pagina["url"] == "":
+        L.append('<meta name="msvalidate.01" content="%s">' % a(SITE["bing_verificacao"]))
     L.append(json_ld(dados_estruturados(pagina, descricao)))
     L.append(FIM)
     return L
