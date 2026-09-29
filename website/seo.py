@@ -19,6 +19,8 @@ SITE = {
     # github.io/rasgo-modular/ não é raiz de domínio: um robots.txt aqui
     # seria ignorado. O sitemap vai ao Search Console à mão.
     "raiz_do_dominio": False,
+    # Search Console, propriedade https://lucioaraujo.github.io/rasgo-modular/
+    "google_verificacao": "MM4BJtOhpV7eceoH4I73LRqX8u9zjQOd6o98Ljgjr_0",
 }
 
 VERSAO = "0.1.0"  # verificar.py amarra esta versão ao CMakeLists.txt
@@ -134,6 +136,11 @@ def bloco(pagina, grupo, titulo, descricao):
         if p is not pagina:
             L.append('<meta property="og:locale:alternate" content="%s">' % OG_LOCALE[p["lang"]])
     L.append('<meta name="twitter:card" content="summary_large_image">')
+    # Verificação do Google Search Console (propriedade "prefixo do URL"):
+    # o Google só procura a tag na página inicial.
+    if SITE.get("google_verificacao") and pagina["url"] == "":
+        L.append('<meta name="google-site-verification" content="%s">'
+                 % a(SITE["google_verificacao"]))
     L.append(json_ld(dados_estruturados(pagina, descricao)))
     L.append(FIM)
     return L
