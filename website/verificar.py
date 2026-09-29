@@ -29,6 +29,7 @@ import html.parser
 import os
 import pathlib
 import re
+import subprocess
 import sys
 
 AQUI = pathlib.Path(__file__).parent
@@ -36,7 +37,10 @@ RAIZ = AQUI.parent
 
 VAZIAS = {"meta", "link", "img", "br", "hr", "source", "input", "area",
           "base", "col"}
-EXTERNOS_OK = ("rasgosound.arquiviagem.net", "github.com/lucioaraujo")
+# O próprio endereço público aparece nos <link rel="canonical|alternate"> do
+# seo.py: são declarações de endereço, não recursos carregados.
+EXTERNOS_OK = ("rasgosound.arquiviagem.net", "github.com/lucioaraujo",
+               "lucioaraujo.github.io/rasgo-modular/")
 
 problemas = []
 
@@ -146,9 +150,25 @@ def conferir_downloads():
                     % (arq, achado, versao))
 
 
+def conferir_seo():
+    """O bloco de seo.py em dia em todas as páginas, e a versão do JSON-LD
+    igual à do CMake. gerar_modulos.py reescreve as páginas de módulos
+    inteiras e apaga o bloco — sem esta conferência, isso passaria calado."""
+    r = subprocess.run([sys.executable, str(AQUI / "seo.py"), "--verificar"],
+                       capture_output=True, text=True)
+    print(r.stdout.strip())
+    if r.returncode != 0:
+        problemas.append("metadados desatualizados: " + (r.stdout.strip() or r.stderr.strip()))
+    m = re.search(r'^VERSAO = "([^"]+)"', (AQUI / "seo.py").read_text(encoding="utf-8"), re.M)
+    cm = versao_do_cmake()
+    if m and cm and m.group(1) != cm:
+        problemas.append("seo.py declara VERSAO %s; o CMake diz %s" % (m.group(1), cm))
+
+
 def main():
     conferir_estrutura()
     conferir_downloads()
+    conferir_seo()
     print()
     if problemas:
         print("%d problema(s):" % len(problemas))
