@@ -4447,8 +4447,40 @@ private:
             setUsingNativeTitleBar(true);
             setContentOwned(new MainComponent(), true);
             setResizable(true, true);
-            centreWithSize(getWidth(), getHeight());
+            // Abre sempre MAXIMIZADO no monitor PRINCIPAL (pedido do autor,
+            // 1 out. 2026). Maximizar age sobre o monitor onde a janela
+            // está, então primeiro ela é posta dentro do principal. Isso é
+            // feito DUAS vezes: antes de mostrar e de novo depois, porque o
+            // gerenciador de janelas pode reposicioná-la ao mapear — o
+            // Cinnamon abre janela nova no monitor do MOUSE, e com só a
+            // primeira colocação ela maximizava no monitor secundário
+            // (conferido com `xprop`/`xwininfo`). O mapeamento é
+            // assíncrono, então a segunda colocação espera a janela
+            // aparecer (150 ms) e a maximização espera o gerenciador
+            // aplicar a posição (mais 150 ms).
+            // Com barra de título nativa, o `setFullScreen` do JUCE pede ao
+            // gerenciador o estado MAXIMIZADO, não tela cheia: barra de
+            // título e painel do sistema continuam à vista, e restaurar
+            // volta ao tamanho de antes (~88% do monitor, calculado em
+            // `MainComponent`).
+            placeOnPrimaryDisplay();
             setVisible(true);
+            const juce::Component::SafePointer<Window> self(this);
+            juce::Timer::callAfterDelay(150, [self] {
+                if (self == nullptr) return;
+                self->placeOnPrimaryDisplay();
+                juce::Timer::callAfterDelay(150, [self] {
+                    if (self != nullptr) self->setFullScreen(true);
+                });
+            });
+        }
+        void placeOnPrimaryDisplay() {
+            if (const auto* d = juce::Desktop::getInstance().getDisplays()
+                                    .getPrimaryDisplay())
+                setBounds(d->userBounds.toNearestInt()
+                              .withSizeKeepingCentre(getWidth(), getHeight()));
+            else
+                centreWithSize(getWidth(), getHeight());
         }
         void closeButtonPressed() override {
             JUCEApplication::getInstance()->systemRequestedQuit();
