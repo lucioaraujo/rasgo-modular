@@ -9290,6 +9290,24 @@ não menor:
 Um `perf` de verdade (a linha do `./travou --perfil`, rodada pelo autor)
 antes do passo 2 diria qual desses pesa mais hoje.
 
+### Passo 2 tentado em 1 out. 2026 — chrome `RGB` opaco, sem ganho
+
+Branch `v0.1.1-chrome-opaco` (commit `d4d1dea`, não integrado): a camada
+fixa de cada módulo passou de `ARGB` para `RGB` (ela é opaca — começa com
+`fillRect` em `T.surface`, `0xff262b36`). Mesmo protocolo, **5 rodadas**
+intercaladas: mediana do processo **40,8% antes, 42,3% depois**; thread
+principal 33,0% e 34,0%. A variação entre rodadas (31–54%) é maior que
+qualquer efeito, e nada aponta para melhora. Provável razão: a imagem da
+janela no Linux é `ARGB`, então copiar `RGB` para ela ainda converte
+pixel a pixel. Revertido pela regra da tarefa.
+
+**Limite do método:** CPU por `/proc` em 20 s não enxerga efeitos de
+poucos pontos percentuais neste app — a variação natural é de ±10. Os
+próximos passos (cabos guardados entre quadros, cadência) precisam do
+`perf` por função (`./travou --perfil`, com `sudo`, pelo autor) para
+serem julgados, ou de um efeito grande o bastante para aparecer acima do
+ruído. Sem isso, não tentar mais otimização às cegas.
+
 ## Registro da etapa — 2026-09-24: estourei a cota de CI da conta do autor
 
 O GitHub avisou que a conta bateu **100% dos 2.000 minutos** mensais

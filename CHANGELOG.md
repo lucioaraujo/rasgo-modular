@@ -7,14 +7,32 @@ pronto.
 
 ---
 
-## v0.1.0 — **preparada, ainda não cortada**
+## v0.1.1 — em preparação
 
-> **Por que ainda não é uma release.** A sessão de escuta documentada —
-> que era o bloqueio duro da camada 2 da `ESTRATEGIA_DE_PUBLICACAO.md` —
-> **foi feita** em 23–24 set. 2026 (`dossies/VALIDACAO_v0.1.0.md`: quatro
-> estudos, sete achados, três corrigidos antes de publicar). O que falta é
-> operacional: cortar a tag e abrir o repositório junto com o site e o
-> portal, depois de 1 out. 2026.
+- **A janela abre sempre maximizada no monitor principal** (pedido do
+  autor, 1 out. 2026). Antes abria com ~88% do monitor, e num sistema com
+  dois monitores o Cinnamon a punha no monitor onde estava o mouse. Agora
+  ela é colocada no monitor principal (o primário do XRandR) depois de
+  aparecer e só então maximizada — maximizada, não tela cheia: barra de
+  título e painel do sistema continuam à vista, e restaurar volta ao
+  tamanho anterior. Conferido no Linux Mint/Cinnamon com dois monitores
+  (`xprop` e `xwininfo`, três aberturas). **Limitação:** por ~0,3 s a
+  janela pode aparecer no monitor do mouse antes de ir para o principal;
+  Windows e macOS não foram abertos pelo autor.
+- Desempenho do desenho: duas tentativas medidas **sem ganho** (repintura
+  por região; chrome `RGB` opaco), não integradas. Registro e números em
+  `TAREFAS.md` → "Tarefa aberta — v0.1.1".
+
+---
+
+## v0.1.0 — 2026-09-29
+
+> Publicada em 29 set. 2026: tag `v0.1.0`, release com os três
+> instaladores (`.deb`, `.exe`, `.dmg`) gerados pela CI, repositório
+> aberto e site no ar. A sessão de escuta documentada foi feita em 23–24
+> set. (`dossies/VALIDACAO_v0.1.0.md`). O `.deb` foi instalado pelo autor
+> no Linux Mint a partir da release; Windows e macOS continuam sem teste
+> em máquina real.
 
 Primeira versão publicável do instrumento. O que ela é: um ambiente
 modular generativo que **nunca abre em branco** — ele apresenta um patch
