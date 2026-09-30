@@ -9244,6 +9244,52 @@ regressão nesta semana. Validar cada passo com os atalhos e a bateria de
 77 testes, e pedir confirmação de uso ao autor antes de seguir para o
 passo seguinte.
 
+### Passo 1 tentado em 30 set. 2026 — sem ganho, revertido
+
+Implementado no branch `v0.1.1-repintura` (commit `8662903`, não
+integrado): o timer passou a repintar só displays, knobs/sliders/toggles
+cujo valor mudou e o inspector; view inteira só quando os cabos mudam ou
+durante gesto; módulos e cabos fora da região pulados no `paint`.
+
+**Medição** (sem `perf` — exige `sudo` aqui): CPU do processo e da thread
+principal lidos de `/proc` por 20 s, após 6 s de aquecimento,
+`RASGO_SEED=424242`, config isolada em `XDG_CONFIG_HOME` temporário (a do
+autor não foi tocada), rodadas intercaladas antes/depois, os dois binários
+compilados localmente do mesmo código:
+
+| | processo | thread principal |
+|---|---|---|
+| antes (`main`) | 40,9 · 47,5 · 44,0 % | 31,5 · 36,5 · 33,8 % |
+| 1ª versão (um retângulo por widget) | 53,7 · 46,4 · 51,1 % | 45,4 · 39,9 · 43,5 % |
+| 2ª versão (um retângulo por módulo) | 41,8 · 46,4 · 64,3 % | 31,5 · 35,8 · 21,2 % |
+
+A 1ª versão saiu **pior**: o JUCE junta os pedidos numa lista de
+retângulos e pinta com ela como recorte; recorte com muitas peças tira o
+renderizador do caminho rápido, e o descarte por `getClipBounds()` não
+descartava nada (o envelope da lista é a janela inteira). A 2ª,
+corrigida, **empata** — a terceira rodada é anômala nos dois sentidos.
+
+**Por que não há ganho a colher aqui:** a premissa "entre um quadro e
+outro só mudam osciloscópios, LEDs e VU" não vale. **54 dos 58 módulos
+têm display animado** e o **VARIA vem ligado**: quase todo módulo visível
+fica sujo a cada quadro, e a região suja é praticamente a tela.
+
+**O que isso muda na ordem dos passos:** como o quadro inteiro é pintado
+de qualquer jeito, o ganho está em deixar **cada quadro mais barato**,
+não menor:
+
+- passo 2 (chrome `RGB` opaco) ataca direto os 8,9% de `ImageFill` —
+  cópia em vez de mistura por pixel;
+- cabos: setenta curvas remontadas a cada quadro são ~17% do perfil
+  (`EdgeTable` 10,5% + construção 6,3%). Quando a assinatura dos cabos não
+  muda, o traçado (`createStrokedPath`) pode ser guardado de um quadro para
+  o outro;
+- passo 3 (cadência): displays a 20 Hz em vez de 30 cortariam ~1/3 do
+  desenho — mas é decisão de sensação, do autor.
+
+Um `perf` de verdade (a linha do `./travou --perfil`, rodada pelo autor)
+antes do passo 2 diria qual desses pesa mais hoje.
+
 ## Registro da etapa — 2026-09-24: estourei a cota de CI da conta do autor
 
 O GitHub avisou que a conta bateu **100% dos 2.000 minutos** mensais
