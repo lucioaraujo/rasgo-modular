@@ -855,8 +855,8 @@ public:
         // custaram ~17 blocos de código escritos na mão. Ele é
         // reposicionado aqui porque o resto do cabeçalho é immediate-mode
         // e a posição depende da largura da marca.
-        seedBox_.setBounds(x, 12, 108, 22);
-        x += 114;
+        seedBox_.setBounds(x, 12, seedBoxW(), 22);
+        x += seedBoxW() + 6;
 
         x += button(g, x, u8("\xE2\x9A\x84 ")
                     + str(rasgo::panel::strings::hdrSeed),
@@ -882,7 +882,7 @@ public:
                                   &S2::hdrOpen, &S2::hdrUndo, &S2::hdrUncable})
                 cmdsW_ += labelW(str(*l)) + 6;
             cmdsW_ += 38 + kVaryW + 6;   // rótulo VARIA + slider
-            cmdsW_ += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
+            cmdsW_ += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
             cmdsW_ += 28 + labelW(str(S2::hdrStandby)) + 6;
             // A fileira é decidida AQUI, antes de qualquer coisa que a
             // consulte. Decidir depois deixava as guardas do VU e da
@@ -1031,29 +1031,35 @@ public:
             x += button(g, x, L, c.on || flashing(c.act), c.act);
 
         }
-        // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
-        // próprios `button`/`buttonR` acima, via `flashing`)
-        if (x + 24 + 40 < rx - 8) {   // ZOOM − / +
-            g.setColour(T.textSecondary);
-            g.setFont(juce::FontOptions(11.0f));
-            g.drawText("ZOOM", x, 12, 38, 22,
-                       juce::Justification::centredLeft, false);
-            x += 40;
-            x += button(g, x, u8("\xe2\x88\x92"), flashing(Act::zoomOut), Act::zoomOut);
-            x += button(g, x, "+", flashing(Act::zoomIn), Act::zoomIn);
-        }
-        // STANDBY isolado no fim, com régua antes — pra não clicar nele
-        // sem querer (mesma separação do painel X11)
+        // STANDBY logo à direita do DESCABEIA (pedido do autor, 2 out.
+        // 2026): os dois gestos que calam o som ficam juntos. Continua com
+        // a régua antes — separado dos comandos que transformam o patch,
+        // pra não ser clicado sem querer (mesma separação do painel X11).
         {
             const juce::String L = str(rasgo::panel::strings::hdrStandby);
             g.setFont(juce::FontOptions(11.0f));
             if (x + 28 + textW(g, L) + 14 < rx - 8) {
-                x += 16;
+                x += 10;
                 g.setColour(T.line);
-                g.drawVerticalLine(x, 14.0f, static_cast<float>(kHeight - 14));
+                g.drawVerticalLine(x, static_cast<float>(cmdY_ + 2),
+                                   static_cast<float>(cmdY_ + 20));
                 x += 12;
-                button(g, x, L, standby_, Act::standby);
+                x += button(g, x, L, standby_, Act::standby);
             }
+        }
+        // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
+        // próprios `button`/`buttonR` acima, via `flashing`)
+        if (x + 24 + 40 < rx - 8) {   // ZOOM − / +
+            x += 10;
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(11.0f));
+            // `cmdY_`, não 12: na segunda fileira (janela estreita) o
+            // rótulo ficava sozinho lá em cima, separado dos seus botões.
+            g.drawText("ZOOM", x, cmdY_, 38, 22,
+                       juce::Justification::centredLeft, false);
+            x += 40;
+            x += button(g, x, u8("\xe2\x88\x92"), flashing(Act::zoomOut), Act::zoomOut);
+            x += button(g, x, "+", flashing(Act::zoomIn), Act::zoomIn);
         }
     }
 
@@ -1164,7 +1170,7 @@ private:
 
     bool commandsFit(const int width) const {
         namespace S = rasgo::panel::strings;
-        int need = kBrandW + 6 + kSeedBoxW + 6
+        int need = kBrandW + 6 + seedBoxW() + 6
                  + labelW(u8("\xE2\x9A\x84 ") + str(S::hdrSeed)) + 6;
         if (seed_ != 0) need += labelW(str(S::hdrRestore)) + 6;
         for (const auto* l : {&S::hdrChange, &S::hdrEvolve,
@@ -1178,7 +1184,7 @@ private:
         // botão desaparece em silêncio — foi assim que o DESCABEIA sumiu e
         // o `n` pareceu quebrado por dois dias.
         need += 38 + kVaryW + 6;   // rótulo VARIA + slider (não mais botão)
-        need += 40 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
+        need += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
         need += 28 + labelW(str(S::hdrStandby)) + 6;                   // ESPERA
         // cluster da direita (sem o VU e a leitura, que já têm guarda)
         need += labelW(str(S::hdrAbout)) + labelW(str(S::hdrTutorial))
@@ -1190,7 +1196,17 @@ private:
     }
 
     static constexpr int kBrandW = 240;   // marca + "MODULAR" + régua
-    static constexpr int kSeedBoxW = 108;
+    // Largura da caixa do seed, MEDIDA: 20 dígitos (o máximo de um seed de
+    // 64 bits, `setInputRestrictions(20, …)`) na fonte do campo, mais as
+    // margens internas do `TextEditor`. Eram 108 px fixos, e um seed de 19
+    // ou 20 algarismos aparecia com o primeiro cortado (achado do autor, 2
+    // out. 2026). Uma função só, usada pelo desenho E pela conta de
+    // `commandsFit` — antes os dois tinham cada um o seu número.
+    int seedBoxW() const {
+        return juce::roundToInt(juce::GlyphArrangement::getStringWidth(
+                   seedBox_.getFont(), "00000000000000000000"))
+               + seedBox_.getLeftIndent() * 2 + 8;
+    }
 
     juce::String langLabel() const {
         switch (lang_) {
@@ -1251,7 +1267,10 @@ private:
 
     juce::TextEditor seedBox_;
     // slider da intensidade do VARIA: retângulo em tela e valor 0..2
-    static constexpr int kVaryW = 54;
+    // 54 → 84 px (pedido do autor, 2 out. 2026): a 54 o ajuste fino de
+    // VARIA ficava curto demais para a mão — cada pixel valia ~3,8% do
+    // alcance; a 84, ~2,4%.
+    static constexpr int kVaryW = 84;
     juce::Rectangle<int> varySlider_;
     float varyAmount_ = 1.0f;
     bool varyDragging_ = false;
