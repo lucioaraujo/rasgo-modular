@@ -1612,6 +1612,7 @@ public:
             // de repatchear sem ter que ir até a outra ponta
             if (!j.isOut) {
                 int from = -1;
+                std::size_t srcNode = 0;
                 rack_.pushUndo();          // repatchear é desfazível
                 {
                     std::lock_guard<std::mutex> lk(rack_.gmx);
@@ -1635,10 +1636,25 @@ public:
                                   true, sj ? sj->kind : PortKind::Audio,
                                   sj ? sj->x : e.getPosition().x,
                                   sj ? sj->y : e.getPosition().y};
-                        beginDragAffordance(src.node);
+                        srcNode = src.node;
                     }
                 }
-                if (from >= 0) { repaint(); return; }
+                // FORA do lock: `beginDragAffordance` trava o `gmx` por
+                // conta própria, e `std::mutex` não é reentrante. Chamada
+                // aqui dentro (como foi de ab316bf até a v0.1.0), travar
+                // duas vezes na mesma thread é comportamento indefinido. No
+                // Linux a thread de mensagens congela esperando a si mesma
+                // (comprovado com um teste mínimo em 1 out. 2026); a STL
+                // da MSVC detecta a reentrada e lança exceção, o que é
+                // compatível com o relato de um usuário do Windows 10 no
+                // mesmo dia: "crash ao tirar um cabo de um módulo". O
+                // gesto era o mais comum de repatchear — clicar numa
+                // entrada já cabeada para pegar a ponta do cabo.
+                if (from >= 0) {
+                    beginDragAffordance(srcNode);
+                    repaint();
+                    return;
+                }
             }
 
             cdrag_ = {true, j.node, j.port, j.isOut, j.kind, j.x, j.y};
