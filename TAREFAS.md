@@ -10402,3 +10402,39 @@ montado por JavaScript) — invisíveis para leitores de IA que não executam JS
 Linux Mint, com êxito. É a primeira evidência de que o pacote publicado (e não
 um build local) instala numa máquina real. Windows e macOS continuam sem teste
 em máquina real.
+
+---
+
+## Registro da etapa — 2026-10-01: primeiro retorno de uso (r/modular)
+
+Um usuário do Windows 10 tocou a v0.1.0 e relatou, em resumo: som que
+convida a se perder; paleta de cores agradável; **travamentos** (um deles
+"ao tirar um cabo de um módulo"); problemas ao **mover módulos**; tela
+cheia de módulos **inativos** depois de um seed; família dos módulos
+**invisível** dentro do rack; pedido de **INIT** (rack vazio) e
+**templates**. O autor respondeu no próprio fio.
+
+**Feito:** o travamento ao tirar um cabo foi localizado e corrigido (ver
+CHANGELOG v0.1.1): trava dupla do `gmx` no gesto de pegar a ponta numa
+entrada cabeada. Comprovado no Linux que a trava dupla congela; o Windows
+não foi executado. 80/80 no `ctest`, build limpo.
+
+**Pendente, do relato:**
+
+- [ ] **mover módulos** — o usuário não detalhou; pedir o gesto exato se
+      ele voltar ao assunto, ou revisar o arrasto de módulo (`mdrag_`);
+- [ ] **seed novo abrir na vista RACK·SAÍDA** (só o que alcança a saída),
+      com o rack completo a um clique — o botão existe e não foi achado;
+- [ ] **marca de família no módulo** (acento de cor discreto ou rótulo),
+      sem abandonar o estilo uniforme — decisão estética do autor;
+- [ ] **INIT / rack vazio em uma ação**, e depois **templates** (rack
+      vazio, voz básica, processamento de áudio, generativo) — coerente com
+      "patches como ponto de partida": o patch gerado é UM ponto de partida,
+      não o único.
+
+**Para o autor conferir no Linux:** no binário novo
+(`build/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular`, 1 out.
+23:14), clicar com o botão esquerdo numa entrada já cabeada deve pegar a
+ponta do cabo e seguir o mouse. Se a v0.1.0 instalada congelava nesse gesto,
+era este o defeito.
+

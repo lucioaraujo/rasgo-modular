@@ -9,6 +9,16 @@ pronto.
 
 ## v0.1.1 — em preparação
 
+- **Corrigido: o app fechava (Windows) ou congelava (Linux/macOS) ao
+  pegar a ponta de um cabo numa entrada já cabeada** — o gesto de
+  repatchear clicando na entrada. O código travava o mutex do grafo e,
+  ainda com ele travado, chamava uma função que o travava de novo;
+  `std::mutex` não é reentrante. No Linux isso congela a thread (comprovado
+  com teste mínimo); no Windows a STL da MSVC lança exceção, compatível com
+  o relato de um usuário do Windows 10 no r/modular (1 out. 2026). Defeito
+  presente desde o commit `ab316bf`, portanto na v0.1.0. Uma varredura do
+  arquivo por outras chamadas a funções que travam o mesmo mutex dentro de
+  um lock aberto não achou outro caso.
 - **A janela abre sempre maximizada no monitor principal** (pedido do
   autor, 1 out. 2026). Antes abria com ~88% do monitor, e num sistema com
   dois monitores o Cinnamon a punha no monitor onde estava o mouse. Agora
