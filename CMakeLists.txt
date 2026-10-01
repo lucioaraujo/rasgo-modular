@@ -586,13 +586,28 @@ if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
         COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --short HEAD
         OUTPUT_VARIABLE RASGO_GIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET)
+    # Reconfigurar quando o hash muda. Observar só `.git/HEAD` não basta:
+    # ele muda ao trocar de BRANCH, não a cada commit — o carimbo ficava
+    # parado num hash antigo (a tela mostrava 49eb4ad com o main em 1754f72,
+    # 1 out. 2026), e não havia como saber pela janela qual binário estava
+    # aberto. Observa também o arquivo do branch atual e o packed-refs, por
+    # caminho ABSOLUTO (`--git-path` devolve relativo, e `if(EXISTS)` com
+    # caminho relativo não é confiável).
     execute_process(
-        COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --git-path HEAD
-        OUTPUT_VARIABLE RASGO_GIT_HEAD_FILE OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} rev-parse --absolute-git-dir
+        OUTPUT_VARIABLE RASGO_GIT_DIR OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET)
-    if(RASGO_GIT_HEAD_FILE AND EXISTS "${RASGO_GIT_HEAD_FILE}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${RASGO_GIT_HEAD_FILE}")
+    execute_process(
+        COMMAND git -C ${CMAKE_CURRENT_SOURCE_DIR} symbolic-ref -q HEAD
+        OUTPUT_VARIABLE RASGO_GIT_REF OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
+    if(RASGO_GIT_DIR)
+        foreach(rasgo_git_file IN ITEMS HEAD packed-refs ${RASGO_GIT_REF})
+            if(EXISTS "${RASGO_GIT_DIR}/${rasgo_git_file}")
+                set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+                    "${RASGO_GIT_DIR}/${rasgo_git_file}")
+            endif()
+        endforeach()
     endif()
     string(TIMESTAMP RASGO_BUILD_DATE "%Y")
     if(RASGO_GIT_HASH)
