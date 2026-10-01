@@ -883,7 +883,7 @@ public:
                 cmdsW_ += labelW(str(*l)) + 6;
             cmdsW_ += 38 + kVaryW + 6;   // rótulo VARIA + slider
             cmdsW_ += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
-            cmdsW_ += 28 + labelW(str(S2::hdrStandby)) + 6;
+            cmdsW_ += labelW(str(S2::hdrStandby)) + 6;
             // A fileira é decidida AQUI, antes de qualquer coisa que a
             // consulte. Decidir depois deixava as guardas do VU e da
             // leitura lendo o valor do quadro ANTERIOR — um atraso de um
@@ -1032,20 +1032,15 @@ public:
 
         }
         // STANDBY logo à direita do DESCABEIA (pedido do autor, 2 out.
-        // 2026): os dois gestos que calam o som ficam juntos. Continua com
-        // a régua antes — separado dos comandos que transformam o patch,
-        // pra não ser clicado sem querer (mesma separação do painel X11).
+        // 2026): os dois gestos que calam o som ficam juntos, como dois
+        // botões comuns. A régua que o separava dos outros comandos (herdada
+        // do painel X11, contra clique acidental) saiu no mesmo dia, também
+        // a pedido: ao lado do DESCABEIA ela só cortava a fileira.
         {
             const juce::String L = str(rasgo::panel::strings::hdrStandby);
             g.setFont(juce::FontOptions(11.0f));
-            if (x + 28 + textW(g, L) + 14 < rx - 8) {
-                x += 10;
-                g.setColour(T.line);
-                g.drawVerticalLine(x, static_cast<float>(cmdY_ + 2),
-                                   static_cast<float>(cmdY_ + 20));
-                x += 12;
+            if (x + textW(g, L) + 14 < rx - 8)
                 x += button(g, x, L, standby_, Act::standby);
-            }
         }
         // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
         // próprios `button`/`buttonR` acima, via `flashing`)
@@ -1185,7 +1180,7 @@ private:
         // o `n` pareceu quebrado por dois dias.
         need += 38 + kVaryW + 6;   // rótulo VARIA + slider (não mais botão)
         need += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
-        need += 28 + labelW(str(S::hdrStandby)) + 6;                   // ESPERA
+        need += labelW(str(S::hdrStandby)) + 6;                        // ESPERA
         // cluster da direita (sem o VU e a leitura, que já têm guarda)
         need += labelW(str(S::hdrAbout)) + labelW(str(S::hdrTutorial))
               + labelW(langLabel()) + labelW(u8("\xe2\x97\x8f ") + str(S::hdrRec))
