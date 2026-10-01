@@ -1,250 +1,319 @@
 # Rasgo Modular
 
-**Identificador arquivístico:** `ARQ-RSM-001` — ingresso e manifesto em
-[`../RASGO_ARQUIVO/`](../RASGO_ARQUIVO/INGRESSO_ARQ-RSM-001.md)
-**Estado:** protótipo C++17 — **marco 1** (2026-09-01): fundação
-`SignalGraph` + 6 módulos DSP + peça de 40 s. **marco 2**
-(2026-09-02): + `MEMORY` (granular/freeze) + `TURING` (registrador) +
-`MATTER` (modal) + `SPACE` (multitap) + `STRING` (corda/guia-de-onda) +
-`QUANTIZER` (escala) + `PARAMETRIC` (EQ, RBJ) + `HARMONY` (movimento
-harmônico — 6 técnicas reais) + `SEQUENCE` (sequenciador de passos
-editável, 5 modos de leitura) + `MIXER` (4 canais, pan de potência
-constante) + `MASTER` (largura mid/side, bloqueio de DC, limitador, VU) +
-**modelo de conexão de 3 camadas** (matriz + constelação + semântico,
-serializado no patch) + 3 peças (40/50/55 s) + **painel gráfico de teste**
-(`apps/panel/`, X11 + ALSA) + `OSC` (oscilador subtrativo antialias, 1
-V/oct, 5 formas, sync, TZFM) + `NOISE` (branco/rosa/brown + S&H) + `VCA`
-(duplo, linear/exp, atenuverter) + `CONTROL` (atenuversor/offset/slew/
-retificação/soma de CV) + `LOGIC` (÷/× de clock, AND/OR/XOR, flip-flop,
-gate delay). **marco 3** (2026-09-04): + `SH` (S&H duplo) + `SHAPE`
-(wavefolder/ring-mod) + `LPG` (low-pass gate a vactrol) + `CHORD` (VCO
-parafônico) + `DRIFT` (campo de deriva) + `SWITCH` (chave/mux-demux) +
-`SCOPE` (medidor/osciloscópio) + `TRIGSEQ` (grade de gates) + `ABACUS`
-(aritmética/lógica de CV) + `WASP` (filtro áspero) + `MATRIX` (matriz de
-roteamento 4×4) + `MULT` (múltiplo processado); **`connectToParameter`
-aditivo** (a modulação soma sobre o knob) + **antialiasing** (helper
-`Oversampler2x` 2× + ADAA) + **displays por módulo no painel** (grade
-clicável da MATRIX, espectro do SCOPE, lanes do TRIGSEQ) + profundidade
-por módulo (op bit a bit, slew assimétrico, voice-leading, ring-mod,
-memória de topologia…) + **`MotionEngine`** (`apps/panel/`, protótipo de
-composição generativa — parâmetros com comportamento `WALK`/
-`OSCILLATE`/`ATTRACT` no tempo, aditivo sobre o patch) + **Patch
-Genetics** (`MUTATE`/`EVOLVE`/`CROSS`/`FREEZE`,
-`apps/panel/PatchGenetics.hpp` — edita um patch já existente preservando
-topologia; `CROSS` alinha por tipo de módulo entre dois patches) +
-**`ScoreRecorder`** (`SYSTEM SCORE` — registro determinístico de
-conexões e mudanças de parâmetro, texto byte-idêntico entre renders —
-+ `MUSICAL SCORE`, captura de notas via `NOTE-OUT`) + **hover-learn**
-(`apps/panel/LearnCatalog.hpp` — caixa estilo terminal sempre presente
-no rodapé da coluna esquerda, silenciosa; os 37 módulos com texto de 3
-níveis; ver `dossies/ESTUDO_seed_composicao_generativa.md`).
-**(2026-09-05):**
-+ `AUDIO-IN` (entrada de áudio ao vivo, ALSA) + `CHAOS` (campo caótico
-de poço duplo) + `PLL` (segundo oscilador, malha de fase + rede de
-feedback selecionável) + `NOTE-OUT` (adaptador que captura o contrato
-`NOTE` do `MUSICAL SCORE`) + gramática do `Seed` nomeada e explícita
-(`apps/panel/SeedGrammar.hpp`, refactor comprovado byte a byte —
-ver `dossies/ESTUDO_seed_composicao_generativa.md §1.1`)
-+ **body guard** na saída (`OutputStage.hpp` — governador de agudo
-áspero) + `MASTER.mute` (rampa). **(2026-09-06):**
-+ **cabeçalho de linha única** modelo RASGO Synth (logo anti-aliased +
-barra de comandos em botões, toggles com anel · pico da saída ·
-`SEED`/`REC`/`STANDBY` · `IDIOMA`/`TUTORIAL`/`SOBRE`)
-+ **i18n do painel** (`apps/panel/UiLanguage.hpp` — EN padrão, PT/FR/ES
-no botão `IDIOMA`; cabeçalho/tutorial/créditos traduzidos; rótulos de
-módulo não; LEARN em fases)
-+ **passe de ergonomia** dos 38 painéis (`design.md §3.2.1` — larguras
-enxutas, displays cheios e mais altos, colisões de rótulo de jack
-resolvidas)
-+ roadmap de continuidade (`PESQUISA_MODULOS.md §2.4`, 4 ondas) e a
-Onda A (completa): `GLIDE` (Módulo 39 — portamento por nota: slide 303,
-legato, `fall` assimétrico) + `WAVETABLE` (Módulo 40 — oscilador de
-tabela procedural, `warp` tipo WAVE CUT, captura de ciclo ao vivo do
-`AUDIO-IN`) + `LOOPER` (Módulo 41 — delay de linha com HOLD/REVERSE
-sem clique e caráter de fita/BBD num knob `age`). Onda B (completa):
-`ADDITIVE` (Módulo 42 — oscilador aditivo, 64 parciais) + `PLANAR`
-(Módulo 43 — morph vetorial XY, gesto gravável) + `OPERATOR` (Módulo 44
-— FM de 4 operadores, 8 algoritmos, feedback DX7) + `FORMANT` (Módulo 45
-— 5 passa-faixas paralelos, morph de vogais A→E→I→O→U). Onda C (completa):
-`HALL` (Módulo 46 — reverb FDN de 8 linhas + matriz de Householder,
-`freeze`, estéreo) + `DRUM` (Módulo 47 — voz de percussão, corpo com
-pitch-sweep + estalo, mapa 808↔909↔acústico, `roll`). Onda D (completa):
-`SAMPLER` (Módulo 48 — toca-fatias com varispeed/reverse/repitch/wear;
-camada `io/` + `dr_wav`) + `SIGNAL-IN` (Módulo 49 — o `AUDIO-IN` cresceu:
-áudio + MIDI num adaptador, voz mono last-note, saídas pitch/gate/vel/cc)
-+ `TURNTABLE` (Módulo 50 — o buffer do `SAMPLER` lido por um prato com
-inércia: torque de motor, atrito, mão na CV `scratch`, `wear`
-determinístico; o `TAPE` virou `heads` no `LOOPER`).
-**As 4 ondas do roadmap `§2.4` fechadas.** Pós-roadmap: `BOXCAR` (Módulo
-51 — *boxcar averager* / integrador de porta: janela + delay + média de N
-capturas, `scan` reconstrói a onda, `geiger` = trem de Poisson livre;
-inspirado no AI Synthesis AI250 BXR) + o `NOISE` ganhou o modo `poisson`.
-**Onda E** (`§2.5`) completa: `SWIRL` (Módulo 52 — chorus/flanger/ensemble/
-phaser, a família de MODULAÇÃO que faltava) + `CRUSH` (Módulo 53 —
-destruidor lo-fi: redução de taxa/bits, wrap de inteiro, glitch, jitter;
-o verbo DAMAGE) + `STAGES` (Módulo 54 — gerador de N segmentos
-configuráveis: envelope, LFO ou sequência conforme a fiação; Mutable
-Stages / Rossum Control Forge) + `RESONATOR` (Módulo 55 — banco de modos
-afinados excitado por sinal externo, saídas low/mid/high que se cruzam;
-Rings/Elements + Three Sisters) + `PULSAR` (Módulo 56 — síntese pulsar de
-Curtis Roads: trem de pulsarets com altura e timbre em duas frequências
-independentes; masking e jitter semeados).
-**Onda F** (`§2.6`, análise → síntese) começou: `SPECTRA` (Módulo 57 —
-resíntese espectral: ouve um som, acha os parciais e re-oscila como um
-banco de senóides que o segue; `blur`, `freeze` = *spectral freeze*,
-`shift`/`stretch` transpõem a re-síntese; Panharmonium / phase vocoder;
-autônomo sem entrada) + `SHIFTER` (Módulo 58 — deslocador de frequência
-SSB: move o espectro inteiro por um Δf fixo em Hz → inarmônico; saídas
-`up`/`down`, `feedback` = barber pole de Risset; Bode/Moog) + `VCA4`
-(Módulo 59 — banco de 4 VCAs + mixer somado; Veils/Quad VCA) + `VOCODER`
-(Módulo 60 — vocoder DEDICADO de até 20 bandas: a portadora fala o
-modulador; `sibilance` pra as fricativas, `freeze` = pad falado; o
-`FORMANT` já tinha um `mode` vocoder de 5 bandas). **Onda F completa
-(Dudley 1938 pra os dois).**
-+ **painel — navegação e tutorial (2026-09-08):** caixa do número do seed
-vira **campo de texto padrão** (selecionar/copiar/colar/apagar, botão do
-meio cola; clipboard ICCCM completo; o seed também sai no terminal);
-**rolar o rack ao cabear** (arrastar o cabo pra borda) e **botão do meio
-paneia**; **TUTORIAL reescrito e rolável** — cobre o cabeçalho botão a
-botão, gravar (as gravações vão pra `~/Music/RasgoModular/`, nome por
-data/hora — desde 2026-09-11), adicionar/remover módulos e **as 8
-famílias**, nas 4 línguas; pans do MIXER sempre no centro em todo seed.
-+ **painel — vista do rack (2026-09-09):** botão `RACK` no cabeçalho
-alterna **TODOS** os módulos ↔ só os que **chegam à saída**
-(`SignalGraph::nodesFeeding`); é só uma vista, persistida, com reflow ao
-vivo ao cabear.
-+ **fase didática completa (2026-09-09 → 12):**
-[`guia/`](guia/00_indice.md) — guia para quem toca, em 4 partes:
-mentalidade (`COMO_PENSAR.md`), funcionamento (`CABEAMENTO.md` +
-`RELACAO_DE_CABO.md`), **os 58 módulos um a um** (jack a jack, "como
-cabear", "potencializar"), o apêndice de equivalências Eurorack e o
-caderno de **10 receitas** de patch passo a passo — todos com um passe
-de aprofundamento didático (o conceito por trás de cada parâmetro, não
-só a fórmula). Falta só a tradução, quando o site for construído.
-+ **taxonomia consolidada** (18 verbos → 8 famílias). **Rack
-de partida completo**;
-58 módulos DSP,
-80 alvos CTest
-verdes (Debug + Release), 5 peças de exemplo byte-idênticas. Custodiante:
-Lúcio de Araújo.
-**Licença do código:** GNU AGPLv3 ou posterior — ver [`LICENSE`](LICENSE)
-(decisão do autor, 2026-09-01: "a mesma que temos usado" → a licença
-habitual da família RASGO). Código de terceiros só entra sob licença
-livre compatível com AGPLv3 (MIT/BSD/ISC/Apache-2.0/LGPL/GPL/AGPL) e com
-proveniência registrada.
+![Rasgo Modular running: a three-row rack of modules crossed by some seventy orange and blue cables](screenshots/rack-completo-2026-09-18.png)
 
-## Build e plataformas
+**Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
+**Download:** [v0.1.0 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) ·
+**Contact:** **rasgo.instruments@gmail.com**
 
-Duas interfaces, papéis diferentes:
+Languages:
 
-| | `apps/juce/` — **produção** | `apps/panel/` — **teste** |
-|---|---|---|
-| Plataformas | Linux · Windows · macOS | Linux (X11 + ALSA) |
-| Papel | o que vai em release | ferramenta de desenvolvimento |
-| Estado | paridade funcional alcançada (`apps/juce/PARIDADE.md`) | completo |
+- [English](#english)
+- [Português](#português)
+- [Français](#français)
+- [Español](#español)
 
-O app JUCE tem dois recursos que o painel X11 não tem, porque dependem de
-API multiplataforma: **ABRIR** um `.rmp` por seletor de arquivo nativo, e
-**desfazer** (`Ctrl+Z`) — um anel de fotografias serializadas do grafo que
-cobre cada cabo ligado ou cortado.
+---
 
-**Motor + testes** (sem dependência de GUI, os três sistemas):
+## English
 
-```sh
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j
-ctest --test-dir build
-```
+**Patches as a starting point.** Rasgo Modular does not open on a blank
+page: it offers a patch already built and sounding, for you to play from —
+re-patching by hand, adjusting, letting it drift, or taking it all apart and
+building from scratch.
 
-**Front-end JUCE.** O JUCE não é versionado aqui (política da família
-RASGO: nem submodule, nem FetchContent) — aponte um checkout local:
+**Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Version:** v0.1.0 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
-```sh
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE
-cmake --build build --target RasgoModularApp -j
-cd build && cpack -G DEB      # ou NSIS (Windows) / DragNDrop (macOS)
-```
+### What it is
 
-Instruções completas, matriz de plataformas e variáveis de ambiente:
-[`INSTALL.md`](INSTALL.md). Licenciamento do JUCE:
-[`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md); créditos e
-fontes: [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md); estado de
-prontidão para publicação e procedimento de correção/retirada:
-[`PUBLICACAO.md`](PUBLICACAO.md).
+A generative modular environment with **58 modules** in eight families
+(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), written in
+C++17 with no dependencies in the core. Modules are described as data — each
+declares its own panel in millimetres — and one engine drives two front-ends:
+a cross-platform JUCE app and an X11 test panel.
 
-**Excelência de saída.** O instrumento segue a arquitetura comum da
-família (`RASGO_DOCUMENTATION/architecture/SAIDA_AUDIO_COMUM.md`):
-proteção de excelência no `MASTER` (finitude, DC, guarda ultrassônica,
-governador de corpo, limitador look-ahead por pico verdadeiro, teto
-−1 dBFS) e uma **guarda de segurança no sink**, que não pode ser
-contornada nem desligada — o MASTER é um módulo, e dá pra cabear por fora
-dele. Medição BS.1770-4 (momentary, short-term, integrated com as duas
-portas) em `src/dsp/Loudness.hpp`, com fixtures de conformidade EBU no
-`ctest`. Taps de gravação nomeados: o REC captura de `post-safety` (padrão) ou
-`pre-safety`, por `RASGO_REC_TAP` — gravar só depois do limitador faz ele
-esconder a dinâmica que se queria examinar. **Ainda fora:** exportação
-PCM24 e float, que depende de um alvo de publicação declarado.
+It is not a plugin and needs no DAW. It opens, sounds, records. MIDI and
+audio input exist as optional adapter modules, opened only when a patch
+contains one.
 
-**Painel de teste (só Linux):** `./.run_rasgo_modular.sh` — precisa de
-`libX11` e `libasound`; o alvo é pulado automaticamente se faltarem.
+### The cable is an object, not a wire
 
-Matriz de plataformas: Linux é a única **verificada em hardware real**
-hoje. Windows e macOS são construídos e empacotados pela CI
-(`.github/workflows/package.yml`, com checagem de Universal 2 e
-deployment target no macOS), ainda **não abertos em máquina real** — a
-mesma condição em que o Antitotem foi publicado, e uma decisão a
-registrar explicitamente antes de qualquer release.
+- **Conductance** — a cable can conduct probabilistically, passing
+  sometimes rather than always.
+- **Relation** — a cable can combine what crosses it with a second signal:
+  ring modulation, wavefolding or difference (RING, FOLD, DIFF in the cable
+  inspector).
+- **Rupture with a scar** — breaking a cable does not cut to silence: the
+  scar holds the last block and repeats it, decaying.
 
-## Apresentação
+### How you use it
 
-Rasgo Modular é o ambiente modular próprio da família RASGO: instrumento,
-laboratório de síntese, composição e performance, com potencial de oferecer
-infraestrutura reutilizável sem absorver a identidade dos instrumentos irmãos.
-A antiga “Fábrica de Módulos” permanece como camada funcional e antecedente
-conceitual, não como um projeto separado.
+Two ways in, and neither is the "advanced" one. **One:** press SEED and
+steer what comes out — the same number always reproduces the same patch;
+VARY moves parameters live, CHANGE, EVOLVE and CROSS take the patch
+elsewhere. **Two:** press `n` to pull every cable at once and build the piece
+connection by connection; `Ctrl+Z` steps back one action.
 
-## Retomada e fontes locais
+Hovering any knob, jack or module explains it in the LEARN box — in
+Portuguese, English, French or Spanish. The [module guide](https://lucioaraujo.github.io/rasgo-modular/modulos-en.html)
+has the same text for all 58 modules.
 
-- [`RASGO_MODULAR.md`](RASGO_MODULAR.md) — arquitetura, taxonomia, fluxos,
-  decisões e pesquisa; §29 = proveniência e licença;
-- [`TAREFAS.md`](TAREFAS.md) — estado operacional, testes e próximo marco
-  ("Registro da etapa — 2026-09-01");
-- [`PESQUISA_MODULOS.md`](PESQUISA_MODULOS.md) — pesquisa de módulos e ordem
-  de execução (§2);
-- [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
-  modelo, testes);
-- [`guia/`](guia/00_indice.md) — guia de referência **para quem toca**:
-  uma página em prosa por módulo (fase didática, `PESQUISA_MODULOS.md
-  §2.7`; iniciada 2026-09-09, piloto `OSC`/`MULT`/`SPACE`);
-- `src/core/SignalGraph.hpp` = grafo de áudio; `src/dsp/*` = os 58 módulos de rack (mais alguns auxiliares que não aparecem no catálogo: medição de loudness e true-peak, oversampler, pitch-shifter, estágio de saída)
-  (+ `Oversampler.hpp`, helper 2× compartilhado);
-  `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
-  (+ `MotionEngine.hpp`, protótipo de composição — ver
-  `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 72 alvos CTest.
+A recording comes out as a pair: the `.wav` of what you heard and a
+`.score.txt` logging the topology and every gesture of the take. Patches are
+saved as `.rmp`.
 
-O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
-existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.
-Scheduler stateful, realtime safety ampliada, front-ends e segundo
-consumidor continuam pendentes (marco 2).
+### Download
 
-## Limites e promoção
+[**v0.1.0 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+Linux `.deb`, Windows `.exe`, macOS `.dmg`, all built and packaged by
+continuous integration.
 
-Nenhum módulo é promovido ao comum apenas por semelhança. Antes de reutilização
-externa, confirmar autoria, licença, dependências, contrato, testes e um
-segundo consumidor plausível. O núcleo não deve receber UI, processos externos
-ou integração entre instrumentos antes de estabilizar o contrato de dados.
+| Platform | Built | Run | Audio verified |
+|---|---|---|---|
+| Linux x86-64 | yes | yes | yes, on real hardware |
+| Windows x86-64 | continuous integration only | no | no |
+| macOS (Universal 2) | continuous integration only | no | no |
 
-## Próxima tarefa arquivística
+Said in full before you download: the Windows and macOS packages have
+never been opened by the author, and the `.dmg` is ad-hoc signed, without
+Developer ID or notarisation — Gatekeeper will warn about an unidentified
+developer on first launch.
 
-**Feito no marco 1 (2026-09-01):** ingresso `ARQ-RSM-001` atualizado,
-licença registrada (AGPLv3-or-later), manifesto de integridade em
-[`../RASGO_ARQUIVO/MANIFESTO_ARQ-RSM-001_marco-1_2026-09-01.md`](../RASGO_ARQUIVO/MANIFESTO_ARQ-RSM-001_marco-1_2026-09-01.md)
-(inventário somente leitura + SHA-256).
+### Build from source
 
-**Pendente (só quando o estado deixar de ser móvel):** cópia de
-preservação congelada + teste de restauração — atrelar a um commit/tag do
-marco, à migração de diretórios ou ao handoff do marco 2. Enquanto o
-protótipo evolui, basta atualizar `TAREFAS.md`, este README e o ingresso;
-não se cria pacote de preservação a cada etapa (governança
-`VM_STUDIO_ARCHIVE.md §167-181`).
+Requirements, build steps, environment variables and troubleshooting are
+in [`INSTALL.md`](INSTALL.md) (English and Portuguese). With JUCE available,
+`./run` builds when needed and opens the app. What changed between versions
+is in [`CHANGELOG.md`](CHANGELOG.md); development notes, in Portuguese, are
+in [`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
+
+---
+
+## Português
+
+**Patches como ponto de partida.** O Rasgo Modular não abre em branco: ele
+apresenta um patch já montado e soando, para você tocar a partir dele —
+recabeando à mão, ajustando, deixando derivar, ou desmontando tudo e
+construindo do zero.
+
+**Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Versão:** v0.1.0 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+
+### O que ele é
+
+Um ambiente modular generativo com **58 módulos** em oito famílias
+(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), escrito em
+C++17 sem dependências no núcleo. Os módulos são descritos por dados — cada
+um declara seu painel em milímetros — e o mesmo motor alimenta dois
+front-ends: um app multiplataforma em JUCE e um painel de teste em X11.
+
+Ele não é plugin e não depende de uma DAW. Abre, soa, grava. MIDI e entrada
+de áudio existem como módulos adaptadores opcionais, abertos só quando o
+patch tem um deles.
+
+### O cabo é um objeto, não um fio
+
+- **Condutância** — o cabo pode conduzir de forma probabilística, passando
+  às vezes, não sempre.
+- **Relação** — o cabo pode combinar o que o atravessa com um segundo
+  sinal: modulação em anel, dobra de onda ou diferença (RING, FOLD, DIFF no
+  inspetor de cabo).
+- **Ruptura com cicatriz** — romper um cabo não corta para o silêncio: a
+  cicatriz segura o último bloco e o repete decaindo.
+
+### Como se usa
+
+Há dois caminhos, e nenhum é o "avançado". **Um:** aperte SEED e conduza o
+que sair — o mesmo número reproduz sempre o mesmo patch; VARIA mexe nos
+parâmetros ao vivo, MUDA, EVOLUI e CRUZA levam o patch a outro lugar.
+**Dois:** aperte `n` para tirar todos os cabos de uma vez e construa a peça
+ligação por ligação; `Ctrl+Z` volta uma ação.
+
+Passar o mouse sobre qualquer knob, jack ou módulo explica-o na caixa
+LEARN — em português, inglês, francês ou espanhol. O [guia dos módulos](https://lucioaraujo.github.io/rasgo-modular/modulos.html)
+traz o mesmo texto para os 58 módulos.
+
+A gravação sai em par: o `.wav` do que se ouviu e um `.score.txt` com a
+topologia e cada gesto da tomada. Os patches são salvos em `.rmp`.
+
+### Download
+
+[**Release v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+`.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construídos
+e empacotados pela integração contínua.
+
+| Plataforma | Construído | Executado | Áudio verificado |
+|---|---|---|---|
+| Linux x86-64 | sim | sim | sim, em hardware real |
+| Windows x86-64 | só na integração contínua | não | não |
+| macOS (Universal 2) | só na integração contínua | não | não |
+
+Dito por inteiro antes de baixar: os pacotes de Windows e macOS nunca foram
+abertos pelo autor, e o `.dmg` tem assinatura ad-hoc, sem Developer ID nem
+notarização — o Gatekeeper mostra aviso de desenvolvedor não identificado
+na primeira abertura.
+
+### Compilar a partir do código
+
+Requisitos, passos de build, variáveis de ambiente e problemas comuns estão
+no [`INSTALL.md`](INSTALL.md) (português e inglês). Com o JUCE disponível,
+`./run` compila quando precisa e abre o app. O que mudou entre versões está
+no [`CHANGELOG.md`](CHANGELOG.md); as notas de desenvolvimento, no
+[`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
+
+---
+
+## Français
+
+**Des patches comme point de départ.** Le Rasgo Modular ne s'ouvre pas sur
+une page blanche : il propose un patch déjà monté et sonnant, pour que vous
+jouiez à partir de lui — en recâblant à la main, en ajustant, en le laissant
+dériver, ou en démontant tout pour construire depuis zéro.
+
+**Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Version :** v0.1.0 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+
+### Ce que c'est
+
+Un environnement modulaire génératif de **58 modules** en huit familles
+(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), écrit en
+C++17 sans dépendances dans le noyau. Les modules sont décrits comme des
+données — chacun déclare son propre panneau en millimètres — et un seul
+moteur alimente deux interfaces : une application JUCE multiplateforme et un
+panneau de test X11.
+
+Ce n'est pas un plugin et il ne dépend d'aucune STAN. Il s'ouvre, il sonne,
+il enregistre. Le MIDI et l'entrée audio existent comme modules adaptateurs
+optionnels, ouverts seulement quand un patch en contient un.
+
+### Le câble est un objet, pas un fil
+
+- **Conductance** — un câble peut conduire de façon probabiliste, passer
+  parfois plutôt que toujours.
+- **Relation** — le câble peut combiner ce qui le traverse avec un second
+  signal : modulation en anneau, repliement d'onde ou différence (RING,
+  FOLD, DIFF dans l'inspecteur de câble).
+- **Rupture avec cicatrice** — rompre un câble ne coupe pas vers le
+  silence : la cicatrice retient le dernier bloc et le répète en
+  décroissant.
+
+### Comment on s'en sert
+
+Deux voies, et aucune n'est la voie « avancée ». **Une :** appuyez sur SEED
+et dirigez ce qui sort — le même numéro reproduit toujours le même patch ;
+VARIER déplace les paramètres en direct, CHANGER, ÉVOLUE et CROISER
+emmènent le patch ailleurs. **Deux :** appuyez sur `n` pour retirer tous
+les câbles d'un coup et construisez la pièce liaison par liaison ; `Ctrl+Z`
+revient d'une action.
+
+Survoler n'importe quel potentiomètre, jack ou module l'explique dans la
+case LEARN — en portugais, anglais, français ou espagnol. Le [guide des modules](https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html)
+donne le même texte pour les 58 modules.
+
+Un enregistrement sort par paire : le `.wav` de ce qu'on a entendu et un
+`.score.txt` avec la topologie et chaque geste de la prise. Les patches sont
+enregistrés en `.rmp`.
+
+### Téléchargement
+
+[**Version v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+`.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
+empaquetés par l'intégration continue.
+
+| Plateforme | Construit | Lancé | Audio vérifié |
+|---|---|---|---|
+| Linux x86-64 | oui | oui | oui, sur matériel réel |
+| Windows x86-64 | intégration continue uniquement | non | non |
+| macOS (Universal 2) | intégration continue uniquement | non | non |
+
+Dit en entier avant de télécharger : les paquets Windows et macOS n'ont
+jamais été ouverts par l'auteur, et le `.dmg` est signé en ad-hoc, sans
+Developer ID ni notarisation — Gatekeeper affichera un avertissement de
+développeur non identifié au premier lancement.
+
+### Compiler depuis les sources
+
+Prérequis, étapes de compilation, variables d'environnement et problèmes
+courants sont dans [`INSTALL.md`](INSTALL.md) (en anglais et en portugais).
+Avec JUCE disponible, `./run` compile si nécessaire et ouvre l'application.
+Les changements entre versions sont dans [`CHANGELOG.md`](CHANGELOG.md) ; les
+notes de développement, en portugais, dans [`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
+
+---
+
+## Español
+
+**Patches como punto de partida.** El Rasgo Modular no abre en blanco:
+ofrece un patch ya montado y sonando, para que usted toque a partir de él —
+recableando a mano, ajustando, dejándolo derivar, o desmontándolo todo y
+construyendo desde cero.
+
+**Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Versión:** v0.1.0 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+
+### Qué es
+
+Un entorno modular generativo con **58 módulos** en ocho familias (SOURCE,
+TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), escrito en C++17 sin
+dependencias en el núcleo. Los módulos se describen como datos — cada uno
+declara su propio panel en milímetros — y un mismo motor alimenta dos
+interfaces: una aplicación JUCE multiplataforma y un panel de prueba X11.
+
+No es un plugin y no depende de un DAW. Abre, suena, graba. El MIDI y la
+entrada de audio existen como módulos adaptadores opcionales, abiertos solo
+cuando el patch contiene uno.
+
+### El cable es un objeto, no un hilo
+
+- **Conductancia** — un cable puede conducir de forma probabilística,
+  pasando a veces y no siempre.
+- **Relación** — el cable puede combinar lo que lo atraviesa con una
+  segunda señal: modulación en anillo, plegado de onda o diferencia (RING,
+  FOLD, DIFF en el inspector de cable).
+- **Ruptura con cicatriz** — romper un cable no corta al silencio: la
+  cicatriz retiene el último bloque y lo repite decayendo.
+
+### Cómo se usa
+
+Dos caminos, y ninguno es el "avanzado". **Uno:** pulse SEED y conduzca lo
+que salga — el mismo número reproduce siempre el mismo patch; VARIAR mueve
+los parámetros en vivo, CAMBIA, EVOLUCIONA y CRUZAR llevan el patch a otro
+lugar. **Dos:** pulse `n` para quitar todos los cables de una vez y
+construya la pieza conexión a conexión; `Ctrl+Z` deshace una acción.
+
+Pasar el ratón sobre cualquier perilla, jack o módulo lo explica en la caja
+LEARN — en portugués, inglés, francés o español. La [guía de módulos](https://lucioaraujo.github.io/rasgo-modular/modulos-es.html)
+trae el mismo texto para los 58 módulos.
+
+Una grabación sale en par: el `.wav` de lo que se escuchó y un `.score.txt`
+con la topología y cada gesto de la toma. Los patches se guardan en `.rmp`.
+
+### Descarga
+
+[**Versión v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+`.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
+y empaquetados por la integración continua.
+
+| Plataforma | Construido | Ejecutado | Audio verificado |
+|---|---|---|---|
+| Linux x86-64 | sí | sí | sí, en hardware real |
+| Windows x86-64 | solo en integración continua | no | no |
+| macOS (Universal 2) | solo en integración continua | no | no |
+
+Dicho por completo antes de descargar: los paquetes de Windows y macOS
+nunca fueron abiertos por el autor, y el `.dmg` tiene firma ad-hoc, sin
+Developer ID ni notarización — Gatekeeper mostrará un aviso de desarrollador
+no identificado en la primera apertura.
+
+### Compilar desde el código
+
+Requisitos, pasos de compilación, variables de entorno y problemas comunes
+están en [`INSTALL.md`](INSTALL.md) (en inglés y portugués). Con JUCE
+disponible, `./run` compila cuando hace falta y abre la aplicación. Los
+cambios entre versiones están en [`CHANGELOG.md`](CHANGELOG.md); las notas
+de desarrollo, en portugués, en [`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
