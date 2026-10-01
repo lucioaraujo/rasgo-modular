@@ -9,9 +9,19 @@
 #   ./run 12345            abre reproduzindo o seed 12345
 #   ./run --resume         retoma a sessão salva
 #   ./run --rec-both       grava dos DOIS taps (pre-safety e post-safety)
-#   ./run --build          recompila antes de abrir
+#   ./run --build          recompila antes de abrir, mesmo sem mudança
+#   ./run --no-build       abre o binário que existir, sem recompilar
+#   ./run --fecha          fecha as janelas abertas antes de abrir a nova
 #   ./run --fg             fica em primeiro plano (prende o terminal)
 #   ./run 12345 --rec-both combina
+#
+# Funciona de qualquer pasta — o caminho completo do script basta.
+#
+# RECOMPILA SOZINHO quando o código ficou mais novo que o binário. Em 1
+# out. 2026 o app foi aberto 20 s antes de um build terminar: era o
+# binário velho, congelou num defeito que já estava corrigido, e pela
+# janela não havia como saber. Agora o `./run` compara as datas, recompila
+# se preciso e diz qual binário abriu (data e carimbo de commit).
 #
 # Por padrão o app abre SOLTO do terminal: o prompt volta na hora e a
 # saída de diagnóstico vai pra um log. Use --fg quando quiser ver o
@@ -26,6 +36,8 @@ cd "$(dirname "$0")"
 BUILD_DIR=build
 APP="$BUILD_DIR/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular"
 DO_BUILD=0
+NO_BUILD=0
+FECHA=0
 FOREGROUND=0
 # Log POR INSTÂNCIA. Era um caminho fixo, e com duas janelas abertas as
 # duas escreviam no mesmo arquivo: a segunda truncava o da primeira, e o
@@ -38,6 +50,8 @@ LOG="${TMPDIR:-/tmp}/rasgo-modular-$$.log"
 for arg in "$@"; do
   case "$arg" in
     --build)     DO_BUILD=1 ;;
+    --no-build)  NO_BUILD=1 ;;
+    --fecha)     FECHA=1 ;;
     --fg)        FOREGROUND=1 ;;
     --resume)    export RASGO_RESUME=1 ;;
     --rec-both)  export RASGO_REC_TAP=both ;;
@@ -85,6 +99,21 @@ alvo_existe() {
     | grep -q "RasgoModularApp"
 }
 
+# Código mais novo que o binário? Fonte do app e do motor, e os
+# CMakeLists — trocar de branch também conta, porque o git reescreve as
+# datas dos arquivos que mudam.
+codigo_mais_novo() {
+  [ -x "$APP" ] || return 1
+  [ -n "$(find src apps/juce apps/panel CMakeLists.txt -type f \
+            \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \
+               -o -name 'CMakeLists.txt' \) \
+            -newer "$APP" -print -quit 2>/dev/null)" ]
+}
+if [ "$NO_BUILD" = 0 ] && [ "$DO_BUILD" = 0 ] && codigo_mais_novo; then
+  echo "-> o código mudou desde o último build — recompilando"
+  DO_BUILD=1
+fi
+
 if [ ! -x "$APP" ] || [ "$DO_BUILD" = 1 ]; then
   if [ ! -d "$BUILD_DIR" ] || ! alvo_existe; then
     JUCE=$(achar_juce)
@@ -100,7 +129,9 @@ if [ ! -x "$APP" ] || [ "$DO_BUILD" = 1 ]; then
           -DRASGO_MODULAR_JUCE_PATH="$JUCE" >/dev/null
   fi
   echo "-> compilando"
-  cmake --build "$BUILD_DIR" --target RasgoModularApp -j"$(nproc 2>/dev/null || echo 4)"
+  # `nice`: quem compila divide a máquina com o áudio de outros apps
+  nice -n 10 cmake --build "$BUILD_DIR" --target RasgoModularApp \
+    -j"$(nproc 2>/dev/null || echo 4)"
 fi
 
 if [ ! -x "$APP" ]; then
@@ -118,13 +149,38 @@ fi
 # vez de dois; o `--rec-both` parecia quebrado e estava certo.
 # Só avisa, não mata: duas instâncias são legítimas (comparar dois seeds,
 # por exemplo). Quem decide é quem está tocando.
+if [ "$FECHA" = 1 ]; then
+  for p in $(pgrep -x "Rasgo Modular" 2>/dev/null); do
+    echo "-> fechando a janela aberta (pid $p)"
+    kill -TERM "$p" 2>/dev/null || true
+    for _ in $(seq 1 20); do kill -0 "$p" 2>/dev/null || break; sleep 0.25; done
+    # congelada não responde ao TERM — e congelada não tem o que salvar
+    kill -0 "$p" 2>/dev/null && kill -KILL "$p" 2>/dev/null || true
+  done
+fi
 ABERTAS=$(pgrep -c -x "Rasgo Modular" 2>/dev/null || echo 0)
 if [ "$ABERTAS" -gt 0 ] 2>/dev/null; then
   echo "aviso: já há $ABERTAS instância(s) do Rasgo Modular aberta(s)." >&2
   echo "  As opções desta linha valem SÓ para a janela nova — a antiga" >&2
   echo "  não grava com os dois taps nem retoma sessão." >&2
-  echo "  Para testar sem ambiguidade, feche as outras primeiro." >&2
+  # Instância rodando um binário que o build já substituiu: o Linux marca
+  # o executável dela como "(deleted)". Era a situação de 1 out. 2026 —
+  # duas janelas iguais, uma delas com o código de antes da correção.
+  for p in $(pgrep -x "Rasgo Modular" 2>/dev/null); do
+    case "$(readlink "/proc/$p/exe" 2>/dev/null)" in
+      *"(deleted)")
+        echo "  ATENÇÃO: a janela do pid $p roda um binário ANTIGO (já" >&2
+        echo "  substituído por um build mais novo). Não teste nela." >&2 ;;
+    esac
+  done
+  echo "  Para testar sem ambiguidade: ./run --fecha" >&2
 fi
+
+# Qual binário vai abrir — data e carimbo de commit (o mesmo que aparece
+# nos créditos da janela). Código compilado, binário em disco e programa
+# aberto são estados diferentes (AGENTS.md §7); isto mostra o segundo.
+CARIMBO=$(LC_ALL=C grep -a -o -m1 -E 'v[0-9]+\.[0-9]+\.[0-9]+ .{1,4}[0-9a-f]{7}' "$APP" 2>/dev/null || true)
+echo "-> binário: $(date -r "$APP" '+%d/%m %H:%M')${CARIMBO:+  ·  $CARIMBO}"
 
 echo "-> abrindo${RASGO_SEED:+  seed=$RASGO_SEED}${RASGO_RESUME:+  resume}${RASGO_REC_TAP:+  tap=$RASGO_REC_TAP}"
 
