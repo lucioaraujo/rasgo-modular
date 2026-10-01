@@ -9,6 +9,12 @@ pronto.
 
 ## v0.1.1 — em preparação
 
+- **Cabeçalho** (pedidos do autor, 2 out. 2026): a caixa do seed mede a
+  própria largura pela fonte e mostra os 20 dígitos inteiros (cortava o
+  primeiro em seeds longos); o slider VARIA passou de 54 para 84 px, para
+  ajuste fino; ESPERA fica logo à direita do DESCABEIA, com a régua antes;
+  o rótulo ZOOM deixa de ficar sozinho na primeira fileira quando os
+  comandos descem para a segunda.
 - **Corrigido: o app fechava (Windows) ou congelava (Linux/macOS) ao
   pegar a ponta de um cabo numa entrada já cabeada** — o gesto de
   repatchear clicando na entrada. O código travava o mutex do grafo e,
