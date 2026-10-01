@@ -1,10 +1,11 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (18 set. 2026):** candidato publicável em preparação. Ainda
-> **não há release** nem pacote assinado. Este documento descreve como
-> construir e rodar a partir do código — que é o caminho reproduzível
-> hoje, e é o que a `ESTRATEGIA_DE_PUBLICACAO.md` chama de release de
-> pesquisa: válida desde que isso seja dito com todas as letras.
+> **Estado (2 out. 2026):** a **v0.1.0 foi publicada** em 29 set. 2026,
+> com instaladores para Linux, Windows e macOS na
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0).
+> Este documento descreve também como construir e rodar a partir do
+> código. *English:* v0.1.0 was released on 29 Sep 2026 — installers on
+> the release page above; the English section is further down.
 
 ---
 
