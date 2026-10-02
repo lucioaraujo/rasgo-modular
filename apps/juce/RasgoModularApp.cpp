@@ -2752,8 +2752,9 @@ public:
 
         // 2. cabo
         if (const int ci = cableUnder(p); ci >= 0)
-            return {&rasgo::panel::learnCable(),
-                    u8("CABO  \xc2\xb7  clique para abrir"),
+            return {&rasgo::panel::learnCable(lang_),
+                    u8(rasgo::panel::tr(rasgo::panel::strings::learnCableHead,
+                                        lang_)),
                     "cabo|" + std::to_string(ci)};
 
         // 3. corpo do módulo

@@ -8,13 +8,14 @@ cortar, e pode **conduzir com uma certa probabilidade** em vez de
 sempre. Três recursos, todos no objeto `Cable`, nenhum deles um nó do
 grafo.
 
-**Como usar (2026-09-12):** clique no **corpo** de um cabo (não numa
-ponta) — abre um pequeno inspector ancorado ali, com botões pra
-escolher a relação, um clique num jack de saída pra escolher o
-*companion*, dois sliders (`AMT`/`COND`) e um botão de romper/reconectar
-só aquele cabo. Ver §4. Editar o `.rmp` à mão continua funcionando (§6)
-— útil pra scripts e pras peças de `examples/`, mas não é mais o único
-caminho.
+**Como usar (atualizado na v0.1.2, 2 out. 2026):** passe o mouse sobre o
+**corpo** de um cabo — ele se acende, e é esse que o clique vai abrir.
+Clique: a caixa do cabo abre no **canto inferior direito** da tela, com
+as duas pontas no título (módulo e porta), e o cabo fica aceso enquanto
+ela está aberta. Dentro: os botões da relação, o *companion* pelo nome,
+os sliders `AMT`, `GAIN` e `COND`, e os botões `ROMPER`/`RECONECTAR` e
+`DESPLUGAR`. Ver §4. Editar o `.rmp` à mão continua funcionando (§6) —
+útil pra scripts e pras peças de `examples/`.
 
 ---
 
@@ -302,39 +303,48 @@ resultado na hora.
 
 ## 4. Como usar no painel
 
-**Clique no corpo de um cabo** — no fio em si, na barriga da curva, não
-numa ponta (as pontas continuam sendo pra puxar/tirar cabo, como
-sempre). Abre um pequeno inspector ancorado ali perto, sem esconder o
-resto do patch:
+**Passe o mouse sobre o corpo de um cabo** — no fio em si, não numa ponta
+(as pontas continuam sendo pra puxar e tirar cabo). O cabo sob o ponteiro
+**se acende** e o cursor vira a mãozinha: é exatamente o que o clique vai
+abrir. Se dois cabos passam perto, vale o mais próximo do ponteiro.
+Clique sobre um cabo **nunca move um módulo**: o módulo só se desloca
+quando o arrasto começa num ponto sem cabo e passa de alguns pixels.
 
-1. Uma linha de 4 botões — `NONE · RING · FOLD · DIFF` — escolhe a
-   relação. O botão aceso é a relação atual do cabo.
-2. Ao escolher `RING`/`FOLD`/`DIFF` pela primeira vez (vindo de
-   `NONE`), o painel entra no modo de **escolher o companion**: todo
-   jack de **saída** de todo módulo do patch acende um halo (o mesmo
-   afordance de "destino válido" que já existe ao puxar um cabo
-   normal). Clique em qualquer um — inclusive na própria origem do
-   cabo, pra uma auto-relação (ver a caixa "e se o companion for o
-   próprio cabo?" em cada relação, §1). `Esc` cancela e volta a `NONE`.
-3. Com uma relação já ligada, dois sliders aparecem: `AMT` (a
-   intensidade, `amount`) e `COND` (a condução probabilística,
-   `conductance`). Clique e arraste verticalmente — a mesma física dos
-   knobs de módulo (sobe = mais, desce = menos), com o som mudando em
-   tempo real.
-4. Um botão `ROMPER`/`RECONECTAR` no fim rompe **só aquele cabo** — a
-   cicatriz e o decaimento de §2, sem afetar o resto do patch. É a
-   versão seletiva do `[espaço]`.
-5. Clicar fora do inspector (ou `Esc`) fecha.
+A caixa abre no **canto inferior direito** da área visível — sempre no
+mesmo lugar, longe do patch, em vez de cair em cima de módulos vizinhos.
+O cabo inspecionado continua aceso enquanto ela está aberta, que é o que
+liga a caixa ao cabo. De cima para baixo:
 
-Trocar de tipo de relação (por exemplo `RING`→`FOLD`) num cabo que já
-tem um companion **mantém** o companion e o `amount` — só troca a
-fórmula. Pra trocar o companion sem trocar o tipo, escolha o mesmo
-botão de novo.
+1. **Título** em duas linhas: a ponta de saída (`CLOCK · euclid`) e a de
+   entrada (`→ QUANTIZER · trigger`). À direita, a **luz de condução**
+   (acesa quando o sorteio deixa passar neste instante — com `COND`
+   abaixo de 1 ela pisca) e, se o cabo fecha um laço, a marca
+   **realimentação** (o motor o atrasa um bloco pra o laço existir).
+2. Quatro botões — `NONE · RING · FOLD · DIFF` — escolhem a relação. O
+   aceso é a atual. Ao escolher `RING`/`FOLD`/`DIFF` vindo de `NONE`, o
+   painel entra no modo de **escolher o companion**: todo jack de
+   **saída** do patch acende um halo; clique em qualquer um — inclusive
+   na própria origem, pra uma auto-relação (§1). `Esc` cancela.
+3. Com relação ligada: a linha **`COMP`** mostra o companion pelo nome
+   (clicar nela volta ao modo de escolha) e o slider **`AMT`** dosa a
+   relação.
+4. **`GAIN`**: o ganho do cabo, de 0 a 2, com o neutro (1,0) na marca do
+   meio.
+5. **`COND`**: a condução probabilística (§3). Aparece **sempre** — até a
+   v0.1.1 só aparecia depois de escolher uma relação, embora funcione
+   sem ela.
+6. **`ROMPER`/`RECONECTAR`** rompe só aquele cabo (a cicatriz de §2) e
+   **`DESPLUGAR`** o tira do patch — o mesmo que o botão direito num jack.
+   Na vista `RACK · SAÍDA`, o que deixa de chegar ao som com o corte
+   continua na tela com borda tracejada, em vez de sumir.
 
-Tudo isso já é salvo por `Ctrl+S` (a serialização do patch sempre
-gravou `relation=`/`companion=`/`amount=`/`conductance=`/`state=` por
-cabo — o que faltava era só o jeito de editar ao vivo) e volta
-exatamente igual com `--resume`/`RASGO_RESUME=1`.
+Os sliders são **horizontais**: o valor segue a posição do mouse na
+trilha desde o primeiro clique. Clicar fora da caixa (ou `Esc`) fecha.
+Trocar de tipo de relação (`RING`→`FOLD`) mantém companion e `amount`.
+
+Tudo isso é salvo por `Ctrl+S` (`gain=`/`relation=`/`companion=`/
+`amount=`/`conductance=`/`state=` por cabo) e volta igual com
+`RASGO_RESUME=1`. Toda mudança na caixa é desfazível (`Ctrl+Z`).
 
 ---
 

@@ -10425,8 +10425,8 @@ não foi executado. 80/80 no `ctest`, build limpo.
       ele voltar ao assunto, ou revisar o arrasto de módulo (`mdrag_`);
 - [ ] **seed novo abrir na vista RACK·SAÍDA** (só o que alcança a saída),
       com o rack completo a um clique — o botão existe e não foi achado;
-- [ ] **marca de família no módulo** (acento de cor discreto ou rótulo),
-      sem abandonar o estilo uniforme — decisão estética do autor;
+- [x] **marca de família no módulo** — faixa de cor no topo, com legenda
+      na paleta (v0.1.1, escolha do autor entre faixa e fundo tingido);
 - [ ] **INIT / rack vazio em uma ação**, e depois **templates** (rack
       vazio, voz básica, processamento de áudio, generativo) — coerente com
       "patches como ponto de partida": o patch gerado é UM ponto de partida,
@@ -10437,4 +10437,45 @@ não foi executado. 80/80 no `ctest`, build limpo.
 23:14), clicar com o botão esquerdo numa entrada já cabeada deve pegar a
 ponta do cabo e seguir o mouse. Se a v0.1.0 instalada congelava nesse gesto,
 era este o defeito.
+
+---
+
+## Registro da etapa — 2026-10-02: v0.1.1 publicada; v0.1.2 em pré-release
+
+**v0.1.1** (tag `v0.1.1`, CI verde nos três sistemas, release com os três
+instaladores, site virado): correção do travamento ao pegar a ponta de um
+cabo, janela maximizada no monitor principal, cabeçalho (seed inteiro,
+VARIA mais largo, ESPERA junto do DESCABEIA), faixa de cor por família,
+REC vermelho, carimbo de build acompanhando o commit, README público em
+quatro idiomas com o diário movido para `DESENVOLVIMENTO.md`.
+
+**v0.1.2** — branch `v0.1.2-cabo-hover`, pré-release `v0.1.2-rc1` para o
+autor testar baixando (a v0.1.1 segue como Latest, site sem mudança):
+
+- clique no cabo acerta o cabo (ordem trocada dos argumentos desde 15
+  set.; `nearestCable` testada no ctest), destaque ao passar o mouse,
+  módulo só se move com arrasto começado fora de cabo;
+- caixa do cabo no canto inferior direito, título com portas, GAIN, COND
+  sempre, luz de condução, companion pelo nome, DESPLUGAR;
+- desplugar na vista SAÍDA mantém à vista o que deixou de chegar ao som;
+- cabeçalho em grupos com régua, RACK junto do ZOOM;
+- ícone: o monograma em todo lugar (o Linux instalava o wordmark preto);
+- documentação: tutorial (4 idiomas), verbete de cabo do LEARN (agora
+  traduzido — existia só em português) e `guia/RELACAO_DE_CABO.md`.
+  Corrigida uma descrição errada da relação que estava no tutorial e no
+  LEARN desde a criação: ela combina o cabo com o **companion**, não "com
+  o que já chegava na entrada", e o normal é NONE, não "SOMA".
+
+**Experimentos de desempenho sem ganho**, revertidos e guardados em
+branches: repintura por região (`v0.1.1-repintura`) e chrome `RGB`
+(`v0.1.1-chrome-opaco`). Medir por `/proc` não enxerga efeitos de poucos
+pontos; o próximo passo exige o `perf` do autor.
+
+**Pendente para a v0.1.2 final:** teste do autor com o rc1 baixado (em
+especial a caixa do cabo com relação, que não pôde ser vista na tela sem
+clicar); refazer a captura de tela do site e do README (é de 18 set.:
+sem as faixas de família e com o cabeçalho antigo); virar o site.
+**Observado e não reproduzido:** numa abertura de teste o app terminou
+antes de mostrar a janela; quatro repetições ficaram abertas, sem
+registro de falha no sistema.
 
