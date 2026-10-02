@@ -83,11 +83,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../packaging/linux/rasgo-modular.desktop"
             DESTINATION share/applications)
     endif()
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../panel/assets/rasgo_logo_2026.svg")
-        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../panel/assets/rasgo_logo_2026.svg"
-            DESTINATION share/icons/hicolor/scalable/apps
-            RENAME rasgo-modular.svg)
-    endif()
+    # Ícone do menu e da barra de tarefas: o MONOGRAMA (`mark-source.svg`,
+    # o mesmo favicon do site), não o wordmark. Até a v0.1.1 instalava
+    # `rasgo_logo_2026.svg` — o wordmark master, PRETO, desenhado pra fundo
+    # claro: no painel escuro do Mint quase sumia, e com proporção 4,86:1
+    # virava um traço no quadrado do ícone (achado do autor, 2 out. 2026).
+    # O PNG de 256 vai junto para menus que não leem SVG.
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/assets/mark-source.svg"
+        DESTINATION share/icons/hicolor/scalable/apps
+        RENAME rasgo-modular.svg)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon-256.png"
+        DESTINATION share/icons/hicolor/256x256/apps
+        RENAME rasgo-modular.png)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     install(TARGETS RasgoModularApp RUNTIME DESTINATION .)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
