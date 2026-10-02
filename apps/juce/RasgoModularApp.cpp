@@ -3343,18 +3343,22 @@ public:
                                  mode_ == Mode::tutorial ? getHeight() - 60 : 330);
         const int cx = (getWidth() - cw) / 2, cy = (getHeight() - chh) / 2;
         const juce::Rectangle<int> card(cx, cy, cw, chh);
+        card_ = card;
+        track_ = {};
+        thumb_ = {};
         g.setColour(T.surface);
         g.fillRect(card);
         g.setColour(T.accent);
         g.drawRect(card, 1);
 
         namespace S = rasgo::panel::strings;
-        // FECHAR é decorativo — o clique fecha em qualquer lugar
+        // FECHAR: clique nele, fora do cartão ou [Esc] fecha
         {
             g.setFont(juce::FontOptions(11.0f));
             const juce::String cl = str(S::close);
             const int w = juce::roundToInt(juce::GlyphArrangement::getStringWidth(
                               g.getCurrentFont(), cl)) + 14;
+            closeBtn_ = {cx + cw - w - 12, cy + 10, w, 20};
             g.setColour(T.line);
             g.drawRect(cx + cw - w - 12, cy + 10, w, 20, 1);
             g.setColour(T.textSecondary);
@@ -3409,12 +3413,23 @@ public:
             contentH_ = (py + scroll_) - (viewTop + 4);
             g.restoreState();
 
+            // Barra de rolagem de VERDADE (relato do autor, 2 out. 2026: "a
+            // barra de scroll não funciona direito"). Era só um traço de 4 px
+            // desenhado — não arrastava, não tinha trilha, e como qualquer
+            // clique fechava o tutorial, tentar arrastá-la FECHAVA a janela.
+            // Agora: trilha visível, alvo de 14 px, polegar arrastável e
+            // clique na trilha pula uma página.
             if (contentH_ > viewH_) {
-                const int thH = std::max(24, viewH_ * viewH_ / contentH_);
+                const int thH = std::max(32, viewH_ * viewH_ / contentH_);
                 const int thY = viewTop
                     + (viewH_ - thH) * scroll_ / (contentH_ - viewH_);
-                g.setColour(T.line);
-                g.fillRect(cx + cw - 7, thY, 4, thH);
+                track_ = {cx + cw - 16, viewTop, 14, viewH_};
+                thumb_ = {track_.getX(), thY, track_.getWidth(), thH};
+                viewTop_ = viewTop;
+                g.setColour(T.recessed);
+                g.fillRect(track_.reduced(3, 0));
+                g.setColour(dragging_ ? T.accent : T.line);
+                g.fillRect(thumb_.reduced(3, 0));
             }
         } else {
             g.saveState();
@@ -3492,9 +3507,32 @@ public:
         }
     }
 
-    void mouseDown(const juce::MouseEvent&) override {
+    // Dentro do cartão o clique NÃO fecha (era o que fazia a barra de
+    // rolagem fechar o tutorial): só FECHAR, clique fora do cartão ou [Esc].
+    void mouseDown(const juce::MouseEvent& e) override {
+        const auto p = e.getPosition();
+        if (!thumb_.isEmpty() && thumb_.contains(p)) {
+            dragging_ = true;
+            dragGrab_ = p.y - thumb_.getY();
+            repaint();
+            return;
+        }
+        if (!track_.isEmpty() && track_.contains(p)) {   // pula uma página
+            scrollBy(p.y < thumb_.getY() ? -(viewH_ - 40) : (viewH_ - 40));
+            return;
+        }
+        if (card_.contains(p) && !closeBtn_.contains(p)) return;
         close();
         if (onClose) onClose();
+    }
+    void mouseDrag(const juce::MouseEvent& e) override {
+        if (!dragging_ || contentH_ <= viewH_) return;
+        const int span = std::max(1, viewH_ - thumb_.getHeight());
+        const int y = juce::jlimit(0, span, e.getPosition().y - dragGrab_ - viewTop_);
+        scrollTo(y * (contentH_ - viewH_) / span);
+    }
+    void mouseUp(const juce::MouseEvent&) override {
+        if (dragging_) { dragging_ = false; repaint(); }
     }
     void mouseWheelMove(const juce::MouseEvent&,
                         const juce::MouseWheelDetails& w) override {
@@ -3532,6 +3570,10 @@ private:
     Mode mode_ = Mode::none;
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
     int scroll_ = 0, contentH_ = 0, viewH_ = 1;
+    // geometria do último quadro, para o mouse (o desenho é que a calcula)
+    juce::Rectangle<int> card_, closeBtn_, track_, thumb_;
+    int viewTop_ = 0, dragGrab_ = 0;
+    bool dragging_ = false;
 };
 
 // ---- áudio + janela ----------------------------------------------------
@@ -3794,6 +3836,12 @@ public:
         view_->refresh();
         syncHeader();
         syncSignalIn();
+        // `RASGO_TUTORIAL=1` abre o tutorial ao iniciar — para medir e
+        // capturar a tela sem precisar clicar (como `RASGO_INSPECIONAR`).
+        if (std::getenv("RASGO_TUTORIAL") != nullptr)
+            juce::MessageManager::callAsync([this] {
+                toggleOverlay(OverlayView::Mode::tutorial);
+            });
 
         // O QUADRO. Sem isto o app só repinta quando o mouse se mexe, e
         // tudo que anima sozinho fica congelado: osciloscópio, espectro,
