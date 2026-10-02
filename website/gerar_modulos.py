@@ -189,6 +189,100 @@ NIVEIS = {
     "es": ("Rápido", "Cómo funciona", "Pruebe esto"),
 }
 
+# Títulos das quatro partes de um verbete do guia didático (ver
+# `ESTILO.md`). No arquivo de cada verbete os títulos são sempre em
+# português — são chaves —, e a página recebe o título do idioma.
+PARTES = ("O que é", "Como pensar nele", "Controles", "Experimente")
+TITULOS_PARTES = {
+    "pt": ("O que é", "Como pensar nele", "Controles", "Experimente"),
+    "en": ("What it is", "How to think about it", "Controls", "Try this"),
+    "fr": ("Ce que c’est", "Comment l’aborder", "Commandes", "À essayer"),
+    "es": ("Qué es", "Cómo pensarlo", "Controles", "Pruebe esto"),
+}
+
+
+def ler_verbete(codigo, tipo):
+    """Lê `guia/<idioma>/<TIPO>.md`, o verbete didático (ver ESTILO.md).
+
+    Devolve {parte: [linhas]} ou None se o arquivo não existe — e aí a
+    página cai no texto curto do LEARN, como antes. Assim o guia pode
+    crescer módulo a módulo sem nunca publicar um buraco.
+    """
+    arq = AQUI / "guia" / codigo / (tipo + ".md")
+    if not arq.exists():
+        return None
+    partes, atual = {}, None
+    for linha in arq.read_text(encoding="utf-8").splitlines():
+        if linha.startswith("## "):
+            atual = linha[3:].strip()
+            if atual not in PARTES:
+                sys.exit("%s: parte desconhecida '%s'" % (arq, atual))
+            partes[atual] = []
+        elif atual is not None:
+            partes[atual].append(linha)
+    falta = [p for p in PARTES if p not in partes]
+    if falta:
+        sys.exit("%s: faltam as partes %s" % (arq, falta))
+    return partes
+
+
+def inline(texto):
+    """Escapa e aplica a única marcação permitida no verbete: `código`."""
+    return re.sub(r"`([^`]+)`", r"<code>\1</code>", e(texto))
+
+
+def html_verbete(codigo, partes):
+    """As quatro partes em HTML: parágrafos, lista de controles, passos."""
+    titulos = TITULOS_PARTES[codigo]
+    L = []
+    for chave, titulo in zip(PARTES, titulos):
+        linhas = partes[chave]
+        L.append('    <h4>%s</h4>' % e(titulo))
+        paragrafo, lista, numerada = [], [], []
+
+        def fecha_paragrafo():
+            if paragrafo:
+                L.append("    <p>%s</p>" % inline(" ".join(paragrafo)))
+                paragrafo.clear()
+
+        def fecha_listas():
+            if lista:
+                L.append('    <ul class="controles">')
+                for item in lista:
+                    nome, _, resto = item.partition(":")
+                    if resto:
+                        L.append("      <li><b>%s</b>%s</li>"
+                                 % (e(nome.strip()), inline(":" + resto)))
+                    else:
+                        L.append("      <li>%s</li>" % inline(item))
+                L.append("    </ul>")
+                lista.clear()
+            if numerada:
+                L.append('    <ol class="passos">')
+                for item in numerada:
+                    L.append("      <li>%s</li>" % inline(item))
+                L.append("    </ol>")
+                numerada.clear()
+
+        for linha in linhas + [""]:
+            s = linha.strip()
+            m = re.match(r"^\d+\.\s+(.*)", s)
+            if s.startswith("- "):
+                fecha_paragrafo()
+                lista.append(s[2:])
+            elif m:
+                fecha_paragrafo()
+                numerada.append(m.group(1))
+            elif not s:
+                fecha_paragrafo()
+                fecha_listas()
+            else:
+                if lista or numerada:
+                    fecha_listas()
+                paragrafo.append(s)
+    return L
+
+
 PAGINA_PRINCIPAL = {"pt": "index.html", "en": "en.html",
                     "fr": "fr.html", "es": "es.html"}
 
@@ -272,6 +366,11 @@ def pagina(codigo, dados, familias, marca):
             verbete = mod[codigo] or mod["pt"]
             L.append('  <article class="modulo" id="mod-%s">' % mod["tipo"])
             L.append("    <h3>%s</h3>" % e(mod["tipo"]))
+            didatico = ler_verbete(codigo, mod["tipo"])
+            if didatico is not None:
+                L.extend(html_verbete(codigo, didatico))
+                L.append("  </article>")
+                continue
             for i, texto in enumerate(verbete):
                 if not texto.strip():
                     continue

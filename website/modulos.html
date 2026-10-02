@@ -115,19 +115,78 @@
   <h2>SOURCE <small>13 módulos</small></h2>
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
-    <p><span class="nivel">Rápido</span> Oscilador subtrativo — a voz de partida. Dente/quadrada/triângulo/seno com PW e drift orgânico; toca em 1 V/oct.</p>
-    <p><span class="nivel">Como funciona</span> É a fonte 'clássica'; o WAVETABLE varre tabelas, o ADDITIVE soma parciais, o OPERATOR faz FM.</p>
-    <p><span class="nivel">Experimente</span> OSC → FILTER → VCA com um ENVELOPE no gate: a cadeia mínima de um sintetizador.</p>
+    <h4>O que é</h4>
+    <p>O OSC é um oscilador: ele produz uma nota contínua, sempre igual, a partir da qual quase todo som de sintetizador é construído. Ele entrega cinco formas de onda ao mesmo tempo, cada uma num jack de saída: seno, triângulo, dente de serra, pulso e uma voz uma ou duas oitavas abaixo (o sub). Você escolhe qual usar, ou usa várias.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense no OSC como a matéria-prima. Sozinho ele soa cru, e é de propósito: o caráter vem do que você liga depois dele, como um filtro que tira brilho ou um envelope que dá forma à nota. Se você quer uma voz com personalidade pronta, o STRING e o MATTER já trazem isso; se quer um timbre que se transforma sozinho, experimente o WAVETABLE. O OSC é a base previsível, e por isso é o melhor lugar para aprender.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a altura da nota, de 8 a 8000 Hz. Valores baixos viram vibração lenta; a região musical fica entre uns 50 e 1000 Hz.</li>
+      <li><b>FINE</b>: afinação fina, até um semitom para cima ou para baixo. Use para afinar com outra voz, ou para desafinar de leve e engrossar o som.</li>
+      <li><b>PW</b>: a largura do pulso, que só afeta a saída PLS. No meio, a onda é quadrada e soa oca; perto das pontas, fica fina e anasalada.</li>
+      <li><b>FM</b>: quanto o sinal ligado na entrada FM mexe na altura. Com outro oscilador ali e este knob alto, o timbre fica metálico, de sino.</li>
+      <li><b>DRIFT</b>: uma oscilação lenta e pequena na afinação, como a de um oscilador analógico. Em zero, a nota fica perfeitamente parada.</li>
+      <li><b>SUB2</b>: escolhe se a saída SUB fica uma oitava (desligado) ou duas (ligado) abaixo da nota.</li>
+      <li><b>SYNC</b>: liga a entrada SYNC. Com ela ativa, outro oscilador mais lento força este a recomeçar o ciclo, e girar FREQ passa a mudar o timbre em vez da altura.</li>
+      <li><b>PROX</b>: mistura cada saída com uma versão mais escura de si mesma. É um jeito de amaciar o som sem gastar um filtro.</li>
+    </ul>
+    <p>Entradas: 1V/O recebe a altura vinda de um sequenciador ou quantizador, FM e PWM aceitam modulação, e SYNC recebe o oscilador que comanda o sincronismo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW do OSC numa entrada do MIXER e ouça um zumbido constante.</li>
+      <li>Gire FREQ devagar: a nota sobe e desce.</li>
+      <li>Troque o cabo para a saída PLS e mova PW de um lado ao outro. O timbre muda de oco para fino, sem a altura mudar.</li>
+      <li>Volte para SAW e passe o som por um FILTER antes do MIXER. Agora você está fazendo síntese subtrativa: começar com um som rico e tirar o que sobra.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-WAVETABLE">
     <h3>WAVETABLE</h3>
-    <p><span class="nivel">Rápido</span> Oscilador de tabela — um POS varre um banco de formas de onda, de suave a espectral, com anti-aliasing.</p>
-    <p><span class="nivel">Experimente</span> LFO lento → POS: o timbre 'respira' entre as ondas.</p>
+    <h4>O que é</h4>
+    <p>O WAVETABLE é um oscilador que guarda uma sequência de 16 formas de onda diferentes, como os quadros de uma animação, da mais brilhante (uma serra) à mais suave (um seno). O knob POS escolhe em que ponto dessa sequência você está. Movendo POS, o timbre muda de forma contínua, sem precisar de filtro.</p>
+    <h4>Como pensar nele</h4>
+    <p>Enquanto o OSC dá um som fixo que você esculpe depois, o WAVETABLE já nasce em movimento: basta algo mexendo em POS. Um LFO lento faz um pad que respira; um envelope faz cada nota começar brilhante e terminar escura. Ele também sabe ouvir: ligado ao SIGNAL-IN, captura um ciclo do som que entra e passa a usá-lo como forma de onda.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a altura da nota, de 8 a 8000 Hz.</li>
+      <li><b>FINE</b>: afinação fina, até um semitom para cada lado.</li>
+      <li><b>POS</b>: a posição na tabela. No começo, o som é cheio de harmônicos; no fim, é quase um seno. A entrada POS soma a este knob, e é aí que o módulo ganha vida.</li>
+      <li><b>WARP</b>: deforma a leitura de cada ciclo e acrescenta harmônicos com um sotaque digital, sem trocar de quadro.</li>
+      <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
+      <li><b>DRIFT</b>: uma pequena oscilação lenta na afinação.</li>
+    </ul>
+    <p>Entradas: 1V/O para a altura, POS para mover a posição, FM, CAP para o som a ser capturado e GRAB, um pulso que manda capturar um ciclo novo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER e gire POS de ponta a ponta. Ouça o timbre passar de áspero a liso.</li>
+      <li>Ligue a saída de um FUNCTION, em velocidade lenta, na entrada POS. Agora o som muda sozinho, em ciclos.</li>
+      <li>Para capturar: ligue o SIGNAL-IN na entrada CAP e um pulso do CLOCK em GRAB. A cada pulso, o oscilador passa a tocar um pedaço do som que está entrando.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-ADDITIVE">
     <h3>ADDITIVE</h3>
-    <p><span class="nivel">Rápido</span> Oscilador aditivo — soma até 64 parciais; TILT/ODD-EVEN/STRETCH esculpem o espectro direto.</p>
-    <p><span class="nivel">Como funciona</span> Constrói o timbre somando senos, o oposto do FILTER (que tira de um som rico).</p>
+    <h4>O que é</h4>
+    <p>O ADDITIVE constrói o som somando 64 senos, cada um numa frequência diferente. Esses senos se chamam parciais: juntos, formam o timbre. Em vez de começar com um som rico e cortar, como faz um filtro, aqui você decide quanta força cada parcial recebe. É assim que se chega a órgãos, sinos, vibrafones e pads.</p>
+    <h4>Como pensar nele</h4>
+    <p>Os quatro knobs centrais moldam o espectro inteiro de uma vez, sem que você precise mexer em 64 controles. TILT decide o brilho, ODD equilibra parciais pares e ímpares, STRCH desafina as parciais entre si para soar como metal ou vidro, e COMB abre vales no espectro. Todos aceitam modulação: um envelope em TILT faz cada nota abrir o brilho no ataque, como um instrumento acústico.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a nota fundamental, de 8 a 8000 Hz.</li>
+      <li><b>FINE</b>: afinação fina, até um semitom para cada lado.</li>
+      <li><b>TILT</b>: o brilho. Para a esquerda, só as parciais graves soam e o timbre fica escuro; para a direita, todas soam fortes.</li>
+      <li><b>ODD</b>: o equilíbrio entre parciais. No meio, a série completa; à direita, só as ímpares, com um som oco de clarinete; à esquerda, só as pares, mais anasalado.</li>
+      <li><b>STRCH</b>: estica ou comprime a distância entre as parciais. No meio, o som é afinado; para os lados, vira sino, metal ou algo indefinido.</li>
+      <li><b>COMB</b>: abre vales regulares no espectro, como um filtro em pente. Em zero, nada muda.</li>
+      <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
+      <li><b>DRIFT</b>: faz cada parcial desafinar e respirar um pouco, de forma lenta. Em zero, o som é totalmente estável.</li>
+    </ul>
+    <p>Entradas: 1V/O para a altura, TILT e STRCH para modular esses dois controles, e FM.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER, com TILT no meio. Você ouve uma nota suave.</li>
+      <li>Leve STRCH devagar para a direita. A nota afinada vira um som de sino.</li>
+      <li>Volte STRCH ao meio e mova ODD de um lado ao outro. Ouça o timbre passar de anasalado a oco.</li>
+      <li>Ligue a saída ENV de um ENVELOPE na entrada TILT, e a saída CLK do CLOCK na entrada GATE do ENVELOPE. A cada pulso, o som começa brilhante e escurece, como uma corda tocada.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-OPERATOR">
     <h3>OPERATOR</h3>
