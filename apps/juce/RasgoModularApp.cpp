@@ -93,7 +93,11 @@ inline juce::String u8(const std::string& s) {
 struct Tokens {
     juce::Colour bg{0xff131a1a}, surface{0xff262b36}, recessed{0xff0e1015},
         line{0xff485060}, textPrimary{0xffe0e4ec}, textSecondary{0xff8890a0},
-        accent{0xffff9d4c}, warning{0xffff6b5b};
+        accent{0xffff9d4c}, warning{0xffff6b5b},
+        // REC aceso: vermelho de gravação, não o laranja de "ligado" dos
+        // outros botões — pedido do autor, 2 out. 2026. O `warning` (coral)
+        // ao lado do laranja não chegava a ler como vermelho.
+        recording{0xffe0362c};
 };
 const Tokens T;
 
@@ -934,7 +938,8 @@ public:
         // REC — ponto cheio quando gravando, como no painel X11
         rx -= buttonR(g, rx, u8("\xe2\x97\x8f ")
                       + str(rasgo::panel::strings::hdrRec),
-                      recording_ || flashing(Act::rec), Act::rec);
+                      recording_ || flashing(Act::rec), Act::rec,
+                      recording_ ? T.recording : T.accent);
         // As duas palavras vinham FIXAS em português — o botão dizia
         // "RACK · SAÍDA" mesmo com a interface em inglês (achado do autor,
         // 18 set. 2026). As traduções já existiam em `UiLanguage.hpp` e o
@@ -1246,13 +1251,13 @@ private:
     }
 
     int drawButton(juce::Graphics& g, int bx, const juce::String& label,
-                   bool active, Act act) {
+                   bool active, Act act, juce::Colour on = T.accent) {
         g.setFont(juce::FontOptions(11.0f));
         const int w = juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), label)) + 14;
         const juce::Rectangle<int> r(bx, btnY_, w, 22);
-        if (active) { g.setColour(T.accent); g.fillRect(r); }
-        g.setColour(active ? T.accent : T.line);
+        if (active) { g.setColour(on); g.fillRect(r); }
+        g.setColour(active ? on : T.line);
         g.drawRect(r, 1);
         if (active) g.drawRect(r.expanded(2), 1);   // anel de "ligado"
         g.setColour(active ? T.bg : T.textSecondary);
@@ -1264,11 +1269,11 @@ private:
         return drawButton(g, bx, l, a, c);
     }
     int buttonR(juce::Graphics& g, int rightEdge, const juce::String& label,
-                bool active, Act act) {
+                bool active, Act act, juce::Colour on = T.accent) {
         g.setFont(juce::FontOptions(11.0f));
         const int w = juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), label)) + 14;
-        drawButton(g, rightEdge - w, label, active, act);
+        drawButton(g, rightEdge - w, label, active, act, on);
         return w + 6;
     }
 

@@ -18,6 +18,8 @@ pronto.
   controle); o par mais próximo, TRANSFORM e SPACE, fica a ΔE 17,8. Está
   na camada fixa do módulo: custo zero por quadro.
 - Sai a régua entre DESCABEIA e ESPERA.
+- **REC fica vermelho enquanto grava**, em vez do laranja de "ligado" dos
+  outros botões.
 - **Cabeçalho** (pedidos do autor, 2 out. 2026): a caixa do seed mede a
   própria largura pela fonte e mostra os 20 dígitos inteiros (cortava o
   primeiro em seeds longos); o slider VARIA passou de 54 para 84 px, para
