@@ -9,6 +9,19 @@ pronto.
 
 ## v0.1.2 — em preparação
 
+- **Corrigido: estalos por blocos de áudio perdidos.** O áudio desistia
+  do bloco na primeira tentativa se a interface estivesse com o patch
+  travado, e a interface trava o patch a cada quadro por frações de
+  milissegundo (o VARIA mexe nos parâmetros sob a trava). Num patch comum
+  isso perdia ~2 blocos por segundo; cada perda é uma queda de ~6 ms no
+  som, e muitas por minuto soavam como estalos (relato do autor no seed
+  4303935450909092226: 2247 blocos perdidos numa sessão, gravação limpa —
+  o bloco perdido não entra na gravação). Agora o áudio espera até 1,5 ms
+  antes de desistir. Medido no mesmo seed, 60 s: **106 perdidos antes, 0
+  depois** da abertura (os 14 da abertura são a medição de volume do seed,
+  antes de o som começar). `RASGO_DIAG=1` imprime a contagem no terminal.
+- **Partitura com cabeçalho:** data e hora, arquivo de áudio com duração,
+  versão do instrumento, autoria, licença e contato.
 - **Clique no cabo acerta o cabo.** Desde 15 set. o front-end JUCE passava
   o ponto do mouse em último lugar à função que mede a distância até a
   curva, que o espera em primeiro: o teste era outro, e o clique só
