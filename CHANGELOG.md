@@ -9,6 +9,13 @@ pronto.
 
 ## v0.1.2 — em preparação
 
+- **Corrigido: depois de DESCABEIA o patch ficava mudo para sempre.** A
+  saída de som é um nó que não aparece no rack, ligado ao MASTER por um
+  cabo invisível; o DESCABEIA (e o clique direito na saída do MASTER)
+  tirava também esse cabo, e não havia como refazê-lo — só SEED ou
+  DESFAZ traziam o som de volta, e o "construir do zero" do tutorial não
+  funcionava. Agora essa ligação final nunca é tirada, e um MASTER
+  re-adicionado pela paleta vai direto à saída.
 - **Corrigido: estalos por blocos de áudio perdidos.** O áudio desistia
   do bloco na primeira tentativa se a interface estivesse com o patch
   travado, e a interface trava o patch a cada quadro por frações de
