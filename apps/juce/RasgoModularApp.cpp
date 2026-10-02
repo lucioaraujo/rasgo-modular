@@ -471,6 +471,36 @@ struct Rack {
 // módulos agrupada por família em cima, e a caixa LEARN sempre presente
 // no rodapé — passar o mouse num módulo escreve ali o que ele é. A caixa
 // é silenciosa por decisão de projeto (não pula, não pisca).
+// ---- cor de família -------------------------------------------------
+// Sugestão de um usuário do r/modular (1 out. 2026): dentro do rack não
+// dava para saber de relance a que família um módulo pertence. Uma FAIXA
+// fina na cor da família no topo de cada módulo, e o mesmo tom num
+// quadrado ao lado do nome da família na paleta, que vira a legenda.
+// Escolha do autor em 2 out. 2026 entre faixa e fundo tingido, pelas
+// capturas do mesmo patch (o tingido está no branch
+// `experimento-cor-familia`).
+// Tons APAGADOS (saturação baixa) e espaçados no círculo cromático: a cor
+// forte da tela é dos cabos (quentes = áudio, frios = controle), e a
+// família não pode competir com ela nem ser confundida com tipo de sinal.
+inline std::string familyOfType(const std::string& type) {
+    for (const auto& grp : rasgo::panel::moduleCatalog())
+        for (const char* t : grp.types)
+            if (type == t) return grp.family;
+    return {};
+}
+inline juce::Colour familyColour(const std::string& family) {
+    static const std::map<std::string, float> hue = {
+        {"SOURCE", 90.0f},   {"TRANSFORM", 285.0f}, {"MODULATE", 325.0f},
+        {"TIME", 150.0f},    {"DECISION", 52.0f},   {"ROUTE", 195.0f},
+        {"SPACE", 245.0f},   {"OUT", 0.0f}};
+    const auto it = hue.find(family);
+    if (it == hue.end()) return T.line;
+    // OUT quase neutro: é a família que fecha o patch, e o MASTER já
+    // carrega a cor mais forte do rack (o VU)
+    const float sat = family == "OUT" ? 0.12f : 0.34f;
+    return juce::Colour::fromHSL(it->second / 360.0f, sat, 0.56f, 1.0f);
+}
+
 class PaletteColumn : public juce::Component {
 public:
     // A coluna cresceu de 158 pra 186 px e a caixa LEARN de 172 pra 232:
@@ -525,8 +555,10 @@ public:
         for (const auto& h : heads_) {
             const int y = h.second - scroll_;
             if (y < -14 || y > learnTop) continue;
+            g.setColour(familyColour(h.first));   // legenda da faixa
+            g.fillRect(10, y + 3, 8, 8);
             g.setColour(T.accent);
-            g.drawText(u8(h.first), 10, y, kWidth - 20, 14,
+            g.drawText(u8(h.first), 22, y, kWidth - 32, 14,
                        juce::Justification::centredLeft, false);
         }
         for (const auto& r : rows_) {
@@ -2579,6 +2611,12 @@ private:
     void paintChrome(juce::Graphics& g, const ModBox& m, Signal& node) {
         g.setColour(T.surface);
         g.fillRect(m.bounds);
+        // faixa da família: na camada fixa, então custa zero por quadro
+        if (const std::string fam = familyOfType(node.type()); !fam.empty()) {
+            g.setColour(familyColour(fam));
+            g.fillRect(m.bounds.getX() + 1, m.bounds.getY() + 1,
+                       m.bounds.getWidth() - 2, 3);
+        }
         g.setColour(T.line);
         // trilhos de parafuso (a "cara" do painel Eurorack), como no X11
         g.drawHorizontalLine(m.bounds.getY() + 3,
