@@ -20,7 +20,15 @@ pronto.
 - **Módulo não foge mais no clique** (regra do autor): clique sobre um cabo
   é sempre do cabo; o módulo só se move se o clique começar fora de cabo e
   o arrasto passar de 6 px.
-- **Caixa do cabo fixa no canto inferior direito** da área visível.
+- **Caixa do cabo fixa no canto inferior direito** da área visível, com
+  **título completo** — módulo e porta das duas pontas (`CLOCK · euclid`
+  / `→ QUANTIZER · trigger`), sugestão do autor — e mais controles do que
+  o motor já sabia fazer: **GAIN** (0 a 2, neutro no meio; existia e não
+  tinha controle), **COND sempre visível** (só aparecia depois de escolher
+  uma relação, embora funcione sem ela), **luz de condução** ao vivo,
+  marca de **realimentação**, o **companion pelo nome** (clicar volta a
+  escolher) e **REMOVER**. `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo
+  cabo ao iniciar, para capturas de tela.
 - **Cabeçalho em grupos**, separados por régua: [seed · SEED · REPOR] |
   [VARIA · MUDA · EVOLUI · CRUZA] | [BANCO · SALVA · ABRIR] | [DESFAZ ·
   DESCABEIA · ESPERA] | [ZOOM · RACK]. O RACK saiu do canto direito.
