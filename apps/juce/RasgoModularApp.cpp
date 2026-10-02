@@ -134,6 +134,9 @@ struct Rack {
         Relation relation{};
         float amount = 0.0f, conductance = 0.0f;
         std::size_t companionNode = 0, companionPort = 0;
+        float gain = 1.0f;
+        bool conducting = true;   // o sorteio de condução, neste quadro
+        bool feedback = false;    // fecha um laço (atrasado um bloco)
     };
     std::vector<CableView> cableSnap;
 
@@ -152,6 +155,9 @@ struct Rack {
             v.conductance = c.conductance();
             v.companionNode = c.companion().node;
             v.companionPort = c.companion().port;
+            v.gain = c.gain();
+            v.conducting = c.conductingNow();
+            v.feedback = c.isFeedback();
             cableSnap.push_back(v);
         }
     }
@@ -1469,14 +1475,33 @@ public:
     // que pertence (no X11 não havia viewport, o ponto era o mesmo).
     void paintInspector(juce::Graphics& g) {
         inspHits_.clear();
+        // `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo cabo uma vez, no
+        // primeiro quadro que tiver cabos — para capturas de tela e
+        // documentação sem precisar mirar e clicar. Sem a variável, nada.
+        if (!inspectEnvDone_ && !rack_.cableSnap.empty()) {
+            inspectEnvDone_ = true;
+            if (const char* v = std::getenv("RASGO_INSPECIONAR")) {
+                const auto n = static_cast<std::size_t>(std::strtoul(v, nullptr, 10));
+                if (n < rack_.cableSnap.size()) {
+                    const auto& cv = rack_.cableSnap[n];
+                    insp_ = {true, cv.target, cv.targetPort, 0, 0, 0, 0, 0, 0};
+                }
+            }
+        }
         if (!insp_.open) return;
         const int si = snapIndexOfInspected();
         if (si < 0) { insp_.open = false; return; }     // o cabo sumiu
 
         const auto& c = rack_.cableSnap[static_cast<std::size_t>(si)];
         const bool hasRel = c.hasRelation;
-        const int pad = 8, rowH = 20, bw = 190;
-        const int rows = hasRel ? 5 : 3;
+        // Linhas: título · relação · [companion · AMT] · GANHO · COND ·
+        // romper/remover. Grupo 1 da caixa do cabo (2 out. 2026): GANHO e
+        // REMOVER entraram, COND deixou de depender de haver relação (a
+        // condutância sempre funcionou sozinha, e a caixa a escondia), o
+        // companion aparece pelo nome, e o título traz a luz de condução e
+        // a marca de realimentação.
+        const int pad = 8, rowH = 20, bw = 210;
+        const int rows = hasRel ? 8 : 6;   // o título ocupa duas
         const int bh = pad * 2 + rowH * rows;
         // Canto INFERIOR DIREITO da área visível (sugestão do autor, 2 out.
         // 2026), não mais ao lado do clique: ancorada no clique, a caixa
@@ -1497,12 +1522,47 @@ public:
         g.drawRect(insp_.bx, insp_.by, bw, bh, 1);
 
         int ry = insp_.by + pad;
-        g.setFont(juce::FontOptions(10.0f));
-        g.setColour(T.textSecondary);
-        g.drawText(moduleLabel(c.source) + " -> " + moduleLabel(c.target),
-                   insp_.bx + pad, ry, bw - pad * 2, 14,
-                   juce::Justification::centredLeft, false);
-        ry += rowH;
+        // TÍTULO: as duas pontas com módulo E porta (sugestão do autor, 2
+        // out. 2026). Com a caixa fixa no canto, longe do cabo, só os
+        // módulos não bastavam: dois cabos entre os mesmos módulos eram
+        // indistinguíveis. À direita: a luz de condução (acesa quando o
+        // sorteio deixa passar NESTE quadro — com COND < 1 ela pisca) e a
+        // marca de realimentação.
+        {
+            const auto portName = [&](std::size_t node, std::size_t port, bool out) {
+                try {
+                    const auto& n = rack_.graph.node(node);
+                    return u8(out ? n.outputDescriptor(port).name
+                                  : n.inputDescriptor(port).name);
+                } catch (...) { return juce::String(); }
+            };
+            const juce::String dot = u8("  \xc2\xb7  ");
+            const juce::String from = moduleLabel(c.source) + dot
+                + portName(c.source, c.sourcePort, true);
+            const juce::String to = u8("\xe2\x86\x92 ") + moduleLabel(c.target) + dot
+                + portName(c.target, c.targetPort, false);
+            const int tw = bw - pad * 2 - 16;
+            g.setFont(juce::FontOptions(10.0f, juce::Font::bold));
+            g.setColour(T.textPrimary);
+            g.drawText(from, insp_.bx + pad, ry, tw, 14,
+                       juce::Justification::centredLeft, true);
+            g.drawText(to, insp_.bx + pad, ry + rowH - 4, tw, 14,
+                       juce::Justification::centredLeft, true);
+            const float lx = static_cast<float>(insp_.bx + bw - pad - 9);
+            g.setColour(c.conducting && !c.ruptured ? T.accent : T.recessed);
+            g.fillEllipse(lx, static_cast<float>(ry + 3), 8.0f, 8.0f);
+            g.setColour(T.line);
+            g.drawEllipse(lx, static_cast<float>(ry + 3), 8.0f, 8.0f, 1.0f);
+            if (c.feedback) {
+                g.setFont(juce::FontOptions(8.0f));
+                g.setColour(T.warning);
+                g.drawText(u8("\xe2\x86\xba ") + u8(rasgo::panel::tr(
+                               rasgo::panel::strings::inspFeedback, lang_)),
+                           insp_.bx + pad, ry + 2 * rowH - 8, bw - pad * 2, 10,
+                           juce::Justification::centredRight, false);
+            }
+        }
+        ry += 2 * rowH;
 
         const auto boxBtn = [&](int bx, int by, int bwp, int bhp,
                                 const char* label, bool active, InspAct act) {
@@ -1534,35 +1594,63 @@ public:
                c.relation == Relation::Difference, InspAct::RelDiff);
         ry += rowH;
 
+        const auto sliderRow = [&](const char* label, float v, InspAct act,
+                                   bool centreMark) {
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(9.0f));
+            g.drawText(u8(label), insp_.bx + pad, ry, 40, rowH - 2,
+                       juce::Justification::centredLeft, false);
+            const int trackX = insp_.bx + pad + 42;
+            const int trackW = bw - pad * 2 - 42;
+            g.setColour(T.line);
+            g.drawRect(trackX, ry + 3, trackW, rowH - 8, 1);
+            const int fillW = static_cast<int>(
+                static_cast<float>(trackW) * juce::jlimit(0.0f, 1.0f, v));
+            if (fillW > 0) {
+                g.setColour(T.accent);
+                g.fillRect(trackX, ry + 3, fillW, rowH - 8);
+            }
+            if (centreMark) {   // ganho neutro (1,0) no meio da trilha
+                g.setColour(T.textSecondary.withAlpha(0.8f));
+                g.drawVerticalLine(trackX + trackW / 2,
+                                   static_cast<float>(ry + 4),
+                                   static_cast<float>(ry + rowH - 6));
+            }
+            inspHits_.push_back({{trackX, ry, trackW, rowH - 2}, act});
+            ry += rowH;
+        };
+
         if (hasRel) {
-            const auto sliderRow = [&](const char* label, float v, InspAct act) {
-                g.setColour(T.textSecondary);
-                g.setFont(juce::FontOptions(9.0f));
-                g.drawText(u8(label), insp_.bx + pad, ry, 40, rowH - 2,
-                           juce::Justification::centredLeft, false);
-                const int trackX = insp_.bx + pad + 42;
-                const int trackW = bw - pad * 2 - 42;
-                g.setColour(T.line);
-                g.drawRect(trackX, ry + 3, trackW, rowH - 8, 1);
-                const int fillW = static_cast<int>(
-                    static_cast<float>(trackW) * juce::jlimit(0.0f, 1.0f, v));
-                if (fillW > 0) {
-                    g.setColour(T.accent);
-                    g.fillRect(trackX, ry + 3, fillW, rowH - 8);
-                }
-                inspHits_.push_back({{trackX, ry, trackW, rowH - 2}, act});
-                ry += rowH;
-            };
-            sliderRow("AMT",  c.amount,      InspAct::Amount);
-            sliderRow("COND", c.conductance, InspAct::Conductance);
+            // o segundo sinal, pelo nome; clicar volta ao modo de escolha
+            juce::String comp = moduleLabel(c.companionNode);
+            try {
+                comp += u8("  \xc2\xb7  ") + u8(rack_.graph.node(c.companionNode)
+                            .outputDescriptor(c.companionPort).name);
+            } catch (...) {}
+            const juce::Rectangle<int> cr(insp_.bx + pad, ry, bw - pad * 2, rowH - 2);
+            g.setColour(T.line);
+            g.drawRect(cr, 1);
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(9.0f));
+            g.drawText(u8("COMP  ") + comp, cr.reduced(4, 0),
+                       juce::Justification::centredLeft, false);
+            inspHits_.push_back({cr, InspAct::Companion});
+            ry += rowH;
+            sliderRow("AMT", c.amount, InspAct::Amount, false);
         }
+        sliderRow("GAIN", c.gain * 0.5f, InspAct::Gain, true);   // 0..2
+        sliderRow("COND", c.conductance, InspAct::Conductance, false);
 
         const bool ruptured = c.ruptured;
-        boxBtn(insp_.bx + pad, ry, bw - pad * 2, rowH - 2,
+        const int half = (bw - pad * 2 - 4) / 2;
+        boxBtn(insp_.bx + pad, ry, half, rowH - 2,
                rasgo::panel::tr(ruptured ? rasgo::panel::strings::inspReconnect
                                          : rasgo::panel::strings::inspRupture,
                                 lang_).c_str(),
                ruptured, InspAct::Rupture);
+        boxBtn(insp_.bx + pad + half + 4, ry, half, rowH - 2,
+               rasgo::panel::tr(rasgo::panel::strings::inspRemove, lang_).c_str(),
+               false, InspAct::Remove);
     }
 
     // Prepara a afordância do cabeamento: quem alcança a saída, e se a
@@ -2140,7 +2228,30 @@ public:
             return false;                       // e o clique segue seu curso
         }
 
-        rack_.pushUndo();   // relação, condutância e ruptura são desfazíveis
+        if (hit->act == InspAct::Companion) {   // volta a escolher o companion
+            picking_ = true;
+            return true;
+        }
+        if (hit->act == InspAct::Remove) {
+            // tirar o cabo pela caixa (antes só pelo clique direito no
+            // jack). Desfazível como o clique direito.
+            rack_.pushUndo();
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                if (const int li = liveIndexOfInspected(); li >= 0) {
+                    rack_.graph.disconnect(insp_.tnode, insp_.tport);
+                    rack_.reprepare();
+                }
+            }
+            insp_.open = false;
+            hoverCable_ = -1;
+            // FORA do lock: `layoutFor` → `relayout` trava o `gmx` por
+            // conta própria (a vista SAÍDA pode mudar sem o cabo)
+            layoutFor(viewportW_, viewportH_);
+            return true;
+        }
+
+        rack_.pushUndo();   // relação, condutância, ganho e ruptura são desfazíveis
         std::lock_guard<std::mutex> lk(rack_.gmx);
         const int li = liveIndexOfInspected();
         if (li < 0) { insp_.open = false; return true; }
@@ -2169,8 +2280,10 @@ public:
             break;
         }
         case InspAct::Amount:
-        case InspAct::Conductance: {
-            cslide_ = {true, hit->act == InspAct::Amount ? 0 : 1,
+        case InspAct::Conductance:
+        case InspAct::Gain: {
+            cslide_ = {true, hit->act == InspAct::Amount ? 0
+                             : (hit->act == InspAct::Conductance ? 1 : 2),
                        hit->bounds.getX(), hit->bounds.getWidth()};
             applyCableSlider(c, p.x);
             break;
@@ -2178,6 +2291,9 @@ public:
         case InspAct::Rupture:
             if (c.state() == CableState::Ruptured) c.reconnect();
             else                                   c.rupture();
+            break;
+        case InspAct::Companion:   // tratados antes do lock
+        case InspAct::Remove:
             break;
         }
         return true;
@@ -2189,8 +2305,10 @@ public:
                 / static_cast<float>(std::max(1, cslide_.trackW)));
         if (cslide_.which == 0)
             c.setRelation(c.relation(), c.companion().node, c.companion().port, v);
-        else
+        else if (cslide_.which == 1)
             c.setConductance(v);
+        else
+            c.setGain(v * 2.0f);   // GAIN: 0..2, neutro (1,0) no meio
     }
 
     // Liga src→dst ao vivo; em ciclo, tenta de novo como feedback; deixa o
@@ -2249,7 +2367,7 @@ private:
     static constexpr int kDragSlopPx = 6;
     struct CableHit { std::size_t cable; int x0, y0, x1, y1; };
     enum class InspAct { RelNone, RelRing, RelFold, RelDiff,
-                         Amount, Conductance, Rupture };
+                         Amount, Conductance, Gain, Companion, Rupture, Remove };
     struct InspHit { juce::Rectangle<int> bounds; InspAct act; };
     // O inspector guarda a PONTA DE DESTINO do cabo, não o índice dele.
     // Cada porta de entrada aceita um cabo só, então (nó, porta) identifica
@@ -3115,6 +3233,7 @@ private:
     juce::Point<int> downAt_;
     int pendingInspect_ = -1;   // clique-ou-arrasto ainda indeciso
     int hoverCable_ = -1;       // cabo sob o mouse (índice no `cableSnap`)
+    bool inspectEnvDone_ = false;   // ver `RASGO_INSPECIONAR` em `paintInspector`
     std::chrono::steady_clock::time_point lastReorder_{};
     std::string palHover_;
     bool silenced_ = false;
