@@ -5,5 +5,6 @@ GenericName=Generative Modular Instrument
 Comment=Instrumento modular generativo — soa ao carregar, patch por seed
 Exec=rasgo-modular
 Icon=rasgo-modular
+StartupWMClass=Rasgo Modular
 Terminal=false
 Categories=AudioVideo;Audio;Music;

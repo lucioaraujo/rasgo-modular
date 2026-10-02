@@ -7,11 +7,23 @@ cria.
 
 | Arquivo | Conteúdo | Fonte |
 |---|---|---|
-| `icon-256.png` | wordmark RASGO completo | `icon-source.svg` |
-| `icon-32.png` | monograma (a letra `r` do próprio wordmark) | `mark-source.svg` |
+| `icon-256.png` | monograma (a letra `r` do próprio wordmark) | `mark-source.svg` |
+| `icon-32.png` | monograma | `mark-source.svg` |
 
-Regenerar: `inkscape --export-type=png --export-filename=icon-256.png -w 256 -h 256 icon-source.svg`
-(e o equivalente 32×32 a partir de `mark-source.svg`).
+Regenerar: `inkscape --export-type=png --export-filename=icon-256.png -w 256 -h 256 mark-source.svg`
+(e o equivalente 32×32). O `.ico` do instalador Windows
+(`../../../packaging/windows/rasgo-modular.ico`) junta 256/64/48/32/16 do
+mesmo desenho (`convert` do ImageMagick). No Linux, `mark-source.svg` é
+instalado como ícone do menu e da barra (`../CMakeLists.txt`). O site usa
+os mesmos arquivos (`website/assets/identity/favicon*`).
+
+## Desde 2 out. 2026: o monograma em todos os tamanhos
+
+O autor não gostou de ver o wordmark no menu e na barra de tarefas. O
+ícone grande, que até então era o wordmark inteiro (`icon-source.svg`,
+mantido aqui como fonte), passou a ser o monograma também; e o Linux,
+que instalava o wordmark master preto em vez de qualquer destes,
+passou a instalar o monograma.
 
 ## Por que dois desenhos diferentes
 

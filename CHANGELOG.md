@@ -7,6 +7,30 @@ pronto.
 
 ---
 
+## v0.1.2 — em preparação
+
+- **Clique no cabo acerta o cabo.** Desde 15 set. o front-end JUCE passava
+  o ponto do mouse em último lugar à função que mede a distância até a
+  curva, que o espera em primeiro: o teste era outro, e o clique só
+  acertava por acaso — o "fico tentando várias vezes" do autor. Nova
+  função `nearestCable`, testada no ctest, que também escolhe o cabo mais
+  próximo quando dois passam perto.
+- **Destaque do cabo sob o mouse** (mais grosso e mais claro) e cursor de
+  mão; o cabo inspecionado fica destacado enquanto a caixa está aberta.
+- **Módulo não foge mais no clique** (regra do autor): clique sobre um cabo
+  é sempre do cabo; o módulo só se move se o clique começar fora de cabo e
+  o arrasto passar de 6 px.
+- **Caixa do cabo fixa no canto inferior direito** da área visível.
+- **Cabeçalho em grupos**, separados por régua: [seed · SEED · REPOR] |
+  [VARIA · MUDA · EVOLUI · CRUZA] | [BANCO · SALVA · ABRIR] | [DESFAZ ·
+  DESCABEIA · ESPERA] | [ZOOM · RACK]. O RACK saiu do canto direito.
+- **Ícone: o monograma** (a letra `r` do wordmark, o favicon do site) em
+  todos os tamanhos e sistemas. No Linux o menu e a barra mostravam o
+  wordmark master preto, quase invisível no painel escuro; o `.desktop`
+  ganhou `StartupWMClass` para a barra associar a janela ao atalho.
+
+---
+
 ## v0.1.1 — 2026-10-02
 
 > **English summary.** Fixes a crash on Windows (and a freeze on Linux and
