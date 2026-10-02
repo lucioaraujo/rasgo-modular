@@ -3402,14 +3402,34 @@ public:
                 {&S::tutFamTitle,     &S::tutFamBody},
                 {&S::tutLearnTitle,   &S::tutLearnBody},
             };
+            // DIAGRAMAÇÃO (pedido do autor, 3 out. 2026: "os textos em
+            // bloco deixam as informações meio truncadas"). A coluna de
+            // leitura tem no máximo 640 px — a 13 pt, umas 85 letras por
+            // linha, em vez de ~120 com o cartão inteiro. Listas escritas
+            // com " · " (o cabeçalho e o teclado) saem um item por linha,
+            // com marcador; os textos longos trazem parágrafos (\n\n) no
+            // próprio `UiLanguage.hpp`. Entre cartões, uma régua e ar.
+            const int readW = std::min(wrapW, 640);
+            bool first = true;
             for (const auto& c : cards) {
+                if (!first) {
+                    g.setColour(T.line);
+                    g.drawHorizontalLine(py, static_cast<float>(px),
+                                         static_cast<float>(px + readW));
+                    py += 14;
+                }
+                first = false;
                 g.setColour(T.accent);
-                g.setFont(juce::FontOptions(kCardPt));
-                g.drawText(str(*c[0]), px, py, wrapW, 18,
+                g.setFont(juce::FontOptions(kCardPt, juce::Font::bold));
+                g.drawText(str(*c[0]), px, py, readW, 18,
                            juce::Justification::topLeft, false);
-                py += 21;
-                py += drawWrapped(g, str(*c[1]), px, py, wrapW, T.textSecondary);
-                py += 12;
+                py += 24;
+                juce::String body = str(*c[1]);
+                if (body.contains(u8(" \xc2\xb7 ")))
+                    body = u8("\xe2\x80\xa2  ")
+                         + body.replace(u8(" \xc2\xb7 "), u8("\n\xe2\x80\xa2  "));
+                py += drawWrapped(g, body, px, py, readW, T.textSecondary);
+                py += 18;
             }
             contentH_ = (py + scroll_) - (viewTop + 4);
             g.restoreState();
@@ -3537,7 +3557,11 @@ public:
     }
     void mouseWheelMove(const juce::MouseEvent&,
                         const juce::MouseWheelDetails& w) override {
-        scrollBy(-juce::roundToInt(w.deltaY * 60.0f));
+        // ~70 px por clique da roda. Era `deltaY * 60`: no Linux o JUCE
+        // entrega deltaY ≈ 0,14 por clique, ou seja ~8 px — menos de uma
+        // linha por clique, e a rolagem parecia não responder.
+        const int step = juce::roundToInt(w.deltaY * 500.0f);
+        scrollBy(-(step == 0 ? (w.deltaY > 0 ? 40 : -40) : step));
     }
 
     std::function<void()> onClose;
@@ -3609,6 +3633,12 @@ public:
             palette_.setLanguage(lang_);
             credits_.setLanguage(lang_);
             view_->setLanguage(lang_);
+            // A caixa LEARN guardava o verbete do idioma ANTERIOR até o
+            // próximo hover — interface em inglês com o LEARN em português
+            // (captura do autor, 3 out. 2026). Volta à dica inicial, que já
+            // sai no idioma novo; o próximo hover traz o verbete traduzido.
+            palette_.setLearn(nullptr, {});
+            learnKey_.clear();
             if (overlay_.mode() != OverlayView::Mode::none)
                 overlay_.show(overlay_.mode(), lang_);
             syncHeader();

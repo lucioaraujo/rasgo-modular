@@ -48,6 +48,15 @@ pronto.
   da tela no instante do corte (continuava no patch, mas para quem toca
   era igual a ter sido apagado). `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo
   cabo ao iniciar, para capturas de tela.
+- **Tutorial diagramado para leitura:** coluna de no máximo 640 px (em vez
+  de linhas de ~120 letras), listas do cabeçalho e do teclado um item por
+  linha, textos longos em parágrafos, régua e espaço entre os cartões, e a
+  roda do mouse rolando ~70 px por clique (eram ~8 px — "a rolagem não
+  responde"). Dois fatos corrigidos no texto, nos 4 idiomas: a gravação é
+  de 24 bits (dizia 16) e o volume do MASTER é ajustado por seed (dizia que
+  começava sempre em −24 dB).
+- **A caixa LEARN segue o idioma:** ao trocar de idioma ela guardava o
+  verbete no idioma anterior até o próximo hover; agora volta à dica.
 - **Tutorial: barra de rolagem de verdade** — trilha visível, polegar
   arrastável, clique na trilha pula uma página. Antes era só um traço
   desenhado e, como qualquer clique fechava o tutorial, tentar arrastá-la

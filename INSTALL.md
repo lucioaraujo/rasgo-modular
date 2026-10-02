@@ -172,7 +172,7 @@ armadilha. Ambos em PCM 24 bits.
 | | |
 |---|---|
 | **Taxa de amostragem** | **a do dispositivo** — o app não impõe uma. Ele abre a saída e adota o que o sistema oferecer (44,1 · 48 · 96 kHz…). A taxa em uso aparece no cartão **SOBRE**, porque a única resposta honesta a "em que taxa estou?" vem da tela, não do código. |
-| **Gravação (REC)** | **WAV PCM 24 bits**, sem dither. A tomada não é o arquivo final: vai ser comparada com o tap `pre-safety` e possivelmente masterizada depois, e 16 bits jogariam fora resolução que não volta — ainda mais porque o MASTER abre em −24 dB de propósito. Em 24 bits o degrau de quantização fica muito abaixo do ruído do material, então dither só somaria ruído. |
+| **Gravação (REC)** | **WAV PCM 24 bits**, sem dither. A tomada não é o arquivo final: vai ser comparada com o tap `pre-safety` e possivelmente masterizada depois, e 16 bits jogariam fora resolução que não volta — ainda mais porque o ganho do MASTER abre com folga abaixo do teto (ajustado por seed para todo patch abrir num volume parecido). Em 24 bits o degrau de quantização fica muito abaixo do ruído do material, então dither só somaria ruído. |
 | **Renders de auditoria/CI** | seguem em PCM 16 com dither TPDF desligado, para continuarem byte-idênticos entre execuções (são *goldens*, não obra). |
 
 **Alvo de publicação declarado (21 set. 2026): streaming / plataformas.**
@@ -221,8 +221,9 @@ medido por um risco de regressão desconhecido.
 ### Problemas comuns
 
 - **Abre mudo.** O instrumento soa ao abrir por desenho. Se não sair som,
-  confira o dispositivo de saída do sistema e o `gain` do módulo MASTER,
-  que começa em −24 dB de propósito.
+  confira o dispositivo de saída do sistema, o botão ESPERA (que cala o
+  master) e o `gain` do módulo MASTER, que cada seed ajusta para abrir num
+  volume parecido.
 - **`RASGO_MODULAR_JUCE_PATH` não definido.** O alvo do app é pulado e só
   o motor é construído; é intencional, pra um checkout limpo compilar sem
   o JUCE à mão.
