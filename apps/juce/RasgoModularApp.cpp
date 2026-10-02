@@ -1389,6 +1389,14 @@ public:
     // thread de áudio 30×/s — ver o comentário em `Rack::cableSnap`.
     void paintCables(juce::Graphics& g) {
         cableHits_.clear();
+        // Destaque: o cabo sob o mouse e o do inspector aberto. Desenhados
+        // DEPOIS dos outros (por cima), mais grossos e mais claros — e o do
+        // inspector continua aceso enquanto a caixa está aberta, que agora
+        // fica num canto fixo da tela, longe do cabo: o destaque é o que
+        // liga uma coisa à outra.
+        const int inspected = insp_.open ? snapIndexOfInspected() : -1;
+        struct Hot { int x0, y0, x1, y1; juce::Colour col; bool cut; };
+        std::vector<Hot> hot;
         for (std::size_t i = 0; i < rack_.cableSnap.size(); ++i) {
             const auto& c = rack_.cableSnap[i];
             const JackScreen* s = findJack(c.source,
@@ -1406,10 +1414,15 @@ public:
             // isso — esmaecido, mas inteiro (o patch continua rodando por
             // baixo; quem ROMPE tudo é o [espaço], e aí eles ficam
             // tracejados de `warning`).
+            const int ii = static_cast<int>(i);
+            if (ii == hoverCable_ || ii == inspected)
+                hot.push_back({s->x, s->y, t->x, t->y, col.brighter(0.45f), cut});
             if (silenced_) col = col.withMultipliedAlpha(0.32f);
             strokeCable(g, s->x, s->y, t->x, t->y, col, cut);
             cableHits_.push_back({i, s->x, s->y, t->x, t->y});
         }
+        for (const auto& c : hot)
+            strokeCable(g, c.x0, c.y0, c.x1, c.y1, c.col, c.cut, 4.0f);
         if (cdrag_.active) {
             // Fonte sem sinal agora: o cabo sai acinzentado. Explica o
             // "liguei e não aconteceu nada" ANTES de ligar — e aponta o
@@ -1439,8 +1452,17 @@ public:
         const int pad = 8, rowH = 20, bw = 190;
         const int rows = hasRel ? 5 : 3;
         const int bh = pad * 2 + rowH * rows;
-        insp_.bx = juce::jlimit(4, std::max(4, getWidth() - bw - 6), insp_.ax);
-        insp_.by = juce::jlimit(4, std::max(4, getHeight() - bh - 6), insp_.ay);
+        // Canto INFERIOR DIREITO da área visível (sugestão do autor, 2 out.
+        // 2026), não mais ao lado do clique: ancorada no clique, a caixa
+        // caía em cima de módulos e cabos vizinhos e mudava de lugar a cada
+        // abertura. Fixa, ela está sempre onde o olho a espera; o cabo
+        // inspecionado fica destacado (ver `paintCables`). Coordenadas da
+        // view: acompanha a rolagem, sempre no canto da janela.
+        juce::Rectangle<int> vis = getLocalBounds();
+        if (auto* vp = findParentComponentOfClass<juce::Viewport>())
+            vis = vp->getViewArea();
+        insp_.bx = std::max(vis.getX() + 4, vis.getRight() - bw - 12);
+        insp_.by = std::max(vis.getY() + 4, vis.getBottom() - bh - 12);
         insp_.bw = bw; insp_.bh = bh;
 
         g.setColour(T.surface);
@@ -1570,7 +1592,7 @@ public:
     }
 
     void strokeCable(juce::Graphics& g, int x0, int y0, int x1, int y1,
-                     juce::Colour col, bool dashed) const {
+                     juce::Colour col, bool dashed, float width = 2.0f) const {
         const auto pts = ui::cablePoints(
             static_cast<float>(x0), static_cast<float>(y0),
             static_cast<float>(x1), static_cast<float>(y1));
@@ -1582,11 +1604,11 @@ public:
         if (dashed) {
             const float dash[] = {5.0f, 4.0f};
             juce::Path dashedPath;
-            juce::PathStrokeType(1.0f).createDashedStroke(dashedPath, path,
-                                                          dash, 2);
+            juce::PathStrokeType(width * 0.5f).createDashedStroke(dashedPath, path,
+                                                                  dash, 2);
             g.fillPath(dashedPath);
         } else {
-            g.strokePath(path, juce::PathStrokeType(2.0f));
+            g.strokePath(path, juce::PathStrokeType(width));
         }
     }
 
@@ -1788,11 +1810,21 @@ public:
             // arrasto de módulo). Quem decide é o GESTO, não a posição:
             // soltar sem mover = clique = inspector; mover além do limiar
             // = arrasto de módulo. Só decidimos no `mouseDrag`/`mouseUp`.
-            mdrag_ = {true, m.id};
+            //
+            // Regra do autor (2 out. 2026), que substitui a decisão pelo
+            // gesto descrita acima: clique SOBRE UM CABO é sempre do cabo —
+            // abre o inspector ao soltar, e arrastar dali não move nada. O
+            // módulo só se desloca se o clique começar numa área SEM cabo e
+            // o arrasto passar de `kDragSlopPx`. Antes, um clique que errava
+            // o cabo por um pixel virava arrasto, e a menor tremida da mão
+            // tirava o módulo do lugar — era preciso DESFAZ e recomeçar.
             downAt_ = e.getPosition();
-            pendingInspect_ = cableUnder(e.getPosition());
+            if (const int ci = cableUnder(e.getPosition()); ci >= 0) {
+                pendingInspect_ = ci;
+                return;
+            }
+            mdrag_ = {true, m.id, false};
             juce::Desktop::getInstance().beginDragAutoRepeat(40);
-            repaint();
             return;
         }
 
@@ -1814,15 +1846,70 @@ public:
     // Alcance proporcional ao zoom: fixo em pixel ficava minúsculo em
     // zoom alto, e mirar numa curva fina já é mais difícil que num jack.
     // índice do cabo sob o ponto (-1 se nenhum)
+    //
+    // De 15 set. a 2 out. 2026 esta função passava o PONTO por último a
+    // `pointNearCable`, que o espera primeiro: testava se o jack de origem
+    // estava perto de uma curva do destino até o mouse. O clique no cabo
+    // acertava por acaso — o "fico tentando várias vezes" do autor. Agora
+    // usa `nearestCable`, testada no ctest, que também escolhe o MAIS
+    // PRÓXIMO quando dois cabos passam perto.
     int cableUnder(juce::Point<int> p) const {
         const float tol = static_cast<float>(mmpx(5.0f) + 3);
+        std::vector<ui::CableEnds> ends;
+        ends.reserve(cableHits_.size());
         for (const auto& ch : cableHits_)
-            if (ui::pointNearCable(
-                    static_cast<float>(ch.x0), static_cast<float>(ch.y0),
-                    static_cast<float>(ch.x1), static_cast<float>(ch.y1),
-                    static_cast<float>(p.x), static_cast<float>(p.y), tol))
-                return static_cast<int>(ch.cable);
-        return -1;
+            ends.push_back({static_cast<float>(ch.x0), static_cast<float>(ch.y0),
+                            static_cast<float>(ch.x1), static_cast<float>(ch.y1)});
+        const int k = ui::nearestCable(static_cast<float>(p.x),
+                                       static_cast<float>(p.y), ends, tol);
+        return k < 0 ? -1 : static_cast<int>(cableHits_[static_cast<std::size_t>(k)].cable);
+    }
+
+    // Há um controle (jack, knob, slider, toggle, célula da MATRIX, [x])
+    // sob o ponto? Esses ganham do cabo no clique, então o destaque de
+    // cabo não acende sobre eles — o destaque tem que mostrar exatamente
+    // o que o clique vai pegar.
+    bool controlAt(juce::Point<int> p) const {
+        if (jackAt(p) >= 0) return true;
+        for (const auto& m : mods_) {
+            if (!m.bounds.contains(p)) continue;
+            if (juce::Rectangle<int>(m.bounds.getRight() - 15, m.bounds.getY() + 2,
+                                     13, 13).contains(p))
+                return true;
+            const std::string ty = rack_.graph.node(m.id).type();
+            if (ty == "MATRIX")
+                for (int j = 0; j < 4; ++j)
+                    for (int k = 0; k < 4; ++k) {
+                        const ui::RectMM rm = ui::matrixCellMM(j, k);
+                        if (juce::Rectangle<int>(m.bounds.getX() + mmpx(rm.x),
+                                                 m.bounds.getY() + mmpx(rm.y),
+                                                 mmpx(rm.w), mmpx(rm.h)).contains(p))
+                            return true;
+                    }
+            for (const auto& w : m.panel.widgets) {
+                const bool interactive = w.kind == Widget::Kind::Knob
+                    || w.kind == Widget::Kind::Slider
+                    || w.kind == Widget::Kind::Toggle
+                    || (w.kind == Widget::Kind::Display && ty == "SCOPE");
+                if (interactive && widgetBounds(m, w).contains(p)) return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    // Destaque do cabo sob o mouse (sugestão do autor, 2 out. 2026): sem
+    // ele só se sabia se o ponteiro estava no cabo DEPOIS de clicar.
+    void mouseMove(const juce::MouseEvent& e) override {
+        setHoverCable(controlAt(e.getPosition()) ? -1 : cableUnder(e.getPosition()));
+    }
+    void mouseExit(const juce::MouseEvent&) override { setHoverCable(-1); }
+    void setHoverCable(int h) {
+        if (h == hoverCable_) return;
+        hoverCable_ = h;
+        setMouseCursor(h >= 0 ? juce::MouseCursor::PointingHandCursor
+                              : juce::MouseCursor::NormalCursor);
+        repaint();
     }
 
     void openInspectorFor(int snapIdx, juce::Point<int> at) {
@@ -1877,18 +1964,25 @@ public:
             repaint();
             return;
         }
-        if (mdrag_.active) {
-            // passou do limiar: é arrasto, não clique — o inspector
-            // pendente é descartado
-            if (pendingInspect_ >= 0
-                && e.getPosition().getDistanceFrom(downAt_) > 4)
+        // clique que começou num cabo: arrastar além do limiar desiste do
+        // clique, e não move nada (regra do autor — ver `mouseDown`)
+        if (pendingInspect_ >= 0 && !mdrag_.active) {
+            if (e.getPosition().getDistanceFrom(downAt_) > kDragSlopPx)
                 pendingInspect_ = -1;
+            return;
+        }
+        if (mdrag_.active) {
+            if (!mdrag_.moved) {          // ainda é clique: zona morta
+                if (e.getPosition().getDistanceFrom(downAt_) <= kDragSlopPx)
+                    return;
+                mdrag_.moved = true;
+            }
             autoScrollAtEdge(e);
             mouse_ = e.getPosition();
             // reordenar ao vivo — só na vista TODOS: nas filtradas a ordem
             // visível é parcial e a conta do índice de destino não fecha.
             // Arrastar pra a paleta pra remover continua valendo nas duas.
-            if (pendingInspect_ < 0) reorderTo(mdrag_.id, e.getPosition());
+            reorderTo(mdrag_.id, e.getPosition());
             repaint();
             return;
         }
@@ -1942,16 +2036,18 @@ public:
         juce::Desktop::getInstance().beginDragAutoRepeat(0);
         if (pan_.active) { pan_.active = false; return; }
         if (cslide_.active) { cslide_.active = false; return; }
+        if (pendingInspect_ >= 0 && !mdrag_.active) {   // clique num cabo
+            openInspectorFor(pendingInspect_, downAt_);
+            pendingInspect_ = -1;
+            return;
+        }
         if (mdrag_.active) {
             const std::size_t id = mdrag_.id;
+            const bool moved = mdrag_.moved;
             mdrag_.active = false;
-            if (pendingInspect_ >= 0) {      // soltou parado: era um clique
-                openInspectorFor(pendingInspect_, downAt_);
-                pendingInspect_ = -1;
-                return;
-            }
-            // soltou sobre a paleta = tira o módulo da case
-            if (overPalette && overPalette(e.getScreenPosition())
+            // soltou sobre a paleta = tira o módulo da case — só se houve
+            // arrasto de verdade, nunca num clique parado
+            if (moved && overPalette && overPalette(e.getScreenPosition())
                 && onRemoveModule)
                 onRemoveModule(id);
             repaint();
@@ -2121,7 +2217,10 @@ private:
         float startVal = 0, lo = 0, hi = 1; int startY = 0; };
     struct JackScreen { std::size_t node; int port; bool isOut;
         PortKind kind; int x, y; };
-    struct ModDrag { bool active = false; std::size_t id = 0; };
+    // `moved`: o módulo só se desloca depois de `kDragSlopPx` de arrasto
+    // (ver `mouseDown`) — antes disso o gesto ainda é um clique.
+    struct ModDrag { bool active = false; std::size_t id = 0; bool moved = false; };
+    static constexpr int kDragSlopPx = 6;
     struct CableHit { std::size_t cable; int x0, y0, x1, y1; };
     enum class InspAct { RelNone, RelRing, RelFold, RelDiff,
                          Amount, Conductance, Rupture };
@@ -2531,7 +2630,7 @@ private:
         g.drawImageAt(m.chrome, m.bounds.getX(), m.bounds.getY());
 
         // ---- borda: fora da camada fixa porque muda com hover/arrasto -
-        const bool dragging = mdrag_.active && mdrag_.id == m.id;
+        const bool dragging = mdrag_.active && mdrag_.moved && mdrag_.id == m.id;
         const bool palHit = !palHover_.empty() && node.type() == palHover_;
         g.setColour((dragging || palHit) ? T.accent : T.line);
         g.drawRect(m.bounds, 1);
@@ -2989,6 +3088,7 @@ private:
     ModDrag mdrag_;
     juce::Point<int> downAt_;
     int pendingInspect_ = -1;   // clique-ou-arrasto ainda indeciso
+    int hoverCable_ = -1;       // cabo sob o mouse (índice no `cableSnap`)
     std::chrono::steady_clock::time_point lastReorder_{};
     std::string palHover_;
     bool silenced_ = false;
