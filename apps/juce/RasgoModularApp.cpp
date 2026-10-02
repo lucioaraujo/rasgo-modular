@@ -920,6 +920,8 @@ public:
             cmdsW_ += 38 + kVaryW + 6;   // rótulo VARIA + slider
             cmdsW_ += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
             cmdsW_ += labelW(str(S2::hdrStandby)) + 6;
+            cmdsW_ += labelW(rackLabel()) + 6;      // RACK, junto do ZOOM
+            cmdsW_ += 4 * kGroupSepW;               // réguas entre grupos
             // A fileira é decidida AQUI, antes de qualquer coisa que a
             // consulte. Decidir depois deixava as guardas do VU e da
             // leitura lendo o valor do quadro ANTERIOR — um atraso de um
@@ -940,14 +942,8 @@ public:
                       + str(rasgo::panel::strings::hdrRec),
                       recording_ || flashing(Act::rec), Act::rec,
                       recording_ ? T.recording : T.accent);
-        // As duas palavras vinham FIXAS em português — o botão dizia
-        // "RACK · SAÍDA" mesmo com a interface em inglês (achado do autor,
-        // 18 set. 2026). As traduções já existiam em `UiLanguage.hpp` e o
-        // painel X11 já as usava; só este caminho as ignorava.
-        rx -= buttonR(g, rx, u8("RACK \xc2\xb7 ")
-                      + str(rackOut_ ? rasgo::panel::strings::hdrRackOut
-                                     : rasgo::panel::strings::hdrRackAll),
-                      rackOut_, Act::rackView);
+        // (o RACK saiu daqui em 2 out. 2026: foi para junto do ZOOM, no
+        // grupo de visualização — ver o fim de `paint`)
 
         // VU do MASTER — a mesma leitura que o painel X11 põe no
         // cabeçalho: dá pra ver que o instrumento está soando sem ter que
@@ -1035,6 +1031,12 @@ public:
         // VARIA: rótulo + slider, no lugar onde o botão ficava. Zero à
         // esquerda é desligado; a marca do meio é o 1,0, o comportamento
         // histórico. Sem isto não há como saber onde era o "normal".
+        // GRUPOS separados por uma régua fina (pedido do autor, 2 out.
+        // 2026): [seed · SEED · REPOR] | [VARIA · MUDA · EVOLUI · CRUZA] |
+        // [BANCO · SALVA · ABRIR] | [DESFAZ · DESCABEIA · ESPERA] |
+        // [ZOOM − + · RACK]. Na segunda fileira (janela estreita) o VARIA
+        // abre a fileira e não leva régua antes.
+        if (cmdY_ == 12) x += groupSeparator(g, x);
         if (x + 38 + kVaryW + 6 < rx - 8) {
             g.setColour(varyAmount_ > 0.0f ? T.textPrimary : T.textSecondary);
             g.drawText(str(rasgo::panel::strings::hdrVary), x, cmdY_, 36, 22,
@@ -1062,6 +1064,8 @@ public:
 
         for (const auto& c : cmds) {
             const juce::String L = str(*c.label);
+            if (c.act == Act::bank || c.act == Act::undo)   // início de grupo
+                x += groupSeparator(g, x);
             // com duas fileiras o corte nunca acontece; a guarda fica só
             // como rede pra janela absurdamente estreita
             if (x + textW(g, L) + 14 > rx - 8) break;
@@ -1081,8 +1085,10 @@ public:
         }
         // (o realce momentâneo de SEED, ZOOM, REC e afins é aplicado nos
         // próprios `button`/`buttonR` acima, via `flashing`)
-        if (x + 24 + 40 < rx - 8) {   // ZOOM − / +
-            x += 10;
+        // ZOOM e RACK juntos: os dois dizem respeito a COMO se vê o rack
+        // (pedido do autor, 2 out. 2026). O RACK vinha do canto direito.
+        if (x + kGroupSepW + 24 + 40 + labelW(rackLabel()) < rx - 8) {
+            x += groupSeparator(g, x);
             g.setColour(T.textSecondary);
             g.setFont(juce::FontOptions(11.0f));
             // `cmdY_`, não 12: na segunda fileira (janela estreita) o
@@ -1092,7 +1098,26 @@ public:
             x += 40;
             x += button(g, x, u8("\xe2\x88\x92"), flashing(Act::zoomOut), Act::zoomOut);
             x += button(g, x, "+", flashing(Act::zoomIn), Act::zoomIn);
+            // As duas palavras vinham FIXAS em português — o botão dizia
+            // "RACK · SAÍDA" mesmo com a interface em inglês (achado do
+            // autor, 18 set. 2026); hoje vêm de `UiLanguage.hpp`.
+            x += button(g, x, rackLabel(), rackOut_, Act::rackView);
         }
+    }
+
+    // Régua fina entre grupos de botões. Devolve a largura que ocupa, a
+    // mesma `kGroupSepW` que as duas contas de largura somam.
+    int groupSeparator(juce::Graphics& g, int x) const {
+        g.setColour(T.line);
+        g.drawVerticalLine(x + kGroupSepW / 2 - 3,
+                           static_cast<float>(btnY_ + 3),
+                           static_cast<float>(btnY_ + 19));
+        return kGroupSepW;
+    }
+    juce::String rackLabel() const {
+        return u8("RACK \xc2\xb7 ")
+            + str(rackOut_ ? rasgo::panel::strings::hdrRackOut
+                           : rasgo::panel::strings::hdrRackAll);
     }
 
 
@@ -1218,16 +1243,17 @@ private:
         need += 38 + kVaryW + 6;   // rótulo VARIA + slider (não mais botão)
         need += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;   // ZOOM
         need += labelW(str(S::hdrStandby)) + 6;                        // ESPERA
+        need += labelW(rackLabel()) + 6;                               // RACK
+        need += 4 * kGroupSepW;                                 // réguas
         // cluster da direita (sem o VU e a leitura, que já têm guarda)
         need += labelW(str(S::hdrAbout)) + labelW(str(S::hdrTutorial))
               + labelW(langLabel()) + labelW(u8("\xe2\x97\x8f ") + str(S::hdrRec))
-              + labelW(u8("RACK \xc2\xb7 ") + str(rackOut_ ? S::hdrRackOut
-                                                            : S::hdrRackAll))
-              + 5 * 6 + 24;
+              + 4 * 6 + 24;
         return need <= width;
     }
 
     static constexpr int kBrandW = 240;   // marca + "MODULAR" + régua
+    static constexpr int kGroupSepW = 14;  // régua entre grupos de botões
     // Largura da caixa do seed, MEDIDA: 20 dígitos (o máximo de um seed de
     // 64 bits, `setInputRestrictions(20, …)`) na fonte do campo, mais as
     // margens internas do `TextEditor`. Eram 108 px fixos, e um seed de 19
