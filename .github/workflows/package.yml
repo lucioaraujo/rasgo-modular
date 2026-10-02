@@ -244,7 +244,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
+          # Tag com hífen (v0.1.2-rc1) é PRÉ-RELEASE: os instaladores ficam
+          # baixáveis para teste, mas a versão anterior continua sendo a
+          # "Latest" e o site não aponta para ela. Decisão do autor em 2
+          # out. 2026: testar baixando do GitHub antes de publicar.
+          PRE=""
+          case "${GITHUB_REF_NAME}" in *-*) PRE="--prerelease" ;; esac
+          gh release create "${GITHUB_REF_NAME}" ${PRE} \
             --repo "${GITHUB_REPOSITORY}" \
             --title "Rasgo Modular ${GITHUB_REF_NAME}" \
             --verify-tag \
