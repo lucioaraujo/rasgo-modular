@@ -4576,24 +4576,45 @@ private:
     void finishRec() {
         rack_.recording.store(false);
         recWasOn_ = false;
+        // nome por data/hora; se já existir (2ª tomada no mesmo segundo),
+        // acrescenta -2, -3… — decidido ANTES da partitura, que agora
+        // cita o arquivo de áudio no cabeçalho
+        const juce::Time agora = juce::Time::getCurrentTime();
+        const juce::String stamp = agora.formatted("rec-%Y%m%d-%H%M%S");
+        juce::File out = recDir().getChildFile(stamp + ".wav");
+        for (int n = 2; out.existsAsFile(); ++n)
+            out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");
+
         std::vector<float> take, takePre;
         std::string scoreText;
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             take.swap(rack_.recBuf);
             takePre.swap(rack_.recPreBuf);
+            // CABEÇALHO da partitura (pedido do autor, 3 out. 2026): quando,
+            // com o quê, de quem. A data vem daqui — o gravador não lê
+            // relógio, para os renders seguirem determinísticos.
+            const double segundos = static_cast<double>(
+                std::max(take.size(), takePre.size())) / 2.0 / sampleRate_;
+            const int tz = agora.getUTCOffsetSeconds() / 60;
+            const juce::String fuso = juce::String::formatted(
+                "%c%02d%02d", tz < 0 ? '-' : '+', std::abs(tz) / 60, std::abs(tz) % 60);
+            rack_.score.setHeader({
+                {"data", (agora.formatted("%Y-%m-%d %H:%M:%S ") + fuso).toStdString()},
+                {"audio", (out.getFileName() + " (24 bits, "
+                           + juce::String(static_cast<int>(sampleRate_)) + " Hz, "
+                           + juce::String(segundos, 1) + " s)").toStdString()},
+                {"instrumento", std::string("Rasgo Modular ") + RASGO_MODULAR_BUILD},
+                {"autoria", "instrumento criado por L\xc3\xbacio Ara\xc3\xbajo \xe2\x80\x94 "
+                            "fam\xc3\xadlia RASGO, rasgosound.arquiviagem.net"},
+                {"licenca", "instrumento sob GNU AGPL-3.0-or-later"},
+                {"contato", "rasgo.instruments@gmail.com"},
+            });
             scoreText = rack_.score.toText();
         }
         if (take.empty() && takePre.empty()) return;
 
         ++recCount_;
-        // nome por data/hora; se já existir (2ª tomada no mesmo segundo),
-        // acrescenta -2, -3…
-        const juce::String stamp =
-            juce::Time::getCurrentTime().formatted("rec-%Y%m%d-%H%M%S");
-        juce::File out = recDir().getChildFile(stamp + ".wav");
-        for (int n = 2; out.existsAsFile(); ++n)
-            out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");
 
         // PCM 24 bits desde 21 set. 2026, quando o alvo de publicação foi
         // declarado (streaming). A tomada do músico não é o arquivo final

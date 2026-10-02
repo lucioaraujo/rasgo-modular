@@ -139,7 +139,17 @@ public:
     std::size_t eventCount() const noexcept { return events_.size(); }
     const std::vector<RasgoEvent>& events() const noexcept { return events_; }
     void clear() noexcept { events_.clear(); nodes_.clear(); seed_ = 0;
-                            sampleRate_ = 0.0; }
+                            sampleRate_ = 0.0; header_.clear(); }
+
+    // Cabeçalho da tomada — data, arquivo de áudio, instrumento, autoria
+    // (pedido do autor, 3 out. 2026: a partitura começava direto no seed,
+    // sem dizer quando nem com o quê foi feita). Quem chama fornece as
+    // linhas: o gravador continua sem ler relógio de parede (regra de
+    // determinismo acima), e sem cabeçalho o texto é o mesmo de sempre.
+    // Cada par sai como `chave valor`, logo depois da linha de formato.
+    void setHeader(std::vector<std::pair<std::string, std::string>> lines) {
+        header_ = std::move(lines);
+    }
 
     // ---- dicionário, preenchido por quem chama ------------------------
     void describe(const std::size_t id, ScoreNodeInfo info) {
@@ -166,6 +176,12 @@ public:
         out << std::fixed;
 
         out << "rasgo-system-score 2\n";
+        if (!header_.empty()) {
+            out << "# Rasgo Modular — partitura de uma tomada\n";
+            for (const auto& [chave, valor] : header_)
+                out << chave << ' ' << valor << '\n';
+            out << '\n';
+        }
         if (seed_ != 0)       out << "seed " << seed_ << '\n';
         if (sampleRate_ > 0.0)
             out << "taxa " << std::setprecision(0) << sampleRate_ << " Hz\n";
@@ -259,6 +275,7 @@ private:
     std::map<std::size_t, ScoreNodeInfo> nodes_;
     std::uint64_t seed_ = 0;
     double sampleRate_ = 0.0;
+    std::vector<std::pair<std::string, std::string>> header_;
 };
 
 }  // namespace rasgo::panel
