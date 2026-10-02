@@ -13,6 +13,7 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <vector>
 
 namespace rasgo::ui {
 
@@ -69,6 +70,36 @@ inline bool pointNearCable(float px, float py, float x0, float y0,
                             float x1, float y1, float threshold) {
     return distanceToPolyline(px, py, cablePoints(x0, y0, x1, y1))
         <= threshold;
+}
+
+// As duas pontas de um cabo na tela, na ordem do desenho (origem →
+// destino).
+struct CableEnds {
+    float x0, y0, x1, y1;
+};
+
+// Índice do cabo cujo CORPO passa mais perto de (px,py), se estiver a
+// `threshold` pixels ou menos; -1 se nenhum.
+//
+// O MAIS PRÓXIMO, não o primeiro da lista: com cabos sobrepostos o
+// primeiro que coubesse na tolerância ganhava, e o clique abria um cabo
+// vizinho daquele que o músico mirou. E o ponto vem PRIMEIRO, como em
+// `pointNearCable` — o front-end JUCE chamava esta família de funções com
+// o ponto por último (de 15 set. a 2 out. 2026), o que testava se o JACK
+// DE ORIGEM estava perto de uma curva do destino até o mouse: o clique no
+// cabo acertava por acaso e errava quase sempre.
+inline int nearestCable(float px, float py,
+                        const std::vector<CableEnds>& cables,
+                        float threshold) {
+    int best = -1;
+    float bestD = threshold;
+    for (std::size_t i = 0; i < cables.size(); ++i) {
+        const auto& c = cables[i];
+        const float d = distanceToPolyline(
+            px, py, cablePoints(c.x0, c.y0, c.x1, c.y1));
+        if (d <= bestD) { bestD = d; best = static_cast<int>(i); }
+    }
+    return best;
 }
 
 } // namespace rasgo::ui
