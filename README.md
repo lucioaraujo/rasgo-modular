@@ -1,6 +1,6 @@
 # Rasgo Modular
 
-![Rasgo Modular running: a three-row rack of modules crossed by some seventy orange and blue cables](screenshots/rack-completo-2026-09-18.png)
+![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
 **Download:** [v0.1.1 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) ·
