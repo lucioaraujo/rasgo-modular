@@ -248,7 +248,13 @@ jobs:
             --repo "${GITHUB_REPOSITORY}" \
             --title "Rasgo Modular ${GITHUB_REF_NAME}" \
             --verify-tag \
-            --notes "Notas desta versão: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) · instalação por plataforma: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
+            --notes "Release notes: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) (English summary at the top of each version) · installation per platform: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
+
+          **Stated limitation:** the Windows and macOS packages were built, packaged and tested **by continuous integration only** — the author has never opened the application on those two systems. The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
+
+          ---
+
+          Notas desta versão: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) · instalação por plataforma: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
 
           **Limitação declarada:** Windows e macOS foram construídos, empacotados e testados **somente pela integração contínua** — o autor nunca abriu o aplicativo nesses dois sistemas. O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
             $(find pacotes -type f \( -name '*.deb' -o -name '*.dmg' -o -name '*.exe' \))
