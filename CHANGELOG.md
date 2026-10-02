@@ -35,6 +35,12 @@ pronto.
   da tela no instante do corte (continuava no patch, mas para quem toca
   era igual a ter sido apagado). `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo
   cabo ao iniciar, para capturas de tela.
+- **Tutorial: barra de rolagem de verdade** — trilha visível, polegar
+  arrastável, clique na trilha pula uma página. Antes era só um traço
+  desenhado e, como qualquer clique fechava o tutorial, tentar arrastá-la
+  fechava a janela; agora só fecham o FECHAR, um clique fora do cartão e
+  `Esc`. Saem os asteriscos de "negrito" que apareciam literais no texto.
+  `RASGO_TUTORIAL=1` abre o tutorial ao iniciar, para capturas.
 - **Cabeçalho em grupos**, separados por régua: [seed · SEED · REPOR] |
   [VARIA · MUDA · EVOLUI · CRUZA] | [BANCO · SALVA · ABRIR] | [DESFAZ ·
   DESCABEIA · ESPERA] | [ZOOM · RACK]. O RACK saiu do canto direito.
