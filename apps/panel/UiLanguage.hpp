@@ -113,9 +113,10 @@ inline const L4 close      {"CLOSE",    "FECHAR",   "FERMER",     "CERRAR"};
 // arquivo.
 inline const L4 inspRupture   {"BREAK",     "ROMPER",     "ROMPRE",      "ROMPER"};
 inline const L4 inspReconnect {"RECONNECT", "RECONECTAR", "RECONNECTER", "RECONECTAR"};
-// caixa do cabo, grupo 1 (2 out. 2026): tirar o cabo pela própria caixa, e
+// caixa do cabo, grupo 1 (2 out. 2026): tirar o cabo pela própria caixa
+// ("REMOVER" lia como tirar o MÓDULO — trocado a pedido do autor), e
 // a marca de cabo de realimentação (atrasado um bloco para fechar um laço)
-inline const L4 inspRemove    {"REMOVE",    "REMOVER",    "RETIRER",     "QUITAR"};
+inline const L4 inspRemove    {"UNPLUG",    "DESPLUGAR",  "DÉBRANCHER",  "DESENCHUFAR"};
 inline const L4 inspFeedback  {"FEEDBACK",  "REALIMENTA", "RÉTROACTION", "REALIMENTA"};
 inline const L4 openPatch     {"Open patch","Abrir patch","Ouvrir un patch","Abrir patch"};
 inline const L4 builtOn       {"built",     "compilado",  "compilé",     "compilado"};

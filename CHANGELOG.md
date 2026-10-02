@@ -27,7 +27,13 @@ pronto.
   tinha controle), **COND sempre visível** (só aparecia depois de escolher
   uma relação, embora funcione sem ela), **luz de condução** ao vivo,
   marca de **realimentação**, o **companion pelo nome** (clicar volta a
-  escolher) e **REMOVER**. `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo
+  escolher) e **DESPLUGAR** (era "REMOVER", que lia como tirar o módulo).
+- **Desplugar na vista RACK · SAÍDA não some com o módulo.** Quem chegava ao
+  som e deixou de chegar com o corte fica à vista por exceção, com borda
+  tracejada, como o módulo recém-adicionado — vale para o DESPLUGAR, o
+  clique direito no jack e pegar a ponta do cabo. Antes, o módulo sumia
+  da tela no instante do corte (continuava no patch, mas para quem toca
+  era igual a ter sido apagado). `RASGO_INSPECIONAR=n` abre a caixa do n-ésimo
   cabo ao iniciar, para capturas de tela.
 - **Cabeçalho em grupos**, separados por régua: [seed · SEED · REPOR] |
   [VARIA · MUDA · EVOLUI · CRUZA] | [BANCO · SALVA · ABRIR] | [DESFAZ ·
