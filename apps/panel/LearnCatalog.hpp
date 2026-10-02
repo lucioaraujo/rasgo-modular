@@ -90,23 +90,91 @@ struct LearnEntry {
 // É o defeito mais caro da lista, porque o que estava escondido não era
 // um recurso lateral: é a ideia que separa este instrumento de um modular
 // comum — o cabo como objeto com estado, e não um fio que só liga.
-inline const LearnEntry& learnCable() {
-    static const LearnEntry e{
-        "o cabo é um OBJETO, não um fio. Clique sobre ele para abrir o "
-        "inspector e mexer no que ele faz com o sinal que passa.",
+//
+// 2 out. 2026: o verbete existia só em PORTUGUÊS — aparecia assim mesmo com
+// a interface em inglês, francês ou espanhol, e escapou da tradução do
+// LEARN inteiro em 27 set. E dizia que a RELAÇÃO combina o cabo "com o
+// sinal que já chegava no destino", com "SOMA" como normal: não é o que o
+// motor faz. A relação combina o que atravessa com um SEGUNDO sinal, o
+// companion (`Relation` em `SignalGraph.hpp`), e o normal é NONE. Corrigido
+// junto com a caixa nova do cabo (GAIN, COND sempre, DESPLUGAR).
+inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
+    static const LearnEntry en{
+        "a cable is an OBJECT, not a wire. Click it to open its box (bottom "
+        "right) and change what it does to the signal passing through.",
 
-        "todo cabo tem ganho (AMT) e condutância (COND — a chance de "
-        "deixar passar em cada instante, de onde vem a intermitência "
-        "viva), e uma RELAÇÃO com o sinal que já chegava no destino: "
-        "SOMA é o normal; RING multiplica os dois; FOLD dobra a soma "
-        "sobre si mesma; DIFF usa a diferença. Um cabo também pode ser "
-        "ROMPIDO sem ser removido — o som decai numa cicatriz em vez de "
-        "cortar seco, e [espaço] rompe e reata todos de uma vez.",
+        "every cable has GAIN (0 to 2, neutral in the middle) and "
+        "conductance, COND — the chance of letting through at each moment, "
+        "where the living intermittence comes from. Its RELATION combines "
+        "what crosses it with a second signal, the companion: NONE just "
+        "lets it through, RING multiplies, FOLD folds the signal driven by "
+        "the companion, DIFF subtracts it; AMT says how much. A cable can "
+        "also be BROKEN without being removed — the sound decays into a "
+        "scar instead of cutting dead, and [space] breaks and restores them "
+        "all at once.",
 
-        "ligue dois sinais no mesmo destino e troque a relação de SOMA "
-        "para RING: a mesma fiação, outro instrumento. Depois baixe COND "
-        "pela metade e ouça a ligação piscar."};
-    return e;
+        "set a cable to RING with an oscillator as companion: the same "
+        "wiring, another instrument. Then drop COND to half and hear the "
+        "connection flicker."};
+    static const LearnEntry pt{
+        "o cabo é um OBJETO, não um fio. Clique sobre ele para abrir a "
+        "caixa dele (no canto inferior direito) e mexer no que ele faz com "
+        "o sinal que passa.",
+
+        "todo cabo tem GANHO (0 a 2, neutro no meio) e condutância, COND — "
+        "a chance de deixar passar em cada instante, de onde vem a "
+        "intermitência viva. A RELAÇÃO combina o que atravessa o cabo com "
+        "um segundo sinal, o companion: NONE só deixa passar; RING "
+        "multiplica; FOLD dobra o sinal comandado pelo companion; DIFF o "
+        "subtrai; AMT diz quanto. Um cabo também pode ser ROMPIDO sem ser "
+        "removido — o som decai numa cicatriz em vez de cortar seco, e "
+        "[espaço] rompe e reata todos de uma vez.",
+
+        "ponha um cabo em RING com um oscilador como companion: a mesma "
+        "fiação, outro instrumento. Depois baixe COND pela metade e ouça a "
+        "ligação piscar."};
+    static const LearnEntry fr{
+        "un câble est un OBJET, pas un fil. Cliquez dessus pour ouvrir sa "
+        "fenêtre (en bas à droite) et changer ce qu’il fait au signal qui "
+        "le traverse.",
+
+        "tout câble a un GAIN (0 à 2, neutre au milieu) et une conductance, "
+        "COND — la chance de laisser passer à chaque instant, d’où vient "
+        "l’intermittence vivante. Sa RELATION combine ce qui le traverse "
+        "avec un second signal, le compagnon : NONE laisse simplement "
+        "passer, RING multiplie, FOLD replie le signal piloté par le "
+        "compagnon, DIFF le soustrait ; AMT dit combien. Un câble peut aussi "
+        "être ROMPU sans être retiré — le son décroît en cicatrice au lieu "
+        "de couper net, et [espace] les rompt et les rétablit tous d’un "
+        "coup.",
+
+        "mettez un câble en RING avec un oscillateur comme compagnon : le "
+        "même câblage, un autre instrument. Puis baissez COND de moitié et "
+        "écoutez la liaison clignoter."};
+    static const LearnEntry es{
+        "un cable es un OBJETO, no un hilo. Haga clic sobre él para abrir "
+        "su caja (abajo a la derecha) y cambiar lo que hace con la señal "
+        "que lo atraviesa.",
+
+        "todo cable tiene GANANCIA (0 a 2, neutra en el centro) y "
+        "conductancia, COND — la probabilidad de dejar pasar en cada "
+        "instante, de donde viene la intermitencia viva. Su RELACIÓN "
+        "combina lo que lo atraviesa con una segunda señal, el compañero: "
+        "NONE solo deja pasar, RING multiplica, FOLD pliega la señal guiada "
+        "por el compañero, DIFF lo resta; AMT dice cuánto. Un cable también "
+        "puede ser ROTO sin ser retirado — el sonido decae en una cicatriz "
+        "en vez de cortarse seco, y [espacio] los rompe y restablece todos "
+        "a la vez.",
+
+        "ponga un cable en RING con un oscilador como compañero: el mismo "
+        "cableado, otro instrumento. Luego baje COND a la mitad y escuche la "
+        "conexión parpadear."};
+    switch (lang) {
+    case Lang::en: return en;
+    case Lang::fr: return fr;
+    case Lang::es: return es;
+    default:       return pt;
+    }
 }
 
 namespace detail {
