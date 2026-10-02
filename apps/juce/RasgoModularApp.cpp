@@ -58,6 +58,7 @@
 #include <random>
 #include <set>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace {
@@ -4163,7 +4164,19 @@ private:
 
         view_->repaint();
         header_.repaint();
+
+        // `RASGO_DIAG=1`: imprime no terminal, a cada 10 s, quantos blocos
+        // de áudio se perderam (o mesmo número do SOBRE). Existe para medir
+        // a disputa do `gmx` entre interface e áudio (estalos relatados em
+        // 2-3 out. 2026: 2247 blocos perdidos numa sessão).
+        if (diag_ && ++diagFrames_ >= 300) {
+            diagFrames_ = 0;
+            std::fprintf(stderr, "[diag] blocos perdidos: %u\n",
+                         rack_.starvedBlocks.load(std::memory_order_relaxed));
+        }
     }
+    const bool diag_ = std::getenv("RASGO_DIAG") != nullptr;
+    int diagFrames_ = 0;
 
     // Caixa LEARN: o que está sob o mouse — um widget do rack, o corpo de
     // um módulo, ou uma linha da paleta. O conteúdo só troca depois de 1 s
@@ -4672,7 +4685,23 @@ private:
     // cada mexida na interface.
     void renderBlock() {
         std::unique_lock<std::mutex> lk(rack_.gmx, std::try_to_lock);
+        // ESPERA CURTA antes de desistir (3 out. 2026). Desistir na
+        // primeira tentativa perdia ~2 blocos por segundo num patch comum:
+        // a interface segura o `gmx` por frações de milissegundo a cada
+        // quadro (o VARIA mexe nos parâmetros sob ele), e o áudio, que
+        // chega a cada ~6 ms, esbarrava nessas janelas. Cada bloco perdido
+        // é uma queda de ~6 ms no som — muitas por minuto soavam como
+        // estalos (relato do autor: 2247 perdidos numa sessão, e a
+        // gravação limpa, porque o bloco perdido não entra nela). As
+        // seções da interface são curtas; esperar até 1,5 ms dos ~6 ms do
+        // bloco cobre quase todas sem arriscar o prazo do dispositivo.
         if (!lk) {
+            const auto limite = std::chrono::steady_clock::now()
+                              + std::chrono::microseconds(1500);
+            while (!lk.try_lock() && std::chrono::steady_clock::now() < limite)
+                std::this_thread::yield();
+        }
+        if (!lk.owns_lock()) {
             rack_.starvedBlocks.fetch_add(1, std::memory_order_relaxed);
 
             // FOME: a interface está com o grafo e não há bloco novo.
