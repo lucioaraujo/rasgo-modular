@@ -3,7 +3,7 @@
 ![Rasgo Modular running: a three-row rack of modules crossed by some seventy orange and blue cables](screenshots/rack-completo-2026-09-18.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.0 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) ·
+**Download:** [v0.1.1 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -23,7 +23,7 @@ re-patching by hand, adjusting, letting it drift, or taking it all apart and
 building from scratch.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Version:** v0.1.0 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.1 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -66,7 +66,7 @@ saved as `.rmp`.
 
 ### Download
 
-[**v0.1.0 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+[**v0.1.1 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) —
 Linux `.deb`, Windows `.exe`, macOS `.dmg`, all built and packaged by
 continuous integration.
 
@@ -99,7 +99,7 @@ recabeando à mão, ajustando, deixando derivar, ou desmontando tudo e
 construindo do zero.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Versão:** v0.1.0 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.1 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que ele é
@@ -141,7 +141,7 @@ topologia e cada gesto da tomada. Os patches são salvos em `.rmp`.
 
 ### Download
 
-[**Release v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+[**Release v0.1.1**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construídos
 e empacotados pela integração contínua.
 
@@ -174,7 +174,7 @@ jouiez à partir de lui — en recâblant à la main, en ajustant, en le laissan
 dériver, ou en démontant tout pour construire depuis zéro.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Version :** v0.1.0 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.1 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -220,7 +220,7 @@ enregistrés en `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+[**Version v0.1.1**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
@@ -253,7 +253,7 @@ recableando a mano, ajustando, dejándolo derivar, o desmontándolo todo y
 construyendo desde cero.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Versión:** v0.1.0 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.1 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -295,7 +295,7 @@ con la topología y cada gesto de la toma. Los patches se guardan en `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.0**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0) —
+[**Versión v0.1.1**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 

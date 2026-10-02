@@ -7,7 +7,17 @@ pronto.
 
 ---
 
-## v0.1.1 — em preparação
+## v0.1.1 — 2026-10-02
+
+> **English summary.** Fixes a crash on Windows (and a freeze on Linux and
+> macOS) when picking up the end of a cable from an input that was already
+> patched — the most common way to re-patch. The window now always opens
+> maximised on the primary monitor. Each module shows its family as a thin
+> colour stripe at the top, with the matching colour as a legend in the
+> module palette. The header shows the full 20-digit seed, the VARY slider
+> is wider, STANDBY sits next to UNCABLE, and REC turns red while
+> recording. Windows and macOS are still built and tested by continuous
+> integration only. Details below, in Portuguese.
 
 - **Faixa de cor por família** no topo de cada módulo, e o mesmo tom num
   quadrado ao lado do nome da família na paleta, que serve de legenda.
@@ -23,7 +33,7 @@ pronto.
 - **Cabeçalho** (pedidos do autor, 2 out. 2026): a caixa do seed mede a
   própria largura pela fonte e mostra os 20 dígitos inteiros (cortava o
   primeiro em seeds longos); o slider VARIA passou de 54 para 84 px, para
-  ajuste fino; ESPERA fica logo à direita do DESCABEIA, com a régua antes;
+  ajuste fino; ESPERA fica logo à direita do DESCABEIA;
   o rótulo ZOOM deixa de ficar sozinho na primeira fileira quando os
   comandos descem para a segunda.
 - **Corrigido: o app fechava (Windows) ou congelava (Linux/macOS) ao

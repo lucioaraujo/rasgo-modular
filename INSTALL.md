@@ -1,11 +1,12 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (2 out. 2026):** a **v0.1.0 foi publicada** em 29 set. 2026,
-> com instaladores para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.0).
-> Este documento descreve também como construir e rodar a partir do
-> código. *English:* v0.1.0 was released on 29 Sep 2026 — installers on
-> the release page above; the English section is further down.
+> **Estado (2 out. 2026):** a versão atual é a **v0.1.1**, com
+> instaladores para Linux, Windows e macOS na
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1)
+> (a v0.1.0 saiu em 29 set. 2026). Este documento descreve também como
+> construir e rodar a partir do código. *English:* the current version is
+> v0.1.1 — installers on the release page above; the English section is
+> further down.
 
 ---
 
