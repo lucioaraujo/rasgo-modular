@@ -340,6 +340,13 @@ struct Rack {
         std::lock_guard<std::mutex> lk(gmx);
         for (std::size_t i = graph.cableCount(); i-- > 0;) {
             const auto& c = graph.cable(i);
+            // A ligação FINAL (MASTER → saída de som) fica. A saída é um nó
+            // que não aparece no rack: tirada essa ligação, não havia como
+            // refazê-la, e o patch ficava mudo até um SEED ou DESFAZ — o
+            // "construir do zero" do tutorial não funcionava (achado em 3
+            // out. 2026, ao escrever o guia do site). É o cabo da caixa de
+            // som do instrumento: descabear não o tira.
+            if (c.target().node == sink) continue;
             graph.disconnect(c.target().node, c.target().port);
         }
         cableSnap.clear();
@@ -1778,9 +1785,13 @@ public:
                         any = rack_.graph.disconnect(
                             j.node, static_cast<std::size_t>(j.port));
                     } else {
-                        // tira todos os cabos que SAEM deste jack
+                        // tira todos os cabos que SAEM deste jack — menos
+                        // a ligação final à saída de som, que não aparece
+                        // no rack e não teria como ser refeita (ver
+                        // `Rack::clearCables`)
                         for (std::size_t i = rack_.graph.cableCount(); i-- > 0;) {
                             const auto& c = rack_.graph.cable(i);
+                            if (c.target().node == rack_.sink) continue;
                             if (c.source().node == j.node
                                 && static_cast<int>(c.source().port) == j.port) {
                                 rack_.graph.disconnect(c.target().node,
@@ -4311,6 +4322,17 @@ private:
             rack_.shown.push_back(id);
             rack_.scopes[id];
             rack_.byType[type] = id;
+            // Um MASTER novo, com a saída de som vazia (o anterior foi
+            // removido), vai direto à saída — ela não aparece no rack e
+            // não teria como ser cabeada à mão (ver `Rack::clearCables`).
+            if (type == "MASTER") {
+                bool saidaLigada = false;
+                for (std::size_t i = 0; i < rack_.graph.cableCount(); ++i)
+                    if (rack_.graph.cable(i).target().node == rack_.sink)
+                        saidaLigada = true;
+                if (!saidaLigada)
+                    try { rack_.graph.connect(id, 0, rack_.sink, 0); } catch (...) {}
+            }
             rack_.reprepare();
             newId = id;
         }
@@ -4648,8 +4670,11 @@ private:
                            + juce::String(static_cast<int>(sampleRate_)) + " Hz, "
                            + juce::String(segundos, 1) + " s)").toStdString()},
                 {"instrumento", std::string("Rasgo Modular ") + RASGO_MODULAR_BUILD},
-                {"autoria", "instrumento criado por L\xc3\xbacio Ara\xc3\xbajo \xe2\x80\x94 "
-                            "fam\xc3\xadlia RASGO, rasgosound.arquiviagem.net"},
+                // literais PARTIDOS depois de cada \x: o escape hexadecimal
+                // engole todo dígito hexa seguinte ("\xbac" de "Lúcio"), e
+                // Clang e MSVC recusam — o rc2 caiu no macOS e no Windows
+                {"autoria", "instrumento criado por L\xc3\xba" "cio Ara\xc3\xba" "jo "
+                            "\xe2\x80\x94 fam\xc3\xad" "lia RASGO, rasgosound.arquiviagem.net"},
                 {"licenca", "instrumento sob GNU AGPL-3.0-or-later"},
                 {"contato", "rasgo.instruments@gmail.com"},
             });
