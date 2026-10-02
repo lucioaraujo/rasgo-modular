@@ -1772,6 +1772,7 @@ public:
                 rack_.pushUndo();          // cortar cabo é desfazível
                 {
                     std::lock_guard<std::mutex> lk(rack_.gmx);
+                    const auto before = rack_.graph.nodesFeeding(rack_.sink);
                     if (!j.isOut) {
                         any = rack_.graph.disconnect(
                             j.node, static_cast<std::size_t>(j.port));
@@ -1787,7 +1788,10 @@ public:
                             }
                         }
                     }
-                    if (any) rack_.reprepare();   // sem isto o corte não vale
+                    if (any) {
+                        rack_.reprepare();   // sem isto o corte não vale
+                        keepVisibleAfterCut(before);
+                    }
                 }
                 if (any) layoutFor(viewportW_, viewportH_);  // vista filtrada
                 repaint();
@@ -1813,9 +1817,11 @@ public:
                     if (from >= 0) {
                         const auto src = rack_.graph.cable(
                             static_cast<std::size_t>(from)).source();
+                        const auto before = rack_.graph.nodesFeeding(rack_.sink);
                         rack_.graph.disconnect(
                             j.node, static_cast<std::size_t>(j.port));
                         rack_.reprepare();
+                        keepVisibleAfterCut(before);
                         rebuildJacks();
                         const JackScreen* sj = findJack(
                             src.node, static_cast<int>(src.port), true);
@@ -2239,8 +2245,10 @@ public:
             {
                 std::lock_guard<std::mutex> lk(rack_.gmx);
                 if (const int li = liveIndexOfInspected(); li >= 0) {
+                    const auto before = rack_.graph.nodesFeeding(rack_.sink);
                     rack_.graph.disconnect(insp_.tnode, insp_.tport);
                     rack_.reprepare();
+                    keepVisibleAfterCut(before);
                 }
             }
             insp_.open = false;
@@ -2630,6 +2638,21 @@ public:
     // Um módulo que acabou de entrar: fica visível mesmo na vista SAÍDA
     // até ser cabeado até o som. Ver `relayout`.
     void markPending(std::size_t id) { pending_.insert(id); }
+
+    // Desplugar na vista SAÍDA: quem chegava ao som antes do corte e deixou
+    // de chegar fica à vista POR EXCEÇÃO (borda tracejada), como o módulo
+    // recém-adicionado. Sem isto o módulo — e tudo o que o alimentava —
+    // sumia da tela no instante do corte: continuava no patch, mas para
+    // quem toca era igual a ter sido apagado (relato do autor, 2 out.
+    // 2026: "o módulo está sendo removido"). Chamar sob `gmx`, com o
+    // `nodesFeeding` tirado ANTES do corte.
+    void keepVisibleAfterCut(const std::vector<char>& before) {
+        if (!outputOnly_) return;
+        const auto after = rack_.graph.nodesFeeding(rack_.sink);
+        for (std::size_t i = 0; i < before.size(); ++i)
+            if (before[i] && !(i < after.size() && after[i]))
+                pending_.insert(i);
+    }
 
     // O rack desenha o inspector de cabo, que tem PROSA (romper /
     // reconectar) — então ele precisa saber o idioma. Não sabia: o
