@@ -9,6 +9,15 @@ pronto.
 
 ## v0.1.1 — em preparação
 
+- **Faixa de cor por família** no topo de cada módulo, e o mesmo tom num
+  quadrado ao lado do nome da família na paleta, que serve de legenda.
+  Sugestão de um usuário do r/modular (não se via de relance a família de
+  um módulo dentro do rack); faixa escolhida pelo autor entre faixa e
+  fundo tingido, por capturas do mesmo patch. Tons de saturação baixa,
+  para não competir com a cor dos cabos (quentes = áudio, frios =
+  controle); o par mais próximo, TRANSFORM e SPACE, fica a ΔE 17,8. Está
+  na camada fixa do módulo: custo zero por quadro.
+- Sai a régua entre DESCABEIA e ESPERA.
 - **Cabeçalho** (pedidos do autor, 2 out. 2026): a caixa do seed mede a
   própria largura pela fonte e mostra os 20 dígitos inteiros (cortava o
   primeiro em seeds longos); o slider VARIA passou de 54 para 84 px, para
