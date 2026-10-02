@@ -95,6 +95,46 @@ void despejarModulos() {
     std::printf("\n]\n");
 }
 
+// `--referencia`: a FICHA TÉCNICA de cada módulo, tirada do próprio motor —
+// parâmetros (faixa, padrão, unidade), portas e painel, com o rótulo que o
+// músico vê. Existe para a revisão didática do guia do site (2 out. 2026):
+// todo texto público sobre um controle tem que bater com o que o módulo
+// de fato expõe, e ler isso do código evita repetir de memória um nome ou
+// uma faixa errados (o LEARN chamava o FILTER de "multimodo", e ele tem
+// três saídas simultâneas).
+void despejarReferencia() {
+    for (const auto& grp : rasgo::panel::moduleCatalog()) {
+        for (const char* t : grp.types) {
+            auto n = rasgo::panel::makeModule(t);
+            if (!n) continue;
+            std::printf("## %s  (%s)\n", t, grp.family);
+            const auto rotulo = [&](const std::string& bind) {
+                for (const auto& w : n->panel().widgets)
+                    if (w.bind == bind) return w.label;
+                return std::string("-");
+            };
+            for (const auto& p : n->parameters()) {
+                const auto& d = p.descriptor;
+                std::printf("  param %-14s [%s]  %g..%g  padrão %g %s\n",
+                            d.id.c_str(), rotulo(d.id).c_str(), d.minimum,
+                            d.maximum, d.defaultValue, d.unit.c_str());
+            }
+            for (std::size_t i = 0; i < n->inputCount(); ++i) {
+                const auto& pd = n->inputDescriptor(i);
+                std::printf("  in    %-14s [%s]  %s %s\n", pd.name.c_str(),
+                            rotulo("in:" + pd.name).c_str(),
+                            portKindName(pd.kind), pd.unit.c_str());
+            }
+            for (std::size_t i = 0; i < n->outputCount(); ++i) {
+                const auto& pd = n->outputDescriptor(i);
+                std::printf("  out   %-14s [%s]  %s %s\n", pd.name.c_str(),
+                            rotulo("out:" + pd.name).c_str(),
+                            portKindName(pd.kind), pd.unit.c_str());
+            }
+        }
+    }
+}
+
 void despejar(const char* familia) {
     std::printf("[\n");
     bool primeiro = true;
@@ -124,6 +164,10 @@ void despejar(const char* familia) {
 
 int main(int argc, char** argv) {
     if (argc > 2 && std::string(argv[1]) == "--despejar") { despejar(argv[2]); return 0; }
+    if (argc > 1 && std::string(argv[1]) == "--referencia") {
+        despejarReferencia();
+        return 0;
+    }
     if (argc > 1 && std::string(argv[1]) == "--despejar-modulos") {
         despejarModulos();
         return 0;

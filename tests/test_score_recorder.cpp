@@ -146,7 +146,29 @@ void testSoOsModulosQueParticipam() {
 
 }  // namespace
 
+// O cabeçalho da tomada sai logo depois da linha de formato, que continua
+// sendo a primeira; e sem cabeçalho nada muda (determinismo dos renders).
+void testCabecalho() {
+    ScoreRecorder rec;
+    rec.setSeed(42);
+    const std::string sem = rec.toText();
+    check(sem.find("# Rasgo Modular") == std::string::npos,
+          "sem cabeçalho, o texto não ganha linhas novas");
+    rec.setHeader({{"data", "2026-10-03 00:12:05 +0200"},
+                   {"instrumento", "Rasgo Modular v0.1.2"}});
+    const std::string com = rec.toText();
+    check(com.find("rasgo-system-score 2\n# Rasgo Modular") == 0,
+          "a linha de formato continua primeira, o cabeçalho logo depois");
+    check(com.find("data 2026-10-03 00:12:05 +0200\n") != std::string::npos,
+          "a data aparece como chave valor");
+    check(com.find("seed 42") != std::string::npos, "o seed continua");
+    rec.clear();
+    check(rec.toText().find("# Rasgo Modular") == std::string::npos,
+          "clear() limpa também o cabeçalho");
+}
+
 int main() {
+    testCabecalho();
     testRecordsInOrder();
     testTextFormatContainsFields();
     testDeterministicText();
