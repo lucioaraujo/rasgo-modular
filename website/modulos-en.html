@@ -1270,44 +1270,184 @@
   <article class="modulo" id="mod-SPACE">
     <h3>SPACE</h3>
     <figure class="painel"><img src="assets/modulos/SPACE.webp" alt="SPACE module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Reverberation — a multitap Schroeder/Dattorro network, from short ambience to a long tail; pre-delay and damping.</p>
-    <p><span class="nivel">How it works</span> SPACE is the 'classic' reverb; HALL is an 8-line FDN (denser, stereo); MEMORY is granular.</p>
+    <h4>What it is</h4>
+    <p>SPACE puts the sound in a place. It repeats the sound with a delay, once or several times, and can spread those repeats until they merge into a continuous tail. With a few adjustments it goes from a crisp echo to a wide room.</p>
+    <h4>How to think about it</h4>
+    <p>Echo and reverb are two ends of the same road. A single delay, with nothing else, is an echo. Add repeats, feed them back to the input and scramble them, and the ear stops telling them apart: it hears a room. SPACE travels that whole road. Its place is near the end of the patch, before MIXER or MASTER, and several voices going through the same SPACE sound as if they were in the same room.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TIME</b>: the delay time, from 2 milliseconds to 2 seconds. Turning it while sound is passing makes the space seem to change size.</li>
+      <li><b>TAPS</b>: how many repeats come out on each pass, from 1 to 8.</li>
+      <li><b>SPRD</b>: spreads those repeats in time. At zero they come out together, as a single echo; at maximum they form a rhythmic pattern.</li>
+      <li><b>FBK</b>: how much of the repeated sound goes back to be repeated again. More means more repeats and a longer tail.</li>
+      <li><b>DIFF</b>: scrambles the repeats until they can no longer be heard one by one. Raise FBK and DIFF together and the echo becomes a room.</li>
+      <li><b>TONE</b>: the brightness of the repeats. Low, each pass gets darker, as in a real room; high, the brightness holds.</li>
+      <li><b>MOD</b>: a slight wobble in the repeat timing, which makes the tail wider and shimmering.</li>
+      <li><b>MIX</b>: the blend between the original and the processed sound, on the OUT output.</li>
+    </ul>
+    <p>Inputs: IN, the sound; TIME and FBK, to modulate those controls. Outputs: OUT, the blend; WET, the processed sound only.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect a voice that plays short notes, such as a MATTER played by CLOCK, to the IN input, and OUT to a MIXER input.</li>
+      <li>Set TAPS to 1, SPRD and DIFF to zero, and FBK to a third. You hear a clean echo.</li>
+      <li>Raise DIFF and FBK together, slowly. The echo turns into a room without any jump.</li>
+      <li>Move TIME while the tail is ringing and hear the space change size.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-HALL">
     <h3>HALL</h3>
     <figure class="painel"><img src="assets/modulos/HALL.webp" alt="HALL module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> 8-line FDN reverb with a Householder matrix — a dense stereo tail, with FREEZE (endless hold) and pre-delay.</p>
+    <h4>What it is</h4>
+    <p>HALL is a stereo reverb, the sound of a large hall, a church or a studio plate. Unlike the repeats you can make out in SPACE, here the tail is smooth and dense from the start. It can also freeze the sound and keep it ringing indefinitely.</p>
+    <h4>How to think about it</h4>
+    <p>Use SPACE when you want to hear echoes and HALL when you want a room. Since size and length accept control signals, the room can breathe with a slow wave, grow along with the music, or open up only on certain notes. The FRZ input freezes the tail while the signal is on: a chord becomes a continuous backdrop for the rest of the patch to play over.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>SIZE</b>: the size of the space, from a small room to a hall.</li>
+      <li><b>DECAY</b>: how long the tail takes to die, from a fifth of a second to about fifteen seconds. At maximum it barely dies.</li>
+      <li><b>DAMP</b>: how much of the highs is lost in the tail. At zero, bright; at maximum, dark, like a room full of curtains.</li>
+      <li><b>MOD</b>: a slight wobble inside the tail, which avoids a metallic tone.</li>
+      <li><b>PRE</b>: a short delay before the reverb starts, up to about 120 milliseconds. It helps separate the direct sound from the room and makes the space feel larger.</li>
+      <li><b>MIX</b>: the blend between the original and the processed sound.</li>
+    </ul>
+    <p>Inputs: IN, the sound; SIZE and DEC, to modulate size and length; FRZ, to freeze. Outputs: L and R, the two sides of the stereo image.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect CHORD's OUT to the IN input, and L and R to two MIXER inputs.</li>
+      <li>Raise MIX and DECAY and hear the chord gain a long tail.</li>
+      <li>Connect the UNI output of a very slow FUNCTION to SIZE. The room starts to breathe.</li>
+      <li>Connect the GATE output of a DECISION with low BIAS to FRZ. Every now and then the tail freezes.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-LOOPER">
     <h3>LOOPER</h3>
     <figure class="painel"><img src="assets/modulos/LOOPER.webp" alt="LOOPER module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Delay line with HOLD (freezes and repeats), REVERSE (plays backwards without a click), AGE (tape/BBD character) and HEADS (multi-head echo, Space Echo style).</p>
-    <p><span class="nivel">How it works</span> The old 'TAPE' became this HEADS. FBK near 1 + a long TIME + several heads = Frippertronics.</p>
+    <h4>What it is</h4>
+    <p>LOOPER is an echo that imitates magnetic tape. It repeats the sound with a delay, and the repeats can age on each pass, losing brightness and gaining noise. It can also freeze a stretch and repeat it endlessly, or play it backwards.</p>
+    <h4>How to think about it</h4>
+    <p>A lot of music made with tape machines lives on three gestures: repeating a phrase, playing it backwards, and letting the echo wear out. LOOPER has all three. With AGE at zero it is a clean digital echo; as you raise AGE, the marks of tape appear. With HOLD on, whatever is in the loop starts repeating, and you can play over it. SPACE is for creating ambience; LOOPER, for echoes you hear as repeats.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TIME</b>: the length of the loop, from a thousandth of a second to two seconds.</li>
+      <li><b>FBK</b>: how much of the repeated sound goes back into the loop. Near 1 the repeats barely end; above 1 they build up until they saturate.</li>
+      <li><b>AGE</b>: tape wear: loss of highs, wavering pitch, saturation and hiss.</li>
+      <li><b>MIX</b>: the blend between the original sound and the repeats.</li>
+      <li><b>HOLD</b>: freezes the loop. It stops recording and repeats the current stretch endlessly.</li>
+      <li><b>REV</b>: plays the loop backwards.</li>
+      <li><b>HEADS</b>: how many playback heads, from 1 to 4. With more than one, each head repeats at a different time, and the echo gets dense and rhythmic.</li>
+    </ul>
+    <p>Inputs: IN, the sound; TIME, to modulate the time; FRZ and REV, to freeze and reverse with a signal. Outputs: OUT, the blend; WET, the repeats only.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect a voice that plays notes to the IN input, and OUT to a MIXER input.</li>
+      <li>Set TIME to about 0.35 seconds, FBK to the middle and AGE to a third. You hear a tape echo.</li>
+      <li>Raise HEADS to 3 and hear the repeats multiply.</li>
+      <li>Turn HOLD on at the end of a phrase. It keeps circling while the voice goes on playing. Turn REV on to hear it backwards.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SWIRL">
     <h3>SWIRL</h3>
     <figure class="painel"><img src="assets/modulos/SWIRL.webp" alt="SWIRL module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> MODULATION effects — chorus, flanger, ensemble and phaser in one module (TYPE). SHORT delays modulated by an LFO (plus the phaser, a cascade of all-passes), with BBD character in AGE.</p>
-    <p><span class="nivel">How it works</span> RASGO had none of these. Distinct from LOOPER (a delay line, audible echoes) and from reverb — here you hear the MOVEMENT, not the echo.</p>
-    <p><span class="nivel">Try this</span> voice → SWIRL → MASTER thickens it; LFO → RATE lets the sweep breathe off the bar; FBK near ±1 + AGE = it self-oscillates.</p>
+    <h4>What it is</h4>
+    <p>SWIRL brings together four movement effects: chorus, flanger, ensemble and phaser. They all make the sound undulate, widen, or seem to spin, without creating audible echoes. It takes a sound in and gives it back in stereo.</p>
+    <h4>How to think about it</h4>
+    <p>The four effects share the same idea: blending the sound with a slightly delayed copy of itself, with the delay changing slowly. Chorus thickens and widens, like several people playing the same note. Flanger produces a metallic sweep, like a passing jet. Ensemble is a denser chorus, typical of string synthesizers. Phaser creates notches that rise and fall through the spectrum. On a pad or a single voice, it adds movement and width.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TYPE</b>: the effect: chorus, flanger, ensemble or phaser.</li>
+      <li><b>RATE</b>: the speed of the undulation, from one cycle every fifty seconds to eight per second.</li>
+      <li><b>DEPTH</b>: the intensity of the undulation.</li>
+      <li><b>FBK</b>: how much of the processed sound goes back to the input. It makes flanger and phaser more pronounced; near the extremes, they start sounding on their own.</li>
+      <li><b>SPRD</b>: the difference between left and right, that is, the width of the stereo image.</li>
+      <li><b>TONE</b>: darkens or brightens the processed sound.</li>
+      <li><b>AGE</b>: imitates the old analog circuits of these effects, with a little noise and instability.</li>
+      <li><b>MIX</b>: the blend between the original and the processed sound.</li>
+    </ul>
+    <p>Inputs: IN, the sound; RTM and MXM, to modulate speed and blend. Outputs: L and R.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect CHORD's OUT to the IN input, and L and R to two MIXER inputs.</li>
+      <li>With TYPE on chorus, RATE low and DEPTH near the middle, hear the chord widen.</li>
+      <li>Switch TYPE to flanger, raise FBK and lower RATE. The sound gains a metallic sweep.</li>
+      <li>Try phaser with a very slow RATE on a background sound.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MEMORY">
     <h3>MEMORY</h3>
     <figure class="painel"><img src="assets/modulos/MEMORY.webp" alt="MEMORY module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Granular — a buffer chopped into grains (grain/cloud/spray), with position, size, density and FREEZE; textures and time-stretch.</p>
+    <h4>What it is</h4>
+    <p>MEMORY continuously records the last three seconds of whatever goes into it and plays that material back in tiny pieces, called grains. Each grain is a short fragment, and many grains together form a cloud of sound that can be transposed, smeared in time, or frozen. The technique is called granular synthesis.</p>
+    <h4>How to think about it</h4>
+    <p>With MEMORY, the patch starts remembering what it played. A phrase that has just sounded comes back as texture, higher or lower, stretched, blurred. Short, sparse grains give a rough rhythm; long, numerous grains, a smooth cloud. With HOLD on, recording stops and the stored stretch becomes fixed material that the grains keep exploring. LOOPER repeats whole stretches; MEMORY breaks them into particles.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>GRAIN</b>: the length of each grain, from 5 milliseconds to half a second. Short, a grainy texture; long, almost the original sound.</li>
+      <li><b>DENS</b>: how many new grains are born per second. Few give isolated dots; many, a continuous cloud.</li>
+      <li><b>POS</b>: where in the recording the grains are read from, from the most recent to the oldest.</li>
+      <li><b>SPRAY</b>: scatters each grain's reading point, blurring time.</li>
+      <li><b>PITCH</b>: transposes the grains, up to two octaves up or down.</li>
+      <li><b>FBK</b>: feeds the cloud back into the recording, so the material builds up and wears down.</li>
+      <li><b>BLEND</b>: the blend between the incoming sound and the cloud.</li>
+      <li><b>HOLD</b>: stops recording and freezes the stored material.</li>
+    </ul>
+    <p>Inputs: IN, the sound; POS, to move the reading point; PTCH, to transpose; FRZ, to freeze with a signal. Output: OUT.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect a voice that plays a melody to the IN input, and OUT to a MIXER input.</li>
+      <li>Set GRAIN to about 0.1 seconds and DENS near 30, and hear the melody turn into a cloud.</li>
+      <li>Raise SPRAY and set PITCH an octave up.</li>
+      <li>Turn HOLD on. Recording stops, and the cloud carries on from the last stored stretch.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SAMPLER">
     <h3>SAMPLER</h3>
     <figure class="painel"><img src="assets/modulos/SAMPLER.webp" alt="SAMPLER module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Slice player (MPC/Akai) — TRIG fires a passage recorded live (REC gate) or from a file; varispeed, slices + POS, repitch, wear.</p>
-    <p><span class="nivel">How it works</span> SAMPLER jumps the read position (a slice); TURNTABLE reads continuously with inertia; MEMORY is granular.</p>
+    <h4>What it is</h4>
+    <p>SAMPLER records a stretch of whatever goes into it, up to about eight seconds, divides that stretch into slices, and plays them when it receives pulses. It is the gesture of hip-hop and electronic music samplers: take a recording, chop it up and play it back in another order, faster, slower or backwards.</p>
+    <h4>How to think about it</h4>
+    <p>While the REC input is on, it records what arrives at IN. When REC turns off, the stretch is kept. From then on, each pulse at TRIG plays a slice, and the POS input chooses which one. With a TRIGSEQ triggering and a SEQUENCE choosing slices, the recording recombines into a new rhythm. Feeding the patch's own output into it, the instrument starts reusing what it has just played.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>START</b>: where, within the slice, playback begins.</li>
+      <li><b>SPEED</b>: the playback speed, from a quarter to four times the original. Negative plays backwards. Normally, faster also sounds higher.</li>
+      <li><b>SLICE</b>: how many equal slices the recording is divided into, from 1 to 16.</li>
+      <li><b>REPIT</b>: off, speed and pitch move together, as on tape; on, the pitch comes from the PIT input and the slice keeps its length.</li>
+      <li><b>WEAR</b>: wear on each trigger: an imprecise start, loss of definition, a grainy sound.</li>
+      <li><b>LOOP</b>: off, each slice plays once; on, it repeats.</li>
+    </ul>
+    <p>Inputs: TRIG, the pulse that plays; IN, the sound to record; REC, the signal that records while it is on; POS, to choose the slice; PIT, to tune. Output: OUT.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect a voice that plays a phrase, for example a SEQUENCE playing an OSC, to the IN input.</li>
+      <li>To record, connect the DIV output of a LOGIC to REC, with CLOCK's CLK output on LOGIC's CLK and DIV at 16. Connect SAMPLER's OUT to the MIXER.</li>
+      <li>Set SLICE to 8, connect T1 of a TRIGSEQ to TRIG and the CV output of a TURING to POS. The recorded phrase comes back chopped and reordered.</li>
+      <li>Move SPEED to the left of center and hear the slices backwards.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-TURNTABLE">
     <h3>TURNTABLE</h3>
     <figure class="painel"><img src="assets/modulos/TURNTABLE.webp" alt="TURNTABLE module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Turntable with a platter that has mass — the SAMPLER's buffer read by an angular velocity with INERTIA: the motor pulls slowly (TORQ), the hand pushes (SCR), the brake lets it coast (BRK).</p>
-    <p><span class="nivel">How it works</span> NO BPM quantisation — beatmatching is a gesture, as on vinyl.</p>
-    <p><span class="nivel">Try this</span> LFO → SCR: the record scratches in time. ENVELOPE → BRK: a tape-stop on the turnaround.</p>
+    <h4>What it is</h4>
+    <p>TURNTABLE plays a recording as if it were on a vinyl record. It records a stretch, like SAMPLER, but playback imitates a real platter: the record has weight, takes time to get up to speed, slows down gradually, and can be pushed back and forth, as in a DJ's scratch.</p>
+    <h4>How to think about it</h4>
+    <p>SAMPLER jumps from one point to another instantly. TURNTABLE has inertia, and that is what gives it the vinyl sound: the pitch slides when the record speeds up or slows down. The SCR input is the hand on the record: a slow wave there makes the record go back and forth in time. The BRK input switches the motor off, and the sound drops until it stops, the effect known as tape stop. There is no automatic tempo sync: getting the rhythm right is part of the gesture.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>SPEED</b>: the speed the motor tries to reach, from half to double the original. Negative spins the record backwards.</li>
+      <li><b>TORQ</b>: the strength of the motor, that is, how quickly the record reaches speed. Low, the start has a long wavering of pitch; at minimum, the record moves only by hand, through the SCR input.</li>
+      <li><b>FRIC</b>: the friction. It decides how quickly the record stops when braking and how much it drifts back into rhythm on its own after a scratch.</li>
+      <li><b>GRAB</b>: how firm the hand is, how much the signal on SCR moves the record.</li>
+      <li><b>START</b>: where the needle drops on each pulse at TRIG.</li>
+      <li><b>WEAR</b>: wear on the record: crackles and small irregularities in rotation.</li>
+      <li><b>LOOP</b>: off, the record runs out and stops; on, playback wraps around and starts again.</li>
+    </ul>
+    <p>Inputs: TRIG, to drop the needle again; IN, the sound to record; REC, the signal that records while it is on; SCR, the hand on the record; BRK, the brake. Output: OUT.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Record a phrase as with SAMPLER: the voice on IN and the DIV output of a LOGIC, with DIV at 16, on REC. Connect OUT to the MIXER and turn LOOP on.</li>
+      <li>Connect the BI output of a FUNCTION at about 2 Hz to SCR and raise GRAB to the middle. The record goes back and forth, a scratch.</li>
+      <li>Remove the cable from SCR. Connect the GATE output of a DECISION with low BIAS to BRK. Every now and then, the record brakes and spins up again.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-OUT">
@@ -1315,27 +1455,90 @@
   <article class="modulo" id="mod-MIXER">
     <h3>MIXER</h3>
     <figure class="painel"><img src="assets/modulos/MIXER.webp" alt="MIXER module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> 4-channel mixer — level (slider), pan and mute per channel plus a master out. Where the musician does the balance.</p>
-    <p><span class="nivel">How it works</span> Exempt from the Motion Engine — the pans and levels are yours.</p>
+    <h4>What it is</h4>
+    <p>MIXER combines up to four sounds into one stereo output. Each channel has its own volume, its position between the left and right speakers, and a switch to silence it. It is how the patch's voices reach MASTER, and from there your ears.</p>
+    <h4>How to think about it</h4>
+    <p>In Rasgo Modular, each input accepts only one cable, so sounds don't add up by accident: to combine voices, you need a MIXER. It is also where you balance the patch, deciding what sits in front and what sits behind, and where you open up the stereo image, placing each voice somewhere between left and right. Almost every patch ends with a MIXER connected to MASTER, and the seeds come that way already.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>CH1, CH2, CH3, CH4</b>: the volume of each channel, from silence to 12 dB above normal.</li>
+      <li><b>PAN</b>: the position of each channel between left and right.</li>
+      <li><b>MUTE</b>: silences the channel without touching its volume, to compare the patch with and without that voice.</li>
+      <li><b>OUT</b>: the output volume, after the sum.</li>
+    </ul>
+    <p>Inputs: 1, 2, 3 and 4, the channels. Output: L+R, the stereo mix.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect two different voices to inputs 1 and 2, and L+R to MASTER's IN input, if it isn't connected already.</li>
+      <li>Balance the two volumes until neither voice covers the other.</li>
+      <li>Move one channel's PAN to the left and the other's to the right. The voices separate in space.</li>
+      <li>Use MUTE to hear each voice alone and then both together.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MASTER">
     <h3>MASTER</h3>
     <figure class="painel"><img src="assets/modulos/MASTER.webp" alt="MASTER module panel" width="95" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Stereo output stage — width, body guard and a true-peak limiter; the ceiling of the patch.</p>
-    <p><span class="nivel">How it works</span> Exempt from the Motion Engine. The header's STANDBY button is this module's mute.</p>
+    <h4>What it is</h4>
+    <p>MASTER is the last stage before the sound card. It sets the final volume, adjusts the width of the stereo image and protects the output from peaks, so nothing reaches the speakers distorted or too loud. Its output is already connected to the computer's sound: there is nowhere to cable it.</p>
+    <h4>How to think about it</h4>
+    <p>MIXER adds things up, but the sum can have peaks, an exaggerated stereo image, or a constant offset that wastes the speakers' power without making sound. MASTER takes care of that. The meter shows the level; a small square lights up when the limiter has to hold back a peak. In practice, set the volume with GAIN and leave the protections on. The silence switch in the app's header is this module's MUTE.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>GAIN</b>: the final volume. Raise it until the meter gets close to the top without the limiter square staying lit all the time.</li>
+      <li><b>WIDTH</b>: the width of the stereo image. At zero, mono; at 1, normal; above, wider.</li>
+      <li><b>MONO</b>: folds both sides into one, to check how the patch sounds on a single speaker.</li>
+      <li><b>DC</b>: removes the constant offset from the signal. Leave it on.</li>
+      <li><b>LIMIT</b>: the limiter, which keeps peaks from going past the ceiling. Leave it on.</li>
+      <li><b>MUTE</b>: silences the output, without a click.</li>
+      <li><b>BODY</b>: softens strong, sustained highs that would tire the ear. It only acts when they appear.</li>
+    </ul>
+    <p>Input: IN. Outputs: OUT, already connected to the sound card; VU, the level as a control signal.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Play any seed and watch MASTER's meter.</li>
+      <li>Move WIDTH from zero to maximum and hear the sound open up.</li>
+      <li>Connect VU to the IN1 input of a CONTROL with SCALE at −1, and O1 to the CV1 of a VCA that controls a background voice. When the rest of the patch gets loud, that voice steps back.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SCOPE">
     <h3>SCOPE</h3>
     <figure class="painel"><img src="assets/modulos/SCOPE.webp" alt="SCOPE module panel" width="178" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Oscilloscope and meter that GIVES BACK as CV — pitch (YIN), envelope, spectral centroid, ONSET (a pulse on the attack); the patch hears itself.</p>
-    <p><span class="nivel">How it works</span> SCOPE measures in order to reduce (→ a scalar); BOXCAR measures in order to reconstruct (→ a wave).</p>
-    <p><span class="nivel">Try this</span> SCOPE.onset ← drums → fires an ENVELOPE in time with the audio; SCOPE.pitch → OSC.pitch tunes to whatever comes in.</p>
+    <h4>What it is</h4>
+    <p>SCOPE shows a signal's waveform, like an oscilloscope, and measures what it hears: volume, brightness, pitch and the start of each note. Those measurements come out through cables, as control signals. That way the patch can react to its own sound.</p>
+    <h4>How to think about it</h4>
+    <p>On an ordinary oscilloscope, the screen is the end of the road. Here, what SCOPE measures can go back into the patch: the brightness of the mix opens a filter, one voice's pitch tunes another, the start of each note fires an envelope. Sound passes through it unchanged, via the THRU output, so it can sit in the middle of any chain. With SIGNAL-IN, it can also listen to an outside sound and make Rasgo Modular follow it.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TRIG</b>: the level the signal must cross to steady the picture on the screen.</li>
+      <li><b>EDGE</b>: whether that crossing counts on the way up or the way down.</li>
+      <li><b>REJ</b>: a tolerance margin, so noise doesn't trigger the screen several times.</li>
+      <li><b>RESP</b>: how fast the volume, brightness and pitch measurements are. Fast, they track every detail; slow, they show the trend.</li>
+      <li><b>HOLD</b>: freezes the measurements at their current values.</li>
+      <li><b>SENS</b>: the sensitivity of the note-start detector. High, any rise counts; low, only strong attacks.</li>
+    </ul>
+    <p>Inputs: IN, the sound; EXT, an external signal to steady the screen. Outputs: THRU, the untouched sound; TRIG, the trigger pulse; LVL, the volume; BRT, the brightness; PIT, the pitch; ONS, a pulse at the start of each note.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Put SCOPE between a voice and the MIXER: the voice on IN, THRU to the MIXER. Watch the waveform.</li>
+      <li>Connect BRT to the FC input of another voice's FILTER. When the first voice gets bright, the second opens up too.</li>
+      <li>Connect ONS to the GATE input of a DRUM. Each note of the first voice now comes with a hit.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-NOTE-OUT">
     <h3>NOTE-OUT</h3>
     <figure class="painel"><img src="assets/modulos/NOTE-OUT.webp" alt="NOTE-OUT module panel" width="83" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> MIDI out — converts gate + 1 V/oct into note on/off, with channel, velocity and a score log.</p>
-    <p><span class="nivel">How it works</span> The OUTPUT counterpart of SIGNAL-IN.</p>
+    <h4>What it is</h4>
+    <p>NOTE-OUT writes down the notes of a voice. Placed in the path of the pitch and trigger signals, it logs each note that passes, with pitch, length, intensity and accent, in the score the app records alongside the audio. It has no controls and doesn't change the sound.</p>
+    <h4>How to think about it</h4>
+    <p>In a generative patch, notes come and go. NOTE-OUT keeps a record of them for anyone who wants to study, transcribe or rework the piece later. It sits in the middle of the path: the pitch comes in on PITCH and goes out unchanged on PTHR; the pulse comes in on GATE and goes out unchanged on GTHR. When you record with REC, the text file that accompanies the audio includes those notes.</p>
+    <h4>Controls</h4>
+    <p>NOTE-OUT has no controls. Inputs: GATE, the pulse for each note; PITCH, the pitch; VEL, the intensity; ACC, the accent. Outputs: GTHR and PTHR, the same signals, to continue on to the voice.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>In a melody made with QUANTIZER, OSC and ENVELOPE, connect QUANTIZER's PTCH to NOTE-OUT's PITCH, and PTHR to the OSC's 1V/O.</li>
+      <li>Connect the pulse that fires the envelope to NOTE-OUT's GATE, and GTHR to the envelope's GATE. The sound stays the same.</li>
+      <li>Record a stretch with REC. Next to the audio file, the score's text file lists every note played.</li>
+    </ol>
   </article>
 </section>
 
