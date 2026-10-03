@@ -1173,22 +1173,96 @@
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="Painel do módulo SWITCH" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Chave/roteador — N entradas → 1 saída (ou 1 → N), por passo de clock, CV ou aleatório; sequencia FONTES em vez de notas.</p>
+    <h4>O que é</h4>
+    <p>O SWITCH é uma chave seletora comandada pelo patch. Ele pode escolher uma entre quatro fontes e mandá-la para uma saída, ou pegar uma fonte só e mandá-la para uma entre quatro saídas. A troca acontece a cada pulso, em ordem ou ao acaso, ou segue um sinal de controle.</p>
+    <h4>Como pensar nele</h4>
+    <p>Num patch que se transforma, mudar de material é tão importante quanto mudar de nota: a mesma melodia tocada ora por um oscilador, ora por uma corda; o filtro alimentado ora pelo ruído, ora pelo acorde. Sem o SWITCH, isso exige trocar cabos à mão. Com DEMUX desligado, ele escolhe entre A, B, C e D e entrega em OA. Ligado, pega o que chega em A e o envia a uma das quatro saídas, OA, OB, OC ou OD.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>STEP</b>: quantas posições a chave percorre, de 2 a 4.</li>
+      <li><b>MODE</b>: como a posição muda: para a frente, indo e voltando, ao acaso, ou só pelo sinal da entrada ADR.</li>
+      <li><b>DEMUX</b>: desligado, quatro entradas para uma saída; ligado, uma entrada para quatro saídas.</li>
+      <li><b>GLID</b>: uma transição gradual entre as posições, em que as duas fontes se misturam por um instante. Em zero, o corte é seco.</li>
+      <li><b>SLEW</b>: suaviza a troca para evitar estalos. Convém deixar sempre um pouco.</li>
+    </ul>
+    <p>Entradas: A, B, C e D, as fontes; CLK, o pulso que avança; RST, para voltar à primeira posição; ADR, para escolher a posição com um sinal. Saídas: OA, OB, OC e OD; STP, a posição atual como sinal de controle.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC em A, e OUT de um MATTER, tocado pelo CLOCK, em B. Ligue OA numa entrada do MIXER.</li>
+      <li>Ponha STEP em 2 e ligue a saída DIV de um LOGIC em CLK, com a saída CLK do CLOCK na entrada CLK do LOGIC e DIV em 4.</li>
+      <li>A cada quatro pulsos, o som troca de fonte. Suba GLID para que as trocas se fundam.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MATRIX">
     <h3>MATRIX</h3>
     <figure class="painel"><img src="assets/modulos/MATRIX.webp" alt="Painel do módulo MATRIX" width="237" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Matriz de roteamento 4×4 — qualquer entrada pra qualquer saída com ganho por célula; um mixer de CV/áudio programável.</p>
+    <h4>O que é</h4>
+    <p>O MATRIX liga quatro entradas a quatro saídas por todos os caminhos possíveis ao mesmo tempo. No painel há uma grade de 16 células, e cada uma decide quanto de uma entrada vai para uma saída. É uma mesa de distribuição: em vez de um cabo por ligação, todas as ligações estão lá, cada uma com seu volume.</p>
+    <h4>Como pensar nele</h4>
+    <p>É útil quando se pensa em blocos: um pouco desta modulação em todos os destinos, ou trocar a fonte de tudo de uma vez. Ligue quatro fontes de movimento nas entradas e quatro destinos nas saídas, e a grade passa a ser um painel de modulação. Com áudio, vira um mixer de quatro saídas. Com DRIFT, as 16 células mudam devagar sozinhas, e a rede de ligações evolui com a música.</p>
+    <h4>Controles</h4>
+    <p>A grade: cada célula tem dois algarismos, a entrada e depois a saída. A célula 23, por exemplo, decide quanto da entrada 2 vai para a saída 3. Arraste na vertical para ajustar; valores negativos invertem o sinal.</p>
+    <ul class="controles">
+      <li><b>LEVEL</b>: o volume geral das quatro saídas.</li>
+      <li><b>NORM</b>: equilibra o volume quando várias células de uma saída estão abertas, para que a soma não cresça demais.</li>
+      <li><b>RING</b>: em vez de somar as entradas numa saída, multiplica, o que produz timbres metálicos com sinais de áudio.</li>
+      <li><b>SAT</b>: uma saturação que segura o volume quando você realimenta a matriz.</li>
+      <li><b>DRIFT</b>: faz as 16 células passearem devagar.</li>
+    </ul>
+    <p>Entradas: IN1 a IN4. Saídas: OUT1 a OUT4.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída BI de um FUNCTION em IN1 e a saída A de um DRIFT em IN2.</li>
+      <li>Monte uma voz com FILTER e SPACE. Ligue OUT1 na entrada FC do FILTER e OUT2 na entrada FBK do SPACE.</li>
+      <li>Abra e feche as células 11, 12, 21 e 22 e ouça cada fonte passar de um destino ao outro.</li>
+      <li>Suba DRIFT e deixe a matriz se rearranjar sozinha.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MULT">
     <h3>MULT</h3>
     <figure class="painel"><img src="assets/modulos/MULT.webp" alt="Painel do módulo MULT" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Múltiplo com buffer — copia um sinal pra vários destinos sem queda de nível; modo dual e slew opcional.</p>
+    <h4>O que é</h4>
+    <p>O MULT pega um sinal de controle e o distribui para quatro saídas, cada uma com seu ajuste de tamanho e de deslocamento. Sem nada na entrada, ele vira um banco de quatro valores fixos que você regula à mão.</p>
+    <h4>Como pensar nele</h4>
+    <p>No Rasgo Modular, uma saída já pode ir para vários destinos com cabos comuns. O MULT existe para quando cada destino precisa de uma dose diferente: o mesmo envelope abrindo o filtro por inteiro, baixando um pouco o volume de outra voz, mexendo de leve num efeito. Uma entrada, quatro versões ajustadas. Com DUAL ligado, ele se divide em dois distribuidores de duas saídas cada.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>DUAL</b>: desligado, IN vai para as quatro saídas; ligado, IN vai para O1 e O2, e IN2 vai para O3 e O4.</li>
+      <li><b>SCL1, SCL2, SCL3, SCL4</b>: o tamanho do sinal em cada saída. Em 1 passa igual; abaixo de 1, diminui; acima, aumenta; negativo, inverte. Em zero, sobra só o deslocamento.</li>
+      <li><b>OFF1, OFF2, OFF3, OFF4</b>: um valor somado a cada saída. Sem nada na entrada, é o próprio valor da saída.</li>
+      <li><b>SLEW</b>: suaviza as quatro saídas juntas.</li>
+    </ul>
+    <p>Entradas: IN e IN2. Saídas: O1 a O4.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça duas vozes, cada uma com seu FILTER, passando pelo MIXER.</li>
+      <li>Ligue a saída ENV de um ENVELOPE, tocado pelo CLOCK, em IN do MULT. Ligue O1 em FC do primeiro FILTER e O2 em FC do segundo.</li>
+      <li>Deixe SCL1 em 1 e leve SCL2 para um valor negativo. A cada nota, um filtro abre e o outro fecha.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PLANAR">
     <h3>PLANAR</h3>
     <figure class="painel"><img src="assets/modulos/PLANAR.webp" alt="Painel do módulo PLANAR" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Morph vetorial XY — desliza entre 4 fontes num plano; o gesto (o caminho no plano) é gravável e reproduzível.</p>
+    <h4>O que é</h4>
+    <p>O PLANAR mistura quatro sons postos nos cantos de um quadrado. Um ponto se move dentro do quadrado, e o som que sai é a mistura dos quatro, pesada pela distância do ponto a cada canto. Movendo o ponto devagar, o timbre se transforma de um som em outro. A técnica se chama síntese vetorial.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense num joystick: X move o ponto da esquerda para a direita, Y de baixo para cima. Você pode mover à mão, com duas ondas lentas, ou com um DRIFT, e o ponto desenha figuras. A posição também sai pelas saídas X' e Y', o que permite que o mesmo movimento conduza outros controles do patch. Com um pulso longo na entrada GST, o PLANAR grava o trajeto que você fizer nos knobs X e Y e depois o repete sem parar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>X, Y</b>: a posição do ponto no quadrado. As entradas de mesmo nome se somam a estes valores.</li>
+      <li><b>CURVE</b>: o jeito de misturar. Num extremo, a mistura é linear, boa para sinais de controle; no outro, mantém o volume constante, e o som não afunda quando o ponto está no meio.</li>
+      <li><b>SMTH</b>: faz o ponto escorregar até a posição nova, em vez de saltar.</li>
+      <li><b>RATE</b>: a velocidade da repetição do gesto gravado e do passeio de DRIFT.</li>
+      <li><b>DRIFT</b>: faz o ponto passear sozinho pelo quadrado.</li>
+    </ul>
+    <p>Entradas: A, B, C e D, os quatro sons; X e Y, para mover o ponto; GST, para gravar e repetir um gesto. Saídas: OUT, a mistura; X' e Y', a posição do ponto.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue quatro fontes diferentes em A, B, C e D: por exemplo SAW de um OSC, OUT de um WAVETABLE, OUT do CHORD e PNK de um NOISE. Ligue OUT do PLANAR no MIXER.</li>
+      <li>Mova X e Y à mão e ouça o som passar de um canto ao outro.</li>
+      <li>Ligue BI de dois FUNCTION lentos, em velocidades diferentes, nas entradas X e Y. O ponto desenha uma figura e o timbre não para de mudar.</li>
+      <li>Ligue Y' na entrada FC de um FILTER no caminho do som: o filtro acompanha o movimento.</li>
+    </ol>
   </article>
 </section>
 <section class="section" id="fam-SPACE">
