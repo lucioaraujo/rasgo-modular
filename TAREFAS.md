@@ -10530,3 +10530,22 @@ Revisão de textos (3 out.): README (4 idiomas) reescrito na voz do
 diziam PRIVATE PREVIEW); `DESENVOLVIMENTO.md` com estado atual;
 `PAINEL_MESTRE` com o Modular como `published` (linha alterada sem commit,
 o arquivo tem mudanças de outra sessão).
+
+**3 out. 2026, fim do dia — `v0.1.3-rc1` publicada como pré-release de
+teste** (tag no branch `v0.1.2-cabo-hover`, CI verde nos três sistemas;
+v0.1.2 segue como Latest; site sem mudança). Motivo: relato do
+Audiofanzine (Win10 22H2, RTX 30xx, 2560×1440, fecha em 2–3 s sem janela).
+A CI do Windows (branch `diag/windows-arranque`, workflow
+`diag-windows.yml`) abre o app sem cair, mas não tem som, MIDI nem GPU.
+Suspeitos tratados no rc1: microfone + todos os MIDI abertos em toda
+abertura (o rack nasce com SIGNAL-IN; agora só com saída cabeada) e
+Direct2D (agora software no Windows; `RASGO_RENDER=gpu` volta).
+Diagnóstico à distância: `%APPDATA%\rasgo-modular\arranque.log` e
+`crash.log`. **Pendente:** resultado do teste do autor no Windows e do
+usuário do fórum. Achado colateral: 116 de 300 seeds cabeiam o SIGNAL-IN,
+o que, com microfone presente, injeta o som da sala no patch e abre a
+entrada — decidir com o autor se o gerador deve deixar o SIGNAL-IN de fora
+(muda o patch dessas seeds).
+Pedidos de VST3 (Audiofanzine, Palmieri): avaliado em conversa; caminho
+proposto em etapas, começando por tirar a trava tela↔áudio, sem mudar a
+licença.
