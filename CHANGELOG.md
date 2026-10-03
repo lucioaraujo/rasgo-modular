@@ -9,6 +9,23 @@ pronto.
 
 ## v0.1.3 — em preparação
 
+> **Pré-release de teste `v0.1.3-rc1` (3 out. 2026)** para quem viu o app
+> fechar ao abrir no Windows. *English:* test pre-release for Windows users
+> whose app closed on startup. If it still fails, please send the file
+> `%APPDATA%\rasgo-modular\arranque.log` (and `crash.log`, if present).
+
+- **Correções de arranque, pelo relato de um usuário do Audiofanzine**
+  (Windows 10 22H2, RTX 30xx, 2560×1440: o app fechava em 2–3 s sem
+  mostrar a janela; a CI do Windows não reproduz, por não ter placa de
+  som, MIDI nem GPU):
+  - o app abria o **microfone e todas as entradas MIDI em toda abertura**,
+    antes da janela, porque o rack nasce com um SIGNAL-IN; agora só abre
+    quando uma saída do SIGNAL-IN está cabeada (reavaliado a cada ~0,5 s);
+  - no Windows, a tela passa a ser desenhada **por software**, o mesmo
+    caminho do Linux (o padrão do JUCE no Windows é Direct2D, pela GPU);
+    `RASGO_RENDER=gpu` volta ao Direct2D;
+  - `arranque.log` (uma linha por etapa da abertura) e `crash.log` (pilha,
+    se o app cair) na pasta de dados do app, para diagnóstico à distância.
 - **QUANTIZER ganha entradas ROOT e SCL** — o HARMONY passa a mudar de
   fato a tônica e a escala da melodia. Até a v0.1.2, o LEARN, o dossiê e o
   site mandavam ligar a saída ROOT/SCALE do HARMONY "em QUANTIZER.root",
