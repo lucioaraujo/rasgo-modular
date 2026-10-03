@@ -2,7 +2,7 @@
 O CHORD transforma uma nota em um acorde. Você dá uma altura e ele toca de duas a quatro vozes afinadas em cima dela, com formatos que vão do uníssono a acordes com nona. Normalmente, num modular, um acorde exige vários osciladores e quantizadores; aqui basta um módulo.
 
 ## Como pensar nele
-Pense nele como uma mão no teclado que já sabe o formato do acorde. O knob CHORD escolhe o formato, VOX quantas notas ele tem e INV a disposição das notas. Ligado ao HARMONY pela entrada CHRD, a progressão de acordes anda sozinha. Com VLEAD, cada voz vai para a nota mais próxima do acorde seguinte, deslizando, e a troca soa suave como um coral.
+Pense nele como uma mão no teclado que já sabe o formato do acorde. O knob CHORD escolhe o formato, VOX quantas notas ele tem e INV a disposição das notas. Uma onda lenta na entrada CHRD faz o formato mudar sozinho; a saída ROOT do HARMONY na entrada PITCH faz a fundamental acompanhar as trocas de tom. Com VLEAD, cada voz vai para a nota mais próxima do acorde seguinte, deslizando, e a troca soa suave como um coral.
 
 ## Controles
 - FREQ: a nota fundamental, de 16 a 4000 Hz.

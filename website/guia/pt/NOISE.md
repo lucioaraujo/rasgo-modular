@@ -2,7 +2,7 @@
 O NOISE produz ruído, o som de todas as frequências misturadas ao acaso, em várias cores ao mesmo tempo, cada uma numa saída: do branco, chiado e brilhante, ao marrom, grave como o mar. Ele também produz valores aleatórios lentos, que servem para fazer outros módulos mudarem sozinhos.
 
 ## Como pensar nele
-O NOISE tem dois usos bem diferentes. Como som, é a matéria do vento, da chuva, dos pratos e do estalo de uma caixa. Como acaso, é o coração de um patch generativo: a saída S&H sorteia um valor novo a cada pulso e o segura até o próximo, e a SMTH desliza de um valor a outro. Ligue uma delas na altura de um oscilador, passando por um quantizador, e você tem uma melodia que nunca se repete igual.
+O NOISE tem dois usos bem diferentes. Como som, é a matéria do vento, da chuva, dos pratos e do estalo de uma caixa. Como acaso, é uma fonte de variação para patches generativos: a saída S&H sorteia um valor novo a cada pulso e o segura até o próximo, e a SMTH desliza de um valor a outro. Ligue uma delas na altura de um oscilador, passando por um quantizador, e você tem uma melodia que nunca se repete igual.
 
 ## Controles
 - RATE: o ritmo dos sorteios das saídas S&H e SMTH, de muito lento a 2000 por segundo. Se a entrada TRIG estiver ligada, ela manda no lugar deste knob.
