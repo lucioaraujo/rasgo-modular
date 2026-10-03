@@ -9,8 +9,10 @@ pronto.
 
 ## v0.1.3 — em preparação
 
-> **Pré-release de teste `v0.1.3-rc1` (3 out. 2026)** para quem viu o app
-> fechar ao abrir no Windows. *English:* test pre-release for Windows users
+> **Pré-releases de teste:** `v0.1.3-rc1` e `v0.1.3-rc2` (3 out. 2026; o
+> rc2 acrescenta o botão ON do SIGNAL-IN, sem o qual o rc1 ainda abria o
+> microfone em ~40% das aberturas) para quem viu o app fechar ao abrir no
+> Windows. *English:* test pre-release for Windows users
 > whose app closed on startup. If it still fails, please send the file
 > `%APPDATA%\rasgo-modular\arranque.log` (and `crash.log`, if present).
 
