@@ -353,3 +353,10 @@ dez com seeds comuns, e para cada módulo ficou a imagem de display mais
 movimentado, medido pelos pixels de traço fora da linha de repouso. Os de
 lógica e decisão (QUANTIZER, LOGIC, TURING…) mostram estado, não onda, e
 ficam quietos — é o painel deles. WebP 82, 58 imagens, ~500 KB.
+
+**Refazer (desde 4 out. 2026, v0.1.3):** o processo virou dois scripts,
+`website/exportar_paineis.sh <pasta>` (as 13 exportações, com `HOME`
+isolado; desviar o áudio para uma saída nula ou baixar o volume, porque o
+app toca) e `python3 website/escolher_paineis.py <pasta>` (escolhe e grava
+os WebP com o Pillow). Na v0.1.3: 58 imagens, ~640 KB — os painéis mudaram
+(rótulos sem corte, ROOT/SCL no QUANTIZER, ON no SIGNAL-IN).

@@ -3,7 +3,7 @@
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.2 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2) ·
+**Download:** [v0.1.3 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -23,7 +23,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Version:** v0.1.2 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.3 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -37,7 +37,7 @@ ROUTE, SPACE, OUT).
 
 It is a standalone program: it opens, sounds and records, with no other music
 software needed. MIDI and audio input come in through an optional module, and
-the app only asks for the audio input when that module is in the patch.
+the app only opens the audio input after you switch that module ON.
 
 Under the hood it is C++17 with no dependencies in the core. Each module is
 described as data, including its panel in millimetres, and the same engine
@@ -75,7 +75,7 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.2 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2) —
+[**v0.1.3 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
 Linux `.deb`, Windows `.exe`, macOS `.dmg`, all built and packaged by
 continuous integration.
 
@@ -108,7 +108,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Versão:** v0.1.2 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.3 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que é
@@ -122,7 +122,7 @@ OUT).
 
 É um programa que funciona sozinho: abre, soa e grava, sem precisar de outro
 software de música. MIDI e entrada de áudio chegam por um módulo opcional, e o
-app só pede a entrada de áudio quando esse módulo está no patch.
+app só abre a entrada de áudio depois que você liga o ON desse módulo.
 
 Por dentro, é C++17 sem dependências no núcleo. Cada módulo é descrito por
 dados, inclusive o painel em milímetros, e o mesmo motor alimenta um app
@@ -161,7 +161,7 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.2**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2) —
+[**Release v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construídos
 e empacotados pela integração contínua.
 
@@ -195,7 +195,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Version :** v0.1.2 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.3 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -209,8 +209,7 @@ cela sur l'écran de l'ordinateur, avec **58 modules** en huit familles
 
 C'est un programme autonome : il s'ouvre, sonne et enregistre, sans autre
 logiciel de musique. Le MIDI et l'entrée audio passent par un module
-optionnel, et l'application ne demande l'entrée audio que lorsque ce module
-est dans le patch.
+optionnel, et l'application n'ouvre l'entrée audio qu'après que vous avez allumé le ON de ce module.
 
 Sous le capot, c'est du C++17 sans dépendances dans le noyau. Chaque module
 est décrit par des données, y compris son panneau en millimètres, et le même
@@ -252,7 +251,7 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.2**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2) —
+[**Version v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
@@ -285,7 +284,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgosound.arquiviagem.net/) ·
-**Versión:** v0.1.2 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.3 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -299,7 +298,7 @@ TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT).
 
 Es un programa independiente: abre, suena y graba, sin otro software de
 música. El MIDI y la entrada de audio llegan por un módulo opcional, y la
-aplicación solo pide la entrada de audio cuando ese módulo está en el patch.
+aplicación solo abre la entrada de audio después de que usted encienda el ON de ese módulo.
 
 Por dentro es C++17 sin dependencias en el núcleo. Cada módulo se describe
 con datos, incluido su panel en milímetros, y el mismo motor mueve una
@@ -338,7 +337,7 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.2**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2) —
+[**Versión v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 

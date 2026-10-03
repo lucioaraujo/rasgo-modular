@@ -4,7 +4,7 @@ HARMONY decides which keys the music passes through. From time to time, or on ea
 ## Como pensar nele
 QUANTIZER keeps the melody in tune, but always in the same key. Music tends to travel, and each style travels its own way. The MOVE control picks the route: Coltrane, which leaps a major third on each change and closes a cycle of three keys, as in Giant Steps; tritone substitution, which reaches the next key by an unexpected path; chromatic mediant, third-related shifts with a film-score feel; modal interchange, which keeps the tonic and changes the mode; modal jazz, which hardly ever moves; and backdoor, which rises a whole step.
 
-In this version, the way to hear the changes is to add the ROOT output to the melody before the oscillator. Each input accepts only one cable, so the sum goes through a MATRIX, and the whole melody transposes to the new center. Scale changes, from the SCALE output, can't yet reach QUANTIZER by cable.
+Connect the ROOT output to the ROOT input of QUANTIZER and the SCALE output to the SCL input. On each change the melody's scale changes, and each note moves to the nearest note of the new scale: the melody stays in the same register, with another colour. To hear the melody jump to the new centre, also connect the ROOT output to the TRSP input of QUANTIZER.
 
 ## Controles
 - MOVE: the kind of route, among the six described above.
@@ -15,7 +15,7 @@ In this version, the way to hear the changes is to add the ROOT output to the me
 Inputs: ADV, the pulse that asks for a change; RST, to go back to the start. Outputs: ROOT, the tonic as a pitch; SCALE, the scale number; CHG, a pulse on each change.
 
 ## Experimente
-1. Build the QUANTIZER melody: the CV output of a TURING, driven by CLOCK, into QUANTIZER's CV input, and an OSC running through an ENVELOPE to the MIXER.
-2. Connect QUANTIZER's PTCH to IN1 of a MATRIX, HARMONY's ROOT to IN2, and the MATRIX's OUT1 to the OSC's 1V/O. On the MATRIX, set cell 21 to 1: OUT1 is now the melody plus the tonic.
-3. Set MOVE to the first position, Coltrane, and raise RATE. On each change the melody jumps to another center, in cycles of three.
-4. Connect CHG to the ADV input of a DRIFT so the rest of the patch also changes section on each change.
+1. Build the QUANTIZER melody: the CV output of a TURING, driven by CLOCK, into QUANTIZER's CV input, and QUANTIZER's PTCH into the 1V/O of an OSC running through an ENVELOPE to the MIXER.
+2. Connect HARMONY's ROOT to the ROOT input of QUANTIZER, and SCALE to the SCL input.
+3. Set MOVE to the first position, Coltrane, and raise RATE to a change every two or three seconds. On each change the melody changes scale.
+4. Also connect HARMONY's ROOT to QUANTIZER's TRSP input. Now the melody jumps from centre to centre, in cycles of three.

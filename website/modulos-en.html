@@ -10,63 +10,6 @@
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
 <script src="assets/contact.js" defer></script>
-<!-- SEO:INICIO — gerado por seo.py; editar lá, não aqui -->
-<link rel="canonical" href="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
-<link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
-<link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
-<link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/modulos-es.html">
-<link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Rasgo Modular">
-<meta property="og:title" content="Rasgo Modular — module guide">
-<meta property="og:description" content="The 58 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
-<meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
-<meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rasgo Modular running: a three-row rack of modules crossed by some seventy orange and blue cables.">
-<meta property="og:locale" content="en_US">
-<meta property="og:locale:alternate" content="pt_BR">
-<meta property="og:locale:alternate" content="fr_FR">
-<meta property="og:locale:alternate" content="es_ES">
-<meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Rasgo Modular",
-  "description": "The 58 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
-  "url": "https://lucioaraujo.github.io/rasgo-modular/",
-  "inLanguage": "en",
-  "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
-  "applicationCategory": "MultimediaApplication",
-  "applicationSubCategory": "Modular synthesizer",
-  "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.2",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "EUR"
-  },
-  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-  "isAccessibleForFree": true,
-  "author": {
-    "@type": "Person",
-    "name": "Lúcio Araújo"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "RASGO",
-    "url": "https://rasgosound.arquiviagem.net/"
-  },
-  "sameAs": [
-    "https://github.com/lucioaraujo/rasgo-modular"
-  ]
-}
-</script>
-<!-- SEO:FIM -->
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — family of instruments and sound research</a></div>
@@ -433,19 +376,20 @@
     <h4>What it is</h4>
     <p>SIGNAL-IN brings the outside world into the patch. It takes sound from the computer's audio input, such as a microphone or another instrument, and notes from a MIDI keyboard or controller, and turns them into signals the other modules understand.</p>
     <h4>How to think about it</h4>
-    <p>With it, someone outside can play Rasgo Modular: the key's pitch goes to an oscillator, holding the key opens an envelope, and the keyboard's mod wheel can open a filter. It also lets the patch process outside sound, running a voice or a guitar through filters and spaces. The app only opens the audio input when there is a SIGNAL-IN in the patch.</p>
+    <p>With it, someone outside can play Rasgo Modular: the key's pitch goes to an oscillator, holding the key opens an envelope, and the keyboard's mod wheel can open a filter. It also lets the patch process outside sound, running a voice or a guitar through filters and spaces. The module starts switched off: the app only opens the microphone and MIDI after you turn ON on and patch one of its outputs.</p>
     <h4>Controls</h4>
     <ul class="controles">
       <li><b>GAIN</b>: the level of the incoming audio, from zero to double.</li>
       <li><b>BEND</b>: how many semitones the keyboard's pitch bend moves the pitch, from zero to two octaves.</li>
       <li><b>CC#</b>: which keyboard controller the CC output follows. Number 1 is usually the mod wheel.</li>
+      <li><b>ON</b>: turns the outside input on. Off, which is how the module starts, nothing comes into the patch.</li>
     </ul>
     <p>Outputs: L and R, the incoming audio; 1V/O, the pitch of the key played; GATE, open while the key is held; VEL, how hard it was played; CC, the value of the chosen controller.</p>
     <h4>Try this</h4>
     <ol class="passos">
-      <li>With a microphone or instrument connected to the computer, connect L to a MIXER input and adjust GAIN until you hear the sound.</li>
+      <li>With a microphone or instrument connected to the computer, connect L to a MIXER input, turn ON on, and adjust GAIN until you hear the sound.</li>
       <li>Run that sound through a FILTER or SPACE before the MIXER to transform it.</li>
-      <li>With a MIDI keyboard, connect 1V/O to the 1V/O input of an OSC, and GATE to the GATE input of an ENVELOPE that has the OSC's sound on its IN input. The keyboard now plays the patch.</li>
+      <li>With a MIDI keyboard and ON turned on, connect 1V/O to the 1V/O input of an OSC, and GATE to the GATE input of an ENVELOPE that has the OSC's sound on its IN input. The keyboard now plays the patch.</li>
     </ol>
   </article>
 </section>
@@ -1100,7 +1044,7 @@
     <h4>What it is</h4>
     <p>QUANTIZER pins a continuous signal to the notes of a scale. A value that rises and falls freely, coming from a TURING, an SH or a CHAOS, comes out as a sequence of in-tune notes. In most patches, it is what turns chance into melody.</p>
     <h4>How to think about it</h4>
-    <p>Control signals vary continuously, and musical notes don't. Without a quantizer, a melody generated by chance falls between the notes and sounds out of tune. QUANTIZER rounds each value to the nearest note of the chosen scale. With a pulse on the TRIG input, it only changes note on the pulse, and the melody gains a rhythm. The GATE output pulses whenever the note actually changes, which is handy for firing an envelope only on new notes.</p>
+    <p>Control signals vary continuously, and musical notes don't. Without a quantizer, a melody generated by chance falls between the notes and sounds out of tune. QUANTIZER rounds each value to the nearest note of the chosen scale. With a pulse on the TRIG input, it only changes note on the pulse, and the melody gains a rhythm. The GATE output pulses whenever the note actually changes, which is handy for firing an envelope only on new notes. The ROOT and SCL inputs change the tonic and the scale by cable: connected to the outputs of HARMONY, the melody's key changes as the music goes on.</p>
     <h4>Controls</h4>
     <ul class="controles">
       <li><b>SCALE</b>: the scale, out of twelve: chromatic, major, natural minor, Dorian, Phrygian dominant, Lydian, melodic minor, minor pentatonic, major pentatonic, hirajoshi, whole tone, and octaves only.</li>
@@ -1109,7 +1053,7 @@
       <li><b>GLIDE</b>: makes the pitch slide from one note to the next.</li>
       <li><b>HYST</b>: a tolerance margin. With an unsteady signal, the note doesn't keep flipping between two neighbors.</li>
     </ul>
-    <p>Inputs: CV, the signal to quantize; TRSP, to transpose before quantizing; TRIG, the pulse that decides when to change note. Outputs: PTCH, the pitch; GATE, a pulse on each new note; ST, the note in semitones.</p>
+    <p>Inputs: CV, the signal to quantize; TRSP, to transpose before quantizing; TRIG, the pulse that decides when to change note; ROOT and SCL, which, when patched, take over the tonic and the scale from the knobs. Outputs: PTCH, the pitch; GATE, a pulse on each new note; ST, the note in semitones.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect the CV output of a TURING to QUANTIZER's CV input, and the CLK output of CLOCK to the TURING's CLK input.</li>
@@ -1124,7 +1068,7 @@
     <p>HARMONY decides which keys the music passes through. From time to time, or on each pulse at the ADV input, it picks a new tonal center, following one of six moves that jazz and film musicians have used for decades. The ROOT output gives the new tonic on the same pitch scale the oscillators understand.</p>
     <h4>How to think about it</h4>
     <p>QUANTIZER keeps the melody in tune, but always in the same key. Music tends to travel, and each style travels its own way. The MOVE control picks the route: Coltrane, which leaps a major third on each change and closes a cycle of three keys, as in Giant Steps; tritone substitution, which reaches the next key by an unexpected path; chromatic mediant, third-related shifts with a film-score feel; modal interchange, which keeps the tonic and changes the mode; modal jazz, which hardly ever moves; and backdoor, which rises a whole step.</p>
-    <p>In this version, the way to hear the changes is to add the ROOT output to the melody before the oscillator. Each input accepts only one cable, so the sum goes through a MATRIX, and the whole melody transposes to the new center. Scale changes, from the SCALE output, can't yet reach QUANTIZER by cable.</p>
+    <p>Connect the ROOT output to the ROOT input of QUANTIZER and the SCALE output to the SCL input. On each change the melody's scale changes, and each note moves to the nearest note of the new scale: the melody stays in the same register, with another colour. To hear the melody jump to the new centre, also connect the ROOT output to the TRSP input of QUANTIZER.</p>
     <h4>Controls</h4>
     <ul class="controles">
       <li><b>MOVE</b>: the kind of route, among the six described above.</li>
@@ -1136,10 +1080,10 @@
     <p>Inputs: ADV, the pulse that asks for a change; RST, to go back to the start. Outputs: ROOT, the tonic as a pitch; SCALE, the scale number; CHG, a pulse on each change.</p>
     <h4>Try this</h4>
     <ol class="passos">
-      <li>Build the QUANTIZER melody: the CV output of a TURING, driven by CLOCK, into QUANTIZER's CV input, and an OSC running through an ENVELOPE to the MIXER.</li>
-      <li>Connect QUANTIZER's PTCH to IN1 of a MATRIX, HARMONY's ROOT to IN2, and the MATRIX's OUT1 to the OSC's 1V/O. On the MATRIX, set cell 21 to 1: OUT1 is now the melody plus the tonic.</li>
-      <li>Set MOVE to the first position, Coltrane, and raise RATE. On each change the melody jumps to another center, in cycles of three.</li>
-      <li>Connect CHG to the ADV input of a DRIFT so the rest of the patch also changes section on each change.</li>
+      <li>Build the QUANTIZER melody: the CV output of a TURING, driven by CLOCK, into QUANTIZER's CV input, and QUANTIZER's PTCH into the 1V/O of an OSC running through an ENVELOPE to the MIXER.</li>
+      <li>Connect HARMONY's ROOT to the ROOT input of QUANTIZER, and SCALE to the SCL input.</li>
+      <li>Set MOVE to the first position, Coltrane, and raise RATE to a change every two or three seconds. On each change the melody changes scale.</li>
+      <li>Also connect HARMONY's ROOT to QUANTIZER's TRSP input. Now the melody jumps from centre to centre, in cycles of three.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-ABACUS">

@@ -3,6 +3,7 @@
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Quantizer.hpp"
+#include "dsp/Harmony.hpp"
 #include "dsp/TuringLoop.hpp"
 #include "dsp/FunctionGenerator.hpp"
 #include "io/AsciiPanel.hpp"
@@ -375,6 +376,58 @@ void testRaizEEscalaPorCabo() {
     EXPECT(semitoneWith(13.0f / 12.0f, 1.0f / 11.0f, true) == 1);
 }
 
+// HARMONY (Coltrane, troca rápida) -> ROOT/SCL do QUANTIZER, com a CV
+// parada: a nota de saída tem de MUDAR a cada troca de centro (o pedido
+// que o LEARN fazia e que até a v0.1.2 não tinha efeito nenhum).
+void testHarmonyMoveOQuantizer() {
+    SignalGraph graph;
+    const auto har = graph.add(std::make_unique<Harmony>());
+    graph.node(har).setParameter("movement", 0.0f);   // Coltrane
+    graph.node(har).setParameter("rate", 2.0f);       // 2 trocas/s
+    const auto quant = graph.add(std::make_unique<Quantizer>());
+    graph.connect(har, 0, quant, 3);   // ROOT -> root_cv
+    graph.connect(har, 1, quant, 4);   // SCALE -> scale_cv
+    graph.prepare(kSampleRate, 1, 128);
+    AudioBlock out(kSampleRate, 1, 128);
+    std::vector<int> notas;
+    for (int b = 0; b < static_cast<int>(kSampleRate / 128.0f * 6.0f); ++b) {   // 6 s
+        graph.process(out, quant, 0);
+        const int n = static_cast<int>(std::lround(out.at(0, 127) * 12.0f));
+        if (notas.empty() || notas.back() != n) notas.push_back(n);
+    }
+    check(notas.size() >= 4, "HARMONY muda a nota do QUANTIZER ao longo de 6 s");
+    std::cout << "  notas do QUANTIZER sob o HARMONY (ROOT/SCL):";
+    for (const int n : notas) std::cout << ' ' << n;
+    std::cout << '\n';
+
+    // ROOT também no TRSP: a melodia é TRANSPOSTA para o centro novo e
+    // presa à escala nova — o "salto de centro" audível (Coltrane: terças
+    // maiores). Sem o TRSP a tônica só troca quais notas valem e a nota
+    // vai à vizinha mais próxima (mudança sutil, mesma região).
+    SignalGraph g2;
+    const auto h2 = g2.add(std::make_unique<Harmony>());
+    g2.node(h2).setParameter("movement", 0.0f);
+    g2.node(h2).setParameter("rate", 2.0f);
+    const auto q2 = g2.add(std::make_unique<Quantizer>());
+    g2.connect(h2, 0, q2, 3);
+    g2.connect(h2, 1, q2, 4);
+    g2.connect(h2, 0, q2, 1);   // ROOT -> TRSP também
+    g2.prepare(kSampleRate, 1, 128);
+    std::vector<int> n2;
+    for (int b = 0; b < static_cast<int>(kSampleRate / 128.0f * 6.0f); ++b) {
+        g2.process(out, q2, 0);
+        const int n = static_cast<int>(std::lround(out.at(0, 127) * 12.0f));
+        if (n2.empty() || n2.back() != n) n2.push_back(n);
+    }
+    int lo = 99, hi = -99;
+    for (const int n : n2) { lo = std::min(lo, n); hi = std::max(hi, n); }
+    check(n2.size() >= 4 && hi - lo >= 4,
+          "com ROOT também no TRSP, a nota salta (≥ 4 semitons)");
+    std::cout << "  notas com ROOT também no TRSP:";
+    for (const int n : n2) std::cout << ' ' << n;
+    std::cout << '\n';
+}
+
 int main() {
     testSnapsToScale();
     testRootShifts();
@@ -387,6 +440,7 @@ int main() {
     testInGraph();
     testPanel();
     testRaizEEscalaPorCabo();
+    testHarmonyMoveOQuantizer();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular QUANTIZER tests passed\n";

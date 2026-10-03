@@ -57,7 +57,7 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probability of SKIPPING a scheduled change, keeping the current tonal centre.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — moves on to the next tonal centre on the rising edge; present, it replaces RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Back to the initial ROOT/scale.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"New root, as CV (semitone/12) — plug it into the ROOT input of QUANTIZER.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"New root, as CV (semitone/12) — plug it into the ROOT input of QUANTIZER.", "On ROOT alone, the root changes which notes are allowed and each note moves to the nearest one: the change is subtle. For the melody to JUMP to the new centre, also plug this output into the TRSP input of QUANTIZER.", ""};
         t["HARMONY"]["out:scale"] = LearnEntry{"New scale index, as CV (index/11) — plug it into the SCL input of QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Short pulse (~20 ms) every time ROOT or SCALE really change.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Operation between A and B: 0 add, 1 subtract, 2 multiply, 3 remainder (mod RANGE), 4-7 bitwise (AND/OR/XOR/NAND).", "0-3 is continuous arithmetic; 4-7 treats A/B as 5-bit integers (the ±RANGE window → 0..31) and operates on the bits — a Lunetta idea (Numeric Repetitor).", "Compare OP=add with OP=XOR on the same input — the bitwise version breaks the signal into unpredictable steps."};
@@ -132,7 +132,7 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probabilité de SAUTER un changement prévu, en gardant le centre tonal actuel.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — passe au centre tonal suivant sur le front montant ; présent, il remplace RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Retour au ROOT/gamme de départ.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur l’entrée ROOT du QUANTIZER.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur l’entrée ROOT du QUANTIZER.", "Sur ROOT seul, la tonique change les notes permises et chaque note va à la voisine la plus proche : le changement est subtil. Pour que la mélodie SAUTE vers le nouveau centre, branchez aussi cette sortie sur l’entrée TRSP du QUANTIZER.", ""};
         t["HARMONY"]["out:scale"] = LearnEntry{"Nouvel indice de gamme, en CV (indice/11) — à brancher sur l’entrée SCL du QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Brève impulsion (~20 ms) chaque fois que ROOT ou SCALE changent vraiment.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Opération entre A et B : 0 addition, 1 soustraction, 2 multiplication, 3 reste (mod RANGE), 4-7 bit à bit (AND/OR/XOR/NAND).", "0-3 c’est de l’arithmétique continue ; 4-7 traite A/B comme des entiers de 5 bits (la fenêtre ±RANGE → 0..31) et opère sur les bits — une idée Lunetta (Numeric Repetitor).", "Comparez OP=addition et OP=XOR sur la même entrée — la version bit à bit casse le signal en paliers imprévisibles."};
@@ -207,7 +207,7 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probabilidad de SALTARSE un cambio previsto, manteniendo el centro tonal actual.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — avanza al siguiente centro tonal en el flanco de subida; si está presente, sustituye a RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Vuelve al ROOT/escala inicial.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"Nueva fundamental, como CV (semitono/12) — conéctela a la entrada ROOT del QUANTIZER.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"Nueva fundamental, como CV (semitono/12) — conéctela a la entrada ROOT del QUANTIZER.", "Solo en ROOT, la tónica cambia qué notas valen y cada nota va a la vecina más cercana: el cambio es sutil. Para que la melodía SALTE al nuevo centro, conecte también esta salida a la entrada TRSP del QUANTIZER.", ""};
         t["HARMONY"]["out:scale"] = LearnEntry{"Nuevo índice de escala, como CV (índice/11) — conéctelo a la entrada SCL del QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Pulso corto (~20 ms) cada vez que ROOT o SCALE cambian de verdad.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Operación entre A y B: 0 suma, 1 resta, 2 multiplica, 3 resto (mod RANGE), 4-7 bit a bit (AND/OR/XOR/NAND).", "0-3 es aritmética continua; 4-7 trata A/B como enteros de 5 bits (la ventana ±RANGE → 0..31) y opera en los bits — idea Lunetta (Numeric Repetitor).", "Compare OP=suma con OP=XOR en la misma entrada — la versión bit a bit rompe la señal en escalones imprevisibles."};
