@@ -4692,6 +4692,8 @@ private:
             std::lock_guard<std::mutex> lk(rack_.gmx);
             for (std::size_t i = 0; i < rack_.graph.nodeCount() && !present; ++i) {
                 if (rack_.graph.node(i).type() != "SIGNAL-IN") continue;
+                // e com o ON ligado (nasce desligado: v0.1.3)
+                if (rack_.graph.node(i).parameterValue("listen") < 0.5f) continue;
                 for (std::size_t c = 0; c < rack_.graph.cableCount(); ++c)
                     if (rack_.graph.cable(c).source().node == i) { present = true; break; }
             }

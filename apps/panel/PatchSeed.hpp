@@ -659,7 +659,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 || nm == "sync_enable" || nm == "dc_block" || nm == "limit"
                 || nm == "voices" || nm == "freeze" || nm == "mono"
                 || nm == "gain" || nm == "output" || nm == "out_gain"
-                || nm == "fm_amount")
+                || nm == "fm_amount" || nm == "listen")
                 continue;
             if (f01() > 0.55f) continue;
             const float lo = dsc.minimum, hi = dsc.maximum;

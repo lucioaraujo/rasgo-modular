@@ -1143,6 +1143,11 @@ inline const LearnTable& learnTable() {
             {"cc_num", {
                 "Qual Control Change do MIDI a saída CC segue (1 = mod "
                 "wheel).", "", ""}},
+            {"listen", {
+                "Liga a entrada de fora: o áudio do sistema (microfone, "
+                "instrumento) e o MIDI. Começa desligado — só com ele "
+                "ligado e alguma saída cabeada o app abre o microfone e "
+                "o MIDI.", "", ""}},
             {"out:out", {
                 "Áudio da entrada do sistema, canal esquerdo — sem nada "
                 "capturando, silêncio (nunca trava, nunca lê lixo).",

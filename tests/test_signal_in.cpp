@@ -32,6 +32,7 @@ std::vector<AudioBlock> mkOut(std::size_t frames) {
 
 void testSilentWithoutFeed() {
     SignalIn a;
+    a.setParameter("listen", 1.0f);   // ON (v0.1.3)
     a.prepare(kSr, 64);
     auto out = mkOut(64);
     for (int b = 0; b < 20; ++b) a.process({}, out);
@@ -44,6 +45,7 @@ void testSilentWithoutFeed() {
 
 void testAudioRoundTrip() {
     SignalIn a;
+    a.setParameter("listen", 1.0f);   // ON (v0.1.3)
     a.prepare(kSr, 64);
     std::vector<float> feed(64 * 2);
     for (std::size_t i = 0; i < 64; ++i) {
@@ -63,6 +65,7 @@ void testAudioRoundTrip() {
 
 void testGainApplied() {
     SignalIn a;
+    a.setParameter("listen", 1.0f);   // ON (v0.1.3)
     a.prepare(kSr, 64);
     a.setParameter("gain", 0.5f);
     std::vector<float> feed(64 * 2, 0.0f);
@@ -75,6 +78,7 @@ void testGainApplied() {
 
 void testUnderrunSilentNotGarbage() {
     SignalIn a;
+    a.setParameter("listen", 1.0f);   // ON (v0.1.3)
     a.prepare(kSr, 64);
     std::vector<float> feed(30 * 2, 0.0f);
     for (std::size_t i = 0; i < 30; ++i) feed[i * 2] = 1.0f;
@@ -89,6 +93,7 @@ void testUnderrunSilentNotGarbage() {
 
 void testOverflowResyncs() {
     SignalIn a;
+    a.setParameter("listen", 1.0f);   // ON (v0.1.3)
     a.prepare(kSr, 64);
     const std::size_t total = 65536 * 3;
     std::vector<float> chunk(1000 * 2);
@@ -119,6 +124,7 @@ void render(SignalIn& s, int blocks, std::vector<AudioBlock>& out) {
 
 void testNoteOnGatePitchVel() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     s.prepare(kSr, 128);
     auto out = mkOut(128);
     render(s, 4, out);
@@ -140,6 +146,7 @@ void testNoteOnGatePitchVel() {
 
 void testLastNotePriorityStack() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     s.prepare(kSr, 128);
     auto out = mkOut(128);
     s.pushMidi(0x90, 60, 80);   // C4
@@ -159,6 +166,7 @@ void testLastNotePriorityStack() {
 
 void testNoteOnZeroVelIsOff() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     s.prepare(kSr, 128);
     auto out = mkOut(128);
     s.pushMidi(0x90, 64, 90);
@@ -171,6 +179,7 @@ void testNoteOnZeroVelIsOff() {
 
 void testPitchBend() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     s.prepare(kSr, 128);
     s.setParameter("bend", 12.0f);   // ±1 oitava no fundo de escala
     auto out = mkOut(128);
@@ -188,6 +197,7 @@ void testPitchBend() {
 
 void testCcFollowsSelectedNumber() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     s.prepare(kSr, 128);
     s.setParameter("cc_num", 7.0f);   // volume
     auto out = mkOut(128);
@@ -202,6 +212,7 @@ void testCcFollowsSelectedNumber() {
 void testDeterminism() {
     auto run = []() {
         SignalIn s;
+        s.setParameter("listen", 1.0f);   // ON (v0.1.3)
         s.prepare(kSr, 64);
         std::vector<float> feed(64 * 2);
         for (std::size_t i = 0; i < feed.size(); ++i)
@@ -226,10 +237,35 @@ void testDeterminism() {
 
 void testType() {
     SignalIn s;
+    s.setParameter("listen", 1.0f);   // ON (v0.1.3)
     EXPECT(s.type() == "SIGNAL-IN");
 }
 
 }  // namespace
+
+// ON desligado (o padrão, v0.1.3): nada de fora entra — nem áudio nem
+// MIDI — e uma nota pendente não dispara ao ligar.
+void testDesligadoNaoDeixaEntrar() {
+    SignalIn s;
+    check(s.parameterValue("listen") == 0.0f, "ON nasce desligado");
+    s.prepare(kSr, 64);
+    std::vector<float> feed(64 * 2, 0.5f);
+    s.pushSamples(feed.data(), 64);
+    s.pushMidi(0x90, 72, 100);
+    auto out = mkOut(64);
+    s.process({}, out);
+    bool mudo = true;
+    for (std::size_t i = 0; i < 64; ++i)
+        for (int o = 0; o < 6; ++o)
+            if (out[static_cast<std::size_t>(o)].at(0, i) != 0.0f) mudo = false;
+    check(mudo, "desligado: todas as saídas em zero");
+    s.setParameter("listen", 1.0f);
+    for (int b = 0; b < 20; ++b) s.process({}, out);
+    check(out[3].at(0, 63) == 0.0f, "nota de antes de ligar não dispara");
+    s.pushMidi(0x90, 72, 100);
+    for (int b = 0; b < 20; ++b) s.process({}, out);
+    check(out[3].at(0, 63) > 0.5f, "ligado: nota nova abre o gate");
+}
 
 int main() {
     testSilentWithoutFeed();
@@ -244,6 +280,7 @@ int main() {
     testCcFollowsSelectedNumber();
     testDeterminism();
     testType();
+    testDesligadoNaoDeixaEntrar();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular SIGNAL-IN tests passed\n";

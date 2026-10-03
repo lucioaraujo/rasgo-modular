@@ -49,7 +49,13 @@ public:
                   {"cc", PortKind::Control, ""}},
                  {{"gain", 0.0f, 2.0f, 1.0f, ""},
                   {"bend", 0.0f, 24.0f, 2.0f, "st"},
-                  {"cc_num", 0.0f, 127.0f, 1.0f, ""}}) {}
+                  {"cc_num", 0.0f, 127.0f, 1.0f, ""},
+                  // ON (v0.1.3): a entrada de fora só entra com ele ligado.
+                  // Nasce DESLIGADO — o app não abre microfone nem MIDI sem
+                  // um gesto de quem toca (pedido do autor, 3 out. 2026).
+                  // No FIM da lista e fora de todo sorteio (seed, VARIA,
+                  // MUDA): o mesmo seed segue dando o mesmo patch.
+                  {"listen", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "SIGNAL-IN"; }
 
@@ -61,6 +67,7 @@ public:
         p.add(Widget::Kind::Knob, "GAIN", "gain", 4.0f, 30.0f);
         p.add(Widget::Kind::Knob, "BEND", "bend", 17.0f, 30.0f);
         p.add(Widget::Kind::Knob, "CC#", "cc_num", 10.5f, 50.0f);
+        p.add(Widget::Kind::Toggle, "ON", "listen", 3.0f, 60.0f);
         p.add(Widget::Kind::Jack, "L", "out:out", 5.0f, 78.0f);
         p.add(Widget::Kind::Jack, "R", "out:r", 16.0f, 78.0f);
         p.add(Widget::Kind::Jack, "1V/O", "out:pitch", 5.0f, 96.0f);
@@ -132,6 +139,14 @@ public:
         const std::size_t frames = oL.frames();
         const std::size_t channels = oL.channels();
 
+        if (parameterValue("listen") < 0.5f) {
+            // desligado: nada de fora entra. O MIDI pendente é descartado
+            // para não disparar notas velhas ao ligar.
+            drainMidi(static_cast<int>(parameterValue("cc_num") + 0.5f));
+            curNote_ = 60; gateHigh_ = false; gateRamp_ = 0.0f;
+            for (auto& o : outputs) o.clear();
+            return;
+        }
         const float gain = parameterValue("gain");
         const float bendSt = parameterValue("bend");
         const int ccNum = static_cast<int>(parameterValue("cc_num") + 0.5f);
