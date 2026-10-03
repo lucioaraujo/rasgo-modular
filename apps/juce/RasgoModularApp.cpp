@@ -3453,73 +3453,50 @@ public:
 
             const int viewTop = top + 42;
             viewH_ = cy + chh - 16 - viewTop;
-            scroll_ = juce::jlimit(0, std::max(0, contentH_ - viewH_), scroll_);
-            g.saveState();
-            g.reduceClipRegion({cx + 1, viewTop, cw - 2, viewH_});
-            int py = viewTop + 4 - scroll_;
-            static const rasgo::panel::L4* const cards[][2] = {
-                {&S::tutWhatTitle,    &S::tutWhatBody},
-                {&S::tutSeedTitle,    &S::tutSeedBody},
-                {&S::tutSeedBoxTitle, &S::tutSeedBoxBody},
-                {&S::tutVaryTitle,    &S::tutVaryBody},
-                {&S::tutStoreTitle,   &S::tutStoreBody},
-                {&S::tutRecTitle,     &S::tutRecBody},
-                {&S::tutHdrTitle,     &S::tutHdrBody},
-                {&S::tutCableTitle,   &S::tutCableBody},
-                {&S::tutNavTitle,     &S::tutNavBody},
-                {&S::tutKeysTitle,    &S::tutKeysBody},
-                {&S::tutModTitle,     &S::tutModBody},
-                {&S::tutScratchTitle, &S::tutScratchBody},
-                {&S::tutFamTitle,     &S::tutFamBody},
-                {&S::tutLearnTitle,   &S::tutLearnBody},
-            };
-            // DIAGRAMAÇÃO (pedido do autor, 3 out. 2026: "os textos em
-            // bloco deixam as informações meio truncadas"). A coluna de
-            // leitura tem no máximo 640 px — a 13 pt, umas 85 letras por
-            // linha, em vez de ~120 com o cartão inteiro. Listas escritas
-            // com " · " (o cabeçalho e o teclado) saem um item por linha,
-            // com marcador; os textos longos trazem parágrafos (\n\n) no
-            // próprio `UiLanguage.hpp`. Entre cartões, uma régua e ar.
+            // DESEMPENHO (relato do autor, 3 out. 2026: rolagem lenta e
+            // FECHAR demorando). O conteúdo era diagramado e desenhado do
+            // zero a cada quadro — 14 cartões de texto — e o rack por baixo
+            // seguia repintando a 30 fps. Agora o conteúdo vira uma IMAGEM,
+            // refeita só quando mudam idioma, largura ou escala da tela;
+            // rolar é deslocar a imagem. O link é desenhado ao vivo por
+            // cima (o destaque do mouse não refaz a imagem). E o timer não
+            // repinta o rack enquanto o tutorial o cobre.
             const int readW = std::min(wrapW, 640);
-            bool first = true;
-            for (const auto& c : cards) {
-                if (!first) {
-                    g.setColour(T.line);
-                    g.drawHorizontalLine(py, static_cast<float>(px),
-                                         static_cast<float>(px + readW));
-                    py += 14;
+            const float sc = std::max(1.0f,
+                g.getInternalContext().getPhysicalPixelScaleFactor());
+            if (cache_.isNull() || cacheW_ != readW || cacheLang_ != lang_
+                || cacheSc_ != sc) {
+                int ly = 0, lw = 0;
+                const int h = layoutCards(nullptr, readW, ly, lw);
+                cache_ = juce::Image(juce::Image::ARGB,
+                                     std::max(1, juce::roundToInt(readW * sc)),
+                                     std::max(1, juce::roundToInt(h * sc)), true,
+                                     juce::SoftwareImageType());
+                {
+                    juce::Graphics ig(cache_);
+                    ig.addTransform(juce::AffineTransform::scale(sc));
+                    layoutCards(&ig, readW, ly, lw);
                 }
-                first = false;
-                g.setColour(T.accent);
-                g.setFont(juce::FontOptions(kCardPt, juce::Font::bold));
-                g.drawText(str(*c[0]), px, py, readW, 18,
-                           juce::Justification::topLeft, false);
-                py += 24;
-                juce::String body = str(*c[1]);
-                if (body.contains(u8(" \xc2\xb7 ")))
-                    body = u8("\xe2\x80\xa2  ")
-                         + body.replace(u8(" \xc2\xb7 "), u8("\n\xe2\x80\xa2  "));
-                py += drawWrapped(g, body, px, py, readW, T.textSecondary);
-                // Depois do cartão LEARN, o link para o guia dos módulos no
-                // site, no idioma do app. Clicável; o retângulo guardado é o
-                // da tela, já com a rolagem, e só vale se estiver visível.
-                if (c[0] == &S::tutLearnTitle) {
-                    py += 8;
-                    const juce::String url = str(S::guideUrl);
-                    g.setFont(juce::FontOptions(kBodyPt));
-                    const int lw = std::min(readW, juce::roundToInt(
-                        juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), url)) + 2);
-                    g.setColour(linkHover_ ? T.textPrimary : T.accent);
-                    g.drawText(url, px, py, lw, 18, juce::Justification::topLeft, true);
-                    g.drawHorizontalLine(py + 16, static_cast<float>(px),
-                                         static_cast<float>(px + lw));
-                    const juce::Rectangle<int> r(px, py, lw, 18);
-                    link_ = r.getIntersection({cx + 1, viewTop, cw - 2, viewH_});
-                    py += 18;
-                }
-                py += 18;
+                cacheW_ = readW; cacheLang_ = lang_; cacheSc_ = sc;
+                cacheH_ = h; linkY_ = ly; linkW_ = lw;
             }
-            contentH_ = (py + scroll_) - (viewTop + 4);
+            contentH_ = cacheH_;
+            scroll_ = juce::jlimit(0, std::max(0, contentH_ - viewH_), scroll_);
+            const juce::Rectangle<int> view(cx + 1, viewTop, cw - 2, viewH_);
+            const int oy = viewTop + 4 - scroll_;
+            g.saveState();
+            g.reduceClipRegion(view);
+            g.drawImage(cache_, px, oy, readW, cacheH_,
+                        0, 0, cache_.getWidth(), cache_.getHeight());
+            // o link do guia, ao vivo
+            g.setFont(juce::FontOptions(kBodyPt));
+            g.setColour(linkHover_ ? T.textPrimary : T.accent);
+            g.drawText(str(S::guideUrl), px, oy + linkY_, linkW_, 18,
+                       juce::Justification::topLeft, true);
+            g.drawHorizontalLine(oy + linkY_ + 16, static_cast<float>(px),
+                                 static_cast<float>(px + linkW_));
+            link_ = juce::Rectangle<int>(px, oy + linkY_, linkW_, 18)
+                        .getIntersection(view);
             g.restoreState();
 
             // Barra de rolagem de VERDADE (relato do autor, 2 out. 2026: "a
@@ -3682,6 +3659,74 @@ private:
     juce::String str(const rasgo::panel::L4& s) const {
         return u8(rasgo::panel::tr(s, lang_));
     }
+    // Os cartões do tutorial a partir de (0,0), na largura `w`. Com `g`
+    // nulo só MEDE (a altura é preciso saber antes de criar a imagem).
+    // Devolve a altura; `linkY`/`linkW` = onde fica o link do guia, que é
+    // desenhado ao vivo no `paint`. A ordem e a diagramação (coluna de até
+    // 640 px; listas " · " um item por linha; régua entre cartões) são as
+    // pedidas pelo autor em 3 out. 2026.
+    int layoutCards(juce::Graphics* g, const int w, int& linkY, int& linkW) const {
+        namespace S = rasgo::panel::strings;
+        static const rasgo::panel::L4* const cards[][2] = {
+            {&S::tutWhatTitle,    &S::tutWhatBody},
+            {&S::tutSeedTitle,    &S::tutSeedBody},
+            {&S::tutSeedBoxTitle, &S::tutSeedBoxBody},
+            {&S::tutVaryTitle,    &S::tutVaryBody},
+            {&S::tutStoreTitle,   &S::tutStoreBody},
+            {&S::tutRecTitle,     &S::tutRecBody},
+            {&S::tutHdrTitle,     &S::tutHdrBody},
+            {&S::tutCableTitle,   &S::tutCableBody},
+            {&S::tutNavTitle,     &S::tutNavBody},
+            {&S::tutKeysTitle,    &S::tutKeysBody},
+            {&S::tutModTitle,     &S::tutModBody},
+            {&S::tutScratchTitle, &S::tutScratchBody},
+            {&S::tutFamTitle,     &S::tutFamBody},
+            {&S::tutLearnTitle,   &S::tutLearnBody},
+        };
+        int py = 0;
+        bool first = true;
+        for (const auto& c : cards) {
+            if (!first) {
+                if (g) {
+                    g->setColour(T.line);
+                    g->drawHorizontalLine(py, 0.0f, static_cast<float>(w));
+                }
+                py += 14;
+            }
+            first = false;
+            if (g) {
+                g->setColour(T.accent);
+                g->setFont(juce::FontOptions(kCardPt, juce::Font::bold));
+                g->drawText(str(*c[0]), 0, py, w, 18,
+                            juce::Justification::topLeft, false);
+            }
+            py += 24;
+            juce::String body = str(*c[1]);
+            if (body.contains(u8(" \xc2\xb7 ")))
+                body = u8("\xe2\x80\xa2  ")
+                     + body.replace(u8(" \xc2\xb7 "), u8("\n\xe2\x80\xa2  "));
+            py += g ? drawWrapped(*g, body, 0, py, w, T.textSecondary)
+                    : wrappedHeight(body, w);
+            if (c[0] == &S::tutLearnTitle) {
+                py += 8;
+                linkY = py;
+                linkW = std::min(w, juce::roundToInt(
+                    juce::GlyphArrangement::getStringWidth(
+                        juce::Font(juce::FontOptions(kBodyPt)), str(S::guideUrl))) + 2);
+                py += 18;
+            }
+            py += 18;
+        }
+        return py;
+    }
+    static int wrappedHeight(const juce::String& text, const int w) {
+        juce::AttributedString as;
+        as.append(text, juce::FontOptions(kBodyPt), T.textSecondary);
+        juce::TextLayout tl;
+        tl.createLayout(as, static_cast<float>(w));
+        return static_cast<int>(tl.getHeight());
+    }
+
     // devolve a altura consumida — os corpos têm quebras de parágrafo
     static int drawWrapped(juce::Graphics& g, const juce::String& text,
                            int x, int y, int w, juce::Colour c) {
@@ -3699,6 +3744,11 @@ private:
     int scroll_ = 0, contentH_ = 0, viewH_ = 1;
     // geometria do último quadro, para o mouse (o desenho é que a calcula)
     juce::Rectangle<int> card_, closeBtn_, track_, thumb_, link_;
+    // imagem do conteúdo do tutorial (ver o comentário no `paint`)
+    juce::Image cache_;
+    int cacheW_ = 0, cacheH_ = 0, linkY_ = 0, linkW_ = 0;
+    float cacheSc_ = 0.0f;
+    rasgo::panel::Lang cacheLang_ = rasgo::panel::Lang::pt;
     int viewTop_ = 0, dragGrab_ = 0;
     bool dragging_ = false, linkHover_ = false;
 };
@@ -4410,8 +4460,14 @@ private:
         pollRecAutoStop();
         view_->setPaletteHover(palette_.hoveredType());
 
-        view_->repaint();
-        header_.repaint();
+        // sob o tutorial/SOBRE o rack fica coberto pelo véu: repintá-lo a
+        // 30 fps só atrasava a rolagem e o FECHAR (o som segue normal)
+        if (!overlay_.isVisible()) {
+            view_->repaint();
+            header_.repaint();
+        } else if (overlay_.mode() == OverlayView::Mode::about) {
+            overlay_.repaint();   // as leituras ao vivo do SOBRE (LUFS, blocos)
+        }
 
         // `RASGO_DIAG=1`: imprime no terminal, a cada 10 s, quantos blocos
         // de áudio se perderam (o mesmo número do SOBRE). Existe para medir
