@@ -59,79 +59,337 @@
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="OSC module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Subtractive oscillator — the starting voice. Saw/square/triangle/sine with PW and organic drift; tracks 1 V/oct.</p>
-    <p><span class="nivel">How it works</span> This is the 'classic' source; WAVETABLE sweeps tables, ADDITIVE sums partials, OPERATOR does FM.</p>
-    <p><span class="nivel">Try this</span> OSC → FILTER → VCA with an ENVELOPE on the gate: the minimum chain of a synthesiser.</p>
+    <h4>What it is</h4>
+    <p>OSC is an oscillator: it produces a steady, unchanging tone, the raw material almost every synthesizer sound is built from. It gives you five waveforms at once, each on its own output jack: sine, triangle, sawtooth, pulse, and a voice one or two octaves below (the sub). Pick one, or use several.</p>
+    <h4>How to think about it</h4>
+    <p>Think of OSC as raw material. On its own it sounds plain, and that is on purpose: the character comes from what you connect after it, such as a filter that takes away brightness or an envelope that shapes each note. If you want a voice with a personality of its own, STRING and MATTER already have one; if you want a tone that changes by itself, try WAVETABLE. OSC is the predictable foundation, which makes it the best place to learn.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the pitch of the note, from 8 to 8000 Hz. Low values become a slow vibration; the musical range sits roughly between 50 and 1000 Hz.</li>
+      <li><b>FINE</b>: fine tuning, up to a semitone up or down. Use it to tune against another voice, or to detune slightly and thicken the sound.</li>
+      <li><b>PW</b>: the pulse width, which only affects the PLS output. In the middle the wave is square and sounds hollow; near the ends it gets thin and nasal.</li>
+      <li><b>FM</b>: how much the signal on the FM input moves the pitch. With another oscillator there and this knob turned up, the tone turns metallic, like a bell.</li>
+      <li><b>DRIFT</b>: a small, slow wobble in the tuning, like an analog oscillator. At zero the note stays perfectly still.</li>
+      <li><b>SUB2</b>: sets whether the SUB output sits one octave (off) or two octaves (on) below the note.</li>
+      <li><b>SYNC</b>: enables the SYNC input. With it on, another, slower oscillator forces this one to restart its cycle, and turning FREQ changes the tone instead of the pitch.</li>
+      <li><b>PROX</b>: blends each output with a darker version of itself. A way to soften the sound without using up a filter.</li>
+    </ul>
+    <p>Inputs: 1V/O takes pitch from a sequencer or quantizer, FM and PWM accept modulation, and SYNC takes the oscillator that drives the sync.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the SAW output of OSC to a MIXER input and listen to a steady buzz.</li>
+      <li>Turn FREQ slowly: the note goes up and down.</li>
+      <li>Move the cable to the PLS output and sweep PW from one side to the other. The tone goes from hollow to thin while the pitch stays put.</li>
+      <li>Go back to SAW and run the sound through a FILTER before the MIXER. You are now doing subtractive synthesis: starting from a rich sound and taking away what you don't need.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-WAVETABLE">
     <h3>WAVETABLE</h3>
     <figure class="painel"><img src="assets/modulos/WAVETABLE.webp" alt="WAVETABLE module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Wavetable oscillator — a POS knob sweeps a bank of waveforms, from smooth to spectral, anti-aliased.</p>
-    <p><span class="nivel">Try this</span> Slow LFO → POS: the timbre 'breathes' between the waves.</p>
+    <h4>What it is</h4>
+    <p>WAVETABLE is an oscillator that holds a sequence of 16 different waveforms, like the frames of an animation, from the brightest (a saw) to the smoothest (a sine). The POS knob picks where you are in that sequence. As you move POS, the tone changes smoothly, with no filter needed.</p>
+    <h4>How to think about it</h4>
+    <p>Where OSC gives you a fixed sound to sculpt afterwards, WAVETABLE is born in motion: all it takes is something moving POS. A slow LFO makes a pad that breathes; an envelope makes each note start bright and end dark. It can also listen: connected to SIGNAL-IN, it captures one cycle of the incoming sound and starts using it as its waveform.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the pitch of the note, from 8 to 8000 Hz.</li>
+      <li><b>FINE</b>: fine tuning, up to a semitone either way.</li>
+      <li><b>POS</b>: the position in the table. At the start the sound is full of harmonics; at the end it is almost a sine. The POS input adds to this knob, and that is how the tone starts moving on its own.</li>
+      <li><b>WARP</b>: bends the reading of each cycle and adds harmonics with a digital accent, without changing frames.</li>
+      <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
+      <li><b>DRIFT</b>: a small, slow wobble in the tuning.</li>
+    </ul>
+    <p>Inputs: 1V/O for pitch, POS to move the position, FM, CAP for the sound to capture, and GRAB, a pulse that tells it to capture a new cycle.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input and turn POS from end to end. Hear the tone go from rough to smooth.</li>
+      <li>Connect the output of a slow FUNCTION to the POS input. Now the sound changes by itself, in cycles.</li>
+      <li>To capture: connect SIGNAL-IN to the CAP input and a CLOCK pulse to GRAB. On each pulse, the oscillator starts playing a slice of the incoming sound.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-ADDITIVE">
     <h3>ADDITIVE</h3>
     <figure class="painel"><img src="assets/modulos/ADDITIVE.webp" alt="ADDITIVE module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Additive oscillator — sums up to 64 partials; TILT/ODD-EVEN/STRETCH sculpt the spectrum directly.</p>
-    <p><span class="nivel">How it works</span> Builds timbre by adding sines, the opposite of FILTER (which takes away from a rich sound).</p>
+    <h4>What it is</h4>
+    <p>ADDITIVE builds sound by adding up 64 sine waves, each at a different frequency. These sines are called partials, and together they make the tone. Instead of starting from a rich sound and cutting it down, as a filter does, here you decide how strong each partial is. This is how you get to organs, bells, vibraphones and pads.</p>
+    <h4>How to think about it</h4>
+    <p>The four central knobs shape the whole spectrum at once, so you never have to touch 64 controls. TILT sets the brightness, ODD balances even and odd partials, STRCH detunes the partials from one another so the sound turns to metal or glass, and COMB carves notches into the spectrum. All of them accept modulation: an envelope on TILT makes each note open up in brightness at the attack, like an acoustic instrument.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the fundamental, from 8 to 8000 Hz.</li>
+      <li><b>FINE</b>: fine tuning, up to a semitone either way.</li>
+      <li><b>TILT</b>: brightness. To the left, only the low partials sound and the tone is dark; to the right, all of them sound strongly.</li>
+      <li><b>ODD</b>: the balance between partials. In the middle, the full series; to the right, only the odd ones, with the hollow sound of a clarinet; to the left, only the even ones, more nasal.</li>
+      <li><b>STRCH</b>: stretches or squeezes the spacing between partials. In the middle the sound is in tune; towards either side it becomes a bell, metal, or something hard to name.</li>
+      <li><b>COMB</b>: carves regular notches into the spectrum, like a comb filter. At zero nothing changes.</li>
+      <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
+      <li><b>DRIFT</b>: lets each partial detune and breathe a little, slowly. At zero the sound is completely stable.</li>
+    </ul>
+    <p>Inputs: 1V/O for pitch, TILT and STRCH to modulate those two controls, and FM.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input with TILT in the middle. You hear a soft note.</li>
+      <li>Move STRCH slowly to the right. The pitched note turns into a bell.</li>
+      <li>Bring STRCH back to the middle and move ODD from side to side. Hear the tone go from nasal to hollow.</li>
+      <li>Connect the ENV output of an ENVELOPE to the TILT input, and the CLK output of CLOCK to the GATE input of the ENVELOPE. On each pulse the sound starts bright and darkens, like a plucked string.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-OPERATOR">
     <h3>OPERATOR</h3>
     <figure class="painel"><img src="assets/modulos/OPERATOR.webp" alt="OPERATOR module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> 4-operator FM, 8 algorithms, DX7-style feedback — brass, bells and basses the subtractive path will not make.</p>
-    <p><span class="nivel">Try this</span> Whole-number RATIO = harmonic; fractional = inharmonic (bell).</p>
+    <h4>What it is</h4>
+    <p>OPERATOR is an FM synthesizer with four sine oscillators, called operators. In FM, an operator does not sound on its own: it pushes another operator's frequency back and forth very fast, and new harmonics are born from that. This is how electric pianos, bells, snappy basses and metallic tones are made, as on the digital synthesizers of the 1980s.</p>
+    <h4>How to think about it</h4>
+    <p>Three decisions make the tone: who modulates whom (ALGO), the frequency ratio between operators (RB, RC, RD), and the strength of the modulation (INDEX). Start with INDEX low and raise it slowly: the sound goes from a clean sine to something bright and harsh. The most useful move is to connect an envelope to the IDX input, so each note starts bright and darkens, like an electric piano key.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the pitch of the note, from 8 to 8000 Hz.</li>
+      <li><b>FINE</b>: fine tuning, up to a semitone either way.</li>
+      <li><b>ALGO</b>: picks one of eight arrangements of who modulates whom. At the start the operators are chained and the sound is harsher; at the end they sound side by side, closer to an organ.</li>
+      <li><b>RB, RC, RD</b>: each operator's frequency ratio to the first. Whole numbers sound in tune; fractional values such as 2.5 sound like bells; high values, like metal.</li>
+      <li><b>INDEX</b>: the strength of the modulation. At zero you hear only pure sines; at maximum, a very bright tone.</li>
+      <li><b>FBK</b>: makes the first operator modulate itself. On its own it already turns the sine into something close to a sawtooth.</li>
+      <li><b>DRIFT</b>: detunes each operator a tiny bit, slowly. At zero everything stays stable.</li>
+    </ul>
+    <p>Inputs: 1V/O for pitch and IDX to modulate the FM strength.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input with INDEX at zero: a plain sine.</li>
+      <li>Raise INDEX slowly and hear the harmonics appear.</li>
+      <li>Set RB to a fractional value and the sound becomes a bell.</li>
+      <li>Connect the ENV output of an ENVELOPE to the IDX input, and the CLK output of CLOCK to the GATE input of the ENVELOPE. Each note opens bright and fades, like an electric piano.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PULSAR">
     <h3>PULSAR</h3>
     <figure class="painel"><img src="assets/modulos/PULSAR.webp" alt="PULSAR module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Pulsar synthesis (Curtis Roads) — a train of pulsarets (grain + silence) with TWO independent frequencies: FREQ is the pitch, FORMANT the timbre. Between granular and formant synthesis.</p>
-    <p><span class="nivel">How it works</span> OPERATOR/ADDITIVE pin the spectrum to the pitch; here FORMANT slides the spectral envelope WITHOUT detuning. MASK/JITTER thin out and misalign the train (burlesque patterns, seeded).</p>
-    <p><span class="nivel">Try this</span> LFO → FQM: 'wah' with no filter. MASK ~0.7 + JITTER ~0.4 = an irregular rhythmic cloud over the same note.</p>
+    <h4>What it is</h4>
+    <p>PULSAR produces a train of tiny sound pulses, each followed by silence. When the pulses repeat quickly you hear a note; when they slow down you hear a rhythm. The technique comes from the composer Curtis Roads and has a curious property: pitch and tone are controlled separately, so you can change the color of the sound without detuning it.</p>
+    <h4>How to think about it</h4>
+    <p>FREQ sets how many times per second the pulse repeats, and so the note. FRMT sets what happens inside each pulse, and so the tone: low sounds hollow, high sounds nasal. Bring FREQ down to around 30 repeats per second and each pulse becomes an event you hear on its own; with MASK and JITR, those events turn irregular, like a cloud.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the pulse repetition rate, from 20 to 2000 Hz. This is the pitch of the note.</li>
+      <li><b>FRMT</b>: the frequency inside each pulse, from 0.1 to 8 times FREQ. This is the tone: low is hollow, high is bright.</li>
+      <li><b>SHAPE</b>: the shape of each pulse, from a plain sine to a narrower pulse rich in harmonics.</li>
+      <li><b>WIND</b>: the contour of each pulse. To the left the edges are hard and the sound is bright; in the middle it is clean; to the right each pulse attacks fast and decays, like percussion.</li>
+      <li><b>JITR</b>: makes the timing and level of each pulse irregular. At zero the train is rigid.</li>
+      <li><b>MASK</b>: the chance of each pulse being skipped. It opens gaps and creates rhythmic patterns without changing the note.</li>
+      <li><b>SPRD</b>: spreads alternate pulses between left and right, widening the sound in stereo.</li>
+      <li><b>LEVEL</b>: the output level.</li>
+    </ul>
+    <p>Inputs: PIT for pitch and FQM to modulate the tone. Outputs L and R, for stereo.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect L to a MIXER input and turn FRMT slowly. The tone changes, but the note stays where it is.</li>
+      <li>Bring FREQ close to its minimum. The note falls apart into pulses you can hear one by one.</li>
+      <li>With FREQ low, raise MASK and JITR. The pulses become sparse and irregular, like rain.</li>
+      <li>Connect the BI output of a slow FUNCTION to the FQM input. The tone wanders on its own without going out of tune.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SPECTRA">
     <h3>SPECTRA</h3>
     <figure class="painel"><img src="assets/modulos/SPECTRA.webp" alt="SPECTRA module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Spectral resynthesis — it LISTENS to a sound, finds the strongest partials and re-oscillates as a bank of sines that follows it. The analysis → synthesis bridge (Panharmonium / phase vocoder).</p>
-    <p><span class="nivel">How it works</span> ADDITIVE builds the spectrum from nothing; MEMORY grains in time; here the material is the short-term spectrum of the input. FREEZE = an endless pad from any sound. With no IN, seeded noise feeds the analysis → a drone that evolves on its own.</p>
-    <p><span class="nivel">Try this</span> DRUM → IN, low VOICE, STRETCH = a bell-like shadow of the rhythm; FRZ ← gate = frozen spectrum alternating with the live one.</p>
+    <h4>What it is</h4>
+    <p>SPECTRA listens to a sound, finds its strongest frequencies, and plays them again with a set of sine oscillators. The result is a kind of shadow of the original: recognizable, but made only of pure tones, and you can transpose it, bend it, or freeze it.</p>
+    <h4>How to think about it</h4>
+    <p>It sits among the source modules because its output is what you hear, but it almost always needs something on the IN input: a voice, a chord, a drum, or outside sound through SIGNAL-IN. With few voices it draws a caricature of the sound; with many, a faithful copy. Its strongest move is FRZ: it freezes the last spectrum and keeps it ringing indefinitely, like a pad lifted from any moment.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>VOICE</b>: how many sines the module uses, from 2 to 24. Few simplify the sound; many reproduce it faithfully.</li>
+      <li><b>BLUR</b>: how quickly each sine follows the incoming sound. At zero it tracks closely; at maximum it drags and smears, and the sound seems to melt.</li>
+      <li><b>SHIFT</b>: transposes the reconstruction up to two octaves up or down, without touching the listening.</li>
+      <li><b>STRCH</b>: pushes the frequencies apart or together, taking the sound towards metal or bell without changing the perceived pitch.</li>
+      <li><b>TONE</b>: darkens or brings out the highs of the reconstruction. In the middle it stays true to what was heard.</li>
+      <li><b>JITR</b>: makes each sine wobble slightly, so the reconstruction never sounds static.</li>
+      <li><b>FRZ</b>: freezes the listening. The sines keep playing the last spectrum.</li>
+      <li><b>MIX</b>: the blend between the original sound and the reconstruction. At maximum you hear only the reconstruction.</li>
+    </ul>
+    <p>Inputs: IN for the sound to analyze, PIT to transpose and FRZ to freeze with a gate. Outputs L and R.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the OUT output of CHORD to the IN input of SPECTRA, and the L output to a MIXER input. You hear the chord rebuilt in pure tones.</li>
+      <li>Lower VOICE to 3 or 4. The chord becomes a sketch of itself.</li>
+      <li>Move STRCH to one side and hear the chord turn metallic.</li>
+      <li>Connect the EUC output of CLOCK to the FRZ input. The sound freezes and lets go in time with the clock.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PLL">
     <h3>PLL</h3>
     <figure class="painel"><img src="assets/modulos/PLL.webp" alt="PLL module panel" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Phase-locked loop — locks phase to an input and generates divisions/multiplications of it; left free, it self-oscillates.</p>
-    <p><span class="nivel">How it works</span> It is oscillator AND clock extractor — it follows what it hears, within a capture window.</p>
+    <h4>What it is</h4>
+    <p>PLL is an oscillator that knows how to follow another. On its own it works like any oscillator, with its own pitch and a waveform you choose. When it receives a second signal on the REF input, it gradually adjusts its speed until it moves together with that signal, like a musician falling into step with another.</p>
+    <h4>How to think about it</h4>
+    <p>OSC can also lock to another oscillator, but all at once (that is sync). PLL does it gradually, and that path towards locking is audible: a gliding pitch. With RATIO it locks an octave above, an octave below, or at deeper divisions of the reference. The LOCK output tells you how locked it is, and you can use it to make other things react.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the pitch when there is no reference, and the starting point when there is.</li>
+      <li><b>FINE</b>: fine tuning, up to a semitone either way.</li>
+      <li><b>SHAPE</b>: the waveform, moving from sine to triangle, sawtooth and square.</li>
+      <li><b>RATIO</b>: the relationship to the reference it locks to. At 1, the same note; at 2, an octave above; near the minimum, far below.</li>
+      <li><b>LOCK</b>: how hard it chases the reference. Low, it glides slowly until it arrives; high, it locks quickly but gets more jittery.</li>
+      <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
+      <li><b>FBK</b>: how much of its own signal goes back into the circuit, adding texture without detuning.</li>
+      <li><b>FTYP</b>: picks one of six feedback types, each with a different color.</li>
+    </ul>
+    <p>Inputs: 1V/O for pitch, FM, and REF, the reference to follow. Outputs: OUT, RING (the PLL multiplied by the reference) and LOCK, a control signal showing how locked it is.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input. With nothing on REF it is an ordinary oscillator; turn SHAPE to hear the waveforms.</li>
+      <li>Connect the SAW output of an OSC to the REF input. PLL searches for the OSC's pitch and locks onto it.</li>
+      <li>Lower LOCK. Now it takes its time getting there, and you hear the pitch glide.</li>
+      <li>Set RATIO to 2. It locks an octave above the OSC.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CHORD">
     <h3>CHORD</h3>
     <figure class="painel"><img src="assets/modulos/CHORD.webp" alt="CHORD module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Chord voice — 3–4 oscillators tuned by an interval/inversion; one note in, a chord out.</p>
+    <h4>What it is</h4>
+    <p>CHORD turns one note into a chord. You give it a pitch and it plays two to four voices tuned above it, in shapes that range from unison to chords with a ninth. In a modular, a chord normally takes several oscillators and quantizers; here one module is enough.</p>
+    <h4>How to think about it</h4>
+    <p>Think of it as a hand on a keyboard that already knows the chord shape. The CHORD knob picks the shape, VOX how many notes it has, and INV how the notes are stacked. A slow wave on the CHRD input changes the shape by itself; the ROOT output of HARMONY on the PITCH input makes the root follow key changes. With VLEAD, each voice moves to the nearest note of the next chord, gliding, and the change sounds as smooth as a choir.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the fundamental, from 16 to 4000 Hz.</li>
+      <li><b>CHORD</b>: the chord shape, from ten tables, from unison to chords with a ninth.</li>
+      <li><b>VOX</b>: how many voices sound, from two to four.</li>
+      <li><b>INV</b>: moves the lowest notes up an octave. It changes the look of the chord without changing the notes.</li>
+      <li><b>VLEAD</b>: on a chord change, makes each voice move to the nearest note, gliding. At zero they all jump at once.</li>
+      <li><b>DTUNE</b>: detunes the voices from one another. A little thickens the sound; a lot becomes a wall.</li>
+      <li><b>WAVE</b>: the waveform of the voices, from sawtooth to pulse and triangle.</li>
+      <li><b>DRIFT</b>: lets each voice wobble slightly in tuning, slowly.</li>
+    </ul>
+    <p>Inputs: PITCH for the fundamental, CHRD to change the shape, and FM.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input and turn CHORD slowly. Hear the shapes go by.</li>
+      <li>Change VOX from 2 to 4 and the chord fills out.</li>
+      <li>Raise DTUNE a little: the voices drift apart and the sound gets wider.</li>
+      <li>Connect the CLK output of CLOCK to the CLK input of a SEQUENCE, and the PTCH output of the SEQUENCE to the PITCH input of CHORD. The chord now moves with the sequence.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-NOISE">
     <h3>NOISE</h3>
     <figure class="painel"><img src="assets/modulos/NOISE.webp" alt="NOISE module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Noise and continuous chance — white/pink/brown/blue/violet/bit + S&amp;H + a wandering voltage, 8 outputs at once.</p>
-    <p><span class="nivel">How it works</span> DECISION decides events; NOISE gives the floor and the random CVs. POIS swaps the internal clock for free Poisson.</p>
+    <h4>What it is</h4>
+    <p>NOISE produces noise, the sound of all frequencies mixed at random, in several colors at once, each on its own output: from white, hissy and bright, to brown, deep like the sea. It also produces slow random values, which you can use to make other modules change on their own.</p>
+    <h4>How to think about it</h4>
+    <p>NOISE has two very different uses. As sound, it is the stuff of wind, rain, cymbals and the crack of a snare. As chance, it is a source of variation for generative patches: the S&amp;H output picks a new value on each pulse and holds it until the next, and SMTH glides from one value to another. Connect one of them to an oscillator's pitch, through a quantizer, and you have a melody that never repeats the same way.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: how often the S&amp;H and SMTH outputs pick a value, from very slow to 2000 times per second. If the TRIG input is connected, it takes over from this knob.</li>
+      <li><b>SLEW</b>: how long the SMTH output takes to reach each new value. At zero it jumps; at maximum it glides slowly.</li>
+      <li><b>SPRD</b>: the kind of draw. At zero every value is equally likely; at maximum, values near the middle come up more often and the changes get gentler.</li>
+      <li><b>POIS</b>: replaces the regular rhythm of the draws with irregular, random timing, keeping the same average.</li>
+    </ul>
+    <p>Sound outputs: WHT (white), PNK (pink), BRN (brown), BLU (blue), VLT (violet) and BIT (digital noise). Chance outputs: S&amp;H and SMTH. Inputs: TRIG, to trigger the draws, and IN.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect PNK to a MIXER input. You hear a soft hiss, like rain.</li>
+      <li>Switch to BRN, deeper, and then to WHT, brighter.</li>
+      <li>Connect S&amp;H to the CV input of a QUANTIZER, and its PTCH output to the 1V/O input of an OSC that is sounding. The note starts jumping at random, always within the scale.</li>
+      <li>Connect the CLK output of CLOCK to the TRIG input: the jumps now happen in time with the clock.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MATTER">
     <h3>MATTER</h3>
     <figure class="painel"><img src="assets/modulos/MATTER.webp" alt="MATTER module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Physical-modelling voice — matter excited (blown/rubbed/struck) and ringing; stiffness/tension/wear as knobs.</p>
+    <h4>What it is</h4>
+    <p>MATTER simulates an object that vibrates when struck: a string, a bell, a metal plate, a tube. Inside it has 24 resonances that ring together, like those of a real object. You strike it and hear the object answer, with the tuning and material you choose.</p>
+    <h4>How to think about it</h4>
+    <p>A filtered oscillator sounds electronic; MATTER sounds like something being played. You don't build the tone harmonic by harmonic: you choose the material with STRC and where the object is struck with POS, and then you excite it. The strike can come from inside, through the HIT input, or from outside, from any sound connected to IN. A CLOCK hitting HIT is already tuned percussion.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the tuning of the object, from 20 to 8000 Hz.</li>
+      <li><b>STRC</b>: the material. At the start, a string, sweet and in tune; at the end, bell or metal, with scattered resonances.</li>
+      <li><b>BRITE</b>: how many high resonances ring. Low is muffled; high is bright.</li>
+      <li><b>DAMP</b>: how long the object keeps ringing after the strike. Low is a short tap; high is a long ring.</li>
+      <li><b>POS</b>: the point where the object is struck. As the point moves, some resonances disappear and others appear, as on a real instrument.</li>
+      <li><b>EXCIT</b>: how much noise goes into the strike. Low is a clean tap; high has more air in the attack.</li>
+      <li><b>MIX</b>: the blend between the raw strike and the object's resonance. At maximum, only the body of the object.</li>
+    </ul>
+    <p>Inputs: IN, to make an outside sound resonate; HIT, a pulse that strikes; 1V/O, for tuning; STR, to change the material.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input, and the CLK output of CLOCK to the HIT input. You hear tuned hits.</li>
+      <li>Turn STRC from end to end. The hit goes from string to bell.</li>
+      <li>Raise DAMP until the hits run together into a continuous ring.</li>
+      <li>Move POS slowly and hear the tone change with the striking point.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-STRING">
     <h3>STRING</h3>
     <figure class="painel"><img src="assets/modulos/STRING.webp" alt="STRING module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Extended Karplus-Strong string — pluck/bow/hammer into a delay line with damping and material.</p>
+    <h4>What it is</h4>
+    <p>STRING simulates a string: plucked, as on a guitar; hammered, as on a piano; or bowed, as on a violin. It recreates the behavior of a string that vibrates and gradually loses energy, which is why the attack and body of the sound feel natural even though they are synthetic.</p>
+    <h4>How to think about it</h4>
+    <p>MATTER is the module for objects that ring, like bells and plates; STRING is the one for strings. Its main gesture is POS, the point where the string is played: as that point moves, some harmonics disappear, just as when a guitarist plays closer to the bridge. A pulse on PLK plucks the string; a continuous sound on IN makes it sing as if bowed.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: the tuning of the string, from 20 to 4000 Hz.</li>
+      <li><b>DECAY</b>: how long the string rings after being plucked. Low is dry; high barely ends.</li>
+      <li><b>DAMP</b>: brightness. High makes the string dark, like an old string; low keeps the brightness of a new one.</li>
+      <li><b>POS</b>: the point where the string is played. Near the middle, the even harmonics vanish and the sound turns hollow.</li>
+      <li><b>EXCIT</b>: how much noise goes into the strike, like the sound of a finger or pick.</li>
+      <li><b>DRIVE</b>: saturates the string from inside, taking it from an acoustic sound to a distorted one.</li>
+      <li><b>MIX</b>: the blend between the raw strike and the string. At maximum, only the string.</li>
+    </ul>
+    <p>Inputs: IN, a sound that makes the string vibrate; PLK, a pulse that plucks it; 1V/O, for tuning; DMP, to change the brightness.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input, and the EUC output of CLOCK to the PLK input. The string is plucked in time with the clock.</li>
+      <li>Turn DECAY: from dry notes to notes that run into each other.</li>
+      <li>Move POS slowly and hear the tone change with the playing point.</li>
+      <li>Connect the PTCH output of a SEQUENCE, driven by the same CLOCK, to the 1V/O input. Now the string plays a melodic line.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-DRUM">
     <h3>DRUM</h3>
     <figure class="painel"><img src="assets/modulos/DRUM.webp" alt="DRUM module panel" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Percussion voice — body with pitch sweep + attack click; an 808 ↔ 909 ↔ acoustic map, and ROLL.</p>
+    <h4>What it is</h4>
+    <p>DRUM is a ready-made percussion voice: on each pulse at the GATE input, it plays a hit. With a few knobs it goes from kick to snare, tom and hi-hat, and shifts in character between the sound of old drum machines and a more acoustic sound.</p>
+    <h4>How to think about it</h4>
+    <p>Building a kick drum from scratch takes several modules; DRUM gives you one ready to go. It needs something to tell it when to play: a CLOCK or, better, a TRIGSEQ, which generates rhythmic patterns on four lanes. Four DRUM modules, one on each TRIGSEQ lane, make a kit. And since TONE accepts a pitch through the PIT input, you can play a line of toms.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TONE</b>: the pitch of the body of the hit, from 20 to 1000 Hz. Low is a kick; mid, a tom or snare; high, something like a clave.</li>
+      <li><b>BEND</b>: how far the pitch drops right after the hit. High gives a kick its weight; zero keeps the hit on a single pitch.</li>
+      <li><b>DECAY</b>: the length, from a short click to a sustained boom.</li>
+      <li><b>SNAP</b>: the amount of crack in the attack, which gives body to snare and hi-hat.</li>
+      <li><b>MAP</b>: the character, moving through drum-machine tones to an acoustic sound.</li>
+      <li><b>DRIVE</b>: saturates the output and makes the hit more aggressive.</li>
+      <li><b>ROLL</b>: makes the module trigger itself, from a slow roll to a buzz. At zero it only plays when it receives a pulse.</li>
+      <li><b>DRIFT</b>: varies each hit slightly, so repetition sounds played rather than programmed.</li>
+    </ul>
+    <p>Inputs: GATE, the pulse that fires the hit; ACC, for accents; PIT, for pitch.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect OUT to a MIXER input, and the CLK output of CLOCK to the GATE input. You hear a kick keeping time.</li>
+      <li>Raise TONE and SNAP, lower DECAY: the kick becomes a dry snare.</li>
+      <li>Raise ROLL with nothing on GATE: the module plays by itself, in a roll.</li>
+      <li>Connect CLOCK to a TRIGSEQ and its T1 and T2 outputs to two DRUM modules set up differently. You have a small drum kit.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SIGNAL-IN">
     <h3>SIGNAL-IN</h3>
     <figure class="painel"><img src="assets/modulos/SIGNAL-IN.webp" alt="SIGNAL-IN module panel" width="71" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> The way in from the world — live audio (ALSA) + MIDI in a single adapter; monophonic last-note voice with pitch/gate/vel/cc outputs.</p>
-    <p><span class="nivel">How it works</span> It is the INPUT counterpart of NOTE-OUT. With nothing connected, deterministic silence.</p>
+    <h4>What it is</h4>
+    <p>SIGNAL-IN brings the outside world into the patch. It takes sound from the computer's audio input, such as a microphone or another instrument, and notes from a MIDI keyboard or controller, and turns them into signals the other modules understand.</p>
+    <h4>How to think about it</h4>
+    <p>With it, someone outside can play Rasgo Modular: the key's pitch goes to an oscillator, holding the key opens an envelope, and the keyboard's mod wheel can open a filter. It also lets the patch process outside sound, running a voice or a guitar through filters and spaces. The app only opens the audio input when there is a SIGNAL-IN in the patch.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>GAIN</b>: the level of the incoming audio, from zero to double.</li>
+      <li><b>BEND</b>: how many semitones the keyboard's pitch bend moves the pitch, from zero to two octaves.</li>
+      <li><b>CC#</b>: which keyboard controller the CC output follows. Number 1 is usually the mod wheel.</li>
+    </ul>
+    <p>Outputs: L and R, the incoming audio; 1V/O, the pitch of the key played; GATE, open while the key is held; VEL, how hard it was played; CC, the value of the chosen controller.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>With a microphone or instrument connected to the computer, connect L to a MIXER input and adjust GAIN until you hear the sound.</li>
+      <li>Run that sound through a FILTER or SPACE before the MIXER to transform it.</li>
+      <li>With a MIDI keyboard, connect 1V/O to the 1V/O input of an OSC, and GATE to the GATE input of an ENVELOPE that has the OSC's sound on its IN input. The keyboard now plays the patch.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-TRANSFORM">

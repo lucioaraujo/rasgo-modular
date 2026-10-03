@@ -7,7 +7,7 @@ Enquanto o OSC dá um som fixo que você esculpe depois, o WAVETABLE já nasce e
 ## Controles
 - FREQ: a altura da nota, de 8 a 8000 Hz.
 - FINE: afinação fina, até um semitom para cada lado.
-- POS: a posição na tabela. No começo, o som é cheio de harmônicos; no fim, é quase um seno. A entrada POS soma a este knob, e é aí que o módulo ganha vida.
+- POS: a posição na tabela. No começo, o som é cheio de harmônicos; no fim, é quase um seno. A entrada POS soma a este knob, e é por ela que o timbre passa a se mover sozinho.
 - WARP: deforma a leitura de cada ciclo e acrescenta harmônicos com um sotaque digital, sem trocar de quadro.
 - FM: quanto o sinal na entrada FM mexe na altura.
 - DRIFT: uma pequena oscilação lenta na afinação.

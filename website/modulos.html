@@ -94,7 +94,7 @@
     <ul class="controles">
       <li><b>FREQ</b>: a altura da nota, de 8 a 8000 Hz.</li>
       <li><b>FINE</b>: afinação fina, até um semitom para cada lado.</li>
-      <li><b>POS</b>: a posição na tabela. No começo, o som é cheio de harmônicos; no fim, é quase um seno. A entrada POS soma a este knob, e é aí que o módulo ganha vida.</li>
+      <li><b>POS</b>: a posição na tabela. No começo, o som é cheio de harmônicos; no fim, é quase um seno. A entrada POS soma a este knob, e é por ela que o timbre passa a se mover sozinho.</li>
       <li><b>WARP</b>: deforma a leitura de cada ciclo e acrescenta harmônicos com um sotaque digital, sem trocar de quadro.</li>
       <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
       <li><b>DRIFT</b>: uma pequena oscilação lenta na afinação.</li>
@@ -247,7 +247,7 @@
     <h4>O que é</h4>
     <p>O CHORD transforma uma nota em um acorde. Você dá uma altura e ele toca de duas a quatro vozes afinadas em cima dela, com formatos que vão do uníssono a acordes com nona. Normalmente, num modular, um acorde exige vários osciladores e quantizadores; aqui basta um módulo.</p>
     <h4>Como pensar nele</h4>
-    <p>Pense nele como uma mão no teclado que já sabe o formato do acorde. O knob CHORD escolhe o formato, VOX quantas notas ele tem e INV a disposição das notas. Ligado ao HARMONY pela entrada CHRD, a progressão de acordes anda sozinha. Com VLEAD, cada voz vai para a nota mais próxima do acorde seguinte, deslizando, e a troca soa suave como um coral.</p>
+    <p>Pense nele como uma mão no teclado que já sabe o formato do acorde. O knob CHORD escolhe o formato, VOX quantas notas ele tem e INV a disposição das notas. Uma onda lenta na entrada CHRD faz o formato mudar sozinho; a saída ROOT do HARMONY na entrada PITCH faz a fundamental acompanhar as trocas de tom. Com VLEAD, cada voz vai para a nota mais próxima do acorde seguinte, deslizando, e a troca soa suave como um coral.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>FREQ</b>: a nota fundamental, de 16 a 4000 Hz.</li>
@@ -274,7 +274,7 @@
     <h4>O que é</h4>
     <p>O NOISE produz ruído, o som de todas as frequências misturadas ao acaso, em várias cores ao mesmo tempo, cada uma numa saída: do branco, chiado e brilhante, ao marrom, grave como o mar. Ele também produz valores aleatórios lentos, que servem para fazer outros módulos mudarem sozinhos.</p>
     <h4>Como pensar nele</h4>
-    <p>O NOISE tem dois usos bem diferentes. Como som, é a matéria do vento, da chuva, dos pratos e do estalo de uma caixa. Como acaso, é o coração de um patch generativo: a saída S&amp;H sorteia um valor novo a cada pulso e o segura até o próximo, e a SMTH desliza de um valor a outro. Ligue uma delas na altura de um oscilador, passando por um quantizador, e você tem uma melodia que nunca se repete igual.</p>
+    <p>O NOISE tem dois usos bem diferentes. Como som, é a matéria do vento, da chuva, dos pratos e do estalo de uma caixa. Como acaso, é uma fonte de variação para patches generativos: a saída S&amp;H sorteia um valor novo a cada pulso e o segura até o próximo, e a SMTH desliza de um valor a outro. Ligue uma delas na altura de um oscilador, passando por um quantizador, e você tem uma melodia que nunca se repete igual.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>RATE</b>: o ritmo dos sorteios das saídas S&amp;H e SMTH, de muito lento a 2000 por segundo. Se a entrada TRIG estiver ligada, ela manda no lugar deste knob.</li>
