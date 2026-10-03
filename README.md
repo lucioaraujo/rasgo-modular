@@ -17,10 +17,10 @@ Languages:
 
 ## English
 
-**Patches as a starting point.** Rasgo Modular does not open on a blank
-page: it offers a patch already built and sounding, for you to play from —
-re-patching by hand, adjusting, letting it drift, or taking it all apart and
-building from scratch.
+**Patches as a starting point.** Rasgo Modular opens with a patch already
+built and sounding. You can play it as it is, turn the controls, rewire it by
+hand, or take it all apart and start from scratch. Every patch comes from a
+number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgosound.arquiviagem.net/) ·
 **Version:** v0.1.2 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
@@ -28,41 +28,50 @@ and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
 
-A generative modular environment with **58 modules** in eight families
-(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), written in
-C++17 with no dependencies in the core. Modules are described as data — each
-declares its own panel in millimetres — and one engine drives two front-ends:
-a cross-platform JUCE app and an X11 test panel.
+A modular synthesizer is an instrument made of separate modules, each with one
+job: one makes sound, another filters it, another keeps time, another makes
+decisions. You connect outputs to inputs with cables, and the sound comes out
+of those connections. Rasgo Modular does this on the computer screen, with
+**58 modules** in eight families (SOURCE, TRANSFORM, MODULATE, TIME, DECISION,
+ROUTE, SPACE, OUT).
 
-It is not a plugin and needs no DAW. It opens, sounds, records. MIDI and
-audio input exist as optional adapter modules, opened only when a patch
-contains one.
+It is a standalone program: it opens, sounds and records, with no other music
+software needed. MIDI and audio input come in through an optional module, and
+the app only asks for the audio input when that module is in the patch.
 
-### The cable is an object, not a wire
+Under the hood it is C++17 with no dependencies in the core. Each module is
+described as data, including its panel in millimetres, and the same engine
+drives a cross-platform JUCE app and an X11 test panel.
 
-- **Conductance** — a cable can conduct probabilistically, passing
-  sometimes rather than always.
-- **Relation** — a cable can combine what crosses it with a second signal:
-  ring modulation, wavefolding or difference (RING, FOLD, DIFF in the cable
-  inspector).
-- **Rupture with a scar** — breaking a cable does not cut to silence: the
-  scar holds the last block and repeats it, decaying.
+### The cables play too
+
+Every cable has settings of its own, which open when you click on it:
+
+- **Conduction:** a cable can let the signal through only part of the time,
+  at random.
+- **Relation:** a cable can combine what it carries with a second signal of
+  your choice, by multiplying (RING), folding (FOLD) or subtracting (DIFF).
+- **Rupture:** a broken cable keeps repeating the last stretch it carried,
+  quieter each time, instead of cutting to silence.
 
 ### How you use it
 
-Two ways in, and neither is the "advanced" one. **One:** press SEED and
-steer what comes out — the same number always reproduces the same patch;
-VARY moves parameters live, CHANGE, EVOLVE and CROSS take the patch
-elsewhere. **Two:** press `n` to pull every cable at once and build the piece
-connection by connection; `Ctrl+Z` steps back one action.
+**From a seed.** Press SEED and the app builds a new patch. Listen, turn the
+controls, rewire a few cables. VARY moves the controls slowly while you play;
+CHANGE, EVOLVE and CROSS take the patch down new paths from where it is.
 
-Hovering any knob, jack or module explains it in the LEARN box — in
-Portuguese, English, French or Spanish. The [module guide](https://lucioaraujo.github.io/rasgo-modular/modulos-en.html)
-has the same text for all 58 modules.
+**From scratch.** Press `n` to remove every cable. The modules stay in the
+rack and the sound stops; from then on every connection is yours. `Ctrl+Z`
+undoes the last action, one cable at a time.
 
-A recording comes out as a pair: the `.wav` of what you heard and a
-`.score.txt` logging the topology and every gesture of the take. Patches are
-saved as `.rmp`.
+To learn as you play, hover over any module, control or jack: the LEARN box
+explains it in English, Portuguese, French or Spanish. The
+[module guide](https://lucioaraujo.github.io/rasgo-modular/modulos-en.html) explains all 58 modules for beginners, with an
+exercise for each one.
+
+The REC button records a 24-bit `.wav` plus a `.score.txt` that logs the
+patch at the start of the take and every gesture made during it. Patches are
+saved as `.rmp` files.
 
 ### Download
 
@@ -93,51 +102,62 @@ in [`DESENVOLVIMENTO.md`](DESENVOLVIMENTO.md).
 
 ## Português
 
-**Patches como ponto de partida.** O Rasgo Modular não abre em branco: ele
-apresenta um patch já montado e soando, para você tocar a partir dele —
-recabeando à mão, ajustando, deixando derivar, ou desmontando tudo e
-construindo do zero.
+**Patches como ponto de partida.** O Rasgo Modular abre com um patch já
+montado e soando. Você pode tocá-lo como está, mexer nos controles, refazer os
+cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
+número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgosound.arquiviagem.net/) ·
 **Versão:** v0.1.2 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
-### O que ele é
+### O que é
 
-Um ambiente modular generativo com **58 módulos** em oito famílias
-(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), escrito em
-C++17 sem dependências no núcleo. Os módulos são descritos por dados — cada
-um declara seu painel em milímetros — e o mesmo motor alimenta dois
-front-ends: um app multiplataforma em JUCE e um painel de teste em X11.
+Um sintetizador modular é um instrumento feito de módulos independentes, cada
+um com uma função: um gera som, outro filtra, outro marca o tempo, outro toma
+decisões. Você liga saídas a entradas com cabos, e o som nasce dessas
+ligações. O Rasgo Modular faz isso na tela do computador, com **58 módulos**
+em oito famílias (SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE,
+OUT).
 
-Ele não é plugin e não depende de uma DAW. Abre, soa, grava. MIDI e entrada
-de áudio existem como módulos adaptadores opcionais, abertos só quando o
-patch tem um deles.
+É um programa que funciona sozinho: abre, soa e grava, sem precisar de outro
+software de música. MIDI e entrada de áudio chegam por um módulo opcional, e o
+app só pede a entrada de áudio quando esse módulo está no patch.
 
-### O cabo é um objeto, não um fio
+Por dentro, é C++17 sem dependências no núcleo. Cada módulo é descrito por
+dados, inclusive o painel em milímetros, e o mesmo motor alimenta um app
+multiplataforma em JUCE e um painel de teste em X11.
 
-- **Condutância** — o cabo pode conduzir de forma probabilística, passando
-  às vezes, não sempre.
-- **Relação** — o cabo pode combinar o que o atravessa com um segundo
-  sinal: modulação em anel, dobra de onda ou diferença (RING, FOLD, DIFF no
-  inspetor de cabo).
-- **Ruptura com cicatriz** — romper um cabo não corta para o silêncio: a
-  cicatriz segura o último bloco e o repete decaindo.
+### Os cabos também tocam
+
+Cada cabo tem ajustes próprios, que aparecem quando você clica nele:
+
+- **Condução:** o cabo pode deixar o sinal passar só parte do tempo, ao
+  acaso.
+- **Relação:** o cabo pode combinar o que leva com um segundo sinal, à sua
+  escolha, multiplicando (RING), dobrando (FOLD) ou subtraindo (DIFF).
+- **Ruptura:** um cabo rompido continua repetindo o último trecho que levava,
+  cada vez mais baixo, em vez de cortar para o silêncio.
 
 ### Como se usa
 
-Há dois caminhos, e nenhum é o "avançado". **Um:** aperte SEED e conduza o
-que sair — o mesmo número reproduz sempre o mesmo patch; VARIA mexe nos
-parâmetros ao vivo, MUDA, EVOLUI e CRUZA levam o patch a outro lugar.
-**Dois:** aperte `n` para tirar todos os cabos de uma vez e construa a peça
-ligação por ligação; `Ctrl+Z` volta uma ação.
+**A partir de uma semente.** Aperte SEED e o app monta um patch novo. Ouça,
+mexa nos controles, refaça alguns cabos. VARIA move os controles devagar
+enquanto você toca; MUDA, EVOLUI e CRUZA levam o patch para outros caminhos a
+partir do atual.
 
-Passar o mouse sobre qualquer knob, jack ou módulo explica-o na caixa
-LEARN — em português, inglês, francês ou espanhol. O [guia dos módulos](https://lucioaraujo.github.io/rasgo-modular/modulos.html)
-traz o mesmo texto para os 58 módulos.
+**Do zero.** Aperte `n` para tirar todos os cabos. Os módulos ficam no rack e
+o som para; daí em diante, cada ligação é sua. `Ctrl+Z` desfaz a última ação,
+cabo por cabo.
 
-A gravação sai em par: o `.wav` do que se ouviu e um `.score.txt` com a
-topologia e cada gesto da tomada. Os patches são salvos em `.rmp`.
+Para aprender enquanto toca, passe o mouse sobre qualquer módulo, controle ou
+entrada: a caixa LEARN explica em português, inglês, francês ou espanhol. O
+[guia dos módulos](https://lucioaraujo.github.io/rasgo-modular/modulos.html) explica os 58 módulos para quem está começando,
+com um exercício para cada um.
+
+O botão REC grava um `.wav` de 24 bits e um `.score.txt` que anota o patch no
+início da gravação e cada gesto feito durante ela. Os patches são salvos em
+arquivos `.rmp`.
 
 ### Download
 
@@ -168,10 +188,11 @@ no [`CHANGELOG.md`](CHANGELOG.md); as notas de desenvolvimento, no
 
 ## Français
 
-**Des patches comme point de départ.** Le Rasgo Modular ne s'ouvre pas sur
-une page blanche : il propose un patch déjà monté et sonnant, pour que vous
-jouiez à partir de lui — en recâblant à la main, en ajustant, en le laissant
-dériver, ou en démontant tout pour construire depuis zéro.
+**Des patchs comme point de départ.** Rasgo Modular s'ouvre sur un patch
+déjà monté qui sonne. Vous pouvez le jouer tel quel, tourner les réglages,
+refaire les câbles à la main, ou tout démonter et repartir de zéro. Chaque
+patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
+son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgosound.arquiviagem.net/) ·
 **Version :** v0.1.2 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
@@ -179,44 +200,55 @@ et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
 
-Un environnement modulaire génératif de **58 modules** en huit familles
-(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), écrit en
-C++17 sans dépendances dans le noyau. Les modules sont décrits comme des
-données — chacun déclare son propre panneau en millimètres — et un seul
-moteur alimente deux interfaces : une application JUCE multiplateforme et un
-panneau de test X11.
+Un synthétiseur modulaire est un instrument fait de modules indépendants,
+chacun avec une fonction : l'un produit du son, un autre le filtre, un autre
+bat la mesure, un autre prend des décisions. Vous reliez des sorties à des
+entrées avec des câbles, et le son naît de ces liaisons. Rasgo Modular fait
+cela sur l'écran de l'ordinateur, avec **58 modules** en huit familles
+(SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT).
 
-Ce n'est pas un plugin et il ne dépend d'aucune STAN. Il s'ouvre, il sonne,
-il enregistre. Le MIDI et l'entrée audio existent comme modules adaptateurs
-optionnels, ouverts seulement quand un patch en contient un.
+C'est un programme autonome : il s'ouvre, sonne et enregistre, sans autre
+logiciel de musique. Le MIDI et l'entrée audio passent par un module
+optionnel, et l'application ne demande l'entrée audio que lorsque ce module
+est dans le patch.
 
-### Le câble est un objet, pas un fil
+Sous le capot, c'est du C++17 sans dépendances dans le noyau. Chaque module
+est décrit par des données, y compris son panneau en millimètres, et le même
+moteur fait tourner une application JUCE multiplateforme et un panneau de test
+X11.
 
-- **Conductance** — un câble peut conduire de façon probabiliste, passer
-  parfois plutôt que toujours.
-- **Relation** — le câble peut combiner ce qui le traverse avec un second
-  signal : modulation en anneau, repliement d'onde ou différence (RING,
-  FOLD, DIFF dans l'inspecteur de câble).
-- **Rupture avec cicatrice** — rompre un câble ne coupe pas vers le
-  silence : la cicatrice retient le dernier bloc et le répète en
-  décroissant.
+### Les câbles jouent aussi
 
-### Comment on s'en sert
+Chaque câble a ses propres réglages, qui apparaissent quand vous cliquez
+dessus :
 
-Deux voies, et aucune n'est la voie « avancée ». **Une :** appuyez sur SEED
-et dirigez ce qui sort — le même numéro reproduit toujours le même patch ;
-VARIER déplace les paramètres en direct, CHANGER, ÉVOLUE et CROISER
-emmènent le patch ailleurs. **Deux :** appuyez sur `n` pour retirer tous
-les câbles d'un coup et construisez la pièce liaison par liaison ; `Ctrl+Z`
-revient d'une action.
+- **Conduction :** un câble peut ne laisser passer le signal qu'une partie du
+  temps, au hasard.
+- **Relation :** un câble peut combiner ce qu'il porte avec un second signal
+  de votre choix, en multipliant (RING), en repliant (FOLD) ou en soustrayant
+  (DIFF).
+- **Rupture :** un câble rompu continue de répéter le dernier passage qu'il
+  portait, de plus en plus bas, au lieu de couper net.
 
-Survoler n'importe quel potentiomètre, jack ou module l'explique dans la
-case LEARN — en portugais, anglais, français ou espagnol. Le [guide des modules](https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html)
-donne le même texte pour les 58 modules.
+### Comment s'en servir
 
-Un enregistrement sort par paire : le `.wav` de ce qu'on a entendu et un
-`.score.txt` avec la topologie et chaque geste de la prise. Les patches sont
-enregistrés en `.rmp`.
+**À partir d'une graine.** Appuyez sur SEED et l'application monte un nouveau
+patch. Écoutez, tournez les réglages, refaites quelques câbles. VARIER fait
+bouger les réglages lentement pendant que vous jouez ; CHANGER, ÉVOLUE et
+CROISER emmènent le patch sur d'autres chemins à partir de l'actuel.
+
+**À partir de zéro.** Appuyez sur `n` pour retirer tous les câbles. Les
+modules restent dans le rack et le son s'arrête ; dès lors, chaque liaison
+vous appartient. `Ctrl+Z` annule la dernière action, câble par câble.
+
+Pour apprendre en jouant, survolez n'importe quel module, réglage ou prise :
+la boîte LEARN l'explique en français, portugais, anglais ou espagnol. Le
+[guide des modules](https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html) explique les 58 modules pour qui débute, avec un
+exercice pour chacun.
+
+Le bouton REC enregistre un `.wav` en 24 bits et un `.score.txt` qui note le
+patch au début de la prise et chaque geste fait pendant celle-ci. Les patchs
+sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
@@ -247,10 +279,10 @@ notes de développement, en portugais, dans [`DESENVOLVIMENTO.md`](DESENVOLVIMEN
 
 ## Español
 
-**Patches como punto de partida.** El Rasgo Modular no abre en blanco:
-ofrece un patch ya montado y sonando, para que usted toque a partir de él —
-recableando a mano, ajustando, dejándolo derivar, o desmontándolo todo y
-construyendo desde cero.
+**Patches como punto de partida.** Rasgo Modular abre con un patch ya
+armado y sonando. Puede tocarlo tal como está, mover los controles, rehacer
+los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
+número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgosound.arquiviagem.net/) ·
 **Versión:** v0.1.2 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
@@ -258,40 +290,51 @@ y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
 
-Un entorno modular generativo con **58 módulos** en ocho familias (SOURCE,
-TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT), escrito en C++17 sin
-dependencias en el núcleo. Los módulos se describen como datos — cada uno
-declara su propio panel en milímetros — y un mismo motor alimenta dos
-interfaces: una aplicación JUCE multiplataforma y un panel de prueba X11.
+Un sintetizador modular es un instrumento hecho de módulos independientes,
+cada uno con una función: uno genera sonido, otro lo filtra, otro marca el
+tiempo, otro toma decisiones. Usted conecta salidas con entradas mediante
+cables, y el sonido nace de esas conexiones. Rasgo Modular hace esto en la
+pantalla del ordenador, con **58 módulos** en ocho familias (SOURCE,
+TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT).
 
-No es un plugin y no depende de un DAW. Abre, suena, graba. El MIDI y la
-entrada de audio existen como módulos adaptadores opcionales, abiertos solo
-cuando el patch contiene uno.
+Es un programa independiente: abre, suena y graba, sin otro software de
+música. El MIDI y la entrada de audio llegan por un módulo opcional, y la
+aplicación solo pide la entrada de audio cuando ese módulo está en el patch.
 
-### El cable es un objeto, no un hilo
+Por dentro es C++17 sin dependencias en el núcleo. Cada módulo se describe
+con datos, incluido su panel en milímetros, y el mismo motor mueve una
+aplicación JUCE multiplataforma y un panel de prueba en X11.
 
-- **Conductancia** — un cable puede conducir de forma probabilística,
-  pasando a veces y no siempre.
-- **Relación** — el cable puede combinar lo que lo atraviesa con una
-  segunda señal: modulación en anillo, plegado de onda o diferencia (RING,
-  FOLD, DIFF en el inspector de cable).
-- **Ruptura con cicatriz** — romper un cable no corta al silencio: la
-  cicatriz retiene el último bloque y lo repite decayendo.
+### Los cables también tocan
+
+Cada cable tiene ajustes propios, que aparecen al hacer clic sobre él:
+
+- **Conducción:** un cable puede dejar pasar la señal solo una parte del
+  tiempo, al azar.
+- **Relación:** un cable puede combinar lo que lleva con una segunda señal
+  elegida por usted, multiplicando (RING), plegando (FOLD) o restando (DIFF).
+- **Ruptura:** un cable roto sigue repitiendo el último tramo que llevaba,
+  cada vez más bajo, en lugar de cortar en seco.
 
 ### Cómo se usa
 
-Dos caminos, y ninguno es el "avanzado". **Uno:** pulse SEED y conduzca lo
-que salga — el mismo número reproduce siempre el mismo patch; VARIAR mueve
-los parámetros en vivo, CAMBIA, EVOLUCIONA y CRUZAR llevan el patch a otro
-lugar. **Dos:** pulse `n` para quitar todos los cables de una vez y
-construya la pieza conexión a conexión; `Ctrl+Z` deshace una acción.
+**A partir de una semilla.** Pulse SEED y la aplicación arma un patch nuevo.
+Escuche, mueva los controles, rehaga algunos cables. VARIAR mueve los
+controles despacio mientras toca; CAMBIA, EVOLUCIONA y CRUZAR llevan el patch
+por otros caminos a partir del actual.
 
-Pasar el ratón sobre cualquier perilla, jack o módulo lo explica en la caja
-LEARN — en portugués, inglés, francés o español. La [guía de módulos](https://lucioaraujo.github.io/rasgo-modular/modulos-es.html)
-trae el mismo texto para los 58 módulos.
+**Desde cero.** Pulse `n` para quitar todos los cables. Los módulos se quedan
+en el rack y el sonido se detiene; desde ahí, cada conexión es suya. `Ctrl+Z`
+deshace la última acción, cable por cable.
 
-Una grabación sale en par: el `.wav` de lo que se escuchó y un `.score.txt`
-con la topología y cada gesto de la toma. Los patches se guardan en `.rmp`.
+Para aprender mientras toca, pase el ratón sobre cualquier módulo, control o
+conector: la caja LEARN lo explica en español, portugués, inglés o francés. La
+[guía de los módulos](https://lucioaraujo.github.io/rasgo-modular/modulos-es.html) explica los 58 módulos para quien empieza, con
+un ejercicio para cada uno.
+
+El botón REC graba un `.wav` de 24 bits y un `.score.txt` que anota el patch
+al empezar la toma y cada gesto hecho durante ella. Los patches se guardan en
+archivos `.rmp`.
 
 ### Descarga
 
