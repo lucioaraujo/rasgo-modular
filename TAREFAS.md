@@ -10496,8 +10496,12 @@ knobs `ROOT`/`SCALE` do `QUANTIZER`. No app isso não é possível: o
 só é usado pelas sementes), e as sementes não ligam o HARMONY ao
 QUANTIZER. `TRSP` não serve: transpõe a entrada **antes** de quantizar,
 então a escala continua na tônica do knob. O que funciona hoje é somar
-`ROOT` à melodia na `1V/O` do oscilador (dois cabos na mesma entrada se
-somam): a tônica muda, a escala não. O verbete do site descreve isso e
+`ROOT` à melodia antes da `1V/O` do oscilador. Como cada entrada aceita
+um cabo só, a soma passa por um `MATRIX` (`PTCH`→IN1, `ROOT`→IN2,
+célula 21 = 1, `SAT`/`NORM` em 0: soma exata; o `SUM` do `CONTROL`
+corta em ±1 e achataria a melodia). A tônica muda, a escala não.
+`guia/RELACAO_DE_CABO.md` dizia que dois cabos no mesmo destino se
+somam; corrigido. O verbete do site descreve isso e
 diz que a troca de escala ainda não chega ao QUANTIZER.
 **Proposta para a v0.1.3:** duas entradas novas no `QUANTIZER`, `ROOT`
 e `SCALE`, no fim da lista de portas (não muda os índices dos patches
