@@ -10,63 +10,6 @@
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
 <script src="assets/contact.js" defer></script>
-<!-- SEO:INICIO — gerado por seo.py; editar lá, não aqui -->
-<link rel="canonical" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
-<link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
-<link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/modulos-es.html">
-<link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Rasgo Modular">
-<meta property="og:title" content="Rasgo Modular — guia dos módulos">
-<meta property="og:description" content="Os 58 módulos do Rasgo Modular, família por família: o que cada um é, onde fica entre os vizinhos, e uma cadeia para experimentar.">
-<meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rasgo Modular em execução: rack de três fileiras de módulos cruzado por cerca de setenta cabos em laranja e azul.">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:locale:alternate" content="en_US">
-<meta property="og:locale:alternate" content="fr_FR">
-<meta property="og:locale:alternate" content="es_ES">
-<meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Rasgo Modular",
-  "description": "Os 58 módulos do Rasgo Modular, família por família: o que cada um é, onde fica entre os vizinhos, e uma cadeia para experimentar.",
-  "url": "https://lucioaraujo.github.io/rasgo-modular/",
-  "inLanguage": "pt-BR",
-  "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
-  "applicationCategory": "MultimediaApplication",
-  "applicationSubCategory": "Modular synthesizer",
-  "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.1",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.1",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "EUR"
-  },
-  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-  "isAccessibleForFree": true,
-  "author": {
-    "@type": "Person",
-    "name": "Lúcio Araújo"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "RASGO",
-    "url": "https://rasgosound.arquiviagem.net/"
-  },
-  "sameAs": [
-    "https://github.com/lucioaraujo/rasgo-modular"
-  ]
-}
-</script>
-<!-- SEO:FIM -->
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — família de instrumentos e pesquisa sonora</a></div>
@@ -194,60 +137,259 @@
   <article class="modulo" id="mod-OPERATOR">
     <h3>OPERATOR</h3>
     <figure class="painel"><img src="assets/modulos/OPERATOR.webp" alt="Painel do módulo OPERATOR" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — metais, sinos, baixos que o subtrativo não faz.</p>
-    <p><span class="nivel">Experimente</span> RATIO inteiro = harmônico; quebrado = inarmônico (sino).</p>
+    <h4>O que é</h4>
+    <p>O OPERATOR é um sintetizador de FM com quatro osciladores de seno, chamados operadores. Em FM, um operador não soa sozinho: ele empurra a frequência de outro para frente e para trás muito depressa, e disso nascem harmônicos novos. É assim que se fazem pianos elétricos, sinos, baixos estalados e timbres metálicos, como nos sintetizadores digitais dos anos 1980.</p>
+    <h4>Como pensar nele</h4>
+    <p>Três decisões fazem o timbre: quem modula quem (ALGO), a relação de frequência entre os operadores (RB, RC, RD) e a força da modulação (INDEX). Comece com INDEX baixo e suba aos poucos: o som vai de um seno limpo a algo brilhante e áspero. O gesto mais útil é ligar um envelope na entrada IDX, para cada nota começar brilhante e ir escurecendo, como uma tecla de piano elétrico.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a altura da nota, de 8 a 8000 Hz.</li>
+      <li><b>FINE</b>: afinação fina, até um semitom para cada lado.</li>
+      <li><b>ALGO</b>: escolhe um entre oito arranjos de quem modula quem. No começo, os operadores ficam em cadeia e o som é mais áspero; no fim, soam lado a lado, mais perto de um órgão.</li>
+      <li><b>RB, RC, RD</b>: a relação de frequência de cada operador com o primeiro. Valores inteiros soam afinados; valores quebrados, como 2,5, soam como sino; valores altos, como metal.</li>
+      <li><b>INDEX</b>: a força da modulação. Em zero, você ouve só senos puros; no máximo, um timbre muito brilhante.</li>
+      <li><b>FBK</b>: faz o primeiro operador modular a si mesmo. Sozinho, já transforma o seno em algo parecido com um dente de serra.</li>
+      <li><b>DRIFT</b>: desafina cada operador um pouquinho, de forma lenta. Em zero, tudo fica estável.</li>
+    </ul>
+    <p>Entradas: 1V/O para a altura e IDX para modular a força da FM.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER com INDEX em zero: um seno simples.</li>
+      <li>Suba INDEX devagar e ouça os harmônicos aparecerem.</li>
+      <li>Mude RB para um valor quebrado e o som vira sino.</li>
+      <li>Ligue a saída ENV de um ENVELOPE na entrada IDX, e a saída CLK do CLOCK na entrada GATE do ENVELOPE. Cada nota abre brilhante e se apaga, como um piano elétrico.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PULSAR">
     <h3>PULSAR</h3>
     <figure class="painel"><img src="assets/modulos/PULSAR.webp" alt="Painel do módulo PULSAR" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Síntese pulsar (Curtis Roads) — trem de pulsarets (grão + silêncio) com DUAS frequências independentes: FREQ = a altura, FORMANT = o timbre. Entre a granular e a de formante.</p>
-    <p><span class="nivel">Como funciona</span> O OPERATOR/ADDITIVE fixam o espectro na altura; aqui FORMANT desliza o envelope espectral SEM desafinar. MASK/JITTER rareiam e desalinham o trem (padrões burlescos, semeados).</p>
-    <p><span class="nivel">Experimente</span> LFO → FQM: 'wah' sem filtro. MASK ~0,7 + JITTER ~0,4 = uma nuvem rítmica irregular sobre a mesma nota.</p>
+    <h4>O que é</h4>
+    <p>O PULSAR produz um trem de pequenos pulsos sonoros, cada um seguido de um silêncio. Quando os pulsos se repetem depressa, você ouve uma nota; quando ficam lentos, ouve um ritmo. A técnica vem do compositor Curtis Roads e tem uma propriedade curiosa: a altura e o timbre são controlados separadamente, então dá para mudar a cor do som sem desafiná-lo.</p>
+    <h4>Como pensar nele</h4>
+    <p>FREQ decide quantas vezes por segundo o pulso se repete, e portanto a nota. FRMT decide o que acontece dentro de cada pulso, e portanto o timbre: baixo soa oco, alto soa nasal. Abaixe FREQ até umas 30 repetições por segundo e cada pulso vira um evento que se ouve separado; com MASK e JITR, esses eventos ficam irregulares, como uma nuvem.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a taxa de repetição dos pulsos, de 20 a 2000 Hz. É a altura da nota.</li>
+      <li><b>FRMT</b>: a frequência dentro de cada pulso, de 0,1 a 8 vezes FREQ. É o timbre: baixo é oco, alto é brilhante.</li>
+      <li><b>SHAPE</b>: a forma de cada pulso, de um seno simples a um pulso mais estreito e rico em harmônicos.</li>
+      <li><b>WIND</b>: o contorno de cada pulso. Para a esquerda, as bordas são duras e o som é brilhante; no meio, é limpo; para a direita, cada pulso ataca rápido e decai, como uma percussão.</li>
+      <li><b>JITR</b>: torna irregular o tempo e o volume de cada pulso. Em zero, o trem é rígido.</li>
+      <li><b>MASK</b>: a chance de cada pulso ser pulado. Abre buracos e cria padrões rítmicos sem mudar a nota.</li>
+      <li><b>SPRD</b>: espalha pulsos alternados entre esquerda e direita, alargando o som em estéreo.</li>
+      <li><b>LEVEL</b>: o volume de saída.</li>
+    </ul>
+    <p>Entradas: PIT para a altura e FQM para modular o timbre. Saídas L e R, para o estéreo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue L numa entrada do MIXER e gire FRMT devagar. O timbre muda, mas a nota fica no mesmo lugar.</li>
+      <li>Leve FREQ para perto do mínimo. A nota se desfaz em pulsos que se ouvem um a um.</li>
+      <li>Com FREQ baixo, suba MASK e JITR. Os pulsos ficam esparsos e irregulares, como uma chuva.</li>
+      <li>Ligue a saída BI de um FUNCTION lento na entrada FQM. O timbre passeia sozinho sem desafinar.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SPECTRA">
     <h3>SPECTRA</h3>
     <figure class="painel"><img src="assets/modulos/SPECTRA.webp" alt="Painel do módulo SPECTRA" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Resíntese espectral — OUVE um som, acha os parciais mais fortes e re-oscila como um banco de senóides que o segue. A ponte análise → síntese (Panharmonium / phase vocoder).</p>
-    <p><span class="nivel">Como funciona</span> O ADDITIVE constrói o espectro do zero; o MEMORY grão no tempo; aqui o material é o espectro de curto prazo da entrada. FREEZE = pad infinito de qualquer som. Sem IN, um ruído semeado alimenta a análise → drone que evolui sozinho.</p>
-    <p><span class="nivel">Experimente</span> DRUM → IN, VOICE baixo, STRETCH = uma sombra sineira do ritmo; FRZ ← gate = espectro congelado alternando com o vivo.</p>
+    <h4>O que é</h4>
+    <p>O SPECTRA escuta um som, encontra as frequências mais fortes que há nele e as toca de novo com um conjunto de osciladores de seno. O resultado é uma espécie de sombra do som original: reconhecível, mas feita só de tons puros, e que você pode transpor, deformar ou congelar.</p>
+    <h4>Como pensar nele</h4>
+    <p>Ele fica entre os módulos de fonte porque é a sua saída que soa, mas quase sempre precisa de algo na entrada IN: uma voz, um acorde, um tambor, o som de fora pelo SIGNAL-IN. Com poucas vozes, ele faz uma caricatura do som; com muitas, uma cópia fiel. O gesto mais forte é o FRZ: congela o último espectro e o deixa soando indefinidamente, como um pad tirado de qualquer instante.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>VOICE</b>: quantos senos o módulo usa, de 2 a 24. Poucos simplificam o som; muitos o reproduzem com fidelidade.</li>
+      <li><b>BLUR</b>: a rapidez com que cada seno segue o som que entra. Em zero, acompanha de perto; no máximo, arrasta e borra, e o som parece derreter.</li>
+      <li><b>SHIFT</b>: transpõe a reconstrução até duas oitavas para cima ou para baixo, sem mexer na escuta.</li>
+      <li><b>STRCH</b>: afasta ou aproxima as frequências entre si, levando o som para algo metálico, de sino, sem mudar a altura percebida.</li>
+      <li><b>TONE</b>: escurece ou realça os agudos da reconstrução. No meio, fica fiel ao que foi ouvido.</li>
+      <li><b>JITR</b>: faz cada seno oscilar de leve, para a reconstrução nunca soar parada.</li>
+      <li><b>FRZ</b>: congela a escuta. Os senos continuam tocando o último espectro.</li>
+      <li><b>MIX</b>: a mistura entre o som original e a reconstrução. No máximo, você ouve só a reconstrução.</li>
+    </ul>
+    <p>Entradas: IN para o som a analisar, PIT para transpor e FRZ para congelar com um gate. Saídas L e R.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída OUT do CHORD na entrada IN do SPECTRA, e a saída L numa entrada do MIXER. Você ouve o acorde refeito em tons puros.</li>
+      <li>Baixe VOICE até 3 ou 4. O acorde vira um esboço de si mesmo.</li>
+      <li>Leve STRCH para um dos lados e ouça o acorde ficar metálico.</li>
+      <li>Ligue a saída EUC do CLOCK na entrada FRZ. O som congela e se solta no ritmo do relógio.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PLL">
     <h3>PLL</h3>
     <figure class="painel"><img src="assets/modulos/PLL.webp" alt="Painel do módulo PLL" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Phase-locked loop — trava a fase num sinal de entrada e gera divisões/multiplicações dele; solto, auto-oscila.</p>
-    <p><span class="nivel">Como funciona</span> É oscilador E extrator de clock — segue o que ouve dentro de uma janela de captura.</p>
+    <h4>O que é</h4>
+    <p>O PLL é um oscilador que sabe seguir outro. Sozinho, funciona como qualquer oscilador, com altura própria e uma forma de onda que você escolhe. Quando recebe um segundo sinal na entrada REF, ele ajusta a própria velocidade aos poucos até andar junto com esse sinal, como um músico que acerta o passo com outro.</p>
+    <h4>Como pensar nele</h4>
+    <p>O OSC também pode se prender a outro oscilador, mas de um golpe só (o sync). O PLL faz isso devagar, e esse caminho até travar é audível: um deslizar de altura. Com RATIO, ele trava numa oitava acima, numa abaixo ou em divisões mais fundas da referência. A saída LOCK diz o quanto ele está travado, e serve para fazer outras coisas reagirem a isso.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a altura quando não há referência, e o ponto de partida quando há.</li>
+      <li><b>FINE</b>: afinação fina, até um semitom para cada lado.</li>
+      <li><b>SHAPE</b>: a forma da onda, passando de seno para triângulo, dente de serra e quadrada.</li>
+      <li><b>RATIO</b>: em que relação com a referência ele trava. Em 1, na mesma nota; em 2, uma oitava acima; perto do mínimo, muito abaixo.</li>
+      <li><b>LOCK</b>: a força com que persegue a referência. Baixo, ele desliza devagar até chegar; alto, trava logo, mas fica mais nervoso.</li>
+      <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
+      <li><b>FBK</b>: quanto o próprio sinal volta para dentro do circuito, acrescentando textura sem desafinar.</li>
+      <li><b>FTYP</b>: escolhe entre seis tipos de retorno, cada um com uma cor diferente.</li>
+    </ul>
+    <p>Entradas: 1V/O para a altura, FM e REF, a referência a seguir. Saídas: OUT, RING (o PLL multiplicado pela referência) e LOCK, um sinal de controle que indica o quanto ele está travado.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER. Sem nada em REF, é um oscilador comum; gire SHAPE para ouvir as formas.</li>
+      <li>Ligue a saída SAW de um OSC na entrada REF. O PLL procura a altura do OSC e se prende a ela.</li>
+      <li>Baixe LOCK. Agora ele demora para chegar, e você ouve a altura deslizando.</li>
+      <li>Mude RATIO para 2. Ele trava uma oitava acima do OSC.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CHORD">
     <h3>CHORD</h3>
     <figure class="painel"><img src="assets/modulos/CHORD.webp" alt="Painel do módulo CHORD" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Voz de acorde — 3–4 osciladores afinados por um intervalo/inversão; uma nota entra, um acorde sai.</p>
+    <h4>O que é</h4>
+    <p>O CHORD transforma uma nota em um acorde. Você dá uma altura e ele toca de duas a quatro vozes afinadas em cima dela, com formatos que vão do uníssono a acordes com nona. Normalmente, num modular, um acorde exige vários osciladores e quantizadores; aqui basta um módulo.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense nele como uma mão no teclado que já sabe o formato do acorde. O knob CHORD escolhe o formato, VOX quantas notas ele tem e INV a disposição das notas. Ligado ao HARMONY pela entrada CHRD, a progressão de acordes anda sozinha. Com VLEAD, cada voz vai para a nota mais próxima do acorde seguinte, deslizando, e a troca soa suave como um coral.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a nota fundamental, de 16 a 4000 Hz.</li>
+      <li><b>CHORD</b>: o formato do acorde, entre dez tabelas, do uníssono a acordes com nona.</li>
+      <li><b>VOX</b>: quantas vozes soam, de duas a quatro.</li>
+      <li><b>INV</b>: sobe as notas mais graves uma oitava. Muda a cara do acorde sem mudar as notas.</li>
+      <li><b>VLEAD</b>: na troca de acorde, faz cada voz ir para a nota mais próxima, deslizando. Em zero, todas saltam ao mesmo tempo.</li>
+      <li><b>DTUNE</b>: desafina as vozes entre si. Um pouco engrossa o som; muito vira um paredão.</li>
+      <li><b>WAVE</b>: a forma de onda das vozes, de dente de serra a pulso e triângulo.</li>
+      <li><b>DRIFT</b>: deixa cada voz oscilar de leve na afinação, de forma lenta.</li>
+    </ul>
+    <p>Entradas: PITCH para a fundamental, CHRD para trocar o formato e FM.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER e gire CHORD devagar. Ouça os formatos passarem.</li>
+      <li>Mude VOX de 2 para 4 e o acorde se enche.</li>
+      <li>Suba DTUNE um pouco: as vozes se afastam e o som fica mais largo.</li>
+      <li>Ligue a saída CLK do CLOCK na entrada CLK de uma SEQUENCE, e a saída PTCH da SEQUENCE na entrada PITCH do CHORD. O acorde passa a andar com a sequência.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-NOISE">
     <h3>NOISE</h3>
     <figure class="painel"><img src="assets/modulos/NOISE.webp" alt="Painel do módulo NOISE" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Ruído e acaso contínuo — branco/rosa/brown/azul/violeta/bit + S&amp;H + tensão que passeia, 8 saídas ao mesmo tempo.</p>
-    <p><span class="nivel">Como funciona</span> O DECISION decide eventos; o NOISE dá o piso e as CVs aleatórias. POIS troca o clock interno por Poisson livre.</p>
+    <h4>O que é</h4>
+    <p>O NOISE produz ruído, o som de todas as frequências misturadas ao acaso, em várias cores ao mesmo tempo, cada uma numa saída: do branco, chiado e brilhante, ao marrom, grave como o mar. Ele também produz valores aleatórios lentos, que servem para fazer outros módulos mudarem sozinhos.</p>
+    <h4>Como pensar nele</h4>
+    <p>O NOISE tem dois usos bem diferentes. Como som, é a matéria do vento, da chuva, dos pratos e do estalo de uma caixa. Como acaso, é o coração de um patch generativo: a saída S&amp;H sorteia um valor novo a cada pulso e o segura até o próximo, e a SMTH desliza de um valor a outro. Ligue uma delas na altura de um oscilador, passando por um quantizador, e você tem uma melodia que nunca se repete igual.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o ritmo dos sorteios das saídas S&amp;H e SMTH, de muito lento a 2000 por segundo. Se a entrada TRIG estiver ligada, ela manda no lugar deste knob.</li>
+      <li><b>SLEW</b>: quanto tempo a saída SMTH leva para chegar a cada valor novo. Em zero, ela salta; no máximo, desliza devagar.</li>
+      <li><b>SPRD</b>: o tipo de sorteio. Em zero, qualquer valor é igualmente provável; no máximo, os valores perto do meio aparecem mais, e as mudanças ficam mais suaves.</li>
+      <li><b>POIS</b>: troca o ritmo regular dos sorteios por tempos irregulares, ao acaso, mantendo a mesma média.</li>
+    </ul>
+    <p>Saídas de som: WHT (branco), PNK (rosa), BRN (marrom), BLU (azul), VLT (violeta) e BIT (ruído digital). Saídas de acaso: S&amp;H e SMTH. Entradas: TRIG, para disparar os sorteios, e IN.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue PNK numa entrada do MIXER. Você ouve um chiado suave, como chuva.</li>
+      <li>Troque para BRN, mais grave, e depois para WHT, mais brilhante.</li>
+      <li>Ligue S&amp;H na entrada CV de um QUANTIZER, e a saída PTCH dele na entrada 1V/O de um OSC que esteja soando. A nota passa a saltar ao acaso, sempre dentro da escala.</li>
+      <li>Ligue a saída CLK do CLOCK na entrada TRIG: os saltos passam a acontecer no ritmo do relógio.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MATTER">
     <h3>MATTER</h3>
     <figure class="painel"><img src="assets/modulos/MATTER.webp" alt="Painel do módulo MATTER" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Voz de modelagem física — matéria excitada (sopro/atrito/impacto) ressoando; rigidez/tensão/desgaste como knobs.</p>
+    <h4>O que é</h4>
+    <p>O MATTER simula um objeto que vibra quando é tocado: uma corda, um sino, uma placa de metal, um tubo. Por dentro, ele tem 24 ressonâncias que soam juntas, como as de um objeto real. Você dá um golpe e ouve o objeto responder, com a afinação e o material que escolher.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um oscilador filtrado soa como eletrônica; o MATTER soa como algo sendo tocado. Você não monta o timbre harmônico por harmônico: escolhe o material em STRC e onde o objeto é golpeado em POS, e depois o excita. O golpe pode vir de dentro, pela entrada HIT, ou de fora, de qualquer som ligado em IN. Um CLOCK batendo em HIT já é percussão afinada.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a afinação do objeto, de 20 a 8000 Hz.</li>
+      <li><b>STRC</b>: o material. No começo, uma corda, de som afinado e doce; no fim, sino ou metal, com ressonâncias desencontradas.</li>
+      <li><b>BRITE</b>: quantas ressonâncias agudas soam. Baixo é abafado; alto é brilhante.</li>
+      <li><b>DAMP</b>: quanto tempo o objeto continua soando depois do golpe. Baixo é um toque curto; alto é um anel longo.</li>
+      <li><b>POS</b>: o ponto onde o objeto é golpeado. Mudando o ponto, algumas ressonâncias somem e outras aparecem, como acontece num instrumento de verdade.</li>
+      <li><b>EXCIT</b>: quanto ruído entra no golpe. Baixo é um toque limpo; alto tem mais ar no ataque.</li>
+      <li><b>MIX</b>: a mistura entre o golpe cru e a ressonância do objeto. No máximo, só o corpo do objeto.</li>
+    </ul>
+    <p>Entradas: IN, para fazer ressoar um som de fora; HIT, um pulso que golpeia; 1V/O, para a afinação; STR, para mudar o material.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER, e a saída CLK do CLOCK na entrada HIT. Você ouve batidas afinadas.</li>
+      <li>Gire STRC de ponta a ponta. A batida passa de corda a sino.</li>
+      <li>Suba DAMP para os golpes se emendarem num anel contínuo.</li>
+      <li>Mova POS devagar e ouça o timbre mudar conforme o ponto do golpe.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-STRING">
     <h3>STRING</h3>
     <figure class="painel"><img src="assets/modulos/STRING.webp" alt="Painel do módulo STRING" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Corda Karplus-Strong estendida — pluck/bow/hammer numa linha de atraso com amortecimento e material.</p>
+    <h4>O que é</h4>
+    <p>O STRING simula uma corda: pinçada, como num violão; martelada, como num piano; ou friccionada, como num violino. Ele recria o comportamento de uma corda que vibra e vai perdendo energia, e por isso o ataque e o corpo do som soam naturais, mesmo sendo sintéticos.</p>
+    <h4>Como pensar nele</h4>
+    <p>O MATTER é o módulo dos objetos que ressoam, como sinos e placas; o STRING é o das cordas. O gesto principal é POS, o ponto onde a corda é tocada: mudando esse ponto, alguns harmônicos somem, como quando um violonista toca mais perto da ponte. Um pulso em PLK pinça a corda; um som contínuo em IN faz a corda cantar como se fosse arcada.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a afinação da corda, de 20 a 4000 Hz.</li>
+      <li><b>DECAY</b>: quanto tempo a corda soa depois de pinçada. Baixo é seco; alto quase não acaba.</li>
+      <li><b>DAMP</b>: o brilho. Alto deixa a corda escura, como uma corda velha; baixo mantém o brilho de uma corda nova.</li>
+      <li><b>POS</b>: o ponto onde a corda é tocada. Perto do meio, os harmônicos pares somem e o som fica oco.</li>
+      <li><b>EXCIT</b>: quanto ruído entra no golpe, como o som do dedo ou da palheta.</li>
+      <li><b>DRIVE</b>: satura a corda por dentro, levando-a do som acústico a um som distorcido.</li>
+      <li><b>MIX</b>: a mistura entre o golpe cru e a corda. No máximo, só a corda.</li>
+    </ul>
+    <p>Entradas: IN, um som que faz a corda vibrar; PLK, um pulso que a pinça; 1V/O, para a afinação; DMP, para mudar o brilho.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER, e a saída EUC do CLOCK na entrada PLK. A corda é pinçada no ritmo do relógio.</li>
+      <li>Gire DECAY: das notas secas às que se emendam.</li>
+      <li>Mova POS devagar e ouça o timbre mudar com o ponto do toque.</li>
+      <li>Ligue a saída PTCH de uma SEQUENCE, movida pelo mesmo CLOCK, na entrada 1V/O. Agora a corda toca uma linha melódica.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-DRUM">
     <h3>DRUM</h3>
     <figure class="painel"><img src="assets/modulos/DRUM.webp" alt="Painel do módulo DRUM" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Voz de percussão — corpo com pitch-sweep + estalo de ataque; um mapa 808 ↔ 909 ↔ acústico e ROLL.</p>
+    <h4>O que é</h4>
+    <p>O DRUM é uma voz de percussão pronta: a cada pulso na entrada GATE, ele toca um golpe. Com poucos knobs, vai do bumbo à caixa, ao tom e ao chimbal, e muda de caráter entre o som das baterias eletrônicas clássicas e um som mais acústico.</p>
+    <h4>Como pensar nele</h4>
+    <p>Montar um bumbo do zero exige vários módulos; o DRUM entrega um pronto. Ele precisa de quem diga quando tocar: um CLOCK ou, melhor, um TRIGSEQ, que gera padrões rítmicos em quatro linhas. Quatro DRUM, cada um numa linha do TRIGSEQ, formam um kit. E como TONE aceita uma altura pela entrada PIT, dá para tocar uma linha de toms.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>TONE</b>: a altura do corpo do golpe, de 20 a 1000 Hz. Grave é bumbo; médio, tom ou caixa; agudo, algo como uma clave.</li>
+      <li><b>BEND</b>: o quanto a altura cai logo depois do golpe. Alto dá o peso do bumbo; zero mantém o golpe numa altura só.</li>
+      <li><b>DECAY</b>: a duração, de um clique curto a um grave que sustenta.</li>
+      <li><b>SNAP</b>: a quantidade de estalo no ataque, o que dá corpo à caixa e ao chimbal.</li>
+      <li><b>MAP</b>: o caráter, passando por timbres de baterias eletrônicas até um som acústico.</li>
+      <li><b>DRIVE</b>: satura a saída e deixa o golpe mais agressivo.</li>
+      <li><b>ROLL</b>: faz o módulo se disparar sozinho, de um rufo lento a um zumbido. Em zero, ele só toca quando recebe um pulso.</li>
+      <li><b>DRIFT</b>: varia levemente cada golpe, para a repetição soar humana.</li>
+    </ul>
+    <p>Entradas: GATE, o pulso que dispara o golpe; ACC, para acentuar; PIT, para a altura.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue OUT numa entrada do MIXER, e a saída CLK do CLOCK na entrada GATE. Você ouve um bumbo marcando o tempo.</li>
+      <li>Suba TONE e SNAP, baixe DECAY: o bumbo vira uma caixa seca.</li>
+      <li>Suba ROLL sem nada em GATE: o módulo toca sozinho, num rufo.</li>
+      <li>Ligue o CLOCK a um TRIGSEQ e as saídas T1 e T2 em dois DRUM ajustados de forma diferente. Você tem uma pequena bateria.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SIGNAL-IN">
     <h3>SIGNAL-IN</h3>
     <figure class="painel"><img src="assets/modulos/SIGNAL-IN.webp" alt="Painel do módulo SIGNAL-IN" width="71" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Entrada do mundo — áudio ao vivo (ALSA) + MIDI num adaptador só; voz monofônica last-note com saídas pitch/gate/vel/cc.</p>
-    <p><span class="nivel">Como funciona</span> É a contraparte de ENTRADA do NOTE-OUT. Sem nada ligado, silêncio determinístico.</p>
+    <h4>O que é</h4>
+    <p>O SIGNAL-IN traz o mundo de fora para dentro do patch. Ele recebe o som da entrada de áudio do computador, como um microfone ou outro instrumento, e as notas de um teclado ou controlador MIDI, e transforma tudo em sinais que os outros módulos entendem.</p>
+    <h4>Como pensar nele</h4>
+    <p>Com ele, alguém de fora pode tocar o Rasgo Modular: a altura da tecla vai para um oscilador, o aperto da tecla abre um envelope, e a roda de modulação do teclado pode abrir um filtro. Ele também deixa o patch processar som de fora, passando uma voz ou uma guitarra por filtros e espaços. O app só abre a entrada de áudio quando há um SIGNAL-IN no patch.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>GAIN</b>: o volume do áudio que entra, de zero ao dobro.</li>
+      <li><b>BEND</b>: quantos semitons a alavanca de pitch bend do teclado move a altura, de zero a duas oitavas.</li>
+      <li><b>CC#</b>: qual controle do teclado a saída CC segue. O número 1 costuma ser a roda de modulação.</li>
+    </ul>
+    <p>Saídas: L e R, o áudio que entra; 1V/O, a altura da tecla tocada; GATE, aberto enquanto a tecla está pressionada; VEL, a força com que ela foi tocada; CC, o valor do controle escolhido.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Com um microfone ou instrumento ligado ao computador, ligue L numa entrada do MIXER e ajuste GAIN até ouvir o som.</li>
+      <li>Passe esse som por um FILTER ou pelo SPACE antes do MIXER para transformá-lo.</li>
+      <li>Com um teclado MIDI, ligue 1V/O na entrada 1V/O de um OSC, e GATE na entrada GATE de um ENVELOPE que tenha o som do OSC na entrada IN. O teclado passa a tocar o patch.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-TRANSFORM">
