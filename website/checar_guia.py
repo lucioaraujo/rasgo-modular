@@ -14,7 +14,11 @@ for f in sorted(pathlib.Path('website/guia/'+lang).glob('*.md')):
     t=f.stem; n+=1; txt=f.read_text(encoding='utf-8')
     ctrl=re.search(r'^## Controles\n(.*?)(?=^## |\Z)', txt, re.S|re.M).group(1)
     for nome in re.findall(r'^- ([^:]+):', ctrl, re.M):
-        for parte in [p.strip() for p in nome.split(',')]:
+        partes=[]
+        for p in nome.split(','):
+            p=p.strip(); m=re.fullmatch(r'([A-Z]+)(\d+) \S+ \1(\d+)', p)  # "P1 a P8"
+            partes+= [f'{m.group(1)}{i}' for i in range(int(m.group(2)),int(m.group(3))+1)] if m else [p]
+        for parte in partes:
             if parte not in rot.get(t,set()):
                 print(f'{t}: controle "{parte}" não existe no painel ({sorted(rot.get(t,set()))})'); probs+=1
 print(f'{n} verbetes conferidos, {probs} problema(s)')

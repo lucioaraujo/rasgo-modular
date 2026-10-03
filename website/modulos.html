@@ -903,30 +903,136 @@
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="Painel do módulo CLOCK" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Relógio mestre euclidiano — pulso com divisões, fill euclidiano, swing e drift; a batida de todo o patch.</p>
-    <p><span class="nivel">Experimente</span> CLOCK → tudo que tem gate/trig. FILL espalha os pulsos pelo compasso (padrões de Toussaint).</p>
+    <h4>O que é</h4>
+    <p>O CLOCK é o relógio do patch. Ele emite pulsos regulares no andamento que você escolher e, a partir deles, cria ritmos e acentos. Quase todo patch começa por ele: os pulsos fazem a sequência avançar, disparam os envelopes e tocam a percussão.</p>
+    <h4>Como pensar nele</h4>
+    <p>Em vez de programar batida por batida, você descreve o ritmo com dois números. LEN diz quantos passos tem o ciclo, FILL diz quantos deles tocam, e o CLOCK espalha esses toques da forma mais uniforme possível. Esse método, chamado ritmo euclidiano, reproduz muitos padrões tradicionais do mundo inteiro: 3 em 8 dá o tresillo cubano, 5 em 8, o cinquillo. A saída CLK pulsa em todos os passos; EUC só nos passos escolhidos; ACC marca os acentos.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>BPM</b>: o andamento, de 20 a 300 batidas por minuto.</li>
+      <li><b>MULT</b>: quantos passos cabem numa batida.</li>
+      <li><b>LEN</b>: o tamanho do ciclo, de 1 a 32 passos.</li>
+      <li><b>FILL</b>: quantos passos do ciclo tocam na saída EUC. Poucos deixam o ritmo esparso; perto de LEN, quase contínuo.</li>
+      <li><b>ROT</b>: gira o padrão, começando de outro ponto. A densidade é a mesma, mas a sensação muda.</li>
+      <li><b>SWING</b>: atrasa um passo a cada dois, dando balanço.</li>
+      <li><b>DRIFT</b>: deixa o andamento variar de leve, como um baterista que acelera e recua.</li>
+      <li><b>GATE</b>: quanto tempo cada pulso fica ligado, dentro do passo.</li>
+      <li><b>ACC-A, ACC-B</b>: os acentos caem nos passos múltiplos destes números. Com 4 e 3, por exemplo, os acentos formam um padrão de três contra quatro.</li>
+      <li><b>AND</b>: decide se o acento precisa dos dois números ao mesmo tempo ou basta um deles.</li>
+      <li><b>FEEL</b>: em quantas partes cada batida se divide: em dois, em três (tercinas), em cinco, sete, nove, onze, ou numa divisão sorteada a cada passo.</li>
+    </ul>
+    <p>Entradas: EXT, para seguir pulsos de fora; RST, para voltar ao começo; BPM, para modular o andamento. Saídas: CLK, EUC e ACC.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue EUC na entrada GATE de um DRUM, e OUT do DRUM numa entrada do MIXER.</li>
+      <li>Ponha LEN em 8 e mova FILL de 1 a 8. Em 3 e em 5 você ouve padrões conhecidos.</li>
+      <li>Gire ROT e ouça o mesmo padrão começar de outro lugar.</li>
+      <li>Ligue ACC na entrada ACC do DRUM e mude ACC-A e ACC-B para ouvir os acentos se deslocarem.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-LOGIC">
     <h3>LOGIC</h3>
     <figure class="painel"><img src="assets/modulos/LOGIC.webp" alt="Painel do módulo LOGIC" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Lógica de clock — divide/multiplica, AND/OR/XOR de gates, atraso; recombina o TEMPO.</p>
-    <p><span class="nivel">Como funciona</span> O par do ABACUS (que faz aritmética de CV). Aqui é só gate/trigger.</p>
+    <h4>O que é</h4>
+    <p>O LOGIC combina e transforma ritmos. Ele divide um pulso para criar ritmos mais lentos, compara dois ritmos para gerar um terceiro e alterna um estado a cada pulso. São operações simples, das que se usam em circuitos digitais, aplicadas ao tempo musical.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um ritmo interessante raramente é um pulso reto. Costuma ser a relação entre dois: um que toca na metade da velocidade, um que só toca quando outro também toca, um que toca quando um ou outro toca mas nunca os dois juntos. O LOGIC fica entre as fontes de pulsos, como CLOCK, TURING e SEQUENCE, e os módulos que eles disparam. Sem nada na entrada CLK, ele usa um relógio próprio.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o relógio interno, usado quando nada chega em CLK.</li>
+      <li><b>DIV</b>: divide o pulso. Em 2, a saída DIV pulsa uma vez a cada dois pulsos; em 3, uma a cada três.</li>
+      <li><b>MULT</b>: acrescenta pulsos intermediários dentro de cada período.</li>
+      <li><b>GATE</b>: quanto tempo o pulso da saída DIV fica ligado.</li>
+      <li><b>DELAY</b>: atrasa o pulso da saída DIV em até 200 milissegundos.</li>
+    </ul>
+    <p>Entradas: CLK, o pulso a dividir; A e B, os dois ritmos a comparar; RST, para zerar. Saídas: DIV, o pulso dividido; AND, quando A e B estão ligados juntos; OR, quando um ou outro está; XOR, quando só um deles está; FLIP, que muda de estado a cada pulso em A.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída CLK do CLOCK na entrada CLK do LOGIC e DIV na entrada GATE de um DRUM ligado ao MIXER. Mude DIV para ouvir o pulso ficar mais lento.</li>
+      <li>Ligue EUC do CLOCK em A, e PLS de um TURING em B.</li>
+      <li>Leve a percussão para a saída XOR e depois para AND. Ouça como cada combinação gera um ritmo diferente a partir dos mesmos dois.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-TURING">
     <h3>TURING</h3>
     <figure class="painel"><img src="assets/modulos/TURING.webp" alt="Painel do módulo TURING" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Registrador de deslocamento aleatório (Turing Machine) — um laço de bits que LOCK trava, MUTATE reembaralha; melodia/ritmo que se repete com variação.</p>
+    <h4>O que é</h4>
+    <p>O TURING inventa melodias por acaso e deixa você guardar as que agradam. Ele mantém um laço de alguns valores que gira a cada pulso; a cada volta, cada valor pode se manter ou ser trocado por outro. Com o controle LOCK você decide quanto o laço muda, de acaso total a repetição fixa.</p>
+    <h4>Como pensar nele</h4>
+    <p>Aqui você compõe escolhendo pelo ouvido, não escrevendo nota por nota. Deixe LOCK no meio, ouça a melodia se transformar e, quando surgir algo bom, gire LOCK até o fim: o laço trava e se repete. Para variar de novo, solte um pouco. O nome homenageia o módulo Turing Machine, da Music Thing Modular, que popularizou essa ideia. A SEQUENCE toca uma frase escrita; o TURING faz frases nascerem e se fixarem.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o relógio interno, usado quando nada chega em CLK.</li>
+      <li><b>LEN</b>: o tamanho do laço, de 2 a 16 passos.</li>
+      <li><b>LOCK</b>: a chance de o laço se manter. Em zero, tudo é sorteado de novo; no máximo, a frase trava e se repete.</li>
+      <li><b>MUT</b>: quando um valor muda, o quanto muda. Baixo, pequenas variações do que já estava; alto, um sorteio novo.</li>
+      <li><b>RANGE</b>: a extensão dos valores de saída, ou seja, o tamanho dos saltos da melodia.</li>
+      <li><b>STEPS</b>: divide a saída em degraus. Em 1, os valores são contínuos.</li>
+      <li><b>OFST</b>: o centro dos valores, que sobe ou desce a região da melodia.</li>
+    </ul>
+    <p>Entradas: CLK, o pulso que faz o laço girar; LOCK, para modular o travamento. Saídas: CV, a melodia; CV2, outra leitura do mesmo laço, aparentada mas diferente; PLS, um ritmo tirado do mesmo laço.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída CLK do CLOCK na entrada CLK do TURING.</li>
+      <li>Ligue CV na entrada CV de um QUANTIZER, e PTCH do QUANTIZER em 1V/O de um OSC passando por um ENVELOPE até o MIXER. Ligue PLS na entrada GATE do envelope.</li>
+      <li>Com LOCK no meio, ouça a melodia mudar aos poucos.</li>
+      <li>Quando gostar do que ouviu, leve LOCK ao máximo. A frase fica.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SEQUENCE">
     <h3>SEQUENCE</h3>
     <figure class="painel"><img src="assets/modulos/SEQUENCE.webp" alt="Painel do módulo SEQUENCE" width="237" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Sequenciador de 8 passos — sliders de altura + direção (frente/trás/ping-pong/aleatório/browniano), gate por passo.</p>
-    <p><span class="nivel">Experimente</span> Os sliders são a partitura — a Motion Engine mal os toca. Use MUTATE/EVOLVE pra reembaralhar de propósito.</p>
+    <h4>O que é</h4>
+    <p>A SEQUENCE toca uma frase curta que você escreve: até oito notas, cada uma com sua altura, cada uma ligada ou em silêncio. A cada pulso na entrada CLK ela avança um passo, entregando a altura na saída PTCH e o pulso da nota na saída GATE. Serve para uma linha de baixo, um riff, uma figura que se repete.</p>
+    <h4>Como pensar nele</h4>
+    <p>O TURING faz a frase nascer do acaso; a SEQUENCE parte de uma frase que você decide. A variação vem do jeito de ler: para a frente, de trás para a frente, indo e voltando, em ordem sorteada, ou vagando de um passo para o vizinho. A mesma frase de oito notas rende muita coisa mudando só MODE e LEN. Para que as alturas caiam nas notas de uma escala, passe PTCH por um QUANTIZER antes do oscilador.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>LEN</b>: quantos dos oito passos entram na frase.</li>
+      <li><b>MODE</b>: a ordem de leitura: para a frente, para trás, ida e volta, sorteada, ou vagando passo a passo.</li>
+      <li><b>RATE</b>: o relógio interno, usado quando nada chega em CLK.</li>
+      <li><b>GATE</b>: quanto tempo cada nota fica ligada dentro do passo. Curto soa destacado; longo, ligado.</li>
+      <li><b>GLIDE</b>: faz a altura escorregar de uma nota à seguinte.</li>
+      <li><b>RANGE</b>: quantas oitavas os oito valores cobrem, até duas.</li>
+      <li><b>P1 a P8</b>: a altura de cada passo.</li>
+      <li><b>G1 a G8</b>: liga ou silencia cada passo.</li>
+    </ul>
+    <p>Entradas: CLK, o pulso que avança; RST, para voltar ao primeiro passo. Saídas: PTCH, a altura; GATE, o pulso da nota; EOS, um pulso a cada fim de frase.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída CLK do CLOCK em CLK da SEQUENCE.</li>
+      <li>Ligue PTCH na entrada CV de um QUANTIZER, e PTCH do QUANTIZER em 1V/O de um OSC. Passe o OSC por um ENVELOPE até o MIXER e ligue GATE da SEQUENCE em GATE do envelope.</li>
+      <li>Mexa em P1 a P8 até a frase agradar e desligue alguns passos com G1 a G8.</li>
+      <li>Troque MODE e ouça a mesma frase lida de outros jeitos.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-TRIGSEQ">
     <h3>TRIGSEQ</h3>
     <figure class="painel"><img src="assets/modulos/TRIGSEQ.webp" alt="Painel do módulo TRIGSEQ" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Sequenciador de TRIGGERS — 4 faixas de densidade euclidiana com chaos/ratchet/fill/swing; a percussão generativa.</p>
+    <h4>O que é</h4>
+    <p>O TRIGSEQ gera ritmos de bateria em quatro linhas ao mesmo tempo, pensadas para bumbo, caixa, chimbal e uma percussão extra. Você não marca as batidas uma por uma: escolhe um estilo, decide a densidade de cada linha, e ele cria o padrão. Ao carregar, já está tocando.</p>
+    <h4>Como pensar nele</h4>
+    <p>Quatro CLOCK, um por instrumento, gerariam linhas que não conversam entre si. No TRIGSEQ as quatro nascem do mesmo estilo, e por isso se encaixam como numa bateria tocada por uma pessoa. O controle MAP passa por quatro caracteres: reto, como no rock e na house; quebrado, como no breakbeat; com balanço, como no hip-hop; e esparso, como no dub. Girando devagar, o groove muda de personalidade sem perder o pulso.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>LEN</b>: quantos dos 16 passos entram no ciclo.</li>
+      <li><b>RATE</b>: o relógio interno, usado quando nada chega em CLK.</li>
+      <li><b>MAP</b>: o estilo, do reto ao esparso.</li>
+      <li><b>DNS1, DNS2, DNS3, DNS4</b>: a densidade de cada linha. Mais alto, mais batidas.</li>
+      <li><b>SWING</b>: atrasa um passo a cada dois, dando balanço.</li>
+      <li><b>CHAOS</b>: a chance de surgirem batidas fantasmas ou de faltarem batidas previstas, o que torna o ritmo menos mecânico.</li>
+      <li><b>RATCH</b>: a chance de uma batida virar uma rajada rápida de repetições, um rufo.</li>
+      <li><b>FILL</b>: quanto a entrada FILL aumenta as densidades, para viradas.</li>
+      <li><b>DRIFT</b>: deixa o estilo e as densidades variarem aos poucos, e o groove evolui sozinho.</li>
+    </ul>
+    <p>Entradas: CLK, o pulso; RST, para voltar ao começo; FILL, um sinal que dispara a virada; MAP, para modular o estilo. Saídas: T1 a T4, as quatro linhas; ACC, os acentos; ANY, um pulso sempre que qualquer linha toca.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída CLK do CLOCK na entrada CLK do TRIGSEQ.</li>
+      <li>Ponha três DRUM no rack. Ligue T1, T2 e T3 nas entradas GATE de cada um, e as saídas OUT no MIXER.</li>
+      <li>Ajuste TONE e DECAY de cada DRUM para soar como bumbo, caixa e chimbal.</li>
+      <li>Gire MAP devagar e ouça o groove mudar de estilo. Depois mexa nas densidades.</li>
+    </ol>
   </article>
 </section>
 <section class="section" id="fam-DECISION">
