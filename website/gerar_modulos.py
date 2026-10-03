@@ -346,7 +346,7 @@ def pagina(codigo, dados, familias, marca):
     L.append('<script src="assets/contact.js" defer></script>')
     L.append("</head>")
     L.append("<body>")
-    L.append('<div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">%s</a></div>'
+    L.append('<div class="rasgo-strip"><a href="https://rasgoinstruments.arquiviagem.net/">%s</a></div>'
              % e(t["faixa"]))
     L.append('<a class="skip-link" href="#conteudo">%s</a>' % e(t["pular"]))
     L.append("")

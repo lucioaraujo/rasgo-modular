@@ -22,7 +22,7 @@ built and sounding. You can play it as it is, turn the controls, rewire it by
 hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
-**Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Version:** v0.1.3 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
@@ -109,7 +109,7 @@ montado e soando. Você pode tocá-lo como está, mexer nos controles, refazer o
 cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
-**Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Versão:** v0.1.3 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
@@ -198,7 +198,7 @@ refaire les câbles à la main, ou tout démonter et repartir de zéro. Chaque
 patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
-**Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Version :** v0.1.3 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
@@ -289,7 +289,7 @@ armado y sonando. Puede tocarlo tal como está, mover los controles, rehacer
 los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
-**Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgosound.arquiviagem.net/) ·
+**Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Versión:** v0.1.3 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 

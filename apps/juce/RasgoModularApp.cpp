@@ -4958,7 +4958,7 @@ private:
                 // engole todo dígito hexa seguinte ("\xbac" de "Lúcio"), e
                 // Clang e MSVC recusam — o rc2 caiu no macOS e no Windows
                 {"autoria", "instrumento criado por L\xc3\xba" "cio Ara\xc3\xba" "jo "
-                            "\xe2\x80\x94 fam\xc3\xad" "lia RASGO, rasgosound.arquiviagem.net"},
+                            "\xe2\x80\x94 fam\xc3\xad" "lia RASGO, rasgoinstruments.arquiviagem.net"},
                 {"licenca", "instrumento sob GNU AGPL-3.0-or-later"},
                 {"contato", "rasgo.instruments@gmail.com"},
             });
