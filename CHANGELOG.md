@@ -16,6 +16,13 @@ pronto.
 > whose app closed on startup. If it still fails, please send the file
 > `%APPDATA%\rasgo-modular\arranque.log` (and `crash.log`, if present).
 
+- **Tutorial sem lentidão** (relato do autor com o rc2, 3 out. 2026:
+  rolagem lenta e FECHAR demorando). O conteúdo era diagramado e desenhado
+  do zero a cada quadro, e o rack por baixo seguia repintando a 30 fps; os
+  eventos do mouse esperavam na fila. Agora o conteúdo vira uma imagem
+  (refeita só ao mudar idioma, largura ou escala da tela) e o rack não é
+  repintado enquanto o tutorial ou o SOBRE o cobrem. Medido com o app
+  mudo: ~50% de um núcleo com o tutorial aberto antes, ~21% depois.
 - **SIGNAL-IN com botão ON, desligado ao abrir** (ideia do autor, 3 out.
   2026). Desligado, nada de fora entra e o app não abre microfone nem MIDI;
   ligado, abre os dois (se alguma saída do módulo estiver cabeada). Motivo:
