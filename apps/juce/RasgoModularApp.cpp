@@ -993,7 +993,9 @@ public:
                 + juce::String(static_cast<int>(cables_)) + " "
                 + str(rasgo::panel::strings::rdCables);
             g.setFont(juce::FontOptions(11.0f));
-            const int w = textW(g, rd);
+            // +3: a largura medida arredonda para baixo e o drawText corta
+            // no limite — em francês sumia o "s" final ("13 câble")
+            const int w = textW(g, rd) + 3;
             if (rx - x - (cmdY_ == 12 ? cmdsW_ : 0) > w + 24) {
                 rx -= w;
                 g.setColour(T.textSecondary);
@@ -3567,7 +3569,8 @@ public:
                 if (lu.starved > 0) g.setColour(T.warning);
                 g.drawText(juce::String(juce::roundToInt(lu.sr)) + u8(" Hz")
                                + u8("   \xc2\xb7   REC 24 bits PCM")
-                               + u8("   \xc2\xb7   blocos perdidos ")
+                               + u8("   \xc2\xb7   ")
+                               + str(S::aboutStarved) + u8(" ")
                                + juce::String((int)lu.starved),
                            px, py, wrapW, 17,
                            juce::Justification::topLeft, false);
@@ -3583,7 +3586,7 @@ public:
                 using LM = rasgo::modular::LoudnessMeter;
                 const bool overTp = lu.tp > LM::kTargetDbtp;
                 g.setColour(overTp ? T.warning : T.textSecondary);
-                juce::String alvo = u8("alvo  ")
+                juce::String alvo = str(S::aboutTarget) + u8("  ")
                     + juce::String(LM::kTargetLufs, 0) + u8(" LUFS / ")
                     + juce::String(LM::kTargetDbtp, 0) + u8(" dBTP   \xc2\xb7   TP ")
                     + (lu.tp <= -119.0f ? u8("--")
@@ -4594,6 +4597,14 @@ private:
         if (lf.existsAsFile())
             lang_ = rasgo::panel::langFromCode(
                 lf.loadFileAsString().trim().toStdString());
+        else
+            // Primeira abertura: o idioma do sistema ("pt", "fr", "es";
+            // qualquer outro cai no inglês). Antes abria em português para
+            // todo mundo, e quem não lê português precisava achar sozinho o
+            // botão de idioma (auditoria de idiomas, 3 out. 2026).
+            lang_ = rasgo::panel::langFromCode(
+                juce::SystemStats::getUserLanguage().substring(0, 2)
+                    .toLowerCase().toStdString());
         const auto rf = dataDir().getChildFile("rack-view");
         if (rf.existsAsFile())
             rackOutputPref_ = rf.loadFileAsString().trim() == "output";

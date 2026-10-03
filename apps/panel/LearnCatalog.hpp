@@ -2856,13 +2856,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "gate/trigger.", ""}},
         {"TURING", {
             "Registrador de deslocamento aleatório (Turing Machine) — um "
-            "laço de bits que LOCK trava, MUTATE reembaralha; melodia/"
+            "laço de bits que LOCK trava e MUT reembaralha; melodia/"
             "ritmo que se repete com variação.", "", ""}},
         {"SEQUENCE", {
             "Sequenciador de 8 passos — sliders de altura + direção "
             "(frente/trás/ping-pong/aleatório/browniano), gate por passo.",
             "", "Os sliders são a partitura — a Motion Engine mal os "
-            "toca. Use MUTATE/EVOLVE pra reembaralhar de propósito."}},
+            "toca. Use MUDA/EVOLUI pra reembaralhar de propósito."}},
         {"TRIGSEQ", {
             "Sequenciador de TRIGGERS — 4 faixas de densidade euclidiana "
             "com chaos/ratchet/fill/swing; a percussão generativa.", "",
@@ -2957,7 +2957,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"MASTER", {
             "Estágio de saída estéreo — largura, guarda de corpo e "
             "limitador true-peak; o teto do patch.",
-            "Isento da Motion Engine. O botão STANDBY do cabeçalho é o "
+            "Isento da Motion Engine. O botão ESPERA do cabeçalho é o "
             "mute deste módulo.", ""}},
         {"SCOPE", {
             "Osciloscópio + medidor que DEVOLVE como CV — pitch (YIN), "
@@ -3140,13 +3140,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The partner of ABACUS (which does CV arithmetic). Here it is gates and triggers only.",
             ""}},
         {"TURING", {
-            "Random shift register (Turing Machine) — a loop of bits that LOCK holds and MUTATE reshuffles; melody/rhythm that repeats with variation.",
+            "Random shift register (Turing Machine) — a loop of bits that LOCK holds and MUT reshuffles; melody/rhythm that repeats with variation.",
             "",
             ""}},
         {"SEQUENCE", {
             "8-step sequencer — pitch sliders + direction (forward/back/ping-pong/random/brownian), with a gate per step.",
             "",
-            "The sliders are the score — the Motion Engine barely touches them. Use MUTATE/EVOLVE to reshuffle on purpose."}},
+            "The sliders are the score — the Motion Engine barely touches them. Use CHANGE/EVOLVE to reshuffle on purpose."}},
         {"TRIGSEQ", {
             "TRIGGER sequencer — 4 lanes of euclidean density with chaos/ratchet/fill/swing; the generative percussion.",
             "",
@@ -3378,13 +3378,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le pendant d’ABACUS (qui fait l’arithmétique de CV). Ici, uniquement gates et triggers.",
             ""}},
         {"TURING", {
-            "Registre à décalage aléatoire (Turing Machine) — une boucle de bits que LOCK retient et que MUTATE rebat ; mélodie/rythme qui se répète avec variation.",
+            "Registre à décalage aléatoire (Turing Machine) — une boucle de bits que LOCK retient et que MUT rebat ; mélodie/rythme qui se répète avec variation.",
             "",
             ""}},
         {"SEQUENCE", {
             "Séquenceur à 8 pas — curseurs de hauteur + direction (avant/arrière/ping-pong/aléatoire/brownien), avec un gate par pas.",
             "",
-            "Les curseurs sont la partition — la Motion Engine y touche à peine. Utilisez MUTATE/EVOLVE pour rebattre exprès."}},
+            "Les curseurs sont la partition — la Motion Engine y touche à peine. Utilisez CHANGER/ÉVOLUE pour rebattre exprès."}},
         {"TRIGSEQ", {
             "Séquenceur de TRIGGERS — 4 pistes de densité euclidienne avec chaos/ratchet/fill/swing ; la percussion générative.",
             "",
@@ -3616,13 +3616,13 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "La pareja de ABACUS (que hace aritmética de CV). Aquí sólo gates y triggers.",
             ""}},
         {"TURING", {
-            "Registro de desplazamiento aleatorio (Turing Machine) — un bucle de bits que LOCK retiene y MUTATE vuelve a mezclar; melodía/ritmo que se repite con variación.",
+            "Registro de desplazamiento aleatorio (Turing Machine) — un bucle de bits que LOCK retiene y MUT vuelve a mezclar; melodía/ritmo que se repite con variación.",
             "",
             ""}},
         {"SEQUENCE", {
             "Secuenciador de 8 pasos — deslizadores de altura + dirección (adelante/atrás/ping-pong/aleatorio/browniano), con un gate por paso.",
             "",
-            "Los deslizadores son la partitura — la Motion Engine casi no los toca. Use MUTATE/EVOLVE para remezclar a propósito."}},
+            "Los deslizadores son la partitura — la Motion Engine casi no los toca. Use CAMBIA/EVOLUCIONA para remezclar a propósito."}},
         {"TRIGSEQ", {
             "Secuenciador de TRIGGERS — 4 pistas de densidad euclidiana con chaos/ratchet/fill/swing; la percusión generativa.",
             "",
