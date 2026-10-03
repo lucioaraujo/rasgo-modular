@@ -751,39 +751,151 @@
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="ENVELOPE module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Envelope generator — AD/ADSR/AR and loops; the shape of amplitude (or of any CV) over time, fired by a gate.</p>
-    <p><span class="nivel">Try this</span> ENVELOPE → VCA + ENVELOPE → cutoff: the contour of the sound.</p>
+    <h4>What it is</h4>
+    <p>ENVELOPE shapes a note over time: how it starts, how it falls, how much it sustains and how it fades. It receives a pulse on the GATE input and draws a curve for each pulse. It has a volume control built in, so passing a sound through it is enough to hear notes instead of a continuous sound.</p>
+    <h4>How to think about it</h4>
+    <p>Sources sound all the time; ENVELOPE turns that flow into phrases. It has two uses that can happen at once. Through the IN input and OUT output, it articulates the sound that passes through. Through the ENV output, it hands you the curve itself, which you can send to open a filter, change a tone or dose an effect. The four stages of the curve have names that appear on every synthesizer: attack, decay, sustain and release, hence ADSR.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>ATK</b>: the attack, the time the note takes to reach its peak after the pulse. Short sounds percussive; long, like a bow coming in slowly.</li>
+      <li><b>DEC</b>: the decay, the time it takes to fall from the peak down to the SUS level.</li>
+      <li><b>SUS</b>: the level the note holds while the pulse stays high. At zero there is no sustain and the note sounds plucked.</li>
+      <li><b>REL</b>: the time the note takes to fade after the pulse ends.</li>
+      <li><b>CURVE</b>: the shape of the curves, from softer to punchier, with the attack felt earlier.</li>
+      <li><b>TRIG</b>: in one position, the note holds as long as the pulse lasts; in the other, each pulse fires the whole curve without waiting.</li>
+      <li><b>VCA</b>: how much the built-in volume acts on the sound passing through. At zero the sound goes through unchanged and only the ENV output matters.</li>
+      <li><b>LVL</b>: the output volume.</li>
+    </ul>
+    <p>Inputs: IN, the sound; GATE, the pulse that fires the note; TIME, to speed up or slow down all stages. Outputs: OUT, the articulated sound; ENV, the curve.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the SAW output of an OSC to the IN input, OUT to a MIXER input, and the EUC output of CLOCK to GATE. You hear notes.</li>
+      <li>Raise ATK and hear each note come in slowly. Bring it back and play with DEC to make the notes short or long.</li>
+      <li>Put a FILTER between the OSC and the ENVELOPE, with CUT low, and connect ENV to the filter's FC input. Now each note also opens the tone.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-FUNCTION">
     <h3>FUNCTION</h3>
     <figure class="painel"><img src="assets/modulos/FUNCTION.webp" alt="FUNCTION module panel" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Maths-style function generator — a deformable ramp/envelope/LFO with derived outputs; it sums, integrates, fires.</p>
-    <p><span class="nivel">How it works</span> It is envelope AND LFO AND slew, all in the curve. DRIFT is a slow walk; CHAOS is genuinely chaotic.</p>
+    <h4>What it is</h4>
+    <p>FUNCTION generates a ramp that rises and falls without stopping. Slowly, it moves other controls, which is called an LFO, a low-frequency oscillator; fast, it becomes an audible sound; triggered by a pulse, it works as a simple envelope. It is the most used source of movement in Rasgo Modular.</p>
+    <h4>How to think about it</h4>
+    <p>Envelope, LFO and oscillator are the same thing at different speeds, and FUNCTION covers all of them, from one cycle every hundred seconds to thousands per second. When a guide tells you to connect an LFO somewhere, it almost always means a slow FUNCTION. The shape goes from a falling ramp to a rising one, passing through a triangle, and the two outputs give the same shape on different scales: UNI only above zero, BI above and below.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the speed, from 0.01 to 12000 cycles per second.</li>
+      <li><b>SLOPE</b>: the shape. At one end it rises suddenly and falls slowly; in the middle, a triangle; at the other end, it rises slowly and drops suddenly.</li>
+      <li><b>DRIFT</b>: varies the speed gradually, so the movement doesn't sound like a metronome.</li>
+      <li><b>SYNC</b>: enables the SYNC input, so each pulse restarts the ramp.</li>
+    </ul>
+    <p>Inputs: RATE and SLOPE, to modulate those controls; SYNC, the pulse that restarts. Outputs: UNI and BI.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER. Lower CUT.</li>
+      <li>Connect FUNCTION's BI to the FILTER's FC input, with RATE low. The tone opens and closes slowly.</li>
+      <li>Raise RATE to about 5 Hz and connect BI to the OSC's FM input, with the OSC's FM knob very low. The pitch trembles, a vibrato.</li>
+      <li>Raise RATE into the audible range and connect BI straight to the MIXER: FUNCTION itself becomes sound.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-STAGES">
     <h3>STAGES</h3>
     <figure class="painel"><img src="assets/modulos/STAGES.webp" alt="STAGES module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Generator of N configurable segments (2–8) whose FUNCTION EMERGES from how they chain: ramps → envelope/LFO, steps → a CV sequence. Mutable Stages / Rossum Control Forge.</p>
-    <p><span class="nivel">How it works</span> FUNCTION is ONE ramp; STAGES is the COMPOUND shape, sculpted by CONTOUR/TILT/HOLD (a generator, not an editor). HOLD=0 slides (env), HOLD=1 jumps (seq); LOOP runs ↔ fires.</p>
-    <p><span class="nivel">Try this</span> STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = an envelope; STAGES.step → ENVELOPE.gate chains them.</p>
+    <h4>What it is</h4>
+    <p>STAGES draws a curve made of several linked segments, from two to eight. Depending on the settings, that curve becomes a multi-stage envelope, a slow movement that never repeats exactly, a sequence of stepped values, or even an oddly shaped sound.</p>
+    <h4>How to think about it</h4>
+    <p>FUNCTION makes a single ramp, and ENVELOPE the usual four stages. STAGES makes compound shapes, and you don't draw point by point: a few controls shape the whole drawing at once. The control that changes its character most is HOLD. At zero the segments are ramps and the result is continuous movement; at maximum each segment jumps and holds, and STAGES starts working as a sequencer. With LOOP on, the shape repeats by itself; off, it runs once for each pulse on GATE.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>SEGS</b>: how many segments the shape has, from 2 to 8.</li>
+      <li><b>RATE</b>: the speed of one full cycle, when LOOP is on.</li>
+      <li><b>CNTR</b>: the layout of the levels: a rising staircase, an arch, or a falling staircase.</li>
+      <li><b>CURVE</b>: how each segment goes from one level to the next: fast at first, in a straight line, or slow at first.</li>
+      <li><b>HOLD</b>: at zero, smooth ramps; at maximum, steps that jump and hold.</li>
+      <li><b>TILT</b>: makes the first segments longer than the last ones, or the other way round.</li>
+      <li><b>JITR</b>: makes levels and durations vary slightly on each cycle, always the same for the same seed.</li>
+      <li><b>LOOP</b>: on, the shape repeats; off, it runs once per pulse.</li>
+    </ul>
+    <p>Inputs: GATE, the pulse that fires it; RST, to go back to the start; RTM, to modulate the speed. Outputs: OUT, the curve; EOC, a pulse at the end of each cycle; STEP, a pulse on each segment.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER. Lower CUT.</li>
+      <li>Connect STAGES's OUT to the FILTER's FC input, with SEGS at 6. The tone travels along a shape that comes and goes.</li>
+      <li>Move CNTR and TILT and hear the drawing change.</li>
+      <li>Turn HOLD all the way up and SEGS to 8. Connect OUT to the CV input of a QUANTIZER and the QUANTIZER's PTCH to the OSC's 1V/O: STAGES now plays a melody.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-DRIFT">
     <h3>DRIFT</h3>
     <figure class="painel"><img src="assets/modulos/DRIFT.webp" alt="DRIFT module panel" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Field of organic drift — several correlated CVs wandering slowly (on the scale of minutes), with momentum and an anchor to recorded landmarks.</p>
-    <p><span class="nivel">How it works</span> It gives LIFE without direction — nothing stays still. Deterministic (seeded).</p>
+    <h4>What it is</h4>
+    <p>DRIFT produces very slow movements, on the scale of minutes. Connected to a few controls in a patch, it makes the music change gradually on its own: the tone at thirty seconds is different from the tone at four minutes, with no jumps and no return to the same point.</p>
+    <h4>How to think about it</h4>
+    <p>A patch nobody is touching tends to go round in circles after a while. DRIFT is the layer of slow development. Inside there is a single value wandering, and the four outputs A, B, C and D are versions of that same walk, each with its own weight. So they tell the same story from different angles: when one rises, the others tend to rise too. The walk also has inertia: once it picks a direction, it tends to keep it for a while.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the pace of the walk, from one step per second to one every eight minutes or so.</li>
+      <li><b>DEPTH</b>: the reach, how far the walk can stray from its resting point.</li>
+      <li><b>MOMT</b>: the inertia. High, the path is smooth and keeps a direction; low, it changes course constantly.</li>
+      <li><b>STRD</b>: at zero the four outputs move almost together; at maximum each goes its own way.</li>
+      <li><b>ANCHR</b>: the memory. At zero the walk never returns; high, it tends to come back to places it has been, which gives the piece something like recurring themes.</li>
+      <li><b>BIAS</b>: moves the resting point up or down.</li>
+    </ul>
+    <p>Inputs: ADV, a pulse that forces a step; RATE, to modulate the speed. Outputs: A, B, C and D, the four aspects of the walk; FLD, the unweighted walk; EVT, a pulse on each step.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Build any voice that goes through a FILTER and a SPACE before the MIXER.</li>
+      <li>Connect A to the FILTER's FC input and B to the SPACE's FBK input. Raise DEPTH.</li>
+      <li>Let it play for a few minutes. The tone and the space change together, unhurried.</li>
+      <li>To follow the shape of the music, connect the EOS output of a SEQUENCE to ADV: the walk takes a step at the end of each phrase.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CHAOS">
     <h3>CHAOS</h3>
     <figure class="painel"><img src="assets/modulos/CHAOS.webp" alt="CHAOS module panel" width="83" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Double-well chaotic field — a deterministic ODE that settles in one well, oscillates between two, or 'hunts' unpredictably.</p>
-    <p><span class="nivel">How it works</span> Genuinely chaotic, not pseudo-random (DECISION/TURING) nor a filtered walk (DRIFT).</p>
+    <h4>What it is</h4>
+    <p>CHAOS generates unpredictable movement from a simulated physical system: something like a ball rolling between two valleys, sometimes settling in one, sometimes jumping to the other. You can't predict when it will jump, but with the same seed everything repeats the same way.</p>
+    <h4>How to think about it</h4>
+    <p>Other modules draw random values, like TURING and DECISION, or wander slowly, like DRIFT. CHAOS behaves in its own way: it spends a while circling one region and then suddenly switches to another. On a filter, that gives a tone that hesitates and then leaps; on a melody, phrases that stay in one register and then move abruptly. At high speeds it becomes a sound texture itself.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the speed of the movement, from 0.02 to 400 cycles per second. Slow to move controls; fast to listen to directly.</li>
+      <li><b>DRIVE</b>: the force pushing the ball between the valleys. Higher means bigger, more frequent jumps.</li>
+      <li><b>DAMP</b>: the friction. High, the ball settles in a valley and nearly stops; low, it swings widely and jumps from side to side.</li>
+      <li><b>FRZ</b>: freezes the movement at its current value.</li>
+    </ul>
+    <p>Inputs: RSD, a pulse that gives a fresh push; RTM, to modulate the speed. Output: OUT.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER.</li>
+      <li>Connect CHAOS's OUT to the FILTER's FC input. Set RATE around 0.3, DRIVE high and DAMP low.</li>
+      <li>Hear the tone stay in one region for a while and then leap to another.</li>
+      <li>Also connect CHAOS's OUT to the CV input of a QUANTIZER, and its PTCH to the OSC's 1V/O. Now the melody changes register along with the tone.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SH">
     <h3>SH</h3>
     <figure class="painel"><img src="assets/modulos/SH.webp" alt="SH module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Dual sample &amp; hold — holds a value on a pulse; 2 channels with CORRELATION (twins ↔ mirror ↔ independent) and slew.</p>
-    <p><span class="nivel">Try this</span> CLOCK → SH · out1 → pitch · out2 → cutoff: a melody and a timbre that 'go together'.</p>
+    <h4>What it is</h4>
+    <p>SH, short for sample and hold, captures the value of a signal at the moment of a pulse and holds it until the next pulse. With nothing on its input, it draws a new random value on each pulse. It is the traditional way of turning chance into steps: each pulse, a new note, a new tone. SH has two channels.</p>
+    <h4>How to think about it</h4>
+    <p>Two independent draws have nothing to do with each other, and sometimes that is what you want. But a melody often sounds better when the tone follows the note without copying it. The CORR control sets exactly that relationship between the two channels: from mirrored, one rising as the other falls, to independent, to twins that draw the same value. The slew controls turn the steps into glides.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal draw rate, from 0.02 to 40 times per second. It only applies to a channel with no pulse on T1 or T2.</li>
+      <li><b>SLW1, SLW2</b>: how long each channel takes to glide to the new value. At zero it jumps instantly.</li>
+      <li><b>SLOPE</b>: makes the way up faster than the way down, or the other way round.</li>
+      <li><b>TRK1, TRK2</b>: instead of capturing only at the moment of the pulse, the channel follows the input while the pulse is high and holds when it falls.</li>
+      <li><b>SPRD</b>: changes the kind of draw, making small variations more frequent than large ones.</li>
+      <li><b>CORR</b>: the relationship between the two channels' draws: mirrored, independent or identical. It only applies to channels with nothing on their input.</li>
+    </ul>
+    <p>Inputs: IN1 and IN2, the signals to capture; T1 and T2, the pulses. Outputs: O1 and O2.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER.</li>
+      <li>Connect the CLK output of CLOCK to T1 and to T2.</li>
+      <li>Connect O1 to the CV input of a QUANTIZER, the QUANTIZER's PTCH to the OSC's 1V/O, and O2 to the FILTER's FC input. Each pulse brings a note and a tone.</li>
+      <li>Turn CORR from one end to the other. On one side, high notes come out dark; in the middle, no relationship; on the other, high notes come out bright.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
@@ -791,30 +903,136 @@
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="CLOCK module panel" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Euclidean master clock — a pulse with divisions, euclidean fill, swing and drift; the beat of the whole patch.</p>
-    <p><span class="nivel">Try this</span> CLOCK → everything with a gate or trigger. FILL spreads the pulses across the bar (Toussaint's patterns).</p>
+    <h4>What it is</h4>
+    <p>CLOCK is the patch's timekeeper. It sends regular pulses at the tempo you choose and builds rhythms and accents from them. Almost every patch starts with it: its pulses advance the sequence, fire the envelopes and play the drums.</p>
+    <h4>How to think about it</h4>
+    <p>Instead of programming beat by beat, you describe the rhythm with two numbers. LEN says how many steps the cycle has, FILL says how many of them play, and CLOCK spreads those hits as evenly as possible. This method, called Euclidean rhythm, reproduces many traditional patterns from around the world: 3 in 8 gives the Cuban tresillo, 5 in 8 the cinquillo. The CLK output pulses on every step; EUC only on the chosen steps; ACC marks the accents.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>BPM</b>: the tempo, from 20 to 300 beats per minute.</li>
+      <li><b>MULT</b>: how many steps fit in one beat.</li>
+      <li><b>LEN</b>: the length of the cycle, from 1 to 32 steps.</li>
+      <li><b>FILL</b>: how many steps of the cycle play on the EUC output. Few make the rhythm sparse; close to LEN, almost continuous.</li>
+      <li><b>ROT</b>: rotates the pattern so it starts from another point. The density is the same, but the feel changes.</li>
+      <li><b>SWING</b>: delays every other step, giving it a lilt.</li>
+      <li><b>DRIFT</b>: lets the tempo vary slightly, like a drummer who pushes and pulls.</li>
+      <li><b>GATE</b>: how long each pulse stays on, within its step.</li>
+      <li><b>ACC-A, ACC-B</b>: accents fall on steps that are multiples of these numbers. With 4 and 3, for instance, the accents form a three-against-four pattern.</li>
+      <li><b>AND</b>: decides whether an accent needs both numbers at once or just one of them.</li>
+      <li><b>FEEL</b>: how many parts each beat is divided into: two, three (triplets), five, seven, nine, eleven, or a division drawn at random on each step.</li>
+    </ul>
+    <p>Inputs: EXT, to follow outside pulses; RST, to go back to the start; BPM, to modulate the tempo. Outputs: CLK, EUC and ACC.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect EUC to the GATE input of a DRUM, and the DRUM's OUT to a MIXER input.</li>
+      <li>Set LEN to 8 and move FILL from 1 to 8. At 3 and at 5 you will hear familiar patterns.</li>
+      <li>Turn ROT and hear the same pattern start from somewhere else.</li>
+      <li>Connect ACC to the DRUM's ACC input and change ACC-A and ACC-B to hear the accents move around.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-LOGIC">
     <h3>LOGIC</h3>
     <figure class="painel"><img src="assets/modulos/LOGIC.webp" alt="LOGIC module panel" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Clock logic — divide/multiply, AND/OR/XOR of gates, delay; it recombines TIME.</p>
-    <p><span class="nivel">How it works</span> The partner of ABACUS (which does CV arithmetic). Here it is gates and triggers only.</p>
+    <h4>What it is</h4>
+    <p>LOGIC combines and transforms rhythms. It divides a pulse to create slower rhythms, compares two rhythms to make a third, and flips a state on each pulse. These are simple operations, the kind used in digital circuits, applied to musical time.</p>
+    <h4>How to think about it</h4>
+    <p>An interesting rhythm is rarely a straight pulse. It is usually the relationship between two: one playing at half speed, one that only plays when another plays too, one that plays when either plays but never both together. LOGIC sits between pulse sources, such as CLOCK, TURING and SEQUENCE, and the modules they trigger. With nothing on the CLK input, it uses a clock of its own.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal clock, used when nothing reaches CLK.</li>
+      <li><b>DIV</b>: divides the pulse. At 2, the DIV output pulses once every two pulses; at 3, once every three.</li>
+      <li><b>MULT</b>: adds in-between pulses within each period.</li>
+      <li><b>GATE</b>: how long the DIV output's pulse stays on.</li>
+      <li><b>DELAY</b>: delays the DIV output's pulse by up to 200 milliseconds.</li>
+    </ul>
+    <p>Inputs: CLK, the pulse to divide; A and B, the two rhythms to compare; RST, to reset. Outputs: DIV, the divided pulse; AND, when A and B are on together; OR, when either is; XOR, when only one of them is; FLIP, which changes state on each pulse at A.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the CLK output of CLOCK to LOGIC's CLK input and DIV to the GATE input of a DRUM connected to the MIXER. Change DIV to hear the pulse slow down.</li>
+      <li>Connect CLOCK's EUC to A, and the PLS output of a TURING to B.</li>
+      <li>Move the drum to the XOR output and then to AND. Hear how each combination makes a different rhythm out of the same two.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-TURING">
     <h3>TURING</h3>
     <figure class="painel"><img src="assets/modulos/TURING.webp" alt="TURING module panel" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> Random shift register (Turing Machine) — a loop of bits that LOCK holds and MUTATE reshuffles; melody/rhythm that repeats with variation.</p>
+    <h4>What it is</h4>
+    <p>TURING invents melodies by chance and lets you keep the ones you like. It holds a loop of a few values that turns on each pulse; on each turn, every value may stay or be swapped for another. With the LOCK control you decide how much the loop changes, from total chance to a fixed repetition.</p>
+    <h4>How to think about it</h4>
+    <p>Here you compose by choosing with your ears, not by writing note by note. Leave LOCK in the middle, listen to the melody transform and, when something good comes up, turn LOCK all the way: the loop locks and repeats. To vary it again, loosen it a little. The name honors the Turing Machine module by Music Thing Modular, which popularized the idea. SEQUENCE plays a written phrase; TURING lets phrases emerge and settle.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal clock, used when nothing reaches CLK.</li>
+      <li><b>LEN</b>: the length of the loop, from 2 to 16 steps.</li>
+      <li><b>LOCK</b>: the chance of the loop staying the same. At zero everything is drawn again; at maximum the phrase locks and repeats.</li>
+      <li><b>MUT</b>: when a value changes, how much it changes. Low, small variations of what was there; high, a fresh draw.</li>
+      <li><b>RANGE</b>: the span of the output values, that is, the size of the melody's leaps.</li>
+      <li><b>STEPS</b>: divides the output into steps. At 1 the values are continuous.</li>
+      <li><b>OFST</b>: the center of the values, which moves the melody's register up or down.</li>
+    </ul>
+    <p>Inputs: CLK, the pulse that turns the loop; LOCK, to modulate the locking. Outputs: CV, the melody; CV2, another reading of the same loop, related but different; PLS, a rhythm taken from the same loop.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the CLK output of CLOCK to TURING's CLK input.</li>
+      <li>Connect CV to the CV input of a QUANTIZER, and the QUANTIZER's PTCH to the 1V/O of an OSC running through an ENVELOPE to the MIXER. Connect PLS to the envelope's GATE input.</li>
+      <li>With LOCK in the middle, hear the melody change little by little.</li>
+      <li>When you like what you hear, turn LOCK all the way up. The phrase stays.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SEQUENCE">
     <h3>SEQUENCE</h3>
     <figure class="painel"><img src="assets/modulos/SEQUENCE.webp" alt="SEQUENCE module panel" width="237" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> 8-step sequencer — pitch sliders + direction (forward/back/ping-pong/random/brownian), with a gate per step.</p>
-    <p><span class="nivel">Try this</span> The sliders are the score — the Motion Engine barely touches them. Use MUTATE/EVOLVE to reshuffle on purpose.</p>
+    <h4>What it is</h4>
+    <p>SEQUENCE plays a short phrase you write: up to eight notes, each with its own pitch, each on or silent. On every pulse at the CLK input it moves one step, sending the pitch out of the PTCH output and the note's pulse out of the GATE output. It is for a bass line, a riff, a repeating figure.</p>
+    <h4>How to think about it</h4>
+    <p>TURING lets a phrase emerge from chance; SEQUENCE starts from a phrase you decide. The variation comes from the way it reads: forwards, backwards, back and forth, in random order, or wandering from one step to its neighbor. The same eight-note phrase yields a lot just by changing MODE and LEN. To make the pitches land on the notes of a scale, run PTCH through a QUANTIZER before the oscillator.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>LEN</b>: how many of the eight steps are in the phrase.</li>
+      <li><b>MODE</b>: the reading order: forwards, backwards, back and forth, random, or wandering step by step.</li>
+      <li><b>RATE</b>: the internal clock, used when nothing reaches CLK.</li>
+      <li><b>GATE</b>: how long each note stays on within its step. Short sounds detached; long, connected.</li>
+      <li><b>GLIDE</b>: makes the pitch slide from one note to the next.</li>
+      <li><b>RANGE</b>: how many octaves the eight values cover, up to two.</li>
+      <li><b>P1 to P8</b>: the pitch of each step.</li>
+      <li><b>G1 to G8</b>: turns each step on or silences it.</li>
+    </ul>
+    <p>Inputs: CLK, the pulse that advances; RST, to go back to the first step. Outputs: PTCH, the pitch; GATE, the note's pulse; EOS, a pulse at the end of each phrase.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the CLK output of CLOCK to SEQUENCE's CLK.</li>
+      <li>Connect PTCH to the CV input of a QUANTIZER, and the QUANTIZER's PTCH to the 1V/O of an OSC. Run the OSC through an ENVELOPE to the MIXER and connect SEQUENCE's GATE to the envelope's GATE.</li>
+      <li>Adjust P1 to P8 until you like the phrase, and turn some steps off with G1 to G8.</li>
+      <li>Change MODE and hear the same phrase read in other ways.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-TRIGSEQ">
     <h3>TRIGSEQ</h3>
     <figure class="painel"><img src="assets/modulos/TRIGSEQ.webp" alt="TRIGSEQ module panel" width="189" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Quick</span> TRIGGER sequencer — 4 lanes of euclidean density with chaos/ratchet/fill/swing; the generative percussion.</p>
+    <h4>What it is</h4>
+    <p>TRIGSEQ generates drum rhythms on four lanes at once, meant for kick, snare, hi-hat and an extra percussion. You don't mark the hits one by one: you choose a style, set the density of each lane, and it creates the pattern. When it loads, it is already playing.</p>
+    <h4>How to think about it</h4>
+    <p>Four CLOCK modules, one per instrument, would produce lanes that don't talk to each other. In TRIGSEQ all four come from the same style, so they fit together like a kit played by a person. The MAP control moves through four characters: straight, as in rock and house; broken, as in breakbeat; swung, as in hip-hop; and sparse, as in dub. Turned slowly, the groove changes personality without losing the pulse.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>LEN</b>: how many of the 16 steps are in the cycle.</li>
+      <li><b>RATE</b>: the internal clock, used when nothing reaches CLK.</li>
+      <li><b>MAP</b>: the style, from straight to sparse.</li>
+      <li><b>DNS1, DNS2, DNS3, DNS4</b>: the density of each lane. Higher, more hits.</li>
+      <li><b>SWING</b>: delays every other step, giving it a lilt.</li>
+      <li><b>CHAOS</b>: the chance of ghost hits appearing or expected hits going missing, which makes the rhythm less mechanical.</li>
+      <li><b>RATCH</b>: the chance of a hit becoming a quick burst of repeats, a roll.</li>
+      <li><b>FILL</b>: how much the FILL input raises the densities, for fills.</li>
+      <li><b>DRIFT</b>: lets the style and densities vary gradually, and the groove evolves on its own.</li>
+    </ul>
+    <p>Inputs: CLK, the pulse; RST, to go back to the start; FILL, a signal that triggers the fill; MAP, to modulate the style. Outputs: T1 to T4, the four lanes; ACC, the accents; ANY, a pulse whenever any lane plays.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect the CLK output of CLOCK to TRIGSEQ's CLK input.</li>
+      <li>Put three DRUM modules in the rack. Connect T1, T2 and T3 to the GATE input of each one, and their OUT outputs to the MIXER.</li>
+      <li>Adjust TONE and DECAY on each DRUM so they sound like kick, snare and hi-hat.</li>
+      <li>Turn MAP slowly and hear the groove change style. Then play with the densities.</li>
+    </ol>
   </article>
 </section>
 <section class="section" id="fam-DECISION">
