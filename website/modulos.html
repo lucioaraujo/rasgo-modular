@@ -751,39 +751,151 @@
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="Painel do módulo ENVELOPE" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Gerador de envelope — AD/ADSR/AR e laços; a forma da amplitude (ou de qualquer CV) no tempo, disparada por gate.</p>
-    <p><span class="nivel">Experimente</span> ENVELOPE → VCA + ENVELOPE → cutoff: o contorno do som.</p>
+    <h4>O que é</h4>
+    <p>O ENVELOPE dá forma a uma nota no tempo: como ela começa, como cai, quanto se sustenta e como some. Ele recebe um pulso na entrada GATE e desenha uma curva a cada pulso. Já traz um controle de volume embutido, então basta passar um som por ele para ouvir notas no lugar de um som contínuo.</p>
+    <h4>Como pensar nele</h4>
+    <p>As fontes soam o tempo todo; o ENVELOPE transforma esse fluxo em frases. Ele tem dois usos que podem acontecer ao mesmo tempo. Pela entrada IN e saída OUT, ele articula o som que passa. Pela saída ENV, ele entrega a curva em si, que você pode mandar para abrir um filtro, mudar um timbre ou dosar um efeito. As quatro etapas da curva têm nomes em inglês que aparecem em todo sintetizador: attack, decay, sustain e release, por isso ADSR.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>ATK</b>: o ataque, o tempo que a nota leva para chegar ao máximo depois do pulso. Curto soa percussivo; longo, como um arco que entra devagar.</li>
+      <li><b>DEC</b>: o decaimento, o tempo da queda depois do máximo até o nível de SUS.</li>
+      <li><b>SUS</b>: o nível em que a nota se sustenta enquanto o pulso continua alto. Em zero, não há sustentação e a nota soa como algo dedilhado.</li>
+      <li><b>REL</b>: o tempo que a nota leva para sumir depois que o pulso termina.</li>
+      <li><b>CURVE</b>: o formato das curvas, de mais suave a mais incisivo, com o ataque percebido mais cedo.</li>
+      <li><b>TRIG</b>: em uma posição, a nota se sustenta enquanto o pulso durar; na outra, cada pulso dispara a curva inteira, sem esperar.</li>
+      <li><b>VCA</b>: quanto o volume embutido age sobre o som que passa. Em zero, o som atravessa sem mudar e só a saída ENV importa.</li>
+      <li><b>LVL</b>: o volume de saída.</li>
+    </ul>
+    <p>Entradas: IN, o som; GATE, o pulso que dispara a nota; TIME, para acelerar ou retardar todas as etapas. Saídas: OUT, o som articulado; ENV, a curva.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC na entrada IN, OUT numa entrada do MIXER, e a saída EUC do CLOCK em GATE. Você ouve notas.</li>
+      <li>Suba ATK e ouça cada nota entrar devagar. Volte e mexa em DEC para deixá-las curtas ou longas.</li>
+      <li>Ponha um FILTER entre o OSC e o ENVELOPE, com CUT baixo, e ligue ENV na entrada FC do filtro. Agora cada nota também abre o timbre.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-FUNCTION">
     <h3>FUNCTION</h3>
     <figure class="painel"><img src="assets/modulos/FUNCTION.webp" alt="Painel do módulo FUNCTION" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Gerador de função tipo Maths — rampa/envelope/LFO deformável com saídas derivadas; soma, integra, dispara.</p>
-    <p><span class="nivel">Como funciona</span> É envelope E LFO E slew, tudo na curva. O DRIFT é passeio lento; o CHAOS é caótico de verdade.</p>
+    <h4>O que é</h4>
+    <p>O FUNCTION gera uma rampa que sobe e desce sem parar. Devagar, ela serve para mover outros controles, o que se chama LFO, oscilador de baixa frequência; rápido, vira um som audível; disparada por um pulso, funciona como um envelope simples. É a fonte de movimento mais usada do Rasgo Modular.</p>
+    <h4>Como pensar nele</h4>
+    <p>Envelope, LFO e oscilador são a mesma coisa em velocidades diferentes, e o FUNCTION cobre todas, de um ciclo a cada cem segundos a milhares por segundo. Quando um guia diz para ligar um LFO em algum lugar, quase sempre é um FUNCTION lento. A forma vai de uma rampa que cai a uma que sobe, passando pelo triângulo, e as duas saídas entregam a mesma forma em escalas diferentes: UNI só acima de zero, BI acima e abaixo.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: a velocidade, de 0,01 a 12000 ciclos por segundo.</li>
+      <li><b>SLOPE</b>: a forma. Num extremo, sobe de repente e desce devagar; no meio, triângulo; no outro extremo, sobe devagar e cai de repente.</li>
+      <li><b>DRIFT</b>: varia a velocidade aos poucos, para que o movimento não soe como um metrônomo.</li>
+      <li><b>SYNC</b>: liga a entrada SYNC, para que cada pulso recomece a rampa.</li>
+    </ul>
+    <p>Entradas: RATE e SLOPE, para modular os controles; SYNC, o pulso que recomeça. Saídas: UNI e BI.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, LO do FILTER no MIXER. Baixe CUT.</li>
+      <li>Ligue BI do FUNCTION na entrada FC do FILTER, com RATE baixo. O timbre abre e fecha devagar.</li>
+      <li>Suba RATE até uns 5 Hz e ligue BI na entrada FM do OSC, com o FM do OSC bem baixo. A afinação treme, num vibrato.</li>
+      <li>Suba RATE até a faixa audível e ligue BI direto no MIXER: o próprio FUNCTION vira som.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-STAGES">
     <h3>STAGES</h3>
     <figure class="painel"><img src="assets/modulos/STAGES.webp" alt="Painel do módulo STAGES" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Gerador de N segmentos configuráveis (2–8) cuja FUNÇÃO EMERGE de como se encadeiam: rampas → envelope/LFO, degraus → sequência de CV. Mutable Stages / Rossum Control Forge.</p>
-    <p><span class="nivel">Como funciona</span> O FUNCTION é UMA rampa; o STAGES é a forma COMPOSTA, esculpida por CONTOUR/TILT/HOLD (gerador, não editor). HOLD=0 desliza (env), HOLD=1 salta (seq); LOOP corre ↔ dispara.</p>
-    <p><span class="nivel">Experimente</span> STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = envelope; STAGES.step → ENVELOPE.gate encadeia.</p>
+    <h4>O que é</h4>
+    <p>O STAGES desenha uma curva feita de vários trechos encadeados, de dois a oito. Conforme os ajustes, essa curva vira um envelope com várias etapas, um movimento lento que não se repete exatamente, uma sequência de valores em degraus, ou até um som de forma estranha.</p>
+    <h4>Como pensar nele</h4>
+    <p>O FUNCTION faz uma rampa só, e o ENVELOPE, as quatro etapas de sempre. O STAGES faz formas compostas, e você não desenha ponto por ponto: alguns controles moldam o desenho inteiro de uma vez. O controle que mais muda o caráter é HOLD. Com ele em zero, os trechos são rampas e o resultado é um movimento contínuo; no máximo, cada trecho salta e se mantém, e o STAGES passa a funcionar como um sequenciador. Com LOOP ligado, a forma se repete sozinha; desligado, ela corre uma vez a cada pulso em GATE.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>SEGS</b>: quantos trechos a forma tem, de 2 a 8.</li>
+      <li><b>RATE</b>: a velocidade de uma volta completa, quando LOOP está ligado.</li>
+      <li><b>CNTR</b>: o desenho dos níveis: uma escada que sobe, um arco, ou uma escada que desce.</li>
+      <li><b>CURVE</b>: como cada trecho vai de um nível ao outro: começando rápido, em linha reta, ou começando devagar.</li>
+      <li><b>HOLD</b>: em zero, rampas suaves; no máximo, degraus que saltam e seguram.</li>
+      <li><b>TILT</b>: deixa os primeiros trechos mais longos que os últimos, ou o contrário.</li>
+      <li><b>JITR</b>: faz níveis e durações variarem de leve a cada volta, sempre igual para a mesma semente.</li>
+      <li><b>LOOP</b>: ligado, a forma se repete; desligado, corre uma vez a cada pulso.</li>
+    </ul>
+    <p>Entradas: GATE, o pulso que dispara; RST, para voltar ao começo; RTM, para modular a velocidade. Saídas: OUT, a curva; EOC, um pulso no fim de cada volta; STEP, um pulso a cada trecho.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, LO do FILTER no MIXER. Baixe CUT.</li>
+      <li>Ligue OUT do STAGES na entrada FC do FILTER, com SEGS em 6. O timbre passeia numa forma que vai e volta.</li>
+      <li>Mova CNTR e TILT e ouça o desenho mudar.</li>
+      <li>Leve HOLD ao máximo e SEGS a 8. Ligue OUT na entrada CV de um QUANTIZER e PTCH do QUANTIZER em 1V/O do OSC: o STAGES agora toca uma melodia.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-DRIFT">
     <h3>DRIFT</h3>
     <figure class="painel"><img src="assets/modulos/DRIFT.webp" alt="Painel do módulo DRIFT" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Campo de deriva orgânica — várias CVs correlacionadas que passeiam devagar (escala de minutos), com momentum e âncora a marcos gravados.</p>
-    <p><span class="nivel">Como funciona</span> Dá VIDA sem direção — nada fica estático. Determinístico (semeado).</p>
+    <h4>O que é</h4>
+    <p>O DRIFT produz movimentos muito lentos, na escala dos minutos. Ligado a alguns controles de um patch, ele faz a música mudar aos poucos por conta própria: o timbre aos trinta segundos é outro aos quatro minutos, sem saltos e sem voltar ao mesmo ponto.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um patch sem ninguém mexendo tende a andar em círculos depois de um tempo. O DRIFT é a camada de desenvolvimento lento. Por dentro existe um único valor passeando, e as quatro saídas A, B, C e D são versões desse mesmo passeio, cada uma com seu peso. Por isso elas contam a mesma história de ângulos diferentes: quando uma sobe, as outras tendem a subir também. O passeio também tem inércia: quando ganha uma direção, tende a mantê-la por um tempo.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o ritmo do passeio, de um passo por segundo a um a cada oito minutos, mais ou menos.</li>
+      <li><b>DEPTH</b>: o alcance, quanto o passeio pode se afastar do ponto de repouso.</li>
+      <li><b>MOMT</b>: a inércia. Alto, o caminho é suave e insiste numa direção; baixo, muda de rumo a todo momento.</li>
+      <li><b>STRD</b>: em zero, as quatro saídas andam quase juntas; no máximo, cada uma vai para um lado.</li>
+      <li><b>ANCHR</b>: a memória. Em zero, o passeio nunca volta; alto, ele tende a retornar a lugares por onde já passou, o que dá à peça algo como temas que reaparecem.</li>
+      <li><b>BIAS</b>: desloca o ponto de repouso para cima ou para baixo.</li>
+    </ul>
+    <p>Entradas: ADV, um pulso que força um passo; RATE, para modular a velocidade. Saídas: A, B, C e D, os quatro aspectos do passeio; FLD, o passeio sem pesos; EVT, um pulso a cada passo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Monte uma voz qualquer que passe por um FILTER e por um SPACE antes do MIXER.</li>
+      <li>Ligue A na entrada FC do FILTER e B na entrada FBK do SPACE. Suba DEPTH.</li>
+      <li>Deixe tocar alguns minutos. O timbre e o espaço vão mudando juntos, sem pressa.</li>
+      <li>Para acompanhar a forma da música, ligue a saída EOS de uma SEQUENCE em ADV: o passeio dá um passo a cada fim de frase.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CHAOS">
     <h3>CHAOS</h3>
     <figure class="painel"><img src="assets/modulos/CHAOS.webp" alt="Painel do módulo CHAOS" width="83" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Campo caótico de poço duplo — EDO determinística que assenta num poço, oscila entre dois, ou 'caça' imprevisível.</p>
-    <p><span class="nivel">Como funciona</span> Genuinamente caótico, não pseudo-aleatório (DECISION/TURING) nem passeio filtrado (DRIFT).</p>
+    <h4>O que é</h4>
+    <p>O CHAOS gera um movimento imprevisível a partir de um sistema físico simulado: algo como uma bola que rola entre dois vales, ora se acomodando num deles, ora pulando para o outro. Você não consegue prever quando ela vai pular, mas com a mesma semente tudo se repete do mesmo jeito.</p>
+    <h4>Como pensar nele</h4>
+    <p>Outros módulos sorteiam valores, como o TURING e o DECISION, ou passeiam devagar, como o DRIFT. O CHAOS tem um comportamento próprio: passa um tempo rondando uma região e de repente muda para outra. Num filtro, isso dá um timbre que hesita e depois salta; numa melodia, frases que ficam numa região e se mudam de repente. Em velocidades altas, ele mesmo vira uma textura sonora.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: a velocidade do movimento, de 0,02 a 400 ciclos por segundo. Lento para mover controles; rápido para ouvir direto.</li>
+      <li><b>DRIVE</b>: a força que empurra a bola entre os vales. Mais alto, saltos maiores e mais frequentes.</li>
+      <li><b>DAMP</b>: o atrito. Alto, a bola assenta num vale e quase para; baixo, ela oscila muito e pula de um lado para o outro.</li>
+      <li><b>FRZ</b>: congela o movimento no valor atual.</li>
+    </ul>
+    <p>Entradas: RSD, um pulso que dá um empurrão novo; RTM, para modular a velocidade. Saída: OUT.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, LO do FILTER no MIXER.</li>
+      <li>Ligue OUT do CHAOS na entrada FC do FILTER. Ponha RATE em torno de 0,3, DRIVE alto e DAMP baixo.</li>
+      <li>Ouça o timbre ficar um tempo numa região e saltar para outra.</li>
+      <li>Ligue OUT do CHAOS também na entrada CV de um QUANTIZER, e PTCH dele em 1V/O do OSC. Agora a melodia muda de região junto com o timbre.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SH">
     <h3>SH</h3>
     <figure class="painel"><img src="assets/modulos/SH.webp" alt="Painel do módulo SH" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Sample &amp; hold duplo — segura um valor no pulso; 2 canais com CORRELATION (gêmeos ↔ espelho ↔ independentes) e slew.</p>
-    <p><span class="nivel">Experimente</span> CLOCK → SH · out1 → pitch · out2 → cutoff: melodia e timbre que 'combinam'.</p>
+    <h4>O que é</h4>
+    <p>O SH, de sample and hold, captura o valor de um sinal no instante de um pulso e o segura até o pulso seguinte. Com nada na entrada, ele sorteia um valor novo a cada pulso. É o jeito tradicional de transformar acaso em degraus: cada pulso, uma nota nova, um timbre novo. O SH tem dois canais.</p>
+    <h4>Como pensar nele</h4>
+    <p>Dois sorteios independentes não têm nada a ver um com o outro, e às vezes é isso que se quer. Mas muitas vezes uma melodia soa melhor quando o timbre acompanha a nota, sem copiá-la. O controle CORR faz justamente essa relação entre os dois canais: de espelhados, um sobe quando o outro desce, a independentes, a gêmeos, que sorteiam o mesmo valor. Os controles de deslize transformam os degraus em escorregões.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o ritmo interno de sorteio, de 0,02 a 40 vezes por segundo. Só vale para o canal sem pulso ligado em T1 ou T2.</li>
+      <li><b>SLW1, SLW2</b>: o tempo que cada canal leva para escorregar até o valor novo. Em zero, salta na hora.</li>
+      <li><b>SLOPE</b>: deixa a subida mais rápida que a descida, ou o contrário.</li>
+      <li><b>TRK1, TRK2</b>: em vez de capturar só no instante do pulso, o canal acompanha a entrada enquanto o pulso estiver alto e segura quando ele cai.</li>
+      <li><b>SPRD</b>: muda o jeito do sorteio, tornando as variações pequenas mais frequentes que as grandes.</li>
+      <li><b>CORR</b>: a relação entre os sorteios dos dois canais: espelhados, independentes ou iguais. Só vale para os canais sem nada ligado na entrada.</li>
+    </ul>
+    <p>Entradas: IN1 e IN2, os sinais a capturar; T1 e T2, os pulsos. Saídas: O1 e O2.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, LO do FILTER no MIXER.</li>
+      <li>Ligue a saída CLK do CLOCK em T1 e em T2.</li>
+      <li>Ligue O1 na entrada CV de um QUANTIZER, PTCH do QUANTIZER em 1V/O do OSC, e O2 na entrada FC do FILTER. Cada pulso traz uma nota e um timbre.</li>
+      <li>Gire CORR de um extremo ao outro. Num lado, notas agudas vêm escuras; no meio, sem relação; no outro, notas agudas vêm brilhantes.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
