@@ -1040,31 +1040,132 @@
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
     <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="Panel del módulo QUANTIZER" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Cuantizador de escala — encaja una CV en los grados de una escala y tónica; slew e histéresis para que no tiemble en el borde.</p>
-    <p><span class="nivel">Pruebe esto</span> SH/TURING/DRIFT → QUANTIZER → pitch: un paseo aleatorio se vuelve melodía en la escala.</p>
+    <h4>Qué es</h4>
+    <p>QUANTIZER ata una señal continua a las notas de una escala. Un valor que sube y baja libremente, venido de un TURING, de un SH o de un CHAOS, sale de él como una sucesión de notas afinadas. En la mayoría de los patches, es él quien convierte el azar en melodía.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>Las señales de control varían de forma continua, y las notas musicales no. Sin un cuantizador, una melodía generada al azar cae entre las notas y suena desafinada. QUANTIZER redondea cada valor a la nota más cercana de la escala elegida. Con un pulso en la entrada TRIG, solo cambia de nota en el pulso, y la melodía gana ritmo. La salida GATE pulsa cada vez que la nota cambia de verdad, lo que sirve para disparar una envolvente solo en las notas nuevas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>SCALE</b>: la escala, entre doce: cromática, mayor, menor natural, dórica, frigia dominante, lidia, menor melódica, pentatónica menor, pentatónica mayor, hirajoshi, tonos enteros y solo octavas.</li>
+      <li><b>ROOT</b>: la tónica, la nota de partida de la escala, de do a si.</li>
+      <li><b>RANGE</b>: cuántas octavas cubre la señal de entrada, de 1 a 6. Más octavas, saltos más grandes.</li>
+      <li><b>GLIDE</b>: hace que la altura se deslice de una nota a la siguiente.</li>
+      <li><b>HYST</b>: un margen de tolerancia. Con una señal inestable, la nota no salta sin parar entre dos vecinas.</li>
+    </ul>
+    <p>Entradas: CV, la señal a cuantizar; TRSP, para transponer antes de cuantizar; TRIG, el pulso que decide cuándo cambiar de nota. Salidas: PTCH, la altura; GATE, un pulso en cada nota nueva; ST, la nota en semitonos.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte la salida CV de un TURING a la entrada CV del QUANTIZER, y la salida CLK del CLOCK a la entrada CLK del TURING.</li>
+      <li>Conecte PTCH a 1V/O de un OSC, y la salida SIN del OSC a un ENVELOPE conectado al MIXER. Conecte GATE del QUANTIZER a GATE de la envolvente.</li>
+      <li>Cambie SCALE y escuche la misma sucesión de valores volverse otra melodía. Cambie ROOT para transponer.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-HARMONY">
     <h3>HARMONY</h3>
     <figure class="painel"><img src="assets/modulos/HARMONY.webp" alt="Panel del módulo HARMONY" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Armonizador — de una nota genera intervalos y acordes coherentes con una tonalidad y una conducción de voces.</p>
+    <h4>Qué es</h4>
+    <p>HARMONY decide por qué tonalidades pasa la música. De vez en cuando, o con cada pulso en la entrada ADV, elige un nuevo centro tonal, siguiendo uno de seis movimientos que los músicos de jazz y de cine usan desde hace décadas. La salida ROOT entrega la nueva tónica en la misma escala de altura que entienden los osciladores.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>QUANTIZER mantiene la melodía afinada, pero siempre en el mismo tono. La música suele viajar, y cada estilo viaja a su manera. El control MOVE elige el recorrido: Coltrane, que salta una tercera mayor en cada cambio y cierra un ciclo de tres tonos, como en Giant Steps; sustitución tritonal, que llega al tono siguiente por un camino inesperado; mediante cromática, cambios de tercera con aire de banda sonora; intercambio modal, que mantiene la tónica y cambia el modo; jazz modal, que casi nunca se mueve; y backdoor, que sube un tono entero.</p>
+    <p>En esta versión, la manera de oír los cambios es sumar la salida ROOT a la melodía antes del oscilador. Cada entrada acepta un solo cable, así que la suma pasa por un MATRIX, y toda la melodía se transpone al nuevo centro. El cambio de escala, de la salida SCALE, todavía no llega al QUANTIZER por cable.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>MOVE</b>: el tipo de recorrido, entre los seis descritos arriba.</li>
+      <li><b>RATE</b>: el ritmo de los cambios, cuando no llega nada a ADV. Va de un cambio cada pocos minutos a dos por segundo.</li>
+      <li><b>ROOT</b>: la tónica de partida, a la que vuelve el módulo cuando recibe un pulso en RST.</li>
+      <li><b>S-LO, S-HI</b>: el rango de escalas que pueden sortearse en los cambios.</li>
+      <li><b>HOLD</b>: la probabilidad de que un cambio se ignore, lo que alarga algunas secciones.</li>
+    </ul>
+    <p>Entradas: ADV, el pulso que pide un cambio; RST, para volver al principio. Salidas: ROOT, la tónica como altura; SCALE, el número de la escala; CHG, un pulso en cada cambio.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Arme la melodía del QUANTIZER: la salida CV de un TURING, movido por el CLOCK, a la entrada CV del QUANTIZER, y un OSC que pase por un ENVELOPE hasta el MIXER.</li>
+      <li>Conecte PTCH del QUANTIZER a IN1 de un MATRIX, ROOT del HARMONY a IN2, y OUT1 del MATRIX a 1V/O del OSC. En el MATRIX, lleve la celda 21 a 1: OUT1 pasa a ser la melodía más la tónica.</li>
+      <li>Ponga MOVE en la primera posición, Coltrane, y suba RATE. En cada cambio, la melodía salta a otro centro, en ciclos de tres.</li>
+      <li>Conecte CHG a la entrada ADV de un DRIFT para que el resto del patch también cambie de sección en cada cambio.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-ABACUS">
     <h3>ABACUS</h3>
     <figure class="painel"><img src="assets/modulos/ABACUS.webp" alt="Panel del módulo ABACUS" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Aritmética de CV — suma/resta/multiplicación/módulo y AND/OR/XOR bit a bit entre dos señales, más un contador binario cuyos bits se vuelven ritmo (Numeric Repetitor).</p>
-    <p><span class="nivel">Cómo funciona</span> La pareja de LOGIC (que recombina el tiempo). Por sí solo, el contador ya toca una secuencia y un ritmo.</p>
+    <h4>Qué es</h4>
+    <p>ABACUS trata las señales como números. Hace cuentas entre dos entradas, cuenta pulsos y convierte la cuenta en ritmos y escaleras, y corta o refleja la parte negativa de una señal. Incluso sin nada en las entradas A y B, su contador interno genera patrones que sirven de ritmo y de melodía.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>Contar es la manera más simple de crear un patrón. Un contador que va de 0 a 7 y vuelve a empezar, mirado bit a bit, produce ritmos sincopados sin ningún secuenciador: cada bit se enciende y se apaga a una velocidad distinta. La salida QNT convierte la cuenta en una escalera de valores, buena para enviar a un QUANTIZER. Y la salida RCT, el rectificador, es útil por sí sola siempre que haga falta la mitad positiva de una señal o su valor absoluto.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>OP</b>: la cuenta entre A y B que sale por MTH: suma, resta, multiplicación, resto de la división, o cuatro operaciones bit a bit.</li>
+      <li><b>MOD</b>: hasta cuánto cuenta el contador antes de volver a empezar, de 2 a 32.</li>
+      <li><b>STEP</b>: en cuántos escalones se divide la salida QNT.</li>
+      <li><b>RNG</b>: el tamaño de la ventana de valores que usan las salidas MTH, QNT y RCT.</li>
+      <li><b>RECT</b>: el modo del rectificador: solo la parte positiva, solo la negativa, las dos reflejadas hacia arriba, o solo el signo, más o menos.</li>
+      <li><b>CNT</b>: cuánto avanza el contador con cada pulso. Negativo cuenta hacia atrás.</li>
+      <li><b>PAT</b>: qué bit del contador se vuelve la salida P1. Los bits bajos cambian rápido; los altos, despacio.</li>
+      <li><b>SLEW</b>: suaviza las salidas MTH y QNT.</li>
+      <li><b>RATE</b>: el reloj interno, usado cuando no llega nada a CLK.</li>
+    </ul>
+    <p>Entradas: A y B, los números de la cuenta; CLK, el pulso que hace contar; RST, para poner a cero. Salidas: MTH, la cuenta; QNT, la escalera; RCT, el rectificador; P1 y P2, dos ritmos sacados del contador; CRY, un pulso cada vez que la cuenta vuelve a empezar.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte la salida CLK del CLOCK a la entrada CLK de ABACUS, con MOD en 8.</li>
+      <li>Conecte P1, P2 y CRY a las entradas GATE de tres DRUM conectados al MIXER. Oye un ritmo sincopado que se cierra cada ocho pulsos.</li>
+      <li>Gire PAT y escuche P1 volverse más rápido o más lento.</li>
+      <li>Conecte QNT a la entrada CV de un QUANTIZER, y PTCH a 1V/O de un OSC conectado al MIXER. La cuenta se vuelve una melodía en escalera.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-DECISION">
     <h3>DECISION</h3>
     <figure class="painel"><img src="assets/modulos/DECISION.webp" alt="Panel del módulo DECISION" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Fuente de azar ESTRUCTURADO, estilo Marbles — distribución (bias/spread/shape), déjà-vu (repite el patrón), steps y slew; hace CV y gates con «intención».</p>
+    <h4>Qué es</h4>
+    <p>DECISION es la fuente de elecciones del patch. Con cada pulso decide si dispara o no una señal en la salida GATE, y sortea dos valores en las salidas X e Y. Usted controla la probabilidad de disparar, el tamaño y la forma de los sorteos, y cuánto recuerda de lo que ya hizo.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>Una onda lenta es demasiado previsible, y el ruido puro no tiene forma. DECISION está en el medio: azar con reglas. BIAS decide si algo sucede casi siempre o solo a veces. SHAPE decide si los valores se reparten por igual o se concentran cerca del centro, con saltos grandes poco frecuentes. DEJA es la memoria: en lugar de sortear de nuevo, relee los últimos pasos, y la música gana repeticiones, como un tema que vuelve.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: el reloj interno, usado cuando no llega nada a TRIG.</li>
+      <li><b>BIAS</b>: la probabilidad de que GATE se dispare con cada pulso. En cero, nunca; al máximo, siempre.</li>
+      <li><b>SPRD</b>: el alcance de los sorteos en X e Y. Bajo, valores cercanos al centro; alto, todo el rango.</li>
+      <li><b>SHAPE</b>: en cero, todos los valores tienen la misma probabilidad; al máximo, los valores cercanos al centro salen mucho más.</li>
+      <li><b>STEPS</b>: divide los sorteos en escalones. En 1 son continuos.</li>
+      <li><b>SLEW</b>: hace que cada valor nuevo se deslice desde el anterior.</li>
+      <li><b>DEJA</b>: la probabilidad de repetir un valor de la memoria en lugar de sortear otro. Alto, la misma frase tiende a repetirse.</li>
+      <li><b>LOOP</b>: el tamaño de esa memoria, de 1 a 16 pasos.</li>
+    </ul>
+    <p>Entradas: TRIG, el pulso de cada decisión; BIAS y SPRD, para modular esos controles. Salidas: X e Y, los valores sorteados; GATE, la decisión.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte la salida EUC del CLOCK a TRIG.</li>
+      <li>Conecte X a la entrada CV de un QUANTIZER, PTCH a 1V/O de un OSC, y el OSC por un ENVELOPE hasta el MIXER. Conecte GATE del DECISION a GATE de la envolvente.</li>
+      <li>Baje BIAS y escuche cómo las notas se vuelven escasas, solo de vez en cuando.</li>
+      <li>Suba DEJA poco a poco. La melodía empieza a repetirse, y con DEJA al máximo queda atrapada en un bucle de LOOP pasos.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-BOXCAR">
     <h3>BOXCAR</h3>
     <figure class="painel"><img src="assets/modulos/BOXCAR.webp" alt="Panel del módulo BOXCAR" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Promediador de puerta (boxcar averager) — una ventana muestrea un punto del período, y el promedio de N capturas revela la señal dentro del ruido; SCAN reconstruye la onda; GEIG = gates de Poisson.</p>
-    <p><span class="nivel">Cómo funciona</span> Es el SCOPE al revés: mide para CONSTRUIR una onda. mode 0 = S&amp;H de ventana, 1 = reconstruye, 2 = relee su propio búfer como oscilador.</p>
-    <p><span class="nivel">Pruebe esto</span> Ruido más un tono débil sincronizado al TRIG, mode 1, SCAN alto: el tono «se dibuja» a lo largo de segundos.</p>
+    <h4>Qué es</h4>
+    <p>BOXCAR mide una señal en ventanas cortas y promedia muchas mediciones seguidas. La técnica viene de instrumentos de laboratorio usados para encontrar una señal débil escondida en el ruido. En el patch, sirve como seguidor de volumen muy estable, como reconstructor de formas de onda y como oscilador hecho de lo que midió.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>SH captura un instante; BOXCAR captura una porción de tiempo y la promedia. Con cada pulso en TRIG, abre una ventana en un punto del ciclo, mide y suma esa medición a las anteriores. Lo que se repite igual en cada ciclo se va afirmando, y lo que es azar se cancela. MODE elige qué hacer con el resultado: entregar solo el promedio, como una señal de control que sigue al sonido despacio; reproducir el ciclo reconstruido; o releer ese ciclo por su cuenta, como un oscilador. Tiene además una salida aparte, GEIG, con pulsos irregulares como los de un contador Geiger.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>DLY</b>: en qué punto del ciclo se abre la ventana.</li>
+      <li><b>APER</b>: el ancho de la ventana. Estrecha, mide casi un instante; ancha, promedia un tramo.</li>
+      <li><b>AVG</b>: cuántas mediciones entran en el promedio, de 1 a 64. Más mediciones, menos ruido y una respuesta más lenta.</li>
+      <li><b>SCAN</b>: hace que la ventana recorra el ciclo sola, en un sentido o en el otro. En cero queda quieta.</li>
+      <li><b>MODE</b>: seguidor, reconstrucción u oscilador.</li>
+      <li><b>RATE</b>: el reloj interno, cuando no llega nada a TRIG, y la velocidad de relectura en modo oscilador.</li>
+      <li><b>THRSH</b>: el nivel que la señal debe cruzar para disparar una medición, cuando no llega nada a TRIG.</li>
+      <li><b>GEI</b>: la densidad de los pulsos en la salida GEIG. En cero queda muda.</li>
+      <li><b>BLEND</b>: la mezcla entre la señal original y la procesada.</li>
+    </ul>
+    <p>Entradas: IN, la señal a medir; TRIG, el pulso de cada medición; SWP, para mover la ventana; THR, para modular el umbral. Salidas: OUT y GEIG.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte GEIG a la entrada GATE de un DRUM conectado al MIXER y suba GEI. Oye golpes en momentos imprevisibles.</li>
+      <li>Ahora conecte una voz que toque notas, como un OSC que pase por un ENVELOPE, a la entrada IN, con MODE en la primera posición y APER ancha.</li>
+      <li>Conecte OUT a la entrada CV1 de un VCA que controle otro sonido. El segundo sonido sigue ahora el volumen de la voz, sin temblar.</li>
+    </ol>
   </article>
 </section>
 <section class="section section-dark" id="fam-ROUTE">
@@ -1072,22 +1173,96 @@
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="Panel del módulo SWITCH" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Conmutador/enrutador — N entradas → 1 salida (o 1 → N), por paso de reloj, CV o al azar; secuencia FUENTES en vez de notas.</p>
+    <h4>Qué es</h4>
+    <p>SWITCH es un selector comandado por el patch. Puede elegir una de cuatro fuentes y mandarla a una salida, o tomar una sola fuente y mandarla a una de cuatro salidas. El cambio ocurre con cada pulso, en orden o al azar, o sigue una señal de control.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>En un patch que se transforma, cambiar de material importa tanto como cambiar de nota: la misma melodía tocada a veces por un oscilador, a veces por una cuerda; el filtro alimentado a veces por el ruido, a veces por el acorde. Sin SWITCH, eso exige cambiar cables a mano. Con DEMUX apagado, elige entre A, B, C y D y entrega en OA. Encendido, toma lo que llega a A y lo envía a una de las cuatro salidas, OA, OB, OC u OD.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>STEP</b>: cuántas posiciones recorre el selector, de 2 a 4.</li>
+      <li><b>MODE</b>: cómo cambia la posición: hacia adelante, de ida y vuelta, al azar, o solo por la señal de la entrada ADR.</li>
+      <li><b>DEMUX</b>: apagado, cuatro entradas a una salida; encendido, una entrada a cuatro salidas.</li>
+      <li><b>GLID</b>: una transición gradual entre posiciones, en la que las dos fuentes se mezclan por un instante. En cero, el corte es seco.</li>
+      <li><b>SLEW</b>: suaviza el cambio para evitar chasquidos. Conviene dejar siempre un poco.</li>
+    </ul>
+    <p>Entradas: A, B, C y D, las fuentes; CLK, el pulso que avanza; RST, para volver a la primera posición; ADR, para elegir la posición con una señal. Salidas: OA, OB, OC y OD; STP, la posición actual como señal de control.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte la salida SAW de un OSC a A, y OUT de un MATTER, tocado por el CLOCK, a B. Conecte OA a una entrada del MIXER.</li>
+      <li>Ponga STEP en 2 y conecte la salida DIV de un LOGIC a CLK, con la salida CLK del CLOCK en la entrada CLK del LOGIC y DIV en 4.</li>
+      <li>Cada cuatro pulsos, el sonido cambia de fuente. Suba GLID para que los cambios se fundan.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MATRIX">
     <h3>MATRIX</h3>
     <figure class="painel"><img src="assets/modulos/MATRIX.webp" alt="Panel del módulo MATRIX" width="237" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Matriz de enrutamiento 4×4 — cualquier entrada a cualquier salida con una ganancia por celda; un mezclador de CV/audio programable.</p>
+    <h4>Qué es</h4>
+    <p>MATRIX conecta cuatro entradas con cuatro salidas por todos los caminos posibles a la vez. En el panel hay una cuadrícula de 16 celdas, y cada una decide cuánto de una entrada va a una salida. Es una mesa de distribución: en lugar de un cable por conexión, todas las conexiones están ahí, cada una con su nivel.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>Es útil cuando se piensa en bloques: un poco de esta modulación en todos los destinos, o cambiar la fuente de todo a la vez. Conecte cuatro fuentes de movimiento a las entradas y cuatro destinos a las salidas, y la cuadrícula se vuelve un panel de modulación. Con audio, se vuelve un mezclador de cuatro salidas. Con DRIFT, las 16 celdas cambian despacio por sí solas, y la red de conexiones evoluciona con la música.</p>
+    <h4>Controles</h4>
+    <p>La cuadrícula: cada celda tiene dos cifras, la entrada y luego la salida. La celda 23, por ejemplo, decide cuánto de la entrada 2 va a la salida 3. Arrastre en vertical para ajustar; los valores negativos invierten la señal.</p>
+    <ul class="controles">
+      <li><b>LEVEL</b>: el nivel general de las cuatro salidas.</li>
+      <li><b>NORM</b>: equilibra el nivel cuando hay varias celdas de una salida abiertas, para que la suma no crezca demasiado.</li>
+      <li><b>RING</b>: en lugar de sumar las entradas en una salida, las multiplica, lo que produce timbres metálicos con señales de audio.</li>
+      <li><b>SAT</b>: una saturación que contiene el nivel cuando usted realimenta la matriz.</li>
+      <li><b>DRIFT</b>: hace que las 16 celdas paseen despacio.</li>
+    </ul>
+    <p>Entradas: IN1 a IN4. Salidas: OUT1 a OUT4.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte la salida BI de un FUNCTION a IN1 y la salida A de un DRIFT a IN2.</li>
+      <li>Arme una voz con FILTER y SPACE. Conecte OUT1 a la entrada FC del FILTER y OUT2 a la entrada FBK del SPACE.</li>
+      <li>Abra y cierre las celdas 11, 12, 21 y 22 y escuche cómo cada fuente pasa de un destino al otro.</li>
+      <li>Suba DRIFT y deje que la matriz se reorganice sola.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MULT">
     <h3>MULT</h3>
     <figure class="painel"><img src="assets/modulos/MULT.webp" alt="Panel del módulo MULT" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Múltiple con búfer — copia una señal a varios destinos sin caída de nivel; modo doble y slew opcional.</p>
+    <h4>Qué es</h4>
+    <p>MULT toma una señal de control y la distribuye a cuatro salidas, cada una con su propio ajuste de tamaño y desplazamiento. Sin nada en la entrada, se vuelve un banco de cuatro valores fijos que usted ajusta a mano.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>En Rasgo Modular, una salida ya puede ir a varios destinos con cables comunes. MULT existe para cuando cada destino necesita una dosis distinta: la misma envolvente abriendo un filtro del todo, bajando un poco el volumen de otra voz, rozando un efecto. Una entrada, cuatro versiones ajustadas. Con DUAL encendido, se divide en dos distribuidores de dos salidas cada uno.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>DUAL</b>: apagado, IN va a las cuatro salidas; encendido, IN va a O1 y O2, e IN2 va a O3 y O4.</li>
+      <li><b>SCL1, SCL2, SCL3, SCL4</b>: el tamaño de la señal en cada salida. En 1 pasa igual; por debajo de 1, se achica; por encima, se agranda; negativo, se invierte. En cero solo queda el desplazamiento.</li>
+      <li><b>OFF1, OFF2, OFF3, OFF4</b>: un valor que se suma a cada salida. Sin nada en la entrada, es el propio valor de la salida.</li>
+      <li><b>SLEW</b>: suaviza las cuatro salidas juntas.</li>
+    </ul>
+    <p>Entradas: IN e IN2. Salidas: O1 a O4.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Arme dos voces, cada una con su FILTER, pasando por el MIXER.</li>
+      <li>Conecte la salida ENV de un ENVELOPE, tocado por el CLOCK, a IN del MULT. Conecte O1 a FC del primer FILTER y O2 a FC del segundo.</li>
+      <li>Deje SCL1 en 1 y lleve SCL2 a un valor negativo. Con cada nota, un filtro se abre y el otro se cierra.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PLANAR">
     <h3>PLANAR</h3>
     <figure class="painel"><img src="assets/modulos/PLANAR.webp" alt="Panel del módulo PLANAR" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Morfismo vectorial XY — desliza entre 4 fuentes en un plano; el gesto (el camino en el plano) se graba y se reproduce.</p>
+    <h4>Qué es</h4>
+    <p>PLANAR mezcla cuatro sonidos colocados en las esquinas de un cuadrado. Un punto se mueve dentro del cuadrado, y el sonido que sale es la mezcla de los cuatro, ponderada por la distancia del punto a cada esquina. Al mover el punto despacio, el timbre se transforma de un sonido en otro. La técnica se llama síntesis vectorial.</p>
+    <h4>Cómo pensarlo</h4>
+    <p>Piense en un joystick: X mueve el punto de izquierda a derecha, Y de abajo arriba. Puede moverlo a mano, con dos ondas lentas o con un DRIFT, y el punto dibuja figuras. La posición también sale por las salidas X' e Y', lo que permite que el mismo movimiento conduzca otros controles del patch. Con un pulso largo en la entrada GST, PLANAR graba el recorrido que usted haga con las perillas X e Y y luego lo repite sin parar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>X, Y</b>: la posición del punto en el cuadrado. Las señales de las entradas del mismo nombre se suman a estos valores.</li>
+      <li><b>CURVE</b>: la manera de mezclar. En un extremo, la mezcla es lineal, buena para señales de control; en el otro, mantiene el volumen constante, y el sonido no se hunde cuando el punto está en el centro.</li>
+      <li><b>SMTH</b>: hace que el punto se deslice a la nueva posición en lugar de saltar.</li>
+      <li><b>RATE</b>: la velocidad de repetición del gesto grabado y del paseo de DRIFT.</li>
+      <li><b>DRIFT</b>: hace que el punto pasee solo por el cuadrado.</li>
+    </ul>
+    <p>Entradas: A, B, C y D, los cuatro sonidos; X e Y, para mover el punto; GST, para grabar y repetir un gesto. Salidas: OUT, la mezcla; X' e Y', la posición del punto.</p>
+    <h4>Pruebe esto</h4>
+    <ol class="passos">
+      <li>Conecte cuatro fuentes distintas a A, B, C y D: por ejemplo la SAW de un OSC, OUT de un WAVETABLE, OUT del CHORD y PNK de un NOISE. Conecte OUT de PLANAR al MIXER.</li>
+      <li>Mueva X e Y a mano y escuche el sonido pasar de una esquina a otra.</li>
+      <li>Conecte BI de dos FUNCTION lentos, a velocidades distintas, a las entradas X e Y. El punto dibuja una figura y el timbre no deja de cambiar.</li>
+      <li>Conecte Y' a la entrada FC de un FILTER en el camino del sonido: el filtro sigue el movimiento.</li>
+    </ol>
   </article>
 </section>
 <section class="section" id="fam-SPACE">
