@@ -64,7 +64,26 @@ a extração para [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/r
 
 ## Português
 
-### Requisitos
+### Requisitos para usar
+
+| | |
+|---|---|
+| **Windows** | Windows 10 (versão 1607 ou posterior) ou Windows 11, 64 bits (x86-64) |
+| **macOS** | macOS 10.15 Catalina ou posterior, Intel ou Apple Silicon (Universal 2) |
+| **Linux** | x86-64 com glibc 2.35 ou mais nova: Ubuntu 22.04+, Debian 12+, Mint 21+ (o `.deb`); outras distribuições, compilando do código |
+| **Processador** | 64 bits, dois núcleos ou mais. Medido num Intel Core i5-6500 (2015, 4 núcleos, 3,2 GHz): o app inteiro usa de um terço a metade de um núcleo; o som sozinho, de 7% a 15% |
+| **Memória** | ~55 MB em uso (medido); qualquer computador com 4 GB basta |
+| **Disco** | ~20 MB |
+| **Tela** | 1280 × 760 ou maior |
+| **Áudio** | qualquer saída de áudio do sistema; microfone e teclado MIDI são opcionais (módulo SIGNAL-IN, botão ON) |
+
+O mínimo de sistema vem do build (macOS 10.15 é o alvo declarado no
+`CMakeLists.txt`; Windows 10 1607 é o mínimo do JUCE; glibc 2.35 é a do
+Ubuntu 22.04, onde o `.deb` é compilado). O de processador e memória é o
+que foi **medido** na máquina do autor; máquinas mais fracas não foram
+testadas.
+
+### Requisitos para compilar
 
 **Motor e testes** (não precisam de GUI nem de JUCE):
 
@@ -245,7 +264,24 @@ comercial — ver [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 
 ## English
 
-### Requirements
+### Requirements to run
+
+- **Windows:** Windows 10 (version 1607 or later) or Windows 11, 64-bit.
+- **macOS:** macOS 10.15 Catalina or later, Intel or Apple Silicon.
+- **Linux:** x86-64 with glibc 2.35 or newer — Ubuntu 22.04+, Debian 12+,
+  Mint 21+ for the `.deb`; other distributions by building from source.
+- **CPU:** 64-bit, two cores or more. Measured on an Intel Core i5-6500
+  (2015, 4 cores, 3.2 GHz): the whole app uses a third to half of one core;
+  the sound alone, 7% to 15%.
+- **Memory:** ~55 MB in use (measured). **Disk:** ~20 MB. **Screen:**
+  1280 × 760 or larger.
+- **Audio:** any system audio output; microphone and MIDI keyboard are
+  optional (SIGNAL-IN module, ON switch).
+
+The OS minimums come from the build; the CPU and memory figures were
+measured on the author's machine, and weaker machines have not been tested.
+
+### Requirements to build
 
 **Engine and tests** (no GUI, no JUCE): CMake ≥ 3.22 and a C++17 compiler
 (GCC 11+, Clang 14+, MSVC 2022).

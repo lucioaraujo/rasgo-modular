@@ -10550,3 +10550,13 @@ o ON no "Controles" e no "Experimente", e o painel exportado de novo.
 Pedidos de VST3 (Audiofanzine, Palmieri): avaliado em conversa; caminho
 proposto em etapas, começando por tirar a trava tela↔áudio, sem mudar a
 licença.
+
+**4 out. 2026 — v0.1.3 publicada** (tag `v0.1.3`, release Latest com os
+três instaladores pela CI; site virado: downloads, pílula, verbetes
+HARMONY/QUANTIZER/SIGNAL-IN nos 4 idiomas, painéis refeitos). Requisitos
+mínimos para usar (sistemas, processador, memória, tela) passam a estar no
+INSTALL (pt/en), no README (4 idiomas) e no site (4 idiomas), com o que foi
+medido separado do que vem do build. **Pendente:** teste no Windows (autor
+e usuário do Audiofanzine, com `arranque.log` se cair); subir o zip do
+portal; pedidos registrados para depois: VST3/CLAP (caminho em etapas) e
+módulos para VCV Rack/Cardinal (exigiria oferecê-los também sob GPLv3).

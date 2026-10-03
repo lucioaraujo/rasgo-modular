@@ -85,6 +85,8 @@ continuous integration.
 | Windows x86-64 | continuous integration only | no | no |
 | macOS (Universal 2) | continuous integration only | no | no |
 
+**Minimum:** Windows 10 (1607+) or 11, 64-bit · macOS 10.15+ (Intel or Apple Silicon) · Linux x86-64 with glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · a 64-bit processor with two cores or more · ~55 MB of memory · a 1280 × 760 screen. Details in [`INSTALL.md`](INSTALL.md).
+
 Said in full before you download: the Windows and macOS packages have
 never been opened by the author, and the `.dmg` is ad-hoc signed, without
 Developer ID or notarisation — Gatekeeper will warn about an unidentified
@@ -170,6 +172,8 @@ e empacotados pela integração contínua.
 | Linux x86-64 | sim | sim | sim, em hardware real |
 | Windows x86-64 | só na integração contínua | não | não |
 | macOS (Universal 2) | só na integração contínua | não | não |
+
+**Mínimo:** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 com glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processador de 64 bits com dois núcleos ou mais · ~55 MB de memória · tela de 1280 × 760. Detalhes no [`INSTALL.md`](INSTALL.md).
 
 Dito por inteiro antes de baixar: os pacotes de Windows e macOS nunca foram
 abertos pelo autor, e o `.dmg` tem assinatura ad-hoc, sem Developer ID nem
@@ -261,6 +265,8 @@ empaquetés par l'intégration continue.
 | Windows x86-64 | intégration continue uniquement | non | non |
 | macOS (Universal 2) | intégration continue uniquement | non | non |
 
+**Minimum :** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 avec glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processeur 64 bits à deux cœurs ou plus · ~55 Mo de mémoire · écran de 1280 × 760. Détails dans [`INSTALL.md`](INSTALL.md).
+
 Dit en entier avant de télécharger : les paquets Windows et macOS n'ont
 jamais été ouverts par l'auteur, et le `.dmg` est signé en ad-hoc, sans
 Developer ID ni notarisation — Gatekeeper affichera un avertissement de
@@ -346,6 +352,8 @@ y empaquetados por la integración continua.
 | Linux x86-64 | sí | sí | sí, en hardware real |
 | Windows x86-64 | solo en integración continua | no | no |
 | macOS (Universal 2) | solo en integración continua | no | no |
+
+**Mínimo:** Windows 10 (1607+) u 11, 64 bits · macOS 10.15+ (Intel o Apple Silicon) · Linux x86-64 con glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · procesador de 64 bits con dos núcleos o más · ~55 MB de memoria · pantalla de 1280 × 760. Detalles en [`INSTALL.md`](INSTALL.md).
 
 Dicho por completo antes de descargar: los paquetes de Windows y macOS
 nunca fueron abiertos por el autor, y el `.dmg` tiene firma ad-hoc, sin
