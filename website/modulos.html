@@ -1067,7 +1067,7 @@
     <p>O HARMONY decide por quais tonalidades a música passa. De tempos em tempos, ou a cada pulso na entrada ADV, ele escolhe um novo centro tonal, seguindo um entre seis movimentos que músicos de jazz e de cinema usam há décadas. A saída ROOT informa a tônica nova na mesma escala de altura que os osciladores entendem.</p>
     <h4>Como pensar nele</h4>
     <p>O QUANTIZER deixa a melodia afinada, mas sempre no mesmo tom. Músicas costumam viajar, e cada estilo viaja de um jeito. O controle MOVE escolhe o percurso: Coltrane, que salta uma terça maior a cada troca e fecha um ciclo de três tons, como em Giant Steps; substituição de trítono, que chega ao tom seguinte por um caminho inesperado; mediante cromática, mudanças de terça com efeito de trilha de cinema; intercâmbio modal, que mantém a tônica e troca o modo; jazz modal, que quase nunca sai do lugar; e backdoor, que sobe um tom inteiro.</p>
-    <p>Nesta versão, a forma de ouvir as mudanças é somar a saída ROOT à melodia: dois cabos chegando na mesma entrada 1V/O se somam, e a melodia inteira se transpõe para o centro novo. A troca de escala, da saída SCALE, ainda não chega ao QUANTIZER por cabo.</p>
+    <p>Nesta versão, a forma de ouvir as mudanças é somar a saída ROOT à melodia antes do oscilador. Cada entrada aceita um cabo só, então a soma passa por um MATRIX, e a melodia inteira se transpõe para o centro novo. A troca de escala, da saída SCALE, ainda não chega ao QUANTIZER por cabo.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>MOVE</b>: o tipo de percurso, entre os seis descritos acima.</li>
@@ -1079,8 +1079,8 @@
     <p>Entradas: ADV, o pulso que pede uma troca; RST, para voltar ao começo. Saídas: ROOT, a tônica como altura; SCALE, o número da escala; CHG, um pulso a cada troca.</p>
     <h4>Experimente</h4>
     <ol class="passos">
-      <li>Monte a melodia do QUANTIZER: TURING no CV do QUANTIZER, PTCH em 1V/O de um OSC, o OSC passando por um ENVELOPE até o MIXER.</li>
-      <li>Ligue ROOT do HARMONY também em 1V/O do OSC. Os dois cabos se somam.</li>
+      <li>Monte a melodia do QUANTIZER: a saída CV de um TURING, movido pelo CLOCK, na entrada CV do QUANTIZER, e um OSC passando por um ENVELOPE até o MIXER.</li>
+      <li>Ligue PTCH do QUANTIZER em IN1 de um MATRIX, ROOT do HARMONY em IN2, e OUT1 do MATRIX em 1V/O do OSC. No MATRIX, leve a célula 21 a 1: OUT1 passa a ser a melodia mais a tônica.</li>
       <li>Ponha MOVE na primeira posição, Coltrane, e suba RATE. A cada troca, a melodia salta para outro centro, em ciclos de três.</li>
       <li>Ligue CHG na entrada ADV de um DRIFT para que o resto do patch também mude de seção a cada troca.</li>
     </ol>
@@ -1249,7 +1249,7 @@
     <p>Pense num joystick: X move o ponto da esquerda para a direita, Y de baixo para cima. Você pode mover à mão, com duas ondas lentas, ou com um DRIFT, e o ponto desenha figuras. A posição também sai pelas saídas X' e Y', o que permite que o mesmo movimento conduza outros controles do patch. Com um pulso longo na entrada GST, o PLANAR grava o trajeto que você fizer nos knobs X e Y e depois o repete sem parar.</p>
     <h4>Controles</h4>
     <ul class="controles">
-      <li><b>X, Y</b>: a posição do ponto no quadrado. As entradas de mesmo nome se somam a estes valores.</li>
+      <li><b>X, Y</b>: a posição do ponto no quadrado. Os sinais nas entradas de mesmo nome se somam a estes valores.</li>
       <li><b>CURVE</b>: o jeito de misturar. Num extremo, a mistura é linear, boa para sinais de controle; no outro, mantém o volume constante, e o som não afunda quando o ponto está no meio.</li>
       <li><b>SMTH</b>: faz o ponto escorregar até a posição nova, em vez de saltar.</li>
       <li><b>RATE</b>: a velocidade da repetição do gesto gravado e do passeio de DRIFT.</li>
@@ -1455,27 +1455,90 @@
   <article class="modulo" id="mod-MIXER">
     <h3>MIXER</h3>
     <figure class="painel"><img src="assets/modulos/MIXER.webp" alt="Painel do módulo MIXER" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Mixer de 4 canais — nível (slider), pan e mute por canal + saída geral. Onde o músico faz o balanço.</p>
-    <p><span class="nivel">Como funciona</span> Isento da Motion Engine — os pans e níveis são teus.</p>
+    <h4>O que é</h4>
+    <p>O MIXER junta até quatro sons numa saída estéreo. Cada canal tem seu volume, sua posição entre os alto-falantes esquerdo e direito, e uma chave para silenciá-lo. É por ele que as vozes do patch chegam ao MASTER e daí aos seus ouvidos.</p>
+    <h4>Como pensar nele</h4>
+    <p>No Rasgo Modular, cada entrada aceita um cabo só, então sons não se somam por acaso: para juntar vozes, é preciso um MIXER. Ele é também o lugar de equilibrar o patch, decidindo o que fica na frente e o que fica ao fundo, e de abrir o som no estéreo, pondo cada voz num ponto entre a esquerda e a direita. Quase todo patch termina com um MIXER ligado ao MASTER, e as sementes já vêm assim.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CH1, CH2, CH3, CH4</b>: o volume de cada canal, do silêncio a 12 dB acima do normal.</li>
+      <li><b>PAN</b>: a posição de cada canal entre a esquerda e a direita.</li>
+      <li><b>MUTE</b>: silencia o canal sem mexer no volume, para comparar o patch com e sem aquela voz.</li>
+      <li><b>OUT</b>: o volume da saída, depois da soma.</li>
+    </ul>
+    <p>Entradas: 1, 2, 3 e 4, os canais. Saída: L+R, a mistura estéreo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue duas vozes diferentes nas entradas 1 e 2, e L+R na entrada IN do MASTER, se ainda não estiver ligado.</li>
+      <li>Equilibre os dois volumes até que nenhuma voz encubra a outra.</li>
+      <li>Leve o PAN de um canal para a esquerda e o do outro para a direita. As vozes se separam no espaço.</li>
+      <li>Use MUTE para ouvir cada voz sozinha e depois as duas juntas.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-MASTER">
     <h3>MASTER</h3>
     <figure class="painel"><img src="assets/modulos/MASTER.webp" alt="Painel do módulo MASTER" width="95" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Estágio de saída estéreo — largura, guarda de corpo e limitador true-peak; o teto do patch.</p>
-    <p><span class="nivel">Como funciona</span> Isento da Motion Engine. O botão STANDBY do cabeçalho é o mute deste módulo.</p>
+    <h4>O que é</h4>
+    <p>O MASTER é a última etapa antes da placa de som. Ele define o volume final, ajusta a largura do estéreo e protege a saída contra picos, para que nada chegue distorcido ou alto demais aos alto-falantes. A saída dele já está ligada ao som do computador: não há onde cabeá-la.</p>
+    <h4>Como pensar nele</h4>
+    <p>O MIXER soma, mas a soma pode ter picos, um estéreo exagerado ou um desvio constante que gasta a potência dos alto-falantes sem soar. O MASTER cuida disso. O medidor mostra o nível; um pequeno quadrado acende quando o limitador precisa segurar um pico. Na prática, ajuste o volume pelo GAIN e deixe as proteções ligadas. A chave de silêncio do cabeçalho do app é o MUTE deste módulo.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>GAIN</b>: o volume final. Suba até o medidor chegar perto do topo sem que o quadrado do limitador fique aceso o tempo todo.</li>
+      <li><b>WIDTH</b>: a largura do estéreo. Em zero, mono; em 1, normal; acima, mais aberto.</li>
+      <li><b>MONO</b>: junta os dois lados num só, para conferir como o patch soa num alto-falante único.</li>
+      <li><b>DC</b>: remove o desvio constante do sinal. Deixe ligado.</li>
+      <li><b>LIMIT</b>: o limitador, que impede que picos passem do teto. Deixe ligado.</li>
+      <li><b>MUTE</b>: silencia a saída, sem estalo.</li>
+      <li><b>BODY</b>: amacia agudos fortes e sustentados que cansariam o ouvido. Só age quando eles aparecem.</li>
+    </ul>
+    <p>Entrada: IN. Saídas: OUT, já ligada à placa de som; VU, o nível como sinal de controle.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Toque uma semente qualquer e observe o medidor do MASTER.</li>
+      <li>Mova WIDTH de zero até o máximo e ouça o som se abrir.</li>
+      <li>Ligue VU numa entrada IN1 de um CONTROL com SCALE em −1, e O1 no CV1 de um VCA que controle uma voz de fundo. Quando o resto do patch fica forte, essa voz recua.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SCOPE">
     <h3>SCOPE</h3>
     <figure class="painel"><img src="assets/modulos/SCOPE.webp" alt="Painel do módulo SCOPE" width="178" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Osciloscópio + medidor que DEVOLVE como CV — pitch (YIN), envelope, centroide espectral, ONSET (pulso no ataque); o patch se ouve.</p>
-    <p><span class="nivel">Como funciona</span> É o SCOPE que mede pra reduzir (→ escalar); o BOXCAR mede pra reconstruir (→ onda).</p>
-    <p><span class="nivel">Experimente</span> SCOPE.onset ← bateria → dispara ENVELOPE no compasso do áudio; SCOPE.pitch → OSC.pitch afina pelo que entra.</p>
+    <h4>O que é</h4>
+    <p>O SCOPE mostra a forma de onda de um sinal, como um osciloscópio, e mede o que ouve: o volume, o brilho, a altura e o início de cada nota. Essas medidas saem por cabos, como sinais de controle. Assim o patch pode reagir ao próprio som.</p>
+    <h4>Como pensar nele</h4>
+    <p>Num osciloscópio comum, a tela é o fim do caminho. Aqui, o que o SCOPE mede pode voltar ao patch: o brilho da mistura abre um filtro, a altura de uma voz afina outra, o começo de cada nota dispara um envelope. O som passa por ele sem mudança, pela saída THRU, então ele pode ficar no meio de qualquer cadeia. Com o SIGNAL-IN, ele também escuta um som de fora e faz o Rasgo Modular acompanhá-lo.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>TRIG</b>: o nível que o sinal precisa cruzar para estabilizar a imagem na tela.</li>
+      <li><b>EDGE</b>: se esse cruzamento conta na subida ou na descida.</li>
+      <li><b>REJ</b>: uma margem de tolerância, para que ruído não dispare a tela várias vezes.</li>
+      <li><b>RESP</b>: a rapidez das medidas de volume, brilho e altura. Rápido, acompanham cada detalhe; lento, mostram a tendência.</li>
+      <li><b>HOLD</b>: congela as medidas no valor atual.</li>
+      <li><b>SENS</b>: a sensibilidade do detector de início de nota. Alto, qualquer subida conta; baixo, só ataques fortes.</li>
+    </ul>
+    <p>Entradas: IN, o som; EXT, um sinal externo para estabilizar a tela. Saídas: THRU, o som intacto; TRIG, o pulso do disparo; LVL, o volume; BRT, o brilho; PIT, a altura; ONS, um pulso no início de cada nota.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ponha o SCOPE entre uma voz e o MIXER: a voz em IN, THRU no MIXER. Veja a forma de onda.</li>
+      <li>Ligue BRT na entrada FC de um FILTER de outra voz. Quando a primeira fica brilhante, a segunda também se abre.</li>
+      <li>Ligue ONS na entrada GATE de um DRUM. Cada nota da primeira voz agora vem com um golpe.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-NOTE-OUT">
     <h3>NOTE-OUT</h3>
     <figure class="painel"><img src="assets/modulos/NOTE-OUT.webp" alt="Painel do módulo NOTE-OUT" width="83" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Saída MIDI — converte gate + 1 V/oct em note on/off, com canal, velocidade e um registro de partitura.</p>
-    <p><span class="nivel">Como funciona</span> A contraparte de SAÍDA do SIGNAL-IN.</p>
+    <h4>O que é</h4>
+    <p>O NOTE-OUT anota as notas de uma voz. Posto no caminho dos sinais de altura e de disparo, ele registra cada nota que passa, com altura, duração, intensidade e acento, na partitura que o app grava junto com o áudio. Não tem controles e não muda o som.</p>
+    <h4>Como pensar nele</h4>
+    <p>Num patch generativo, as notas surgem e somem. O NOTE-OUT guarda um registro delas para quem quiser estudar, transcrever ou retocar a peça depois. Ele fica no meio do caminho: a altura entra em PITCH e sai igual em PTHR; o pulso entra em GATE e sai igual em GTHR. Ao gravar com REC, o arquivo de texto que acompanha o áudio inclui essas notas.</p>
+    <h4>Controles</h4>
+    <p>O NOTE-OUT não tem controles. Entradas: GATE, o pulso de cada nota; PITCH, a altura; VEL, a intensidade; ACC, o acento. Saídas: GTHR e PTHR, os mesmos sinais, para seguir até a voz.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Numa melodia feita com QUANTIZER, OSC e ENVELOPE, ligue PTCH do QUANTIZER em PITCH do NOTE-OUT, e PTHR em 1V/O do OSC.</li>
+      <li>Ligue o pulso que dispara o envelope em GATE do NOTE-OUT, e GTHR em GATE do envelope. O som continua o mesmo.</li>
+      <li>Grave um trecho com REC. Ao lado do arquivo de áudio, o arquivo de texto da partitura traz cada nota tocada.</li>
+    </ol>
   </article>
 </section>
 

@@ -47,8 +47,8 @@ devagar, vem logo depois.
 
 **O que é, pra quem nunca mexeu com isso:** ring modulation (modulação
 em anel) é o efeito de **multiplicar** dois sinais de áudio, amostra por
-amostra, em vez de somá-los (que é o que um cabo normal faz quando dois
-chegam no mesmo destino). Somar dois sons deixa os dois reconhecíveis,
+amostra, em vez de somá-los (o que faz um `MIXER` ou um `MATRIX`; no
+Rasgo, cada entrada aceita um cabo só). Somar dois sons deixa os dois reconhecíveis,
 tocando junto. **Multiplicar** é outra coisa: o resultado **não contém
 mais as frequências originais** de nenhum dos dois — em vez disso,
 aparecem só as **frequências soma e diferença** de cada par de parciais

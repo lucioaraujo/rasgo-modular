@@ -5,7 +5,7 @@ O PLANAR mistura quatro sons postos nos cantos de um quadrado. Um ponto se move 
 Pense num joystick: X move o ponto da esquerda para a direita, Y de baixo para cima. Você pode mover à mão, com duas ondas lentas, ou com um DRIFT, e o ponto desenha figuras. A posição também sai pelas saídas X' e Y', o que permite que o mesmo movimento conduza outros controles do patch. Com um pulso longo na entrada GST, o PLANAR grava o trajeto que você fizer nos knobs X e Y e depois o repete sem parar.
 
 ## Controles
-- X, Y: a posição do ponto no quadrado. As entradas de mesmo nome se somam a estes valores.
+- X, Y: a posição do ponto no quadrado. Os sinais nas entradas de mesmo nome se somam a estes valores.
 - CURVE: o jeito de misturar. Num extremo, a mistura é linear, boa para sinais de controle; no outro, mantém o volume constante, e o som não afunda quando o ponto está no meio.
 - SMTH: faz o ponto escorregar até a posição nova, em vez de saltar.
 - RATE: a velocidade da repetição do gesto gravado e do passeio de DRIFT.
