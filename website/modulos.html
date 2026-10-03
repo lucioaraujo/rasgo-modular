@@ -347,7 +347,7 @@
     <h3>DRUM</h3>
     <figure class="painel"><img src="assets/modulos/DRUM.webp" alt="Painel do módulo DRUM" width="166" height="300" loading="lazy" /></figure>
     <h4>O que é</h4>
-    <p>O DRUM é uma voz de percussão pronta: a cada pulso na entrada GATE, ele toca um golpe. Com poucos knobs, vai do bumbo à caixa, ao tom e ao chimbal, e muda de caráter entre o som das baterias eletrônicas clássicas e um som mais acústico.</p>
+    <p>O DRUM é uma voz de percussão pronta: a cada pulso na entrada GATE, ele toca um golpe. Com poucos knobs, vai do bumbo à caixa, ao tom e ao chimbal, e muda de caráter entre o som das baterias eletrônicas antigas e um som mais acústico.</p>
     <h4>Como pensar nele</h4>
     <p>Montar um bumbo do zero exige vários módulos; o DRUM entrega um pronto. Ele precisa de quem diga quando tocar: um CLOCK ou, melhor, um TRIGSEQ, que gera padrões rítmicos em quatro linhas. Quatro DRUM, cada um numa linha do TRIGSEQ, formam um kit. E como TONE aceita uma altura pela entrada PIT, dá para tocar uma linha de toms.</p>
     <h4>Controles</h4>
@@ -397,87 +397,353 @@
   <article class="modulo" id="mod-FILTER">
     <h3>FILTER</h3>
     <figure class="painel"><img src="assets/modulos/FILTER.webp" alt="Painel do módulo FILTER" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Filtro multimodo ressonante — LP/BP/HP, com a ressonância chegando à auto-oscilação (vira senoide).</p>
-    <p><span class="nivel">Como funciona</span> Tira energia de um som rico (subtrativo); o WASP distorce no caminho, o LPG fecha com vactrol.</p>
-    <p><span class="nivel">Experimente</span> ENVELOPE → cutoff_mod: o 'wah' clássico. RES perto do talo + cutoff baixo = uma voz de seno afinável.</p>
+    <h4>O que é</h4>
+    <p>O FILTER deixa passar parte das frequências de um som e corta o resto. Ele tem três saídas que funcionam ao mesmo tempo: LO, que deixa passar os graves; CTR, a faixa do meio; e HI, os agudos. Girando o corte, você ouve o som escurecer ou clarear, como quando se cobre a boca ao falar.</p>
+    <h4>Como pensar nele</h4>
+    <p>É o segundo módulo de quase todo patch: depois de uma fonte rica em harmônicos, como a serra de um OSC, o filtro esculpe o timbre. O que ele tem de particular é o SPRD: em zero, as três saídas usam o mesmo corte; subindo, elas se afastam e viram três filtros diferentes, cada um numa região do som. Com a ressonância no máximo, o filtro passa a soar sozinho, como um oscilador de seno.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CUT</b>: a frequência de corte, de 20 a 20000 Hz. É o controle principal: gire e ouça o timbre abrir e fechar.</li>
+      <li><b>RESO</b>: realça as frequências perto do corte, dando um timbre mais nasal. No máximo, o filtro começa a soar sozinho.</li>
+      <li><b>SPRD</b>: afasta as três saídas em frequência. Em zero, as três seguem o mesmo corte; no máximo, cada uma fica numa região do som.</li>
+      <li><b>DRIVE</b>: satura o sinal antes de filtrar, engordando o som.</li>
+    </ul>
+    <p>Entradas: IN, o som a filtrar; FC, para mover o corte (com 1 V por oitava); Q, para mover a ressonância; SPR, para mover o afastamento. Saídas: LO, CTR, HI e ALL, que soma as três.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC na entrada IN, e a saída ALL numa entrada do MIXER.</li>
+      <li>Gire CUT devagar de um lado ao outro e ouça o brilho entrar e sair.</li>
+      <li>Suba RESO até a metade e repita: o corte fica marcado, quase uma voz.</li>
+      <li>Ligue a saída ENV de um ENVELOPE na entrada FC, com o CLOCK na entrada GATE do envelope. O filtro abre a cada pulso, no efeito que se ouve em tanta música eletrônica.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-FORMANT">
     <h3>FORMANT</h3>
     <figure class="painel"><img src="assets/modulos/FORMANT.webp" alt="Painel do módulo FORMANT" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Banco de 5 passa-faixas paralelos — as ressonâncias de vogais; VOWEL faz o morph A→E→I→O→U. VOCODER&gt;0 + jack MOD = vocoder de 5 bandas (as bandas seguem a envoltória do modulador em vez da tabela de vogal).</p>
-    <p><span class="nivel">Como funciona</span> Fonte-filtro de Fant; no modo vocoder, o canal de Dudley (1938).</p>
-    <p><span class="nivel">Experimente</span> Num ruído/pulso: fala sintética. Num acorde: coro. Voz no MOD + serra no IN + VOCODER=1: o sinte 'fala'. Pra fala inteligível de banda larga, o VOCODER dedicado.</p>
+    <h4>O que é</h4>
+    <p>O FORMANT faz um som pronunciar vogais. A voz humana distingue um A de um I pela forma como reforça algumas faixas de frequência, chamadas formantes. Este módulo tem cinco filtros posicionados como os formantes da voz e passa de uma vogal para outra quando você gira VOWEL.</p>
+    <h4>Como pensar nele</h4>
+    <p>Passe por ele qualquer som rico, como um acorde do CHORD ou uma serra, e o som começa a falar. O knob VOWEL percorre A, E, I, O e U; modulado, faz o som cantar uma sequência de vogais. SHIFT muda o tamanho da voz, de grande e grave a pequena e aguda, sem mudar a nota. Com outro som na entrada MOD, ele vira um vocoder simples de cinco faixas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>VOWEL</b>: a vogal, percorrendo A, E, I, O e U.</li>
+      <li><b>SHIFT</b>: o tamanho da voz. Para um lado, grande e grave; para o outro, pequena e aguda. A nota não muda.</li>
+      <li><b>RES</b>: o quanto os cinco filtros se estreitam. Baixo dá uma cor sutil; alto faz cada formante apitar.</li>
+      <li><b>VOCOD</b>: troca as vogais pelo som que entra em MOD, que passa a controlar os cinco filtros. Sem nada em MOD, não tem efeito.</li>
+      <li><b>MIX</b>: a mistura entre o som original e o som filtrado.</li>
+      <li><b>DRIFT</b>: faz cada formante oscilar de leve, para a voz respirar.</li>
+    </ul>
+    <p>Entradas: IN, o som que vai falar; VOW e SHF, para modular a vogal e o tamanho; MOD, o som que comanda o modo vocoder.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída OUT do CHORD na entrada IN, e OUT numa entrada do MIXER.</li>
+      <li>Gire VOWEL devagar: o acorde pronuncia as vogais.</li>
+      <li>Suba RES e ouça as vogais ficarem mais marcadas.</li>
+      <li>Ligue a saída BI de um FUNCTION lento na entrada VOW. O acorde passa a cantar vogais sozinho.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-VOCODER">
     <h3>VOCODER</h3>
     <figure class="painel"><img src="assets/modulos/VOCODER.webp" alt="Painel do módulo VOCODER" width="166" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Vocoder de N bandas (4–20) — a energia do MODULADOR por banda controla o ganho da mesma banda na PORTADORA: a portadora 'fala' o modulador. Homer Dudley, 1938.</p>
-    <p><span class="nivel">Como funciona</span> O FORMANT tem um mode vocoder de 5 bandas (vocálico); este é o dedicado, banda larga (fala inteligível). SIBIL passa as fricativas; FREEZE = pad falado infinito; SHIFT = formant shift.</p>
-    <p><span class="nivel">Experimente</span> Voz no MOD + serra/pad no CAR + BANDS=16 = o clássico. Sem CAR, a serra interna afina por PIT.</p>
+    <h4>O que é</h4>
+    <p>O VOCODER faz um som falar com a voz de outro. Ele escuta um som, normalmente uma voz, e mede quanta energia há em cada faixa de frequência; depois aplica esse desenho a um segundo som, rico em harmônicos. O resultado é o som do segundo com a fala do primeiro: o efeito de voz robótica de tanta música eletrônica.</p>
+    <h4>Como pensar nele</h4>
+    <p>Ele precisa de duas entradas: CAR, a portadora, que é o som que vai falar (uma serra, um acorde), e MOD, que é quem fala (uma voz pelo SIGNAL-IN, um tambor, uma gravação). Com poucas faixas, o resultado é grosso e robótico; com muitas, a fala fica clara. Nada na entrada CAR? Ele usa uma serra interna, afinável pela entrada PIT.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>BANDS</b>: quantas faixas de frequência, de 4 a 20. Poucas soam robóticas; muitas deixam a fala inteligível.</li>
+      <li><b>SHIFT</b>: muda o tamanho da voz resultante, de grande a pequena, sem mudar o que é dito.</li>
+      <li><b>ATK</b>: a rapidez com que cada faixa responde. Curto, as consoantes saem secas; longo, tudo amacia.</li>
+      <li><b>REL</b>: quanto tempo cada faixa leva para soltar. Curto é nítido; longo borra as sílabas num pad.</li>
+      <li><b>SIBIL</b>: quanto do agudo da voz passa direto, para os S e T ficarem claros.</li>
+      <li><b>FRZ</b>: congela o desenho atual. A portadora continua dizendo a última sílaba indefinidamente.</li>
+      <li><b>MIX</b>: a mistura entre a portadora original e a portadora falando.</li>
+    </ul>
+    <p>Entradas: CAR, a portadora; MOD, a voz que fala; PIT, a altura da serra interna quando não há nada em CAR.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC em CAR, e a saída L do SIGNAL-IN, com um microfone, em MOD. Ligue OUT numa entrada do MIXER e fale.</li>
+      <li>Baixe BANDS para 6 e ouça a voz ficar robótica; suba para 20 e ela fica clara.</li>
+      <li>Suba REL: as palavras se emendam num som contínuo.</li>
+      <li>Sem microfone, ligue a saída OUT de um DRUM em MOD. Cada batida abre a portadora no seu próprio timbre.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-RESONATOR">
     <h3>RESONATOR</h3>
     <figure class="painel"><img src="assets/modulos/RESONATOR.webp" alt="Painel do módulo RESONATOR" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Banco de ≤ 24 modos AFINADOS a uma série, excitado por sinal EXTERNO (você bate com o que quiser). Rings/Elements no modo ressoador.</p>
-    <p><span class="nivel">Como funciona</span> O MATTER é voz fechada (exciter próprio); aqui você traz a excitação. As 3 saídas LOW/MID/HIGH se CRUZAM quando você varre TILT — a relação entre elas é o processo (Three Sisters).</p>
-    <p><span class="nivel">Experimente</span> DRUM → IN (uma marimba tocada pelo bumbo); TRIGSEQ → STRK; RESONATOR.low e .high em destinos diferentes.</p>
+    <h4>O que é</h4>
+    <p>O RESONATOR é um corpo que ressoa quando algo bate nele. Você liga qualquer som na entrada, um golpe de tambor, um ruído, uma voz, e ele responde como uma marimba, uma taça ou um sino, conforme o ajuste. Tem três saídas, graves, médios e agudos, que podem ir para lugares diferentes.</p>
+    <h4>Como pensar nele</h4>
+    <p>O MATTER também ressoa, mas traz o próprio golpe; o RESONATOR deixa você escolher o que bate. Um DRUM seco vira marimba afinada; um NOISE suave vira vento numa taça. O knob TILT decide qual das três saídas domina: com LOW e HIGH em lugares diferentes, girar TILT faz a energia passar de um lado ao outro.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>FREQ</b>: a afinação do corpo, de 20 a 5000 Hz.</li>
+      <li><b>STRC</b>: a estrutura. No começo, as ressonâncias são afinadas entre si; no fim, ficam desencontradas, como uma barra de metal ou um sino.</li>
+      <li><b>PRTS</b>: quantas ressonâncias o corpo tem, de 1 a 24. Com uma só, é quase um filtro.</li>
+      <li><b>DECAY</b>: quanto tempo o corpo soa depois do golpe, de um toque curto a um anel longo.</li>
+      <li><b>DAMP</b>: faz os agudos sumirem antes dos graves, como numa corda de verdade.</li>
+      <li><b>TILT</b>: qual região domina. Para um lado, a saída LOW; para o outro, a HIGH.</li>
+      <li><b>POS</b>: o ponto onde o corpo é golpeado, que muda quais ressonâncias aparecem.</li>
+      <li><b>MIX</b>: a mistura entre o golpe cru e a ressonância.</li>
+    </ul>
+    <p>Entradas: IN, o som que golpeia; STRK, um pulso para um golpe interno; FQM, para a afinação. Saídas: LOW, MID e HIGH.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída CLK do CLOCK na entrada GATE de um DRUM, e a saída OUT do DRUM na entrada IN do RESONATOR. Ligue MID numa entrada do MIXER. Cada batida soa como uma tecla de marimba.</li>
+      <li>Gire STRC e ouça a marimba virar sino.</li>
+      <li>Suba DECAY para as notas se prolongarem.</li>
+      <li>Troque o DRUM por PNK de um NOISE em IN, com DECAY alto. Você ouve um anel suave, como o de uma taça.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-WASP">
     <h3>WASP</h3>
     <figure class="painel"><img src="assets/modulos/WASP.webp" alt="Painel do módulo WASP" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Filtro-distorção — o caráter sujo/gritado do EDP Wasp; a não-linearidade fica NO caminho do filtro.</p>
+    <h4>O que é</h4>
+    <p>O WASP é um filtro que distorce. Inspirado num sintetizador do fim dos anos 1970 conhecido pelo som áspero, ele corta frequências como o FILTER, mas suja o som quando a ressonância sobe. É o filtro para baixos agressivos, solos que cortam e drones que rangem.</p>
+    <h4>Como pensar nele</h4>
+    <p>O FILTER é limpo e preciso; o WASP é o contraponto sujo. Três knobs dão a medida da sujeira: DRIVE empurra o som contra a distorção antes de filtrar, GRIT decide o quanto o filtro range ao ressoar, e BIAS deixa a distorção desequilibrada, mais zumbida. Com a ressonância alta, ele soa sozinho, e esse som também é áspero.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CUT</b>: a frequência de corte, de 20 a 24000 Hz.</li>
+      <li><b>RESO</b>: a ressonância. Perto do máximo, o filtro soa sozinho.</li>
+      <li><b>MODE</b>: o tipo de filtro, passando de corta-agudos para faixa do meio e corta-graves.</li>
+      <li><b>DRIVE</b>: o ganho de entrada, que empurra o som para a distorção antes de filtrar.</li>
+      <li><b>GRIT</b>: o quanto o filtro distorce ao ressoar. Baixo é quase limpo; alto range.</li>
+      <li><b>BIAS</b>: desequilibra a distorção, acrescentando harmônicos pares e um zumbido.</li>
+      <li><b>DRIFT</b>: uma oscilação lenta no corte e na ressonância.</li>
+    </ul>
+    <p>Entradas: IN, o som a filtrar; FC, para mover o corte; Q, para a ressonância.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC na entrada IN, e OUT numa entrada do MIXER.</li>
+      <li>Suba RESO até uns dois terços e gire CUT: ouça o filtro morder.</li>
+      <li>Suba GRIT e DRIVE. O som fica áspero e agressivo.</li>
+      <li>Ligue a saída ENV de um ENVELOPE em FC, com o CLOCK na entrada GATE do envelope. Você tem um baixo ácido.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-LPG">
     <h3>LPG</h3>
     <figure class="painel"><img src="assets/modulos/LPG.webp" alt="Painel do módulo LPG" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Low-pass gate — filtro + VCA num controle só, com a assimetria de vactrol (ataque rápido, cauda lenta). O 'bongô' Buchla.</p>
-    <p><span class="nivel">Experimente</span> Ping com um trigger curto: o LPG dá o corpo e o decaimento de uma vez.</p>
+    <h4>O que é</h4>
+    <p>O LPG, de low pass gate, é um portão que abre e fecha o som a cada golpe, ao mesmo tempo baixando o volume e escurecendo o timbre. Ele imita um componente antigo, o vactrol, que reage rápido mas solta devagar, e por isso cada nota soa como algo percutido: uma marimba, uma kalimba, uma gota.</p>
+    <h4>Como pensar nele</h4>
+    <p>Dá para montar algo parecido com FILTER, VCA e ENVELOPE, mas falta o jeito do vactrol: subida instantânea e uma queda que vai freando perto do fim. O LPG traz isso pronto. Basta um som contínuo na entrada IN e pulsos na entrada STRK: cada pulso vira uma nota tocada. MODE escolhe se ele age mais como filtro, mais como controle de volume ou como os dois.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>MODE</b>: para a esquerda, só filtro; para a direita, só volume; no meio, os dois juntos, que é o som característico do LPG.</li>
+      <li><b>RESP</b>: quanto tempo a nota leva para morrer depois do golpe, de um toque curtíssimo a uns dois segundos e meio. A subida é sempre rápida.</li>
+      <li><b>OFST</b>: quanto o portão fica aberto em repouso. Em zero, fecha totalmente entre os golpes.</li>
+      <li><b>RESO</b>: a ressonância do filtro, que dá um tom mais marcado.</li>
+      <li><b>BNCE</b>: acrescenta um pequeno repique logo depois de cada golpe.</li>
+      <li><b>DRIFT</b>: varia de leve, e de forma lenta, a duração de cada nota.</li>
+    </ul>
+    <p>Entradas: IN, o som; STRK, o pulso que golpeia; CV, para abrir o portão com um sinal contínuo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída TRI de um OSC na entrada IN, e OUT numa entrada do MIXER. Por enquanto, silêncio: o portão está fechado.</li>
+      <li>Ligue a saída EUC do CLOCK na entrada STRK. Cada pulso vira uma nota de timbre percutido.</li>
+      <li>Gire RESP para ouvir as notas ficarem curtas ou longas.</li>
+      <li>Ligue a saída PTCH de uma SEQUENCE, movida pelo mesmo CLOCK, na entrada 1V/O do OSC. Agora você tem uma linha de marimba.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-VCA">
     <h3>VCA</h3>
     <figure class="painel"><img src="assets/modulos/VCA.webp" alt="Painel do módulo VCA" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Amplificador controlado por tensão — o volume/nível como CV; resposta linear ou exponencial.</p>
+    <h4>O que é</h4>
+    <p>O VCA controla o volume de um som por meio de outro sinal. Ele tem dois canais iguais: o som entra em IN, um sinal de controle entra em CV, e o volume da saída sobe e desce conforme esse controle. É o módulo mais usado de qualquer modular.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense nele como uma mão no botão de volume, movida por outro módulo. Com um envelope no controle, cada nota ganha começo, meio e fim. Com uma onda lenta, o volume ondula, no efeito chamado tremolo. Ele também serve para dosar um sinal de controle antes de mandá-lo a outro lugar, e a saída SUM soma os dois canais, como um mixer pequeno. Atenção: o nível começa em zero, então o canal fica mudo até algo chegar ao CV ou você subir o LVL.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>LVL1, LVL2</b>: o volume de cada canal. O sinal de controle soma a este valor.</li>
+      <li><b>CV1, CV2</b>: o quanto o sinal de controle age, e em que sentido. Negativo inverte: o volume cai quando o controle sobe.</li>
+      <li><b>RSP1, RSP2</b>: a curva de resposta. Em zero, linear; no máximo, exponencial, que soa mais natural para volume.</li>
+      <li><b>DRIFT</b>: uma oscilação lenta e pequena nos dois volumes.</li>
+    </ul>
+    <p>Entradas: IN1 e IN2, os sons; CV1 e CV2, os controles. Saídas: O1, O2 e SUM, a soma dos dois.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC em IN1, e O1 numa entrada do MIXER. Silêncio: LVL1 está em zero.</li>
+      <li>Suba LVL1 devagar e o som aparece.</li>
+      <li>Volte LVL1 a zero e ligue a saída ENV de um ENVELOPE em CV1, com o CLOCK na entrada GATE do envelope. O som agora pulsa com as notas.</li>
+      <li>Troque o envelope pela saída UNI de um FUNCTION lento: o volume ondula, num tremolo.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-VCA4">
     <h3>VCA4</h3>
     <figure class="painel"><img src="assets/modulos/VCA4.webp" alt="Painel do módulo VCA4" width="213" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Banco de 4 VCAs + um mixer somado (MIX). O `VCA` (#20) é duplo; este é o banco pra patch grande — Mutable Veils / Intellijel Quad VCA.</p>
-    <p><span class="nivel">Como funciona</span> CURVE linear/exp é COMPARTILHADA. Cada canal: LVL + CV atenuvertida (soma por porta). MIXG dá o ganho da soma.</p>
-    <p><span class="nivel">Experimente</span> As 3 saídas low/mid/high do RESONATOR/FILTER em 3 canais + um envelope em cada CV = um espectro que se move; a MIX junta tudo.</p>
+    <h4>O que é</h4>
+    <p>O VCA4 reúne quatro controles de volume num só painel, mais uma saída que soma os quatro. Cada canal funciona como no VCA: o som entra, um sinal de controle decide o volume.</p>
+    <h4>Como pensar nele</h4>
+    <p>É o VCA para quando o patch cresce: quatro vozes, cada uma com seu envelope; as saídas grave, média e aguda de um RESONATOR, cada uma respirando num ritmo; ou simplesmente quatro sons somados na saída MIX, como um mixer. Os quatro canais compartilham a mesma curva de resposta. Assim como no VCA, os níveis começam em zero.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>LVL1, LVL2, LVL3, LVL4</b>: o volume de cada canal. O controle de cada um soma a este valor.</li>
+      <li><b>CV1, CV2, CV3, CV4</b>: o quanto o controle de cada canal age. Negativo inverte o sentido.</li>
+      <li><b>CURVE</b>: a curva dos quatro canais, de linear a exponencial.</li>
+      <li><b>MIXG</b>: o volume da saída MIX, a soma dos quatro.</li>
+      <li><b>DRIFT</b>: uma oscilação lenta e pequena nos quatro volumes.</li>
+    </ul>
+    <p>Entradas: IN1 a IN4, os sons; C1 a C4, os controles. Saídas: O1 a O4 e MIX.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue as saídas LOW, MID e HIGH de um RESONATOR, que esteja soando, em IN1, IN2 e IN3, e MIX numa entrada do MIXER.</li>
+      <li>Suba LVL1, LVL2 e LVL3 até ouvir as três regiões.</li>
+      <li>Ligue saídas de FUNCTION, CHAOS ou NOISE, em velocidades diferentes, em C1, C2 e C3, e baixe os LVL. Cada região do som passa a respirar no seu próprio ritmo.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SHAPE">
     <h3>SHAPE</h3>
     <figure class="painel"><img src="assets/modulos/SHAPE.webp" alt="Painel do módulo SHAPE" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Waveshaper — dobra/satura/retifica a forma de onda pra criar harmônicos; de calor sutil a destruição.</p>
+    <h4>O que é</h4>
+    <p>O SHAPE enriquece um som distorcendo-o de formas controladas. Ele pega uma onda simples, como um seno, e a dobra, satura ou multiplica por outra, criando harmônicos novos. É uma técnica ligada a sintetizadores da costa oeste dos Estados Unidos, que preferiam acrescentar harmônicos a cortá-los com filtros.</p>
+    <h4>Como pensar nele</h4>
+    <p>O filtro tira harmônicos de um som rico; o SHAPE faz o caminho inverso, a partir de um som pobre. O gesto principal é FOLD: quando o sinal passa de um limite, ele é dobrado de volta, e cada dobra acrescenta brilho. Com um envelope na entrada FCV, a nota abre o timbre no ataque e fecha depois. RING multiplica o som pelo que entra em MOD, o que dá timbres de sino.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RING</b>: mistura o som com o produto dele pelo sinal da entrada MOD. No máximo, você ouve só o produto, metálico.</li>
+      <li><b>FOLD</b>: a quantidade de dobra. Quanto mais, mais harmônicos agudos.</li>
+      <li><b>SYM</b>: desloca o centro da dobra e acrescenta harmônicos pares, deixando o som mais anasalado.</li>
+      <li><b>WRAP</b>: troca parte da dobra por um corte seco que reaparece do outro lado, mais brutal.</li>
+      <li><b>SAT</b>: arredonda os picos depois da dobra, amaciando o resultado.</li>
+      <li><b>LVL</b>: o volume de saída.</li>
+      <li><b>DRIFT</b>: uma oscilação lenta na quantidade de dobra.</li>
+    </ul>
+    <p>Entradas: IN, o som; MOD, o segundo sinal para o RING; FCV, para modular a dobra.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SIN de um OSC na entrada IN, e OUT numa entrada do MIXER. Você ouve um seno limpo.</li>
+      <li>Suba FOLD devagar e ouça o seno ganhar brilho, dobra por dobra.</li>
+      <li>Mova SYM para um lado: o som fica mais anasalado.</li>
+      <li>Volte FOLD a zero, ligue a saída SAW de outro OSC em MOD e suba RING. Afine os dois osciladores em notas distantes e o som vira sino.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-SHIFTER">
     <h3>SHIFTER</h3>
     <figure class="painel"><img src="assets/modulos/SHIFTER.webp" alt="Painel do módulo SHIFTER" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Deslocador de frequência — move o espectro INTEIRO por tantos Hz (não por razão). Os parciais deixam de ser harmônicos → metálico, sineiro. SSB: saídas `up` (+Δf) e `down` (−Δf).</p>
-    <p><span class="nivel">Como funciona</span> O ring-mod do SHAPE dá as DUAS bandas simétricas; o SHIFTER dá uma só por saída. FEEDBACK = o 'barber pole' de Risset (glissando infinito). Bode/Moog frequency shifter.</p>
-    <p><span class="nivel">Experimente</span> SHIFT ~8 Hz = fase que nunca fecha; SHIFT grande + FEEDBACK = a espiral de Shepard; `up`/`down` em destinos diferentes.</p>
+    <h4>O que é</h4>
+    <p>O SHIFTER desloca todas as frequências de um som pela mesma quantidade em hertz. A diferença para a transposição está na conta: transpor multiplica as frequências e mantém a relação entre elas; deslocar soma um valor fixo e desfaz essa relação. Por isso o som afinado fica metálico, de sino, e com deslocamentos pequenos ganha um movimento giratório.</p>
+    <h4>Como pensar nele</h4>
+    <p>Ele entrega dois resultados ao mesmo tempo: UP, com o som deslocado para cima, e DN, para baixo. Deslocamentos de poucos hertz criam uma ondulação lenta que nunca se fecha; deslocamentos grandes transformam acordes em clangor. Com FBK, a saída volta para a entrada e o som sobe ou desce sem parar, numa ilusão de escada infinita.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>SHIFT</b>: o deslocamento, de 2000 Hz para baixo a 2000 Hz para cima. Em zero, o som passa intacto.</li>
+      <li><b>FBK</b>: quanto da saída volta para a entrada. Positivo faz o som subir sem fim; negativo, descer.</li>
+      <li><b>TONE</b>: escurece ou realça os agudos do som deslocado.</li>
+      <li><b>DRIFT</b>: varia o deslocamento de forma lenta.</li>
+      <li><b>MIX</b>: a mistura entre o som original e o deslocado.</li>
+    </ul>
+    <p>Entradas: IN, o som; SFT, para modular o deslocamento. Saídas: UP e DN.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída OUT do CHORD na entrada IN, e UP numa entrada do MIXER.</li>
+      <li>Suba SHIFT para uns 100 Hz e ouça o acorde ficar metálico.</li>
+      <li>Baixe SHIFT para uns 8 Hz: o som passa a girar devagar.</li>
+      <li>Com SHIFT baixo, suba FBK: o som parece subir para sempre.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CRUSH">
     <h3>CRUSH</h3>
     <figure class="painel"><img src="assets/modulos/CRUSH.webp" alt="Painel do módulo CRUSH" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Destruidor lo-fi / decimador — o lixo DIGITAL: redução de taxa (aliasing), de bits, transbordo que enrola, glitch (dropout/travada/repique) e jitter de clock.</p>
-    <p><span class="nivel">Como funciona</span> É onde mora o verbo DAMAGE. O SHAPE/WASP distorcem de forma ANALÓGICA (fold, tanh); aqui é quantização, overflow de inteiro, conexão ruim. Tudo semeado → dano reprodutível.</p>
-    <p><span class="nivel">Experimente</span> ENVELOPE → BITS (resolução cai na cauda); LFO → RATE; sem IN + MIX=1 = uma fonte de ruído lo-fi.</p>
+    <h4>O que é</h4>
+    <p>O CRUSH suja o som do jeito digital. Ele imita os defeitos dos primeiros samplers e videogames, e também os de uma conexão ruim: menos amostras por segundo, menos degraus de volume, números que estouram e voltam do outro lado, trechos que travam ou somem. O resultado vai de uma leve aspereza a uma voz de robô em pedaços.</p>
+    <h4>Como pensar nele</h4>
+    <p>O SHAPE distorce como um circuito analógico, arredondando e dobrando a onda. O CRUSH quebra o som em degraus. Cada controle é um tipo diferente de estrago, e você pode usar um só ou somar vários. As falhas são sorteadas, mas a partir da semente do patch, então o mesmo patch estraga o som sempre do mesmo jeito. Com um envelope na entrada MXM, a nota começa limpa e vai se degradando.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: quantas vezes por segundo o som é lido, de 100 a 24000. Valores baixos deixam o som em escada e trazem notas fantasmas, aquele chiado metálico dos aparelhos de 8 bits.</li>
+      <li><b>BITS</b>: quantos degraus de volume restam, de 1 a 16. Em 16 quase não se nota; em 1, tudo vira onda quadrada.</li>
+      <li><b>DRIVE</b>: o ganho antes do estrago, que empurra o som para fora dos limites.</li>
+      <li><b>WRAP</b>: o que acontece quando o som passa do limite. Em zero, ele é cortado; no máximo, reaparece do lado oposto, o que soa muito mais agressivo, sobretudo com DRIVE alto.</li>
+      <li><b>GLTCH</b>: a chance de falha: um trecho que trava, um buraco de silêncio, um repique.</li>
+      <li><b>JITR</b>: torna a leitura irregular, e a afinação oscila um pouco, como uma fita digital cansada.</li>
+      <li><b>TONE</b>: um filtro simples na saída. Para a esquerda escurece; para a direita deixa só o chiado agudo; no meio não muda nada.</li>
+      <li><b>MIX</b>: a mistura entre o som limpo e o estragado. Em zero, o som passa intacto.</li>
+    </ul>
+    <p>Entradas: IN, o som; RTM, para modular RATE; MXM, para modular MIX.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC na entrada IN, e OUT numa entrada do MIXER.</li>
+      <li>Baixe RATE até uns 4000 e BITS até 8. O som fica granulado.</li>
+      <li>Suba GLTCH aos poucos e ouça as falhas aparecerem.</li>
+      <li>Baixe MIX para zero e ligue a saída ENV de um ENVELOPE em MXM, com o CLOCK na entrada GATE do envelope. Cada nota começa limpa e se desfaz.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-PARAMETRIC">
     <h3>PARAMETRIC</h3>
     <figure class="painel"><img src="assets/modulos/PARAMETRIC.webp" alt="Painel do módulo PARAMETRIC" width="260" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> EQ paramétrico — bandas de sino/shelf pra esculpir o espectro cirurgicamente, sem ressonância de filtro.</p>
+    <h4>O que é</h4>
+    <p>O PARAMETRIC é um equalizador de quatro faixas, a ferramenta de estúdio para acertar o timbre com precisão. Cada faixa pode cortar os graves ou os agudos, realçar ou abaixar uma região estreita, ou levantar ou baixar tudo acima ou abaixo de um ponto.</p>
+    <h4>Como pensar nele</h4>
+    <p>O FILTER é para tocar: ele ressoa, se move, chama atenção. O PARAMETRIC serve para os acertos que não devem ser notados: tirar um grave que embola, abaixar uma ressonância que incomoda, dar um pouco de brilho no fim da cadeia. Ele tem também um gesto próprio. A entrada SWP move as quatro faixas juntas, e o desenho inteiro do equalizador desliza pelo espectro sem mudar de forma.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>1, 2, 3, 4</b>: o tipo de cada faixa: desligada, corte de graves, prateleira de graves, realce, prateleira de agudos, corte de agudos. A prateleira sobe ou desce tudo de um lado da frequência escolhida; o realce age só em volta dela.</li>
+      <li><b>FREQ</b>: a frequência em que cada faixa age, de 20 Hz a 20 kHz.</li>
+      <li><b>GAIN</b>: quanto a faixa sobe ou desce, até 24 dB para cada lado. Vale para prateleiras e realces; os cortes não usam este controle.</li>
+      <li><b>Q</b>: a largura do realce. Valores altos atingem uma região estreita, valores baixos uma região larga.</li>
+      <li><b>SLP</b>: a inclinação dos cortes, de suave a muito íngreme.</li>
+      <li><b>OUT</b>: o volume final, depois das quatro faixas.</li>
+      <li><b>DRIVE</b>: uma saturação leve na saída.</li>
+      <li><b>MIX</b>: a mistura entre o som original e o equalizado.</li>
+    </ul>
+    <p>Entradas: IN, o som; SWP, para deslocar as quatro faixas juntas; AMT, para modular a intensidade.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída OUT de um MATTER na entrada IN, e OUT do PARAMETRIC numa entrada do MIXER.</li>
+      <li>Na faixa 1, deixe o corte de graves e suba FREQ até o som perder o peso. Volte um pouco e ouça como pequenas mudanças já se percebem.</li>
+      <li>Na faixa 3, com o realce, suba GAIN e Q e mova FREQ devagar: você encontra as ressonâncias do som.</li>
+      <li>Ligue a saída BI de um FUNCTION bem lento em SWP. O timbre inteiro passeia, subindo e descendo.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-GLIDE">
     <h3>GLIDE</h3>
     <figure class="painel"><img src="assets/modulos/GLIDE.webp" alt="Painel do módulo GLIDE" width="118" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Portamento/slew — desliza entre valores em vez de saltar; tempo separado pra subida e descida, modo constante ou proporcional.</p>
+    <h4>O que é</h4>
+    <p>O GLIDE faz uma nota escorregar até a seguinte, em vez de saltar. Ele fica no caminho do sinal de altura, entre quem escolhe as notas, como SEQUENCE ou QUANTIZER, e o oscilador. Esse escorregão, chamado portamento, é o que dá o canto às linhas de baixo ácidas e aos solos ligados.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um deslize sempre ligado cansa logo. O interessante é escolher quando escorregar, e o GLIDE decide isso nota por nota: pode deslizar sempre, só quando a entrada SLIDE está alta, ou só quando as notas estão ligadas, isto é, quando a nota nova chega antes de soltar a anterior. As saídas MOV e DONE avisam quando um deslize está acontecendo e quando ele termina, e podem disparar outras coisas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>TIME</b>: quanto tempo leva para subir uma oitava, de zero, um salto seco, até dois segundos.</li>
+      <li><b>FALL</b>: deixa a descida mais rápida ou mais lenta que a subida. No meio, as duas são iguais.</li>
+      <li><b>CURVE</b>: o formato do deslize. Em zero, a velocidade é constante e a nota chega no tempo exato; no máximo, ela vai freando e demora mais para encostar.</li>
+      <li><b>MODE</b>: quando deslizar: sempre; só com SLIDE alto, como no sintetizador de baixo TB-303; ou só entre notas ligadas, lendo a entrada GATE.</li>
+    </ul>
+    <p>Entradas: PITCH, a altura que chega; SLIDE e GATE, que decidem quando deslizar. Saídas: OUT, a altura conduzida; MOV, alta durante o deslize; DONE, um pulso quando ele termina.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Monte uma linha: a saída CLK do CLOCK na entrada CLK de uma SEQUENCE, e a saída SAW de um OSC no MIXER.</li>
+      <li>Ligue PTCH da SEQUENCE em PITCH do GLIDE, e OUT do GLIDE em 1V/O do OSC.</li>
+      <li>Suba TIME: as notas passam a escorregar umas nas outras.</li>
+      <li>Ponha MODE na terceira posição e ligue GATE da SEQUENCE em GATE do GLIDE. Agora só as notas ligadas escorregam.</li>
+    </ol>
   </article>
   <article class="modulo" id="mod-CONTROL">
     <h3>CONTROL</h3>
     <figure class="painel"><img src="assets/modulos/CONTROL.webp" alt="Painel do módulo CONTROL" width="142" height="300" loading="lazy" /></figure>
-    <p><span class="nivel">Rápido</span> Utilidades de CV contínua — atenuversor, offset, retificação como lerp, slew. O canivete do sinal de controle.</p>
+    <h4>O que é</h4>
+    <p>O CONTROL ajusta sinais de controle antes que cheguem ao destino. Ele pode diminuir, aumentar ou inverter um sinal, deslocá-lo para cima ou para baixo, suavizar seus degraus e somar dois sinais. São operações discretas, mas aparecem em quase todo patch que vai além do básico.</p>
+    <h4>Como pensar nele</h4>
+    <p>Às vezes uma modulação tem a forma certa e o tamanho errado, ou o sentido errado: um envelope que deveria fechar o filtro em vez de abri-lo, uma onda que deveria oscilar só acima de zero. O ganho do cabo diminui um sinal, mas não inverte nem desloca. O CONTROL faz tudo isso num painel, em dois canais iguais e uma saída que junta os dois. Com um som de verdade na entrada, ele também acompanha o volume desse som e o transforma em controle, o que se chama seguidor de envelope.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>SCALE</b>: o tamanho do sinal, em cada canal. Em 1 passa igual; em 0,5, pela metade; negativo, invertido. Em zero, sobra só o deslocamento de OFF, e o canal vira um controle manual.</li>
+      <li><b>OFF</b>: um valor somado ao sinal, que o desloca para cima ou para baixo.</li>
+      <li><b>RECT</b>: dobra para cima a parte negativa do sinal. No meio, a parte negativa some; no máximo, ela é espelhada.</li>
+      <li><b>SLEW</b>: suaviza mudanças bruscas, em até dois segundos. Degraus viram rampas.</li>
+      <li><b>CRV</b>: o formato dessa suavização, de rampa reta a curva que vai freando.</li>
+      <li><b>SUM</b>: se a saída SUM soma os dois canais ou tira a média deles.</li>
+      <li><b>DRIFT</b>: um passeio lento nos deslocamentos, que tira a rigidez de um valor parado.</li>
+    </ul>
+    <p>Entradas: IN1 e IN2. Saídas: O1, O2 e SUM.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, e LO do FILTER no MIXER. Baixe CUT.</li>
+      <li>Ligue a saída ENV de um ENVELOPE, tocado pelo CLOCK, em IN1 do CONTROL, e O1 na entrada FC do FILTER. Cada nota abre o filtro.</li>
+      <li>Leve SCALE do primeiro canal para −1 e suba CUT. Agora cada nota fecha o filtro.</li>
+      <li>Ligue a saída BI de um FUNCTION em IN2 e escute a saída SUM no lugar de O1: as duas modulações agem juntas.</li>
+    </ol>
   </article>
 </section>
 <section class="section" id="fam-MODULATE">

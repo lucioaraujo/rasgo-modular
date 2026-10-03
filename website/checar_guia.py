@@ -20,7 +20,7 @@ for f in sorted(pathlib.Path('website/guia/'+lang).glob('*.md')):
 print(f'{n} verbetes conferidos, {probs} problema(s)')
 # --- segunda verificação: palavras em maiúsculas ---
 todos=set().union(*rot.values())|set(rot.keys())
-conhecidas={'MIDI','LFO','ADSR','RASGO','VARIA','SEED','DESCABEIA','ESPERA','REC','TODOS','SAÍDA','RACK','LEARN','CV','USB','DAW','AD','AR','VCO','VCA','PWM','DX'}
+conhecidas={'MIDI','LFO','ADSR','RASGO','VARIA','SEED','DESCABEIA','ESPERA','REC','TODOS','SAÍDA','RACK','LEARN','CV','USB','DAW','AD','AR','VCO','VCA','PWM','DX','TB-303'}
 probs2=0
 for f in sorted(pathlib.Path('website/guia/'+lang).glob('*.md')):
     txt=re.sub(r'^## .*$','',f.read_text(encoding='utf-8'),flags=re.M)
