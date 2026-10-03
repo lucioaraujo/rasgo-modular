@@ -38,24 +38,24 @@ IDIOMAS = {
         "nav_conceito": "Conceito",
         "nav_modulos": "Módulos",
         "titulo": "Rasgo Modular — guia dos módulos",
-        "descricao": "Os 58 módulos do Rasgo Modular, família por família: "
-                     "o que cada um é, onde fica entre os vizinhos, e uma "
-                     "cadeia para experimentar.",
+        "descricao": "Os 58 módulos do Rasgo Modular explicados para quem está "
+                     "começando: o que cada um faz com o som, o que muda em cada "
+                     "controle e um exercício para fazer no app.",
         "pill": "58 módulos · 8 famílias",
         "h1": "Guia dos módulos",
-        "lead": "Cada módulo do Rasgo Modular explicado em três níveis — o "
-                "que é, onde fica entre os vizinhos, e uma cadeia para "
-                "experimentar. É o mesmo texto que a caixa LEARN mostra "
-                "dentro do instrumento quando você passa o mouse sobre o "
-                "corpo de um módulo; aqui ele está todo junto, para ler "
-                "antes ou depois de tocar.",
+        "lead": "Os 58 módulos do Rasgo Modular, família por família. Cada verbete "
+                "conta o que o módulo faz com o som, como ele se relaciona com os "
+                "vizinhos, o que muda em cada controle, e termina com alguns passos "
+                "para você experimentar no app. Os exercícios partem de um patch em "
+                "que o MIXER já está ligado ao MASTER, como em toda semente. Dentro "
+                "do instrumento, a caixa LEARN mostra um resumo de cada módulo e de "
+                "cada controle quando você passa o mouse sobre eles.",
         "indice": "Famílias",
         "n_modulos": "%d módulos",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
                     "Código sob GNU AGPL-3.0-or-later.",
-        "rodape_2": "Estes verbetes são gerados do catálogo do próprio "
-                    "instrumento, então a página e o programa nunca "
-                    "divergem.",
+        "rodape_2": "Os nomes de controles e portas citados aqui são conferidos contra "
+                    "o código do instrumento.",
         "contato_h": "Contato",
         "contato_p": "Lúcio Araújo — autoria e desenvolvimento. Defeitos, "
                      "licença, crédito:",
@@ -76,22 +76,24 @@ IDIOMAS = {
         "nav_conceito": "Concept",
         "nav_modulos": "Modules",
         "titulo": "Rasgo Modular — module guide",
-        "descricao": "The 58 modules of Rasgo Modular, family by family: "
-                     "what each one is, where it sits among its neighbours, "
-                     "and a chain to try.",
+        "descricao": "The 58 modules of Rasgo Modular explained for beginners: what each "
+                     "one does to the sound, what every control changes, and an exercise "
+                     "to try in the app.",
         "pill": "58 modules · 8 families",
         "h1": "Module guide",
-        "lead": "Every module of Rasgo Modular explained on three levels — "
-                "what it is, where it sits among its neighbours, and a chain "
-                "to try. It is the same text the LEARN box shows inside the "
-                "instrument when you hover a module's body; here it is all "
-                "together, to read before or after playing.",
+        "lead": "The 58 modules of Rasgo Modular, family by family. Each entry "
+                "tells you what the module does to the sound, how it relates to its "
+                "neighbours, what each control changes, and ends with a few steps "
+                "to try in the app. The exercises start from a patch where MIXER is "
+                "already connected to MASTER, as in every seed. Inside the "
+                "instrument, the LEARN box shows a summary of each module and each "
+                "control when you hover over them.",
         "indice": "Families",
         "n_modulos": "%d modules",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
                     "Code under GNU AGPL-3.0-or-later.",
-        "rodape_2": "These entries are generated from the instrument's own "
-                    "catalogue, so the page and the program never diverge.",
+        "rodape_2": "The control and port names quoted here are checked against the "
+                    "instrument's code.",
         "contato_h": "Contact",
         "contato_p": "Lúcio Araújo — authorship and development. Bugs, "
                      "licence, credit:",
@@ -112,23 +114,25 @@ IDIOMAS = {
         "nav_conceito": "Concept",
         "nav_modulos": "Modules",
         "titulo": "Rasgo Modular — guide des modules",
-        "descricao": "Les 58 modules du Rasgo Modular, famille par famille : "
-                     "ce qu’est chacun, où il se situe parmi ses voisins, et "
-                     "une chaîne à essayer.",
+        "descricao": "Les 58 modules du Rasgo Modular expliqués pour qui débute : ce que "
+                     "chacun fait au son, ce que change chaque réglage, et un exercice à "
+                     "faire dans l’application.",
         "pill": "58 modules · 8 familles",
         "h1": "Guide des modules",
-        "lead": "Chaque module du Rasgo Modular expliqué sur trois niveaux — "
-                "ce qu’il est, où il se situe parmi ses voisins, et une "
-                "chaîne à essayer. C’est le texte que la boîte LEARN affiche "
-                "dans l’instrument quand on survole le corps d’un module ; "
-                "ici il est rassemblé, à lire avant ou après avoir joué.",
+        "lead": "Les 58 modules du Rasgo Modular, famille par famille. Chaque "
+                "notice raconte ce que le module fait au son, comment il se situe "
+                "parmi ses voisins, ce que change chaque réglage, et se termine par "
+                "quelques étapes à essayer dans l’application. Les exercices "
+                "partent d’un patch où le MIXER est déjà relié au MASTER, comme "
+                "dans toutes les graines. Dans l’instrument, la boîte LEARN affiche "
+                "un résumé de chaque module et de chaque réglage quand vous les "
+                "survolez avec la souris.",
         "indice": "Familles",
         "n_modulos": "%d modules",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
                     "Code sous GNU AGPL-3.0-or-later.",
-        "rodape_2": "Ces notices sont générées depuis le catalogue de "
-                    "l’instrument lui-même : la page et le programme ne "
-                    "divergent jamais.",
+        "rodape_2": "Les noms de réglages et de prises cités ici sont vérifiés d’après "
+                    "le code de l’instrument.",
         "contato_h": "Contact",
         "contato_p": "Lúcio Araújo — écriture et développement. Défauts, "
                      "licence, crédit :",
@@ -149,24 +153,24 @@ IDIOMAS = {
         "nav_conceito": "Concepto",
         "nav_modulos": "Módulos",
         "titulo": "Rasgo Modular — guía de los módulos",
-        "descricao": "Los 58 módulos del Rasgo Modular, familia por familia: "
-                     "qué es cada uno, dónde queda entre sus vecinos, y una "
-                     "cadena para probar.",
+        "descricao": "Los 58 módulos del Rasgo Modular explicados para quien empieza: "
+                     "qué hace cada uno con el sonido, qué cambia cada control y un "
+                     "ejercicio para hacer en la aplicación.",
         "pill": "58 módulos · 8 familias",
         "h1": "Guía de los módulos",
-        "lead": "Cada módulo del Rasgo Modular explicado en tres niveles — "
-                "qué es, dónde queda entre sus vecinos, y una cadena para "
-                "probar. Es el mismo texto que la caja LEARN muestra dentro "
-                "del instrumento al pasar el ratón sobre el cuerpo de un "
-                "módulo; aquí está todo junto, para leer antes o después de "
-                "tocar.",
+        "lead": "Los 58 módulos del Rasgo Modular, familia por familia. Cada "
+                "entrada cuenta qué hace el módulo con el sonido, cómo se relaciona "
+                "con sus vecinos, qué cambia cada control, y termina con unos pasos "
+                "para probar en la aplicación. Los ejercicios parten de un patch en "
+                "el que el MIXER ya está conectado al MASTER, como en todas las "
+                "semillas. Dentro del instrumento, la caja LEARN muestra un resumen "
+                "de cada módulo y de cada control al pasar el ratón sobre ellos.",
         "indice": "Familias",
         "n_modulos": "%d módulos",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
                     "Código bajo GNU AGPL-3.0-or-later.",
-        "rodape_2": "Estas entradas se generan del catálogo del propio "
-                    "instrumento, así que la página y el programa nunca "
-                    "divergen.",
+        "rodape_2": "Los nombres de controles y conexiones citados aquí se verifican "
+                    "contra el código del instrumento.",
         "contato_h": "Contacto",
         "contato_p": "Lúcio Araújo — autoría y desarrollo. Defectos, "
                      "licencia, crédito:",
