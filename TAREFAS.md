@@ -10479,3 +10479,28 @@ sem as faixas de família e com o cabeçalho antigo); virar o site.
 antes de mostrar a janela; quatro repetições ficaram abertas, sem
 registro de falha no sistema.
 
+
+## Registro da etapa — 2026-10-03: guia didático do site; lacuna do HARMONY
+
+Verbetes didáticos em português (`website/guia/pt/`, formato do
+`website/ESTILO.md`, conferidos por `website/checar_guia.py` contra a
+ficha do código): SOURCE, TRANSFORM, MODULATE, TIME e DECISION (43 de
+58). Faltam ROUTE, SPACE e OUT, depois as traduções EN/FR/ES e as
+páginas principais.
+
+**Lacuna encontrada ao escrever o HARMONY:** o dossiê, o LEARN e o
+registro de 2 set. dizem que `HARMONY.root`/`scale` vão "por cabo" aos
+knobs `ROOT`/`SCALE` do `QUANTIZER`. No app isso não é possível: o
+`QUANTIZER` não tem entradas para tônica nem escala (só `CV`, `TRSP`,
+`TRIG`), a interface não cria ligação a parâmetro (`connectToParameter`
+só é usado pelas sementes), e as sementes não ligam o HARMONY ao
+QUANTIZER. `TRSP` não serve: transpõe a entrada **antes** de quantizar,
+então a escala continua na tônica do knob. O que funciona hoje é somar
+`ROOT` à melodia na `1V/O` do oscilador (dois cabos na mesma entrada se
+somam): a tônica muda, a escala não. O verbete do site descreve isso e
+diz que a troca de escala ainda não chega ao QUANTIZER.
+**Proposta para a v0.1.3:** duas entradas novas no `QUANTIZER`, `ROOT`
+e `SCALE`, no fim da lista de portas (não muda os índices dos patches
+salvos), que substituem o knob quando ligadas (`round(cv·12)`,
+`round(cv·11)`), com teste em `test_quantizer.cpp`; depois corrigir o
+LEARN (4 idiomas), o dossiê `guia/14_harmony.md` e o verbete do site.
