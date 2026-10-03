@@ -871,7 +871,7 @@ inline void registrarLotesTraduzidos() {
         t["PLANAR"]["out:x_out"] = LearnEntry{"La posición X efectiva (ya suavizada) como CV — conéctela al cutoff de un FILTER, al pos de un WAVETABLE… el gesto dirige el patch.", "", ""};
         t["PLANAR"]["out:y_out"] = LearnEntry{"La posición Y efectiva como CV.", "", ""};
     }
-    // ---- familia SOURCE (164 verbetes) ----
+    // ---- familia SOURCE (165 verbetes) ----
     {
         LearnTable& t = learnTableEnMutable();
         t["OSC"]["freq"] = LearnEntry{"Base frequency of the oscillator.", "1 V/oct: f = freq · 2^(fine/1200) · 2^(pitch) · 2^(drift).", "Connect SEQUENCE.pitch to 1V/O and hear the quantised melody play the OSC."};
@@ -1032,6 +1032,7 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["gain"] = LearnEntry{"Gain applied to the live audio input.", "", ""};
         t["SIGNAL-IN"]["bend"] = LearnEntry{"Range of the MIDI pitch-bend, in semitones (0–24). It affects the 1V/O output.", "", ""};
         t["SIGNAL-IN"]["cc_num"] = LearnEntry{"Which MIDI Control Change the CC output follows (1 = mod wheel).", "", ""};
+        t["SIGNAL-IN"]["listen"] = LearnEntry{"Turns on the outside input: the system audio (microphone, instrument) and MIDI. It starts off — the app only opens the microphone and MIDI with it on and an output patched.", "", ""};
         t["SIGNAL-IN"]["out:out"] = LearnEntry{"Audio from the system input, left channel — with nothing capturing, silence (it never blocks, it never reads rubbish).", "The receiving side of an SPSC ring fed by an external capture thread (`AlsaSource`); the `rasgo_modular_core` core does not know what ALSA is.", "Run another instrument and patch L into a FILTER — the Rasgo starts processing audio from outside."};
         t["SIGNAL-IN"]["out:r"] = LearnEntry{"Audio from the input, right channel.", "", ""};
         t["SIGNAL-IN"]["out:pitch"] = LearnEntry{"Pitch of the MIDI note played, as 1 V/oct CV (note 60 = 0 V), with the pitch-bend added (× BEND).", "A MONOPHONIC voice with a note stack (last-note priority): release the top note and the lower one sounds again. It is the input counterpart of NOTE-OUT.", ""};
@@ -1199,6 +1200,7 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["gain"] = LearnEntry{"Gain appliqué à l’entrée audio en direct.", "", ""};
         t["SIGNAL-IN"]["bend"] = LearnEntry{"Plage du pitch-bend MIDI, en demi-tons (0–24). Elle affecte la sortie 1V/O.", "", ""};
         t["SIGNAL-IN"]["cc_num"] = LearnEntry{"Quel Control Change MIDI la sortie CC suit (1 = molette de modulation).", "", ""};
+        t["SIGNAL-IN"]["listen"] = LearnEntry{"Active l’entrée extérieure : l’audio du système (micro, instrument) et le MIDI. Elle démarre éteinte — l’application n’ouvre le micro et le MIDI que si elle est allumée et qu’une sortie est câblée.", "", ""};
         t["SIGNAL-IN"]["out:out"] = LearnEntry{"Audio de l’entrée du système, canal gauche — sans rien qui capture, du silence (il ne se bloque jamais, il ne lit jamais de déchets).", "Le côté récepteur d’un anneau SPSC alimenté par un thread de capture externe (`AlsaSource`) ; le cœur `rasgo_modular_core` ne sait pas ce qu’est ALSA.", "Lancez un autre instrument et branchez L sur un FILTER — le Rasgo se met à traiter de l’audio venu de l’extérieur."};
         t["SIGNAL-IN"]["out:r"] = LearnEntry{"Audio de l’entrée, canal droit.", "", ""};
         t["SIGNAL-IN"]["out:pitch"] = LearnEntry{"Hauteur de la note MIDI jouée, en CV 1 V/oct (note 60 = 0 V), avec le pitch-bend ajouté (× BEND).", "Une voix MONOPHONIQUE avec pile de notes (last-note priority) : relâchez la note du haut et celle du bas resonne à nouveau. C’est le pendant en entrée du NOTE-OUT.", ""};
@@ -1366,6 +1368,7 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["gain"] = LearnEntry{"Ganancia aplicada a la entrada de audio en vivo.", "", ""};
         t["SIGNAL-IN"]["bend"] = LearnEntry{"Alcance del pitch-bend del MIDI, en semitonos (0–24). Afecta a la salida 1V/O.", "", ""};
         t["SIGNAL-IN"]["cc_num"] = LearnEntry{"Qué Control Change del MIDI sigue la salida CC (1 = rueda de modulación).", "", ""};
+        t["SIGNAL-IN"]["listen"] = LearnEntry{"Activa la entrada de fuera: el audio del sistema (micrófono, instrumento) y el MIDI. Empieza apagada — la aplicación solo abre el micrófono y el MIDI con ella encendida y alguna salida conectada.", "", ""};
         t["SIGNAL-IN"]["out:out"] = LearnEntry{"Audio de la entrada del sistema, canal izquierdo — sin nada capturando, silencio (nunca se bloquea, nunca lee basura).", "El lado receptor de un anillo SPSC alimentado por un hilo de captura externo (`AlsaSource`); el núcleo `rasgo_modular_core` no sabe qué es ALSA.", "Ejecute otro instrumento y conecte L a un FILTER — el Rasgo pasa a procesar audio de fuera."};
         t["SIGNAL-IN"]["out:r"] = LearnEntry{"Audio de la entrada, canal derecho.", "", ""};
         t["SIGNAL-IN"]["out:pitch"] = LearnEntry{"Altura de la nota MIDI tocada, como CV 1 V/oct (nota 60 = 0 V), con el pitch-bend sumado (× BEND).", "Voz MONOFÓNICA con pila de notas (last-note priority): suelte la nota de arriba y la de abajo vuelve a sonar. Es la contraparte de entrada del NOTE-OUT.", ""};

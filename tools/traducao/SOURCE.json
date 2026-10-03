@@ -3003,6 +3003,25 @@
  ],
  [
   "SIGNAL-IN",
+  "listen",
+  [
+   "Turns on the outside input: the system audio (microphone, instrument) and MIDI. It starts off — the app only opens the microphone and MIDI with it on and an output patched.",
+   "",
+   ""
+  ],
+  [
+   "Active l’entrée extérieure : l’audio du système (micro, instrument) et le MIDI. Elle démarre éteinte — l’application n’ouvre le micro et le MIDI que si elle est allumée et qu’une sortie est câblée.",
+   "",
+   ""
+  ],
+  [
+   "Activa la entrada de fuera: el audio del sistema (micrófono, instrumento) y el MIDI. Empieza apagada — la aplicación solo abre el micrófono y el MIDI con ella encendida y alguna salida conectada.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "SIGNAL-IN",
   "out:out",
   [
    "Audio from the system input, left channel — with nothing capturing, silence (it never blocks, it never reads rubbish).",

@@ -14,6 +14,15 @@ pronto.
 > whose app closed on startup. If it still fails, please send the file
 > `%APPDATA%\rasgo-modular\arranque.log` (and `crash.log`, if present).
 
+- **SIGNAL-IN com botão ON, desligado ao abrir** (ideia do autor, 3 out.
+  2026). Desligado, nada de fora entra e o app não abre microfone nem MIDI;
+  ligado, abre os dois (se alguma saída do módulo estiver cabeada). Motivo:
+  116 de 300 seeds cabeiam o SIGNAL-IN — inclusive o de demonstração — e,
+  com microfone presente, o som da sala entrava no patch e a entrada de
+  áudio abria na largada (no rc1 isso ainda acontecia). O ON fica fora do
+  sorteio do seed, do VARIA e do MUDA/EVOLUI: as 300 seeds conferidas dão
+  o mesmo patch. **Patches salvos que usavam o SIGNAL-IN abrem com ele
+  desligado**: é preciso ligar o ON. Teste novo em `test_signal_in.cpp`.
 - **Correções de arranque, pelo relato de um usuário do Audiofanzine**
   (Windows 10 22H2, RTX 30xx, 2560×1440: o app fechava em 2–3 s sem
   mostrar a janela; a CI do Windows não reproduz, por não ter placa de

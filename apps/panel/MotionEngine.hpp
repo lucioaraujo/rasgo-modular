@@ -129,7 +129,8 @@ public:
                 default: continue;
                 }
                 if (w.bind.empty() || w.bind.rfind("in:", 0) == 0
-                    || w.bind.rfind("out:", 0) == 0)
+                    || w.bind.rfind("out:", 0) == 0
+                    || w.bind == "listen")   // ON do SIGNAL-IN: só à mão
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;
                 for (const auto& pr : node.parameters())
