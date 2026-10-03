@@ -7,6 +7,31 @@ pronto.
 
 ---
 
+## v0.1.3 — em preparação
+
+- **Auditoria de idiomas** (pedido do autor, 3 out. 2026): o LEARN segue
+  o idioma escolhido em todas as chamadas (as quatro passam o idioma; a
+  troca chega à paleta, ao rack, ao rodapé, ao cabeçalho e ao tutorial),
+  os 803 verbetes de controle e os 58 de módulo têm os campos completos
+  nos quatro idiomas, e um auditor de palavras não achou texto num idioma
+  dentro de outro. Corrigido o que apareceu:
+  - **primeira abertura no idioma do sistema** (pt, fr ou es; qualquer
+    outro, inglês). Antes abria em português para todo mundo; quem já
+    escolheu um idioma continua com a escolha;
+  - a tela SOBRE dizia "blocos perdidos" e "alvo" em português em
+    qualquer idioma;
+  - o LEARN de TURING e SEQUENCE mandava usar "MUTATE", botão que não
+    existe em nenhum idioma (TURING: o knob MUT; SEQUENCE: MUDA/EVOLUI,
+    CHANGE/EVOLVE, CHANGER/ÉVOLUE, CAMBIA/EVOLUCIONA); o do MASTER em
+    português chamava o botão ESPERA de STANDBY;
+  - o cartão TECLADO dizia "m mutate / muter / muta" com o botão chamado
+    CHANGE / CHANGER / CAMBIA;
+  - o contador do cabeçalho cortava a última letra ("13 câble").
+  Verificado: ctest 80/80; o app aberto com o sistema em francês e sem
+  preferência salva abre em francês (cabeçalho, LEARN, contador).
+
+---
+
 ## v0.1.2 — 2026-10-03
 
 > **English summary.** Fixes a patch going silent for good after UNCABLE,
