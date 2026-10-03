@@ -76,7 +76,7 @@ fonte de CV que sozinha não teria nenhum.
 ## Os controles, um a um
 
 **SCALE** (0–11) — a escala: cromática, maior, os modos, pentatônicas,
-tons inteiros, oitava. A CV do `HARMONY.scale` entra aqui (via cabo).
+tons inteiros, oitava. A CV do `HARMONY.scale` entra pela entrada `SCL` (a partir da v0.1.3; na v0.1.2 essa entrada não existe).
 
 **ROOT** (0–11) — a tônica (0 = C … 11 = B). A CV do `HARMONY.root`
 entra aqui.
@@ -101,8 +101,8 @@ QUANTIZER (gate) → ENVELOPE (gate)
 
 **Com harmonia que se move:**
 ```
-HARMONY (root)  → QUANTIZER (ROOT via cabo)
-HARMONY (scale) → QUANTIZER (SCALE via cabo)
+HARMONY (root)  → QUANTIZER (entrada ROOT, v0.1.3)
+HARMONY (scale) → QUANTIZER (entrada SCL, v0.1.3)
 CLOCK (bem lento) → HARMONY (advance)
 ```
 

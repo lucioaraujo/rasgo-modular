@@ -61,7 +61,13 @@ public:
         : Signal(
               {{"cv", PortKind::Audio, ""},
                {"transpose", PortKind::Control, "v/oct"},
-               {"trigger", PortKind::Control, "trig"}},
+               {"trigger", PortKind::Control, "trig"},
+               // tônica e escala por cabo (v0.1.3): substituem os knobs
+               // ROOT e SCALE quando ligadas. Escala das saídas do HARMONY
+               // (raiz/12, índice/11). No FIM da lista para não mudar o
+               // índice das portas nos patches salvos.
+               {"root_cv", PortKind::Control, ""},
+               {"scale_cv", PortKind::Control, ""}},
               {{"pitch", PortKind::Audio, "v/oct"},
                {"gate", PortKind::Control, "gate"},
                {"semitone", PortKind::Audio, ""}},
@@ -87,6 +93,8 @@ public:
         p.add(Widget::Kind::Jack, "CV", "in:cv", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "TRSP", "in:transpose", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 29.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "ROOT", "in:root_cv", 29.0f, 78.0f);
+        p.add(Widget::Kind::Jack, "SCL", "in:scale_cv", 41.0f, 78.0f);
         p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "GATE", "out:gate", 17.0f, 116.0f);
         p.add(Widget::Kind::Jack, "ST", "out:semitone", 29.0f, 116.0f);
@@ -110,10 +118,16 @@ public:
         const std::size_t frames = pitchOut.frames();
         const std::size_t channels = pitchOut.channels();
 
-        const int scaleIdx =
-            clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, 11);
-        const int root =
-            clampi(static_cast<int>(std::lround(parameterValue("root"))), 0, 11);
+        // ROOT/SCL ligados mandam no lugar dos knobs, lidos uma vez por
+        // bloco (o HARMONY troca de centro em segundos, não em amostras)
+        const AudioBlock* rootCv = inputs.size() > 3 ? inputs[3] : nullptr;
+        const AudioBlock* scaleCv = inputs.size() > 4 ? inputs[4] : nullptr;
+        const int scaleIdx = scaleCv
+            ? clampi(static_cast<int>(std::lround(scaleCv->at(0, 0) * 11.0f)), 0, 11)
+            : clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, 11);
+        const int root = rootCv
+            ? ((static_cast<int>(std::lround(rootCv->at(0, 0) * 12.0f)) % 12) + 12) % 12
+            : clampi(static_cast<int>(std::lround(parameterValue("root"))), 0, 11);
         const float range = parameterValue("range");
         const float glide = parameterValue("glide");
         const float hysteresis = parameterValue("hysteresis");

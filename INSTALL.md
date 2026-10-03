@@ -205,16 +205,21 @@ patch.
 áudio pode falhar. Se acontecer, aumentar o tamanho do buffer no
 dispositivo de saída dá mais folga.
 
-Está registrado como tarefa para a **v0.1.1** — repintar só as regiões
-que mudam. Não entrou na v0.1.0 por decisão explícita: mexer no caminho
-de desenho às vésperas da publicação troca um problema conhecido e
-medido por um risco de regressão desconhecido.
+Na v0.1.1 foram testadas duas saídas, repintar só as regiões que mudam e
+desenhar a moldura opaca, e as duas foram medidas **sem ganho**; ficaram
+fora do código, guardadas em branches (`TAREFAS.md`). Na v0.1.2, os
+estalos por blocos de áudio perdidos foram corrigidos (de 106 por minuto
+para 0, medido no mesmo seed); a tela SOBRE mostra a contagem de blocos
+perdidos, que deve ficar em zero.
 
 ### Onde o instrumento guarda as coisas
 
-- **Estado e preferências:** `~/.local/share/rasgo-modular/`
+- **Estado e preferências:** `~/.config/rasgo-modular/` no Linux
   (`session.rmp`, `patches/`, `ui-lang`, `rack-view`). No macOS e no
-  Windows, o diretório de dados nativo do sistema.
+  Windows, o diretório de dados de aplicativo do sistema. (O
+  `~/.local/share/rasgo-modular/` que pode existir é do painel de teste
+  X11 antigo.) A partir da v0.1.3, apagar o `ui-lang` faz o app voltar a abrir no idioma do
+  sistema.
 - **Gravações:** `~/Music/RasgoModular/` — `.wav` mais o `.score.txt` da
   tomada. São obra, não estado do app, por isso ficam separadas.
 
@@ -228,8 +233,8 @@ medido por um risco de regressão desconhecido.
   o motor é construído; é intencional, pra um checkout limpo compilar sem
   o JUCE à mão.
 - **Sem entrada de MIDI/áudio.** Elas só são abertas quando o patch tem um
-  módulo `SIGNAL-IN` — é decisão de projeto, não falta: o instrumento toca
-  sozinho e os adaptadores são opcionais.
+  módulo `SIGNAL-IN`, por decisão de projeto: o instrumento abre soando
+  sem precisar deles, e os adaptadores são opcionais.
 
 ### Licença
 

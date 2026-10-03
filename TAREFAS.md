@@ -10509,15 +10509,24 @@ salvos), que substituem o knob quando ligadas (`round(cv·12)`,
 `round(cv·11)`), com teste em `test_quantizer.cpp`; depois corrigir o
 LEARN (4 idiomas), o dossiê `guia/14_harmony.md` e o verbete do site.
 
-**Ponto de retomada (3 out. 2026):** o site inteiro está na voz do
-`ESTILO.md`. Os 58 verbetes estão escritos em pt, en, fr e es, e a
-introdução da página de módulos e o corpo das quatro páginas principais
-foram reescritos. Fatos conferidos no código antes de escrever: o botão é
-MUDA, não MUTA (a página antiga dizia MUTA); `n` tira todos os cabos e
-Ctrl+Z desfaz (`src/ui/Shortcuts.hpp`). Os marcadores PILULA/ESTADO e a
-tabela de plataformas ficaram intactos. O `verificar.py` só acusa a
-versão 0.1.1 nas páginas, que é esperado até a virada.
-**Em aberto:** a tabela diz que Windows e macOS nunca foram executados,
-mas o travamento de 1º out. teria sido visto "no Windows". Confirmar com
-o autor antes de mudar a tabela.
-**Próximo:** a release final v0.1.2 (passos na seção de 2 out.).
+**Ponto de retomada (3 out. 2026, noite):** **v0.1.2 publicada** (tag,
+release com os três instaladores pela CI, site virado; zip do portal
+refeito, falta o autor subir na HostGator). O autor vai instalar no
+Windows: quando houver resultado, atualizar a tabela de plataformas (site
+e README, quatro idiomas) e o INSTALL.
+
+Acumulando para a **v0.1.3** (lista no topo do `CHANGELOG.md`): auditoria
+de idiomas (1ª abertura no idioma do sistema, SOBRE traduzido, MUTATE
+inexistente no LEARN, tecla m, contador cortado) e as **entradas ROOT/SCL
+do QUANTIZER** (resolve a lacuna do HARMONY registrada acima).
+**Ao publicar a v0.1.3, atualizar junto o site:** verbetes HARMONY e
+QUANTIZER nos quatro idiomas (tirar o desvio pelo MATRIX, citar as
+entradas ROOT e SCL), refazer a imagem do painel do QUANTIZER
+(`RASGO_EXPORTAR_PAINEIS`) e a referência do `checar_guia.py`. O site
+descreve a versão publicada, por isso isso não foi feito antes.
+
+Revisão de textos (3 out.): README (4 idiomas) reescrito na voz do
+`ESTILO.md`; portal RASGO com EN/FR/ES realinhados ao PT de 28 ago. (ainda
+diziam PRIVATE PREVIEW); `DESENVOLVIMENTO.md` com estado atual;
+`PAINEL_MESTRE` com o Modular como `published` (linha alterada sem commit,
+o arquivo tem mudanças de outra sessão).
