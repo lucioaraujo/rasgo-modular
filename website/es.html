@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — patches como punto de partida</title>
-<meta name="description" content="Rasgo Modular: el entorno modular generativo de la familia RASGO. Abre con un patch ya montado y sonando, como punto de partida — y el cable es un objeto con estado, no un hilo." />
+<meta name="description" content="Rasgo Modular es un sintetizador modular gratuito para Linux, Windows y macOS. Abre con un patch ya armado y sonando, que usted toca, modifica o desarma. Y los cables también tocan: pueden conducir solo a ratos, combinar dos señales o romperse dejando un rastro que se apaga." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — patches como punto de partida">
-<meta property="og:description" content="Rasgo Modular: el entorno modular generativo de la familia RASGO. Abre con un patch ya montado y sonando, como punto de partida — y el cable es un objeto con estado, no un hilo.">
+<meta property="og:description" content="Rasgo Modular es un sintetizador modular gratuito para Linux, Windows y macOS. Abre con un patch ya armado y sonando, que usted toca, modifica o desarma. Y los cables también tocan: pueden conducir solo a ratos, combinar dos señales o romperse dejando un rastro que se apaga.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/es.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Rasgo Modular: el entorno modular generativo de la familia RASGO. Abre con un patch ya montado y sonando, como punto de partida — y el cable es un objeto con estado, no un hilo.",
+  "description": "Rasgo Modular es un sintetizador modular gratuito para Linux, Windows y macOS. Abre con un patch ya armado y sonando, que usted toca, modifica o desarma. Y los cables también tocan: pueden conducir solo a ratos, combinar dos señales o romperse dejando un rastro que se apaga.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "es",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,10 +99,10 @@
   <span class="status-pill">v0.1.1 — disponible para Linux, Windows y macOS</span>
   <!-- PILULA:FIM -->
   <h1>Patches como punto de partida</h1>
-  <p class="lead">El Rasgo Modular no abre en blanco: ofrece un patch ya
-    montado y sonando, para que usted toque a partir de él — recableando a mano,
-    ajustando, dejándolo derivar, o desmontándolo todo y construyendo desde
-    cero.</p>
+  <p class="lead">Rasgo Modular abre con un patch ya armado y sonando. Puede tocarlo tal
+    como está, mover los controles, rehacer los cables a mano o desarmarlo
+    todo y empezar de cero. Cada patch nace de un número, la semilla, y el
+    mismo número trae siempre el mismo sonido.</p>
 </section>
 
 <figure class="shot">
@@ -118,91 +118,96 @@
   </picture>
   <figcaption>El instrumento en ejecución: un patch de seed con 32 de 58 módulos llegando a la salida y 61 cables, con la caja de un cable abierta en la esquina.</figcaption>
 </figure>
-
 <section class="section">
   <h2>Qué es</h2>
-  <p>Un entorno modular generativo con <strong>58 módulos</strong>, escrito en
-    C++17 sin dependencias en el núcleo. Los módulos se describen como datos —
-    cada uno declara su propio panel en milímetros — y un mismo motor alimenta
-    dos interfaces: una aplicación JUCE multiplataforma y un panel de prueba
-    X11.</p>
-
-  <p>No es un plugin ni depende de una DAW. Se abre, suena, graba. MIDI y entrada
-    de audio existen como <em>módulos adaptadores opcionales</em> — y solo se
-    abren cuando el patch contiene uno, porque pedir micrófono a quien nunca lo
-    va a usar es ruido.</p>
-
-  <h3>Las ocho familias</h3>
+  <p>Un sintetizador modular es un instrumento hecho de módulos
+    independientes, cada uno con una función: uno genera sonido, otro lo
+    filtra, otro marca el tiempo, otro toma decisiones. Usted conecta las
+    salidas de unos con las entradas de otros mediante cables, y el sonido
+    nace de esas conexiones. Rasgo Modular hace esto en la pantalla del
+    ordenador, con <strong>58 módulos</strong>.</p>
+  <p>Es un programa independiente, que no necesita ningún otro software de
+    música: abre, suena y graba. Para tocarlo con un teclado MIDI o pasar
+    por él el sonido de un micrófono, hay un módulo propio, y la aplicación
+    solo pide acceso a la entrada de audio cuando ese módulo está en el
+    patch.</p>
+  <p>Es gratuito y de código abierto. Los módulos se reparten en ocho
+    familias, y cada familia tiene su color en el panel:</p>
   <ul class="families">
-    <li>SOURCE <span>— generar</span></li>
-    <li>TRANSFORM <span>— transformar</span></li>
-    <li>MODULATE <span>— mover</span></li>
+    <li>SOURCE <span>— generar sonido</span></li>
+    <li>TRANSFORM <span>— transformar el sonido</span></li>
+    <li>MODULATE <span>— mover los controles</span></li>
     <li>TIME <span>— marcar el tiempo</span></li>
-    <li>DECISION <span>— decidir</span></li>
-    <li>ROUTE <span>— enrutar</span></li>
-    <li>SPACE <span>— espacializar y recordar</span></li>
-    <li>OUT <span>— mezclar, medir, enviar</span></li>
+    <li>DECISION <span>— elegir y afinar</span></li>
+    <li>ROUTE <span>— distribuir señales</span></li>
+    <li>SPACE <span>— espacio y memoria</span></li>
+    <li>OUT <span>— mezclar, medir y grabar</span></li>
   </ul>
 </section>
-
 <section class="section section-dark">
-  <h2>El cable es un objeto, no un hilo</h2>
-  <p>Esta es la idea que separa al Rasgo Modular de un modular convencional. En
-    un patch común el cable solo transporta: se conecta y pasa. Aquí tiene estado
-    propio, y ese estado se toca.</p>
-
+  <h2>Los cables también tocan</h2>
+  <p>En un modular común, el cable solo lleva la señal de un punto a otro. En
+    Rasgo Modular, cada cable tiene ajustes propios, que aparecen al hacer
+    clic sobre él. El mismo patch puede cambiar de carácter sin tocar ningún
+    módulo.</p>
   <div class="grid">
     <div class="card">
-      <h3>Conductancia</h3>
-      <p>El cable puede conducir de forma probabilística — pasar a veces en lugar
-        de siempre. El mismo patch respira distinto sin que ningún módulo
-        cambie.</p>
+      <h3>Conducción</h3>
+      <p>Un cable puede dejar pasar la señal solo una parte del
+        tiempo, al azar. Una línea de notas gana respiros y huecos que cambian
+        en cada vuelta.</p>
     </div>
     <div class="card">
       <h3>Relación</h3>
-      <p>En vez de solo transportar, el cable puede <em>combinar</em> lo que lo
-        atraviesa con una segunda señal: modulación en anillo, plegado de onda o
-        diferencia. Incluso consigo mismo.</p>
+      <p>Un cable puede combinar la señal que lleva con una segunda
+        señal elegida por usted: multiplicándolas, plegando la onda de una
+        según la otra, o restándolas. Es una manera de transformar el sonido
+        sin añadir módulos.</p>
     </div>
     <div class="card">
-      <h3>Ruptura con cicatriz</h3>
-      <p>Romper un cable no produce silencio abrupto: la cicatriz retiene el
-        último bloque y lo repite decayendo. El corte es un gesto musical, no un
-        accidente.</p>
+      <h3>Ruptura</h3>
+      <p>Cuando un cable se rompe, el sonido no desaparece de golpe:
+        el cable repite el último tramo que llevaba, cada vez más bajo, como
+        una cicatriz que se borra. Romper un cable se vuelve un gesto que se
+        puede tocar.</p>
     </div>
   </div>
 </section>
-
 <section class="section">
   <h2>Cómo se usa</h2>
-  <p>Hay dos caminos, y ninguno es el "avanzado".</p>
-  <p><strong>Uno:</strong> pulse SEED y guíe lo que salga. Cada patch tiene un
-    número, y el mismo número reproduce siempre el mismo sonido — la variación es
-    reproducible, no se pierde. Deje que VARIAR mueva los parámetros en vivo, o
-    use CAMBIA, EVOLUCIONA y CRUZAR para llevar el patch a otro lugar.</p>
-  <p><strong>Dos:</strong> pulse <kbd>n</kbd> para quitar todos los cables de una
-    vez — los módulos quedan, el sonido para — y construya la pieza conexión por
-    conexión. <kbd>Ctrl+Z</kbd> retrocede una acción, cable a cable.</p>
-
-  <p>Pasar el ratón por cualquier knob, jack o módulo escribe en la caja LEARN
-    qué hace, por qué, y qué probar después — en portugués, inglés, francés o
-    español.</p>
+  <p>Hay dos maneras de empezar, y puede pasar de una a otra en cualquier momento.</p>
+  <p><strong>A partir de una semilla.</strong> Pulse SEED y la aplicación
+    arma un patch nuevo. Escuche, mueva los controles, rehaga algunos
+    cables. El número de la semilla aparece arriba en la pantalla: anote los
+    que le gusten, y cada uno trae el mismo patch cuando usted quiera.
+    VARIAR mueve los controles despacio mientras toca; CAMBIA, EVOLUCIONA y
+    CRUZAR llevan el patch por otros caminos a partir del actual.</p>
+  <p><strong>Desde cero.</strong> Pulse <kbd>n</kbd> para quitar todos los
+    cables. Los módulos se quedan en el rack y el sonido se detiene; desde
+    ahí, cada conexión es suya. <kbd>Ctrl+Z</kbd> deshace la última acción,
+    cable por cable.</p>
+  <p>Para aprender mientras toca, pase el ratón sobre cualquier módulo,
+    control o conector: la caja LEARN explica qué hace y sugiere qué probar
+    después, en español, portugués, inglés o francés. La
+    <a href="modulos-es.html">guía de los módulos</a> ofrece la misma ayuda
+    con más calma, con un ejercicio para cada módulo.</p>
 </section>
-
 <section class="section section-dark">
-  <h2>Escucha y salida</h2>
-  <p>La grabación sale en par: el <code>.wav</code> de lo que se oyó y un
-    <code>.score.txt</code> que registra la topología al inicio de la toma y cada
-    gesto hecho durante ella. El patch en sí es otro archivo — el
-    <code>.rmp</code>, que guarda el instrumento, no el sonido.</p>
-  <p>La salida sigue la arquitectura común de la familia RASGO: protección de
-    excelencia en el bus final (bloqueo de DC, guarda ultrasónica, limitador con
-    look-ahead guiado por pico verdadero, techo de −1 dBFS) y una guarda de
-    seguridad en el destino que no puede eludirse. Medición de loudness
-    BS.1770-4 — momentary, short-term e integrated — para informar decisiones,
-    nunca para normalizar una interpretación por sí sola.</p>
+  <h2>Lo que sale de él</h2>
+  <p>El botón REC graba lo que está oyendo en un archivo
+    <code>.wav</code> de 24 bits. Junto con el audio viene un archivo de
+    texto, la partitura de la sesión: anota cómo estaba el patch al empezar
+    la grabación, cada gesto hecho durante ella y, si hay un NOTE-OUT en el
+    patch, las notas tocadas. El patch en sí se guarda aparte, en un archivo
+    <code>.rmp</code> que usted vuelve a abrir para seguir donde lo
+    dejó.</p>
+  <p>Antes de llegar a los altavoces, el sonido pasa por protecciones: un
+    limitador impide que los picos superen −1 dBFS, y unos filtros quitan lo
+    que no se oye pero fuerza el equipo. Un medidor de sonoridad, según la
+    norma BS.1770 usada en radio y televisión, muestra la intensidad
+    percibida para ayudarle a decidir el volumen. Informa; nunca cambia el
+    sonido por su cuenta.</p>
 </section>
-
 <section class="section">
   <h2>Estado</h2>
   <!-- ESTADO:INICIO -->
@@ -240,16 +245,18 @@
     </tbody>
   </table>
   </div>
-
-  <p>La distinción importa: la integración continua prueba que el proyecto
-    <em>se construye y se empaqueta</em> en los tres sistemas, y verifica que el
-    paquete de macOS sea Universal 2 de verdad. No prueba que la aplicación abra
-    y suene en una máquina real — y eso no se dirá de otra manera aquí.</p>
+  <p>La diferencia importa: la integración continua prueba que el proyecto
+    compila y se empaqueta en los tres sistemas, y comprueba que el paquete
+    de macOS funciona en los dos tipos de procesador de Apple. No prueba que
+    la aplicación abra y suene en una máquina real, y esta página no va a
+    decir lo contrario.</p>
 </section>
 
 <section class="section" id="guia">
   <h2>Guía de los módulos</h2>
-  <p>Los 58 módulos, familia por familia: qué es cada uno, dónde queda entre sus vecinos, y una cadena para probar. Es el mismo texto que la caja LEARN muestra dentro del instrumento.</p>
+  <p>Los 58 módulos explicados para quien empieza: qué hace cada uno con el
+    sonido, qué cambia cada control y un ejercicio para hacer en la
+    aplicación.</p>
   <div class="contact-row">
     <a class="button button-primary" href="modulos-es.html">Abrir la guía de los módulos</a>
   </div>
