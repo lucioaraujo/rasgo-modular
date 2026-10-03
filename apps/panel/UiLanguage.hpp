@@ -261,10 +261,19 @@ inline const L4 tutKeysBody {
 inline const L4 tutLearnTitle {
     "LEARN — EVERY MODULE, EVERY KNOB", "LEARN — CADA MÓDULO, CADA KNOB", "LEARN — CHAQUE MODULE, CHAQUE POT.", "LEARN — CADA MÓDULO, CADA KNOB"};
 inline const L4 tutLearnBody {
-    "Hover a module's body and the box in the lower-left corner tells you what that module is for. Hover any knob or jack and it explains that control in that module, on three levels — quick, how it works, and one thing to try. A fuller written guide and patch recipes are coming as a companion site and PDF.",
-    "Passe o mouse sobre o corpo de um módulo e a caixa no canto inferior esquerdo diz pra que aquele módulo serve. Passe sobre qualquer knob ou jack e ela explica aquele controle naquele módulo, em três níveis — rápido, como funciona, e um experimento. Um guia escrito mais completo e receitas de patch estão a caminho, como site e PDF.",
-    "Survolez le corps d’un module : la boîte en bas à gauche dit à quoi sert ce module. Survolez un potentiomètre ou un jack : elle explique ce contrôle dans ce module, sur trois niveaux — rapide, comment ça marche, et une chose à essayer. Un guide écrit plus complet et des recettes de patch arrivent, sous forme de site et de PDF.",
-    "Pase el ratón sobre el cuerpo de un módulo: la caja de la esquina inferior izquierda dice para qué sirve ese módulo. Pase sobre un knob o jack: explica ese control en ese módulo, en tres niveles — rápido, cómo funciona, y algo para probar. Una guía escrita más completa y recetas de patch están en camino, como sitio y PDF."};
+    "Hover a module's body and the box in the lower-left corner tells you what that module is for. Hover any knob or jack and it explains that control in that module, on three levels — quick, how it works, and one thing to try. For a calmer read, the module guide on the website explains every module, what each control changes, and gives you an exercise to try. Click the link below to open it in your browser.",
+    "Passe o mouse sobre o corpo de um módulo e a caixa no canto inferior esquerdo diz pra que aquele módulo serve. Passe sobre qualquer knob ou jack e ela explica aquele controle naquele módulo, em três níveis — rápido, como funciona, e um experimento. Para ler com mais calma, o guia dos módulos no site explica cada módulo, o que muda em cada controle, e traz um exercício para experimentar. Clique no link abaixo para abri-lo no navegador.",
+    "Survolez le corps d’un module : la boîte en bas à gauche dit à quoi sert ce module. Survolez un potentiomètre ou un jack : elle explique ce contrôle dans ce module, sur trois niveaux — rapide, comment ça marche, et une chose à essayer. Pour une lecture plus posée, le guide des modules sur le site explique chaque module, ce que change chaque réglage, et propose un exercice à essayer. Cliquez sur le lien ci-dessous pour l’ouvrir dans le navigateur.",
+    "Pase el ratón sobre el cuerpo de un módulo: la caja de la esquina inferior izquierda dice para qué sirve ese módulo. Pase sobre un knob o jack: explica ese control en ese módulo, en tres niveles — rápido, cómo funciona, y algo para probar. Para leer con más calma, la guía de los módulos en el sitio explica cada módulo, qué cambia cada control y propone un ejercicio para probar. Haga clic en el enlace de abajo para abrirla en el navegador."};
+
+// Endereço do guia dos módulos no site, na página do idioma do app. O
+// tutorial desenha este texto como link clicável logo abaixo do cartão
+// LEARN (pedido do autor, 3 out. 2026).
+inline const L4 guideUrl {
+    "https://lucioaraujo.github.io/rasgo-modular/modulos-en.html",
+    "https://lucioaraujo.github.io/rasgo-modular/modulos.html",
+    "https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html",
+    "https://lucioaraujo.github.io/rasgo-modular/modulos-es.html"};
 
 // Caixa LEARN sem nada sob o mouse. Existia como literal fixo em
 // português dentro do `panel_main.cpp` — os outros três idiomas viam uma

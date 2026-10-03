@@ -7,8 +7,28 @@ pronto.
 
 ---
 
-## v0.1.2 — em preparação
+## v0.1.2 — 2026-10-03
 
+> **English summary.** Fixes a patch going silent for good after UNCABLE,
+> and audible clicks caused by dropped audio blocks (106 per minute before,
+> 0 after, measured on the same seed). Clicking a cable now hits that cable
+> (a swapped-argument bug since 15 Sep.), the cable under the mouse lights
+> up, and a click on a cable never moves a module. The cable box sits in
+> the lower-right corner with both ends named, GAIN, an always-visible COND,
+> a live conduction light and UNPLUG. The tutorial is laid out for reading,
+> scrolls properly and links to the new module guide on the website, which
+> now explains all 58 modules for beginners in four languages. The
+> recording's score file gets a header. Windows and macOS are still built
+> and tested by continuous integration only. Details below, in Portuguese.
+
+- **Tutorial com link para o guia dos módulos.** O cartão LEARN dizia que
+  um guia escrito estava "a caminho"; agora convida para o guia do site e
+  traz logo abaixo o endereço da página de módulos no idioma do app,
+  clicável (abre no navegador). O guia foi reescrito para quem está
+  começando: os 58 módulos em português, inglês, francês e espanhol, cada
+  um com o que faz, como pensar nele, o que muda em cada controle e um
+  exercício. Os nomes de controles e portas citados são conferidos contra
+  o código por `website/checar_guia.py`.
 - **Corrigido: depois de DESCABEIA o patch ficava mudo para sempre.** A
   saída de som é um nó que não aparece no rack, ligado ao MASTER por um
   cabo invisível; o DESCABEIA (e o clique direito na saída do MASTER)
