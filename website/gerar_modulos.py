@@ -283,6 +283,27 @@ def html_verbete(codigo, partes):
     return L
 
 
+# Painel de cada módulo, desenhado pelo próprio app
+# (`RASGO_EXPORTAR_PAINEIS`, com fontes de teste ligadas para os displays
+# mostrarem o módulo funcionando) — ver README.md.
+ALT_PAINEL = {"pt": "Painel do módulo %s", "en": "%s module panel",
+              "fr": "Panneau du module %s", "es": "Panel del módulo %s"}
+
+
+def figura_painel(codigo, tipo):
+    arq = AQUI / "assets" / "modulos" / (tipo + ".webp")
+    if not arq.exists():
+        return []
+    try:
+        from PIL import Image
+        w, h = Image.open(arq).size
+        dim = ' width="%d" height="%d"' % (w // 2, h // 2)
+    except Exception:
+        dim = ""
+    return ['    <figure class="painel"><img src="assets/modulos/%s.webp" alt="%s"%s loading="lazy" /></figure>'
+            % (tipo, e(ALT_PAINEL[codigo] % tipo), dim)]
+
+
 PAGINA_PRINCIPAL = {"pt": "index.html", "en": "en.html",
                     "fr": "fr.html", "es": "es.html"}
 
@@ -366,6 +387,7 @@ def pagina(codigo, dados, familias, marca):
             verbete = mod[codigo] or mod["pt"]
             L.append('  <article class="modulo" id="mod-%s">' % mod["tipo"])
             L.append("    <h3>%s</h3>" % e(mod["tipo"]))
+            L.extend(figura_painel(codigo, mod["tipo"]))
             didatico = ler_verbete(codigo, mod["tipo"])
             if didatico is not None:
                 L.extend(html_verbete(codigo, didatico))
