@@ -1,0 +1,94 @@
+# Diagnóstico do arranque no Windows (relato de um usuário do Audiofanzine,
+# 3 out. 2026: Win10 22H2, i7 11ª geração, RTX 30xx, 2560×1440 — o app
+# fecha em 2–3 s sem mostrar a janela).
+#
+# Não é CI de rotina: roda só em push para branches `diag/**` ou à mão.
+# Compila o app com símbolos (RelWithDebInfo), liga os despejos locais do
+# Windows Error Reporting, abre o app e espera; se ele cair, o `cdb` do
+# Windows SDK imprime a pilha a partir do despejo, com os PDB do build.
+name: Diagnóstico — arranque no Windows
+
+on:
+  push:
+    branches: ['diag/**']
+  workflow_dispatch:
+
+jobs:
+  arranque:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout JUCE
+        uses: actions/checkout@v4
+        with:
+          repository: juce-framework/JUCE
+          ref: master
+          path: JUCE-checkout
+
+      - name: Configure (com símbolos)
+        run: >
+          cmake -S . -B build
+          -DRASGO_MODULAR_JUCE_PATH=${{ github.workspace }}/JUCE-checkout
+
+      - name: Build do app (RelWithDebInfo)
+        run: cmake --build build --target RasgoModularApp --config RelWithDebInfo --parallel 2
+
+      - name: Ligar despejos locais do WER
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path C:\dumps | Out-Null
+          $k = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\Rasgo Modular.exe'
+          New-Item -Force -Path $k | Out-Null
+          New-ItemProperty -Force -Path $k -Name DumpFolder -PropertyType ExpandString -Value 'C:\dumps' | Out-Null
+          New-ItemProperty -Force -Path $k -Name DumpType -PropertyType DWord -Value 2 | Out-Null
+
+      - name: Abrir o app (seed sorteado e seed fixo)
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Path build -Filter 'Rasgo Modular.exe' |
+                 Where-Object { $_.FullName -match 'RelWithDebInfo' } | Select-Object -First 1
+          if (-not $exe) { throw 'executável não encontrado' }
+          "executável: $($exe.FullName)"
+          foreach ($seed in @('', '1')) {
+            if ($seed) { $env:RASGO_SEED = $seed } else { Remove-Item Env:RASGO_SEED -ErrorAction SilentlyContinue }
+            $tag = if ($seed) { "seed$seed" } else { 'sorteado' }
+            $p = Start-Process -FilePath $exe.FullName -PassThru `
+                   -RedirectStandardError "err-$tag.txt" -RedirectStandardOutput "out-$tag.txt"
+            Start-Sleep -Seconds 25
+            if ($p.HasExited) {
+              "[$tag] FECHOU — código de saída $($p.ExitCode) (0x{0:X8})" -f $p.ExitCode
+            } else {
+              "[$tag] continua aberto depois de 25 s"
+              Stop-Process -Id $p.Id -Force
+            }
+            "--- stderr [$tag] ---"; Get-Content "err-$tag.txt" -ErrorAction SilentlyContinue
+          }
+          Get-ChildItem C:\dumps -ErrorAction SilentlyContinue
+
+      - name: Pilha a partir do despejo
+        if: always()
+        shell: pwsh
+        run: |
+          $dumps = Get-ChildItem C:\dumps -Filter *.dmp -ErrorAction SilentlyContinue
+          if (-not $dumps) { 'nenhum despejo'; exit 0 }
+          $cdb = Get-ChildItem -Recurse 'C:\Program Files (x86)\Windows Kits\10\Debuggers' -Filter cdb.exe -ErrorAction SilentlyContinue |
+                 Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+          if (-not $cdb) { 'cdb não encontrado'; exit 0 }
+          $pdb = (Get-ChildItem -Recurse -Path build -Filter *.pdb | Select-Object -First 1).DirectoryName
+          foreach ($d in $dumps) {
+            "=== $($d.Name) ==="
+            & $cdb.FullName -z $d.FullName -y "$pdb;srv*C:\symbols*https://msdl.microsoft.com/download/symbols" `
+              -c ".ecxr; kv 40; !analyze -v; q"
+          }
+
+      - name: Guardar despejos e saídas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diag-windows
+          path: |
+            C:\dumps\*.dmp
+            err-*.txt
+            out-*.txt
+          if-no-files-found: ignore
