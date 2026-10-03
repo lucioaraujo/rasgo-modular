@@ -61,7 +61,7 @@ def dados_estruturados(pagina, descricao):
         "isAccessibleForFree": True,
         "author": {"@type": "Person", "name": "Lúcio Araújo"},
         "publisher": {"@type": "Organization", "name": "RASGO",
-                      "url": "https://rasgosound.arquiviagem.net/"},
+                      "url": "https://rasgoinstruments.arquiviagem.net/"},
         "sameAs": [repo],
     }
 

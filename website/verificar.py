@@ -39,7 +39,7 @@ VAZIAS = {"meta", "link", "img", "br", "hr", "source", "input", "area",
           "base", "col"}
 # O próprio endereço público aparece nos <link rel="canonical|alternate"> do
 # seo.py: são declarações de endereço, não recursos carregados.
-EXTERNOS_OK = ("rasgosound.arquiviagem.net", "github.com/lucioaraujo",
+EXTERNOS_OK = ("rasgoinstruments.arquiviagem.net", "github.com/lucioaraujo",
                "lucioaraujo.github.io/rasgo-modular/")
 
 problemas = []
