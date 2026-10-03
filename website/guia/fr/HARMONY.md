@@ -8,7 +8,7 @@ Dans cette version, pour entendre les changements, on ajoute la sortie ROOT à l
 
 ## Controles
 - MOVE : le type de parcours, parmi les six décrits plus haut.
-- RATE : le rythme des changements, quand rien n'arrive sur ADV. De un changement toutes les quelques minutes à deux par seconde.
+- RATE : le rythme des changements, quand rien n'arrive sur ADV. D'un changement toutes les quelques minutes à deux par seconde.
 - ROOT : la tonique de départ, vers laquelle le module revient quand il reçoit une impulsion sur RST.
 - S-LO, S-HI : la plage des gammes qui peuvent être tirées au sort à chaque changement.
 - HOLD : la probabilité qu'un changement soit ignoré, ce qui allonge certaines sections.
