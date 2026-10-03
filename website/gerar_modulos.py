@@ -251,8 +251,11 @@ def html_verbete(codigo, partes):
                 for item in lista:
                     nome, _, resto = item.partition(":")
                     if resto:
-                        L.append("      <li><b>%s</b>%s</li>"
-                                 % (e(nome.strip()), inline(":" + resto)))
+                        # o francês põe espaço fino inseparável antes dos
+                        # dois-pontos ("FREQ : ..."); os outros idiomas, não
+                        sep = "\u202f:" if codigo == "fr" else ":"
+                        L.append("      <li><b>%s</b>%s%s</li>"
+                                 % (e(nome.strip()), sep, inline(resto)))
                     else:
                         L.append("      <li>%s</li>" % inline(item))
                 L.append("    </ul>")
