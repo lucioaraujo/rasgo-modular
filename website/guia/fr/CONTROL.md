@@ -16,6 +16,6 @@ Entrées : IN1 et IN2. Sorties : O1, O2 et SUM.
 
 ## Experimente
 1. Montez une voix : la SAW d'un OSC sur l'entrée IN d'un FILTER, et LO du FILTER dans le MIXER. Baissez CUT.
-2. Branchez la sortie ENV d'un ENVELOPE, jouée par le CLOCK, sur IN1 de CONTROL, et O1 sur l'entrée FC du FILTER. Chaque note ouvre le filtre.
+2. Branchez la sortie ENV d'un ENVELOPE joué par le CLOCK, sur IN1 de CONTROL, et O1 sur l'entrée FC du FILTER. Chaque note ouvre le filtre.
 3. Mettez SCALE du premier canal à −1 et montez CUT. Chaque note ferme maintenant le filtre.
 4. Branchez la sortie BI d'un FUNCTION sur IN2 et écoutez la sortie SUM à la place de O1 : les deux modulations agissent ensemble.
