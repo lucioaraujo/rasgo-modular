@@ -9,6 +9,22 @@ pronto.
 
 ## v0.1.3 — em preparação
 
+- **QUANTIZER ganha entradas ROOT e SCL** — o HARMONY passa a mudar de
+  fato a tônica e a escala da melodia. Até a v0.1.2, o LEARN, o dossiê e o
+  site mandavam ligar a saída ROOT/SCALE do HARMONY "em QUANTIZER.root",
+  entrada que não existia (a única ligação possível era a parâmetro, que
+  só as sementes criam, e nenhuma semente a criava). As entradas leem a
+  escala das saídas do HARMONY (tônica/12, índice/11) e, ligadas,
+  substituem os knobs ROOT e SCALE. Ficam no fim da lista de portas (os
+  patches salvos não mudam) e **fora do sorteio das sementes**: conferido
+  em 300 seeds, inclusive o de demonstração, que todas geram exatamente o
+  mesmo patch de antes. Teste novo em `test_quantizer.cpp`; LEARN nos
+  quatro idiomas (verbetes das entradas e das saídas do HARMONY).
+- **Rótulos dos painéis sem corte.** Rótulos de knob, slider e jack e o
+  título do módulo que não cabiam na caixa eram cortados ("RANG",
+  "QUANTIZE", "ROO"); agora são comprimidos na horizontal até 70% para
+  caber. Fica na camada fixa do módulo, sem custo por quadro. Conferido nos
+  58 painéis exportados.
 - **Auditoria de idiomas** (pedido do autor, 3 out. 2026): o LEARN segue
   o idioma escolhido em todas as chamadas (as quatro passam o idioma; a
   troca chega à paleta, ao rack, ao rodapé, ao cabeçalho e ao tutorial),

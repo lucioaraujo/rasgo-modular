@@ -6,6 +6,16 @@
 > portão editorial da `ESTRATEGIA_DE_PUBLICACAO.md`. O conteúdo abaixo é
 > o registro de trabalho, em português, e não mudou.
 
+**Estado atual (3 out. 2026):** **v0.1.2 publicada** (tag `v0.1.2`,
+release com `.deb`, `.exe` e `.dmg` gerados pela CI; site virado para a
+0.1.2). Linux testado pelo autor em hardware real; Windows e macOS só
+construídos e empacotados pela CI. ctest: 80 alvos, todos passando. O site
+tem um guia didático dos 58 módulos em quatro idiomas
+(`website/guia/<idioma>/`, voz em `website/ESTILO.md`, conferido por
+`website/checar_guia.py`). Correções já feitas para a próxima versão
+(v0.1.3) estão no topo do `CHANGELOG.md`; pendências, no fim do
+`TAREFAS.md`. O resto deste arquivo é o diário histórico.
+
 **Identificador arquivístico:** `ARQ-RSM-001` — ingresso e manifesto em
 `RASGO_ARQUIVO/INGRESSO_ARQ-RSM-001.md`, no acervo local do autor (fora
 deste repositório)
@@ -228,7 +238,7 @@ conceitual, não como um projeto separado.
   `examples/*` = as 5 peças; `apps/panel/` = painel gráfico de teste
   (+ `MotionEngine.hpp`, protótipo de composição — ver
   `dossies/ESTUDO_seed_composicao_generativa.md`);
-  `CMakeLists.txt` + `tests/` = 72 alvos CTest.
+  `CMakeLists.txt` + `tests/` = 80 alvos CTest (3 out. 2026).
 
 O `src/core/Graph.hpp` (grafo escalar/multimodal do lote de agosto) segue
 existindo; o áudio real do marco 1 foi construído à parte em `SignalGraph`.

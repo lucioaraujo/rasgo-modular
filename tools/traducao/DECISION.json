@@ -3,17 +3,17 @@
   "QUANTIZER",
   "scale",
   [
-   "Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave).",
+   "Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over.",
    "",
    ""
   ],
   [
-   "Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave).",
+   "Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande.",
    "",
    ""
   ],
   [
-   "Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava).",
+   "Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable.",
    "",
    ""
   ]
@@ -22,17 +22,17 @@
   "QUANTIZER",
   "root",
   [
-   "Tonic of the scale (0=C ... 11=B).",
+   "Tonic of the scale (0=C ... 11=B). With a cable on the ROOT input, the cable takes over.",
    "",
    ""
   ],
   [
-   "Tonique de la gamme (0=C ... 11=B).",
+   "Tonique de la gamme (0=C ... 11=B). Avec un câble sur l’entrée ROOT, c’est le câble qui commande.",
    "",
    ""
   ],
   [
-   "Tónica de la escala (0=C ... 11=B).",
+   "Tónica de la escala (0=C ... 11=B). Con un cable en la entrada ROOT, manda el cable.",
    "",
    ""
   ]
@@ -147,6 +147,44 @@
   ],
   [
    "Sample & hold — si está presente, la nota sólo se actualiza en el pulso (así TURING/DECISION se vuelven melodía).",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "in:root_cv",
+  [
+   "Root by cable (semitone/12), replacing the ROOT knob — plug the ROOT output of HARMONY here.",
+   "",
+   ""
+  ],
+  [
+   "Tonique par câble (demi-ton/12), à la place du bouton ROOT — branchez ici la sortie ROOT de HARMONY.",
+   "",
+   ""
+  ],
+  [
+   "Tónica por cable (semitono/12), en lugar de la perilla ROOT — conecte aquí la salida ROOT de HARMONY.",
+   "",
+   ""
+  ]
+ ],
+ [
+  "QUANTIZER",
+  "in:scale_cv",
+  [
+   "Scale by cable (index/11), replacing the SCALE knob — plug the SCALE output of HARMONY here.",
+   "",
+   ""
+  ],
+  [
+   "Gamme par câble (indice/11), à la place du bouton SCALE — branchez ici la sortie SCALE de HARMONY.",
+   "",
+   ""
+  ],
+  [
+   "Escala por cable (índice/11), en lugar de la perilla SCALE — conecte aquí la salida SCALE de HARMONY.",
    "",
    ""
   ]
@@ -364,17 +402,17 @@
   "HARMONY",
   "out:root",
   [
-   "New root, as CV (semitone/12) — plug it into QUANTIZER.root.",
+   "New root, as CV (semitone/12) — plug it into the ROOT input of QUANTIZER.",
    "",
    ""
   ],
   [
-   "Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur QUANTIZER.root.",
+   "Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur l’entrée ROOT du QUANTIZER.",
    "",
    ""
   ],
   [
-   "Nueva fundamental, como CV (semitono/12) — conéctela a QUANTIZER.root.",
+   "Nueva fundamental, como CV (semitono/12) — conéctela a la entrada ROOT del QUANTIZER.",
    "",
    ""
   ]
@@ -383,17 +421,17 @@
   "HARMONY",
   "out:scale",
   [
-   "New scale index, as CV (index/11) — plug it into QUANTIZER.scale.",
+   "New scale index, as CV (index/11) — plug it into the SCL input of QUANTIZER.",
    "",
    ""
   ],
   [
-   "Nouvel indice de gamme, en CV (indice/11) — à brancher sur QUANTIZER.scale.",
+   "Nouvel indice de gamme, en CV (indice/11) — à brancher sur l’entrée SCL du QUANTIZER.",
    "",
    ""
   ],
   [
-   "Nuevo índice de escala, como CV (índice/11) — conéctelo a QUANTIZER.scale.",
+   "Nuevo índice de escala, como CV (índice/11) — conéctelo a la entrada SCL del QUANTIZER.",
    "",
    ""
   ]

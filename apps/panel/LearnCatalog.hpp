@@ -1391,11 +1391,11 @@ inline const LearnTable& learnTable() {
                 "subida; presente, substitui RATE.", "", ""}},
             {"in:reset", {"Volta pro ROOT/escala inicial.", "", ""}},
             {"out:root", {
-                "Nova fundamental, como CV (semitom/12) — ligue em "
-                "QUANTIZER.root.", "", ""}},
+                "Nova tônica, como CV (semitom/12) — ligue na entrada "
+                "ROOT do QUANTIZER.", "", ""}},
             {"out:scale", {
-                "Novo índice de escala, como CV (índice/11) — ligue em "
-                "QUANTIZER.scale.", "", ""}},
+                "Novo índice de escala, como CV (índice/11) — ligue na "
+                "entrada SCL do QUANTIZER.", "", ""}},
             {"out:change", {
                 "Pulso curto (~20 ms) toda vez que ROOT ou SCALE mudam de "
                 "verdade.", "", ""}},
@@ -1857,8 +1857,10 @@ inline const LearnTable& learnTable() {
         {"QUANTIZER", {
             {"scale", {
                 "Escala musical (12 tabelas curadas — cromática, maior, "
-                "modos, pentatônicas, tons inteiros, oitava).", "", ""}},
-            {"root", {"Tônica da escala (0=C ... 11=B).", "", ""}},
+                "modos, pentatônicas, tons inteiros, oitava). Com cabo "
+                "na entrada SCL, quem manda é o cabo.", "", ""}},
+            {"root", {"Tônica da escala (0=C ... 11=B). Com cabo na "
+                      "entrada ROOT, quem manda é o cabo.", "", ""}},
             {"range", {
                 "Quantas oitavas a CV de entrada cobre antes de "
                 "quantizar.", "", ""}},
@@ -1875,6 +1877,12 @@ inline const LearnTable& learnTable() {
             {"in:trigger", {
                 "Sample & hold — presente, a nota só atualiza no pulso "
                 "(assim TURING/DECISION viram melodia).", "", ""}},
+            {"in:root_cv", {
+                "Tônica por cabo (semitom/12), no lugar do knob ROOT — "
+                "ligue aqui a saída ROOT do HARMONY.", "", ""}},
+            {"in:scale_cv", {
+                "Escala por cabo (índice/11), no lugar do knob SCALE — "
+                "ligue aqui a saída SCALE do HARMONY.", "", ""}},
             {"out:pitch", {
                 "CV quantizada, em 1 V/oct — pronta pra alimentar "
                 "OSC.pitch.", "", ""}},

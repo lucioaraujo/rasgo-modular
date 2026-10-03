@@ -344,6 +344,37 @@ void testPanel() {
 
 }  // namespace
 
+// ROOT e SCL por cabo (v0.1.3): o HARMONY consegue mudar a tônica e a
+// escala do QUANTIZER, e o knob volta a valer quando o cabo sai.
+int semitoneWith(const float rootCv, const float scaleCv, const bool cabos) {
+    Quantizer q;   // knobs: SCALE 1 (maior), ROOT 0 (dó), RANGE 2
+    q.prepare(kSampleRate, kBlock);
+    std::vector<AudioBlock> out(3, AudioBlock(kSampleRate, 1, kBlock));
+    AudioBlock cv(kSampleRate, 1, kBlock), rt(kSampleRate, 1, kBlock),
+               sc(kSampleRate, 1, kBlock);
+    for (std::size_t i = 0; i < kBlock; ++i) {
+        cv.at(0, i) = 1.2f / 24.0f;   // pede 1,2 semitom acima de dó
+        rt.at(0, i) = rootCv;
+        sc.at(0, i) = scaleCv;
+    }
+    std::vector<const AudioBlock*> ins{&cv, nullptr, nullptr,
+                                       cabos ? &rt : nullptr,
+                                       cabos ? &sc : nullptr};
+    for (int b = 0; b < 4; ++b) q.process(ins, out);
+    return static_cast<int>(std::lround(out[0].at(0, kBlock - 1) * 12.0f));
+}
+
+void testRaizEEscalaPorCabo() {
+    // sem cabo: dó maior, 1,2 vai para ré (2)
+    EXPECT(semitoneWith(0.0f, 0.0f, false) == 2);
+    // ROOT = dó# (1/12), escala maior (1/11): 1,2 vai para dó# (1)
+    EXPECT(semitoneWith(1.0f / 12.0f, 1.0f / 11.0f, true) == 1);
+    // escala cromática (0/11) com tônica dó: 1,2 vai para dó# (1)
+    EXPECT(semitoneWith(0.0f, 0.0f, true) == 1);
+    // tônica fora de 0..11 dá a volta: 13/12 = dó#
+    EXPECT(semitoneWith(13.0f / 12.0f, 1.0f / 11.0f, true) == 1);
+}
+
 int main() {
     testSnapsToScale();
     testRootShifts();
@@ -355,6 +386,7 @@ int main() {
     testDeterminism();
     testInGraph();
     testPanel();
+    testRaizEEscalaPorCabo();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular QUANTIZER tests passed\n";

@@ -3012,9 +3012,11 @@ private:
                 g.setColour(T.line);
                 g.drawEllipse(box.toFloat(), 1.0f);
                 g.setColour(T.textSecondary);
-                g.drawText(w.label, wx - mmpx(2.0f), wy - mmpx(4.0f),
-                           2 * r + mmpx(4.0f), mmpx(3.5f),
-                           juce::Justification::centred, false);
+                // drawFittedText: rótulo que não cabe é comprimido na
+                // horizontal (até 70%) em vez de cortado ("RANG", "ROO")
+                g.drawFittedText(w.label, wx - mmpx(2.0f), wy - mmpx(4.0f),
+                                 2 * r + mmpx(4.0f), mmpx(3.5f),
+                                 juce::Justification::centred, 1, 0.7f);
                 break;
             }
             // ponteiro: -135° a +135°, como o painel X11
@@ -3033,9 +3035,9 @@ private:
                 g.setColour(T.line);
                 g.drawRect(box, 1);
                 g.setColour(T.textSecondary);
-                g.drawText(w.label, box.getX() - mmpx(2.0f), box.getBottom(),
-                           box.getWidth() + mmpx(4.0f), mmpx(3.5f),
-                           juce::Justification::centred, false);
+                g.drawFittedText(w.label, box.getX() - mmpx(2.0f), box.getBottom(),
+                                 box.getWidth() + mmpx(4.0f), mmpx(3.5f),
+                                 juce::Justification::centred, 1, 0.7f);
                 break;
             }
             const int fill = juce::roundToInt(box.getHeight() * norm);
@@ -3080,9 +3082,9 @@ private:
                 g.setColour(T.recessed);
                 g.fillEllipse(box);
                 g.setColour(T.textSecondary);
-                g.drawText(w.label, wx - mmpx(5.0f), wy - mmpx(6.5f),
-                           mmpx(10.0f), mmpx(3.5f),
-                           juce::Justification::centred, false);
+                g.drawFittedText(w.label, wx - mmpx(5.0f), wy - mmpx(6.5f),
+                                 mmpx(10.0f), mmpx(3.5f),
+                                 juce::Justification::centred, 1, 0.7f);
                 break;
             }
 
@@ -3177,9 +3179,13 @@ private:
             g.setFont(juce::FontOptions(isTitle ? 12.0f : 10.0f,
                                         isTitle ? juce::Font::bold
                                                 : juce::Font::plain));
-            g.drawText(w.label, wx, wy, mmpx(24.0f),
-                       mmpx(isTitle ? 4.2f : 3.5f),
-                       juce::Justification::centredLeft, false);
+            // o título vai até antes do [x] de fechar (~5 mm da borda)
+            const int lw = isTitle
+                ? std::max(mmpx(10.0f), m.bounds.getRight() - mmpx(5.5f) - wx)
+                : mmpx(24.0f);
+            g.drawFittedText(w.label, wx, wy, lw,
+                             mmpx(isTitle ? 4.2f : 3.5f),
+                             juce::Justification::centredLeft, 1, 0.7f);
             g.setFont(juce::FontOptions(10.0f));
             break;
         }

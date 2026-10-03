@@ -106,8 +106,8 @@ mantendo o centro tonal.
 **Harmonia que se move sob a melodia:**
 ```
 LOGIC (div, N alto) → HARMONY (ADV)     ou deixe o RATE interno bem lento
-HARMONY (root)  → QUANTIZER (ROOT)
-HARMONY (scale) → QUANTIZER (SCALE)
+HARMONY (root)  → QUANTIZER (entrada ROOT, v0.1.3)
+HARMONY (scale) → QUANTIZER (entrada SCL, v0.1.3)
 TURING → QUANTIZER (cv) → OSC (1V/O)
 ```
 

@@ -130,6 +130,10 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
         for (std::size_t p = 0; p < node.inputCount(); ++p) {
             const auto& d = node.inputDescriptor(p);
             const std::string nm = d.name;
+            // Portas acrescentadas DEPOIS da v0.1.2 ficam fora do passeio:
+            // entrar no sorteio mudaria os patches de seeds antigos, e o
+            // mesmo número tem de dar sempre o mesmo patch.
+            if (t == "QUANTIZER" && (nm == "root_cv" || nm == "scale_cv")) continue;
             int c = SEED_DST_NONE;
             if (d.kind == PortKind::Audio) c = (nm == "fm") ? SEED_DST_FM : SEED_DST_AUDIO;
             else if (nm == "pitch" || nm == "freq_mod" || nm == "transpose") c = SEED_DST_PITCH;

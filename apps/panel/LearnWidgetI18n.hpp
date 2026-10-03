@@ -33,17 +33,19 @@
 namespace rasgo::panel::detail {
 
 inline void registrarLotesTraduzidos() {
-    // ---- familia DECISION (70 verbetes) ----
+    // ---- familia DECISION (72 verbetes) ----
     {
         LearnTable& t = learnTableEnMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave).", "", ""};
-        t["QUANTIZER"]["root"] = LearnEntry{"Tonic of the scale (0=C ... 11=B).", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over.", "", ""};
+        t["QUANTIZER"]["root"] = LearnEntry{"Tonic of the scale (0=C ... 11=B). With a cable on the ROOT input, the cable takes over.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"How many octaves the input CV covers before quantising.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Portamento time between one quantised note and the next.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Dead zone before changing degree — avoids flickering between two neighbouring degrees with unstable CV.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"Continuous CV to quantise.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"1 V/oct CV that adds before quantising — transposes the whole scale.", "", ""};
         t["QUANTIZER"]["in:trigger"] = LearnEntry{"Sample & hold — present, the note only updates on the pulse (that is how TURING/DECISION become melody).", "", ""};
+        t["QUANTIZER"]["in:root_cv"] = LearnEntry{"Root by cable (semitone/12), replacing the ROOT knob — plug the ROOT output of HARMONY here.", "", ""};
+        t["QUANTIZER"]["in:scale_cv"] = LearnEntry{"Scale by cable (index/11), replacing the SCALE knob — plug the SCALE output of HARMONY here.", "", ""};
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"Quantised CV, in 1 V/oct — ready to feed OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Short pulse (~5 ms) every time the note really changes.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"The same note, normalised to ±1 instead of octaves — useful as a control CV.", "", ""};
@@ -55,8 +57,8 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probability of SKIPPING a scheduled change, keeping the current tonal centre.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — moves on to the next tonal centre on the rising edge; present, it replaces RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Back to the initial ROOT/scale.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"New root, as CV (semitone/12) — plug it into QUANTIZER.root.", "", ""};
-        t["HARMONY"]["out:scale"] = LearnEntry{"New scale index, as CV (index/11) — plug it into QUANTIZER.scale.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"New root, as CV (semitone/12) — plug it into the ROOT input of QUANTIZER.", "", ""};
+        t["HARMONY"]["out:scale"] = LearnEntry{"New scale index, as CV (index/11) — plug it into the SCL input of QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Short pulse (~20 ms) every time ROOT or SCALE really change.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Operation between A and B: 0 add, 1 subtract, 2 multiply, 3 remainder (mod RANGE), 4-7 bitwise (AND/OR/XOR/NAND).", "0-3 is continuous arithmetic; 4-7 treats A/B as 5-bit integers (the ±RANGE window → 0..31) and operates on the bits — a Lunetta idea (Numeric Repetitor).", "Compare OP=add with OP=XOR on the same input — the bitwise version breaks the signal into unpredictable steps."};
         t["ABACUS"]["modulus"] = LearnEntry{"Modulus of the binary counter — it restarts every MOD ticks of CLOCK.", "", ""};
@@ -109,14 +111,16 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableFrMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave).", "", ""};
-        t["QUANTIZER"]["root"] = LearnEntry{"Tonique de la gamme (0=C ... 11=B).", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande.", "", ""};
+        t["QUANTIZER"]["root"] = LearnEntry{"Tonique de la gamme (0=C ... 11=B). Avec un câble sur l’entrée ROOT, c’est le câble qui commande.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Combien d’octaves couvre la CV d’entrée avant la quantification.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Temps de portamento entre une note quantifiée et la suivante.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Zone morte avant de changer de degré — évite le papillotement entre deux degrés voisins avec une CV instable.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"CV continue à quantifier.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"CV 1 V/oct qui s’ajoute avant la quantification — transpose la gamme entière.", "", ""};
         t["QUANTIZER"]["in:trigger"] = LearnEntry{"Sample & hold — présent, la note ne se met à jour que sur l’impulsion (c’est ainsi que TURING/DECISION deviennent mélodie).", "", ""};
+        t["QUANTIZER"]["in:root_cv"] = LearnEntry{"Tonique par câble (demi-ton/12), à la place du bouton ROOT — branchez ici la sortie ROOT de HARMONY.", "", ""};
+        t["QUANTIZER"]["in:scale_cv"] = LearnEntry{"Gamme par câble (indice/11), à la place du bouton SCALE — branchez ici la sortie SCALE de HARMONY.", "", ""};
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"CV quantifiée, en 1 V/oct — prête à alimenter OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Brève impulsion (~5 ms) chaque fois que la note change vraiment.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"La même note, normalisée à ±1 au lieu des octaves — utile comme CV de contrôle.", "", ""};
@@ -128,8 +132,8 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probabilité de SAUTER un changement prévu, en gardant le centre tonal actuel.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — passe au centre tonal suivant sur le front montant ; présent, il remplace RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Retour au ROOT/gamme de départ.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur QUANTIZER.root.", "", ""};
-        t["HARMONY"]["out:scale"] = LearnEntry{"Nouvel indice de gamme, en CV (indice/11) — à brancher sur QUANTIZER.scale.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur l’entrée ROOT du QUANTIZER.", "", ""};
+        t["HARMONY"]["out:scale"] = LearnEntry{"Nouvel indice de gamme, en CV (indice/11) — à brancher sur l’entrée SCL du QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Brève impulsion (~20 ms) chaque fois que ROOT ou SCALE changent vraiment.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Opération entre A et B : 0 addition, 1 soustraction, 2 multiplication, 3 reste (mod RANGE), 4-7 bit à bit (AND/OR/XOR/NAND).", "0-3 c’est de l’arithmétique continue ; 4-7 traite A/B comme des entiers de 5 bits (la fenêtre ±RANGE → 0..31) et opère sur les bits — une idée Lunetta (Numeric Repetitor).", "Comparez OP=addition et OP=XOR sur la même entrée — la version bit à bit casse le signal en paliers imprévisibles."};
         t["ABACUS"]["modulus"] = LearnEntry{"Module du compteur binaire — il redémarre à chaque MOD tics de CLOCK.", "", ""};
@@ -182,14 +186,16 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableEsMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava).", "", ""};
-        t["QUANTIZER"]["root"] = LearnEntry{"Tónica de la escala (0=C ... 11=B).", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable.", "", ""};
+        t["QUANTIZER"]["root"] = LearnEntry{"Tónica de la escala (0=C ... 11=B). Con un cable en la entrada ROOT, manda el cable.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Cuántas octavas cubre la CV de entrada antes de cuantizar.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Tiempo de portamento entre una nota cuantizada y la siguiente.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Zona muerta antes de cambiar de grado — evita el temblor entre dos grados vecinos con CV inestable.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"CV continua a cuantizar.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"CV 1 V/oct que se suma antes de cuantizar — transpone la escala entera.", "", ""};
         t["QUANTIZER"]["in:trigger"] = LearnEntry{"Sample & hold — si está presente, la nota sólo se actualiza en el pulso (así TURING/DECISION se vuelven melodía).", "", ""};
+        t["QUANTIZER"]["in:root_cv"] = LearnEntry{"Tónica por cable (semitono/12), en lugar de la perilla ROOT — conecte aquí la salida ROOT de HARMONY.", "", ""};
+        t["QUANTIZER"]["in:scale_cv"] = LearnEntry{"Escala por cable (índice/11), en lugar de la perilla SCALE — conecte aquí la salida SCALE de HARMONY.", "", ""};
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"CV cuantizada, en 1 V/oct — lista para alimentar OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Pulso corto (~5 ms) cada vez que la nota cambia de verdad.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"La misma nota, normalizada a ±1 en vez de octavas — útil como CV de control.", "", ""};
@@ -201,8 +207,8 @@ inline void registrarLotesTraduzidos() {
         t["HARMONY"]["hold"] = LearnEntry{"Probabilidad de SALTARSE un cambio previsto, manteniendo el centro tonal actual.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — avanza al siguiente centro tonal en el flanco de subida; si está presente, sustituye a RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Vuelve al ROOT/escala inicial.", "", ""};
-        t["HARMONY"]["out:root"] = LearnEntry{"Nueva fundamental, como CV (semitono/12) — conéctela a QUANTIZER.root.", "", ""};
-        t["HARMONY"]["out:scale"] = LearnEntry{"Nuevo índice de escala, como CV (índice/11) — conéctelo a QUANTIZER.scale.", "", ""};
+        t["HARMONY"]["out:root"] = LearnEntry{"Nueva fundamental, como CV (semitono/12) — conéctela a la entrada ROOT del QUANTIZER.", "", ""};
+        t["HARMONY"]["out:scale"] = LearnEntry{"Nuevo índice de escala, como CV (índice/11) — conéctelo a la entrada SCL del QUANTIZER.", "", ""};
         t["HARMONY"]["out:change"] = LearnEntry{"Pulso corto (~20 ms) cada vez que ROOT o SCALE cambian de verdad.", "", ""};
         t["ABACUS"]["op"] = LearnEntry{"Operación entre A y B: 0 suma, 1 resta, 2 multiplica, 3 resto (mod RANGE), 4-7 bit a bit (AND/OR/XOR/NAND).", "0-3 es aritmética continua; 4-7 trata A/B como enteros de 5 bits (la ventana ±RANGE → 0..31) y opera en los bits — idea Lunetta (Numeric Repetitor).", "Compare OP=suma con OP=XOR en la misma entrada — la versión bit a bit rompe la señal en escalones imprevisibles."};
         t["ABACUS"]["modulus"] = LearnEntry{"Módulo del contador binario — se reinicia cada MOD tics de CLOCK.", "", ""};
