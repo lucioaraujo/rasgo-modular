@@ -331,3 +331,25 @@ Ordem ao mexer nas páginas: `gerar_modulos.py` → `estado.py` → `seo.py`. O
 `gerar_modulos.py` reescreve as páginas de módulos inteiras e apaga o bloco;
 `verificar.py` acusa isso, e acusa também `VERSAO` do `seo.py` diferente do
 CMake.
+
+## Imagens dos painéis no guia de módulos
+
+Desde 3 out. 2026 (pedido do autor), cada módulo do guia mostra o próprio
+painel, em `assets/modulos/<TIPO>.webp`. As imagens são **desenhadas pelo
+app**, não recortadas de capturas de tela:
+
+```sh
+RASGO_SEED=4303935450909092226 RASGO_EXPORTAR_PAINEIS=/tmp/paineis \
+  "build/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular"
+```
+
+Nesse modo o app liga uma fonte de teste em toda entrada livre (áudio ←
+serra do OSC, disparo/gate ← CLK do CLOCK a 140 BPM, controle ← BI do
+FUNCTION a 3 Hz), faz o motor calcular todos os módulos, espera 4 s para os
+displays encherem, desenha cada painel em 2× e fecha. Os displays mostram,
+portanto, o módulo processando sinal de verdade. Para o site foram feitas
+três exportações assim (seeds `4303935450909092226`, `424242`, `1234567`) e
+dez com seeds comuns, e para cada módulo ficou a imagem de display mais
+movimentado, medido pelos pixels de traço fora da linha de repouso. Os de
+lógica e decisão (QUANTIZER, LOGIC, TURING…) mostram estado, não onda, e
+ficam quietos — é o painel deles. WebP 82, 58 imagens, ~500 KB.

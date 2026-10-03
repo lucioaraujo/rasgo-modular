@@ -2644,6 +2644,53 @@ public:
     }
     int contentHeight() const { return contentH_; }
     void setOutputOnly(bool v) { outputOnly_ = v; layoutFor(viewportW_, viewportH_); }
+
+    // Exporta o painel de cada módulo como PNG (`TIPO.png`), desenhado
+    // direto na imagem em `scale`× — sem passar pelo cache de chrome de
+    // 1×, para sair nítido — e sem cabos por cima. Para as imagens do guia
+    // de módulos do site (pedido do autor, 3 out. 2026); chamado por
+    // `RASGO_EXPORTAR_PAINEIS=pasta`. Devolve quantos salvou.
+    int exportPanels(const juce::File& dir, const float scale) {
+        const bool eraSaida = outputOnly_;
+        outputOnly_ = false;
+        layoutFor(viewportW_, viewportH_);
+        dir.createDirectory();
+        int n = 0;
+        for (auto& m : mods_) {
+            Signal& node = rack_.graph.node(m.id);
+            juce::Image img(juce::Image::ARGB,
+                            juce::roundToInt(static_cast<float>(m.bounds.getWidth()) * scale),
+                            juce::roundToInt(static_cast<float>(m.bounds.getHeight()) * scale),
+                            true);
+            {
+                juce::Graphics g(img);
+                g.addTransform(juce::AffineTransform::scale(scale));
+                g.setOrigin(-m.bounds.getX(), -m.bounds.getY());
+                paintChrome(g, m, node);
+                g.setColour(T.line);
+                g.drawRect(m.bounds, 1);
+                const juce::Graphics::ScopedSaveState clip(g);
+                g.reduceClipRegion(m.bounds.reduced(1));
+                const bool matrix = node.type() == "MATRIX";
+                for (const auto& w : m.panel.widgets) {
+                    if (matrix && w.kind == Widget::Kind::Knob
+                        && ui::isMatrixCellBind(w.bind)) continue;
+                    paintWidget(g, m, node, w, Pass::Dynamic);
+                }
+                if (matrix) paintMatrix(g, m, node);
+            }
+            juce::FileOutputStream os(dir.getChildFile(u8(node.type()) + ".png"));
+            if (os.openedOk()) {
+                os.setPosition(0);
+                os.truncate();
+                juce::PNGImageFormat png;
+                if (png.writeImageToStream(img, os)) ++n;
+            }
+        }
+        outputOnly_ = eraSaida;
+        layoutFor(viewportW_, viewportH_);
+        return n;
+    }
     bool outputOnly() const { return outputOnly_; }
     std::size_t visibleModuleCount() const { return mods_.size(); }
 
@@ -3878,6 +3925,68 @@ public:
         view_->refresh();
         syncHeader();
         syncSignalIn();
+        // `RASGO_EXPORTAR_PAINEIS=pasta`: desenha o painel de cada módulo
+        // em PNG nessa pasta e fecha (imagens do guia do site). Espera 4 s (era 1,5)
+        // 1,5 s para a janela ter tamanho e os displays terem sinal.
+        if (const char* d = std::getenv("RASGO_EXPORTAR_PAINEIS")) {
+            // DEMONSTRAÇÃO: para cada módulo aparecer FUNCIONANDO (pedido do
+            // autor), toda entrada livre recebe uma fonte de teste — áudio
+            // ← serra do OSC, disparo/gate ← CLK do CLOCK, controle ← BI do
+            // FUNCTION. Os displays então desenham o que o módulo faz com
+            // sinal de verdade. Só neste modo de exportação.
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                const auto fonte = [&](const char* t) {
+                    const auto it = rack_.byType.find(t);
+                    return it == rack_.byType.end() ? rack_.sink : it->second;
+                };
+                const std::size_t osc = fonte("OSC"), clk = fonte("CLOCK"),
+                                  fun = fonte("FUNCTION");
+                std::vector<char> ligada;
+                for (const auto id : rack_.shown) {
+                    if (id == osc || id == clk || id == fun) continue;
+                    auto& nd = rack_.graph.node(id);
+                    for (std::size_t p = 0; p < nd.inputCount(); ++p) {
+                        bool ocupada = false;
+                        for (std::size_t i = 0; i < rack_.graph.cableCount(); ++i)
+                            if (rack_.graph.cable(i).target().node == id
+                                && rack_.graph.cable(i).target().port == p)
+                                ocupada = true;
+                        if (ocupada) continue;
+                        const auto& pd = nd.inputDescriptor(p);
+                        std::size_t src = fun, sp = 1;
+                        if (pd.kind == rasgo::modular::PortKind::Audio) { src = osc; sp = 2; }
+                        else if (pd.unit == "trig" || pd.unit == "gate"
+                                 || pd.name == "clock" || pd.name == "clk"
+                                 || pd.name == "trig" || pd.name == "trigger"
+                                 || pd.name == "gate" || pd.name == "advance"
+                                 || pd.name == "step") { src = clk; sp = 0; }
+                        if (src == rack_.sink) continue;
+                        // `tryPatch`, o mesmo caminho do cabo feito à mão: se a
+                        // ligação fechar um laço, ele refaz como realimentação
+                        // em vez de deixar o `prepare` lançar (uma ligação
+                        // direta aqui abortou o app numa exportação)
+                        view_->tryPatch(src, static_cast<int>(sp), id, static_cast<int>(p));
+                    }
+                }
+                // relógio mais rápido: em 4 s, os displays de sequenciador
+                // precisam de vários pulsos para mostrar um padrão
+                if (clk != rack_.sink) rack_.graph.node(clk).setParameter("bpm", 140.0f);
+                // e uma modulação que se veja em 4 s (o seed pode ter deixado
+                // o FUNCTION em fração de Hz)
+                if (fun != rack_.sink) rack_.graph.node(fun).setParameter("rate", 3.0f);
+                rack_.reprepare();
+                // o motor só calcula quem chega à saída de som; aqui todos
+                // precisam rodar para os displays terem o que desenhar
+                rack_.graph.evaluateAllNodes();
+            }
+            juce::Timer::callAfterDelay(4000, [this, dir = juce::String(d)] {
+                const int n = view_->exportPanels(juce::File(dir), 2.0f);
+                std::fprintf(stderr, "[painéis] %d salvos em %s\n", n,
+                             dir.toRawUTF8());
+                juce::JUCEApplication::getInstance()->systemRequestedQuit();
+            });
+        }
         // `RASGO_TUTORIAL=1` abre o tutorial ao iniciar — para medir e
         // capturar a tela sem precisar clicar (como `RASGO_INSPECIONAR`).
         if (std::getenv("RASGO_TUTORIAL") != nullptr)

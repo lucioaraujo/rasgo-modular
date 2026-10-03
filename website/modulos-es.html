@@ -115,65 +115,78 @@
   <h2>SOURCE <small>13 módulos</small></h2>
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
+    <figure class="painel"><img src="assets/modulos/OSC.webp" alt="Panel del módulo OSC" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Oscilador sustractivo — la voz de partida. Diente/cuadrada/triángulo/seno con PW y deriva orgánica; sigue 1 V/oct.</p>
     <p><span class="nivel">Cómo funciona</span> Es la fuente «clásica»; WAVETABLE barre tablas, ADDITIVE suma parciales, OPERATOR hace FM.</p>
     <p><span class="nivel">Pruebe esto</span> OSC → FILTER → VCA con una ENVOLVENTE en el gate: la cadena mínima de un sintetizador.</p>
   </article>
   <article class="modulo" id="mod-WAVETABLE">
     <h3>WAVETABLE</h3>
+    <figure class="painel"><img src="assets/modulos/WAVETABLE.webp" alt="Panel del módulo WAVETABLE" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Oscilador de tabla de ondas — un POS barre un banco de formas de onda, de suave a espectral, con antialias.</p>
     <p><span class="nivel">Pruebe esto</span> LFO lento → POS: el timbre «respira» entre las ondas.</p>
   </article>
   <article class="modulo" id="mod-ADDITIVE">
     <h3>ADDITIVE</h3>
+    <figure class="painel"><img src="assets/modulos/ADDITIVE.webp" alt="Panel del módulo ADDITIVE" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Oscilador aditivo — suma hasta 64 parciales; TILT/ODD-EVEN/STRETCH esculpen el espectro directamente.</p>
     <p><span class="nivel">Cómo funciona</span> Construye el timbre sumando senos, lo contrario del FILTER (que quita de un sonido rico).</p>
   </article>
   <article class="modulo" id="mod-OPERATOR">
     <h3>OPERATOR</h3>
+    <figure class="painel"><img src="assets/modulos/OPERATOR.webp" alt="Panel del módulo OPERATOR" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> FM de 4 operadores, 8 algoritmos, feedback estilo DX7 — metales, campanas y bajos que el sustractivo no hace.</p>
     <p><span class="nivel">Pruebe esto</span> RATIO entero = armónico; fraccionario = inarmónico (campana).</p>
   </article>
   <article class="modulo" id="mod-PULSAR">
     <h3>PULSAR</h3>
+    <figure class="painel"><img src="assets/modulos/PULSAR.webp" alt="Panel del módulo PULSAR" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Síntesis pulsar (Curtis Roads) — un tren de pulsarets (grano + silencio) con DOS frecuencias independientes: FREQ es la altura, FORMANT el timbre. Entre lo granular y la síntesis por formantes.</p>
     <p><span class="nivel">Cómo funciona</span> OPERATOR/ADDITIVE fijan el espectro a la altura; aquí FORMANT desliza la envolvente espectral SIN desafinar. MASK/JITTER ralean y desalinean el tren (patrones burlescos, sembrados).</p>
     <p><span class="nivel">Pruebe esto</span> LFO → FQM: un «wah» sin filtro. MASK ~0,7 + JITTER ~0,4 = una nube rítmica irregular sobre la misma nota.</p>
   </article>
   <article class="modulo" id="mod-SPECTRA">
     <h3>SPECTRA</h3>
+    <figure class="painel"><img src="assets/modulos/SPECTRA.webp" alt="Panel del módulo SPECTRA" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Resíntesis espectral — ESCUCHA un sonido, halla los parciales más fuertes y vuelve a oscilar como un banco de senos que lo sigue. El puente análisis → síntesis (Panharmonium / vocoder de fase).</p>
     <p><span class="nivel">Cómo funciona</span> ADDITIVE construye el espectro desde cero; MEMORY granula en el tiempo; aquí la materia es el espectro de corto plazo de la entrada. FREEZE = un pad infinito de cualquier sonido. Sin IN, un ruido sembrado alimenta el análisis → un drone que evoluciona solo.</p>
     <p><span class="nivel">Pruebe esto</span> DRUM → IN, VOICE bajo, STRETCH = una sombra de campanas del ritmo; FRZ ← gate = espectro congelado alternando con el vivo.</p>
   </article>
   <article class="modulo" id="mod-PLL">
     <h3>PLL</h3>
+    <figure class="painel"><img src="assets/modulos/PLL.webp" alt="Panel del módulo PLL" width="189" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Lazo de enganche de fase — se engancha a la fase de una entrada y genera divisiones y multiplicaciones de ella; libre, auto-oscila.</p>
     <p><span class="nivel">Cómo funciona</span> Es oscilador Y extractor de reloj — sigue lo que oye, dentro de una ventana de captura.</p>
   </article>
   <article class="modulo" id="mod-CHORD">
     <h3>CHORD</h3>
+    <figure class="painel"><img src="assets/modulos/CHORD.webp" alt="Panel del módulo CHORD" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Voz de acorde — 3 o 4 osciladores afinados por un intervalo/inversión; entra una nota, sale un acorde.</p>
   </article>
   <article class="modulo" id="mod-NOISE">
     <h3>NOISE</h3>
+    <figure class="painel"><img src="assets/modulos/NOISE.webp" alt="Panel del módulo NOISE" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Ruido y azar continuo — blanco/rosa/brown/azul/violeta/bit + S&amp;H + una tensión que pasea, 8 salidas a la vez.</p>
     <p><span class="nivel">Cómo funciona</span> DECISION decide eventos; NOISE da el suelo y las CV aleatorias. POIS cambia el reloj interno por un Poisson libre.</p>
   </article>
   <article class="modulo" id="mod-MATTER">
     <h3>MATTER</h3>
+    <figure class="painel"><img src="assets/modulos/MATTER.webp" alt="Panel del módulo MATTER" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Voz de modelado físico — materia excitada (soplada/frotada/golpeada) resonando; rigidez/tensión/desgaste como mandos.</p>
   </article>
   <article class="modulo" id="mod-STRING">
     <h3>STRING</h3>
+    <figure class="painel"><img src="assets/modulos/STRING.webp" alt="Panel del módulo STRING" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Cuerda Karplus-Strong extendida — pulsada/con arco/con martillo en una línea de retardo con amortiguación y material.</p>
   </article>
   <article class="modulo" id="mod-DRUM">
     <h3>DRUM</h3>
+    <figure class="painel"><img src="assets/modulos/DRUM.webp" alt="Panel del módulo DRUM" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Voz de percusión — cuerpo con barrido de altura + chasquido de ataque; un mapa 808 ↔ 909 ↔ acústico, y ROLL.</p>
   </article>
   <article class="modulo" id="mod-SIGNAL-IN">
     <h3>SIGNAL-IN</h3>
+    <figure class="painel"><img src="assets/modulos/SIGNAL-IN.webp" alt="Panel del módulo SIGNAL-IN" width="71" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> La entrada del mundo — audio en vivo (ALSA) + MIDI en un solo adaptador; voz monofónica last-note con salidas pitch/gate/vel/cc.</p>
     <p><span class="nivel">Cómo funciona</span> Es la contraparte de ENTRADA de NOTE-OUT. Sin nada conectado, silencio determinista.</p>
   </article>
@@ -182,73 +195,87 @@
   <h2>TRANSFORM <small>14 módulos</small></h2>
   <article class="modulo" id="mod-FILTER">
     <h3>FILTER</h3>
+    <figure class="painel"><img src="assets/modulos/FILTER.webp" alt="Panel del módulo FILTER" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Filtro multimodo resonante — LP/BP/HP, con la resonancia llegando a la auto-oscilación (se vuelve un seno).</p>
     <p><span class="nivel">Cómo funciona</span> Quita energía a un sonido rico (sustractivo); WASP distorsiona en el camino, LPG cierra con un vactrol.</p>
     <p><span class="nivel">Pruebe esto</span> ENVOLVENTE → cutoff_mod: el «wah» clásico. RES cerca del tope + cutoff bajo = una voz de seno afinable.</p>
   </article>
   <article class="modulo" id="mod-FORMANT">
     <h3>FORMANT</h3>
+    <figure class="painel"><img src="assets/modulos/FORMANT.webp" alt="Panel del módulo FORMANT" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Banco de 5 pasabanda en paralelo — las resonancias de las vocales; VOWEL hace el morfismo A→E→I→O→U. VOCODER&gt;0 + el jack MOD = un vocoder de 5 bandas (las bandas siguen la envolvente del modulador en vez de la tabla de vocales).</p>
     <p><span class="nivel">Cómo funciona</span> El modelo fuente-filtro de Fant; en modo vocoder, el canal de Dudley (1938).</p>
     <p><span class="nivel">Pruebe esto</span> Sobre ruido o pulsos: habla sintética. Sobre un acorde: un coro. Voz en MOD + diente en IN + VOCODER=1: el sinte «habla». Para habla inteligible de banda ancha, el VOCODER dedicado.</p>
   </article>
   <article class="modulo" id="mod-VOCODER">
     <h3>VOCODER</h3>
+    <figure class="painel"><img src="assets/modulos/VOCODER.webp" alt="Panel del módulo VOCODER" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Vocoder de N bandas (4–20) — la energía del MODULADOR por banda controla la ganancia de esa misma banda en la PORTADORA: la portadora «habla» el modulador. Homer Dudley, 1938.</p>
     <p><span class="nivel">Cómo funciona</span> FORMANT tiene un modo vocoder de 5 bandas (vocálico); éste es el dedicado, de banda ancha (habla inteligible). SIBIL pasa las fricativas; FREEZE = un pad hablado infinito; SHIFT = desplazamiento de formantes.</p>
     <p><span class="nivel">Pruebe esto</span> Voz en MOD + diente o pad en CAR + BANDS=16 = el clásico. Sin CAR, el diente interno se afina con PIT.</p>
   </article>
   <article class="modulo" id="mod-RESONATOR">
     <h3>RESONATOR</h3>
+    <figure class="painel"><img src="assets/modulos/RESONATOR.webp" alt="Panel del módulo RESONATOR" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Banco de hasta 24 modos AFINADOS a una serie, excitado por una señal EXTERNA (usted golpea con lo que quiera). Rings/Elements en modo resonador.</p>
     <p><span class="nivel">Cómo funciona</span> MATTER es una voz cerrada (con su propio excitador); aquí usted trae la excitación. Las 3 salidas LOW/MID/HIGH se CRUZAN al barrer TILT — la relación entre ellas es el proceso (Three Sisters).</p>
     <p><span class="nivel">Pruebe esto</span> DRUM → IN (una marimba tocada por el bombo); TRIGSEQ → STRK; RESONATOR.low y .high a destinos distintos.</p>
   </article>
   <article class="modulo" id="mod-WASP">
     <h3>WASP</h3>
+    <figure class="painel"><img src="assets/modulos/WASP.webp" alt="Panel del módulo WASP" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Filtro-distorsión — el carácter sucio y chillón del EDP Wasp; la no linealidad está EN el camino del filtro.</p>
   </article>
   <article class="modulo" id="mod-LPG">
     <h3>LPG</h3>
+    <figure class="painel"><img src="assets/modulos/LPG.webp" alt="Panel del módulo LPG" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Low-pass gate — filtro + VCA en un solo mando, con la asimetría del vactrol (ataque rápido, cola lenta). El «bongó» Buchla.</p>
     <p><span class="nivel">Pruebe esto</span> Un ping con un trigger corto: el LPG da el cuerpo y la caída de una vez.</p>
   </article>
   <article class="modulo" id="mod-VCA">
     <h3>VCA</h3>
+    <figure class="painel"><img src="assets/modulos/VCA.webp" alt="Panel del módulo VCA" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Amplificador controlado por tensión — el volumen/nivel como CV; respuesta lineal o exponencial.</p>
   </article>
   <article class="modulo" id="mod-VCA4">
     <h3>VCA4</h3>
+    <figure class="painel"><img src="assets/modulos/VCA4.webp" alt="Panel del módulo VCA4" width="213" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Banco de 4 VCA más un mezclador sumado (MIX). `VCA` (#20) es doble; éste es el banco para un patch grande — Mutable Veils / Intellijel Quad VCA.</p>
     <p><span class="nivel">Cómo funciona</span> La CURVE lineal/exp es COMPARTIDA. Cada canal: LVL + CV atenuvertida (sumada en el puerto). MIXG da la ganancia de la suma.</p>
     <p><span class="nivel">Pruebe esto</span> Las 3 salidas low/mid/high del RESONATOR/FILTER en 3 canales + una envolvente en cada CV = un espectro que se mueve; MIX lo junta todo.</p>
   </article>
   <article class="modulo" id="mod-SHAPE">
     <h3>SHAPE</h3>
+    <figure class="painel"><img src="assets/modulos/SHAPE.webp" alt="Panel del módulo SHAPE" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Waveshaper — pliega/satura/rectifica la forma de onda para crear armónicos; de un calor sutil a la destrucción.</p>
   </article>
   <article class="modulo" id="mod-SHIFTER">
     <h3>SHIFTER</h3>
+    <figure class="painel"><img src="assets/modulos/SHIFTER.webp" alt="Panel del módulo SHIFTER" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Desplazador de frecuencia — mueve el espectro ENTERO tantos Hz (no por una razón). Los parciales dejan de ser armónicos → metálico, de campana. BLU: salidas `up` (+Δf) y `down` (−Δf).</p>
     <p><span class="nivel">Cómo funciona</span> El ring-mod de SHAPE da LAS DOS bandas simétricas; el SHIFTER da una por salida. FEEDBACK = el «barber pole» de Risset (glissando infinito). Frequency shifter Bode/Moog.</p>
     <p><span class="nivel">Pruebe esto</span> SHIFT ~8 Hz = una fase que nunca cierra; SHIFT grande + FEEDBACK = la espiral de Shepard; `up`/`down` a destinos distintos.</p>
   </article>
   <article class="modulo" id="mod-CRUSH">
     <h3>CRUSH</h3>
+    <figure class="painel"><img src="assets/modulos/CRUSH.webp" alt="Panel del módulo CRUSH" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Destructor lo-fi / diezmador — la basura DIGITAL: reducción de frecuencia de muestreo (aliasing), de bits, desborde que se envuelve, glitch (dropout/trabado/tartamudeo) y jitter de reloj.</p>
     <p><span class="nivel">Cómo funciona</span> Aquí vive el verbo DAMAGE. SHAPE/WASP distorsionan de forma ANALÓGICA (fold, tanh); aquí es cuantización, desborde de entero, una conexión mala. Todo sembrado → daño reproducible.</p>
     <p><span class="nivel">Pruebe esto</span> ENVOLVENTE → BITS (la resolución cae en la cola); LFO → RATE; sin IN + MIX=1 = una fuente de ruido lo-fi.</p>
   </article>
   <article class="modulo" id="mod-PARAMETRIC">
     <h3>PARAMETRIC</h3>
+    <figure class="painel"><img src="assets/modulos/PARAMETRIC.webp" alt="Panel del módulo PARAMETRIC" width="260" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Ecualizador paramétrico — bandas de campana y de estante para esculpir el espectro con precisión, sin resonancia de filtro.</p>
   </article>
   <article class="modulo" id="mod-GLIDE">
     <h3>GLIDE</h3>
+    <figure class="painel"><img src="assets/modulos/GLIDE.webp" alt="Panel del módulo GLIDE" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Portamento/slew — desliza entre valores en vez de saltar; tiempo separado para la subida y la bajada, modo constante o proporcional.</p>
   </article>
   <article class="modulo" id="mod-CONTROL">
     <h3>CONTROL</h3>
+    <figure class="painel"><img src="assets/modulos/CONTROL.webp" alt="Panel del módulo CONTROL" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Utilidades de CV continua — atenuversor, desplazamiento, rectificación como interpolación, slew. La navaja del señal de control.</p>
   </article>
 </section>
@@ -256,32 +283,38 @@
   <h2>MODULATE <small>6 módulos</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
+    <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="Panel del módulo ENVELOPE" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Generador de envolvente — AD/ADSR/AR y bucles; la forma de la amplitud (o de cualquier CV) en el tiempo, disparada por un gate.</p>
     <p><span class="nivel">Pruebe esto</span> ENVOLVENTE → VCA + ENVOLVENTE → cutoff: el contorno del sonido.</p>
   </article>
   <article class="modulo" id="mod-FUNCTION">
     <h3>FUNCTION</h3>
+    <figure class="painel"><img src="assets/modulos/FUNCTION.webp" alt="Panel del módulo FUNCTION" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Generador de función estilo Maths — rampa/envolvente/LFO deformable con salidas derivadas; suma, integra, dispara.</p>
     <p><span class="nivel">Cómo funciona</span> Es envolvente Y LFO Y slew, todo en la curva. DRIFT es un paseo lento; CHAOS es de verdad caótico.</p>
   </article>
   <article class="modulo" id="mod-STAGES">
     <h3>STAGES</h3>
+    <figure class="painel"><img src="assets/modulos/STAGES.webp" alt="Panel del módulo STAGES" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Generador de N segmentos configurables (2–8) cuya FUNCIÓN EMERGE de cómo se encadenan: rampas → envolvente/LFO, escalones → una secuencia de CV. Mutable Stages / Rossum Control Forge.</p>
     <p><span class="nivel">Cómo funciona</span> FUNCTION es UNA rampa; STAGES es la forma COMPUESTA, esculpida por CONTOUR/TILT/HOLD (un generador, no un editor). HOLD=0 desliza (env), HOLD=1 salta (sec); LOOP corre ↔ dispara.</p>
     <p><span class="nivel">Pruebe esto</span> STAGES → FILTER.cutoff; CLOCK → GATE (loop off) = una envolvente; STAGES.step → ENVELOPE.gate los encadena.</p>
   </article>
   <article class="modulo" id="mod-DRIFT">
     <h3>DRIFT</h3>
+    <figure class="painel"><img src="assets/modulos/DRIFT.webp" alt="Panel del módulo DRIFT" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Campo de deriva orgánica — varias CV correlacionadas que pasean despacio (en escala de minutos), con inercia y anclaje a marcas grabadas.</p>
     <p><span class="nivel">Cómo funciona</span> Da VIDA sin dirección — nada se queda quieto. Determinista (sembrado).</p>
   </article>
   <article class="modulo" id="mod-CHAOS">
     <h3>CHAOS</h3>
+    <figure class="painel"><img src="assets/modulos/CHAOS.webp" alt="Panel del módulo CHAOS" width="83" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Campo caótico de doble pozo — una EDO determinista que se asienta en un pozo, oscila entre dos, o «caza» de forma imprevisible.</p>
     <p><span class="nivel">Cómo funciona</span> Genuinamente caótico, ni pseudoaleatorio (DECISION/TURING) ni paseo filtrado (DRIFT).</p>
   </article>
   <article class="modulo" id="mod-SH">
     <h3>SH</h3>
+    <figure class="painel"><img src="assets/modulos/SH.webp" alt="Panel del módulo SH" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Sample &amp; hold doble — retiene un valor en el pulso; 2 canales con CORRELATION (gemelos ↔ espejo ↔ independientes) y slew.</p>
     <p><span class="nivel">Pruebe esto</span> CLOCK → SH · out1 → pitch · out2 → cutoff: una melodía y un timbre que «combinan».</p>
   </article>
@@ -290,25 +323,30 @@
   <h2>TIME <small>5 módulos</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
+    <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="Panel del módulo CLOCK" width="189" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Reloj maestro euclidiano — un pulso con divisiones, relleno euclidiano, swing y deriva; el latido de todo el patch.</p>
     <p><span class="nivel">Pruebe esto</span> CLOCK → todo lo que tenga gate o trigger. FILL reparte los pulsos por el compás (los patrones de Toussaint).</p>
   </article>
   <article class="modulo" id="mod-LOGIC">
     <h3>LOGIC</h3>
+    <figure class="painel"><img src="assets/modulos/LOGIC.webp" alt="Panel del módulo LOGIC" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Lógica de reloj — divide/multiplica, AND/OR/XOR de gates, retardo; recombina el TIEMPO.</p>
     <p><span class="nivel">Cómo funciona</span> La pareja de ABACUS (que hace aritmética de CV). Aquí sólo gates y triggers.</p>
   </article>
   <article class="modulo" id="mod-TURING">
     <h3>TURING</h3>
+    <figure class="painel"><img src="assets/modulos/TURING.webp" alt="Panel del módulo TURING" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Registro de desplazamiento aleatorio (Turing Machine) — un bucle de bits que LOCK retiene y MUTATE vuelve a mezclar; melodía/ritmo que se repite con variación.</p>
   </article>
   <article class="modulo" id="mod-SEQUENCE">
     <h3>SEQUENCE</h3>
+    <figure class="painel"><img src="assets/modulos/SEQUENCE.webp" alt="Panel del módulo SEQUENCE" width="237" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Secuenciador de 8 pasos — deslizadores de altura + dirección (adelante/atrás/ping-pong/aleatorio/browniano), con un gate por paso.</p>
     <p><span class="nivel">Pruebe esto</span> Los deslizadores son la partitura — la Motion Engine casi no los toca. Use MUTATE/EVOLVE para remezclar a propósito.</p>
   </article>
   <article class="modulo" id="mod-TRIGSEQ">
     <h3>TRIGSEQ</h3>
+    <figure class="painel"><img src="assets/modulos/TRIGSEQ.webp" alt="Panel del módulo TRIGSEQ" width="189" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Secuenciador de TRIGGERS — 4 pistas de densidad euclidiana con chaos/ratchet/fill/swing; la percusión generativa.</p>
   </article>
 </section>
@@ -316,24 +354,29 @@
   <h2>DECISION <small>5 módulos</small></h2>
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
+    <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="Panel del módulo QUANTIZER" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Cuantizador de escala — encaja una CV en los grados de una escala y tónica; slew e histéresis para que no tiemble en el borde.</p>
     <p><span class="nivel">Pruebe esto</span> SH/TURING/DRIFT → QUANTIZER → pitch: un paseo aleatorio se vuelve melodía en la escala.</p>
   </article>
   <article class="modulo" id="mod-HARMONY">
     <h3>HARMONY</h3>
+    <figure class="painel"><img src="assets/modulos/HARMONY.webp" alt="Panel del módulo HARMONY" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Armonizador — de una nota genera intervalos y acordes coherentes con una tonalidad y una conducción de voces.</p>
   </article>
   <article class="modulo" id="mod-ABACUS">
     <h3>ABACUS</h3>
+    <figure class="painel"><img src="assets/modulos/ABACUS.webp" alt="Panel del módulo ABACUS" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Aritmética de CV — suma/resta/multiplicación/módulo y AND/OR/XOR bit a bit entre dos señales, más un contador binario cuyos bits se vuelven ritmo (Numeric Repetitor).</p>
     <p><span class="nivel">Cómo funciona</span> La pareja de LOGIC (que recombina el tiempo). Por sí solo, el contador ya toca una secuencia y un ritmo.</p>
   </article>
   <article class="modulo" id="mod-DECISION">
     <h3>DECISION</h3>
+    <figure class="painel"><img src="assets/modulos/DECISION.webp" alt="Panel del módulo DECISION" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Fuente de azar ESTRUCTURADO, estilo Marbles — distribución (bias/spread/shape), déjà-vu (repite el patrón), steps y slew; hace CV y gates con «intención».</p>
   </article>
   <article class="modulo" id="mod-BOXCAR">
     <h3>BOXCAR</h3>
+    <figure class="painel"><img src="assets/modulos/BOXCAR.webp" alt="Panel del módulo BOXCAR" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Promediador de puerta (boxcar averager) — una ventana muestrea un punto del período, y el promedio de N capturas revela la señal dentro del ruido; SCAN reconstruye la onda; GEIG = gates de Poisson.</p>
     <p><span class="nivel">Cómo funciona</span> Es el SCOPE al revés: mide para CONSTRUIR una onda. mode 0 = S&amp;H de ventana, 1 = reconstruye, 2 = relee su propio búfer como oscilador.</p>
     <p><span class="nivel">Pruebe esto</span> Ruido más un tono débil sincronizado al TRIG, mode 1, SCAN alto: el tono «se dibuja» a lo largo de segundos.</p>
@@ -343,18 +386,22 @@
   <h2>ROUTE <small>4 módulos</small></h2>
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
+    <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="Panel del módulo SWITCH" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Conmutador/enrutador — N entradas → 1 salida (o 1 → N), por paso de reloj, CV o al azar; secuencia FUENTES en vez de notas.</p>
   </article>
   <article class="modulo" id="mod-MATRIX">
     <h3>MATRIX</h3>
+    <figure class="painel"><img src="assets/modulos/MATRIX.webp" alt="Panel del módulo MATRIX" width="237" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Matriz de enrutamiento 4×4 — cualquier entrada a cualquier salida con una ganancia por celda; un mezclador de CV/audio programable.</p>
   </article>
   <article class="modulo" id="mod-MULT">
     <h3>MULT</h3>
+    <figure class="painel"><img src="assets/modulos/MULT.webp" alt="Panel del módulo MULT" width="118" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Múltiple con búfer — copia una señal a varios destinos sin caída de nivel; modo doble y slew opcional.</p>
   </article>
   <article class="modulo" id="mod-PLANAR">
     <h3>PLANAR</h3>
+    <figure class="painel"><img src="assets/modulos/PLANAR.webp" alt="Panel del módulo PLANAR" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Morfismo vectorial XY — desliza entre 4 fuentes en un plano; el gesto (el camino en el plano) se graba y se reproduce.</p>
   </article>
 </section>
@@ -362,35 +409,42 @@
   <h2>SPACE <small>7 módulos</small></h2>
   <article class="modulo" id="mod-SPACE">
     <h3>SPACE</h3>
+    <figure class="painel"><img src="assets/modulos/SPACE.webp" alt="Panel del módulo SPACE" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Reverberación — una red Schroeder/Dattorro multitap, de una ambiencia corta a una cola larga; pre-delay y amortiguación.</p>
     <p><span class="nivel">Cómo funciona</span> SPACE es la reverb «clásica»; HALL es un FDN de 8 líneas (más densa, estéreo); MEMORY es granular.</p>
   </article>
   <article class="modulo" id="mod-HALL">
     <h3>HALL</h3>
+    <figure class="painel"><img src="assets/modulos/HALL.webp" alt="Panel del módulo HALL" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Reverb FDN de 8 líneas con matriz de Householder — una cola densa y estéreo, con FREEZE (retención infinita) y pre-delay.</p>
   </article>
   <article class="modulo" id="mod-LOOPER">
     <h3>LOOPER</h3>
+    <figure class="painel"><img src="assets/modulos/LOOPER.webp" alt="Panel del módulo LOOPER" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Línea de retardo con HOLD (congela y repite), REVERSE (lee al revés sin clic), AGE (carácter de cinta/BBD) y HEADS (eco multicabeza, estilo Space Echo).</p>
     <p><span class="nivel">Cómo funciona</span> El viejo «TAPE» se volvió este HEADS. FBK cerca de 1 + un TIME largo + varias cabezas = Frippertronics.</p>
   </article>
   <article class="modulo" id="mod-SWIRL">
     <h3>SWIRL</h3>
+    <figure class="painel"><img src="assets/modulos/SWIRL.webp" alt="Panel del módulo SWIRL" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Efectos de MODULACIÓN — chorus, flanger, ensemble y phaser en un solo módulo (TYPE). Retardos CORTOS modulados por LFO (más el phaser, una cascada de pasa-todo), con carácter BBD en AGE.</p>
     <p><span class="nivel">Cómo funciona</span> RASGO no tenía ninguno. Distinto del LOOPER (línea de retardo, ecos audibles) y de la reverb — aquí se oye el MOVIMIENTO, no el eco.</p>
     <p><span class="nivel">Pruebe esto</span> voz → SWIRL → MASTER engorda; LFO → RATE deja que el barrido respire fuera del compás; FBK cerca de ±1 + AGE = auto-oscila.</p>
   </article>
   <article class="modulo" id="mod-MEMORY">
     <h3>MEMORY</h3>
+    <figure class="painel"><img src="assets/modulos/MEMORY.webp" alt="Panel del módulo MEMORY" width="142" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Granular — un búfer picado en granos (grano/nube/spray), con posición, tamaño, densidad y FREEZE; texturas y time-stretch.</p>
   </article>
   <article class="modulo" id="mod-SAMPLER">
     <h3>SAMPLER</h3>
+    <figure class="painel"><img src="assets/modulos/SAMPLER.webp" alt="Panel del módulo SAMPLER" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Reproductor de rodajas (MPC/Akai) — TRIG dispara un pasaje grabado en vivo (gate REC) o de archivo; varispeed, rodajas + POS, repitch, desgaste.</p>
     <p><span class="nivel">Cómo funciona</span> El SAMPLER salta la posición de lectura (una rodaja); el TURNTABLE lee continuo con inercia; MEMORY es granular.</p>
   </article>
   <article class="modulo" id="mod-TURNTABLE">
     <h3>TURNTABLE</h3>
+    <figure class="painel"><img src="assets/modulos/TURNTABLE.webp" alt="Panel del módulo TURNTABLE" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Tocadiscos con un plato que tiene masa — el búfer del SAMPLER leído por una velocidad angular con INERCIA: el motor tira despacio (TORQ), la mano empuja (SCR), el freno lo deja rodar (BRK).</p>
     <p><span class="nivel">Cómo funciona</span> SIN cuantización de BPM — el beatmatch es un gesto, como en el vinilo.</p>
     <p><span class="nivel">Pruebe esto</span> LFO → SCR: el disco rasca en compás. ENVOLVENTE → BRK: un tape-stop en la vuelta.</p>
@@ -400,22 +454,26 @@
   <h2>OUT <small>4 módulos</small></h2>
   <article class="modulo" id="mod-MIXER">
     <h3>MIXER</h3>
+    <figure class="painel"><img src="assets/modulos/MIXER.webp" alt="Panel del módulo MIXER" width="166" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Mezclador de 4 canales — nivel (deslizador), paneo y mute por canal, más una salida general. Donde el músico hace el balance.</p>
     <p><span class="nivel">Cómo funciona</span> Exento de la Motion Engine — los paneos y los niveles son suyos.</p>
   </article>
   <article class="modulo" id="mod-MASTER">
     <h3>MASTER</h3>
+    <figure class="painel"><img src="assets/modulos/MASTER.webp" alt="Panel del módulo MASTER" width="95" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Etapa de salida estéreo — anchura, guarda de cuerpo y limitador true-peak; el techo del patch.</p>
     <p><span class="nivel">Cómo funciona</span> Exento de la Motion Engine. El botón ESPERA del encabezado es el mute de este módulo.</p>
   </article>
   <article class="modulo" id="mod-SCOPE">
     <h3>SCOPE</h3>
+    <figure class="painel"><img src="assets/modulos/SCOPE.webp" alt="Panel del módulo SCOPE" width="178" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Osciloscopio y medidor que DEVUELVE como CV — altura (YIN), envolvente, centroide espectral, ONSET (un pulso en el ataque); el patch se oye a sí mismo.</p>
     <p><span class="nivel">Cómo funciona</span> El SCOPE mide para reducir (→ un escalar); el BOXCAR mide para reconstruir (→ una onda).</p>
     <p><span class="nivel">Pruebe esto</span> SCOPE.onset ← batería → dispara una ENVOLVENTE al compás del audio; SCOPE.pitch → OSC.pitch afina por lo que entra.</p>
   </article>
   <article class="modulo" id="mod-NOTE-OUT">
     <h3>NOTE-OUT</h3>
+    <figure class="painel"><img src="assets/modulos/NOTE-OUT.webp" alt="Panel del módulo NOTE-OUT" width="83" height="300" loading="lazy" /></figure>
     <p><span class="nivel">Rápido</span> Salida MIDI — convierte gate + 1 V/oct en note on/off, con canal, velocidad y un registro de partitura.</p>
     <p><span class="nivel">Cómo funciona</span> La contraparte de SALIDA de SIGNAL-IN.</p>
   </article>
