@@ -3405,6 +3405,7 @@ public:
         card_ = card;
         track_ = {};
         thumb_ = {};
+        link_ = {};
         g.setColour(T.surface);
         g.fillRect(card);
         g.setColour(T.accent);
@@ -3487,6 +3488,23 @@ public:
                     body = u8("\xe2\x80\xa2  ")
                          + body.replace(u8(" \xc2\xb7 "), u8("\n\xe2\x80\xa2  "));
                 py += drawWrapped(g, body, px, py, readW, T.textSecondary);
+                // Depois do cartão LEARN, o link para o guia dos módulos no
+                // site, no idioma do app. Clicável; o retângulo guardado é o
+                // da tela, já com a rolagem, e só vale se estiver visível.
+                if (c[0] == &S::tutLearnTitle) {
+                    py += 8;
+                    const juce::String url = str(S::guideUrl);
+                    g.setFont(juce::FontOptions(kBodyPt));
+                    const int lw = std::min(readW, juce::roundToInt(
+                        juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), url)) + 2);
+                    g.setColour(linkHover_ ? T.textPrimary : T.accent);
+                    g.drawText(url, px, py, lw, 18, juce::Justification::topLeft, true);
+                    g.drawHorizontalLine(py + 16, static_cast<float>(px),
+                                         static_cast<float>(px + lw));
+                    const juce::Rectangle<int> r(px, py, lw, 18);
+                    link_ = r.getIntersection({cx + 1, viewTop, cw - 2, viewH_});
+                    py += 18;
+                }
                 py += 18;
             }
             contentH_ = (py + scroll_) - (viewTop + 4);
@@ -3600,6 +3618,10 @@ public:
             scrollBy(p.y < thumb_.getY() ? -(viewH_ - 40) : (viewH_ - 40));
             return;
         }
+        if (!link_.isEmpty() && link_.contains(p)) {
+            juce::URL(str(rasgo::panel::strings::guideUrl)).launchInDefaultBrowser();
+            return;
+        }
         if (card_.contains(p) && !closeBtn_.contains(p)) return;
         close();
         if (onClose) onClose();
@@ -3612,6 +3634,15 @@ public:
     }
     void mouseUp(const juce::MouseEvent&) override {
         if (dragging_) { dragging_ = false; repaint(); }
+    }
+    void mouseMove(const juce::MouseEvent& e) override {
+        const bool h = !link_.isEmpty() && link_.contains(e.getPosition());
+        if (h != linkHover_) {
+            linkHover_ = h;
+            setMouseCursor(h ? juce::MouseCursor::PointingHandCursor
+                             : juce::MouseCursor::NormalCursor);
+            repaint();
+        }
     }
     void mouseWheelMove(const juce::MouseEvent&,
                         const juce::MouseWheelDetails& w) override {
@@ -3654,9 +3685,9 @@ private:
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
     int scroll_ = 0, contentH_ = 0, viewH_ = 1;
     // geometria do último quadro, para o mouse (o desenho é que a calcula)
-    juce::Rectangle<int> card_, closeBtn_, track_, thumb_;
+    juce::Rectangle<int> card_, closeBtn_, track_, thumb_, link_;
     int viewTop_ = 0, dragGrab_ = 0;
-    bool dragging_ = false;
+    bool dragging_ = false, linkHover_ = false;
 };
 
 // ---- áudio + janela ----------------------------------------------------
@@ -3989,9 +4020,19 @@ public:
         }
         // `RASGO_TUTORIAL=1` abre o tutorial ao iniciar — para medir e
         // capturar a tela sem precisar clicar (como `RASGO_INSPECIONAR`).
-        if (std::getenv("RASGO_TUTORIAL") != nullptr)
-            juce::MessageManager::callAsync([this] {
+        // `RASGO_TUTORIAL=fim` abre já rolado até o último cartão (LEARN e
+        // o link do guia), que não se alcança sem rolar.
+        if (const char* tut = std::getenv("RASGO_TUTORIAL"))
+            juce::MessageManager::callAsync([this, fim = std::string(tut) == "fim"] {
                 toggleOverlay(OverlayView::Mode::tutorial);
+                if (fim) {
+                    overlay_.repaint();
+                    // depois de a janela maximizar (≈300 ms), senão a
+                    // altura do conteúdo ainda é a da janela pequena
+                    juce::Timer::callAfterDelay(1500, [this] {
+                        overlay_.scrollTo(1 << 20);
+                    });
+                }
             });
 
         // O QUADRO. Sem isto o app só repinta quando o mouse se mexe, e
