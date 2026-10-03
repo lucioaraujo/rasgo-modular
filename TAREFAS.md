@@ -10560,3 +10560,11 @@ medido separado do que vem do build. **Pendente:** teste no Windows (autor
 e usuário do Audiofanzine, com `arranque.log` se cair); subir o zip do
 portal; pedidos registrados para depois: VST3/CLAP (caminho em etapas) e
 módulos para VCV Rack/Cardinal (exigiria oferecê-los também sob GPLv3).
+
+**Decisão do autor (4 out. 2026) — distribuição Linux, próxima versão:**
+AppImage e `.tar.gz` para x86-64 (além do `.deb`), com teste de abertura
+na CI em contêineres de Debian, Fedora e Arch (tela virtual, sem som).
+Depois, se o autor quiser, arm64 (`.deb` + AppImage numa máquina ARM da
+CI). Flathub/AUR só se houver procura; arquiteturas raras (32 bits,
+armhf, riscv64) não. Custo: CI Linux gratuita em repositório público, e
+só roda em tag.
