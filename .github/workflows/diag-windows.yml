@@ -65,6 +65,10 @@ jobs:
             "--- stderr [$tag] ---"; Get-Content "err-$tag.txt" -ErrorAction SilentlyContinue
           }
           Get-ChildItem C:\dumps -ErrorAction SilentlyContinue
+          "--- arranque.log ---"
+          Get-Content "$env:APPDATA\rasgo-modular\arranque.log" -ErrorAction SilentlyContinue
+          "--- crash.log ---"
+          Get-Content "$env:APPDATA\rasgo-modular\crash.log" -ErrorAction SilentlyContinue
 
       - name: Pilha a partir do despejo
         if: always()
