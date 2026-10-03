@@ -212,6 +212,59 @@ deployment target no macOS), ainda **não abertos em máquina real** — a
 mesma condição em que o Antitotem foi publicado, e uma decisão a
 registrar explicitamente antes de qualquer release.
 
+## Planos e pedidos registrados (4 out. 2026)
+
+Conversas com o autor depois da v0.1.3. Nada disto está implementado;
+cada item diz o que foi decidido e o que ficou como possibilidade.
+
+**Distribuição Linux — decidido para a próxima versão.** Além do `.deb`:
+**AppImage** e **`.tar.gz`** para x86-64 (compilados no Ubuntu 22.04, como
+o `.deb`, então rodam em distribuições de 2022 em diante), com um teste de
+abertura na CI em contêineres de Debian, Fedora e Arch (tela virtual, sem
+som; confere que o app inicia sem cair). Depois, se o autor quiser,
+**arm64** (`.deb` + AppImage numa máquina ARM da CI) — atenção ao custo de
+desenho da interface em Raspberry Pi. Flathub e AUR só se houver procura;
+32 bits, armhf e riscv64 não compensam. Custo: a CI Linux é gratuita em
+repositório público e só roda em tag. Inspiração: os builds por
+arquitetura do Cardinal. Ponto de partida já conferido: `cmake --install`
+instala binário, `.desktop` e ícones (SVG e PNG 256) — o que o
+`linuxdeploy` precisa para montar o AppImage.
+
+**VST3 / CLAP / AU — possibilidade futura, sem prazo.** Pedido por um
+usuário do Audiofanzine e por um amigo do autor (Palmieri). Condições do
+autor: sem mudar a licença, sem pagar tarifas de implementação e sem
+prejuízo ao instrumento como está. Viável assim: JUCE em AGPL, SDK do VST3
+aberto (GPLv3; anunciado também como MIT no fim de 2025 — conferir ao
+começar), CLAP em MIT; não usar o logotipo "VST" sem o acordo de marca
+(gratuito). Caminho em etapas: (1) tirar a trava tela↔áudio (fila de
+comandos ou troca de grafo; vale por si, é a origem dos estalos da
+v0.1.2), (2) standalone sobre o wrapper do JUCE, (3) VST3 experimental em
+Linux e Windows (estado no projeto do DAW, CLOCK seguindo o host, MIDI do
+host no SIGNAL-IN, poucos macros para automação), (4) `pluginval` na CI e
+testes em Ardour, Reaper e Infinite, (5) CLAP, (6) AU quando houver Mac.
+Prioridade antes disso: o standalone estável e testado nos três sistemas
+(um plugin que cai derruba o DAW de quem usa).
+
+**Módulos para VCV Rack / Cardinal — possibilidade futura.** Viável: o DSP
+é C++ sem framework; faltariam uma casca `rack::Module` por módulo (com
+ponte de blocos de 256 para amostra a amostra), painéis SVG gerados das
+descrições em milímetros e conversão de tensões (±5 V áudio, 0–10 V gate,
+1 V/oct). Não vão junto: cabos com relação/condução/ruptura, seeds,
+VARIA, MUDA, LEARN — é a ideia do instrumento que fica de fora. Licença:
+a loja do VCV aceita GPL; o **Cardinal exige GPLv3-ou-posterior** (não
+aceita GPLv3-only, e a AGPL imporia condições extras ao binário dele).
+Os módulos teriam de ser oferecidos **também** sob GPLv3+ — decisão do
+autor, que pode fazê-lo sem mudar a licença do instrumento. O Cardinal
+também pede dependências mínimas e nenhum acesso à internet, o que o
+Rasgo já cumpre. README do Cardinal traduzido na conversa de 4 out.
+
+**Ligação com o Infinite** (DAW de nós de Naman Soni, MIT, sugerido pelo
+Palmieri). Hoje: áudio entre os programas por roteamento do sistema
+(PipeWire/JACK, BlackHole, VB-Cable) e MIDI do Infinite para o SIGNAL-IN.
+Com um VST3, o Modular poderia rodar dentro dele (o Infinite hospeda VST3
+e AU). Licença: código MIT pode entrar no Rasgo (AGPL); o inverso não;
+usar os dois juntos como programas separados não tem questão de licença.
+
 ## Apresentação
 
 Rasgo Modular é o ambiente modular próprio da família RASGO: instrumento,

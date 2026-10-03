@@ -70,7 +70,7 @@ a extração para [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/r
 |---|---|
 | **Windows** | Windows 10 (versão 1607 ou posterior) ou Windows 11, 64 bits (x86-64) |
 | **macOS** | macOS 10.15 Catalina ou posterior, Intel ou Apple Silicon (Universal 2) |
-| **Linux** | x86-64 com glibc 2.35 ou mais nova: Ubuntu 22.04+, Debian 12+, Mint 21+ (o `.deb`); outras distribuições, compilando do código |
+| **Linux** | x86-64 com glibc 2.35 ou mais nova: Ubuntu 22.04+, Debian 12+, Mint 21+ (o `.deb`); outras distribuições, compilando do código — AppImage e `.tar.gz` estão previstos para a próxima versão |
 | **Processador** | 64 bits, dois núcleos ou mais. Medido num Intel Core i5-6500 (2015, 4 núcleos, 3,2 GHz): o app inteiro usa de um terço a metade de um núcleo; o som sozinho, de 7% a 15% |
 | **Memória** | ~55 MB em uso (medido); qualquer computador com 4 GB basta |
 | **Disco** | ~20 MB |
@@ -269,7 +269,8 @@ comercial — ver [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 - **Windows:** Windows 10 (version 1607 or later) or Windows 11, 64-bit.
 - **macOS:** macOS 10.15 Catalina or later, Intel or Apple Silicon.
 - **Linux:** x86-64 with glibc 2.35 or newer — Ubuntu 22.04+, Debian 12+,
-  Mint 21+ for the `.deb`; other distributions by building from source.
+  Mint 21+ for the `.deb`; other distributions by building from source
+  (an AppImage and a `.tar.gz` are planned for the next version).
 - **CPU:** 64-bit, two cores or more. Measured on an Intel Core i5-6500
   (2015, 4 cores, 3.2 GHz): the whole app uses a third to half of one core;
   the sound alone, 7% to 15%.
