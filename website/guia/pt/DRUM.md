@@ -1,5 +1,5 @@
 ## O que é
-O DRUM é uma voz de percussão pronta: a cada pulso na entrada GATE, ele toca um golpe. Com poucos knobs, vai do bumbo à caixa, ao tom e ao chimbal, e muda de caráter entre o som das baterias eletrônicas clássicas e um som mais acústico.
+O DRUM é uma voz de percussão pronta: a cada pulso na entrada GATE, ele toca um golpe. Com poucos knobs, vai do bumbo à caixa, ao tom e ao chimbal, e muda de caráter entre o som das baterias eletrônicas antigas e um som mais acústico.
 
 ## Como pensar nele
 Montar um bumbo do zero exige vários módulos; o DRUM entrega um pronto. Ele precisa de quem diga quando tocar: um CLOCK ou, melhor, um TRIGSEQ, que gera padrões rítmicos em quatro linhas. Quatro DRUM, cada um numa linha do TRIGSEQ, formam um kit. E como TONE aceita uma altura pela entrada PIT, dá para tocar uma linha de toms.
