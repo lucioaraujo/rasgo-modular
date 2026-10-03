@@ -10508,3 +10508,17 @@ e `SCALE`, no fim da lista de portas (não muda os índices dos patches
 salvos), que substituem o knob quando ligadas (`round(cv·12)`,
 `round(cv·11)`), com teste em `test_quantizer.cpp`; depois corrigir o
 LEARN (4 idiomas), o dossiê `guia/14_harmony.md` e o verbete do site.
+
+**Ponto de retomada (3 out. 2026, fim da sessão):** os 58 verbetes do
+guia estão escritos em pt, en, fr e es (`website/guia/<idioma>/`, 0
+problema no `checar_guia.py` nos quatro), e a introdução e o rodapé da
+página de módulos foram reescritos. **Próximo:** reescrever o corpo de
+`index.html`, `en.html`, `fr.html` e `es.html` na voz do `ESTILO.md`. O
+texto atual tem vários "não é X, é Y" (título "O cabo é um objeto, não um
+fio", meta description, "o corte é um gesto musical, não um acidente"),
+travessões em excesso e, na seção do guia, a frase "é o mesmo texto que a
+caixa LEARN", que deixou de valer. Mexer só fora dos marcadores
+PILULA/ESTADO (quem cuida deles é o `estado.py`). Conferido no código:
+os botões existem (VARIA, MUTA, EVOLUI, CRUZA, DESCABEIA, ESPERA, SEED);
+falta conferir a tecla `n` em `keyPressed` (RasgoModularApp.cpp ~4120).
+Depois: a release final v0.1.2 (passos na seção anterior).
