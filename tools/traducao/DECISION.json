@@ -403,17 +403,17 @@
   "out:root",
   [
    "New root, as CV (semitone/12) — plug it into the ROOT input of QUANTIZER.",
-   "",
+   "On ROOT alone, the root changes which notes are allowed and each note moves to the nearest one: the change is subtle. For the melody to JUMP to the new centre, also plug this output into the TRSP input of QUANTIZER.",
    ""
   ],
   [
    "Nouvelle fondamentale, en CV (demi-ton/12) — à brancher sur l’entrée ROOT du QUANTIZER.",
-   "",
+   "Sur ROOT seul, la tonique change les notes permises et chaque note va à la voisine la plus proche : le changement est subtil. Pour que la mélodie SAUTE vers le nouveau centre, branchez aussi cette sortie sur l’entrée TRSP du QUANTIZER.",
    ""
   ],
   [
    "Nueva fundamental, como CV (semitono/12) — conéctela a la entrada ROOT del QUANTIZER.",
-   "",
+   "Solo en ROOT, la tónica cambia qué notas valen y cada nota va a la vecina más cercana: el cambio es sutil. Para que la melodía SALTE al nuevo centro, conecte también esta salida a la entrada TRSP del QUANTIZER.",
    ""
   ]
  ],

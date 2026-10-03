@@ -1397,7 +1397,11 @@ inline const LearnTable& learnTable() {
             {"in:reset", {"Volta pro ROOT/escala inicial.", "", ""}},
             {"out:root", {
                 "Nova tônica, como CV (semitom/12) — ligue na entrada "
-                "ROOT do QUANTIZER.", "", ""}},
+                "ROOT do QUANTIZER.",
+                "Só no ROOT, a tônica troca quais notas valem e cada nota "
+                "vai à vizinha mais próxima: a mudança é sutil. Para a "
+                "melodia SALTAR para o centro novo, ligue esta saída também "
+                "na entrada TRSP do QUANTIZER.", ""}},
             {"out:scale", {
                 "Novo índice de escala, como CV (índice/11) — ligue na "
                 "entrada SCL do QUANTIZER.", "", ""}},

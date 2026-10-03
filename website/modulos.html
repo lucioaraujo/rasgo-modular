@@ -10,63 +10,6 @@
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
 <link rel="stylesheet" href="styles.css" />
 <script src="assets/contact.js" defer></script>
-<!-- SEO:INICIO — gerado por seo.py; editar lá, não aqui -->
-<link rel="canonical" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
-<link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
-<link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/modulos-es.html">
-<link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Rasgo Modular">
-<meta property="og:title" content="Rasgo Modular — guia dos módulos">
-<meta property="og:description" content="Os 58 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.">
-<meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
-<meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rasgo Modular em execução: rack de três fileiras de módulos cruzado por cerca de setenta cabos em laranja e azul.">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:locale:alternate" content="en_US">
-<meta property="og:locale:alternate" content="fr_FR">
-<meta property="og:locale:alternate" content="es_ES">
-<meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Rasgo Modular",
-  "description": "Os 58 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.",
-  "url": "https://lucioaraujo.github.io/rasgo-modular/",
-  "inLanguage": "pt-BR",
-  "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
-  "applicationCategory": "MultimediaApplication",
-  "applicationSubCategory": "Modular synthesizer",
-  "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.2",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.2",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "EUR"
-  },
-  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-  "isAccessibleForFree": true,
-  "author": {
-    "@type": "Person",
-    "name": "Lúcio Araújo"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "RASGO",
-    "url": "https://rasgosound.arquiviagem.net/"
-  },
-  "sameAs": [
-    "https://github.com/lucioaraujo/rasgo-modular"
-  ]
-}
-</script>
-<!-- SEO:FIM -->
 </head>
 <body>
 <div class="rasgo-strip"><a href="https://rasgosound.arquiviagem.net/">RASGO — família de instrumentos e pesquisa sonora</a></div>
@@ -433,19 +376,20 @@
     <h4>O que é</h4>
     <p>O SIGNAL-IN traz o mundo de fora para dentro do patch. Ele recebe o som da entrada de áudio do computador, como um microfone ou outro instrumento, e as notas de um teclado ou controlador MIDI, e transforma tudo em sinais que os outros módulos entendem.</p>
     <h4>Como pensar nele</h4>
-    <p>Com ele, alguém de fora pode tocar o Rasgo Modular: a altura da tecla vai para um oscilador, o aperto da tecla abre um envelope, e a roda de modulação do teclado pode abrir um filtro. Ele também deixa o patch processar som de fora, passando uma voz ou uma guitarra por filtros e espaços. O app só abre a entrada de áudio quando há um SIGNAL-IN no patch.</p>
+    <p>Com ele, alguém de fora pode tocar o Rasgo Modular: a altura da tecla vai para um oscilador, o aperto da tecla abre um envelope, e a roda de modulação do teclado pode abrir um filtro. Ele também deixa o patch processar som de fora, passando uma voz ou uma guitarra por filtros e espaços. O módulo começa desligado: o app só abre o microfone e o MIDI depois que você liga o ON e cabeia alguma saída.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>GAIN</b>: o volume do áudio que entra, de zero ao dobro.</li>
       <li><b>BEND</b>: quantos semitons a alavanca de pitch bend do teclado move a altura, de zero a duas oitavas.</li>
       <li><b>CC#</b>: qual controle do teclado a saída CC segue. O número 1 costuma ser a roda de modulação.</li>
+      <li><b>ON</b>: liga a entrada de fora. Desligado, que é como o módulo começa, nada entra no patch.</li>
     </ul>
     <p>Saídas: L e R, o áudio que entra; 1V/O, a altura da tecla tocada; GATE, aberto enquanto a tecla está pressionada; VEL, a força com que ela foi tocada; CC, o valor do controle escolhido.</p>
     <h4>Experimente</h4>
     <ol class="passos">
-      <li>Com um microfone ou instrumento ligado ao computador, ligue L numa entrada do MIXER e ajuste GAIN até ouvir o som.</li>
+      <li>Com um microfone ou instrumento ligado ao computador, ligue L numa entrada do MIXER, ligue o ON e ajuste GAIN até ouvir o som.</li>
       <li>Passe esse som por um FILTER ou pelo SPACE antes do MIXER para transformá-lo.</li>
-      <li>Com um teclado MIDI, ligue 1V/O na entrada 1V/O de um OSC, e GATE na entrada GATE de um ENVELOPE que tenha o som do OSC na entrada IN. O teclado passa a tocar o patch.</li>
+      <li>Com um teclado MIDI e o ON ligado, ligue 1V/O na entrada 1V/O de um OSC, e GATE na entrada GATE de um ENVELOPE que tenha o som do OSC na entrada IN. O teclado passa a tocar o patch.</li>
     </ol>
   </article>
 </section>
@@ -1100,7 +1044,7 @@
     <h4>O que é</h4>
     <p>O QUANTIZER prende um sinal contínuo às notas de uma escala. Um valor que sobe e desce livremente, vindo de um TURING, de um SH ou de um CHAOS, sai dele como uma sequência de notas afinadas. Na maior parte dos patches, é ele que transforma acaso em melodia.</p>
     <h4>Como pensar nele</h4>
-    <p>Sinais de controle variam de forma contínua, e notas musicais não. Sem um quantizador, uma melodia gerada por acaso cai entre as notas e soa desafinada. O QUANTIZER arredonda cada valor para a nota mais próxima da escala escolhida. Com um pulso na entrada TRIG, ele só troca de nota no pulso, e a melodia ganha ritmo. A saída GATE pulsa sempre que a nota muda de fato, o que serve para disparar um envelope só em notas novas.</p>
+    <p>Sinais de controle variam de forma contínua, e notas musicais não. Sem um quantizador, uma melodia gerada por acaso cai entre as notas e soa desafinada. O QUANTIZER arredonda cada valor para a nota mais próxima da escala escolhida. Com um pulso na entrada TRIG, ele só troca de nota no pulso, e a melodia ganha ritmo. A saída GATE pulsa sempre que a nota muda de fato, o que serve para disparar um envelope só em notas novas. As entradas ROOT e SCL trocam a tônica e a escala por cabo: ligadas às saídas do HARMONY, a tonalidade da melodia muda ao longo da música.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>SCALE</b>: a escala, entre doze: cromática, maior, menor natural, dórica, frígia dominante, lídia, menor melódica, pentatônica menor, pentatônica maior, hirajoshi, tons inteiros e só oitavas.</li>
@@ -1109,7 +1053,7 @@
       <li><b>GLIDE</b>: faz a altura escorregar de uma nota à seguinte.</li>
       <li><b>HYST</b>: uma margem de tolerância. Com um sinal instável, a nota não fica pulando entre duas vizinhas.</li>
     </ul>
-    <p>Entradas: CV, o sinal a quantizar; TRSP, para transpor antes de quantizar; TRIG, o pulso que decide quando trocar de nota. Saídas: PTCH, a altura; GATE, um pulso a cada nota nova; ST, a nota em semitons.</p>
+    <p>Entradas: CV, o sinal a quantizar; TRSP, para transpor antes de quantizar; TRIG, o pulso que decide quando trocar de nota; ROOT e SCL, que, com cabo, mandam na tônica e na escala no lugar dos knobs. Saídas: PTCH, a altura; GATE, um pulso a cada nota nova; ST, a nota em semitons.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue a saída CV de um TURING na entrada CV do QUANTIZER, e a saída CLK do CLOCK na entrada CLK do TURING.</li>
@@ -1124,7 +1068,7 @@
     <p>O HARMONY decide por quais tonalidades a música passa. De tempos em tempos, ou a cada pulso na entrada ADV, ele escolhe um novo centro tonal, seguindo um entre seis movimentos que músicos de jazz e de cinema usam há décadas. A saída ROOT informa a tônica nova na mesma escala de altura que os osciladores entendem.</p>
     <h4>Como pensar nele</h4>
     <p>O QUANTIZER deixa a melodia afinada, mas sempre no mesmo tom. Músicas costumam viajar, e cada estilo viaja de um jeito. O controle MOVE escolhe o percurso: Coltrane, que salta uma terça maior a cada troca e fecha um ciclo de três tons, como em Giant Steps; substituição de trítono, que chega ao tom seguinte por um caminho inesperado; mediante cromática, mudanças de terça com efeito de trilha de cinema; intercâmbio modal, que mantém a tônica e troca o modo; jazz modal, que quase nunca sai do lugar; e backdoor, que sobe um tom inteiro.</p>
-    <p>Nesta versão, a forma de ouvir as mudanças é somar a saída ROOT à melodia antes do oscilador. Cada entrada aceita um cabo só, então a soma passa por um MATRIX, e a melodia inteira se transpõe para o centro novo. A troca de escala, da saída SCALE, ainda não chega ao QUANTIZER por cabo.</p>
+    <p>Ligue a saída ROOT na entrada ROOT do QUANTIZER e a saída SCALE na entrada SCL. A cada troca, a escala da melodia muda, e cada nota passa para a mais próxima da escala nova: a melodia fica na mesma região, com outra cor. Para ouvir a melodia saltar para o centro novo, ligue a saída ROOT também na entrada TRSP do QUANTIZER.</p>
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>MOVE</b>: o tipo de percurso, entre os seis descritos acima.</li>
@@ -1136,10 +1080,10 @@
     <p>Entradas: ADV, o pulso que pede uma troca; RST, para voltar ao começo. Saídas: ROOT, a tônica como altura; SCALE, o número da escala; CHG, um pulso a cada troca.</p>
     <h4>Experimente</h4>
     <ol class="passos">
-      <li>Monte a melodia do QUANTIZER: a saída CV de um TURING, movido pelo CLOCK, na entrada CV do QUANTIZER, e um OSC passando por um ENVELOPE até o MIXER.</li>
-      <li>Ligue PTCH do QUANTIZER em IN1 de um MATRIX, ROOT do HARMONY em IN2, e OUT1 do MATRIX em 1V/O do OSC. No MATRIX, leve a célula 21 a 1: OUT1 passa a ser a melodia mais a tônica.</li>
-      <li>Ponha MOVE na primeira posição, Coltrane, e suba RATE. A cada troca, a melodia salta para outro centro, em ciclos de três.</li>
-      <li>Ligue CHG na entrada ADV de um DRIFT para que o resto do patch também mude de seção a cada troca.</li>
+      <li>Monte a melodia do QUANTIZER: a saída CV de um TURING, movido pelo CLOCK, na entrada CV do QUANTIZER, e PTCH do QUANTIZER em 1V/O de um OSC que passe por um ENVELOPE até o MIXER.</li>
+      <li>Ligue ROOT do HARMONY na entrada ROOT do QUANTIZER, e SCALE na entrada SCL.</li>
+      <li>Ponha MOVE na primeira posição, Coltrane, e suba RATE até uma troca a cada dois ou três segundos. A cada troca, a melodia muda de escala.</li>
+      <li>Ligue ROOT do HARMONY também na entrada TRSP do QUANTIZER. Agora a melodia salta de centro, em ciclos de três.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-ABACUS">

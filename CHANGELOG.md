@@ -7,14 +7,24 @@ pronto.
 
 ---
 
-## v0.1.3 — em preparação
+## v0.1.3 — 2026-10-04
 
-> **Pré-releases de teste:** `v0.1.3-rc1` e `v0.1.3-rc2` (3 out. 2026; o
-> rc2 acrescenta o botão ON do SIGNAL-IN, sem o qual o rc1 ainda abria o
-> microfone em ~40% das aberturas) para quem viu o app fechar ao abrir no
-> Windows. *English:* test pre-release for Windows users
-> whose app closed on startup. If it still fails, please send the file
-> `%APPDATA%\rasgo-modular\arranque.log` (and `crash.log`, if present).
+> **English summary.** Startup fixes for Windows, after a user report (the
+> app closed 2–3 s after launch, before showing its window): the app no
+> longer opens the microphone and every MIDI input on every launch — the
+> SIGNAL-IN module gets an **ON** switch, off by default, and the input only
+> opens with it on and an output patched; Windows now draws in software, as
+> Linux does (`RASGO_RENDER=gpu` brings Direct2D back); and startup and
+> crash logs are written to `%APPDATA%\rasgo-modular` (`arranque.log`,
+> `crash.log`). QUANTIZER gains **ROOT and SCL inputs**, so HARMONY can
+> finally change its tonic and scale. The first launch follows the system
+> language; several labels and texts showed the wrong language; panel
+> labels no longer get cut; the tutorial scrolls smoothly. Same seeds still
+> give the same patches (checked on 300 seeds). Windows and macOS are still
+> built and tested by continuous integration only. Details below, in
+> Portuguese.
+>
+> Pré-releases de teste antes desta: `v0.1.3-rc1` e `v0.1.3-rc2` (3 out.).
 
 - **Tutorial sem lentidão** (relato do autor com o rc2, 3 out. 2026:
   rolagem lenta e FECHAR demorando). O conteúdo era diagramado e desenhado
