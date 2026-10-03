@@ -852,7 +852,8 @@ public:
         // Misturado de `bg` até `accent` — a mesma rampa do X11 — pra a
         // marca sair IDÊNTICA nos dois front-ends. Renderizar o SVG cru
         // aqui dava uma marca visivelmente diferente da do painel.
-        logo_ = juce::Image(juce::Image::ARGB, rasgo_logo_w, rasgo_logo_h, true);
+        logo_ = juce::Image(juce::Image::ARGB, rasgo_logo_w, rasgo_logo_h, true,
+                            juce::SoftwareImageType());
         juce::Image::BitmapData px(logo_, juce::Image::BitmapData::writeOnly);
         for (int y = 0; y < rasgo_logo_h; ++y)
             for (int x = 0; x < rasgo_logo_w; ++x) {
@@ -2848,8 +2849,11 @@ private:
         if (!m.chrome.isValid()
             || m.chrome.getWidth() != m.bounds.getWidth()
             || m.chrome.getHeight() != m.bounds.getHeight()) {
-            m.chrome = juce::Image(juce::Image::ARGB, m.bounds.getWidth(),
-                                   m.bounds.getHeight(), true);
+            // imagem de SOFTWARE explícita: no Windows o tipo padrão do
+            // JUCE é Direct2D (GPU); o caminho testado é o do Linux
+            m.chrome = juce::Image(juce::Image::ARGB, std::max(1, m.bounds.getWidth()),
+                                   std::max(1, m.bounds.getHeight()), true,
+                                   juce::SoftwareImageType());
             juce::Graphics ig(m.chrome);
             // desloca a origem pra o código de desenho seguir usando as
             // MESMAS coordenadas absolutas nas duas passadas
@@ -3699,14 +3703,51 @@ private:
     bool dragging_ = false, linkHover_ = false;
 };
 
+// ---- diagnóstico de arranque -------------------------------------------
+// Relato do Audiofanzine (3 out. 2026): no Windows 10 o app fechava em
+// 2–3 s sem mostrar a janela, e a máquina da CI não reproduz (sem placa de
+// som, MIDI nem GPU). Para o próximo teste de quem tem o problema:
+// `arranque.log` recebe uma linha por etapa da abertura (a última linha
+// diz onde parou) e `crash.log` a pilha, se o processo cair. Os dois na
+// pasta de dados do app (Windows: %APPDATA%\rasgo-modular).
+namespace arranque {
+inline juce::File pasta() {
+    auto d = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+                 .getChildFile("rasgo-modular");
+    d.createDirectory();
+    return d;
+}
+inline void marca(const char* etapa) {
+    static const juce::uint32 t0 = juce::Time::getMillisecondCounter();
+    static bool primeira = true;
+    auto f = pasta().getChildFile("arranque.log");
+    if (primeira) {
+        primeira = false;
+        f.replaceWithText(juce::String::fromUTF8(RASGO_MODULAR_BUILD) + "  "
+                          + juce::SystemStats::getOperatingSystemName() + "\n");
+    }
+    f.appendText(juce::String(juce::Time::getMillisecondCounter() - t0) + " ms  "
+                 + juce::String::fromUTF8(etapa) + "\n");
+}
+inline void aoCair(void*) {
+    pasta().getChildFile("crash.log").replaceWithText(
+        juce::String::fromUTF8(RASGO_MODULAR_BUILD) + "  "
+        + juce::SystemStats::getOperatingSystemName() + "\n\n"
+        + juce::SystemStats::getStackBacktrace());
+}
+}  // namespace arranque
+
 // ---- áudio + janela ----------------------------------------------------
 class MainComponent : public juce::AudioAppComponent,
                       private juce::Timer,
                       private juce::MidiInputCallback {
 public:
     MainComponent() {
+        arranque::marca("MainComponent: início");
         loadPrefs();
+        arranque::marca("preferências lidas");
         rack_.build();
+        arranque::marca("rack montado");
         rack_.allocScopes();
         rack_.populateMotion();
         view_ = std::make_unique<RackView>(rack_);
@@ -3938,7 +3979,10 @@ public:
             const auto b = rasgo::panel::firstOpen(mon, 1280, 760, 0.88f);
             setSize(b.w, b.h);
         }
+        arranque::marca("abrindo o áudio");
         setAudioChannels(0, 2);
+        arranque::marca(deviceManager.getCurrentAudioDevice() != nullptr
+                            ? "áudio aberto" : "áudio: nenhum dispositivo aberto");
 
         // ---- que patch abrir -------------------------------------------
         // Mesma política do painel X11, e ela é uma posição de projeto: o
@@ -3962,9 +4006,11 @@ public:
             rack_.applySeed(seed_, sampleRate_, blockSize_);
             rack_.populateMotion();
         }
+        arranque::marca("seed aplicado");
         view_->refresh();
         syncHeader();
         syncSignalIn();
+        arranque::marca("entradas conferidas");
         // `RASGO_EXPORTAR_PAINEIS=pasta`: desenha o painel de cada módulo
         // em PNG nessa pasta e fecha (imagens do guia do site). Espera 4 s (era 1,5)
         // 1,5 s para a janela ter tamanho e os displays terem sinal.
@@ -4287,6 +4333,8 @@ private:
     // com o `gmx`, a UI redesenha o snapshot anterior e segue — nunca
     // congela à espera do áudio (`redraw()` do painel X11 faz igual).
     void timerCallback() override {
+        if (!primeiroQuadro_) { primeiroQuadro_ = true; arranque::marca("primeiro quadro"); }
+        if (++signalInTick_ >= 15) { signalInTick_ = 0; syncSignalIn(); }
         // O TECLADO só chega aqui se este componente tiver o foco. O único
         // filho focável é a caixa de seed (um TextEditor), e o JUCE dá o
         // foco inicial ao primeiro filho que o queira — então, ao abrir, o
@@ -4631,11 +4679,22 @@ private:
     // vai usar é ruído — e no macOS é um diálogo de permissão do sistema
     // aparecendo sem motivo. Mesma regra do `syncSignalIn` do painel X11.
     void syncSignalIn() {
+        // "Presente" = alguma SAÍDA do SIGNAL-IN está cabeada. Até a
+        // v0.1.2 bastava o módulo existir no grafo — e o rack nasce com
+        // um de cada módulo, então o app abria o microfone e TODOS os
+        // MIDI em toda abertura, contra a própria regra (e no construtor,
+        // antes da janela: suspeito do fechamento no arranque relatado no
+        // Windows, Audiofanzine 3 out. 2026). O timer reavalia a cada
+        // meio segundo, então ligar ou cortar o cabo abre ou fecha a
+        // entrada sem precisar de gancho em cada gesto.
         bool present = false;
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
-            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
-                if (rack_.graph.node(i).type() == "SIGNAL-IN") { present = true; break; }
+            for (std::size_t i = 0; i < rack_.graph.nodeCount() && !present; ++i) {
+                if (rack_.graph.node(i).type() != "SIGNAL-IN") continue;
+                for (std::size_t c = 0; c < rack_.graph.cableCount(); ++c)
+                    if (rack_.graph.cable(c).source().node == i) { present = true; break; }
+            }
         }
         if (present == signalIn_.load()) return;
         signalIn_.store(present);
@@ -5081,6 +5140,8 @@ private:
     int recCount_ = 0;
     bool recWasOn_ = false;
     std::unique_ptr<juce::FileChooser> chooser_;
+    int signalInTick_ = 0;   // syncSignalIn a cada 15 quadros (~0,5 s)
+    bool primeiroQuadro_ = false;
     bool chooserOpen_ = false;
     std::string learnKey_;
     std::chrono::steady_clock::time_point learnSince_{};
@@ -5096,7 +5157,10 @@ public:
     bool moreThanOneInstanceAllowed() override { return true; }
 
     void initialise(const juce::String&) override {
+        juce::SystemStats::setApplicationCrashHandler(arranque::aoCair);
+        arranque::marca("initialise");
         window_ = std::make_unique<Window>(getApplicationName());
+        arranque::marca("janela criada");
     }
     void shutdown() override { window_ = nullptr; }
     void systemRequestedQuit() override { quit(); }
@@ -5127,6 +5191,19 @@ private:
             // `MainComponent`).
             placeOnPrimaryDisplay();
             setVisible(true);
+           #if JUCE_WINDOWS
+            // Desenho por SOFTWARE no Windows, o mesmo caminho do Linux
+            // (o único testado pelo autor). O padrão do JUCE no Windows é
+            // Direct2D, pela GPU — suspeito do fechamento no arranque
+            // relatado num notebook com RTX. `RASGO_RENDER=gpu` volta ao
+            // Direct2D.
+            if (auto* peer = getPeer()) {
+                const char* r = std::getenv("RASGO_RENDER");
+                if (r == nullptr || std::string(r) != "gpu")
+                    peer->setCurrentRenderingEngine(0);
+            }
+           #endif
+            arranque::marca("janela visível");
             const juce::Component::SafePointer<Window> self(this);
             juce::Timer::callAfterDelay(150, [self] {
                 if (self == nullptr) return;
