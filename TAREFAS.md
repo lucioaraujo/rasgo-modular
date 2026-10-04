@@ -10568,3 +10568,10 @@ Depois, se o autor quiser, arm64 (`.deb` + AppImage numa máquina ARM da
 CI). Flathub/AUR só se houver procura; arquiteturas raras (32 bits,
 armhf, riscv64) não. Custo: CI Linux gratuita em repositório público, e
 só roda em tag.
+
+**4 out. 2026 — retorno ao Audiofanzine postado** pelo autor (agradecimento
+antes; depois, aviso da v0.1.3 com o link do `.exe` e o pedido do
+`arranque.log`/`crash.log` de `%APPDATA%\rasgo-modular` se ainda cair).
+Aguardando o teste dele e o do autor no Windows. Se vier um `arranque.log`,
+a última linha diz a etapa onde a abertura parou (ver o namespace
+`arranque` no `RasgoModularApp.cpp`).
