@@ -10575,3 +10575,9 @@ antes; depois, aviso da v0.1.3 com o link do `.exe` e o pedido do
 Aguardando o teste dele e o do autor no Windows. Se vier um `arranque.log`,
 a última linha diz a etapa onde a abertura parou (ver o namespace
 `arranque` no `RasgoModularApp.cpp`).
+**4 out. 2026 — retorno ao r/modular postado** pelo autor (em inglês): o
+travamento ao pegar a ponta de um cabo numa entrada já cabeada, que esse
+usuário relatou no Windows 10, foi corrigido na v0.1.1 (mutex travado duas
+vezes); a v0.1.3 traz as correções de abertura no Windows; as faixas de cor
+por família, sugestão dele, estão no app; pedido do `arranque.log` se
+ainda cair. Aguardando retorno.
