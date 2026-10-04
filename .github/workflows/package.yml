@@ -90,6 +90,8 @@ jobs:
           - os: macos-latest
             generator: DragNDrop
             artifact-glob: build/*.dmg
+    # nome explícito: o padrão juntaria a lista de globs do Ubuntu ao nome
+    name: package (${{ matrix.os }}, ${{ matrix.generator }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Rasgo Modular

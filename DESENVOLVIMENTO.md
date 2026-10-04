@@ -230,6 +230,17 @@ arquitetura do Cardinal. Ponto de partida já conferido: `cmake --install`
 instala binário, `.desktop` e ícones (SVG e PNG 256) — o que o
 `linuxdeploy` precisa para montar o AppImage.
 
+*Estado (4 out. 2026): implementado no branch `v0.1.4-linux-pacotes`,
+ainda sem release.* `packaging/linux/empacotar.sh` monta o AppImage
+(linuxdeploy `1-alpha-20251107-1`, conferido por SHA-256; embute só
+libpng, bzip2 e brotli, o resto vem do sistema) e o `.tar.gz` (binário +
+`install.sh` em `~/.local` + LEIA-ME). `packaging/linux/testar-arranque.sh`
+abre o app em Xvfb e exige "primeiro quadro" no `arranque.log`. CI manual
+37235607104: os três sistemas empacotaram e os 10 testes de abertura
+passaram (`.deb` em Debian 12 e Ubuntu 24.04; AppImage e `.tar.gz` em
+Debian 12, Ubuntu 24.04, Fedora e Arch). Falta, na hora da release: site,
+README e INSTALL apontarem para os novos arquivos.
+
 **VST3 / CLAP / AU — possibilidade futura, sem prazo.** Pedido por um
 usuário do Audiofanzine e por um amigo do autor (Palmieri). Condições do
 autor: sem mudar a licença, sem pagar tarifas de implementação e sem

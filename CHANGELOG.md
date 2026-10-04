@@ -7,6 +7,24 @@ pronto.
 
 ---
 
+## Próxima versão (não publicada)
+
+- **Linux além do `.deb`: AppImage e `.tar.gz`** (x86-64, glibc 2.35+),
+  para Fedora, Arch, openSUSE e quem não instala `.deb`. Os dois saem do
+  mesmo `cmake --install` que o `.deb` usa (`packaging/linux/empacotar.sh`).
+  O AppImage é um arquivo só, com as bibliotecas que não são de sistema
+  embutidas (linuxdeploy fixado por versão e hash). O `.tar.gz` traz o
+  binário, um `install.sh` que instala em `~/.local` sem root (e remove
+  com `--remove`) e um LEIA-ME em quatro línguas.
+- **Teste de abertura em quatro distribuições** na CI: Debian 12, Ubuntu
+  24.04, Fedora e Arch, em contêiner, numa tela virtual sem placa de som
+  (`packaging/linux/testar-arranque.sh`). O `.deb` é instalado pelo `apt`
+  nos dois Debian; os três pacotes precisam chegar ao primeiro quadro e
+  continuar abertos. A release só é criada depois desse teste.
+  Primeira execução (manual, 4 out.): os 10 testes passaram.
+
+---
+
 ## v0.1.3 — 2026-10-04
 
 > **English summary.** Startup fixes for Windows, after a user report (the

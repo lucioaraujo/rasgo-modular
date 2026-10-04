@@ -10581,3 +10581,15 @@ usuário relatou no Windows 10, foi corrigido na v0.1.1 (mutex travado duas
 vezes); a v0.1.3 traz as correções de abertura no Windows; as faixas de cor
 por família, sugestão dele, estão no app; pedido do `arranque.log` se
 ainda cair. Aguardando retorno.
+
+**4 out. 2026 — AppImage e `.tar.gz` implementados** (branch
+`v0.1.4-linux-pacotes`, sem release). `packaging/linux/empacotar.sh`
+(AppImage via linuxdeploy fixado por hash; `.tar.gz` com `install.sh` e
+LEIA-ME), `packaging/linux/testar-arranque.sh` (Xvfb, sem som, exige
+"primeiro quadro") e novo job `arranque-linux` no `package.yml` (Debian 12,
+Ubuntu 24.04, Fedora, Arch em contêiner; a release espera por ele).
+Validação: local no Mint (os dois pacotes abrem; `install.sh` instala e
+remove; o teste reprova `/bin/false`) e CI manual 37235607104 (três
+sistemas empacotados, 10/10 aberturas). **Próximo passo:** na release
+v0.1.4, apontar site (4 línguas), README e INSTALL para o AppImage e o
+`.tar.gz`; depois, se o autor quiser, arm64.
