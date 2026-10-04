@@ -74,9 +74,16 @@ jobs:
           # contra bibliotecas mais antigas roda em sistema mais novo, o
           # contrário não. Um único `.deb` passa a atender 22.04, 24.04 e
           # derivados (Mint 21 e 22 inclusive).
+          #
+          # O job do Ubuntu sai com TRÊS pacotes: .deb (CPack), AppImage e
+          # .tar.gz (packaging/linux/empacotar.sh) — os dois últimos para
+          # Fedora, Arch, openSUSE e quem não instala .deb.
           - os: ubuntu-22.04
             generator: DEB
-            artifact-glob: build/*.deb
+            artifact-glob: |
+              build/*.deb
+              build/*.AppImage
+              build/*.tar.gz
           - os: windows-latest
             generator: NSIS
             artifact-glob: build/*.exe
@@ -192,12 +199,81 @@ jobs:
         working-directory: build
         run: cpack -G ${{ matrix.generator }} -C Release
 
+      # Mesma árvore do `cmake --install` que o .deb usa; linuxdeploy
+      # fixado por versão e hash dentro do script.
+      - name: AppImage e .tar.gz (Linux)
+        if: runner.os == 'Linux'
+        run: packaging/linux/empacotar.sh build build
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rasgo-modular-${{ matrix.os }}
           path: ${{ matrix.artifact-glob }}
           if-no-files-found: error
+
+  # ---- arranque-linux: os pacotes Linux abrem em outras distribuições? ---
+  #
+  # O .deb é compilado no Ubuntu 22.04; o AppImage e o .tar.gz prometem
+  # rodar em qualquer distribuição de 2022 em diante. Esta é a prova: cada
+  # contêiner instala só o que um desktop comum já tem (X11, ALSA,
+  # FreeType, Fontconfig), abre o app numa tela virtual, sem placa de som,
+  # e confere que ele chega ao primeiro quadro e não cai
+  # (packaging/linux/testar-arranque.sh). Nos dois sistemas Debian o .deb
+  # é instalado pelo apt, o que confere também as dependências declaradas.
+  #
+  # Só Linux: multiplicador 1, e gratuito em repositório público. Não testa
+  # som nem desenho — testa o defeito que mais custa a quem baixa: o app
+  # que nem abre.
+  arranque-linux:
+    needs: package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        imagem: ['debian:12', 'ubuntu:24.04', 'fedora:latest', 'archlinux:latest']
+    container: ${{ matrix.imagem }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Baixar os pacotes Linux
+        uses: actions/download-artifact@v4
+        with:
+          name: rasgo-modular-ubuntu-22.04
+          path: pacotes
+
+      - name: Instalar o básico de um desktop (e o .deb, onde couber)
+        run: |
+          set -eux
+          case "${{ matrix.imagem }}" in
+            debian:*|ubuntu:*)
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y ./pacotes/*.deb
+              apt-get install -y xvfb libx11-6 libxext6 libxrandr2 \
+                libxcursor1 libxinerama1 libxrender1 fonts-dejavu-core ;;
+            fedora:*)
+              dnf install -y xorg-x11-server-Xvfb alsa-lib freetype fontconfig \
+                libX11 libXext libXrandr libXcursor libXinerama libXrender dejavu-sans-fonts ;;
+            archlinux:*)
+              pacman -Syu --noconfirm xorg-server-xvfb alsa-lib freetype2 fontconfig \
+                libx11 libxext libxrandr libxcursor libxinerama libxrender ttf-dejavu ;;
+          esac
+
+      - name: Abrir o .deb instalado
+        if: startsWith(matrix.imagem, 'debian') || startsWith(matrix.imagem, 'ubuntu')
+        run: packaging/linux/testar-arranque.sh /usr/bin/rasgo-modular
+
+      - name: Abrir o AppImage
+        run: |
+          chmod +x pacotes/*.AppImage
+          packaging/linux/testar-arranque.sh "$(ls pacotes/*.AppImage)"
+
+      - name: Abrir o .tar.gz
+        run: |
+          mkdir tgz && tar -xzf pacotes/*.tar.gz -C tgz
+          packaging/linux/testar-arranque.sh "$(ls tgz/*/bin/rasgo-modular)"
 
   # ---- release: onde a tag vira algo que alguém consegue BAIXAR --------
   #
@@ -215,7 +291,9 @@ jobs:
   # que é onde proveniência importa mais.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: package
+    # também espera o teste de abertura: um pacote Linux que não abre não
+    # entra na release
+    needs: [package, arranque-linux]
     runs-on: ubuntu-22.04
     permissions:
       contents: write        # criar a release e anexar os pacotes
@@ -231,16 +309,16 @@ jobs:
       - name: Conferir o que chegou
         run: |
           find pacotes -type f -print
-          # os três precisam estar aqui: uma release com dois instaladores
+          # os cinco precisam estar aqui: uma release com metade dos pacotes
           # é pior que nenhuma, porque parece completa
-          for ext in deb dmg exe; do
+          for ext in deb AppImage tar.gz dmg exe; do
             if ! find pacotes -type f -name "*.$ext" | grep -q .; then
               echo "::error::nenhum pacote .$ext entre os artefatos"
               exit 1
             fi
           done
 
-      - name: Criar a release com os três instaladores
+      - name: Criar a release com os pacotes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -256,11 +334,15 @@ jobs:
             --verify-tag \
             --notes "Release notes: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) (English summary at the top of each version) · installation per platform: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
 
+          **Linux:** \`.deb\` for Ubuntu, Debian and Mint; AppImage or \`.tar.gz\` for other distributions (x86-64, glibc 2.35+, tested at launch on Debian 12, Ubuntu 24.04, Fedora and Arch).
+
           **Stated limitation:** the Windows and macOS packages were built, packaged and tested **by continuous integration only** — the author has never opened the application on those two systems. The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
 
           ---
 
           Notas desta versão: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) · instalação por plataforma: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
 
+          **Linux:** \`.deb\` para Ubuntu, Debian e Mint; AppImage ou \`.tar.gz\` para as demais distribuições (x86-64, glibc 2.35+, testados na abertura em Debian 12, Ubuntu 24.04, Fedora e Arch).
+
           **Limitação declarada:** Windows e macOS foram construídos, empacotados e testados **somente pela integração contínua** — o autor nunca abriu o aplicativo nesses dois sistemas. O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
-            $(find pacotes -type f \( -name '*.deb' -o -name '*.dmg' -o -name '*.exe' \))
+            $(find pacotes -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.tar.gz' -o -name '*.dmg' -o -name '*.exe' \))
