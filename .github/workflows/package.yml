@@ -199,8 +199,26 @@ jobs:
             exit 1
           fi
 
-          echo "--- codesign (ad-hoc; sem Developer ID/notarização na CI) ---"
-          codesign -dv "$APP" 2>&1 || echo "::warning::Não assinado — ok pra teste local, mas distribuição real precisa de Developer ID + notarização, senão o Gatekeeper mostra aviso de desenvolvedor não identificado na primeira abertura"
+          # Assinatura ad-hoc do PACOTE INTEIRO, nas duas fatias. Até a
+          # v0.1.3 só a fatia arm64 tinha a assinatura automática do
+          # linker, a x86_64 não tinha nenhuma e o .app não era selado (sem
+          # _CodeSignature): baixado num Mac com chip Apple, o Gatekeeper
+          # tende a dizer "está danificado e não pode ser aberto", sem saída
+          # para um usuário comum. Selado ad-hoc, o aviso volta a ser o de
+          # desenvolvedor não identificado, que se libera em Ajustes →
+          # Privacidade e Segurança → "Abrir Mesmo Assim". Tirar o aviso de
+          # vez exige Developer ID + notarização (conta paga da Apple).
+          # Achado em 6 out. 2026 lendo os comandos de carga do binário
+          # publicado.
+          echo "--- codesign ad-hoc (pacote inteiro) ---"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          for arch in x86_64 arm64; do
+            codesign -dv --arch "$arch" "$APP" 2>&1 | grep -q "Signature=adhoc" \
+              || { echo "::error::fatia $arch sem assinatura ad-hoc"; exit 1; }
+          done
+          test -d "$APP/Contents/_CodeSignature" || { echo "::error::pacote não selado"; exit 1; }
+          echo "ok: pacote selado, duas fatias assinadas (ad-hoc)"
 
       # O .exe não pode depender do Visual C++ Redistributable: a v0.1.3
       # dependia (MSVCP140/VCRUNTIME140) e não abria num Windows sem ele, e

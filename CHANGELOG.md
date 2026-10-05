@@ -18,6 +18,15 @@ pronto.
   percebeu porque a máquina do GitHub já tem o pacote. Correção: o runtime
   do Visual C++ vai **embutido** no executável (`/MT`), e a CI agora falha
   se o `.exe` voltar a depender dele.
+- **macOS: o app passa a ser selado por inteiro.** Até a v0.1.3 só a fatia
+  Apple Silicon tinha a assinatura automática do compilador; a fatia Intel
+  não tinha nenhuma, e o pacote `.app` não era selado. Baixado num Mac com
+  chip Apple, isso tende a gerar "está danificado e não pode ser aberto". A
+  CI agora assina o pacote inteiro (ad-hoc) e confere as duas fatias. O
+  aviso de "desenvolvedor não identificado" continua, porque só some com o
+  Developer ID e a notarização da Apple, mas agora pode ser liberado pelo
+  usuário. As dependências do app são só bibliotecas do sistema: no macOS
+  não há equivalente ao problema do Windows.
 - **Instalador mais simples:** a última tela oferece "Executar o Rasgo
   Modular", já marcado.
 - **Versão portátil para Windows** (`.zip`): basta descompactar e abrir, sem
