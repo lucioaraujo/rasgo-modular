@@ -84,9 +84,13 @@ jobs:
               build/*.deb
               build/*.AppImage
               build/*.tar.gz
+          # Windows: instalador (NSIS) e versão portátil (.zip, só
+          # descompactar e abrir); os dois levam o .exe com runtime estático.
           - os: windows-latest
             generator: NSIS
-            artifact-glob: build/*.exe
+            artifact-glob: |
+              build/*.exe
+              build/*.zip
           - os: macos-latest
             generator: DragNDrop
             artifact-glob: build/*.dmg
@@ -99,14 +103,15 @@ jobs:
 
       # O JUCE não é versionado neste repositório (nem submodule, nem
       # FetchContent) — mesma política do Antitotem/Navalha 2/Rasgo Synth.
-      # `ref: master` segue o upstream; pra uma release reprodutível,
-      # fixar aqui o commit/tag usado e registrá-lo na release
-      # (ver apps/juce/LICENSE_STATUS.md).
+      # Fixado numa tag (6 out. 2026): até a v0.1.3 era `master`, e cada
+      # build compilava contra o JUCE do dia, o que não é reproduzível.
+      # Mudar a versão é decisão registrada aqui e em
+      # apps/juce/LICENSE_STATUS.md.
       - name: Checkout JUCE
         uses: actions/checkout@v4
         with:
           repository: juce-framework/JUCE
-          ref: master
+          ref: '9.0.3'
           path: JUCE-checkout
 
       # Dependências de build do JUCE no Linux. Windows (MSVC) e macOS
@@ -197,12 +202,37 @@ jobs:
           echo "--- codesign (ad-hoc; sem Developer ID/notarização na CI) ---"
           codesign -dv "$APP" 2>&1 || echo "::warning::Não assinado — ok pra teste local, mas distribuição real precisa de Developer ID + notarização, senão o Gatekeeper mostra aviso de desenvolvedor não identificado na primeira abertura"
 
+      # O .exe não pode depender do Visual C++ Redistributable: a v0.1.3
+      # dependia (MSVCP140/VCRUNTIME140) e não abria num Windows sem ele, e
+      # este runner, que já tem o pacote, nunca percebeu. Lista as DLLs
+      # importadas e falha se alguma do runtime dinâmico aparecer.
+      - name: Validate Windows runtime (static CRT)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Path build -Filter 'Rasgo Modular.exe' |
+                 Where-Object { $_.FullName -match 'Release' } | Select-Object -First 1
+          if (-not $exe) { throw 'Rasgo Modular.exe não encontrado' }
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $dumpbin = Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Select-Object -First 1
+          if (-not $dumpbin) { throw 'dumpbin não encontrado' }
+          $deps = & $dumpbin.FullName /dependents $exe.FullName
+          $deps
+          $bad = $deps | Select-String -Pattern 'VCRUNTIME|MSVCP|api-ms-win-crt'
+          if ($bad) { Write-Error "o .exe depende do runtime dinâmico do Visual C++: $bad"; exit 1 }
+          "ok: sem dependência do Visual C++ Redistributable"
+
       - name: Package
         working-directory: build
         run: cpack -G ${{ matrix.generator }} -C Release
 
       # Mesma árvore do `cmake --install` que o .deb usa; linuxdeploy
       # fixado por versão e hash dentro do script.
+      - name: Versão portátil (.zip, Windows)
+        if: runner.os == 'Windows'
+        working-directory: build
+        run: cpack -G ZIP -C Release
+
       - name: AppImage e .tar.gz (Linux)
         if: runner.os == 'Linux'
         run: packaging/linux/empacotar.sh build build
@@ -313,7 +343,7 @@ jobs:
           find pacotes -type f -print
           # os cinco precisam estar aqui: uma release com metade dos pacotes
           # é pior que nenhuma, porque parece completa
-          for ext in deb AppImage tar.gz dmg exe; do
+          for ext in deb AppImage tar.gz dmg exe zip; do
             if ! find pacotes -type f -name "*.$ext" | grep -q .; then
               echo "::error::nenhum pacote .$ext entre os artefatos"
               exit 1
@@ -347,4 +377,4 @@ jobs:
           **Linux:** \`.deb\` para Ubuntu, Debian e Mint; AppImage ou \`.tar.gz\` para as demais distribuições (x86-64, glibc 2.35+, testados na abertura em Debian 12, Ubuntu 24.04, Fedora e Arch).
 
           **Limitação declarada:** Windows e macOS foram construídos, empacotados e testados **somente pela integração contínua** — o autor nunca abriu o aplicativo nesses dois sistemas. O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
-            $(find pacotes -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.tar.gz' -o -name '*.dmg' -o -name '*.exe' \))
+            $(find pacotes -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.tar.gz' -o -name '*.dmg' -o -name '*.exe' -o -name '*.zip' \))

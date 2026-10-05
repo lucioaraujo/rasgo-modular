@@ -9,6 +9,21 @@ pronto.
 
 ## Próxima versão (não publicada)
 
+- **Windows: o app passa a abrir em qualquer Windows.** Até a v0.1.3 o
+  `Rasgo Modular.exe` dependia do "Visual C++ Redistributable"
+  (`MSVCP140.dll`, `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`), que o
+  instalador não levava: num Windows sem esse pacote o app não abria. Achado
+  em 6 out. 2026, quando o autor não conseguiu abrir a v0.1.3 num Windows.
+  Confirmado listando as DLLs importadas pelo `.exe` publicado. A CI nunca
+  percebeu porque a máquina do GitHub já tem o pacote. Correção: o runtime
+  do Visual C++ vai **embutido** no executável (`/MT`), e a CI agora falha
+  se o `.exe` voltar a depender dele.
+- **Instalador mais simples:** a última tela oferece "Executar o Rasgo
+  Modular", já marcado.
+- **Versão portátil para Windows** (`.zip`): basta descompactar e abrir, sem
+  instalar.
+- **JUCE fixado na versão 9.0.3** na CI. Antes cada build usava o `master`
+  do dia, o que não era reproduzível.
 - **Linux além do `.deb`: AppImage e `.tar.gz`** (x86-64, glibc 2.35+),
   para Fedora, Arch, openSUSE e quem não instala `.deb`. Os dois saem do
   mesmo `cmake --install` que o `.deb` usa (`packaging/linux/empacotar.sh`).
