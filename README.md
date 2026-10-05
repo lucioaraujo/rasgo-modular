@@ -92,6 +92,10 @@ never been opened by the author, and the `.dmg` is ad-hoc signed, without
 Developer ID or notarisation — Gatekeeper will warn about an unidentified
 developer on first launch.
 
+**On first launch, Windows and macOS show a security warning.** It is
+expected and does not mean anything is wrong. What to click on each system:
+[INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step).
+
 ### Build from source
 
 Requirements, build steps, environment variables and troubleshooting are
@@ -179,6 +183,10 @@ Dito por inteiro antes de baixar: os pacotes de Windows e macOS nunca foram
 abertos pelo autor, e o `.dmg` tem assinatura ad-hoc, sem Developer ID nem
 notarização — o Gatekeeper mostra aviso de desenvolvedor não identificado
 na primeira abertura.
+
+**Na primeira abertura, o Windows e o macOS mostram um aviso de
+segurança.** É esperado e não indica defeito. O que clicar em cada sistema
+está em [INSTALL.md → Instalar, passo a passo](INSTALL.md#instalar-passo-a-passo).
 
 ### Compilar a partir do código
 
@@ -272,6 +280,11 @@ jamais été ouverts par l'auteur, et le `.dmg` est signé en ad-hoc, sans
 Developer ID ni notarisation — Gatekeeper affichera un avertissement de
 développeur non identifié au premier lancement.
 
+**Au premier lancement, Windows et macOS affichent un avertissement de
+sécurité.** C'est attendu et ne signale aucun défaut. Où cliquer sur chaque
+système : [INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step)
+(en anglais et en portugais).
+
 ### Compiler depuis les sources
 
 Prérequis, étapes de compilation, variables d'environnement et problèmes
@@ -359,6 +372,11 @@ Dicho por completo antes de descargar: los paquetes de Windows y macOS
 nunca fueron abiertos por el autor, y el `.dmg` tiene firma ad-hoc, sin
 Developer ID ni notarización — Gatekeeper mostrará un aviso de desarrollador
 no identificado en la primera apertura.
+
+**En la primera apertura, Windows y macOS muestran un aviso de
+seguridad.** Es esperado y no indica ningún defecto. Qué pulsar en cada
+sistema: [INSTALL.md → Instalar, passo a passo](INSTALL.md#instalar-passo-a-passo)
+(en portugués y en inglés).
 
 ### Compilar desde el código
 
