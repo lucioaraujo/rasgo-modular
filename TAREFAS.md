@@ -10626,3 +10626,12 @@ Program, pago, no macOS. Decisão do autor.
 **Próximo passo:** versão 0.1.4 no CMake; publicar a v0.1.4-rc1 se o
 autor autorizar e testá-la no Windows dele.
 
+**6 out. 2026 — v0.1.4-rc1 testada num Windows real pelo autor: instalou e
+executou.** É a primeira abertura confirmada fora da CI. Ela confirma o
+diagnóstico (runtime do Visual C++ ausente na v0.1.3) e a correção (runtime
+embutido). Pré-release com os seis pacotes: Windows `.exe` e `.zip`, macOS
+`.dmg`, Linux `.deb`, AppImage e `.tar.gz`. **Próximo passo:** publicar a
+v0.1.4 final (tag, site com `estado.py --depois 0.1.4`, README e INSTALL
+com a versão nova), com autorização do autor. O macOS continua sem teste em
+máquina real.
+
