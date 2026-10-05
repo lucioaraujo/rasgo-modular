@@ -65,6 +65,8 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
   </div>
 
+  <p>Todas as versões, inclusive as de teste: <a href="%(repo)s/releases">página de releases no GitHub</a>.</p>
+
   <p><strong>Antes de baixar, duas coisas ditas por inteiro.</strong> O
     pacote Windows e o pacote macOS foram construídos, empacotados e
     testados <em>somente pela integração contínua</em> — o autor nunca abriu
@@ -105,6 +107,8 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
   </div>
+
+  <p>All versions, including test builds: <a href="%(repo)s/releases">releases page on GitHub</a>.</p>
 
   <p><strong>Two things said in full before you download.</strong> The
     Windows and macOS packages were built, packaged and tested <em>by
@@ -150,6 +154,8 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
   </div>
 
+  <p>Toutes les versions, y compris celles de test : <a href="%(repo)s/releases">page des releases sur GitHub</a>.</p>
+
   <p><strong>Deux choses dites en entier avant de télécharger.</strong> Les
     paquets Windows et macOS ont été construits, empaquetés et testés
     <em>uniquement par l'intégration continue</em> — l'auteur n'a jamais
@@ -194,6 +200,8 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
   </div>
+
+  <p>Todas las versiones, incluidas las de prueba: <a href="%(repo)s/releases">página de releases en GitHub</a>.</p>
 
   <p><strong>Dos cosas dichas por entero antes de descargar.</strong> Los
     paquetes de Windows y de macOS fueron construidos, empaquetados y
