@@ -3,7 +3,7 @@
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.3 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) ·
+**Download:** [v0.1.4 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -23,7 +23,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version:** v0.1.3 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.4 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -75,22 +75,23 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.3 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
-Linux `.deb`, Windows `.exe`, macOS `.dmg`, all built and packaged by
-continuous integration.
+[**v0.1.4 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
+macOS `.dmg`, all built and packaged by continuous integration.
 
 | Platform | Built | Run | Audio verified |
 |---|---|---|---|
 | Linux x86-64 | yes | yes | yes, on real hardware |
-| Windows x86-64 | continuous integration only | no | no |
+| Windows x86-64 | continuous integration | yes, by the author (Windows 10, 8 GB) | yes, by the author |
 | macOS (Universal 2) | continuous integration only | no | no |
 
 **Minimum:** Windows 10 (1607+) or 11, 64-bit · macOS 10.15+ (Intel or Apple Silicon) · Linux x86-64 with glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · a 64-bit processor with two cores or more · ~55 MB of memory · a 1280 × 760 screen. Details in [`INSTALL.md`](INSTALL.md).
 
-Said in full before you download: the Windows and macOS packages have
-never been opened by the author, and the `.dmg` is ad-hoc signed, without
-Developer ID or notarisation — Gatekeeper will warn about an unidentified
-developer on first launch.
+Said in full before you download: the Windows package was installed and
+played by the author on a real Windows 10 machine (8 GB) on 6 Oct. 2026;
+the macOS package has still only been tested by continuous integration. The
+`.dmg` is ad-hoc signed, without Developer ID or notarisation — Gatekeeper
+will warn about an unidentified developer on first launch.
 
 **On first launch, Windows and macOS show a security warning.** It is
 expected and does not mean anything is wrong. What to click on each system:
@@ -114,7 +115,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versão:** v0.1.3 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.4 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que é
@@ -167,22 +168,23 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
-`.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construídos
-e empacotados pela integração contínua.
+[**Release v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
+`.dmg` — todos construídos e empacotados pela integração contínua.
 
 | Plataforma | Construído | Executado | Áudio verificado |
 |---|---|---|---|
 | Linux x86-64 | sim | sim | sim, em hardware real |
-| Windows x86-64 | só na integração contínua | não | não |
+| Windows x86-64 | na integração contínua | sim, pelo autor (Windows 10, 8 GB) | sim, pelo autor |
 | macOS (Universal 2) | só na integração contínua | não | não |
 
 **Mínimo:** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 com glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processador de 64 bits com dois núcleos ou mais · ~55 MB de memória · tela de 1280 × 760. Detalhes no [`INSTALL.md`](INSTALL.md).
 
-Dito por inteiro antes de baixar: os pacotes de Windows e macOS nunca foram
-abertos pelo autor, e o `.dmg` tem assinatura ad-hoc, sem Developer ID nem
-notarização — o Gatekeeper mostra aviso de desenvolvedor não identificado
-na primeira abertura.
+Dito por inteiro antes de baixar: o pacote de Windows foi instalado e tocado
+pelo autor num Windows 10 real (8 GB) em 6 out. 2026; o de macOS segue
+testado só pela integração contínua. O `.dmg` tem assinatura ad-hoc, sem
+Developer ID nem notarização — o Gatekeeper mostra aviso de desenvolvedor
+não identificado na primeira abertura.
 
 **Na primeira abertura, o Windows e o macOS mostram um aviso de
 segurança.** É esperado e não indica defeito. O que clicar em cada sistema
@@ -207,7 +209,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version :** v0.1.3 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.4 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -263,22 +265,24 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
+[**Version v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
 | Plateforme | Construit | Lancé | Audio vérifié |
 |---|---|---|---|
 | Linux x86-64 | oui | oui | oui, sur matériel réel |
-| Windows x86-64 | intégration continue uniquement | non | non |
+| Windows x86-64 | intégration continue | oui, par l'auteur (Windows 10, 8 Go) | oui, par l'auteur |
 | macOS (Universal 2) | intégration continue uniquement | non | non |
 
 **Minimum :** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 avec glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processeur 64 bits à deux cœurs ou plus · ~55 Mo de mémoire · écran de 1280 × 760. Détails dans [`INSTALL.md`](INSTALL.md).
 
-Dit en entier avant de télécharger : les paquets Windows et macOS n'ont
-jamais été ouverts par l'auteur, et le `.dmg` est signé en ad-hoc, sans
-Developer ID ni notarisation — Gatekeeper affichera un avertissement de
-développeur non identifié au premier lancement.
+Dit en entier avant de télécharger : le paquet Windows a été installé et
+joué par l'auteur sur une vraie machine Windows 10 (8 Go) le 6 oct. 2026 ;
+celui de macOS n'a encore été testé que par l'intégration continue. Le
+`.dmg` est signé en ad-hoc, sans Developer ID ni notarisation — Gatekeeper
+affichera un avertissement de développeur non identifié au premier
+lancement.
 
 **Au premier lancement, Windows et macOS affichent un avertissement de
 sécurité.** C'est attendu et ne signale aucun défaut. Où cliquer sur chaque
@@ -303,7 +307,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versión:** v0.1.3 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.4 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -356,22 +360,23 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.3**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3) —
+[**Versión v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 
 | Plataforma | Construido | Ejecutado | Audio verificado |
 |---|---|---|---|
 | Linux x86-64 | sí | sí | sí, en hardware real |
-| Windows x86-64 | solo en integración continua | no | no |
+| Windows x86-64 | en integración continua | sí, por el autor (Windows 10, 8 GB) | sí, por el autor |
 | macOS (Universal 2) | solo en integración continua | no | no |
 
 **Mínimo:** Windows 10 (1607+) u 11, 64 bits · macOS 10.15+ (Intel o Apple Silicon) · Linux x86-64 con glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · procesador de 64 bits con dos núcleos o más · ~55 MB de memoria · pantalla de 1280 × 760. Detalles en [`INSTALL.md`](INSTALL.md).
 
-Dicho por completo antes de descargar: los paquetes de Windows y macOS
-nunca fueron abiertos por el autor, y el `.dmg` tiene firma ad-hoc, sin
-Developer ID ni notarización — Gatekeeper mostrará un aviso de desarrollador
-no identificado en la primera apertura.
+Dicho por completo antes de descargar: el paquete de Windows fue instalado y
+tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026; el de macOS
+sigue probado solo por la integración continua. El `.dmg` tiene firma
+ad-hoc, sin Developer ID ni notarización — Gatekeeper mostrará un aviso de
+desarrollador no identificado en la primera apertura.
 
 **En la primera apertura, Windows y macOS muestran un aviso de
 seguridad.** Es esperado y no indica ningún defecto. Qué pulsar en cada

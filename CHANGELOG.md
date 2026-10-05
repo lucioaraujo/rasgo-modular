@@ -7,7 +7,23 @@ pronto.
 
 ---
 
-## Próxima versão (não publicada)
+## v0.1.4 — 2026-10-06
+
+> **English summary.** Installation fixes. **Windows:** the app now opens on
+> any Windows. Up to v0.1.3 it silently required the Visual C++
+> Redistributable (`MSVCP140.dll`, `VCRUNTIME140.dll`), which the installer
+> did not ship, so on a Windows without it nothing happened. The runtime is
+> now built into the `.exe`, and CI fails if that dependency comes back.
+> Verified by the author on a real Windows 10 (8 GB). The installer ends
+> with "Run Rasgo Modular", and a portable `.zip` is available. **macOS:**
+> the whole `.app` is now ad-hoc signed and sealed; before, only the Apple
+> Silicon slice had a linker signature, which tends to give "damaged and
+> can't be opened" on Apple Silicon Macs. **Linux:** AppImage and
+> `.tar.gz` (with a no-root `install.sh`) besides the `.deb`, launch-tested
+> in CI on Debian 12, Ubuntu 24.04, Fedora and Arch. **Docs:** a
+> step-by-step install guide for the Windows and macOS first-launch
+> warnings, linked from the site and README. JUCE is now pinned to 9.0.3.
+> Pre-release for testing before this: `v0.1.4-rc1`.
 
 - **Windows: o app passa a abrir em qualquer Windows.** Até a v0.1.3 o
   `Rasgo Modular.exe` dependia do "Visual C++ Redistributable"
