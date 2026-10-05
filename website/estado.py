@@ -72,6 +72,12 @@ TEXTO = {
     ad-hoc, sem Developer ID nem notarização: o Gatekeeper mostra aviso de
     desenvolvedor não identificado na primeira abertura.</p>
 
+  <p><strong>Na primeira abertura, o Windows e o macOS mostram um aviso de
+    segurança.</strong> O programa é livre e não tem certificado pago de
+    assinatura; o aviso não indica defeito. O que clicar em cada sistema
+    está no <a href="%(repo)s/blob/main/INSTALL.md#instalar-passo-a-passo">passo
+    a passo da instalação</a>.</p>
+
   <p>Instalação, requisitos e como compilar a partir do código estão no
     <a href="%(repo)s/blob/v%(v)s/INSTALL.md">INSTALL.md</a>; o que mudou,
     no <a href="%(repo)s/blob/v%(v)s/CHANGELOG.md">CHANGELOG.md</a>.</p>""",
@@ -106,6 +112,13 @@ TEXTO = {
     application on either system. And the <code>.dmg</code> is ad-hoc
     signed, with no Developer ID and no notarisation: Gatekeeper will warn
     about an unidentified developer on first launch.</p>
+
+  <p><strong>On first launch, Windows and macOS show a security
+    warning.</strong> The program is free software without a paid
+    code-signing certificate; the warning does not mean anything is wrong.
+    What to click on each system is in the
+    <a href="%(repo)s/blob/main/INSTALL.md#installing-step-by-step">step-by-step
+    installation guide</a>.</p>
 
   <p>Installation, requirements and how to build from source are in
     <a href="%(repo)s/blob/v%(v)s/INSTALL.md">INSTALL.md</a>; what changed is
@@ -145,6 +158,13 @@ TEXTO = {
     affichera un avertissement de développeur non identifié au premier
     lancement.</p>
 
+  <p><strong>Au premier lancement, Windows et macOS affichent un
+    avertissement de sécurité.</strong> Le programme est libre, sans
+    certificat de signature payant ; l'avertissement ne signale aucun
+    défaut. Où cliquer sur chaque système : le
+    <a href="%(repo)s/blob/main/INSTALL.md#installing-step-by-step">guide
+    d'installation pas à pas</a> (en anglais et en portugais).</p>
+
   <p>Installation, prérequis et compilation depuis les sources sont dans
     <a href="%(repo)s/blob/v%(v)s/INSTALL.md">INSTALL.md</a> ; ce qui a
     changé, dans
@@ -181,6 +201,12 @@ TEXTO = {
     la aplicación en esos dos sistemas. Y el <code>.dmg</code> tiene firma
     ad-hoc, sin Developer ID ni notarización: Gatekeeper mostrará un aviso
     de desarrollador no identificado en la primera apertura.</p>
+
+  <p><strong>En la primera apertura, Windows y macOS muestran un aviso de
+    seguridad.</strong> El programa es libre y no tiene certificado de firma
+    de pago; el aviso no indica ningún defecto. Qué pulsar en cada sistema:
+    la <a href="%(repo)s/blob/main/INSTALL.md#instalar-passo-a-passo">guía de
+    instalación paso a paso</a> (en portugués y en inglés).</p>
 
   <p>Instalación, requisitos y cómo compilar desde el código están en
     <a href="%(repo)s/blob/v%(v)s/INSTALL.md">INSTALL.md</a>; lo que cambió,

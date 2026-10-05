@@ -4,9 +4,12 @@
 > instaladores para Linux, Windows e macOS na
 > [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3)
 > (antes: v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em 29 set. 2026). Este documento descreve também como
-> construir e rodar a partir do código. *English:* the current version is
-> v0.1.3 — installers on the release page above; the English section is
-> further down.
+> construir e rodar a partir do código.
+>
+> **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
+> lá estão os avisos do Windows e do macOS e o que fazer em cada um.
+> *English:* the current version is v0.1.3. Start with
+> ["Installing, step by step"](#installing-step-by-step).
 
 ---
 
@@ -63,6 +66,87 @@ a extração para [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/r
 ---
 
 ## Português
+
+### Instalar, passo a passo
+
+Os avisos de segurança abaixo **são esperados**: o Rasgo Modular é software
+livre, publicado sem certificado pago de assinatura digital. Eles não
+indicam defeito nem vírus. Aparecem só na primeira vez.
+
+#### Windows
+
+1. Na [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/latest),
+   baixe `rasgo-modular-<versão>-windows-x64.exe`.
+2. Abra o arquivo. O Windows mostra uma janela azul **"O Windows protegeu o
+   computador"**. Clique em **"Mais informações"** e depois em
+   **"Executar assim mesmo"**.
+3. Se o Windows pedir permissão de administrador, clique em **"Sim"**. O
+   programa é instalado em Arquivos de Programas.
+4. Clique em **"Avançar"** até o fim. A partir da v0.1.4, a última tela já
+   traz **"Executar o Rasgo Modular"** marcado.
+5. Depois disso, o Rasgo Modular fica no **Menu Iniciar** e na área de
+   trabalho.
+
+**Sem instalar** (a partir da v0.1.4): baixe o `.zip`, descompacte-o e abra
+`Rasgo Modular.exe`. O aviso do passo 2 aparece do mesmo jeito na primeira
+vez.
+
+**Se você instalou a v0.1.3 ou anterior e nada acontece ao abrir**, ou
+aparece um erro sobre `VCRUNTIME140.dll` ou `MSVCP140.dll`: falta no seu
+Windows o pacote "Microsoft Visual C++ Redistributable", que essas versões
+exigiam sem avisar. Instale-o pelo link da Microsoft
+(<https://aka.ms/vs/17/release/vc_redist.x64.exe>) e abra o Rasgo Modular
+de novo. A partir da v0.1.4 isso não é mais necessário, porque tudo vai
+dentro do `.exe`.
+
+**Se ainda assim não abrir:** aperte **Win + R**, digite
+`%APPDATA%\rasgo-modular` e dê Enter. Envie o conteúdo de `arranque.log` e
+de `crash.log` (se existir) [numa issue](https://github.com/lucioaraujo/rasgo-modular/issues).
+A última linha do `arranque.log` diz em que ponto a abertura parou.
+
+#### macOS
+
+1. Na [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/latest),
+   baixe `rasgo-modular-<versão>-macos-universal.dmg`. O mesmo arquivo
+   serve para Mac Intel e Apple Silicon.
+2. Abra o `.dmg` com dois cliques e **arraste "Rasgo Modular" para a pasta
+   Aplicativos**, que aparece como atalho na própria janela.
+3. Abra o Rasgo Modular em Aplicativos. Na primeira vez, o macOS avisa que
+   **não pode verificar o desenvolvedor**. O aviso aparece porque o app não
+   passou pela notarização da Apple, que exige uma conta paga. Clique em
+   **"OK"** ou **"Concluído"**. **Não** clique em "Mover para o Lixo".
+4. Abra **Ajustes do Sistema → Privacidade e Segurança** e desça até a
+   parte de segurança. Lá aparece a linha "Rasgo Modular foi bloqueado…".
+   Clique em **"Abrir Mesmo Assim"**, confirme com sua senha ou Touch ID e
+   clique em **"Abrir"**. Isso só é preciso na primeira vez.
+   - **No macOS 14 ou anterior há um atalho:** no Finder, clique no app com
+     o botão direito (ou Control + clique), escolha **"Abrir"** e depois
+     **"Abrir"** de novo.
+5. Quando você ligar o botão **ON** do módulo SIGNAL-IN, o macOS pede
+   permissão para usar o microfone. Permita, se quiser tocar com entrada de
+   áudio.
+
+**Se aparecer "Rasgo Modular está danificado e não pode ser aberto"**
+(v0.1.3 ou anterior, em Mac com chip Apple): o arquivo não está danificado.
+Essas versões não tinham o pacote assinado por inteiro. Abra o
+**Terminal**, cole o comando abaixo, dê Enter e depois abra o app
+normalmente:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
+```
+
+A partir da v0.1.4, o pacote é assinado por inteiro e esse caso não deve
+mais acontecer. Isso ainda não foi conferido num Mac real.
+
+#### Linux
+
+- **Ubuntu, Debian e Mint:** dê dois cliques no `.deb` ou use
+  `sudo apt install ./rasgo-modular-<versão>-linux-x86_64.deb`.
+- **Outras distribuições** (a partir da v0.1.4): use o **AppImage**. Marque
+  o arquivo como executável (propriedades → permitir executar, ou
+  `chmod +x`) e abra. Ou use o **`.tar.gz`**: descompacte-o e rode
+  `./install.sh`, que instala no seu usuário, sem root.
 
 ### Requisitos para usar
 
@@ -128,17 +212,11 @@ O executável fica em `build/apps/juce/RasgoModularApp_artefacts/Release/`.
 
 ### Pacote instalável
 
-**Limitações do `.deb`** (inspecionado no pacote que a CI gerou):
-
-- **exige Ubuntu 24.04+ / Debian 13+.** A dependência é `libasound2t64`,
-  nome que vem da transição do `time_t` para 64 bits; no Ubuntu 22.04
-  (suporte até 2027) o pacote ainda se chama `libasound2` e a instalação
-  falha. Isso não foi escolhido: vem de a CI usar `ubuntu-latest`. Fixar
-  o runner em `ubuntu-22.04` ampliaria o alcance, ao custo de compilar
-  contra bibliotecas mais antigas;
-- **só cobre a família Debian.** Fedora, Arch e openSUSE precisam
-  compilar do código — um AppImage cobriria todos de uma vez, se vier a
-  fazer falta.
+**O `.deb`** é compilado no Ubuntu 22.04 desde a v0.1.2. Antes, a
+dependência saía `libasound2t64` e o pacote não instalava no 22.04. Agora
+ele instala no Ubuntu 22.04+, no Debian 12+ e no Mint 21+. Para outras
+distribuições, a partir da v0.1.4, há AppImage e `.tar.gz`, gerados por
+`packaging/linux/empacotar.sh`.
 
 O pacote instala `/usr/bin/rasgo-modular`, uma entrada `.desktop` com as
 categorias de áudio e um ícone SVG escalável.
@@ -263,6 +341,73 @@ comercial — ver [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 ---
 
 ## English
+
+### Installing, step by step
+
+The security warnings below **are expected**: Rasgo Modular is free
+software published without a paid code-signing certificate. They do not
+mean anything is wrong, and they only appear the first time.
+
+#### Windows
+
+1. From the [release page](https://github.com/lucioaraujo/rasgo-modular/releases/latest),
+   download `rasgo-modular-<version>-windows-x64.exe`.
+2. Open it. Windows shows a blue **"Windows protected your PC"** box. Click
+   **"More info"**, then **"Run anyway"**.
+3. If Windows asks for administrator permission, click **"Yes"**.
+4. Click **"Next"** to the end. From v0.1.4 on, the last page has
+   **"Run Rasgo Modular"** already ticked.
+5. Rasgo Modular is then in the **Start menu** and on the desktop.
+
+**Without installing** (from v0.1.4): unzip the `.zip` and open
+`Rasgo Modular.exe`.
+
+**v0.1.3 or earlier and nothing happens**, or an error about
+`VCRUNTIME140.dll` or `MSVCP140.dll` appears: your Windows lacks the
+"Microsoft Visual C++ Redistributable", which those versions silently
+required. Install it from
+<https://aka.ms/vs/17/release/vc_redist.x64.exe> and open the app again.
+From v0.1.4 on, everything is inside the `.exe`.
+
+**Still not opening?** Press **Win + R**, type `%APPDATA%\rasgo-modular`,
+and send `arranque.log` and `crash.log` (if present) in
+[an issue](https://github.com/lucioaraujo/rasgo-modular/issues).
+
+#### macOS
+
+1. Download `rasgo-modular-<version>-macos-universal.dmg`. It works on both
+   Intel and Apple Silicon Macs.
+2. Open it and **drag "Rasgo Modular" into Applications**.
+3. Open it. The first time, macOS says it **cannot verify the developer**,
+   because the app is not notarised by Apple, which requires a paid
+   account. Click **"OK"** or **"Done"**, **not** "Move to Trash".
+4. Go to **System Settings → Privacy & Security**, scroll to the security
+   section, click **"Open Anyway"** next to "Rasgo Modular was blocked…",
+   confirm with your password or Touch ID, and click **"Open"**. Only the
+   first time.
+   - **On macOS 14 or earlier there is a shortcut:** right-click (or
+     Control-click) the app in Finder, then **Open → Open**.
+5. Turning on the SIGNAL-IN **ON** switch makes macOS ask for microphone
+   access. Allow it if you want audio input.
+
+**"Rasgo Modular is damaged and can't be opened"** (v0.1.3 or earlier, on
+Apple Silicon Macs): the file is not damaged. Those versions were not
+fully signed. Run this in Terminal, then open the app normally:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
+```
+
+From v0.1.4 on, the whole bundle is signed and this should no longer
+happen. That has not yet been checked on a real Mac.
+
+#### Linux
+
+- **Ubuntu, Debian and Mint:** double-click the `.deb`, or run
+  `sudo apt install ./<file>.deb`.
+- **Other distributions** (from v0.1.4): use the **AppImage** (make it
+  executable, then open it), or the **`.tar.gz`** (unpack it and run
+  `./install.sh`, which installs for your user only, without root).
 
 ### Requirements to run
 
