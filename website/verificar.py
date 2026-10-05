@@ -114,8 +114,10 @@ def conferir_downloads():
 
     estado = (AQUI / "estado.py").read_text(encoding="utf-8")
     moldes = re.findall(r'"(rasgo-modular-%s-[^"]+)"', estado)
-    if len(moldes) != 3:
-        problemas.append("esperava 3 moldes de pacote em estado.py, achei %d"
+    # 6 desde a v0.1.4: .deb, AppImage e .tar.gz (Linux), .exe e .zip
+    # (Windows), .dmg (macOS)
+    if len(moldes) != 6:
+        problemas.append("esperava 6 moldes de pacote em estado.py, achei %d"
                          % len(moldes))
         return
     for molde in moldes:

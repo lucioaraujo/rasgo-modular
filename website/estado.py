@@ -37,6 +37,9 @@ PACOTES = [
     ("linux",   "rasgo-modular-%s-linux-x86_64.deb"),
     ("windows", "rasgo-modular-%s-windows-x64.exe"),
     ("macos",   "rasgo-modular-%s-macos-universal.dmg"),
+    ("appimage", "rasgo-modular-%s-linux-x86_64.AppImage"),
+    ("targz",   "rasgo-modular-%s-linux-x86_64.tar.gz"),
+    ("winzip",  "rasgo-modular-%s-windows-x64.zip"),
 ]
 
 TEXTO = {
@@ -63,14 +66,17 @@ TEXTO = {
     <a class="button button-primary" href="%(repo)s/releases/download/v%(v)s/%(linux)s">Linux &middot; .deb</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portátil)</a>
   </div>
 
   <p>Todas as versões, inclusive as de teste: <a href="%(repo)s/releases">página de releases no GitHub</a>.</p>
 
   <p><strong>Antes de baixar, duas coisas ditas por inteiro.</strong> O
-    pacote Windows e o pacote macOS foram construídos, empacotados e
-    testados <em>somente pela integração contínua</em> — o autor nunca abriu
-    o aplicativo nesses dois sistemas. E o <code>.dmg</code> tem assinatura
+    pacote Windows foi instalado e tocado pelo autor num Windows 10 real
+    (8 GB) em 6 out. 2026; o pacote macOS segue construído, empacotado e
+    testado <em>somente pela integração contínua</em>. E o <code>.dmg</code> tem assinatura
     ad-hoc, sem Developer ID nem notarização: o Gatekeeper mostra aviso de
     desenvolvedor não identificado na primeira abertura.</p>
 
@@ -106,14 +112,17 @@ TEXTO = {
     <a class="button button-primary" href="%(repo)s/releases/download/v%(v)s/%(linux)s">Linux &middot; .deb</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portable)</a>
   </div>
 
   <p>All versions, including test builds: <a href="%(repo)s/releases">releases page on GitHub</a>.</p>
 
   <p><strong>Two things said in full before you download.</strong> The
-    Windows and macOS packages were built, packaged and tested <em>by
-    continuous integration only</em> — the author has never opened the
-    application on either system. And the <code>.dmg</code> is ad-hoc
+    Windows package was installed and played by the author on a real
+    Windows 10 machine (8 GB) on 6 Oct. 2026; the macOS package is still
+    built, packaged and tested <em>by continuous integration only</em>. And the <code>.dmg</code> is ad-hoc
     signed, with no Developer ID and no notarisation: Gatekeeper will warn
     about an unidentified developer on first launch.</p>
 
@@ -152,14 +161,17 @@ TEXTO = {
     <a class="button button-primary" href="%(repo)s/releases/download/v%(v)s/%(linux)s">Linux &middot; .deb</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portable)</a>
   </div>
 
   <p>Toutes les versions, y compris celles de test : <a href="%(repo)s/releases">page des releases sur GitHub</a>.</p>
 
   <p><strong>Deux choses dites en entier avant de télécharger.</strong> Les
-    paquets Windows et macOS ont été construits, empaquetés et testés
-    <em>uniquement par l'intégration continue</em> — l'auteur n'a jamais
-    ouvert l'application sur ces deux systèmes. Et le <code>.dmg</code> est
+    paquet Windows a été installé et joué par l'auteur sur une vraie machine
+    Windows 10 (8 Go) le 6 oct. 2026 ; celui de macOS reste construit,
+    empaqueté et testé <em>uniquement par l'intégration continue</em>. Et le <code>.dmg</code> est
     signé en ad-hoc, sans Developer ID ni notarisation : Gatekeeper
     affichera un avertissement de développeur non identifié au premier
     lancement.</p>
@@ -199,14 +211,17 @@ TEXTO = {
     <a class="button button-primary" href="%(repo)s/releases/download/v%(v)s/%(linux)s">Linux &middot; .deb</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(windows)s">Windows &middot; .exe</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(macos)s">macOS &middot; .dmg</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portátil)</a>
   </div>
 
   <p>Todas las versiones, incluidas las de prueba: <a href="%(repo)s/releases">página de releases en GitHub</a>.</p>
 
   <p><strong>Dos cosas dichas por entero antes de descargar.</strong> Los
-    paquetes de Windows y de macOS fueron construidos, empaquetados y
-    probados <em>sólo por la integración continua</em> — el autor nunca abrió
-    la aplicación en esos dos sistemas. Y el <code>.dmg</code> tiene firma
+    paquete de Windows fue instalado y tocado por el autor en un Windows 10
+    real (8 GB) el 6 oct. 2026; el de macOS sigue construido, empaquetado y
+    probado <em>sólo por la integración continua</em>. Y el <code>.dmg</code> tiene firma
     ad-hoc, sin Developer ID ni notarización: Gatekeeper mostrará un aviso
     de desarrollador no identificado en la primera apertura.</p>
 
