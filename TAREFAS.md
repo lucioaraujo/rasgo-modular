@@ -10627,7 +10627,7 @@ Program, pago, no macOS. Decisão do autor.
 autor autorizar e testá-la no Windows dele.
 
 **6 out. 2026 — v0.1.4-rc1 testada num Windows real pelo autor: instalou e
-executou.** É a primeira abertura confirmada fora da CI. Ela confirma o
+executou e funcionou bem** (Windows 10, 8 GB de memória). É a primeira abertura confirmada fora da CI. Ela confirma o
 diagnóstico (runtime do Visual C++ ausente na v0.1.3) e a correção (runtime
 embutido). Pré-release com os seis pacotes: Windows `.exe` e `.zip`, macOS
 `.dmg`, Linux `.deb`, AppImage e `.tar.gz`. **Próximo passo:** publicar a
