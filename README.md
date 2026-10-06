@@ -83,13 +83,13 @@ macOS `.dmg`, all built and packaged by continuous integration.
 |---|---|---|---|
 | Linux x86-64 | yes | yes | yes, on real hardware |
 | Windows x86-64 | continuous integration | yes, by the author (Windows 10, 8 GB) | yes, by the author |
-| macOS (Universal 2) | continuous integration | yes, by the author (6 Oct. 2026, after allowing it — see INSTALL) | not yet reported |
+| macOS (Universal 2) | continuous integration | yes, by the author (6 Oct. 2026, after allowing it — see INSTALL) | yes, by the author |
 
 **Minimum:** Windows 10 (1607+) or 11, 64-bit · macOS 10.15+ (Intel or Apple Silicon) · Linux x86-64 with glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · a 64-bit processor with two cores or more · ~55 MB of memory · a 1280 × 760 screen. Details in [`INSTALL.md`](INSTALL.md).
 
 Said in full before you download: the Windows package was installed and
 played by the author on a real Windows 10 machine (8 GB) on 6 Oct. 2026;
-the macOS package was opened by the author on a real Mac on the same day,
+the macOS package was opened and played by the author on a real Mac on the same day,
 after allowing it (see INSTALL). The `.dmg` is ad-hoc signed, without
 Developer ID or notarisation — so macOS blocks it on first launch until you
 allow it once.
@@ -177,13 +177,13 @@ Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 |---|---|---|---|
 | Linux x86-64 | sim | sim | sim, em hardware real |
 | Windows x86-64 | na integração contínua | sim, pelo autor (Windows 10, 8 GB) | sim, pelo autor |
-| macOS (Universal 2) | na integração contínua | sim, pelo autor (6 out. 2026, depois de liberar — ver INSTALL) | ainda não relatado |
+| macOS (Universal 2) | na integração contínua | sim, pelo autor (6 out. 2026, depois de liberar — ver INSTALL) | sim, pelo autor |
 
 **Mínimo:** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 com glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processador de 64 bits com dois núcleos ou mais · ~55 MB de memória · tela de 1280 × 760. Detalhes no [`INSTALL.md`](INSTALL.md).
 
 Dito por inteiro antes de baixar: o pacote de Windows foi instalado e tocado
 pelo autor num Windows 10 real (8 GB) em 6 out. 2026, e o de macOS foi
-aberto pelo autor num Mac real no mesmo dia, depois de liberado (ver
+aberto e tocado pelo autor num Mac real no mesmo dia, depois de liberado (ver
 INSTALL). O `.dmg` tem assinatura ad-hoc, sem Developer ID nem notarização:
 na primeira abertura o macOS bloqueia o app até você liberá-lo uma vez.
 
@@ -274,7 +274,7 @@ empaquetés par l'intégration continue.
 |---|---|---|---|
 | Linux x86-64 | oui | oui | oui, sur matériel réel |
 | Windows x86-64 | intégration continue | oui, par l'auteur (Windows 10, 8 Go) | oui, par l'auteur |
-| macOS (Universal 2) | intégration continue | oui, par l'auteur (6 oct. 2026, après l'avoir autorisé — voir INSTALL) | pas encore signalé |
+| macOS (Universal 2) | intégration continue | oui, par l'auteur (6 oct. 2026, après l'avoir autorisé — voir INSTALL) | oui, par l'auteur |
 
 **Minimum :** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 avec glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processeur 64 bits à deux cœurs ou plus · ~55 Mo de mémoire · écran de 1280 × 760. Détails dans [`INSTALL.md`](INSTALL.md).
 
@@ -369,7 +369,7 @@ y empaquetados por la integración continua.
 |---|---|---|---|
 | Linux x86-64 | sí | sí | sí, en hardware real |
 | Windows x86-64 | en integración continua | sí, por el autor (Windows 10, 8 GB) | sí, por el autor |
-| macOS (Universal 2) | en integración continua | sí, por el autor (6 oct. 2026, tras autorizarlo — ver INSTALL) | aún no informado |
+| macOS (Universal 2) | en integración continua | sí, por el autor (6 oct. 2026, tras autorizarlo — ver INSTALL) | sí, por el autor |
 
 **Mínimo:** Windows 10 (1607+) u 11, 64 bits · macOS 10.15+ (Intel o Apple Silicon) · Linux x86-64 con glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · procesador de 64 bits con dos núcleos o más · ~55 MB de memoria · pantalla de 1280 × 760. Detalles en [`INSTALL.md`](INSTALL.md).
 
