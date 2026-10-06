@@ -731,6 +731,13 @@ if(RASGO_MODULAR_BUILD_JUCE_APP AND TARGET RasgoModularApp)
         # não cria atalho NENHUM no Menu Iniciar — bug real, achado e
         # corrigido igual no ANTITOTEM e no Navalha 2 no mesmo dia.
         set(CPACK_PACKAGE_EXECUTABLES "Rasgo Modular" "Rasgo Modular")
+        # O .exe fica na RAIZ da pasta instalada (DESTINATION .), mas o CPack
+        # cria os atalhos do Menu Iniciar e da área de trabalho (e o
+        # "Executar" da última tela) apontando para $INSTDIR\bin\ — o
+        # padrão dele quando esta variável falta. Resultado, visto num
+        # Windows 10 real em 7 out. 2026: o programa abria pela pasta e
+        # NÃO abria pelo menu. A CI agora confere o alvo de cada atalho.
+        set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
         set(CPACK_CREATE_DESKTOP_LINKS "Rasgo Modular")
         set(CPACK_NSIS_INSTALLED_ICON_NAME "Rasgo Modular.exe")
         # última tela do instalador: "Executar o Rasgo Modular" já marcado

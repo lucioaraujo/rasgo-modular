@@ -244,6 +244,31 @@ jobs:
         working-directory: build
         run: cpack -G ${{ matrix.generator }} -C Release
 
+      # Cada atalho do instalador precisa apontar para um arquivo que o
+      # instalador de fato põe lá. Sem CPACK_NSIS_EXECUTABLES_DIRECTORY o
+      # CPack apontava o Menu Iniciar para bin\, que não existe: o app
+      # abria pela pasta e não pelo menu (Windows 10 real, 7 out. 2026).
+      - name: Conferir os atalhos do instalador (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $nsi = Get-ChildItem -Recurse -Path . -Filter project.nsi | Select-Object -First 1
+          if (-not $nsi) { throw 'project.nsi não encontrado' }
+          $stage = Get-ChildItem -Directory $nsi.DirectoryName | Select-Object -First 1
+          if (-not $stage) { throw 'pasta de instalação do CPack não encontrada' }
+          $txt = Get-Content -Raw $nsi.FullName
+          $alvos = @()
+          $alvos += [regex]::Matches($txt, 'CreateShortCut\s+"[^"]+"\s+"\$INSTDIR\\([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+          $alvos += [regex]::Matches($txt, 'MUI_FINISHPAGE_RUN\s+"\$INSTDIR\\([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+          $alvos = $alvos | Where-Object { $_ -notmatch 'Uninstall' } | Sort-Object -Unique
+          if (-not $alvos) { Write-Error 'nenhum atalho para o programa no instalador'; exit 1 }
+          $falta = $false
+          foreach ($a in $alvos) {
+            $p = Join-Path $stage.FullName $a
+            if (Test-Path -LiteralPath $p) { "ok: $a" } else { Write-Error "atalho aponta para arquivo inexistente: $a"; $falta = $true }
+          }
+          if ($falta) { exit 1 }
+
       # Mesma árvore do `cmake --install` que o .deb usa; linuxdeploy
       # fixado por versão e hash dentro do script.
       - name: Versão portátil (.zip, Windows)
