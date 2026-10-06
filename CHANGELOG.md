@@ -7,10 +7,14 @@ pronto.
 
 ---
 
-## v0.1.5 — em teste (pré-release `v0.1.5-rc1`, 2026-10-06)
+## v0.1.5 — 2026-10-07
 
-> **English summary.** Two changes from VCV Rack forum feedback: cables
-> show their state on the canvas (see below), and a startup preference. The **OPENS** button in the header cycles four choices: **SEED** (a
+> **English summary.** **Windows fix:** the Start menu and desktop
+> shortcuts (and "Run" on the installer's last page) now open the program.
+> Up to v0.1.4 they pointed to a `bin\` folder that does not exist, so
+> nothing happened; CI now checks every shortcut target. Two changes from
+> VCV Rack forum feedback: cables show their state on the canvas (see
+> below), and a startup preference. The **OPENS** button in the header cycles four choices: **SEED** (a
 > new generated patch, playing: the default, as before), **NO CABLES** (all
 > modules, no cables, like "New" in a modular environment; a seed is still
 > drawn and kept as the return point for `r`), **MY PATCH** (choosing it
@@ -20,6 +24,17 @@ pronto.
 > A missing file falls back to a new seed. The app now also closes cleanly
 > on SIGTERM/SIGINT/SIGHUP (logout, shutdown, Ctrl+C), saving the session.
 
+- **Windows: os atalhos passam a abrir o programa.** O instalador põe o
+  `.exe` na raiz da pasta, mas o atalho do Menu Iniciar, o da área de
+  trabalho e o "Executar" da última tela apontavam para `bin\`, que é o
+  padrão do CPack quando `CPACK_NSIS_EXECUTABLES_DIRECTORY` não é definido.
+  Essa pasta não existe, então os atalhos não faziam nada. O autor viu
+  isso num Windows 10 real em 7 out. 2026: o programa só abria pela pasta,
+  e o mesmo acontecia na Antitotem e no Navalha 2. Corrigido com essa
+  variável. A CI agora tem o passo "Conferir os atalhos do instalador",
+  que lê o `project.nsi` e falha se algum atalho apontar para um arquivo
+  que o instalador não instala. Pré-releases de teste: `v0.1.5-rc1`, e
+  `v0.1.5-rc2` já com essa correção.
 - **O cabo mostra o próprio estado**, sem precisar abrir a caixa. É o
   segundo pedido do fórum: lá, o cabo com estado soou como "módulos
   escondidos no cabo". Agora:

@@ -3,7 +3,7 @@
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.4 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) ·
+**Download:** [v0.1.5 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -23,7 +23,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version:** v0.1.4 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.5 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -75,7 +75,7 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.4 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+[**v0.1.5 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5) —
 Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
 macOS `.dmg`, all built and packaged by continuous integration.
 
@@ -87,7 +87,11 @@ macOS `.dmg`, all built and packaged by continuous integration.
 
 **Minimum:** Windows 10 (1607+) or 11, 64-bit · macOS 10.15+ (Intel or Apple Silicon) · Linux x86-64 with glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · a 64-bit processor with two cores or more · ~55 MB of memory · a 1280 × 760 screen. Details in [`INSTALL.md`](INSTALL.md).
 
-Said in full before you download: the Windows package was installed and
+Said in full before you download: v0.1.5 was installed by the author on
+the same Windows 10 machine on 7 Oct. 2026, and its CI now also checks that
+the Start menu shortcut points to the installed program (in v0.1.4 and
+earlier it did not open anything). It has not been tried on a real Mac yet.
+For v0.1.4, the Windows package was installed and
 played by the author on a real Windows 10 machine (8 GB) on 6 Oct. 2026;
 the macOS package was opened and played by the author on a real Mac on the same day,
 after allowing it (see INSTALL). The `.dmg` is ad-hoc signed, without
@@ -116,7 +120,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versão:** v0.1.4 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.5 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que é
@@ -169,7 +173,7 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+[**Release v0.1.5**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5) —
 Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 `.dmg` — todos construídos e empacotados pela integração contínua.
 
@@ -181,7 +185,11 @@ Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 
 **Mínimo:** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 com glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processador de 64 bits com dois núcleos ou mais · ~55 MB de memória · tela de 1280 × 760. Detalhes no [`INSTALL.md`](INSTALL.md).
 
-Dito por inteiro antes de baixar: o pacote de Windows foi instalado e tocado
+Dito por inteiro antes de baixar: a v0.1.5 foi instalada pelo autor no
+mesmo Windows 10 em 7 out. 2026, e a CI agora também confere que o atalho
+do Menu Iniciar aponta para o programa instalado (até a v0.1.4 ele não
+abria nada). Ela ainda não foi testada num Mac real. Na v0.1.4, o pacote de
+Windows foi instalado e tocado
 pelo autor num Windows 10 real (8 GB) em 6 out. 2026, e o de macOS foi
 aberto e tocado pelo autor num Mac real no mesmo dia, depois de liberado (ver
 INSTALL). O `.dmg` tem assinatura ad-hoc, sem Developer ID nem notarização:
@@ -210,7 +218,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version :** v0.1.4 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.5 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -266,7 +274,7 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+[**Version v0.1.5**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
@@ -278,7 +286,11 @@ empaquetés par l'intégration continue.
 
 **Minimum :** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 avec glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processeur 64 bits à deux cœurs ou plus · ~55 Mo de mémoire · écran de 1280 × 760. Détails dans [`INSTALL.md`](INSTALL.md).
 
-Dit en entier avant de télécharger : le paquet Windows a été installé et
+Dit en entier avant de télécharger : la v0.1.5 a été installée par l'auteur
+sur le même Windows 10 le 7 oct. 2026, et la CI vérifie désormais aussi que
+le raccourci du menu Démarrer pointe vers le programme installé (jusqu'à la
+v0.1.4, il n'ouvrait rien). Elle n'a pas encore été essayée sur un vrai Mac.
+Pour la v0.1.4, le paquet Windows a été installé et
 joué par l'auteur sur une vraie machine Windows 10 (8 Go) le 6 oct. 2026,
 et celui de macOS a été ouvert et joué par l'auteur sur un vrai Mac le même jour,
 après l'avoir autorisé (voir INSTALL). Le `.dmg` est signé en ad-hoc, sans
@@ -308,7 +320,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versión:** v0.1.4 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.5 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -361,7 +373,7 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.4**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4) —
+[**Versión v0.1.5**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 
@@ -373,7 +385,11 @@ y empaquetados por la integración continua.
 
 **Mínimo:** Windows 10 (1607+) u 11, 64 bits · macOS 10.15+ (Intel o Apple Silicon) · Linux x86-64 con glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · procesador de 64 bits con dos núcleos o más · ~55 MB de memoria · pantalla de 1280 × 760. Detalles en [`INSTALL.md`](INSTALL.md).
 
-Dicho por completo antes de descargar: el paquete de Windows fue instalado y
+Dicho por completo antes de descargar: la v0.1.5 fue instalada por el autor
+en el mismo Windows 10 el 7 oct. 2026, y la CI ahora también comprueba que
+el acceso directo del menú Inicio apunta al programa instalado (hasta la
+v0.1.4 no abría nada). Aún no se probó en un Mac real. En la v0.1.4, el
+paquete de Windows fue instalado y
 tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026, y el de
 macOS fue abierto y tocado por el autor en un Mac real el mismo día, tras autorizarlo
 (ver INSTALL). El `.dmg` tiene firma ad-hoc, sin Developer ID ni

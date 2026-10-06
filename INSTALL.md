@@ -1,15 +1,15 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (6 out. 2026):** a versão atual é a **v0.1.4**, com pacotes
+> **Estado (7 out. 2026):** a versão atual é a **v0.1.5**, com pacotes
 > para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4)
-> (antes: v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5)
+> (antes: v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
 > 29 set. 2026). Este documento descreve também como
 > construir e rodar a partir do código.
 >
 > **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
 > lá estão os avisos do Windows e do macOS e o que fazer em cada um.
-> *English:* the current version is v0.1.4. Start with
+> *English:* the current version is v0.1.5. Start with
 > ["Installing, step by step"](#installing-step-by-step).
 
 ---
@@ -99,6 +99,11 @@ exigiam sem avisar. Instale-o pelo link da Microsoft
 (<https://aka.ms/vs/17/release/vc_redist.x64.exe>) e abra o Rasgo Modular
 de novo. A partir da v0.1.4 isso não é mais necessário, porque tudo vai
 dentro do `.exe`.
+
+**Se você tem a v0.1.4 ou anterior e o atalho do Menu Iniciar não abre
+nada:** instale a v0.1.5 por cima. O atalho dessas versões apontava para um
+arquivo que não existe; o programa em si está bom e abre pela pasta dele em
+`C:\Program Files`.
 
 **Se ainda assim não abrir:** aperte **Win + R**, digite
 `%APPDATA%\rasgo-modular` e dê Enter. Envie o conteúdo de `arranque.log` e
@@ -382,6 +387,11 @@ wrong, and they only appear the first time.
 required. Install it from
 <https://aka.ms/vs/17/release/vc_redist.x64.exe> and open the app again.
 From v0.1.4 on, everything is inside the `.exe`.
+
+**v0.1.4 or earlier and the Start menu shortcut does nothing:** install
+v0.1.5 over it. Those versions' shortcuts pointed to a file that does not
+exist; the program itself is fine and opens from its folder in
+`C:\Program Files`.
 
 **Still not opening?** Press **Win + R**, type `%APPDATA%\rasgo-modular`,
 and send `arranque.log` and `crash.log` (if present) in
