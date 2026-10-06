@@ -43,8 +43,8 @@
   "applicationCategory": "MultimediaApplication",
   "applicationSubCategory": "Modular synthesizer",
   "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.4",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4",
+  "softwareVersion": "0.1.5",
+  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -96,7 +96,7 @@
 <main id="conteudo">
 <section class="hero" id="top">
   <!-- PILULA:INICIO -->
-  <span class="status-pill">v0.1.4 — disponible para Linux, Windows y macOS</span>
+  <span class="status-pill">v0.1.5 — disponible para Linux, Windows y macOS</span>
   <!-- PILULA:FIM -->
   <h1>Patches como punto de partida</h1>
   <p class="lead">Rasgo Modular abre con un patch ya armado y sonando. Puede tocarlo tal
@@ -150,6 +150,11 @@
     Rasgo Modular, cada cable tiene ajustes propios, que aparecen al hacer
     clic sobre él. El mismo patch puede cambiar de carácter sin tocar ningún
     módulo.</p>
+  <p>El propio trazo del cable muestra ese estado sin abrirlo: un cable más
+    grueso lleva más ganancia; un cable que parpadea deja pasar la señal solo
+    parte del tiempo; y un sello en el medio indica que combina dos señales
+    (× multiplica, zigzag pliega, − resta), con una línea punteada hasta la
+    segunda señal.</p>
   <div class="grid">
     <div class="card">
       <h3>Conducción</h3>
@@ -186,6 +191,11 @@
     cables. Los módulos se quedan en el rack y el sonido se detiene; desde
     ahí, cada conexión es suya. <kbd>Ctrl+Z</kbd> deshace la última acción,
     cable por cable.</p>
+  <p><strong>Cómo abre.</strong> El botón <strong>ABRE</strong>, arriba,
+    elige por dónde empieza la app la próxima vez: un patch nuevo (por
+    defecto), el rack sin cables, un patch suyo o la última sesión. Si la app
+    se cerró por una falla, el inicio siguiente viene sin cables, por
+    seguridad.</p>
   <p>Para aprender mientras toca, pase el ratón sobre cualquier módulo,
     control o conector: la caja LEARN explica qué hace y sugiere qué probar
     después, en español, portugués, inglés o francés. La
@@ -212,18 +222,18 @@
   <h2>Estado</h2>
   <!-- ESTADO:INICIO -->
   <div class="note">
-    <p><strong>v0.1.4 disponible.</strong> Un instalador por sistema,
+    <p><strong>v0.1.5 disponible.</strong> Un instalador por sistema,
       construido y empaquetado por la integración continua desde la etiqueta
-      <code>v0.1.4</code>.</p>
+      <code>v0.1.5</code>.</p>
   </div>
 
   <div class="contact-row">
-    <a class="button button-primary" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-linux-x86_64.deb">Linux &middot; .deb</a>
-    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-windows-x64.exe">Windows &middot; .exe</a>
-    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-macos-universal.dmg">macOS &middot; .dmg</a>
-    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-linux-x86_64.AppImage">Linux &middot; AppImage</a>
-    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-linux-x86_64.tar.gz">Linux &middot; .tar.gz</a>
-    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.4/rasgo-modular-0.1.4-windows-x64.zip">Windows &middot; .zip (portátil)</a>
+    <a class="button button-primary" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-linux-x86_64.deb">Linux &middot; .deb</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-windows-x64.exe">Windows &middot; .exe</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-macos-universal.dmg">macOS &middot; .dmg</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-linux-x86_64.AppImage">Linux &middot; AppImage</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-linux-x86_64.tar.gz">Linux &middot; .tar.gz</a>
+    <a class="button" href="https://github.com/lucioaraujo/rasgo-modular/releases/download/v0.1.5/rasgo-modular-0.1.5-windows-x64.zip">Windows &middot; .zip (portátil)</a>
   </div>
 
   <p>Todas las versiones, incluidas las de prueba: <a href="https://github.com/lucioaraujo/rasgo-modular/releases">página de releases en GitHub</a>.</p>
@@ -244,8 +254,8 @@
     pulsar en cada sistema para autorizarlo. Basta hacerlo una vez.</p>
 
   <p>Instalación, requisitos y cómo compilar desde el código están en
-    <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.4/INSTALL.md">INSTALL.md</a>; lo que cambió,
-    en <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.4/CHANGELOG.md">CHANGELOG.md</a>.</p>
+    <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.5/INSTALL.md">INSTALL.md</a>; lo que cambió,
+    en <a href="https://github.com/lucioaraujo/rasgo-modular/blob/v0.1.5/CHANGELOG.md">CHANGELOG.md</a>.</p>
   <!-- ESTADO:FIM -->
 
   <div class="wrap">

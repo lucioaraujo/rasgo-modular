@@ -10724,9 +10724,18 @@ a caixa ou encurtar os textos.
 
 **6 out. 2026 — `v0.1.5-rc1` publicada** (pré-release; CI verde, 6 pacotes). O autor testou no **Linux** e funcionou. **7 out. 2026:** instalada com êxito num Windows 10 real (8 GB), junto com a Antitotem e o Navalha 2 v0.1.1.
 
-**Pendente para a v0.1.5:**
-- testar a rc1 no macOS;
-- no dia da release, atualizar o site nos 4 idiomas: o card "Os cabos
-  também tocam" e "Como se usa" (ABRE), com uma captura do cabo com selo.
-  Isso não pode ser feito antes, porque o site descreve a versão publicada.
+**7 out. 2026 — atalho do Menu Iniciar quebrado no Windows** (achado do
+autor num Windows 10 real; valia para os três instrumentos). Os atalhos
+apontavam para `bin\`, que não existe. Corrigido, e a CI passou a conferir o
+alvo de cada atalho. **Decisão do autor:** não esperar o teste dele em máquina
+real para publicar; a CI verde e as conferências automáticas decidem a
+publicação, e o teste dele vem depois.
+
+**7 out. 2026 — v0.1.5 publicada** (README, INSTALL, site nos 4 idiomas:
+ABRE e o cabo com estado visível).
+
+**Pendente:**
+- testar a v0.1.5 num Mac real;
+- testar no Windows a abertura pelo Menu Iniciar;
+- uma captura do cabo com selo para o site;
 
