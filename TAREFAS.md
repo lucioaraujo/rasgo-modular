@@ -10722,8 +10722,10 @@ aparecem; o "→ experimente" nunca aparece. Isso já era assim antes. Falta
 avaliar se outros verbetes longos têm o mesmo corte e decidir entre rolar
 a caixa ou encurtar os textos.
 
+**6 out. 2026 — `v0.1.5-rc1` publicada** (pré-release; CI verde, 6 pacotes). O autor testou no **Linux** e funcionou.
+
 **Pendente para a v0.1.5:**
-- testar ABRE e o cabo no Windows e no macOS;
+- testar a rc1 no Windows e no macOS;
 - no dia da release, atualizar o site nos 4 idiomas: o card "Os cabos
   também tocam" e "Como se usa" (ABRE), com uma captura do cabo com selo.
   Isso não pode ser feito antes, porque o site descreve a versão publicada.
