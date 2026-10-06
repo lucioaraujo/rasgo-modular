@@ -280,7 +280,7 @@ empaquetés par l'intégration continue.
 
 Dit en entier avant de télécharger : le paquet Windows a été installé et
 joué par l'auteur sur une vraie machine Windows 10 (8 Go) le 6 oct. 2026,
-et celui de macOS a été ouvert par l'auteur sur un vrai Mac le même jour,
+et celui de macOS a été ouvert et joué par l'auteur sur un vrai Mac le même jour,
 après l'avoir autorisé (voir INSTALL). Le `.dmg` est signé en ad-hoc, sans
 Developer ID ni notarisation : au premier lancement, macOS le bloque jusqu'à
 ce que vous l'autorisiez une fois.
@@ -375,7 +375,7 @@ y empaquetados por la integración continua.
 
 Dicho por completo antes de descargar: el paquete de Windows fue instalado y
 tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026, y el de
-macOS fue abierto por el autor en un Mac real el mismo día, tras autorizarlo
+macOS fue abierto y tocado por el autor en un Mac real el mismo día, tras autorizarlo
 (ver INSTALL). El `.dmg` tiene firma ad-hoc, sin Developer ID ni
 notarización: en la primera apertura macOS lo bloquea hasta que usted lo
 autorice una vez.
