@@ -7,7 +7,7 @@ pronto.
 
 ---
 
-## Próxima versão (v0.1.5, não publicada)
+## v0.1.5 — em teste (pré-release `v0.1.5-rc1`, 2026-10-06)
 
 > **English summary.** Two changes from VCV Rack forum feedback: cables
 > show their state on the canvas (see below), and a startup preference. The **OPENS** button in the header cycles four choices: **SEED** (a
