@@ -386,7 +386,7 @@ jobs:
 
           **Linux:** \`.deb\` for Ubuntu, Debian and Mint; AppImage or \`.tar.gz\` for other distributions (x86-64, glibc 2.35+, tested at launch on Debian 12, Ubuntu 24.04, Fedora and Arch).
 
-          **Stated limitation:** the macOS package was built, packaged and tested **by continuous integration only** — the author has not opened it on a real Mac (the Windows package was installed and played by the author on Windows 10, 6 Oct. 2026). On first launch Windows and macOS show a security warning; what to click: [INSTALL.md → Installing, step by step](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#installing-step-by-step). The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
+          **Tested on real machines:** the Windows package was installed and played by the author on Windows 10, and the macOS package was opened by the author on a real Mac after allowing it (6 Oct. 2026). On first launch Windows and macOS show a security warning; what to click: [INSTALL.md → Installing, step by step](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#installing-step-by-step). The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
 
           ---
 
@@ -394,5 +394,5 @@ jobs:
 
           **Linux:** \`.deb\` para Ubuntu, Debian e Mint; AppImage ou \`.tar.gz\` para as demais distribuições (x86-64, glibc 2.35+, testados na abertura em Debian 12, Ubuntu 24.04, Fedora e Arch).
 
-          **Limitação declarada:** o pacote macOS foi construído, empacotado e testado **somente pela integração contínua** — o autor não o abriu num Mac real (o de Windows foi instalado e tocado pelo autor num Windows 10 em 6 out. 2026). Na primeira abertura, Windows e macOS mostram um aviso de segurança; o que clicar: [INSTALL.md → Instalar, passo a passo](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#instalar-passo-a-passo). O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
+          **Testado em máquina real:** o pacote de Windows foi instalado e tocado pelo autor num Windows 10, e o de macOS foi aberto pelo autor num Mac real depois de liberado (6 out. 2026). Na primeira abertura, Windows e macOS mostram um aviso de segurança; o que clicar: [INSTALL.md → Instalar, passo a passo](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#instalar-passo-a-passo). O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
             $(find pacotes -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.tar.gz' -o -name '*.dmg' -o -name '*.exe' -o -name '*.zip' \))

@@ -10645,3 +10645,26 @@ downloads, e os arquivos respondem. O padrão dessa versão virou regra para
 todos os instrumentos (`RASGO_DOCUMENTATION/PADRAO_DISTRIBUICAO_MULTIPLATAFORMA.md`),
 em aplicação no Antitotem e no Navalha 2. **Pendente:** teste num Mac real.
 
+**6 out. 2026 — primeiro teste num Mac real: a v0.1.4 abriu.** O macOS
+bloqueou o app na primeira abertura com a mensagem de app não notarizado
+(*« Apple n'a pas pu confirmer que Rasgo Modular ne contenait pas de
+logiciel malveillant »*). Não foi mais o "danificado" da v0.1.3, o que
+confirma que o `.app` selado ad-hoc resolveu esse caso. O autor liberou o
+app com `xattr -d com.apple.quarantine`, e ele abriu normalmente.
+
+Documentação atualizada:
+
+- **INSTALL (PT/EN):** a mensagem real citada, com dois caminhos
+  (Ajustes → "Abrir Mesmo Assim", ou o Terminal explicado para quem nunca o
+  usou) e o porquê do aviso.
+- **README (4 línguas):** a tabela de plataformas marca o macOS como aberto
+  pelo autor; o áudio no Mac ainda não foi relatado.
+- **Site (4 línguas):** o texto da primeira abertura foi corrigido.
+- **Notas da release v0.1.4** no GitHub e do workflow.
+
+**Pendente:**
+
+- confirmar se houve som no Mac;
+- a decisão sobre o Apple Developer Program (pago, anual), que é o único
+  jeito de o bloqueio sumir.
+
