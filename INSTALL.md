@@ -112,33 +112,55 @@ A última linha do `arranque.log` diz em que ponto a abertura parou.
    serve para Mac Intel e Apple Silicon.
 2. Abra o `.dmg` com dois cliques e **arraste "Rasgo Modular" para a pasta
    Aplicativos**, que aparece como atalho na própria janela.
-3. Abra o Rasgo Modular em Aplicativos. Na primeira vez, o macOS avisa que
-   **não pode verificar o desenvolvedor**. O aviso aparece porque o app não
-   passou pela notarização da Apple, que exige uma conta paga. Clique em
-   **"OK"** ou **"Concluído"**. **Não** clique em "Mover para o Lixo".
-4. Abra **Ajustes do Sistema → Privacidade e Segurança** e desça até a
-   parte de segurança. Lá aparece a linha "Rasgo Modular foi bloqueado…".
-   Clique em **"Abrir Mesmo Assim"**, confirme com sua senha ou Touch ID e
-   clique em **"Abrir"**. Isso só é preciso na primeira vez.
+3. Abra o Rasgo Modular em Aplicativos. Na primeira vez, o macOS **bloqueia**
+   o app e mostra uma mensagem dizendo que **a Apple não pôde confirmar que
+   ele está livre de software malicioso**. Num Mac em francês, por exemplo:
+   *« Rasgo Modular ne peut pas être ouvert. Apple n'a pas pu confirmer que
+   Rasgo Modular ne contenait pas de logiciel malveillant. »*
+   - Isso **não indica defeito nem vírus**. O macOS faz isso com todo app
+     baixado da internet que não passou pela notarização da Apple, que
+     exige uma conta paga.
+   - Clique em **"OK"** ou **"Concluído"**. **Não** clique em "Mover para o
+     Lixo".
+4. Libere o app de um destes dois jeitos. Basta fazer uma vez.
+
+   **Pelos Ajustes (sem Terminal):** abra **Ajustes do Sistema →
+   Privacidade e Segurança** e desça até a parte de segurança. Lá aparece
+   a linha "Rasgo Modular foi bloqueado…". Clique em **"Abrir Mesmo
+   Assim"**, confirme com sua senha ou Touch ID e clique em **"Abrir"**.
    - **No macOS 14 ou anterior há um atalho:** no Finder, clique no app com
      o botão direito (ou Control + clique), escolha **"Abrir"** e depois
      **"Abrir"** de novo.
+
+   **Pelo Terminal**, se o botão não aparecer ou o bloqueio continuar. Foi
+   assim que o autor abriu a v0.1.4 num Mac real, em 6 out. 2026:
+   1. Abra o **Terminal**. Ele fica em Aplicativos → Utilitários, ou é só
+      apertar Cmd + Espaço e digitar "Terminal".
+   2. Copie a linha abaixo, cole no Terminal e aperte **Enter**:
+
+      ```sh
+      xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
+      ```
+
+      Se nada aparecer depois do Enter, deu certo: o comando não responde
+      quando funciona.
+   3. Feche o Terminal e abra o Rasgo Modular normalmente.
+
+   O comando só retira a "marca de quarentena" que o macOS põe em todo
+   arquivo baixado. Ele não altera o app.
 5. Quando você ligar o botão **ON** do módulo SIGNAL-IN, o macOS pede
    permissão para usar o microfone. Permita, se quiser tocar com entrada de
    áudio.
 
 **Se aparecer "Rasgo Modular está danificado e não pode ser aberto"**
 (v0.1.3 ou anterior, em Mac com chip Apple): o arquivo não está danificado.
-Essas versões não tinham o pacote assinado por inteiro. Abra o
-**Terminal**, cole o comando abaixo, dê Enter e depois abra o app
-normalmente:
+Essas versões não tinham o pacote assinado por inteiro. O mesmo comando do
+Terminal, do passo 4, resolve.
 
-```sh
-xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
-```
-
-A partir da v0.1.4, o pacote é assinado por inteiro e esse caso não deve
-mais acontecer. Isso ainda não foi conferido num Mac real.
+**Por que esse aviso existe e quando vai sumir:** ele só desaparece com a
+assinatura **Developer ID** e a **notarização** da Apple. As duas exigem o
+Apple Developer Program, que é pago (anual). Essa é uma decisão ainda em
+aberto. Até lá, o caminho é o deste passo a passo.
 
 #### Linux
 
@@ -379,28 +401,49 @@ and send `arranque.log` and `crash.log` (if present) in
 1. Download `rasgo-modular-<version>-macos-universal.dmg`. It works on both
    Intel and Apple Silicon Macs.
 2. Open it and **drag "Rasgo Modular" into Applications**.
-3. Open it. The first time, macOS says it **cannot verify the developer**,
-   because the app is not notarised by Apple, which requires a paid
-   account. Click **"OK"** or **"Done"**, **not** "Move to Trash".
-4. Go to **System Settings → Privacy & Security**, scroll to the security
-   section, click **"Open Anyway"** next to "Rasgo Modular was blocked…",
-   confirm with your password or Touch ID, and click **"Open"**. Only the
-   first time.
+3. Open it. The first time, macOS **blocks** the app with a message saying
+   **Apple could not confirm it is free of malicious software**. On a French
+   Mac, for example: *« Rasgo Modular ne peut pas être ouvert. Apple n'a pas
+   pu confirmer que Rasgo Modular ne contenait pas de logiciel
+   malveillant. »*
+   - This is **not a defect or a virus**. macOS does it for every downloaded
+     app that has not been notarised by Apple, which requires a paid account.
+   - Click **"OK"** or **"Done"**, **not** "Move to Trash".
+4. Allow the app in one of two ways. You only need to do this once.
+
+   **In System Settings (no Terminal):** go to **System Settings → Privacy
+   & Security**, scroll to the security section, click **"Open Anyway"**
+   next to "Rasgo Modular was blocked…", confirm with your password or
+   Touch ID, and click **"Open"**.
    - **On macOS 14 or earlier there is a shortcut:** right-click (or
      Control-click) the app in Finder, then **Open → Open**.
+
+   **In Terminal**, if the button does not appear or the block remains. This
+   is how the author opened v0.1.4 on a real Mac on 6 Oct. 2026.
+   1. Open **Terminal**. It is in Applications → Utilities, or press
+      Cmd + Space and type "Terminal".
+   2. Copy this line, paste it into Terminal and press **Enter**:
+
+      ```sh
+      xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
+      ```
+
+      If nothing is printed after Enter, it worked.
+   3. Close Terminal and open Rasgo Modular normally.
+
+   The command only removes the "quarantine mark" macOS puts on every
+   downloaded file. It does not change the app.
 5. Turning on the SIGNAL-IN **ON** switch makes macOS ask for microphone
    access. Allow it if you want audio input.
 
 **"Rasgo Modular is damaged and can't be opened"** (v0.1.3 or earlier, on
-Apple Silicon Macs): the file is not damaged. Those versions were not
-fully signed. Run this in Terminal, then open the app normally:
+Apple Silicon Macs): the file is not damaged. Those versions were not fully
+signed. The same Terminal command from step 4 fixes it.
 
-```sh
-xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"
-```
-
-From v0.1.4 on, the whole bundle is signed and this should no longer
-happen. That has not yet been checked on a real Mac.
+**Why the warning exists, and when it will go away:** it only goes away
+with Apple's **Developer ID** signing and **notarisation**. Both require the
+paid (yearly) Apple Developer Program, which is still an open decision.
+Until then, follow the steps above.
 
 #### Linux
 

@@ -83,15 +83,16 @@ macOS `.dmg`, all built and packaged by continuous integration.
 |---|---|---|---|
 | Linux x86-64 | yes | yes | yes, on real hardware |
 | Windows x86-64 | continuous integration | yes, by the author (Windows 10, 8 GB) | yes, by the author |
-| macOS (Universal 2) | continuous integration only | no | no |
+| macOS (Universal 2) | continuous integration | yes, by the author (6 Oct. 2026, after allowing it — see INSTALL) | not yet reported |
 
 **Minimum:** Windows 10 (1607+) or 11, 64-bit · macOS 10.15+ (Intel or Apple Silicon) · Linux x86-64 with glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · a 64-bit processor with two cores or more · ~55 MB of memory · a 1280 × 760 screen. Details in [`INSTALL.md`](INSTALL.md).
 
 Said in full before you download: the Windows package was installed and
 played by the author on a real Windows 10 machine (8 GB) on 6 Oct. 2026;
-the macOS package has still only been tested by continuous integration. The
-`.dmg` is ad-hoc signed, without Developer ID or notarisation — Gatekeeper
-will warn about an unidentified developer on first launch.
+the macOS package was opened by the author on a real Mac on the same day,
+after allowing it (see INSTALL). The `.dmg` is ad-hoc signed, without
+Developer ID or notarisation — so macOS blocks it on first launch until you
+allow it once.
 
 **On first launch, Windows and macOS show a security warning.** It is
 expected and does not mean anything is wrong. What to click on each system:
@@ -176,15 +177,15 @@ Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 |---|---|---|---|
 | Linux x86-64 | sim | sim | sim, em hardware real |
 | Windows x86-64 | na integração contínua | sim, pelo autor (Windows 10, 8 GB) | sim, pelo autor |
-| macOS (Universal 2) | só na integração contínua | não | não |
+| macOS (Universal 2) | na integração contínua | sim, pelo autor (6 out. 2026, depois de liberar — ver INSTALL) | ainda não relatado |
 
 **Mínimo:** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 com glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processador de 64 bits com dois núcleos ou mais · ~55 MB de memória · tela de 1280 × 760. Detalhes no [`INSTALL.md`](INSTALL.md).
 
 Dito por inteiro antes de baixar: o pacote de Windows foi instalado e tocado
-pelo autor num Windows 10 real (8 GB) em 6 out. 2026; o de macOS segue
-testado só pela integração contínua. O `.dmg` tem assinatura ad-hoc, sem
-Developer ID nem notarização — o Gatekeeper mostra aviso de desenvolvedor
-não identificado na primeira abertura.
+pelo autor num Windows 10 real (8 GB) em 6 out. 2026, e o de macOS foi
+aberto pelo autor num Mac real no mesmo dia, depois de liberado (ver
+INSTALL). O `.dmg` tem assinatura ad-hoc, sem Developer ID nem notarização:
+na primeira abertura o macOS bloqueia o app até você liberá-lo uma vez.
 
 **Na primeira abertura, o Windows e o macOS mostram um aviso de
 segurança.** É esperado e não indica defeito. O que clicar em cada sistema
@@ -273,16 +274,16 @@ empaquetés par l'intégration continue.
 |---|---|---|---|
 | Linux x86-64 | oui | oui | oui, sur matériel réel |
 | Windows x86-64 | intégration continue | oui, par l'auteur (Windows 10, 8 Go) | oui, par l'auteur |
-| macOS (Universal 2) | intégration continue uniquement | non | non |
+| macOS (Universal 2) | intégration continue | oui, par l'auteur (6 oct. 2026, après l'avoir autorisé — voir INSTALL) | pas encore signalé |
 
 **Minimum :** Windows 10 (1607+) ou 11, 64 bits · macOS 10.15+ (Intel ou Apple Silicon) · Linux x86-64 avec glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · processeur 64 bits à deux cœurs ou plus · ~55 Mo de mémoire · écran de 1280 × 760. Détails dans [`INSTALL.md`](INSTALL.md).
 
 Dit en entier avant de télécharger : le paquet Windows a été installé et
-joué par l'auteur sur une vraie machine Windows 10 (8 Go) le 6 oct. 2026 ;
-celui de macOS n'a encore été testé que par l'intégration continue. Le
-`.dmg` est signé en ad-hoc, sans Developer ID ni notarisation — Gatekeeper
-affichera un avertissement de développeur non identifié au premier
-lancement.
+joué par l'auteur sur une vraie machine Windows 10 (8 Go) le 6 oct. 2026,
+et celui de macOS a été ouvert par l'auteur sur un vrai Mac le même jour,
+après l'avoir autorisé (voir INSTALL). Le `.dmg` est signé en ad-hoc, sans
+Developer ID ni notarisation : au premier lancement, macOS le bloque jusqu'à
+ce que vous l'autorisiez une fois.
 
 **Au premier lancement, Windows et macOS affichent un avertissement de
 sécurité.** C'est attendu et ne signale aucun défaut. Où cliquer sur chaque
@@ -368,15 +369,16 @@ y empaquetados por la integración continua.
 |---|---|---|---|
 | Linux x86-64 | sí | sí | sí, en hardware real |
 | Windows x86-64 | en integración continua | sí, por el autor (Windows 10, 8 GB) | sí, por el autor |
-| macOS (Universal 2) | solo en integración continua | no | no |
+| macOS (Universal 2) | en integración continua | sí, por el autor (6 oct. 2026, tras autorizarlo — ver INSTALL) | aún no informado |
 
 **Mínimo:** Windows 10 (1607+) u 11, 64 bits · macOS 10.15+ (Intel o Apple Silicon) · Linux x86-64 con glibc 2.35+ (Ubuntu 22.04+, Debian 12+, Mint 21+) · procesador de 64 bits con dos núcleos o más · ~55 MB de memoria · pantalla de 1280 × 760. Detalles en [`INSTALL.md`](INSTALL.md).
 
 Dicho por completo antes de descargar: el paquete de Windows fue instalado y
-tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026; el de macOS
-sigue probado solo por la integración continua. El `.dmg` tiene firma
-ad-hoc, sin Developer ID ni notarización — Gatekeeper mostrará un aviso de
-desarrollador no identificado en la primera apertura.
+tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026, y el de
+macOS fue abierto por el autor en un Mac real el mismo día, tras autorizarlo
+(ver INSTALL). El `.dmg` tiene firma ad-hoc, sin Developer ID ni
+notarización: en la primera apertura macOS lo bloquea hasta que usted lo
+autorice una vez.
 
 **En la primera apertura, Windows y macOS muestran un aviso de
 seguridad.** Es esperado y no indica ningún defecto. Qué pulsar en cada

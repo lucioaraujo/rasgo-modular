@@ -75,10 +75,11 @@ TEXTO = {
 
   <p><strong>Antes de baixar, duas coisas ditas por inteiro.</strong> O
     pacote Windows foi instalado e tocado pelo autor num Windows 10 real
-    (8 GB) em 6 out. 2026; o pacote macOS segue construído, empacotado e
-    testado <em>somente pela integração contínua</em>. E o <code>.dmg</code> tem assinatura
-    ad-hoc, sem Developer ID nem notarização: o Gatekeeper mostra aviso de
-    desenvolvedor não identificado na primeira abertura.</p>
+    (8 GB) em 6 out. 2026, e o pacote macOS foi aberto pelo autor num Mac
+    real no mesmo dia, depois de liberado. E o <code>.dmg</code> tem assinatura
+    ad-hoc, sem Developer ID nem notarização: na primeira abertura o macOS
+    bloqueia o app até você liberá-lo uma vez, pelos Ajustes ou pelo
+    Terminal.</p>
 
   <p><strong>Na primeira abertura, o Windows e o macOS mostram um aviso de
     segurança.</strong> O programa é livre e não tem certificado pago de
@@ -121,10 +122,11 @@ TEXTO = {
 
   <p><strong>Two things said in full before you download.</strong> The
     Windows package was installed and played by the author on a real
-    Windows 10 machine (8 GB) on 6 Oct. 2026; the macOS package is still
-    built, packaged and tested <em>by continuous integration only</em>. And the <code>.dmg</code> is ad-hoc
-    signed, with no Developer ID and no notarisation: Gatekeeper will warn
-    about an unidentified developer on first launch.</p>
+    Windows 10 machine (8 GB) on 6 Oct. 2026, and the macOS package was
+    opened by the author on a real Mac the same day, after allowing it. And the <code>.dmg</code> is ad-hoc
+    signed, with no Developer ID and no notarisation: on first launch macOS
+    blocks the app until you allow it once, in System Settings or in
+    Terminal.</p>
 
   <p><strong>On first launch, Windows and macOS show a security
     warning.</strong> The program is free software without a paid
@@ -170,11 +172,11 @@ TEXTO = {
 
   <p><strong>Deux choses dites en entier avant de télécharger.</strong> Les
     paquet Windows a été installé et joué par l'auteur sur une vraie machine
-    Windows 10 (8 Go) le 6 oct. 2026 ; celui de macOS reste construit,
-    empaqueté et testé <em>uniquement par l'intégration continue</em>. Et le <code>.dmg</code> est
-    signé en ad-hoc, sans Developer ID ni notarisation : Gatekeeper
-    affichera un avertissement de développeur non identifié au premier
-    lancement.</p>
+    Windows 10 (8 Go) le 6 oct. 2026, et celui de macOS a été ouvert par
+    l'auteur sur un vrai Mac le même jour, après l'avoir autorisé. Et le <code>.dmg</code> est
+    signé en ad-hoc, sans Developer ID ni notarisation : au premier lancement,
+    macOS bloque l'app jusqu'à ce que vous l'autorisiez une fois, dans les
+    Réglages ou dans le Terminal.</p>
 
   <p><strong>Au premier lancement, Windows et macOS affichent un
     avertissement de sécurité.</strong> Le programme est libre, sans
@@ -220,10 +222,11 @@ TEXTO = {
 
   <p><strong>Dos cosas dichas por entero antes de descargar.</strong> Los
     paquete de Windows fue instalado y tocado por el autor en un Windows 10
-    real (8 GB) el 6 oct. 2026; el de macOS sigue construido, empaquetado y
-    probado <em>sólo por la integración continua</em>. Y el <code>.dmg</code> tiene firma
-    ad-hoc, sin Developer ID ni notarización: Gatekeeper mostrará un aviso
-    de desarrollador no identificado en la primera apertura.</p>
+    real (8 GB) el 6 oct. 2026, y el de macOS fue abierto por el autor en
+    un Mac real el mismo día, tras autorizarlo. Y el <code>.dmg</code> tiene firma
+    ad-hoc, sin Developer ID ni notarización: en la primera apertura macOS
+    bloquea la app hasta que usted la autorice una vez, en los Ajustes o en
+    el Terminal.</p>
 
   <p><strong>En la primera apertura, Windows y macOS muestran un aviso de
     seguridad.</strong> El programa es libre y no tiene certificado de firma
