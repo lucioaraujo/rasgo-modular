@@ -70,16 +70,16 @@ a extração para [`lucioaraujo/rasgo-modular`](https://github.com/lucioaraujo/r
 
 ### Instalar, passo a passo
 
-Os avisos de segurança abaixo **são esperados**: o Rasgo Modular é software
-livre, publicado sem certificado pago de assinatura digital. Eles não
-indicam defeito nem vírus. Aparecem só na primeira vez.
+Os avisos de segurança abaixo **são esperados**: não indicam defeito nem
+vírus e só aparecem na primeira vez.
 
 #### Windows
 
 1. Na [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/latest),
    baixe `rasgo-modular-<versão>-windows-x64.exe`.
 2. Abra o arquivo. O Windows mostra uma janela azul **"O Windows protegeu o
-   computador"**. Clique em **"Mais informações"** e depois em
+   computador"** (ou outra mensagem dizendo que o programa não é
+   reconhecido). Clique em **"Mais informações"** e depois em
    **"Executar assim mesmo"**.
 3. Se o Windows pedir permissão de administrador, clique em **"Sim"**. O
    programa é instalado em Arquivos de Programas.
@@ -117,9 +117,10 @@ A última linha do `arranque.log` diz em que ponto a abertura parou.
    ele está livre de software malicioso**. Num Mac em francês, por exemplo:
    *« Rasgo Modular ne peut pas être ouvert. Apple n'a pas pu confirmer que
    Rasgo Modular ne contenait pas de logiciel malveillant. »*
-   - Isso **não indica defeito nem vírus**. O macOS faz isso com todo app
-     baixado da internet que não passou pela notarização da Apple, que
-     exige uma conta paga.
+   Também pode aparecer uma mensagem parecida, como \"não é possível
+   verificar o desenvolvedor\" ou \"está danificado e não pode ser aberto\". Em
+   todos esses casos, faça o mesmo:
+   - Isso **não indica defeito nem vírus**.
    - Clique em **"OK"** ou **"Concluído"**. **Não** clique em "Mover para o
      Lixo".
 4. Libere o app de um destes dois jeitos. Basta fazer uma vez.
@@ -132,8 +133,7 @@ A última linha do `arranque.log` diz em que ponto a abertura parou.
      o botão direito (ou Control + clique), escolha **"Abrir"** e depois
      **"Abrir"** de novo.
 
-   **Pelo Terminal**, se o botão não aparecer ou o bloqueio continuar. Foi
-   assim que o autor abriu a v0.1.4 num Mac real, em 6 out. 2026:
+   **Pelo Terminal**, se o botão não aparecer ou o bloqueio continuar:
    1. Abra o **Terminal**. Ele fica em Aplicativos → Utilitários, ou é só
       apertar Cmd + Espaço e digitar "Terminal".
    2. Copie a linha abaixo, cole no Terminal e aperte **Enter**:
@@ -152,15 +152,7 @@ A última linha do `arranque.log` diz em que ponto a abertura parou.
    permissão para usar o microfone. Permita, se quiser tocar com entrada de
    áudio.
 
-**Se aparecer "Rasgo Modular está danificado e não pode ser aberto"**
-(v0.1.3 ou anterior, em Mac com chip Apple): o arquivo não está danificado.
-Essas versões não tinham o pacote assinado por inteiro. O mesmo comando do
-Terminal, do passo 4, resolve.
 
-**Por que esse aviso existe e quando vai sumir:** ele só desaparece com a
-assinatura **Developer ID** e a **notarização** da Apple. As duas exigem o
-Apple Developer Program, que é pago (anual). Essa é uma decisão ainda em
-aberto. Até lá, o caminho é o deste passo a passo.
 
 #### Linux
 
@@ -367,9 +359,8 @@ comercial — ver [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 
 ### Installing, step by step
 
-The security warnings below **are expected**: Rasgo Modular is free
-software published without a paid code-signing certificate. They do not
-mean anything is wrong, and they only appear the first time.
+The security warnings below **are expected**: they do not mean anything is
+wrong, and they only appear the first time.
 
 #### Windows
 
@@ -406,8 +397,10 @@ and send `arranque.log` and `crash.log` (if present) in
    Mac, for example: *« Rasgo Modular ne peut pas être ouvert. Apple n'a pas
    pu confirmer que Rasgo Modular ne contenait pas de logiciel
    malveillant. »*
-   - This is **not a defect or a virus**. macOS does it for every downloaded
-     app that has not been notarised by Apple, which requires a paid account.
+   A similar message may appear instead, such as \"cannot verify the
+   developer\" or \"is damaged and can't be opened\". In every case, do the
+   same:
+   - This is **not a defect or a virus**.
    - Click **"OK"** or **"Done"**, **not** "Move to Trash".
 4. Allow the app in one of two ways. You only need to do this once.
 
@@ -418,8 +411,7 @@ and send `arranque.log` and `crash.log` (if present) in
    - **On macOS 14 or earlier there is a shortcut:** right-click (or
      Control-click) the app in Finder, then **Open → Open**.
 
-   **In Terminal**, if the button does not appear or the block remains. This
-   is how the author opened v0.1.4 on a real Mac on 6 Oct. 2026.
+   **In Terminal**, if the button does not appear or the block remains:
    1. Open **Terminal**. It is in Applications → Utilities, or press
       Cmd + Space and type "Terminal".
    2. Copy this line, paste it into Terminal and press **Enter**:
@@ -436,14 +428,7 @@ and send `arranque.log` and `crash.log` (if present) in
 5. Turning on the SIGNAL-IN **ON** switch makes macOS ask for microphone
    access. Allow it if you want audio input.
 
-**"Rasgo Modular is damaged and can't be opened"** (v0.1.3 or earlier, on
-Apple Silicon Macs): the file is not damaged. Those versions were not fully
-signed. The same Terminal command from step 4 fixes it.
 
-**Why the warning exists, and when it will go away:** it only goes away
-with Apple's **Developer ID** signing and **notarisation**. Both require the
-paid (yearly) Apple Developer Program, which is still an open decision.
-Until then, follow the steps above.
 
 #### Linux
 
