@@ -1,14 +1,15 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (4 out. 2026):** a versão atual é a **v0.1.3**, com
-> instaladores para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.3)
-> (antes: v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em 29 set. 2026). Este documento descreve também como
+> **Estado (6 out. 2026):** a versão atual é a **v0.1.4**, com pacotes
+> para Linux, Windows e macOS na
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.4)
+> (antes: v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
+> 29 set. 2026). Este documento descreve também como
 > construir e rodar a partir do código.
 >
 > **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
 > lá estão os avisos do Windows e do macOS e o que fazer em cada um.
-> *English:* the current version is v0.1.3. Start with
+> *English:* the current version is v0.1.4. Start with
 > ["Installing, step by step"](#installing-step-by-step).
 
 ---
@@ -154,7 +155,7 @@ mais acontecer. Isso ainda não foi conferido num Mac real.
 |---|---|
 | **Windows** | Windows 10 (versão 1607 ou posterior) ou Windows 11, 64 bits (x86-64) |
 | **macOS** | macOS 10.15 Catalina ou posterior, Intel ou Apple Silicon (Universal 2) |
-| **Linux** | x86-64 com glibc 2.35 ou mais nova: Ubuntu 22.04+, Debian 12+, Mint 21+ (o `.deb`); outras distribuições, compilando do código — AppImage e `.tar.gz` estão previstos para a próxima versão |
+| **Linux** | x86-64 com glibc 2.35 ou mais nova: Ubuntu 22.04+, Debian 12+, Mint 21+ (o `.deb`); outras distribuições pelo AppImage ou pelo `.tar.gz` (testados na abertura em Debian 12, Ubuntu 24.04, Fedora e Arch) |
 | **Processador** | 64 bits, dois núcleos ou mais. Medido num Intel Core i5-6500 (2015, 4 núcleos, 3,2 GHz): o app inteiro usa de um terço a metade de um núcleo; o som sozinho, de 7% a 15% |
 | **Memória** | ~55 MB em uso (medido); qualquer computador com 4 GB basta |
 | **Disco** | ~20 MB |
@@ -414,8 +415,8 @@ happen. That has not yet been checked on a real Mac.
 - **Windows:** Windows 10 (version 1607 or later) or Windows 11, 64-bit.
 - **macOS:** macOS 10.15 Catalina or later, Intel or Apple Silicon.
 - **Linux:** x86-64 with glibc 2.35 or newer — Ubuntu 22.04+, Debian 12+,
-  Mint 21+ for the `.deb`; other distributions by building from source
-  (an AppImage and a `.tar.gz` are planned for the next version).
+  Mint 21+ for the `.deb`; other distributions via the AppImage or the
+  `.tar.gz` (launch-tested on Debian 12, Ubuntu 24.04, Fedora and Arch).
 - **CPU:** 64-bit, two cores or more. Measured on an Intel Core i5-6500
   (2015, 4 cores, 3.2 GHz): the whole app uses a third to half of one core;
   the sound alone, 7% to 15%.

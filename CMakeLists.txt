@@ -1,5 +1,16 @@
 cmake_minimum_required(VERSION 3.22)
 
+# Windows: runtime do Visual C++ ESTÁTICO (/MT), embutido no executável.
+# Sem isto o `Rasgo Modular.exe` exige MSVCP140.dll, VCRUNTIME140.dll e
+# VCRUNTIME140_1.dll (o "Visual C++ Redistributable"), que o instalador não
+# leva: num Windows sem esse pacote o app simplesmente não abre. A CI nunca
+# pegou porque o runner do GitHub já tem o pacote instalado. Achado em 6 out.
+# 2026, depois de o autor não conseguir abrir a v0.1.3 num Windows; conferido
+# listando as DLLs importadas do .exe publicado. Vale para o app e para o
+# JUCE (variável global, definida antes de qualquer alvo). A CI agora falha
+# se essas DLLs voltarem a aparecer (package.yml).
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # PRECISA vir antes do `project()` (exigência do CMake/Apple). Mesmo bug
 # que o ANTITOTEM e o Navalha 2 pegaram ao vivo (26 ago. 2026): sem isto o
 # .dmg sai com uma fatia só (a arquitetura do runner) e com `minos` = a
@@ -31,7 +42,7 @@ if (APPLE)
 endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
-project(RasgoModularPrototype VERSION 0.1.3 LANGUAGES C CXX)
+project(RasgoModularPrototype VERSION 0.1.4 LANGUAGES C CXX)
 
 include(CTest)
 
@@ -715,6 +726,8 @@ if(RASGO_MODULAR_BUILD_JUCE_APP AND TARGET RasgoModularApp)
         set(CPACK_PACKAGE_EXECUTABLES "Rasgo Modular" "Rasgo Modular")
         set(CPACK_CREATE_DESKTOP_LINKS "Rasgo Modular")
         set(CPACK_NSIS_INSTALLED_ICON_NAME "Rasgo Modular.exe")
+        # última tela do instalador: "Executar o Rasgo Modular" já marcado
+        set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Rasgo Modular.exe")
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/rasgo-modular.ico")
             set(CPACK_NSIS_MUI_ICON
                 "${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/rasgo-modular.ico")

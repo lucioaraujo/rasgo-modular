@@ -1,6 +1,6 @@
 # License status — Rasgo Modular (front-end JUCE)
 
-**Status atual: código próprio AGPL-3.0-or-later; JUCE 9.0.0 usado sob
+**Status atual: código próprio AGPL-3.0-or-later; JUCE 9.0.3 (fixado na CI desde 6 out. 2026; 9.0.0 no ambiente local) usado sob
 AGPL-3.0-only. Nenhuma licença comercial do JUCE é necessária.**
 
 ## Por que este arquivo existe
