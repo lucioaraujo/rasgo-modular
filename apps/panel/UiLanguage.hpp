@@ -89,6 +89,40 @@ inline const L4 cableNotAudible {
     "Conectado — pero este camino aún no llega al sonido. Siga cableando hasta el MASTER para oírlo."};
 inline const L4 hdrRec     {"REC",     "REC",      "REC",      "REC"};
 inline const L4 hdrSeed    {"SEED",    "SEED",     "SEED",     "SEED"};
+
+// ---- cabeçalho: ABRE — como o app abre (StartupPolicy.hpp) -------------
+// Retorno do fórum do VCV Rack (6 out. 2026): começar do próprio patch ou
+// sem cabos precisa ser escolha do músico. O seed segue como padrão.
+inline const L4 hdrOpens       {"OPENS",     "ABRE",      "OUVRE",       "ABRE"};
+inline const L4 startSeed      {"SEED",      "SEED",      "SEED",        "SEED"};
+inline const L4 startUncabled  {"NO CABLES", "SEM CABOS", "SANS CÂBLES", "SIN CABLES"};
+inline const L4 startInit      {"MY PATCH",  "MEU PATCH", "MON PATCH",   "MI PATCH"};
+inline const L4 startLast      {"LAST",      "ÚLTIMA",    "DERNIÈRE",    "ÚLTIMA"};
+inline const L4 startNoteSeed {
+    "Next time it opens with a new patch (seed), already sounding.",
+    "Na próxima vez, abre com um patch novo (seed), já tocando.",
+    "La prochaine fois, il s’ouvre sur un nouveau patch (seed), qui sonne déjà.",
+    "La próxima vez abre con un patch nuevo (seed), ya sonando."};
+inline const L4 startNoteUncabled {
+    "Next time it opens with all modules and no cables.",
+    "Na próxima vez, abre com todos os módulos e sem cabos.",
+    "La prochaine fois, il s’ouvre avec tous les modules et sans câbles.",
+    "La próxima vez abre con todos los módulos y sin cables."};
+inline const L4 startNoteInit {
+    "This patch is now your opening patch: next time it opens with it. To change it, come back to MY PATCH with the patch you want.",
+    "Este patch agora é o seu patch de abertura: na próxima vez, abre com ele. Para trocar, volte a MEU PATCH com o patch que quiser.",
+    "Ce patch est maintenant votre patch d’ouverture : la prochaine fois, il s’ouvre dessus. Pour le changer, revenez à MON PATCH avec le patch voulu.",
+    "Este patch es ahora su patch de apertura: la próxima vez abre con él. Para cambiarlo, vuelva a MI PATCH con el patch que quiera."};
+inline const L4 startNoteLast {
+    "Next time it opens with the session as it is when you close the app.",
+    "Na próxima vez, abre com a sessão como estiver ao fechar o app.",
+    "La prochaine fois, il s’ouvre sur la session telle qu’elle est à la fermeture.",
+    "La próxima vez abre con la sesión tal como esté al cerrar la app."};
+inline const L4 startNoteSafe {
+    "The last session did not close normally, so it opened without cables, for safety. Press r to bring the seed's cables back, or Ctrl+O to open a patch.",
+    "A última sessão não fechou normalmente, por isso abriu sem cabos, por segurança. Aperte r para trazer de volta os cabos do seed, ou Ctrl+O para abrir um patch.",
+    "La dernière session ne s’est pas fermée normalement : ouverture sans câbles, par sécurité. Appuyez sur r pour remettre les câbles du seed, ou Ctrl+O pour ouvrir un patch.",
+    "La última sesión no se cerró normalmente: abrió sin cables, por seguridad. Pulse r para recuperar los cables del seed, o Ctrl+O para abrir un patch."};
 inline const L4 seedCopied {"COPIED",  "COPIADO",  "COPIÉ",    "COPIADO"};
 
 // ---- cabeçalho: vista do rack (botão RACK, alterna 2 estados) ---------
@@ -195,10 +229,10 @@ inline const L4 tutRecBody {
 inline const L4 tutHdrTitle {
     "THE HEADER, LEFT TO RIGHT", "O CABEÇALHO, DA ESQUERDA PRA DIREITA", "L’EN-TÊTE, DE GAUCHE À DROITE", "LA CABECERA, DE IZQUIERDA A DERECHA"};
 inline const L4 tutHdrBody {
-    "VARY chaotic hand (a SLIDER: 0 = off) · STANDBY master mute · CHANGE resample ~25% · EVOLVE the same in 6 steps · CROSS recombine with a new patch · BANK store patch · SAVE write session · REC record WAV · SEED draw patch, with its number box · the MASTER meter shows the recent peak against the −1 dBFS ceiling: the mark on the RIGHT lights when the limiter had to hold something, the one on the LEFT when BODY — the guard against piercing sound — is acting. Both are rare, and that is the point. The readout shows modules / cables / output PEAK · the language button cycles EN→PT→FR→ES · RACK toggles the rack view: ALL modules ↔ only those reaching the OUTPUT · TUTORIAL this screen · ABOUT version and licence.",
-    "VARIA mão caótica (é um SLIDER: 0 = desligado) · ESPERA muta o master · MUDA reamostra ~25% · EVOLUI o mesmo em 6 passos · CRUZA recombina com um patch novo · BANCO guarda o patch · SALVA grava a sessão · REC grava WAV · SEED sorteia o patch, com a caixa do número · o medidor do MASTER mostra o pico recente contra o teto de −1 dBFS: a marca da DIREITA acende quando o limitador teve que segurar algo, e a da ESQUERDA quando o BODY — a guarda contra som que fura — está agindo. As duas são raras, e é isso que se espera. A leitura mostra módulos / cabos / PICO da saída · o botão de idioma cicla EN→PT→FR→ES · RACK alterna a vista do rack: TODOS os módulos ↔ só os que chegam à SAÍDA · TUTORIAL esta tela · SOBRE versão e licença.",
-    "VARIER main chaotique (un CURSEUR : 0 = éteint) · VEILLE coupe le master · CHANGER rééchantillonne ~25% · ÉVOLUE de même en 6 pas · CROISER recombine avec un nouveau patch · BANQUE stocke le patch · ENREG. écrit la session · REC enregistre un WAV · SEED tire le patch, avec sa case numéro · le vumètre du MASTER montre la crête récente face au plafond de −1 dBFS : le repère de DROITE s’allume quand le limiteur a dû retenir quelque chose, celui de GAUCHE quand BODY — la garde contre le son qui perce — agit. Les deux sont rares, et c’est voulu. L’affichage montre modules / câbles / CRÊTE de sortie · le bouton de langue fait EN→PT→FR→ES · RACK bascule la vue du rack : TOUS les modules ↔ seulement ceux qui atteignent la SORTIE · TUTORIEL cet écran · À PROPOS version et licence.",
-    "VARIAR mano caótica (un DESLIZADOR: 0 = apagado) · ESPERA silencia el master · CAMBIA remuestrea ~25% · EVOLUCIONA lo mismo en 6 pasos · CRUZAR recombina con un patch nuevo · BANCO guarda el patch · GUARDA escribe la sesión · REC graba WAV · SEED sortea el patch, con su caja de número · el medidor del MASTER muestra el pico reciente frente al techo de −1 dBFS: la marca de la DERECHA se enciende cuando el limitador tuvo que retener algo, y la de la IZQUIERDA cuando BODY — la guarda contra el sonido que perfora — está actuando. Ambas son raras, y eso es lo esperado. La lectura muestra módulos / cables / PICO de salida · el botón de idioma cicla EN→PT→FR→ES · RACK alterna la vista del rack: TODOS los módulos ↔ solo los que llegan a la SALIDA · TUTORIAL esta pantalla · ACERCA DE versión y licencia."};
+    "VARY chaotic hand (a SLIDER: 0 = off) · STANDBY master mute · CHANGE resample ~25% · EVOLVE the same in 6 steps · CROSS recombine with a new patch · BANK store patch · SAVE write session · REC record WAV · SEED draw patch, with its number box · the MASTER meter shows the recent peak against the −1 dBFS ceiling: the mark on the RIGHT lights when the limiter had to hold something, the one on the LEFT when BODY — the guard against piercing sound — is acting. Both are rare, and that is the point. The readout shows modules / cables / output PEAK · the language button cycles EN→PT→FR→ES · OPENS chooses how the app starts: SEED (a new patch, sounding), NO CABLES (all modules, no cables), MY PATCH (choosing it saves the current patch as your opening patch) or LAST (the session as you closed it) · RACK toggles the rack view: ALL modules ↔ only those reaching the OUTPUT · TUTORIAL this screen · ABOUT version and licence.",
+    "VARIA mão caótica (é um SLIDER: 0 = desligado) · ESPERA muta o master · MUDA reamostra ~25% · EVOLUI o mesmo em 6 passos · CRUZA recombina com um patch novo · BANCO guarda o patch · SALVA grava a sessão · REC grava WAV · SEED sorteia o patch, com a caixa do número · o medidor do MASTER mostra o pico recente contra o teto de −1 dBFS: a marca da DIREITA acende quando o limitador teve que segurar algo, e a da ESQUERDA quando o BODY — a guarda contra som que fura — está agindo. As duas são raras, e é isso que se espera. A leitura mostra módulos / cabos / PICO da saída · o botão de idioma cicla EN→PT→FR→ES · ABRE escolhe como o app abre: SEED (um patch novo, tocando), SEM CABOS (todos os módulos, sem cabos), MEU PATCH (escolhê-lo guarda o patch atual como o de abertura) ou ÚLTIMA (a sessão como você a fechou) · RACK alterna a vista do rack: TODOS os módulos ↔ só os que chegam à SAÍDA · TUTORIAL esta tela · SOBRE versão e licença.",
+    "VARIER main chaotique (un CURSEUR : 0 = éteint) · VEILLE coupe le master · CHANGER rééchantillonne ~25% · ÉVOLUE de même en 6 pas · CROISER recombine avec un nouveau patch · BANQUE stocke le patch · ENREG. écrit la session · REC enregistre un WAV · SEED tire le patch, avec sa case numéro · le vumètre du MASTER montre la crête récente face au plafond de −1 dBFS : le repère de DROITE s’allume quand le limiteur a dû retenir quelque chose, celui de GAUCHE quand BODY — la garde contre le son qui perce — agit. Les deux sont rares, et c’est voulu. L’affichage montre modules / câbles / CRÊTE de sortie · le bouton de langue fait EN→PT→FR→ES · OUVRE choisit comment l’app démarre : SEED (un nouveau patch, qui sonne), SANS CÂBLES (tous les modules, sans câbles), MON PATCH (le choisir enregistre le patch actuel comme patch d’ouverture) ou DERNIÈRE (la session telle que vous l’avez fermée) · RACK bascule la vue du rack : TOUS les modules ↔ seulement ceux qui atteignent la SORTIE · TUTORIEL cet écran · À PROPOS version et licence.",
+    "VARIAR mano caótica (un DESLIZADOR: 0 = apagado) · ESPERA silencia el master · CAMBIA remuestrea ~25% · EVOLUCIONA lo mismo en 6 pasos · CRUZAR recombina con un patch nuevo · BANCO guarda el patch · GUARDA escribe la sesión · REC graba WAV · SEED sortea el patch, con su caja de número · el medidor del MASTER muestra el pico reciente frente al techo de −1 dBFS: la marca de la DERECHA se enciende cuando el limitador tuvo que retener algo, y la de la IZQUIERDA cuando BODY — la guarda contra el sonido que perfora — está actuando. Ambas son raras, y eso es lo esperado. La lectura muestra módulos / cables / PICO de salida · el botón de idioma cicla EN→PT→FR→ES · ABRE elige cómo arranca la app: SEED (un patch nuevo, sonando), SIN CABLES (todos los módulos, sin cables), MI PATCH (elegirlo guarda el patch actual como el de apertura) o ÚLTIMA (la sesión tal como la cerró) · RACK alterna la vista del rack: TODOS los módulos ↔ solo los que llegan a la SALIDA · TUTORIAL esta pantalla · ACERCA DE versión y licencia."};
 
 inline const L4 tutCableTitle {
     "PATCH CABLES", "CABEAR", "CÂBLER", "CABLEAR"};

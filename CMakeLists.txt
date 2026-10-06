@@ -439,6 +439,13 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_learn_catalog_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_learn_catalog_tests COMMAND rasgo_modular_learn_catalog_tests)
 
+    # usa apps/panel/StartupPolicy.hpp (como o app abre: preferência ABRE)
+    add_executable(rasgo_modular_startup_policy_tests tests/test_startup_policy.cpp)
+    target_include_directories(rasgo_modular_startup_policy_tests PRIVATE src apps)
+    target_link_libraries(rasgo_modular_startup_policy_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_startup_policy_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_startup_policy_tests COMMAND rasgo_modular_startup_policy_tests)
+
     # usa apps/panel/UiLanguage.hpp
     # Guarda de FIAÇÃO: o catálogo traduzido só serve se os front-ends
     # passarem o idioma na consulta. Em 27 set. 2026 eles não passavam, e

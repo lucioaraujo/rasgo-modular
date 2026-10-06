@@ -10697,3 +10697,14 @@ respostas de 1º out.):
 Uma resposta foi redigida e conferida contra o código: a condutância é
 re-sorteada a cerca de 20 Hz (`SignalGraph.hpp`), e não por compasso.
 
+**6 out. 2026 — preferência ABRE implementada** (v0.1.5, ainda sem
+release). Ela tem quatro modos: SEED, SEM CABOS, MEU PATCH e ÚLTIMA.
+"Patch inicial" virou MEU PATCH: escolher o modo guarda o patch atual como
+`init.rmp`, sem passar pelo BANCO. Também entraram a abertura segura após
+uma queda (marcador `sessao-aberta`) e a saída limpa por SIGTERM. Detalhes
+e validação estão no CHANGELOG.
+**Pendente:**
+- testar no Windows e no macOS;
+- texto do site e do LEARN sobre o ABRE;
+- **próximo item:** estado visível no próprio cabo.
+

@@ -36,6 +36,7 @@
 #include "panel/PatchGenetics.hpp"   // MUTA / EVOLUI / CRUZA
 #include "panel/PatchSeed.hpp"
 #include "panel/SeedBalance.hpp"  // equilibra o volume entre seeds
+#include "panel/StartupPolicy.hpp" // como o app abre (botão ABRE)
 #include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"   // mesma política de abertura do painel X11
 #include "ui/CableGeometry.hpp"
@@ -47,6 +48,7 @@
 #include <atomic>
 #include <chrono>
 #include <cerrno>
+#include <csignal>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
@@ -797,8 +799,11 @@ public:
 
     std::function<void()> onSeed, onLang, onRackView, onStandby,
         onVary, onMutate, onEvolve, onCross, onBank, onSave,
-        onTutorial, onAbout, onRec, onOpen, onUndo, onUncable, onRestore;
+        onTutorial, onAbout, onRec, onOpen, onUndo, onUncable, onRestore,
+        onStartup;
     std::function<void(int)> onZoom;
+    // ABRE: como o app abre na próxima vez (StartupPolicy.hpp)
+    void setStartMode(rasgo::panel::StartMode m) { startMode_ = m; repaint(); }
 
     // INTENSIDADE da mão do VARIA (0..2; 1,0 é o comportamento histórico).
     // Pedido do autor na escuta de 23 set. 2026, e ele mesmo sugeriu que
@@ -952,6 +957,9 @@ public:
         rx -= buttonR(g, rx, str(rasgo::panel::strings::hdrTutorial),
                       overlay_ == 1, Act::tutorial);
         rx -= buttonR(g, rx, langLabel(), false, Act::lang);
+        // ABRE — preferência de abertura, junto do idioma (as duas são
+        // preferências de quem usa, não estado do patch)
+        rx -= buttonR(g, rx, startLabel(), flashing(Act::startup), Act::startup);
         // REC — ponto cheio quando gravando, como no painel X11
         rx -= buttonR(g, rx, u8("\xe2\x97\x8f ")
                       + str(rasgo::panel::strings::hdrRec),
@@ -1179,7 +1187,8 @@ public:
 
     enum class Act { seed, lang, rackView, standby, zoomIn, zoomOut,
                      vary, mutate, evolve, cross, bank, save,
-                     tutorial, about, rec, open, undo, uncable, restore };
+                     tutorial, about, rec, open, undo, uncable, restore,
+                     startup };
 
     // Despacho ÚNICO de ação: o clique e o atalho de teclado entram os
     // dois por aqui. Antes o teclado chamava os callbacks direto e pulava
@@ -1192,6 +1201,7 @@ public:
         switch (a) {
         case Act::seed:      if (onSeed) onSeed(); break;
         case Act::lang:      if (onLang) onLang(); break;
+        case Act::startup:   if (onStartup) onStartup(); break;
         case Act::rackView:  if (onRackView) onRackView(); break;
         case Act::standby:   if (onStandby) onStandby(); break;
         case Act::zoomIn:    if (onZoom) onZoom(+1); break;
@@ -1283,6 +1293,18 @@ private:
                + seedBox_.getLeftIndent() * 2 + 8;
     }
 
+    juce::String startLabel() const {
+        namespace S = rasgo::panel::strings;
+        const rasgo::panel::L4* m = &S::startSeed;
+        switch (startMode_) {
+        case rasgo::panel::StartMode::seed: m = &S::startSeed; break;
+        case rasgo::panel::StartMode::uncabled: m = &S::startUncabled; break;
+        case rasgo::panel::StartMode::initPatch: m = &S::startInit; break;
+        case rasgo::panel::StartMode::lastSession: m = &S::startLast; break;
+        }
+        return str(S::hdrOpens) + u8(" \xc2\xb7 ") + str(*m);
+    }
+
     juce::String langLabel() const {
         switch (lang_) {
         case rasgo::panel::Lang::en: return "EN";
@@ -1358,6 +1380,7 @@ private:
     std::map<int, std::chrono::steady_clock::time_point> flash_;
     std::uint64_t seed_ = 0;
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
+    rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
     bool rackOut_ = false, standby_ = false, vary_ = true, recording_ = false;
     std::size_t visMods_ = 0, totalMods_ = 0, cables_ = 0;
     float vu_ = 0.0f;
@@ -3816,6 +3839,25 @@ public:
             view_->refresh();
             syncHeader();
         };
+        header_.onStartup = [this] {
+            namespace S = rasgo::panel::strings;
+            startMode_ = rasgo::panel::nextStartMode(startMode_);
+            const rasgo::panel::L4* note = &S::startNoteSeed;
+            switch (startMode_) {
+            case rasgo::panel::StartMode::seed: note = &S::startNoteSeed; break;
+            case rasgo::panel::StartMode::uncabled: note = &S::startNoteUncabled; break;
+            case rasgo::panel::StartMode::initPatch:
+                // escolher MEU PATCH guarda o patch de agora como o de abertura
+                savePatch(dataDir().getChildFile("init.rmp"));
+                note = &S::startNoteInit;
+                break;
+            case rasgo::panel::StartMode::lastSession: note = &S::startNoteLast; break;
+            }
+            saveStartPref();
+            palette_.setNotice(u8(rasgo::panel::tr(*note, lang_)));
+            syncHeader();
+            grabKeyboardFocus();
+        };
         header_.onLang = [this] {
             lang_ = rasgo::panel::nextLang(lang_);
             saveLangPref();
@@ -4042,19 +4084,57 @@ public:
         // volta à sessão salva — pra quem estava no meio de um patch feito
         // à mão. Ctrl+S e o BANCO continuam sendo como se guarda de
         // propósito.
-        if (const char* sv = std::getenv("RASGO_SEED")) {
-            seed_ = std::strtoull(sv, nullptr, 10);
-            rack_.curSeed = seed_;
-            rack_.applySeed(seed_, sampleRate_, blockSize_);
-            rack_.populateMotion();
-        } else if (std::getenv("RASGO_RESUME") != nullptr
-                   && loadPatch(dataDir().getChildFile("session.rmp"))) {
-            seed_ = rack_.curSeed;
-        } else {
-            seed_ = nextRandomSeed();
-            rack_.curSeed = seed_;
-            rack_.applySeed(seed_, sampleRate_, blockSize_);
-            rack_.populateMotion();
+        //
+        // Desde 6 out. 2026 a abertura é uma PREFERÊNCIA (botão ABRE), com
+        // o seed como padrão — retorno do fórum do VCV Rack. A regra está
+        // em `panel/StartupPolicy.hpp`, testada sem JUCE.
+        {
+            rasgo::panel::StartInputs in;
+            in.envSeed = std::getenv("RASGO_SEED") != nullptr;
+            in.envResume = std::getenv("RASGO_RESUME") != nullptr;
+            in.pref = startMode_;
+            in.previousCrashed = openMarker().existsAsFile();
+            in.initExists = dataDir().getChildFile("init.rmp").existsAsFile();
+            in.lastExists = dataDir().getChildFile("session.rmp").existsAsFile();
+            const auto plan = rasgo::panel::planStartup(in);
+            openMarker().replaceWithText("aberto");
+
+            const auto freshSeed = [this](std::uint64_t s) {
+                seed_ = s;
+                rack_.curSeed = seed_;
+                rack_.applySeed(seed_, sampleRate_, blockSize_);
+                rack_.populateMotion();
+            };
+            bool loaded = false;
+            switch (plan.action) {
+            case rasgo::panel::StartAction::fixedSeed:
+                freshSeed(std::strtoull(std::getenv("RASGO_SEED"), nullptr, 10));
+                loaded = true;
+                break;
+            case rasgo::panel::StartAction::loadInit:
+                loaded = loadPatch(dataDir().getChildFile("init.rmp"));
+                break;
+            case rasgo::panel::StartAction::loadLast:
+                loaded = loadPatch(dataDir().getChildFile("session.rmp"));
+                break;
+            case rasgo::panel::StartAction::newSeedUncabled:
+                freshSeed(nextRandomSeed());
+                // como a tecla n: tira os cabos, o seed fica como retorno (r)
+                rack_.clearCables();
+                rack_.populateMotion();
+                loaded = true;
+                break;
+            case rasgo::panel::StartAction::newSeed:
+                break;
+            }
+            if (loaded && (plan.action == rasgo::panel::StartAction::loadInit
+                           || plan.action == rasgo::panel::StartAction::loadLast))
+                seed_ = rack_.curSeed;
+            if (!loaded)  // seed novo — também quando o arquivo não abriu
+                freshSeed(nextRandomSeed());
+            if (plan.safeStart)
+                palette_.setNotice(u8(rasgo::panel::tr(
+                    rasgo::panel::strings::startNoteSafe, lang_)));
         }
         arranque::marca("seed aplicado");
         view_->refresh();
@@ -4155,8 +4235,10 @@ public:
         for (auto* in : midiIns_) in->stop();
         midiIns_.clear();
         shutdownAudio();
-        // continua daqui na próxima sessão (com `RASGO_RESUME=1`)
+        // continua daqui na próxima sessão (ABRE · ÚLTIMA, ou `RASGO_RESUME=1`)
         savePatch(dataDir().getChildFile("session.rmp"));
+        // fechou normalmente: a próxima abertura não precisa ser a segura
+        openMarker().deleteFile();
     }
 
     void resized() override {
@@ -4718,7 +4800,19 @@ private:
         const auto rf = dataDir().getChildFile("rack-view");
         if (rf.existsAsFile())
             rackOutputPref_ = rf.loadFileAsString().trim() == "output";
+        const auto sf = dataDir().getChildFile("startup");
+        if (sf.existsAsFile())
+            startMode_ = rasgo::panel::startModeFromCode(
+                sf.loadFileAsString().trim().toStdString());
     }
+    void saveStartPref() const {
+        dataDir().getChildFile("startup")
+            .replaceWithText(rasgo::panel::startModeCode(startMode_));
+    }
+    // "sessão aberta": criado ao abrir, apagado ao fechar normalmente. Se
+    // ele já existe na abertura, a sessão anterior caiu ou foi derrubada —
+    // e a próxima abre sem cabos (StartupPolicy.hpp, segurança).
+    juce::File openMarker() const { return dataDir().getChildFile("sessao-aberta"); }
     void saveLangPref() const {
         dataDir().getChildFile("ui-lang")
             .replaceWithText(u8(rasgo::panel::langCode(lang_)));
@@ -5168,6 +5262,7 @@ private:
     void syncHeader() {
         seed_ = rack_.curSeed;
         header_.setState(seed_, lang_, view_->outputOnly(), standby_);
+        header_.setStartMode(startMode_);
     }
 
     Rack rack_;
@@ -5192,6 +5287,7 @@ private:
     int motionThrottle_ = 0;
     std::uint64_t lastSeed_ = 0;
     bool rackOutputPref_ = false;
+    rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
     std::atomic<bool> signalIn_{false};   // há SIGNAL-IN no patch?
     std::vector<float> inFifo_;           // entrada intercalada L/R
     juce::OwnedArray<juce::MidiInput> midiIns_;
@@ -5207,7 +5303,20 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
 
-class RasgoModularApplication : public juce::JUCEApplication {
+// Pedido de saída vindo do sistema (SIGTERM ao desligar ou encerrar a sessão,
+// SIGINT/SIGHUP no terminal). Sem isso o processo morria sem passar pelo
+// destrutor: a sessão não era salva e o marcador "sessao-aberta" ficava,
+// e a abertura seguinte vinha sem cabos como se o app tivesse caído. O
+// handler só levanta uma flag atômica; quem fecha o app é o timer abaixo,
+// no message thread.
+namespace saida {
+std::atomic<bool> pedida{false};
+static_assert(std::atomic<bool>::is_always_lock_free);
+extern "C" inline void aoSinal(int) { pedida.store(true); }
+} // namespace saida
+
+class RasgoModularApplication : public juce::JUCEApplication,
+                                private juce::Timer {
 public:
     const juce::String getApplicationName() override { return "Rasgo Modular"; }
     const juce::String getApplicationVersion() override
@@ -5219,8 +5328,17 @@ public:
         arranque::marca("initialise");
         window_ = std::make_unique<Window>(getApplicationName());
         arranque::marca("janela criada");
+        std::signal(SIGTERM, saida::aoSinal);
+        std::signal(SIGINT, saida::aoSinal);
+#ifdef SIGHUP
+        std::signal(SIGHUP, saida::aoSinal);
+#endif
+        startTimerHz(10);
     }
-    void shutdown() override { window_ = nullptr; }
+    void shutdown() override { stopTimer(); window_ = nullptr; }
+    void timerCallback() override {
+        if (saida::pedida.exchange(false)) systemRequestedQuit();
+    }
     void systemRequestedQuit() override { quit(); }
 
 private:

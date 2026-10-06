@@ -7,6 +7,43 @@ pronto.
 
 ---
 
+## Próxima versão (v0.1.5, não publicada)
+
+> **English summary.** A startup preference, after feedback on the VCV Rack
+> forum. The **OPENS** button in the header cycles four choices: **SEED** (a
+> new generated patch, playing: the default, as before), **NO CABLES** (all
+> modules, no cables, like "New" in a modular environment; a seed is still
+> drawn and kept as the return point for `r`), **MY PATCH** (choosing it
+> stores the current patch as your opening patch) and **LAST** (the session
+> as it was when closed). Safety: if the previous session did not close
+> normally, the next start opens with no cables, whatever the preference.
+> A missing file falls back to a new seed. The app now also closes cleanly
+> on SIGTERM/SIGINT/SIGHUP (logout, shutdown, Ctrl+C), saving the session.
+
+- **Preferência ABRE**, no cabeçalho, ao lado do idioma. Ela alterna entre
+  SEED, SEM CABOS, MEU PATCH e ÚLTIMA. A escolha fica no arquivo `startup`
+  da pasta de dados. Escolher MEU PATCH guarda o patch de agora em
+  `init.rmp`. O seed continua sendo o padrão: o instrumento propõe, e quem
+  escolhe por onde começar é o músico.
+- **Abertura segura.** Enquanto o app está aberto existe o marcador
+  `sessao-aberta`, que é apagado ao fechar normalmente. Se ele ainda
+  estiver lá na abertura seguinte, a sessão anterior caiu: o app abre sem
+  cabos e avisa. `RASGO_SEED` e `RASGO_RESUME` continuam valendo antes da
+  preferência, para testes e render.
+- **Saída limpa por sinal.** Antes, um SIGTERM matava o processo sem salvar
+  a sessão, e o marcador ficava, de modo que a abertura seguinte parecia
+  uma queda. Agora o sinal pede a saída normal.
+- A regra fica em `apps/panel/StartupPolicy.hpp` e é testada em
+  `tests/test_startup_policy.cpp`.
+- Validado no Linux (6 out. 2026): cada modo foi aberto e fechado num
+  `HOME` isolado e com saída de áudio muda (SEED, SEM CABOS → 1 cabo, MASTER
+  → saída; MEU PATCH e ÚLTIMA → mesmo seed e 24 cabos; marcador órfão →
+  abertura segura; init ausente → seed novo; SIGTERM → sessão salva e
+  marcador apagado). `ctest` 81/81. Ainda não testado no Windows nem no
+  macOS.
+
+---
+
 ## v0.1.4 — 2026-10-06
 
 > **English summary.** Installation fixes. **Windows:** the app now opens on
