@@ -10670,3 +10670,30 @@ Documentação atualizada:
 
 **6 out. 2026 — som confirmado no Mac** pelo autor. README (4 línguas) e
 site marcam o macOS como aberto e tocado.
+
+**6 out. 2026 — retorno no fórum do VCV Rack** ("Rasgo Modular — an
+independent open-source instrument", community.vcvrack.com/t/26200,
+respostas de 1º out.):
+
+- **Patch de abertura:** LarsBjerregaard, jaibhimadevi e clone45 preferem
+  começar do próprio template ou vazio. O clone45 disse que partir de um
+  patch alheio "não parece trabalho meu". O jaibhimadevi pediu um "init"
+  configurável ("New" por padrão), por segurança. O Lars achou os patches
+  gerados divertidos para explorar. **Decisão do autor:** uma preferência
+  "Ao abrir" para a v0.1.5 (seed sorteado / rack vazio / patch inicial do
+  BANCO / última sessão). A identidade do instrumento é mantida: o
+  instrumento propõe, e o músico escolhe e toca.
+- **Cabo com estado:** o conceito não chegou ("módulos escondidos no
+  cabo"; "dá pra fazer com um módulo no meio"). Hoje, ganho, condutância e
+  relação só aparecem no inspetor de cabo (é preciso clicar nele); o
+  desenho do cabo só mostra a ruptura (tracejado). **Próximo:** tornar o
+  estado visível no próprio cabo e ter um exemplo curto no site e no LEARN.
+- **Interoperabilidade:** o Lars apontou o som como denominador comum. O
+  clone45 propôs um par de módulos-ponte polifônicos de 16 canais ("Rasgo
+  Connector" no VCV ↔ "VCV Connector" no Rasgo). Ideia registrada, sem
+  promessa; ela exige um plugin do VCV em GPLv3 (ver DESENVOLVIMENTO).
+- **Ohmer** (FR) chamou o Rasgo de "plug-in". É aplicativo independente.
+
+Uma resposta foi redigida e conferida contra o código: a condutância é
+re-sorteada a cerca de 20 Hz (`SignalGraph.hpp`), e não por compasso.
+
