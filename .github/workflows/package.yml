@@ -74,15 +74,28 @@ jobs:
           # contra bibliotecas mais antigas roda em sistema mais novo, o
           # contrário não. Um único `.deb` passa a atender 22.04, 24.04 e
           # derivados (Mint 21 e 22 inclusive).
+          #
+          # O job do Ubuntu sai com TRÊS pacotes: .deb (CPack), AppImage e
+          # .tar.gz (packaging/linux/empacotar.sh) — os dois últimos para
+          # Fedora, Arch, openSUSE e quem não instala .deb.
           - os: ubuntu-22.04
             generator: DEB
-            artifact-glob: build/*.deb
+            artifact-glob: |
+              build/*.deb
+              build/*.AppImage
+              build/*.tar.gz
+          # Windows: instalador (NSIS) e versão portátil (.zip, só
+          # descompactar e abrir); os dois levam o .exe com runtime estático.
           - os: windows-latest
             generator: NSIS
-            artifact-glob: build/*.exe
+            artifact-glob: |
+              build/*.exe
+              build/*.zip
           - os: macos-latest
             generator: DragNDrop
             artifact-glob: build/*.dmg
+    # nome explícito: o padrão juntaria a lista de globs do Ubuntu ao nome
+    name: package (${{ matrix.os }}, ${{ matrix.generator }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Rasgo Modular
@@ -90,14 +103,15 @@ jobs:
 
       # O JUCE não é versionado neste repositório (nem submodule, nem
       # FetchContent) — mesma política do Antitotem/Navalha 2/Rasgo Synth.
-      # `ref: master` segue o upstream; pra uma release reprodutível,
-      # fixar aqui o commit/tag usado e registrá-lo na release
-      # (ver apps/juce/LICENSE_STATUS.md).
+      # Fixado numa tag (6 out. 2026): até a v0.1.3 era `master`, e cada
+      # build compilava contra o JUCE do dia, o que não é reproduzível.
+      # Mudar a versão é decisão registrada aqui e em
+      # apps/juce/LICENSE_STATUS.md.
       - name: Checkout JUCE
         uses: actions/checkout@v4
         with:
           repository: juce-framework/JUCE
-          ref: master
+          ref: '9.0.3'
           path: JUCE-checkout
 
       # Dependências de build do JUCE no Linux. Windows (MSVC) e macOS
@@ -185,12 +199,61 @@ jobs:
             exit 1
           fi
 
-          echo "--- codesign (ad-hoc; sem Developer ID/notarização na CI) ---"
-          codesign -dv "$APP" 2>&1 || echo "::warning::Não assinado — ok pra teste local, mas distribuição real precisa de Developer ID + notarização, senão o Gatekeeper mostra aviso de desenvolvedor não identificado na primeira abertura"
+          # Assinatura ad-hoc do PACOTE INTEIRO, nas duas fatias. Até a
+          # v0.1.3 só a fatia arm64 tinha a assinatura automática do
+          # linker, a x86_64 não tinha nenhuma e o .app não era selado (sem
+          # _CodeSignature): baixado num Mac com chip Apple, o Gatekeeper
+          # tende a dizer "está danificado e não pode ser aberto", sem saída
+          # para um usuário comum. Selado ad-hoc, o aviso volta a ser o de
+          # desenvolvedor não identificado, que se libera em Ajustes →
+          # Privacidade e Segurança → "Abrir Mesmo Assim". Tirar o aviso de
+          # vez exige Developer ID + notarização (conta paga da Apple).
+          # Achado em 6 out. 2026 lendo os comandos de carga do binário
+          # publicado.
+          echo "--- codesign ad-hoc (pacote inteiro) ---"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          for arch in x86_64 arm64; do
+            codesign -dv --arch "$arch" "$APP" 2>&1 | grep -q "Signature=adhoc" \
+              || { echo "::error::fatia $arch sem assinatura ad-hoc"; exit 1; }
+          done
+          test -d "$APP/Contents/_CodeSignature" || { echo "::error::pacote não selado"; exit 1; }
+          echo "ok: pacote selado, duas fatias assinadas (ad-hoc)"
+
+      # O .exe não pode depender do Visual C++ Redistributable: a v0.1.3
+      # dependia (MSVCP140/VCRUNTIME140) e não abria num Windows sem ele, e
+      # este runner, que já tem o pacote, nunca percebeu. Lista as DLLs
+      # importadas e falha se alguma do runtime dinâmico aparecer.
+      - name: Validate Windows runtime (static CRT)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem -Recurse -Path build -Filter 'Rasgo Modular.exe' |
+                 Where-Object { $_.FullName -match 'Release' } | Select-Object -First 1
+          if (-not $exe) { throw 'Rasgo Modular.exe não encontrado' }
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $dumpbin = Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Select-Object -First 1
+          if (-not $dumpbin) { throw 'dumpbin não encontrado' }
+          $deps = & $dumpbin.FullName /dependents $exe.FullName
+          $deps
+          $bad = $deps | Select-String -Pattern 'VCRUNTIME|MSVCP|api-ms-win-crt'
+          if ($bad) { Write-Error "o .exe depende do runtime dinâmico do Visual C++: $bad"; exit 1 }
+          "ok: sem dependência do Visual C++ Redistributable"
 
       - name: Package
         working-directory: build
         run: cpack -G ${{ matrix.generator }} -C Release
+
+      # Mesma árvore do `cmake --install` que o .deb usa; linuxdeploy
+      # fixado por versão e hash dentro do script.
+      - name: Versão portátil (.zip, Windows)
+        if: runner.os == 'Windows'
+        working-directory: build
+        run: cpack -G ZIP -C Release
+
+      - name: AppImage e .tar.gz (Linux)
+        if: runner.os == 'Linux'
+        run: packaging/linux/empacotar.sh build build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -198,6 +261,69 @@ jobs:
           name: rasgo-modular-${{ matrix.os }}
           path: ${{ matrix.artifact-glob }}
           if-no-files-found: error
+
+  # ---- arranque-linux: os pacotes Linux abrem em outras distribuições? ---
+  #
+  # O .deb é compilado no Ubuntu 22.04; o AppImage e o .tar.gz prometem
+  # rodar em qualquer distribuição de 2022 em diante. Esta é a prova: cada
+  # contêiner instala só o que um desktop comum já tem (X11, ALSA,
+  # FreeType, Fontconfig), abre o app numa tela virtual, sem placa de som,
+  # e confere que ele chega ao primeiro quadro e não cai
+  # (packaging/linux/testar-arranque.sh). Nos dois sistemas Debian o .deb
+  # é instalado pelo apt, o que confere também as dependências declaradas.
+  #
+  # Só Linux: multiplicador 1, e gratuito em repositório público. Não testa
+  # som nem desenho — testa o defeito que mais custa a quem baixa: o app
+  # que nem abre.
+  arranque-linux:
+    needs: package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        imagem: ['debian:12', 'ubuntu:24.04', 'fedora:latest', 'archlinux:latest']
+    container: ${{ matrix.imagem }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Baixar os pacotes Linux
+        uses: actions/download-artifact@v4
+        with:
+          name: rasgo-modular-ubuntu-22.04
+          path: pacotes
+
+      - name: Instalar o básico de um desktop (e o .deb, onde couber)
+        run: |
+          set -eux
+          case "${{ matrix.imagem }}" in
+            debian:*|ubuntu:*)
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y ./pacotes/*.deb
+              apt-get install -y xvfb libx11-6 libxext6 libxrandr2 \
+                libxcursor1 libxinerama1 libxrender1 fonts-dejavu-core ;;
+            fedora:*)
+              dnf install -y xorg-x11-server-Xvfb alsa-lib freetype fontconfig \
+                libX11 libXext libXrandr libXcursor libXinerama libXrender dejavu-sans-fonts ;;
+            archlinux:*)
+              pacman -Syu --noconfirm xorg-server-xvfb alsa-lib freetype2 fontconfig \
+                libx11 libxext libxrandr libxcursor libxinerama libxrender ttf-dejavu ;;
+          esac
+
+      - name: Abrir o .deb instalado
+        if: startsWith(matrix.imagem, 'debian') || startsWith(matrix.imagem, 'ubuntu')
+        run: packaging/linux/testar-arranque.sh /usr/bin/rasgo-modular
+
+      - name: Abrir o AppImage
+        run: |
+          chmod +x pacotes/*.AppImage
+          packaging/linux/testar-arranque.sh "$(ls pacotes/*.AppImage)"
+
+      - name: Abrir o .tar.gz
+        run: |
+          mkdir tgz && tar -xzf pacotes/*.tar.gz -C tgz
+          packaging/linux/testar-arranque.sh "$(ls tgz/*/bin/rasgo-modular)"
 
   # ---- release: onde a tag vira algo que alguém consegue BAIXAR --------
   #
@@ -215,7 +341,9 @@ jobs:
   # que é onde proveniência importa mais.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: package
+    # também espera o teste de abertura: um pacote Linux que não abre não
+    # entra na release
+    needs: [package, arranque-linux]
     runs-on: ubuntu-22.04
     permissions:
       contents: write        # criar a release e anexar os pacotes
@@ -231,16 +359,16 @@ jobs:
       - name: Conferir o que chegou
         run: |
           find pacotes -type f -print
-          # os três precisam estar aqui: uma release com dois instaladores
+          # os cinco precisam estar aqui: uma release com metade dos pacotes
           # é pior que nenhuma, porque parece completa
-          for ext in deb dmg exe; do
+          for ext in deb AppImage tar.gz dmg exe zip; do
             if ! find pacotes -type f -name "*.$ext" | grep -q .; then
               echo "::error::nenhum pacote .$ext entre os artefatos"
               exit 1
             fi
           done
 
-      - name: Criar a release com os três instaladores
+      - name: Criar a release com os pacotes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -256,11 +384,15 @@ jobs:
             --verify-tag \
             --notes "Release notes: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) (English summary at the top of each version) · installation per platform: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
 
-          **Stated limitation:** the Windows and macOS packages were built, packaged and tested **by continuous integration only** — the author has never opened the application on those two systems. The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
+          **Linux:** \`.deb\` for Ubuntu, Debian and Mint; AppImage or \`.tar.gz\` for other distributions (x86-64, glibc 2.35+, tested at launch on Debian 12, Ubuntu 24.04, Fedora and Arch).
+
+          **Stated limitation:** the macOS package was built, packaged and tested **by continuous integration only** — the author has not opened it on a real Mac (the Windows package was installed and played by the author on Windows 10, 6 Oct. 2026). On first launch Windows and macOS show a security warning; what to click: [INSTALL.md → Installing, step by step](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#installing-step-by-step). The macOS package is ad-hoc signed, without Developer ID or notarisation, so Gatekeeper warns on first launch.
 
           ---
 
           Notas desta versão: [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md) · instalação por plataforma: [INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md).
 
-          **Limitação declarada:** Windows e macOS foram construídos, empacotados e testados **somente pela integração contínua** — o autor nunca abriu o aplicativo nesses dois sistemas. O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
-            $(find pacotes -type f \( -name '*.deb' -o -name '*.dmg' -o -name '*.exe' \))
+          **Linux:** \`.deb\` para Ubuntu, Debian e Mint; AppImage ou \`.tar.gz\` para as demais distribuições (x86-64, glibc 2.35+, testados na abertura em Debian 12, Ubuntu 24.04, Fedora e Arch).
+
+          **Limitação declarada:** o pacote macOS foi construído, empacotado e testado **somente pela integração contínua** — o autor não o abriu num Mac real (o de Windows foi instalado e tocado pelo autor num Windows 10 em 6 out. 2026). Na primeira abertura, Windows e macOS mostram um aviso de segurança; o que clicar: [INSTALL.md → Instalar, passo a passo](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/INSTALL.md#instalar-passo-a-passo). O pacote macOS tem assinatura ad-hoc, sem Developer ID nem notarização, então o Gatekeeper mostra aviso na primeira abertura." \
+            $(find pacotes -type f \( -name '*.deb' -o -name '*.AppImage' -o -name '*.tar.gz' -o -name '*.dmg' -o -name '*.exe' -o -name '*.zip' \))

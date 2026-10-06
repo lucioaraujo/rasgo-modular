@@ -7,6 +7,64 @@ pronto.
 
 ---
 
+## v0.1.4 — 2026-10-06
+
+> **English summary.** Installation fixes. **Windows:** the app now opens on
+> any Windows. Up to v0.1.3 it silently required the Visual C++
+> Redistributable (`MSVCP140.dll`, `VCRUNTIME140.dll`), which the installer
+> did not ship, so on a Windows without it nothing happened. The runtime is
+> now built into the `.exe`, and CI fails if that dependency comes back.
+> Verified by the author on a real Windows 10 (8 GB). The installer ends
+> with "Run Rasgo Modular", and a portable `.zip` is available. **macOS:**
+> the whole `.app` is now ad-hoc signed and sealed; before, only the Apple
+> Silicon slice had a linker signature, which tends to give "damaged and
+> can't be opened" on Apple Silicon Macs. **Linux:** AppImage and
+> `.tar.gz` (with a no-root `install.sh`) besides the `.deb`, launch-tested
+> in CI on Debian 12, Ubuntu 24.04, Fedora and Arch. **Docs:** a
+> step-by-step install guide for the Windows and macOS first-launch
+> warnings, linked from the site and README. JUCE is now pinned to 9.0.3.
+> Pre-release for testing before this: `v0.1.4-rc1`.
+
+- **Windows: o app passa a abrir em qualquer Windows.** Até a v0.1.3 o
+  `Rasgo Modular.exe` dependia do "Visual C++ Redistributable"
+  (`MSVCP140.dll`, `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`), que o
+  instalador não levava: num Windows sem esse pacote o app não abria. Achado
+  em 6 out. 2026, quando o autor não conseguiu abrir a v0.1.3 num Windows.
+  Confirmado listando as DLLs importadas pelo `.exe` publicado. A CI nunca
+  percebeu porque a máquina do GitHub já tem o pacote. Correção: o runtime
+  do Visual C++ vai **embutido** no executável (`/MT`), e a CI agora falha
+  se o `.exe` voltar a depender dele.
+- **macOS: o app passa a ser selado por inteiro.** Até a v0.1.3 só a fatia
+  Apple Silicon tinha a assinatura automática do compilador; a fatia Intel
+  não tinha nenhuma, e o pacote `.app` não era selado. Baixado num Mac com
+  chip Apple, isso tende a gerar "está danificado e não pode ser aberto". A
+  CI agora assina o pacote inteiro (ad-hoc) e confere as duas fatias. O
+  aviso de "desenvolvedor não identificado" continua, porque só some com o
+  Developer ID e a notarização da Apple, mas agora pode ser liberado pelo
+  usuário. As dependências do app são só bibliotecas do sistema: no macOS
+  não há equivalente ao problema do Windows.
+- **Instalador mais simples:** a última tela oferece "Executar o Rasgo
+  Modular", já marcado.
+- **Versão portátil para Windows** (`.zip`): basta descompactar e abrir, sem
+  instalar.
+- **JUCE fixado na versão 9.0.3** na CI. Antes cada build usava o `master`
+  do dia, o que não era reproduzível.
+- **Linux além do `.deb`: AppImage e `.tar.gz`** (x86-64, glibc 2.35+),
+  para Fedora, Arch, openSUSE e quem não instala `.deb`. Os dois saem do
+  mesmo `cmake --install` que o `.deb` usa (`packaging/linux/empacotar.sh`).
+  O AppImage é um arquivo só, com as bibliotecas que não são de sistema
+  embutidas (linuxdeploy fixado por versão e hash). O `.tar.gz` traz o
+  binário, um `install.sh` que instala em `~/.local` sem root (e remove
+  com `--remove`) e um LEIA-ME em quatro línguas.
+- **Teste de abertura em quatro distribuições** na CI: Debian 12, Ubuntu
+  24.04, Fedora e Arch, em contêiner, numa tela virtual sem placa de som
+  (`packaging/linux/testar-arranque.sh`). O `.deb` é instalado pelo `apt`
+  nos dois Debian; os três pacotes precisam chegar ao primeiro quadro e
+  continuar abertos. A release só é criada depois desse teste.
+  Primeira execução (manual, 4 out.): os 10 testes passaram.
+
+---
+
 ## v0.1.3 — 2026-10-04
 
 > **English summary.** Startup fixes for Windows, after a user report (the

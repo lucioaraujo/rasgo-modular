@@ -1,0 +1,30 @@
+Rasgo Modular — Linux x86-64 (.tar.gz)
+https://lucioaraujo.github.io/rasgo-modular/
+
+PORTUGUÊS
+  Abrir sem instalar:     ./bin/rasgo-modular
+  Instalar no menu:       ./install.sh         (em ~/.local, sem root)
+  Remover:                ./install.sh --remove
+  Precisa de glibc 2.35 ou mais nova (distribuições de 2022 em diante),
+  ALSA, FreeType e Fontconfig — presentes em qualquer desktop Linux.
+  Prefere um arquivo só? Use o AppImage da mesma página de downloads.
+
+ENGLISH
+  Run without installing: ./bin/rasgo-modular
+  Add to the app menu:    ./install.sh         (into ~/.local, no root)
+  Remove:                 ./install.sh --remove
+  Needs glibc 2.35 or newer (distributions from 2022 on), ALSA, FreeType
+  and Fontconfig — present on any Linux desktop.
+  Prefer a single file? Use the AppImage from the same download page.
+
+FRANÇAIS
+  Lancer sans installer : ./bin/rasgo-modular
+  Ajouter au menu :       ./install.sh         (dans ~/.local, sans root)
+  Désinstaller :          ./install.sh --remove
+
+ESPAÑOL
+  Abrir sin instalar:     ./bin/rasgo-modular
+  Añadir al menú:         ./install.sh         (en ~/.local, sin root)
+  Quitar:                 ./install.sh --remove
+
+Licença / License: AGPL-3.0-or-later (LICENSE)

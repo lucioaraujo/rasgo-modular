@@ -10581,3 +10581,57 @@ usuário relatou no Windows 10, foi corrigido na v0.1.1 (mutex travado duas
 vezes); a v0.1.3 traz as correções de abertura no Windows; as faixas de cor
 por família, sugestão dele, estão no app; pedido do `arranque.log` se
 ainda cair. Aguardando retorno.
+
+**4 out. 2026 — AppImage e `.tar.gz` implementados** (branch
+`v0.1.4-linux-pacotes`, sem release). `packaging/linux/empacotar.sh`
+(AppImage via linuxdeploy fixado por hash; `.tar.gz` com `install.sh` e
+LEIA-ME), `packaging/linux/testar-arranque.sh` (Xvfb, sem som, exige
+"primeiro quadro") e novo job `arranque-linux` no `package.yml` (Debian 12,
+Ubuntu 24.04, Fedora, Arch em contêiner; a release espera por ele).
+Validação: local no Mint (os dois pacotes abrem; `install.sh` instala e
+remove; o teste reprova `/bin/false`) e CI manual 37235607104 (três
+sistemas empacotados, 10/10 aberturas). **Próximo passo:** na release
+v0.1.4, apontar site (4 línguas), README e INSTALL para o AppImage e o
+`.tar.gz`; depois, se o autor quiser, arm64.
+
+**6 out. 2026 — Windows: o app não abria, causa achada e corrigida (branch
+`v0.1.4-linux-pacotes`).** O autor tentou instalar a v0.1.3 num Windows:
+apareceu o aviso de "não confiável" e depois o app não funcionou. Causa:
+listando as DLLs importadas pelo `.exe` publicado, ele dependia de
+`MSVCP140.dll`, `VCRUNTIME140.dll` e `VCRUNTIME140_1.dll` (o Visual C++
+Redistributable), que o instalador não leva. O runner da CI já tem esse
+pacote, por isso o teste de abertura de 3 out. passou. Correções:
+
+- runtime estático (`CMAKE_MSVC_RUNTIME_LIBRARY`, `/MT`), com um passo na CI
+  que lista as DLLs e falha se o runtime dinâmico voltar;
+- "Executar o Rasgo Modular" no fim da instalação;
+- versão portátil `.zip`;
+- JUCE fixado em 9.0.3.
+
+**macOS:** as dependências são só do sistema, mas o `.app` não era selado
+(só a fatia arm64 tinha a assinatura do linker), o que tende a gerar
+"danificado" num Mac com chip Apple. Agora o pacote é assinado ad-hoc por
+inteiro e a CI confere as duas fatias.
+
+**Validação:** CI 37380924802 verde. Os pacotes finais, baixados e
+inspecionados aqui (instalador, `.zip` e `.dmg`), estão sem DLL do Visual
+C++, com `_CodeSignature` e as duas fatias assinadas.
+
+**INSTALL, site e README:** passo a passo da instalação (os avisos e onde
+clicar; o contorno para a v0.1.3), levado também para o `main`. Os avisos
+de "não confiável" só somem com assinatura reconhecida: a SignPath
+Foundation, gratuita para software livre, no Windows; o Apple Developer
+Program, pago, no macOS. Decisão do autor.
+
+**Próximo passo:** versão 0.1.4 no CMake; publicar a v0.1.4-rc1 se o
+autor autorizar e testá-la no Windows dele.
+
+**6 out. 2026 — v0.1.4-rc1 testada num Windows real pelo autor: instalou e
+executou e funcionou bem** (Windows 10, 8 GB de memória). É a primeira abertura confirmada fora da CI. Ela confirma o
+diagnóstico (runtime do Visual C++ ausente na v0.1.3) e a correção (runtime
+embutido). Pré-release com os seis pacotes: Windows `.exe` e `.zip`, macOS
+`.dmg`, Linux `.deb`, AppImage e `.tar.gz`. **Próximo passo:** publicar a
+v0.1.4 final (tag, site com `estado.py --depois 0.1.4`, README e INSTALL
+com a versão nova), com autorização do autor. O macOS continua sem teste em
+máquina real.
+
