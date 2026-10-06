@@ -75,8 +75,8 @@ TEXTO = {
 
   <p><strong>Antes de baixar, duas coisas ditas por inteiro.</strong> O
     pacote Windows foi instalado e tocado pelo autor num Windows 10 real
-    (8 GB) em 6 out. 2026, e o pacote macOS foi aberto pelo autor num Mac
-    real no mesmo dia, depois de liberado. E o <code>.dmg</code> tem assinatura
+    (8 GB) em 6 out. 2026, e o pacote macOS foi aberto e tocado pelo autor
+    num Mac real no mesmo dia, depois de liberado. E o <code>.dmg</code> tem assinatura
     ad-hoc, sem Developer ID nem notarização: na primeira abertura o macOS
     bloqueia o app até você liberá-lo uma vez, pelos Ajustes ou pelo
     Terminal.</p>
@@ -123,7 +123,7 @@ TEXTO = {
   <p><strong>Two things said in full before you download.</strong> The
     Windows package was installed and played by the author on a real
     Windows 10 machine (8 GB) on 6 Oct. 2026, and the macOS package was
-    opened by the author on a real Mac the same day, after allowing it. And the <code>.dmg</code> is ad-hoc
+    opened and played by the author on a real Mac the same day, after allowing it. And the <code>.dmg</code> is ad-hoc
     signed, with no Developer ID and no notarisation: on first launch macOS
     blocks the app until you allow it once, in System Settings or in
     Terminal.</p>

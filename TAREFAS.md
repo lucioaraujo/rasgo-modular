@@ -10668,3 +10668,5 @@ Documentação atualizada:
 - a decisão sobre o Apple Developer Program (pago, anual), que é o único
   jeito de o bloqueio sumir.
 
+**6 out. 2026 — som confirmado no Mac** pelo autor. README (4 línguas) e
+site marcam o macOS como aberto e tocado.
