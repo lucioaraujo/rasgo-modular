@@ -100,8 +100,9 @@ struct LearnEntry {
 // junto com a caixa nova do cabo (GAIN, COND sempre, DESPLUGAR).
 inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
     static const LearnEntry en{
-        "a cable is an OBJECT, not a wire. Click it to open its box (bottom "
-        "right) and change what it does to the signal passing through.",
+        "a cable is an OBJECT, not a wire. Its look tells its state: "
+        "thickness is gain, blinking is conduction, a badge is a relation. "
+        "Click it to open its box (bottom right) and change them.",
 
         "every cable has GAIN (0 to 2, neutral in the middle) and "
         "conductance, COND — the chance of letting through at each moment, "
@@ -114,12 +115,13 @@ inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
         "all at once.",
 
         "set a cable to RING with an oscillator as companion: the same "
-        "wiring, another instrument. Then drop COND to half and hear the "
-        "connection flicker."};
+        "wiring, another instrument — a badge with × appears on the cable, "
+        "with a dotted line to the oscillator. Then drop COND to half: you "
+        "hear the connection flicker and see the cable blink with it."};
     static const LearnEntry pt{
-        "o cabo é um OBJETO, não um fio. Clique sobre ele para abrir a "
-        "caixa dele (no canto inferior direito) e mexer no que ele faz com "
-        "o sinal que passa.",
+        "o cabo é um OBJETO, não um fio. O desenho mostra o estado dele: "
+        "espessura é ganho, piscar é condução, selo é relação. Clique "
+        "sobre ele para abrir a caixa (canto inferior direito) e mudar.",
 
         "todo cabo tem GANHO (0 a 2, neutro no meio) e condutância, COND — "
         "a chance de deixar passar em cada instante, de onde vem a "
@@ -131,12 +133,14 @@ inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
         "[espaço] rompe e reata todos de uma vez.",
 
         "ponha um cabo em RING com um oscilador como companion: a mesma "
-        "fiação, outro instrumento. Depois baixe COND pela metade e ouça a "
-        "ligação piscar."};
+        "fiação, outro instrumento — aparece no cabo um selo com ×, com um "
+        "fio pontilhado até o oscilador. Depois baixe COND pela metade: "
+        "você ouve a ligação falhar e vê o cabo piscar junto."};
     static const LearnEntry fr{
-        "un câble est un OBJET, pas un fil. Cliquez dessus pour ouvrir sa "
-        "fenêtre (en bas à droite) et changer ce qu’il fait au signal qui "
-        "le traverse.",
+        "un câble est un OBJET, pas un fil. Son tracé montre son état : "
+        "épaisseur = gain, clignotement = conduction, sceau = relation. "
+        "Cliquez dessus pour ouvrir sa fenêtre (en bas à droite) et les "
+        "changer.",
 
         "tout câble a un GAIN (0 à 2, neutre au milieu) et une conductance, "
         "COND — la chance de laisser passer à chaque instant, d’où vient "
@@ -149,12 +153,14 @@ inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
         "coup.",
 
         "mettez un câble en RING avec un oscillateur comme compagnon : le "
-        "même câblage, un autre instrument. Puis baissez COND de moitié et "
-        "écoutez la liaison clignoter."};
+        "même câblage, un autre instrument — un sceau avec × apparaît sur le "
+        "câble, avec un fil pointillé jusqu’à l’oscillateur. Puis baissez "
+        "COND de moitié : vous entendez la liaison flancher et voyez le "
+        "câble clignoter avec elle."};
     static const LearnEntry es{
-        "un cable es un OBJETO, no un hilo. Haga clic sobre él para abrir "
-        "su caja (abajo a la derecha) y cambiar lo que hace con la señal "
-        "que lo atraviesa.",
+        "un cable es un OBJETO, no un hilo. Su trazo muestra su estado: "
+        "grosor = ganancia, parpadeo = conducción, sello = relación. Haga "
+        "clic sobre él para abrir su caja (abajo a la derecha) y cambiarlos.",
 
         "todo cable tiene GANANCIA (0 a 2, neutra en el centro) y "
         "conductancia, COND — la probabilidad de dejar pasar en cada "
@@ -167,8 +173,9 @@ inline const LearnEntry& learnCable(const Lang lang = Lang::pt) {
         "a la vez.",
 
         "ponga un cable en RING con un oscilador como compañero: el mismo "
-        "cableado, otro instrumento. Luego baje COND a la mitad y escuche la "
-        "conexión parpadear."};
+        "cableado, otro instrumento — aparece en el cable un sello con ×, "
+        "con un hilo punteado hasta el oscilador. Luego baje COND a la "
+        "mitad: oye la conexión fallar y ve el cable parpadear con ella."};
     switch (lang) {
     case Lang::en: return en;
     case Lang::fr: return fr;
