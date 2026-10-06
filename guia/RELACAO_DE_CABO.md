@@ -303,6 +303,27 @@ resultado na hora.
 
 ## 4. Como usar no painel
 
+**Ler o cabo sem abrir a caixa** (a partir da v0.1.5). O desenho do cabo
+mostra o estado dele:
+
+- **Espessura = `GAIN`.** No neutro (1,0), o cabo tem a espessura de
+  sempre. Com ganho 2 ele fica mais grosso, e com ganho perto de 0 vira
+  um fio de cabelo.
+- **Piscar = `COND`.** O cabo **apaga** nos instantes em que o sorteio de
+  condução diz "não passa". É o mesmo sorteio que o áudio usa, a cerca de
+  20 Hz. Com condutância 1 o cabo fica aceso direto; quanto mais baixa,
+  mais ele pisca. Apagado, ele fica em tom fraco, mas não some.
+- **Selo no meio = relação.** O símbolo é a operação: `×` para `RING`,
+  zigue-zague para `FOLD` e `−` para `DIFF`. O arco em volta do selo é o
+  `AMT`: arco completo é 1. Um **fio pontilhado** liga o selo ao jack do
+  companion, de modo que o segundo sinal que o cabo lê fica à vista.
+- **Tracejado na cor de aviso = rompido** (cicatriz, §2), como antes.
+
+A caixa continua sendo o lugar de **mudar** esses valores; o desenho serve
+para **ler** o patch de relance. Esta parte veio do retorno do fórum do VCV
+Rack (6 out. 2026), onde o cabo com estado soou como "módulos escondidos no
+cabo": de fato, até a v0.1.4 o estado só aparecia depois de um clique.
+
 **Passe o mouse sobre o corpo de um cabo** — no fio em si, não numa ponta
 (as pontas continuam sendo pra puxar e tirar cabo). O cabo sob o ponteiro
 **se acende** e o cursor vira a mãozinha: é exatamente o que o clique vai

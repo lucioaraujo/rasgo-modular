@@ -10708,3 +10708,23 @@ e validação estão no CHANGELOG.
 - texto do site e do LEARN sobre o ABRE;
 - **próximo item:** estado visível no próprio cabo.
 
+**6 out. 2026 — estado visível no cabo implementado** (v0.1.5, sem
+release):
+- espessura = GAIN; o cabo apaga quando não conduz (o sorteio de COND, visto);
+- selo no meio do cabo para a relação (×, zigue-zague, −), com o arco do
+  AMT e um fio pontilhado até o companion;
+- textos atualizados no tutorial, no LEARN (na primeira linha, a que
+  sempre aparece) e no guia §4. Validação no CHANGELOG.
+
+**Achado:** o verbete do cabo no LEARN tem cerca de 3× a altura da caixa
+(204 px úteis, 166 px de largura). Só a primeira linha e parte da segunda
+aparecem; o "→ experimente" nunca aparece. Isso já era assim antes. Falta
+avaliar se outros verbetes longos têm o mesmo corte e decidir entre rolar
+a caixa ou encurtar os textos.
+
+**Pendente para a v0.1.5:**
+- testar ABRE e o cabo no Windows e no macOS;
+- no dia da release, atualizar o site nos 4 idiomas: o card "Os cabos
+  também tocam" e "Como se usa" (ABRE), com uma captura do cabo com selo.
+  Isso não pode ser feito antes, porque o site descreve a versão publicada.
+

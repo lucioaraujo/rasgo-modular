@@ -9,8 +9,8 @@ pronto.
 
 ## Próxima versão (v0.1.5, não publicada)
 
-> **English summary.** A startup preference, after feedback on the VCV Rack
-> forum. The **OPENS** button in the header cycles four choices: **SEED** (a
+> **English summary.** Two changes from VCV Rack forum feedback: cables
+> show their state on the canvas (see below), and a startup preference. The **OPENS** button in the header cycles four choices: **SEED** (a
 > new generated patch, playing: the default, as before), **NO CABLES** (all
 > modules, no cables, like "New" in a modular environment; a seed is still
 > drawn and kept as the return point for `r`), **MY PATCH** (choosing it
@@ -20,6 +20,26 @@ pronto.
 > A missing file falls back to a new seed. The app now also closes cleanly
 > on SIGTERM/SIGINT/SIGHUP (logout, shutdown, Ctrl+C), saving the session.
 
+- **O cabo mostra o próprio estado**, sem precisar abrir a caixa. É o
+  segundo pedido do fórum: lá, o cabo com estado soou como "módulos
+  escondidos no cabo". Agora:
+  - a **espessura** é o ganho (o neutro mantém a espessura de sempre);
+  - o cabo **apaga** nos instantes em que não conduz, com o mesmo sorteio
+    do áudio, então condutância baixa vira um cabo que pisca;
+  - uma **relação** aparece como um **selo** no meio do cabo, com `×`
+    (RING), zigue-zague (FOLD) ou `−` (DIFF). O arco do selo é o AMT, e
+    um fio pontilhado vai até o companion.
+
+  O tutorial, o LEARN e `guia/RELACAO_DE_CABO.md §4` explicam como ler o
+  cabo. Isso vale só para o app JUCE: o painel X11 legado não tem.
+  Conferido por captura de tela no Linux (selos RING e FOLD com o fio do
+  companion; três quadros seguidos com COND 0,35 mostram cabos diferentes
+  apagados).
+
+  **English:** cables now show their state on the canvas. Thickness is
+  gain; a cable blinks off when its conduction draw says "don't pass";
+  a relation shows as a badge mid-cable (× ring, zigzag fold, − diff),
+  with an AMT arc and a dotted line to the companion.
 - **Preferência ABRE**, no cabeçalho, ao lado do idioma. Ela alterna entre
   SEED, SEM CABOS, MEU PATCH e ÚLTIMA. A escolha fica no arquivo `startup`
   da pasta de dados. Escolher MEU PATCH guarda o patch de agora em

@@ -1461,8 +1461,26 @@ public:
         // fica num canto fixo da tela, longe do cabo: o destaque é o que
         // liga uma coisa à outra.
         const int inspected = insp_.open ? snapIndexOfInspected() : -1;
-        struct Hot { int x0, y0, x1, y1; juce::Colour col; bool cut; };
+        struct Hot { int x0, y0, x1, y1; juce::Colour col; bool cut; float w; };
         std::vector<Hot> hot;
+        // ESTADO NO PRÓPRIO CABO (retorno do fórum do VCV Rack, 6 out.
+        // 2026: "módulos escondidos no cabo" — o estado só aparecia no
+        // inspector, depois de um clique). Agora o desenho diz:
+        //  - GANHO   → espessura. 0..2, e o neutro (1,0) é a espessura de
+        //              sempre (2 px); ganho 0 vira um fio de cabelo.
+        //  - COND    → o cabo APAGA nos instantes em que o sorteio de
+        //              condução diz "não passa" (o mesmo `conductingNow`
+        //              do áudio, a ~20 Hz). Condutância baixa = cabo que
+        //              pisca muito; 1,0 = aceso direto. Não é ícone: é o
+        //              próprio comportamento, visto.
+        //  - RELAÇÃO → um selo no meio do cabo com a operação (× ring,
+        //              zigue-zague fold, − diferença), um arco com o AMT, e
+        //              um fio pontilhado fino do companion até o selo: o
+        //              segundo sinal que o cabo lê fica à vista.
+        // Rompido continua tracejado na cor de aviso, como antes.
+        struct Badge { float x, y, cx, cy; bool hasComp; juce::Colour col;
+                       Relation rel; float amount; bool lit; };
+        std::vector<Badge> badges;
         for (std::size_t i = 0; i < rack_.cableSnap.size(); ++i) {
             const auto& c = rack_.cableSnap[i];
             const JackScreen* s = findJack(c.source,
@@ -1481,14 +1499,35 @@ public:
             // baixo; quem ROMPE tudo é o [espaço], e aí eles ficam
             // tracejados de `warning`).
             const int ii = static_cast<int>(i);
-            if (ii == hoverCable_ || ii == inspected)
-                hot.push_back({s->x, s->y, t->x, t->y, col.brighter(0.45f), cut});
+            const bool isHot = ii == hoverCable_ || ii == inspected;
+            const float w = 1.0f + juce::jlimit(0.0f, 2.0f, c.gain);
+            if (isHot)
+                hot.push_back({s->x, s->y, t->x, t->y, col.brighter(0.45f), cut,
+                               w + 2.0f});
+            if (!cut && !c.conducting) col = col.withMultipliedAlpha(0.22f);
             if (silenced_) col = col.withMultipliedAlpha(0.32f);
-            strokeCable(g, s->x, s->y, t->x, t->y, col, cut);
+            strokeCable(g, s->x, s->y, t->x, t->y, col, cut, w);
             cableHits_.push_back({i, s->x, s->y, t->x, t->y});
+            if (c.hasRelation) {
+                const auto pts = ui::cablePoints(
+                    static_cast<float>(s->x), static_cast<float>(s->y),
+                    static_cast<float>(t->x), static_cast<float>(t->y));
+                const JackScreen* cj = findJack(c.companionNode,
+                    static_cast<int>(c.companionPort), true);
+                juce::Colour bc = cut ? T.warning
+                    : (s->kind == PortKind::Control ? kCableCtrl[h & 3]
+                                                    : kCableAudio[h & 3]);
+                if (silenced_) bc = bc.withMultipliedAlpha(0.32f);
+                badges.push_back({pts[7].x, pts[7].y,
+                                  cj ? static_cast<float>(cj->x) : 0.0f,
+                                  cj ? static_cast<float>(cj->y) : 0.0f,
+                                  cj != nullptr, bc, c.relation, c.amount, isHot});
+            }
         }
         for (const auto& c : hot)
-            strokeCable(g, c.x0, c.y0, c.x1, c.y1, c.col, c.cut, 4.0f);
+            strokeCable(g, c.x0, c.y0, c.x1, c.y1, c.col, c.cut, c.w);
+        for (const auto& b : badges) paintRelationBadge(g, b.x, b.y, b.cx, b.cy,
+            b.hasComp, b.col, b.rel, b.amount, b.lit);
         if (cdrag_.active) {
             // Fonte sem sinal agora: o cabo sai acinzentado. Explica o
             // "liguei e não aconteceu nada" ANTES de ligar — e aponta o
@@ -1737,6 +1776,58 @@ public:
         }
         if (count <= 1 || mine < 0) return u8(ty);
         return u8(ty) + " " + juce::String(mine + 1);
+    }
+
+    // O selo de relação no meio do cabo (ver `paintCables`). Desenhado com
+    // `Path`, não com fonte: os glifos ×/−/zigue-zague ficam iguais em
+    // qualquer sistema e em qualquer idioma.
+    void paintRelationBadge(juce::Graphics& g, float x, float y, float cx,
+                            float cy, bool hasComp, juce::Colour col,
+                            Relation rel, float amount, bool lit) const {
+        const float r = 9.0f;
+        if (hasComp) {
+            juce::Path line;
+            line.startNewSubPath(cx, cy);
+            line.lineTo(x, y);
+            const float dash[] = {1.5f, 3.0f};
+            juce::Path dotted;
+            juce::PathStrokeType(1.0f).createDashedStroke(dotted, line, dash, 2);
+            g.setColour(col.withMultipliedAlpha(lit ? 0.95f : 0.6f));
+            g.fillPath(dotted);
+        }
+        g.setColour(T.surface);
+        g.fillEllipse(x - r, y - r, 2 * r, 2 * r);
+        g.setColour(col.withMultipliedAlpha(0.45f));
+        g.drawEllipse(x - r, y - r, 2 * r, 2 * r, 1.0f);
+        if (amount > 0.0f) {        // AMT: arco a partir do topo, horário
+            juce::Path arc;
+            arc.addCentredArc(x, y, r, r, 0.0f, 0.0f,
+                              juce::MathConstants<float>::twoPi
+                                  * juce::jlimit(0.0f, 1.0f, amount), true);
+            g.setColour(col);
+            g.strokePath(arc, juce::PathStrokeType(2.0f));
+        }
+        juce::Path glyph;
+        const float a = 4.0f;
+        switch (rel) {
+        case Relation::RingMod:
+            glyph.startNewSubPath(x - a, y - a); glyph.lineTo(x + a, y + a);
+            glyph.startNewSubPath(x + a, y - a); glyph.lineTo(x - a, y + a);
+            break;
+        case Relation::Fold:
+            glyph.startNewSubPath(x - a, y + a * 0.6f);
+            glyph.lineTo(x - a * 0.35f, y - a * 0.6f);
+            glyph.lineTo(x + a * 0.35f, y + a * 0.6f);
+            glyph.lineTo(x + a, y - a * 0.6f);
+            break;
+        case Relation::Difference:
+            glyph.startNewSubPath(x - a, y); glyph.lineTo(x + a, y);
+            break;
+        case Relation::None:
+            break;
+        }
+        g.setColour(lit ? T.textPrimary : col.brighter(0.3f));
+        g.strokePath(glyph, juce::PathStrokeType(1.6f));
     }
 
     void strokeCable(juce::Graphics& g, int x0, int y0, int x1, int y1,
