@@ -172,8 +172,8 @@ TEXTO = {
 
   <p><strong>Deux choses dites en entier avant de télécharger.</strong> Les
     paquet Windows a été installé et joué par l'auteur sur une vraie machine
-    Windows 10 (8 Go) le 6 oct. 2026, et celui de macOS a été ouvert par
-    l'auteur sur un vrai Mac le même jour, après l'avoir autorisé. Et le <code>.dmg</code> est
+    Windows 10 (8 Go) le 6 oct. 2026, et celui de macOS a été ouvert et
+    joué par l'auteur sur un vrai Mac le même jour, après l'avoir autorisé. Et le <code>.dmg</code> est
     signé en ad-hoc, sans Developer ID ni notarisation : au premier lancement,
     macOS bloque l'app jusqu'à ce que vous l'autorisiez une fois, dans les
     Réglages ou dans le Terminal.</p>
@@ -222,8 +222,8 @@ TEXTO = {
 
   <p><strong>Dos cosas dichas por entero antes de descargar.</strong> Los
     paquete de Windows fue instalado y tocado por el autor en un Windows 10
-    real (8 GB) el 6 oct. 2026, y el de macOS fue abierto por el autor en
-    un Mac real el mismo día, tras autorizarlo. Y el <code>.dmg</code> tiene firma
+    real (8 GB) el 6 oct. 2026, y el de macOS fue abierto y tocado por
+    el autor en un Mac real el mismo día, tras autorizarlo. Y el <code>.dmg</code> tiene firma
     ad-hoc, sin Developer ID ni notarización: en la primera apertura macOS
     bloquea la app hasta que usted la autorice una vez, en los Ajustes o en
     el Terminal.</p>
