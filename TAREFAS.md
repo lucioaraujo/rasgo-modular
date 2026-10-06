@@ -10635,3 +10635,13 @@ v0.1.4 final (tag, site com `estado.py --depois 0.1.4`, README e INSTALL
 com a versão nova), com autorização do autor. O macOS continua sem teste em
 máquina real.
 
+**6 out. 2026 — v0.1.4 publicada (Latest),** com autorização do autor depois
+do teste da rc1 num Windows 10 real. Seis pacotes: Windows `.exe` e `.zip`,
+macOS `.dmg`, Linux `.deb`, AppImage e `.tar.gz`. CI 37390504780 verde,
+incluindo a abertura em 4 distribuições. O branch `v0.1.4-linux-pacotes`
+foi juntado ao `main`; um parágrafo do README saiu duplicado no merge e foi
+corrigido, e o `main` ficou idêntico à tag. O site publicado oferece os seis
+downloads, e os arquivos respondem. O padrão dessa versão virou regra para
+todos os instrumentos (`RASGO_DOCUMENTATION/PADRAO_DISTRIBUICAO_MULTIPLATAFORMA.md`),
+em aplicação no Antitotem e no Navalha 2. **Pendente:** teste num Mac real.
+
