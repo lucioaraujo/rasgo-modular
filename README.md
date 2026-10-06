@@ -97,10 +97,6 @@ will warn about an unidentified developer on first launch.
 expected and does not mean anything is wrong. What to click on each system:
 [INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step).
 
-**On first launch, Windows and macOS show a security warning.** It is
-expected and does not mean anything is wrong. What to click on each system:
-[INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step).
-
 ### Build from source
 
 Requirements, build steps, environment variables and troubleshooting are
@@ -189,10 +185,6 @@ pelo autor num Windows 10 real (8 GB) em 6 out. 2026; o de macOS segue
 testado só pela integração contínua. O `.dmg` tem assinatura ad-hoc, sem
 Developer ID nem notarização — o Gatekeeper mostra aviso de desenvolvedor
 não identificado na primeira abertura.
-
-**Na primeira abertura, o Windows e o macOS mostram um aviso de
-segurança.** É esperado e não indica defeito. O que clicar em cada sistema
-está em [INSTALL.md → Instalar, passo a passo](INSTALL.md#instalar-passo-a-passo).
 
 **Na primeira abertura, o Windows e o macOS mostram um aviso de
 segurança.** É esperado e não indica defeito. O que clicar em cada sistema
@@ -297,11 +289,6 @@ sécurité.** C'est attendu et ne signale aucun défaut. Où cliquer sur chaque
 système : [INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step)
 (en anglais et en portugais).
 
-**Au premier lancement, Windows et macOS affichent un avertissement de
-sécurité.** C'est attendu et ne signale aucun défaut. Où cliquer sur chaque
-système : [INSTALL.md → Installing, step by step](INSTALL.md#installing-step-by-step)
-(en anglais et en portugais).
-
 ### Compiler depuis les sources
 
 Prérequis, étapes de compilation, variables d'environnement et problèmes
@@ -390,11 +377,6 @@ tocado por el autor en un Windows 10 real (8 GB) el 6 oct. 2026; el de macOS
 sigue probado solo por la integración continua. El `.dmg` tiene firma
 ad-hoc, sin Developer ID ni notarización — Gatekeeper mostrará un aviso de
 desarrollador no identificado en la primera apertura.
-
-**En la primera apertura, Windows y macOS muestran un aviso de
-seguridad.** Es esperado y no indica ningún defecto. Qué pulsar en cada
-sistema: [INSTALL.md → Instalar, passo a passo](INSTALL.md#instalar-passo-a-passo)
-(en portugués y en inglés).
 
 **En la primera apertura, Windows y macOS muestran un aviso de
 seguridad.** Es esperado y no indica ningún defecto. Qué pulsar en cada
