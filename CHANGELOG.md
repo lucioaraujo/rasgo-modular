@@ -7,6 +7,32 @@ pronto.
 
 ---
 
+## v0.1.6 — 2026-10-07
+
+> **English summary.** Windows upgrades now replace the previous version.
+> Up to v0.1.5 the install folder and the uninstall registry key carried
+> the version number (`rasgo-modular 0.1.5`), so each installer looked for
+> its own name, never found the old one, and versions piled up side by
+> side. Both are now a fixed `Rasgo Modular`; CI fails if the version comes
+> back into either. Install guide: what to do if several versions are
+> installed, and who to write to if macOS still won't open the app.
+
+- **Windows: a versão nova substitui a anterior.** O CPack usa por padrão
+  `<nome> <versão>` tanto na pasta de instalação quanto na chave de
+  registro que o `CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL` consulta.
+  Cada instalador procurava o próprio nome e nunca achava o anterior. Num
+  Windows 10 real (7 out. 2026) apareceram `rasgo-modular 0.1.4` e
+  `rasgo-modular 0.1.5` lado a lado em `C:\Program Files`. Agora
+  `CPACK_PACKAGE_INSTALL_DIRECTORY` e `CPACK_PACKAGE_INSTALL_REGISTRY_KEY`
+  valem `Rasgo Modular`. O passo "Conferir os atalhos do instalador" da CI
+  também falha se a versão voltar à pasta ou à chave. Quem já tem versões
+  antigas instaladas precisa desinstalá-las uma vez, por Configurações →
+  Aplicativos; o INSTALL explica.
+- **INSTALL:** se o macOS ainda assim não abrir o app, escrever para
+  rasgo.instruments@gmail.com com a versão do macOS, o modelo do Mac e a
+  mensagem. As notas de atualização dizem "instale a versão mais nova por
+  cima", sem número de versão que envelheça.
+
 ## v0.1.5 — 2026-10-07
 
 > **English summary.** **Windows fix:** the Start menu and desktop
