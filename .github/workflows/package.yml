@@ -267,6 +267,14 @@ jobs:
             $p = Join-Path $stage.FullName $a
             if (Test-Path -LiteralPath $p) { "ok: $a" } else { Write-Error "atalho aponta para arquivo inexistente: $a"; $falta = $true }
           }
+          # Pasta de instalação e chave de registro sem a versão: senão a
+          # versão nova não acha a anterior e as duas ficam instaladas.
+          $ver = [regex]::Match($txt, '!define VERSION "([^"]+)"').Groups[1].Value
+          $dir = [regex]::Match($txt, '(?m)^\s*InstallDir\s+(.+)$').Groups[1].Value
+          $reg = [regex]::Match($txt, 'CurrentVersion\\Uninstall\\([^"]+)"').Groups[1].Value
+          "versão: $ver · InstallDir: $dir · chave: $reg"
+          if (-not $ver -or -not $dir -or -not $reg) { Write-Error 'não achei VERSION, InstallDir ou a chave de desinstalação no project.nsi'; exit 1 }
+          if ($dir.Contains($ver) -or $reg.Contains($ver)) { Write-Error 'a pasta ou a chave de registro leva a versão: versões vão se acumular'; $falta = $true }
           if ($falta) { exit 1 }
 
       # Mesma árvore do `cmake --install` que o .deb usa; linuxdeploy

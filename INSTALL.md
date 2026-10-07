@@ -1,15 +1,15 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (7 out. 2026):** a versão atual é a **v0.1.5**, com pacotes
+> **Estado (7 out. 2026):** a versão atual é a **v0.1.6**, com pacotes
 > para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.5)
-> (antes: v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.6)
+> (antes: v0.1.5 em 7 out., v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
 > 29 set. 2026). Este documento descreve também como
 > construir e rodar a partir do código.
 >
 > **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
 > lá estão os avisos do Windows e do macOS e o que fazer em cada um.
-> *English:* the current version is v0.1.5. Start with
+> *English:* the current version is v0.1.6. Start with
 > ["Installing, step by step"](#installing-step-by-step).
 
 ---
@@ -101,9 +101,14 @@ de novo. A partir da v0.1.4 isso não é mais necessário, porque tudo vai
 dentro do `.exe`.
 
 **Se você tem a v0.1.4 ou anterior e o atalho do Menu Iniciar não abre
-nada:** instale a v0.1.5 por cima. O atalho dessas versões apontava para um
+nada:** instale a versão mais nova por cima. O atalho dessas versões apontava para um
 arquivo que não existe; o programa em si está bom e abre pela pasta dele em
 `C:\Program Files`.
+
+**Se aparecerem várias versões do Rasgo Modular instaladas** (em Configurações →
+Aplicativos, ou em pastas como `rasgo-modular 0.1.x` dentro de
+`C:\Program Files`): desinstale as antigas por Configurações → Aplicativos.
+A partir da v0.1.6, cada versão nova substitui a anterior sozinha.
 
 **Se ainda assim não abrir:** aperte **Win + R**, digite
 `%APPDATA%\rasgo-modular` e dê Enter. Envie o conteúdo de `arranque.log` e
@@ -153,6 +158,9 @@ A última linha do `arranque.log` diz em que ponto a abertura parou.
 
    O comando só retira a "marca de quarentena" que o macOS põe em todo
    arquivo baixado. Ele não altera o app.
+
+   Se ainda assim não abrir, escreva para **rasgo.instruments@gmail.com**
+   com a versão do macOS, o modelo do Mac e a mensagem que aparece.
 5. Quando você ligar o botão **ON** do módulo SIGNAL-IN, o macOS pede
    permissão para usar o microfone. Permita, se quiser tocar com entrada de
    áudio.
@@ -389,9 +397,14 @@ required. Install it from
 From v0.1.4 on, everything is inside the `.exe`.
 
 **v0.1.4 or earlier and the Start menu shortcut does nothing:** install
-v0.1.5 over it. Those versions' shortcuts pointed to a file that does not
+the newest version over it. Those versions' shortcuts pointed to a file that does not
 exist; the program itself is fine and opens from its folder in
 `C:\Program Files`.
+
+**Several Rasgo Modular versions installed** (in Settings → Apps, or folders like
+`rasgo-modular 0.1.x` inside `C:\Program Files`): uninstall the
+old ones from Settings → Apps. From v0.1.6 on, each new version replaces the
+previous one by itself.
 
 **Still not opening?** Press **Win + R**, type `%APPDATA%\rasgo-modular`,
 and send `arranque.log` and `crash.log` (if present) in
@@ -435,6 +448,9 @@ and send `arranque.log` and `crash.log` (if present) in
 
    The command only removes the "quarantine mark" macOS puts on every
    downloaded file. It does not change the app.
+
+   If it still does not open, write to **rasgo.instruments@gmail.com** with
+   your macOS version, your Mac model and the message you see.
 5. Turning on the SIGNAL-IN **ON** switch makes macOS ask for microphone
    access. Allow it if you want audio input.
 

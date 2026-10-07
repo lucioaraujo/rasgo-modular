@@ -42,7 +42,7 @@ if (APPLE)
 endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
-project(RasgoModularPrototype VERSION 0.1.5 LANGUAGES C CXX)
+project(RasgoModularPrototype VERSION 0.1.6 LANGUAGES C CXX)
 
 include(CTest)
 
@@ -726,6 +726,14 @@ if(RASGO_MODULAR_BUILD_JUCE_APP AND TARGET RasgoModularApp)
         set(CPACK_NSIS_PACKAGE_NAME "Rasgo Modular")
         set(CPACK_NSIS_DISPLAY_NAME "Rasgo Modular")
         set(CPACK_NSIS_MODIFY_PATH OFF)
+        # Pasta e chave de registro SEM a versão. O padrão do CPack é
+        # "<nome> <versão>" nas duas: cada versão procurava a anterior pela
+        # própria chave, nunca a achava, e as duas ficavam instaladas lado a
+        # lado (visto num Windows 10 real em 7 out. 2026: "rasgo-modular
+        # 0.1.4" e "rasgo-modular 0.1.5" em C:\Program Files). Com nome fixo,
+        # o UNINSTALL_BEFORE_INSTALL abaixo encontra e remove a anterior.
+        set(CPACK_PACKAGE_INSTALL_DIRECTORY "Rasgo Modular")
+        set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Rasgo Modular")
         set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
         # SEM isto o template NSIS do CPack registra a desinstalação mas
         # não cria atalho NENHUM no Menu Iniciar — bug real, achado e

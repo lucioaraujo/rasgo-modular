@@ -10734,8 +10734,14 @@ publicação, e o teste dele vem depois.
 **7 out. 2026 — v0.1.5 publicada** (README, INSTALL, site nos 4 idiomas:
 ABRE e o cabo com estado visível).
 
+**7 out. 2026 — v0.1.6:** versões deixam de se acumular no Windows (pasta
+e chave de registro sem versão), achado no histórico do PowerShell do
+autor. Antitotem e Navalha 2 (v0.1.3) receberam a mesma correção. O autor
+instalou e abriu Antitotem e Navalha 2 num Mac real, com o procedimento das
+páginas de instalação.
+
 **Pendente:**
-- testar a v0.1.5 num Mac real;
+- testar a v0.1.6 num Mac real;
 - testar no Windows a abertura pelo Menu Iniciar;
 - uma captura do cabo com selo para o site;
 
