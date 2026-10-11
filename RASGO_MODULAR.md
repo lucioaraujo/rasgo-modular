@@ -11,7 +11,7 @@
 **Rasgo Modular** será um ambiente modular próprio da família Rasgo.
 
 O conceito incorpora a antiga proposta da **Fábrica de Módulos**, registrada em
-[`0_BRAINSTORM/META_INSTRUMENTO_FABRICA_DE_MODULOS.md`](../0_BRAINSTORM/META_INSTRUMENTO_FABRICA_DE_MODULOS.md).
+[`0_BRAINSTORM/META_INSTRUMENTO_FABRICA_DE_MODULOS.md`](../../0_BRAINSTORM/META_INSTRUMENTO_FABRICA_DE_MODULOS.md).
 “Fábrica” permanece como uma camada funcional do projeto — oficina,
 laboratório e construtor de instrumentos —, não como um segundo instrumento.
 
@@ -98,7 +98,7 @@ afetados, validação executada, limitações e próximo passo. O documento vivo
 deve afirmar uma etapa como concluída sem evidência correspondente.
 
 Antes de iniciar uma pesquisa ou módulo novo, consultar o [Inventário global
-de módulos e mecanismos RASGO](../RASGO_DOCUMENTATION/architecture/INVENTARIO_GLOBAL_MODULOS.md).
+de módulos e mecanismos RASGO](../../RASGO_DOCUMENTATION/architecture/INVENTARIO_GLOBAL_MODULOS.md).
 Toda descoberta ou implementação com possível valor para outro projeto deve
 ser registrada nele no mesmo incremento.
 
@@ -997,7 +997,7 @@ Isso reduz retrabalho e aumenta coerência entre projetos.
 
 O desenvolvimento do Rasgo Modular deve partir do trabalho já realizado nos
 instrumentos da família. A fonte transversal é o
-[`INVENTARIO_GLOBAL_MODULOS.md`](../RASGO_DOCUMENTATION/architecture/INVENTARIO_GLOBAL_MODULOS.md),
+[`INVENTARIO_GLOBAL_MODULOS.md`](../../RASGO_DOCUMENTATION/architecture/INVENTARIO_GLOBAL_MODULOS.md),
 que deve ser consultado e atualizado durante cada avanço relevante.
 
 ### 35.1 Pesquisa e princípios disponíveis
@@ -1564,7 +1564,7 @@ Autônomo **não** quer dizer fechado. Além de soar sozinho (§35.4.1), o
 - **outros instrumentos RASGO** — antitotem, rasgo-synth-performance,
   navalha, trioio, aquorbium… por **adaptadores e manifestos**, nunca
   por acesso ao estado privado. Referência:
-  [`ORQUESTRACAO_INSTRUMENTOS.md`](../RASGO_DOCUMENTATION/architecture/ORQUESTRACAO_INSTRUMENTOS.md)
+  [`ORQUESTRACAO_INSTRUMENTOS.md`](../../RASGO_DOCUMENTATION/architecture/ORQUESTRACAO_INSTRUMENTOS.md)
   (`RASGO Ensemble Bus`, separa áudio/evento/modulação/observação);
 - **recursos de composição** — motores de arco/estrutura, engines
   harmônicas, partituras/eventos externos, geradores de forma, DAW/OSC,

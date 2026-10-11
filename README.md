@@ -1,5 +1,15 @@
 # Rasgo Modular
 
+Localização atual (2026-10-11): `RASGO/PROJETOS_AUTORAIS/RASGO_MODULAR/`.
+O caminho antigo na raiz é um alias de compatibilidade, não outra fonte.
+Criação e desenvolvimento são a finalidade; autoria, licença e identidade
+permanecem próprias. Para manutenção no workspace, ler `../../AGENTS.md`,
+a continuidade local, `../../RASGO_DOCUMENTATION/architecture/MIGRACAO_PROJETOS_AUTORAIS.md`
+e `../../../PROCEDIMENTO_SEGURANCA_RECURSOS.md` antes de tarefas controladas.
+Esses caminhos são locais: a documentação do contêiner não acompanha uma
+clonagem independente. Publicação continua uma decisão separada.
+
+
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·

@@ -31,7 +31,7 @@
 # aqui só embrulhadas em algo que se digita.
 
 set -euo pipefail
-cd "$(dirname "$0")"
+cd -P "$(dirname "$0")"
 
 BUILD_DIR=build
 APP="$BUILD_DIR/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular"
@@ -83,7 +83,7 @@ achar_juce() {
             "$BUILD_DIR/CMakeCache.txt" 2>/dev/null | head -1)
   if [ -n "$doCache" ] && [ -d "$doCache" ]; then echo "$doCache"; return; fi
   local c
-  for c in ../RASGO_SYNTH/JUCE-master ../../JUCE ../JUCE "$HOME/JUCE"; do
+  for c in ./JUCE ./third_party/JUCE ../../third_party/JUCE ../../JUCE ../JUCE "$HOME/JUCE"; do
     [ -f "$c/CMakeLists.txt" ] && { (cd "$c" && pwd); return 0; }
   done
   # `return 0` mesmo sem achar, e isto NÃO é descuido: o script roda com

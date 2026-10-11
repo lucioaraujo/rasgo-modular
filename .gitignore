@@ -6,6 +6,7 @@
 
 # build
 /build/
+/.local-build/
 
 # Renders de referência das peças de exemplo. São DERIVADOS — `examples/`
 # tem o código que os gera, e a checagem é byte a byte contra eles. Ficam
