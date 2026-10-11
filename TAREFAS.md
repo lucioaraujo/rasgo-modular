@@ -213,7 +213,7 @@ interno de nenhum deles.
   contrato como infraestrutura comum.
 - [ ] Só depois investigar processos separados, PipeWire, OSC e performance.
 
-Referência transversal: [`ORQUESTRACAO_INSTRUMENTOS.md`](../RASGO_DOCUMENTATION/architecture/ORQUESTRACAO_INSTRUMENTOS.md).
+Referência transversal: [`ORQUESTRACAO_INSTRUMENTOS.md`](../../RASGO_DOCUMENTATION/architecture/ORQUESTRACAO_INSTRUMENTOS.md).
 
 ## Critério do próximo marco
 
@@ -232,7 +232,7 @@ transparência, inovação, arquivística, metodologia, genealogia, taxonomia,
 arquitetura, estratégia, topologia, cartografia/fluxografia, genealogia/historiografia, ergonomia, matemática, engenharia,
 hardware, textualidade, documentação, sound design, educação e publicação.
 Aplicar a matriz geral em
-[`METODOLOGIA_DE_DESENVOLVIMENTO.md`](../RASGO_DOCUMENTATION/METODOLOGIA_DE_DESENVOLVIMENTO.md).
+[`METODOLOGIA_DE_DESENVOLVIMENTO.md`](../../RASGO_DOCUMENTATION/METODOLOGIA_DE_DESENVOLVIMENTO.md).
 Passar nos testes não encerra sozinho um marco artístico.
 
 ## Registro da etapa — separação de estado e parâmetros
