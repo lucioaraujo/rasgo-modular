@@ -1,7 +1,7 @@
 # Entrada do Rasgo Modular no portal da família
 
 Texto pronto para o card do instrumento em
-[`RASGO_WEBSITE`](../../../RASGO_WEBSITE), nos quatro idiomas.
+[`RASGO_WEBSITE`](../../RASGO_WEBSITE/), nos quatro idiomas.
 
 **Não aplicado aqui de propósito.** O portal é território do Codex — isto é
 material para combinar, não alteração feita. Segue o formato exato dos
@@ -66,9 +66,9 @@ loja, verbete, apresentação — usa esta moldura.
 ## Captura
 
 O portal guarda derivados em `assets/screenshots/`. O original do Modular
-está em [`../screenshots/`](../screenshots) (PNG 1920×1006, execução real
+está em [`../screenshots/`](../screenshots/) (PNG 1920×1006, execução real
 de 18 set. 2026) e os derivados otimizados já existem em
-[`assets/images/`](assets/images) — WebP e JPEG em 1000 e 1600 px.
+[`assets/images/`](assets/images/) — WebP e JPEG em 1000 e 1600 px.
 
 **Texto alternativo** (pt; as outras três línguas estão nas páginas do
 site, em `index.html`, `en.html`, `fr.html`, `es.html`, atributo `alt` da

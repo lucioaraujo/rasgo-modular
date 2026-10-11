@@ -292,7 +292,7 @@ conceitual, não como um projeto separado.
   ("Registro da etapa — 2026-09-01");
 - [`PESQUISA_MODULOS.md`](PESQUISA_MODULOS.md) — pesquisa de módulos e ordem
   de execução (§2);
-- [`dossies/`](dossies) — um dossiê por módulo (problema, fontes,
+- [`dossies/`](dossies/) — um dossiê por módulo (problema, fontes,
   modelo, testes);
 - [`guia/`](guia/00_indice.md) — guia de referência **para quem toca**:
   uma página em prosa por módulo (fase didática, `PESQUISA_MODULOS.md
