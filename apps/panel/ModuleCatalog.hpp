@@ -50,6 +50,8 @@
 #include "dsp/SampleHold.hpp"
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
+#include "dsp/Listen.hpp"
+#include "dsp/Phrase.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Shifter.hpp"
@@ -102,6 +104,8 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "SAMPLER")    return std::make_unique<Sampler>();
     if (t == "TURNTABLE")  return std::make_unique<Turntable>();
     if (t == "SCOPE")      return std::make_unique<Scope>();
+    if (t == "LISTEN")     return std::make_unique<Listen>();
+    if (t == "PHRASE")     return std::make_unique<Phrase>();
     if (t == "SHAPE")      return std::make_unique<Shape>();
     if (t == "SHIFTER")    return std::make_unique<Shifter>();
     if (t == "CRUSH")      return std::make_unique<Crush>();
@@ -178,7 +182,10 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
               [&](const char* a, const char* b) { return key(a) < key(b); });
 }
 
-inline const std::vector<CatalogGroup>& moduleCatalog() {
+// The published seed rack keeps its original node order and RNG inputs.
+// New optional modules are offered in the palette, rather than inserted into
+// every generated patch. Adding a module by hand is an explicit musical act.
+inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
@@ -190,6 +197,68 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
     };
     return c;
+}
+
+inline const std::vector<CatalogGroup>& moduleCatalog() {
+    static const std::vector<CatalogGroup> c = [] {
+        auto groups = seedModuleCatalog();
+        for (auto& group : groups) {
+            const std::string family = group.family;
+            if (family == "DECISION") group.types.push_back("PHRASE");
+            if (family == "OUT") group.types.push_back("LISTEN");
+        }
+        return groups;
+    }();
+    return c;
+}
+
+// Inserção visual, não instanciação DSP. Usada somente ao acrescentar um
+// módulo: nunca reordena os vizinhos, patches carregados ou o rack da seed.
+// Uma família presente recebe o novo tipo antes do primeiro sucessor
+// alfabético; tipos repetidos ficam junto da última instância existente.
+// Se a família não existe, usa a primeira família posterior como âncora.
+// Em racks reorganizados pelo músico, a ordem relativa anterior permanece.
+template <typename Id, typename TypeOf>
+inline std::size_t moduleInsertionIndex(const std::vector<Id>& shown,
+                                       const std::string& type,
+                                       TypeOf typeOf) {
+    struct Position { std::string type; std::size_t family, within; };
+    static const std::vector<Position> positions = [] {
+        std::vector<Position> result;
+        std::size_t family = 0;
+        for (const auto& group : moduleCatalog()) {
+            auto ordered = group.types;
+            sortFamilyForDisplay(ordered);
+            for (std::size_t i = 0; i < ordered.size(); ++i)
+                result.push_back({ordered[i], family, i});
+            ++family;
+        }
+        return result;
+    }();
+    const auto find = [&](const std::string& t) -> const Position* {
+        for (const auto& p : positions) if (p.type == t) return &p;
+        return nullptr;
+    };
+    const auto* added = find(type);
+    if (!added) return shown.size();  // tipo externo: não adivinhar família
+    const auto absent = shown.size();
+    auto duplicate = absent, successor = absent, lastInFamily = absent;
+    auto nextFamily = absent;
+    for (std::size_t i = 0; i < shown.size(); ++i) {
+        const auto* p = find(typeOf(shown[i]));
+        if (!p) continue;
+        if (p->family == added->family) {
+            lastInFamily = i;
+            if (p->within == added->within) duplicate = i;
+            if (p->within > added->within && successor == absent) successor = i;
+        } else if (p->family > added->family && nextFamily == absent) {
+            nextFamily = i;
+        }
+    }
+    if (duplicate != absent) return duplicate + 1;
+    if (successor != absent) return successor;
+    if (lastInFamily != absent) return lastInFamily + 1;
+    return nextFamily;
 }
 
 }  // namespace rasgo::panel

@@ -41,7 +41,7 @@ struct Patch {
 // O rack completo do instrumento, na mesma ordem dos front-ends.
 Patch montar(std::uint64_t seed) {
     Patch p;
-    for (const auto& grp : rasgo::panel::moduleCatalog())
+    for (const auto& grp : rasgo::panel::seedModuleCatalog())
         for (const char* t : grp.types)
             if (auto n = rasgo::panel::makeModule(t)) p.g.add(std::move(n));
     p.sink = p.g.add(std::make_unique<rasgo::panel::SinkOut>());

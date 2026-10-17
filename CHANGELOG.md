@@ -7,6 +7,64 @@ pronto.
 
 ---
 
+## Em desenvolvimento — após v0.1.6 — 2026-10-17
+
+- O botão RACK agora informa a contagem visível/total e esclarece que
+  TODOS mostra os módulos do patch aberto, não instancia o catálogo.
+  Teste isolado cobre a ida e volta TODOS → SAÍDA → TODOS com módulo órfão.
+  A regressão dos exemplos LISTEN/PHRASE registra que ambos têm todos os
+  módulos no caminho do áudio (10/10 e 11/11): não são testes de filtro RACK.
+- Corrigido fechamento do JUCE ao abrir um patch menor enquanto a interface
+  ainda guardava o inspetor e o desenho dos cabos do patch anterior. A troca
+  agora invalida os gestos/IDs antigos e reconstrói os instantâneos do novo
+  grafo antes de repintar. Reproduzido pelo registro de falha do autor e
+  conferido com uma troca de patch isolada, sem abrir áudio.
+- JUCE: ajuda dos 22 comandos/campos do cabeçalho em PT/EN/FR/ES,
+  integrada ao LEARN. F6 foca o cabeçalho; setas/Tab percorrem os controles,
+  Enter/espaço acionam e F1 fixa a leitura. A intensidade VARIA aceita
+  setas para cima/baixo enquanto selecionada, sem mudar os atalhos do rack.
+- Leitura do LEARN por F2 ou Aa: 12/14/16 pixels lógicos, coluna e altura ajustadas,
+  texto branco opcional e restauração dos padrões. Preferência reading-ui
+  separada do patch, com leitura limitada e recuperação de arquivo inválido.
+  O ajuste não altera as fontes de toda a interface nem o DSP.
+- Cabeçalho JUCE: removido o glifo de dado ausente em algumas fontes; o
+  botão SEED mantém nome e ação. BANCO agora usa o valor unsigned completo
+  de seeds de 64 bits no nome do arquivo, como o painel X11. A ajuda explica
+  o nome por horário quando o patch não tem seed.
+
+- LISTEN: novo módulo de escuta causal em três bandas, com níveis e
+  ataques independentes, passagem de áudio por canal e medidores no JUCE.
+- PHRASE: novo módulo de motivo por estímulos externos, com âmbito,
+  direção, variação, pausas, acentos, cadência e retorno solicitado.
+- Os dois módulos estão na paleta, em OUT e DECISION. O rack e a ordem de
+  instanciação das seeds publicadas foram preservados; o músico acrescenta
+  os módulos por gesto. SCOPE e QUANTIZER conservam seus contratos.
+- Ajuda dos controles e portas em quatro idiomas, guias próprios e patch
+  `examples/escuta_frase.rmp`. A calibração de LISTEN e a identidade SEED
+  de PHRASE ficam fora da movimentação automática da VARIA.
+- Módulos acrescentados pela paleta entram na posição de sua família e
+  ordem alfabética, com MIXER/MASTER no fim de OUT e instâncias repetidas
+  juntas. A regra é a mesma no JUCE e no painel X11; não reordena os
+  módulos já posicionados nem altera o carregamento de patches ou as seeds.
+- No JUCE: rótulos mais claros e LEARN com explicação rolável, sem
+  compressão do texto. O valor do controle e sua unidade atualizam durante
+  o gesto, inclusive com o ponteiro fora do controle. BASE é a intenção
+  do controle; DSP é o último valor do parâmetro no grafo, não um medidor
+  de todos os CVs internos do módulo. F1/clicar na ajuda fixa a leitura;
+  setas/PgUp/PgDn/Home/End rolam; Esc retorna ao rack. Avisos temporários
+  expiram sem depender de um novo movimento do mouse.
+- Desenvolvimento local; os instaladores publicados continuam na 0.1.6.
+- ENVELOPE: quatro sliders verticais ATK/DEC/SUS/REL; os tempos são
+  apresentados em escala logarítmica e SUS em nível linear. TRIG tem
+  legenda abaixo para caber no painel. FILTER: CUT maior que RESO.
+  Não muda DSP nem valores salvos; regressão compara VARIA com a
+  apresentação anterior, incluindo alteração manual, em três seeds.
+- Guias didáticos de LISTEN/PHRASE e imagens do próprio instrumento nas
+  fontes locais do website em PT/EN/FR/ES. Páginas identificam os dois
+  módulos como 0.1.7-dev; downloads e SEO continuam na release 0.1.6.
+  Exportação de painéis por patch funciona sem áudio/MIDI e com dados
+  de configuração isolados, sem substituir a sessão do músico.
+
 ## v0.1.6 — 2026-10-07
 
 > **English summary.** Windows upgrades now replace the previous version.

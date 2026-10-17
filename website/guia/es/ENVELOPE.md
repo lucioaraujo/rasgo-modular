@@ -5,6 +5,8 @@ ENVELOPE da forma a una nota en el tiempo: cómo empieza, cómo cae, cuánto se 
 Las fuentes suenan todo el tiempo; ENVELOPE convierte ese flujo en frases. Tiene dos usos que pueden darse a la vez. Por la entrada IN y la salida OUT, articula el sonido que pasa. Por la salida ENV, entrega la curva misma, que usted puede enviar a abrir un filtro, cambiar un timbre o dosificar un efecto. Las cuatro etapas de la curva tienen nombres en inglés que aparecen en todos los sintetizadores: attack, decay, sustain y release, de ahí ADSR.
 
 ## Controles
+En la interfaz en desarrollo 0.1.7-dev, ATK, DEC, SUS y REL son deslizadores verticales: arrastre hacia arriba para aumentar. Los tres tiempos usan una escala logarítmica de 1 ms a 10 s; SUS sigue siendo un nivel lineal. CURVE, VCA y LVL quedan debajo. Los parámetros y los patches guardados conservan los valores de la interfaz anterior.
+
 - ATK: el ataque, el tiempo que tarda la nota en llegar al máximo después del pulso. Corto suena percusivo; largo, como un arco que entra despacio.
 - DEC: el decaimiento, el tiempo de la caída después del máximo hasta el nivel de SUS.
 - SUS: el nivel en que la nota se sostiene mientras el pulso sigue alto. En cero no hay sostenimiento y la nota suena pulsada.

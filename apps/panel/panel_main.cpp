@@ -249,7 +249,7 @@ int main() {
     SignalGraph graph;
     std::vector<std::size_t> shown;
     std::map<std::string, std::size_t> byType;
-    for (const auto& g : rasgo::panel::moduleCatalog())
+    for (const auto& g : rasgo::panel::seedModuleCatalog())
         for (const char* t : g.types) {
             auto n = rasgo::panel::makeModule(t);
             if (!n) continue;
@@ -1919,14 +1919,17 @@ int main() {
                     const float lo = d ? d->minimum : 0.0f;
                     const float hi = d ? d->maximum : 1.0f;
                     const float n = hi > lo
-                        ? (paramVal(node, w.bind) - lo) / (hi - lo) : 0.0f;
+                        ? (w.kind == Widget::Kind::Slider && rasgo::ui::envelopeTimeSlider(node.type(), w.bind)
+                            ? rasgo::ui::logarithmicControlFraction(paramVal(node, w.bind), lo, hi)
+                            : (paramVal(node, w.bind) - lo) / (hi - lo)) : 0.0f;
                     if (w.kind == Widget::Kind::Knob) {
-                        const int r = kn / 2;
+                        const int diameter = w.span > 1.0f ? mmpx(w.span) : kn;
+                        const int r = diameter / 2;
                         const int cx = wx + r, cy = wy + r;
                         XSetForeground(dpy, gc, T.recessed);
-                        XFillArc(dpy, bb, gc, wx, wy, kn, kn, 0, 360 * 64);
+                        XFillArc(dpy, bb, gc, wx, wy, diameter, diameter, 0, 360 * 64);
                         XSetForeground(dpy, gc, T.line);
-                        XDrawArc(dpy, bb, gc, wx, wy, kn, kn, 0, 360 * 64);
+                        XDrawArc(dpy, bb, gc, wx, wy, diameter, diameter, 0, 360 * 64);
                         const float a = (0.75f - 1.5f * n) * 3.14159265f + 1.5708f;
                         XSetForeground(dpy, gc, T.accent);
                         XDrawLine(dpy, bb, gc, cx, cy,
@@ -1934,7 +1937,7 @@ int main() {
                                   cy - static_cast<int>(std::sin(a) * r));
                         // rótulo ACIMA do knob, centrado (igual aos jacks) —
                         // não empurra pra a fileira de baixo
-                        capText(wx + kn / 2, wy - mmpx(1.6f), w.label,
+                        capText(wx + diameter / 2, wy - mmpx(1.6f), w.label,
                                 T.textSecondary);
                     } else {
                         const int h = mmpx(32.0f), sw = mmpx(8.0f);
@@ -2779,7 +2782,7 @@ int main() {
         // 0,5. Mesmo FREEZE de MIXER/MASTER. O doador é um grafo solto —
         // nunca processa áudio, só é lido por `crossPatch`.
         SignalGraph donor;
-        for (const auto& grp : rasgo::panel::moduleCatalog())
+        for (const auto& grp : rasgo::panel::seedModuleCatalog())
             for (const char* t : grp.types)
                 donor.add(rasgo::panel::makeModule(t));
         rasgo::panel::seedPatch(donor, nextRandomSeed());
@@ -3168,7 +3171,10 @@ int main() {
                     ++si;
                     if (nn) {
                         const std::size_t nid = graph.add(std::move(nn));
-                        shown.push_back(nid);
+                        const auto at = rasgo::panel::moduleInsertionIndex(
+                            shown, graph.node(nid).type(),
+                            [&](std::size_t i) { return graph.node(i).type(); });
+                        shown.insert(shown.begin() + static_cast<std::ptrdiff_t>(at), nid);
                         scopes[nid];
                         graph.prepare(static_cast<float>(alsa.rate()), 2, block);
                         buildMods(); populateMotion(); syncSignalIn(); relayout();
@@ -3627,7 +3633,10 @@ int main() {
                         auto nn = rasgo::panel::makeModule(spawnType);
                         if (nn) {
                             const std::size_t id = graph.add(std::move(nn));
-                            shown.push_back(id);
+                            const auto at = rasgo::panel::moduleInsertionIndex(
+                                shown, spawnType,
+                                [&](std::size_t i) { return graph.node(i).type(); });
+                            shown.insert(shown.begin() + static_cast<std::ptrdiff_t>(at), id);
                             pendingInView.insert(id);
                             scopes[id];
                             graph.prepare(static_cast<float>(alsa.rate()), 2, block);

@@ -19,6 +19,15 @@ licença comercial. Como o código deste projeto já é AGPLv3-or-later, o
 encaixe é direto — detalhe e conferência em
 [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 
+## Escuta e fraseado — implementação própria
+
+Os módulos locais LISTEN e PHRASE, de 17/10/2026, são implementações
+originais sob AGPL-3.0-or-later. LISTEN retoma como referência conceitual a
+escuta por regiões do Trioio, commit050637f8baf6ff1545965b7e6b0769247d8c201b;
+seu divisor offline não foi copiado. PHRASE não incorpora o arquivo de
+escalas ou código do Trioio. Contratos e proveniência nos dossiês
+[61](dossies/61_listen.md) e [62](dossies/62_phrase.md).
+
 ## Código de terceiros incorporado
 
 Só três, e nenhum no núcleo de DSP:

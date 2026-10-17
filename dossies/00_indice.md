@@ -89,9 +89,16 @@ propriedade do cabo, não um módulo do catálogo.
 | 58 | [`58_shifter.md`](58_shifter.md) | `SHIFTER` (deslocador de frequência — SSB, Bode/Moog) | TRANSFORM | **implementado** (2026-09-07) |
 | 59 | [`59_vca4.md`](59_vca4.md) | `VCA4` (banco de 4 VCAs + mixer — Veils/Quad VCA) | TRANSFORM | **implementado** (2026-09-07) |
 | 60 | [`60_vocoder.md`](60_vocoder.md) | `VOCODER` (vocoder de N bandas — Dudley 1938) | TRANSFORM | **implementado** (2026-09-08) |
+| 61 | [`61_listen.md`](61_listen.md) | `LISTEN` (três regiões de escuta, níveis e ataques) | OUT | implementação local, 2026-10-17 |
+| 62 | [`62_phrase.md`](62_phrase.md) | `PHRASE` (motivo interpretado por estímulos) | DECISION | implementação local, 2026-10-17 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
-**60 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
+Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado
+mais LISTEN e PHRASE, disponíveis na paleta do desenvolvimento local. A
+numeração histórica de dossiês inclui a relação de cabo e a migração de
+AUDIO-IN; não é a contagem de tipos disponíveis no app.
+
+**Estado histórico: 60 módulos feitos** (o `AUDIO-IN` #35 virou o `SIGNAL-IN` #49 — mesmo
 módulo, cresceu; a numeração de dossiê segue, o módulo não conta 2×). **Ondas A–D completas** — o roadmap `§2.4` fechou.
 O #51 (`BOXCAR`) veio depois do roadmap, a partir do interesse do autor
 no AI Synthesis AI250 BXR; junto dele o `NOISE` (#19) ganhou o modo

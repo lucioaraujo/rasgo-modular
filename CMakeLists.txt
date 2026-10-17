@@ -42,7 +42,8 @@ if (APPLE)
 endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
-project(RasgoModularPrototype VERSION 0.1.6 LANGUAGES C CXX)
+project(RasgoModularPrototype VERSION 0.1.7 LANGUAGES C CXX)
+set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}-dev")
 
 include(CTest)
 
@@ -229,6 +230,15 @@ if(BUILD_TESTING)
     target_link_libraries(rasgo_modular_scope_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_scope_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_scope_tests COMMAND rasgo_modular_scope_tests)
+
+    add_executable(rasgo_modular_reactive_modules_tests tests/test_reactive_modules.cpp)
+    target_include_directories(rasgo_modular_reactive_modules_tests PRIVATE apps)
+    target_compile_definitions(rasgo_modular_reactive_modules_tests PRIVATE
+        REACTIVE_EXAMPLE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/escuta_frase.rmp")
+    target_link_libraries(rasgo_modular_reactive_modules_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_reactive_modules_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_reactive_modules_tests COMMAND rasgo_modular_reactive_modules_tests)
+    set_tests_properties(rasgo_modular_reactive_modules_tests PROPERTIES TIMEOUT 30 RUN_SERIAL TRUE)
 
     add_executable(rasgo_modular_trigseq_tests tests/test_trigseq.cpp)
     target_link_libraries(rasgo_modular_trigseq_tests PRIVATE rasgo_modular_core)
@@ -439,6 +449,19 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_learn_catalog_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_learn_catalog_tests COMMAND rasgo_modular_learn_catalog_tests)
 
+    add_executable(rasgo_modular_learn_presentation_tests tests/test_learn_presentation.cpp)
+    target_include_directories(rasgo_modular_learn_presentation_tests PRIVATE apps)
+    target_link_libraries(rasgo_modular_learn_presentation_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_learn_presentation_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_learn_presentation_tests COMMAND rasgo_modular_learn_presentation_tests)
+    set_tests_properties(rasgo_modular_learn_presentation_tests PROPERTIES TIMEOUT 15)
+
+    add_executable(rasgo_modular_ui_guidance_tests tests/test_ui_guidance.cpp)
+    target_include_directories(rasgo_modular_ui_guidance_tests PRIVATE apps)
+    target_compile_options(rasgo_modular_ui_guidance_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_ui_guidance_tests COMMAND rasgo_modular_ui_guidance_tests)
+    set_tests_properties(rasgo_modular_ui_guidance_tests PROPERTIES TIMEOUT 15)
+
     # usa apps/panel/StartupPolicy.hpp (como o app abre: preferência ABRE)
     add_executable(rasgo_modular_startup_policy_tests tests/test_startup_policy.cpp)
     target_include_directories(rasgo_modular_startup_policy_tests PRIVATE src apps)
@@ -629,9 +652,9 @@ if(RASGO_X11 AND RASGO_ASOUND AND RASGO_XRANDR)
     endif()
     string(TIMESTAMP RASGO_BUILD_DATE "%Y")
     if(RASGO_GIT_HASH)
-        set(RASGO_BUILD_STAMP "v${PROJECT_VERSION} · ${RASGO_GIT_HASH} · ${RASGO_BUILD_DATE}")
+        set(RASGO_BUILD_STAMP "v${RASGO_MODULAR_VERSION_LABEL} · ${RASGO_GIT_HASH} · ${RASGO_BUILD_DATE}")
     else()
-        set(RASGO_BUILD_STAMP "v${PROJECT_VERSION} · ${RASGO_BUILD_DATE}")
+        set(RASGO_BUILD_STAMP "v${RASGO_MODULAR_VERSION_LABEL} · ${RASGO_BUILD_DATE}")
     endif()
     add_executable(rasgo_modular_panel apps/panel/panel_main.cpp)
     target_compile_definitions(rasgo_modular_panel

@@ -70,13 +70,9 @@
 // um tipo do catálogo com knobs/jacks próprios; não há widget de painel
 // pra ela hospedar hover-learn.
 
+#include "panel/LearnEntry.hpp"
+#include "panel/ReactiveLearn.hpp"
 namespace rasgo::panel {
-
-struct LearnEntry {
-    std::string quick;
-    std::string understand;
-    std::string explore;
-};
 
 // O CABO, e não um módulo.
 //
@@ -2650,6 +2646,8 @@ inline const LearnTable& learnTableEs() {
 inline const LearnEntry* lookupLearn(const std::string& moduleType,
                                      const std::string& bind,
                                      const Lang lang = Lang::pt) {
+    if (const auto* entry = detail::lookupReactiveLearn(moduleType, bind, lang))
+        return entry;
     if (lang != Lang::pt) {
         const auto& t = (lang == Lang::en) ? detail::learnTableEn()
                       : (lang == Lang::fr) ? detail::learnTableFr()
@@ -3746,6 +3744,8 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
 // português — declarado em `PUBLICACAO.md`.
 inline const LearnEntry* lookupLearnModule(const std::string& moduleType,
                                            const Lang lang = Lang::pt) {
+    if (const auto* entry = detail::lookupReactiveLearn(moduleType, "", lang))
+        return entry;
     const std::string key =
         (moduleType == "AUDIO-IN") ? std::string("SIGNAL-IN") : moduleType;
 

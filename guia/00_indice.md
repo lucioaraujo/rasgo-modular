@@ -175,6 +175,7 @@ Estado: **✓** pronto · **·** a fazer.
 |---|---|---|---|
 | 04 | `DECISION` | [`04_decisao.md`](04_decisao.md) | ✓ |
 | 12 | `QUANTIZER` | [`12_quantizer.md`](12_quantizer.md) | ✓ |
+| 62 | `PHRASE` | [`62_phrase.md`](62_phrase.md) | local, após 0.1.6 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |
@@ -207,6 +208,7 @@ Estado: **✓** pronto · **·** a fazer.
 | 16 | `MIXER` | [`16_mixer.md`](16_mixer.md) | ✓ |
 | 17 | `MASTER` | [`17_master.md`](17_master.md) | ✓ |
 | 29 | `SCOPE` | [`29_scope.md`](29_scope.md) | ✓ |
+| 61 | `LISTEN` | [`61_listen.md`](61_listen.md) | local, após 0.1.6 |
 | 38 | `NOTE-OUT` | [`38_note_out.md`](38_note_out.md) | ✓ |
 
 ### Dois dossiês sem página de módulo — mas com página própria

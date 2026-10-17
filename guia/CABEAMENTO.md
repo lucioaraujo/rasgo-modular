@@ -5,6 +5,58 @@ quê, e como o som chega até você.
 
 ---
 
+## Ajuda enquanto você toca (0.1.7-dev)
+
+No aplicativo JUCE local, aponte para um módulo, controle ou jack. Depois
+de um segundo, o LEARN explica sua função. Durante o ajuste de um controle,
+a explicação entra imediatamente e acompanha o gesto, mesmo se o ponteiro
+sair da área do knob.
+
+BASE mostra o ajuste do controle antes das modulações diretas do grafo.
+DSP mostra o último valor guardado naquele parâmetro pelo processamento.
+Ambos usam a unidade declarada pelo módulo. Esses números não medem todos
+os CVs calculados internamente: por exemplo, um sinal no jack de modulação
+de frequência pode mudar o som sem mudar o valor do parâmetro mostrado.
+Também não são medidas de volume da saída.
+
+Se a explicação continuar além da caixa, role com a roda sobre o LEARN
+ou arraste sua barra lateral. A lista de módulos tem outra rolagem;
+uma não move a outra. A explicação mantém o tamanho das letras, e os
+valores ficam no cabeçalho, fora da parte que rola.
+
+F1 ou um clique na caixa fixa a última explicação para você ler sem que
+o mouse a substitua. Use setas, Page Up/Page Down, Home e End; Esc ou F1
+devolve o teclado ao rack. Enquanto essa leitura está fixa, os valores
+também são a última consulta, não uma medição contínua. Clicar num controle
+volta ao acompanhamento do gesto.
+
+O cabeçalho também tem ajuda: pare sobre um botão, o campo da seed ou a
+intensidade do VARIA por um segundo. As explicações acompanham o idioma.
+BANCO guarda o patch na pasta local patches; ABRIR carrega um patch.
+EVOLUI aplica seis pequenas mutações numa operação de resultado imediato.
+
+Para percorrer esses comandos sem o mouse, F6 leva o foco ao cabeçalho.
+Setas esquerda/direita ou Tab/Shift+Tab percorrem os controles visíveis;
+Enter ou espaço aciona o selecionado. No campo da seed, Enter começa a
+edição, e o próximo Enter confirma o número digitado. Na intensidade do
+VARIA, setas para cima/baixo ajustam 0,05 por vez. F1 fixa a explicação
+no LEARN; Esc ou F6 retorna ao rack. Espaço com foco no cabeçalho aciona
+um botão; no rack, conserva o gesto habitual de romper/reatar os cabos.
+
+F2 ou o botão Aa (F2), no alto da caixa LEARN, abre as preferências de
+leitura. Escolha 12, 14 ou 16 pixels lógicos. A coluna e a caixa crescem junto com
+as letras; o texto longo continua rolável. A opção de texto branco aumenta
+o contraste da explicação. Restaurar padrão de leitura volta a 12 pixels
+e às cores originais. A preferência fica em reading-ui, na configuração
+local do aplicativo, separada dos patches e da seed.
+
+Esses ajustes se aplicam ao LEARN, não às letras de todos os módulos.
+Escolha de família tipográfica, cores livres e renderizador continuam
+pendentes. O zoom do rack permanece separado das preferências de leitura.
+Não está nos instaladores 0.1.6: use o build local 0.1.7-dev.
+
+---
+
 ## 1. Cabo = de uma saída para uma entrada
 
 No painel, cada jack é **saída** (embaixo do módulo, o sinal *sai*) ou

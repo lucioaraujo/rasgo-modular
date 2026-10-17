@@ -5,6 +5,8 @@ ENVELOPE donne forme à une note dans le temps : comment elle commence, comment 
 Les sources sonnent tout le temps ; ENVELOPE transforme ce flux en phrases. Il a deux usages qui peuvent coexister. Par l'entrée IN et la sortie OUT, il articule le son qui passe. Par la sortie ENV, il fournit la courbe elle-même, que vous pouvez envoyer ouvrir un filtre, changer un timbre ou doser un effet. Les quatre étapes de la courbe ont des noms anglais qu'on trouve sur tous les synthétiseurs : attack, decay, sustain et release, d'où ADSR.
 
 ## Controles
+Dans l'interface en développement 0.1.7-dev, ATK, DEC, SUS et REL sont des curseurs verticaux : tirez vers le haut pour augmenter. Les trois durées suivent une échelle logarithmique de 1 ms à 10 s ; SUS reste un niveau linéaire. CURVE, VCA et LVL se trouvent en dessous. Les paramètres et les patches enregistrés conservent les valeurs de l'interface précédente.
+
 - ATK : l'attaque, le temps que met la note pour atteindre son maximum après l'impulsion. Court, c'est percussif ; long, comme un archet qui entre doucement.
 - DEC : la décroissance, le temps de la chute après le maximum jusqu'au niveau de SUS.
 - SUS : le niveau auquel la note se maintient tant que l'impulsion reste haute. À zéro, pas de maintien et la note sonne pincée.

@@ -4,19 +4,20 @@ Definição visual e editorial do site do instrumento, conforme
 `RASGO_DOCUMENTATION/design/WEBSITES.md §5` (que lista o que cada site
 deve documentar).
 
-> **Estado: em preparação, não publicado.** A regra editorial da família é
-> explícita: *"o site de um instrumento só será publicado junto com a
-> publicação do próprio instrumento"*. O Rasgo Modular ainda não tem
-> release — ver [`../PUBLICACAO.md`](../PUBLICACAO.md). Este site existe
-> pronto para o dia em que tiver.
+Estado local em 17/10/2026: fontes em atualização para a 0.1.7-dev.
+Versão e downloads publicados são registrados no [README principal](../README.md)
+e em [PUBLICACAO.md](../PUBLICACAO.md). Ter um arquivo nesta pasta não
+significa que ele já foi enviado ao site. LISTEN e PHRASE têm guias completos
+e imagens reais nos quatro idiomas, identificados como desenvolvimento local.
+O site mantém os downloads da release pública 0.1.6.
 
 ## Propósito, públicos, idiomas
 
 **Propósito:** apresentar o instrumento a quem nunca o viu e ser honesto
-sobre o que ele ainda não é — uma página de apresentação por idioma, mais
-uma de guia dos módulos. Não é documentação de uso: instalação e variáveis
-seguem no repositório (`INSTALL.md`), e o guia do site é o mesmo material
-que o LEARN mostra dentro do app, reunido para leitura corrida.
+sobre suas possibilidades — uma página de apresentação por idioma, mais
+uma de guia dos módulos. Instalação e variáveis seguem no repositório
+(`INSTALL.md`). O guia tem instruções de uso e exercícios; o catálogo e
+a ajuda resumida do app servem de referência para a versão didática.
 
 **Públicos:** músicos e pessoas interessadas em síntese modular e em
 sistemas generativos; secundariamente, quem chega pelo portal da família.
@@ -31,13 +32,13 @@ site em menos idiomas que o produto seria uma regressão.
 |---|---|---|
 | `index.html` (pt) | apresentação completa | esta página |
 | `en.html` · `fr.html` · `es.html` | traduções integrais | `index.html` |
-| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia dos 58 módulos, família por família | **o catálogo do app** — ver abaixo |
+| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia de 60 módulos: 58 publicados + LISTEN/PHRASE em desenvolvimento | catálogo do app + `guia/<idioma>/<TIPO>.md` |
 
 Duas páginas por idioma. A segunda segue o precedente do Antitotem, que já
 tem `install.html` por idioma: `.page-nav` no cabeçalho ao lado do seletor
 de idioma, com `aria-current="page"` na página aberta.
 
-Quando houver release, entram: página de instalação (traduzindo
+Quando houver nova release, revisar: página de instalação (traduzindo
 `INSTALL.md`), downloads e obras.
 
 **O que o site NÃO duplica:** matriz de plataformas detalhada, variáveis
@@ -46,18 +47,20 @@ repositório. O site resume e aponta; cópia editada à mão diverge.
 
 ## O guia dos módulos é GERADO, e por quê
 
-As quatro páginas de guia não são escritas aqui. Os 58 verbetes de módulo
-já existem em `apps/panel/LearnCatalog.hpp`, nos quatro idiomas, cobertos
-por teste — são o mesmo texto que a caixa LEARN mostra quando o mouse passa
-sobre o corpo de um módulo dentro do instrumento.
-
-Escrever uma segunda cópia no site criaria duas versões do mesmo texto, e
-duas versões divergem na primeira correção — sendo que a que o público lê
-seria justamente a que nenhum teste cobre. Então:
+As quatro páginas são montadas pelo gerador. O catálogo de 60 tipos vem
+do app (`LearnCatalog.hpp` e `ReactiveLearn.hpp`); os textos didáticos
+completos vêm de `guia/<idioma>/<TIPO>.md`, conforme `ESTILO.md`.
+Cada texto tem explicação, função musical, controles e experiência guiada.
+Não editar o HTML gerado à mão. A cobertura de tradução do app e as
+regressões do website são verificações distintas. Para regenerar:
 
 ```sh
 ../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
 python3 gerar_modulos.py
+python3 estado.py --depois 0.1.6
+python3 seo.py
+python3 verificar.py
+python3 -B -m unittest discover -s . -p 'test_*.py'
 ```
 
 O primeiro comando despeja o catálogo do BINÁRIO (não de uma leitura do
@@ -68,11 +71,9 @@ de `index.html` em vez de copiado para o script, pelo mesmo motivo.
 `modulos.json` fica versionado de propósito: com ele, o site se regenera
 sem compilar o instrumento.
 
-Isto também cumpre uma promessa que o app já fazia. O tutorial embutido
-diz, nos quatro idiomas, que *"um guia escrito mais completo e receitas de
-patch estão a caminho, como site e PDF"*. O guia é essa primeira metade.
-Quando o site for publicado, esse texto do tutorial precisa passar de "a
-caminho" para um apontamento.
+O guia é a versão de leitura longa; o LEARN continua oferecendo ajuda
+contextual dentro do instrumento. A indicação de uma versão em
+desenvolvimento evita anunciar módulos ausentes dos downloads atuais.
 
 ## Tipografia
 
@@ -329,10 +330,49 @@ RASGO; só a configuração muda.
 
 Ordem ao mexer nas páginas: `gerar_modulos.py` → `estado.py` → `seo.py`. O
 `gerar_modulos.py` reescreve as páginas de módulos inteiras e apaga o bloco;
-`verificar.py` acusa isso, e acusa também `VERSAO` do `seo.py` diferente do
-CMake.
+`verificar.py` acusa isso. `VERSAO` de `seo.py` é a release pública; pode
+ficar anterior ao CMake somente quando este está explicitamente em -dev.
+Os nomes do CPack local continuam sendo conferidos com o CMake local.
+Os seis downloads das quatro páginas são conferidos com a versão pública.
 
 ## Imagens dos painéis no guia de módulos
+
+### Exportação de patch específico, sem saída de áudio — 17/10/2026
+
+Para módulos opcionais que não estão no rack inicial, usar o app local
+recompilado e o exportador Linux:
+
+```sh
+bash website/exportar_patch.sh examples/escuta_frase.rmp /pasta/nova LISTEN,PHRASE
+# Para incluir o layout novo do envelope e do filtro:
+bash website/exportar_patch.sh examples/painel_tutoriais.rmp /pasta/nova LISTEN,PHRASE,ENVELOPE,FILTER
+# Auditoria nativa de ajuda, teclado e tamanhos de leitura (somente local):
+bash website/exportar_patch.sh examples/painel_tutoriais.rmp /pasta/nova LISTEN,PHRASE,ENVELOPE,FILTER --check-guidance
+```
+
+O programa carrega o patch, calcula quatro segundos de sinal em memória,
+desenha somente os tipos pedidos em 2× e fecha. Não abre dispositivo de
+áudio/MIDI nem grava áudio ou sessão. O script limita duração, memória e
+CPU e guarda o diagnóstico em `.capture-state.*` junto dos PNGs.
+`RASGO_EXPORTAR_CONFIG` isola explicitamente os dados do app: o SDK JUCE
+deste projeto não consulta XDG_CONFIG_HOME diretamente do ambiente.
+HOME não é redefinido. O código normal de abertura do instrumento continua
+usando seu diretório habitual.
+
+`--check-guidance` também exercita os handlers JUCE de navegação do
+cabeçalho, foco e leitura em 1024/1920 pixels, três tamanhos e quatro idiomas.
+Escreve e confere reading-ui apenas na configuração isolada e produz
+`reading-1024.png` e `reading-1920.png`. Não certifica teclados/gerenciadores
+de janela de outros sistemas e não substitui o teste manual do músico.
+
+Painéis preparados: `assets/modulos/LISTEN.webp` (378×600, 6.524 bytes) e
+`PHRASE.webp` (474×600, 8.186 bytes). São renderizações do próprio app,
+com os medidores alimentados pelo patch de demonstração, não ilustrações
+por IA. PHRASE mostra uma altura sustentada no passo 7/8; a linha reta
+naquele instante não significa ausência de atividade musical.
+Os guias locais `guia/61_listen.md` e `guia/62_phrase.md` usam essas imagens.
+
+### Processo histórico dos 58 painéis anteriores
 
 Desde 3 out. 2026 (pedido do autor), cada módulo do guia mostra o próprio
 painel, em `assets/modulos/<TIPO>.webp`. As imagens são **desenhadas pelo

@@ -19,7 +19,9 @@
 // `Panel::hp` é a largura em HP; a largura do painel = `hp · 5,08 mm`
 // (1 HP = 0,2 pol = 5,08 mm, o horizontal pitch da Eurocard). A ALTURA é
 // implícita e comum a todo módulo: 128,5 mm (o painel 3U). `y` cresce pra
-// baixo. `span` (Display/Slider) também em mm. O renderizador aplica um
+// baixo. `span` também em mm: largura de Display; diâmetro de Knob quando
+// >1; largura da legenda abaixo de Toggle quando >1. Sliders têm geometria
+// fixa no renderizador. O renderizador aplica um
 // fator único `s` (px/mm) derivado do espaço de tela.
 //
 // `bind`: id de parâmetro (ex. "rate"), ou porta com prefixo ("in:rate_mod",
@@ -57,7 +59,7 @@ struct Widget {
     std::string bind;   // param id | "in:<porta>" | "out:<porta>" | ""
     float x = 0.0f;
     float y = 0.0f;
-    float span = 1.0f;  // largura relativa (Display/Slider usam)
+    float span = 1.0f;  // Display: largura; Knob >1: diâmetro; Toggle >1: largura do rótulo abaixo (mm)
 };
 
 struct Panel {

@@ -89,6 +89,10 @@ diferente.
 
 ## Os controles, um a um
 
+No layout local 0.1.7-dev, CUT usa um knob de 12 mm, maior que RESO,
+para distinguir o controle principal. Área de pega e desenho crescem juntos.
+Não há alteração da resposta DSP, dos parâmetros ou dos patches salvos.
+
 **CUT** (cutoff, 20–20000 Hz) — a frequência de corte. Gire e ouça o
 timbre escurecer. A CV `FC` soma aqui.
 

@@ -1,5 +1,12 @@
 # Validação para a v0.1.0 — protocolo
 
+Nota de continuidade (17/10/2026): este é o protocolo histórico da v0.1.0,
+não uma convocação atual ao autor. Para qualquer novo pedido de teste, vale
+primeiro o [portão de autovalidação do desenvolvimento](../TAREFAS.md#portão-antes-de-pedir-teste-ao-autor--17102026).
+O desenvolvimento deve conferir binário, exemplo e comportamento no app
+antes de pedir escuta ou avaliação perceptiva específica. As instruções
+antigas abaixo permanecem como registro do processo daquela versão.
+
 Este documento existe para transformar o teste do autor em **evidência de
 validação** no formato que o gate da camada 2 exige
 (`ESTRATEGIA_DE_PUBLICACAO.md`) — não em impressão solta. Segue o

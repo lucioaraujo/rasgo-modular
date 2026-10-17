@@ -42,7 +42,7 @@ struct Out final : Signal {
 // monta o rack completo na MESMA ordem do painel (moduleCatalog() achatado)
 // + o sink. Devolve o índice do sink.
 std::size_t buildRack(SignalGraph& g) {
-    for (const auto& grp : rasgo::panel::moduleCatalog())
+    for (const auto& grp : rasgo::panel::seedModuleCatalog())
         for (const char* t : grp.types) {
             auto n = rasgo::panel::makeModule(t);
             if (n) g.add(std::move(n));
@@ -78,7 +78,7 @@ void testCatalogInstantiates() {
     const std::size_t sink = buildRack(g);
     // todos os módulos do catálogo + 1 sink
     std::size_t catN = 0;
-    for (const auto& grp : rasgo::panel::moduleCatalog()) catN += grp.types.size();
+    for (const auto& grp : rasgo::panel::seedModuleCatalog()) catN += grp.types.size();
     EXPECT(catN >= 40);
     EXPECT(g.nodeCount() == catN + 1);
     EXPECT(g.node(sink).type() == "OUT");

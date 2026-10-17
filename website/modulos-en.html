@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — module guide</title>
-<meta name="description" content="The 58 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
+<meta name="description" content="The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — module guide">
-<meta property="og:description" content="The 58 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
+<meta property="og:description" content="The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "The 58 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
+  "description": "The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "en",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -95,9 +95,10 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">58 modules · 8 families</span>
+  <span class="status-pill">60 modules · 8 families</span>
   <h1>Module guide</h1>
-  <p class="lead">The 58 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
+  <p class="lead">The 60 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
+  <p class="note development-note">LISTEN and PHRASE are in local development version 0.1.7-dev. Version 0.1.6 downloads contain the previous 58 modules. ENVELOPE's sliders and FILTER's larger CUT control also belong to the new layout in development.</p>
 </section>
 
 <nav class="familias" aria-label="Families">
@@ -105,10 +106,10 @@
   <a href="#fam-TRANSFORM">TRANSFORM <span>14</span></a>
   <a href="#fam-MODULATE">MODULATE <span>6</span></a>
   <a href="#fam-TIME">TIME <span>5</span></a>
-  <a href="#fam-DECISION">DECISION <span>5</span></a>
+  <a href="#fam-DECISION">DECISION <span>6</span></a>
   <a href="#fam-ROUTE">ROUTE <span>4</span></a>
   <a href="#fam-SPACE">SPACE <span>7</span></a>
-  <a href="#fam-OUT">OUT <span>4</span></a>
+  <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
 
 <section class="section" id="fam-SOURCE">
@@ -460,6 +461,7 @@
     <h4>How to think about it</h4>
     <p>It is the second module in almost every patch: after a source rich in harmonics, such as an OSC saw, the filter sculpts the tone. What sets it apart is SPRD: at zero, all three outputs share the same cutoff; as you raise it, they move apart and become three different filters, each on its own region of the sound. With resonance at maximum, the filter starts sounding by itself, like a sine oscillator.</p>
     <h4>Controls</h4>
+    <p>In development interface 0.1.7-dev, CUT has a larger knob than RESO to distinguish the main gesture of opening and closing the tone. This difference is visual; ranges and sound response remain unchanged.</p>
     <ul class="controles">
       <li><b>CUT</b>: the cutoff frequency, from 20 to 20000 Hz. This is the main control: turn it and hear the tone open and close.</li>
       <li><b>RESO</b>: emphasizes frequencies near the cutoff, giving a more nasal tone. At maximum the filter starts sounding on its own.</li>
@@ -814,6 +816,7 @@
     <h4>How to think about it</h4>
     <p>Sources sound all the time; ENVELOPE turns that flow into phrases. It has two uses that can happen at once. Through the IN input and OUT output, it articulates the sound that passes through. Through the ENV output, it hands you the curve itself, which you can send to open a filter, change a tone or dose an effect. The four stages of the curve have names that appear on every synthesizer: attack, decay, sustain and release, hence ADSR.</p>
     <h4>Controls</h4>
+    <p>In development interface 0.1.7-dev, ATK, DEC, SUS and REL are vertical sliders: drag upwards to increase. The three times use a logarithmic scale from 1 ms to 10 s; SUS remains a linear level. CURVE, VCA and LVL sit below them. Parameters and saved patches keep the same values as in the previous interface.</p>
     <ul class="controles">
       <li><b>ATK</b>: the attack, the time the note takes to reach its peak after the pulse. Short sounds percussive; long, like a bow coming in slowly.</li>
       <li><b>DEC</b>: the decay, the time it takes to fall from the peak down to the SUS level.</li>
@@ -1094,7 +1097,7 @@
   </article>
 </section>
 <section class="section" id="fam-DECISION">
-  <h2>DECISION <small>5 modules</small></h2>
+  <h2>DECISION <small>6 modules</small></h2>
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
     <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="QUANTIZER module panel" width="118" height="300" loading="lazy" /></figure>
@@ -1223,6 +1226,34 @@
       <li>Connect GEIG to the GATE input of a DRUM connected to the MIXER and raise GEI. You hear hits at unpredictable moments.</li>
       <li>Now connect a voice that plays notes, such as an OSC running through an ENVELOPE, to the IN input, with MODE in the first position and APER wide.</li>
       <li>Connect OUT to the CV1 input of a VCA that controls another sound. The second sound now follows the voice's volume, without trembling.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PHRASE">
+    <h3>PHRASE</h3>
+    <p class="development-note">0.1.7-dev · local development; not yet in version 0.1.6 downloads.</p>
+    <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="PHRASE module panel" width="237" height="300" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>PHRASE proposes a motif and plays it when pulses arrive at CLK. The idea returns with each phrase, with changes of direction, rests and accents that you control. Its outputs drive other voices; connect an oscillator and an envelope to hear it.</p>
+    <h4>How to think about it</h4>
+    <p>Use CLOCK for a regular pulse or LISTEN's attacks to respond to another sound. SEED identifies the motif. VAR transforms successive passes; at zero, the returning shape is easier to recognise. The PITCH input supplies an anchor, sampled at the start of each phrase. To choose a scale, send the PITCH output through QUANTIZER with RANGE=1. PHRASE does not supply a repertoire of musical styles or traditions on its own.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>LEN</b>: phrase length in events, from 2 to 16 pulses. This is not a fixed duration in seconds.</li>
+      <li><b>SPAN</b>: the shape's pitch span, from 1 to 36 semitones, before quantisation.</li>
+      <li><b>DIR</b>: leans the shape down or up. At the centre it keeps the base motif's direction.</li>
+      <li><b>VAR</b>: how much each pass changes. Start at zero and raise it while listening for what remains recognisable.</li>
+      <li><b>SPACE</b>: rest probability on intermediate steps. The beginning and ending are preserved.</li>
+      <li><b>CAD</b>: strength of the return to the anchor at the ending.</li>
+      <li><b>GATE</b>: articulation length, from 5 to 400 ms. Connect GATE to the voice's envelope to hear articulated notes.</li>
+      <li><b>SEED</b>: numeric motif identity, from 1 to 65535. Changing it rebuilds the shape and restarts; VARIA leaves this control alone.</li>
+    </ul>
+    <p>Inputs: PITCH, anchor at 1 V per octave; CLK, one step per rising edge; RST, restart; STIM, intensity from 0 to 1; RET, request closure on the next step. Outputs: PITCH, held pitch; GATE, articulation; ACC, accent from 0 to 1; END, 5 ms pulse at closure; PHASE, position from 0 to 1 within the phrase. With STIM unpatched, intensity is 1. Reopening the patch restarts the phrase rather than resuming the exact previous performance position.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Turn VARIA off. Connect CLOCK.EUC to PHRASE.CLK, PHRASE.PITCH to QUANTIZER.CV (RANGE=1), and QUANTIZER.PITCH to OSC.PITCH. Choose a scale on QUANTIZER.</li>
+      <li>Connect OSC.SAW to ENVELOPE.IN, PHRASE.GATE to ENVELOPE.GATE and ENVELOPE.OUT to MIXER. Start with VAR=0 and SPACE=0. Hear the idea repeat; change DIR and SPAN one at a time.</li>
+      <li>Put a VCA between the voice and MIXER: ENVELOPE.OUT into VCA.IN1, VCA.O1 into MIXER, LVL1=0 and CV1=1. Connect PHRASE.ACC to VCA.CV1 to hear the accents. Raise VAR, then SPACE.</li>
+      <li>Replace CLOCK with LISTEN.L-HIT at CLK and connect LISTEN.LOW to STIM. The sound being heard now calls the notes and changes their intensity. A pulse at RET requests closure on the next CLK; END can call a second voice.</li>
     </ol>
   </article>
 </section>
@@ -1509,7 +1540,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-OUT">
-  <h2>OUT <small>4 modules</small></h2>
+  <h2>OUT <small>5 modules</small></h2>
   <article class="modulo" id="mod-MIXER">
     <h3>MIXER</h3>
     <figure class="painel"><img src="assets/modulos/MIXER.webp" alt="MIXER module panel" width="166" height="300" loading="lazy" /></figure>
@@ -1596,6 +1627,32 @@
       <li>In a melody made with QUANTIZER, OSC and ENVELOPE, connect QUANTIZER's PTCH to NOTE-OUT's PITCH, and PTHR to the OSC's 1V/O.</li>
       <li>Connect the pulse that fires the envelope to NOTE-OUT's GATE, and GTHR to the envelope's GATE. The sound stays the same.</li>
       <li>Record a stretch with REC. Next to the audio file, the score's text file lists every note played.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-LISTEN">
+    <h3>LISTEN</h3>
+    <p class="development-note">0.1.7-dev · local development; not yet in version 0.1.6 downloads.</p>
+    <figure class="painel"><img src="assets/modulos/LISTEN.webp" alt="LISTEN module panel" width="189" height="300" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>LISTEN follows the energy of incoming sound in three regions: low, mid and high. Each region provides a continuous level and a pulse when it detects an attack. You can use these signals to make another voice respond to what is playing.</p>
+    <h4>How to think about it</h4>
+    <p>A low drum hit can call a note; cymbals can change a voice's brightness. The regions overlap, so one instrument can appear at several outputs. LISTEN measures frequencies and changes in energy; it does not separate instruments or discover the music's tempo. THRU preserves the incoming sound so you can hear it too. The meters show levels and highlight recent attacks.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>LOW</b>: low/mid split, from 60 to 800 Hz. Moving either split inhibits attacks for 50 ms to avoid triggers caused by the adjustment. Continuous modulation can keep them inhibited.</li>
+      <li><b>HIGH</b>: mid/high split, from 1 to 8 kHz, limited by the sample rate.</li>
+      <li><b>RESP</b>: smooths the level outputs. Raise it to let energy linger after a hit. It does not change attack detection.</li>
+      <li><b>SENS</b>: attack sensitivity. Raise it to detect smaller contrasts; lower it if one hit causes too many events.</li>
+      <li><b>FLOOR</b>: minimum amplitude for triggering, from −72 to −18 dBFS. Raising it helps reject quiet noise.</li>
+      <li><b>REARM</b>: minimum wait between attacks in the same region, from 20 to 250 ms. A high setting can miss fast hits.</li>
+    </ul>
+    <p>Input: IN, audio. Outputs: THRU, unchanged audio on each channel; LOW, MID and HIGH, levels from 0 to 1; L-HIT, M-HIT and H-HIT, 5 ms pulses. Automatic VARIA movement leaves the calibration controls alone.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Turn VARIA off. Connect CLOCK.EUC to DRUM.GATE, DRUM.OUT to LISTEN.IN and LISTEN.THRU to a MIXER input. Start at low volume and watch the meters.</li>
+      <li>Connect L-HIT to PHRASE.CLK. To hear the response, connect PHRASE.PITCH to QUANTIZER.CV, with RANGE=1; QUANTIZER.PITCH to OSC.PITCH; OSC.SAW to ENVELOPE.IN; PHRASE.GATE to ENVELOPE.GATE; ENVELOPE.OUT to MIXER.</li>
+      <li>Change TONE and SNAP on DRUM. Adjust FLOOR and REARM until the voice responds to the hits you want. Swap L-HIT for H-HIT and hear how the conversation changes.</li>
+      <li>For changing intensity, place a VCA between ENVELOPE and MIXER, with LVL1=0 and CV1=1; connect PHRASE.ACC to VCA.CV1 and LISTEN.LOW to PHRASE.STIM. For external audio, send SIGNAL-IN.OUT to LISTEN.IN and enable SIGNAL-IN's ON control yourself.</li>
     </ol>
   </article>
 </section>
