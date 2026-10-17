@@ -237,6 +237,11 @@ if(BUILD_TESTING)
         REACTIVE_EXAMPLE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/examples/escuta_frase.rmp")
     target_link_libraries(rasgo_modular_reactive_modules_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_reactive_modules_tests PRIVATE ${rasgo_modular_warnings})
+    # O teste instancia um grafo completo com LISTEN/PHRASE. No MSVC isso
+    # ultrapassa o limite padrão de seções COFF (C1128); não é falha DSP.
+    if(MSVC)
+        target_compile_options(rasgo_modular_reactive_modules_tests PRIVATE /bigobj)
+    endif()
     add_test(NAME rasgo_modular_reactive_modules_tests COMMAND rasgo_modular_reactive_modules_tests)
     set_tests_properties(rasgo_modular_reactive_modules_tests PROPERTIES TIMEOUT 30 RUN_SERIAL TRUE)
 

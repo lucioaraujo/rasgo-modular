@@ -25,8 +25,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   distribuir este pacote Mint 22 como se fosse o Ubuntu 22.04 da CI.
 - [ ] Concluir o portão interativo e musical descrito abaixo; registrar
   resultados sem afirmar que uma exportação substituiu a janela ou o ouvido.
-- [ ] Executar a matriz CI **uma vez**, inspecionar seis artefatos e quatro
-  testes de abertura Linux; só então decidir tag/release da 0.1.7.
+- [ ] Repetir a matriz CI após corrigir o erro MSVC C1128 do teste
+  LISTEN/PHRASE; inspecionar seis artefatos e quatro testes de abertura
+  Linux. A primeira execução de preparação (`39074923719`) produziu
+  Linux/macOS, mas não Windows; `arranque-linux` ficou sem executar.
+  Nenhum arquivo desse run é release.
 - [ ] Após anexos públicos válidos, mudar site, SEO e guias nos quatro
   idiomas e verificar links reais. Até lá, downloads ficam em 0.1.6.
 

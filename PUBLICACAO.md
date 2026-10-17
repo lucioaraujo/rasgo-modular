@@ -37,10 +37,18 @@ Portão ainda aberto antes da publicação completa:
    do site, metadados e guia de módulos de 0.1.6/0.1.7-dev para 0.1.7; testar
    os seis links e publicar o site. Não antecipar links para arquivos ausentes.
 
-Não foi criada tag nem release nesta auditoria. Um push de desenvolvimento
-por si só atualiza as fontes e, se tocar `website/`, pode publicar o site,
-mas **não** aciona o empacotamento; este depende de tag, pull request ou
-execução manual do workflow.
+Primeira matriz manual de preparação (run `39074923719`, commit `07dcb33`):
+Linux e macOS produziram artefatos, mas Windows falhou ao compilar
+`test_reactive_modules.cpp` com MSVC C1128 (limite padrão de seções COFF).
+Por depender dos três jobs, `arranque-linux` não rodou. O código do teste
+passa no Linux; a correção acrescentou `/bigobj` somente ao teste e ao app
+no MSVC. O workflow separa agora build e CTest para não converter falha de
+compilação em um confuso "Not Run". É necessária nova matriz para validar
+o ajuste e os seis formatos; nenhum arquivo desta tentativa é release.
+
+Não foi criada tag nem release nesta auditoria. O push de desenvolvimento
+atualizou as fontes, não os downloads; empacotamento depende de tag, pull
+request ou execução manual do workflow.
 
 ---
 
