@@ -8,6 +8,18 @@
 
 ## 1. Objetivo
 
+Estado local de 17/10/2026: [LISTEN](dossies/61_listen.md) e
+[PHRASE](dossies/62_phrase.md) acrescentam escuta por regiões e motivo
+interpretado por estímulos ao catálogo. São módulos próprios do Modular;
+SCOPE e QUANTIZER mantêm seus contratos. O catálogo completo da paleta
+se distingue do rack histórico semeado, cuja ordem está congelada em
+`seedModuleCatalog()`. Desenvolvimento 0.1.7-dev, não release pública.
+Ao acrescentar um módulo no rack, `moduleInsertionIndex()` usa a família
+e a ordem de exibição para escolher a posição; não muda os IDs DSP nem a
+ordem relativa dos módulos existentes. Patches carregados conservam sua
+ordem salva. A regra serve ao app JUCE e ao painel de teste X11.
+Testes e ponto de retomada: [TAREFAS.md](TAREFAS.md).
+
 **Rasgo Modular** será um ambiente modular próprio da família Rasgo.
 
 O conceito incorpora a antiga proposta da **Fábrica de Módulos**, registrada em

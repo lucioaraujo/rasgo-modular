@@ -31,6 +31,9 @@
 #include "panel/ScoreRecorder.hpp"  // SYSTEM SCORE da tomada
 #include "panel/SinkOut.hpp"      // sink + guarda de segurança
 #include "panel/LearnCatalog.hpp"
+#include "panel/LearnPresentation.hpp"
+#include "panel/HeaderHelp.hpp"
+#include "panel/ReadingPreferences.hpp"
 #include "panel/ModuleCatalog.hpp"
 #include "panel/MotionEngine.hpp"    // VARIA
 #include "panel/PatchGenetics.hpp"   // MUTA / EVOLUI / CRUZA
@@ -55,6 +58,7 @@
 #include <unordered_set>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <map>
 #include <mutex>
 #include <random>
@@ -74,9 +78,8 @@ namespace ui = rasgo::ui;
 // MESMO nó, e é ele que carrega a guarda de segurança da saída.
 using Out = rasgo::panel::SinkOut;
 
-// Tokens de cor — os mesmos valores do painel X11 (IDENTIDADE_VISUAL §4:
-// cor nomeada por função), pra os dois front-ends serem reconhecivelmente
-// o mesmo instrumento.
+// Tokens de cor por função. A paleta histórica vem do painel X11; no
+// front-end de produção o texto foi clareado após o retorno de legibilidade.
 // ---- texto: SEMPRE por aqui -------------------------------------------
 // `juce::String(const char*)` NÃO é UTF-8 — o construtor documenta que
 // aceita só ASCII de 7 bits e converte byte a byte por `CharPointer_ASCII`.
@@ -93,9 +96,29 @@ inline juce::String u8(const std::string& s) {
     return juce::String::fromUTF8(s.c_str(), static_cast<int>(s.size()));
 }
 
+inline juce::File applicationDataDir() {
+    // JUCE neste SDK lê XDG_CONFIG_HOME de user-dirs.dirs, não do ambiente.
+    // Exportação precisa isolar também diagnósticos e leitura de preferências.
+    if (std::getenv("RASGO_EXPORTAR_PATCH")) {
+        static const juce::File isolated = [] {
+            const char* path = std::getenv("RASGO_EXPORTAR_CONFIG");
+            if (path && *path && juce::File::isAbsolutePath(u8(path))) return juce::File(u8(path));
+            return juce::File::getSpecialLocation(juce::File::tempDirectory)
+                .getNonexistentChildFile("rasgo-panel-export", "", false);
+        }();
+        isolated.createDirectory();
+        return isolated;
+    }
+    auto directory = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+                         .getChildFile("rasgo-modular");
+    directory.createDirectory();
+    return directory;
+}
+
 struct Tokens {
     juce::Colour bg{0xff131a1a}, surface{0xff262b36}, recessed{0xff0e1015},
-        line{0xff485060}, textPrimary{0xffe0e4ec}, textSecondary{0xff8890a0},
+        line{0xff485060}, textPrimary{rasgo::panel::kLearnTextPrimary},
+        textSecondary{rasgo::panel::kLearnTextSecondary},
         accent{0xffff9d4c}, warning{0xffff6b5b},
         // REC aceso: vermelho de gravação, não o laranja de "ligado" dos
         // outros botões — pedido do autor, 2 out. 2026. O `warning` (coral)
@@ -406,12 +429,35 @@ struct Rack {
                     for (std::size_t i = 0; i < ob->frames(); i += stride)
                         it->second.pushLanes(ob->at(0, i), o1->at(0, i),
                                              o2->at(0, i), o3->at(0, i));
+            } else if (graph.node(id).type() == "LISTEN") {
+                const auto* low = graph.lastOutput(id, 1);
+                const auto* mid = graph.lastOutput(id, 2);
+                const auto* high = graph.lastOutput(id, 3);
+                const auto* lh = graph.lastOutput(id, 4);
+                const auto* mh = graph.lastOutput(id, 5);
+                const auto* hh = graph.lastOutput(id, 6);
+                if (low && mid && high && lh && mh && hh)
+                    for (std::size_t i = 0; i < ob->frames(); i += stride) {
+                        const int mask = (lh->at(0, i) >= 0.5f ? 1 : 0)
+                                       | (mh->at(0, i) >= 0.5f ? 2 : 0)
+                                       | (hh->at(0, i) >= 0.5f ? 4 : 0);
+                        it->second.pushLanes(low->at(0, i), mid->at(0, i),
+                                             high->at(0, i), static_cast<float>(mask));
+                    }
+            } else if (graph.node(id).type() == "PHRASE") {
+                const auto* gate = graph.lastOutput(id, 1);
+                const auto* accent = graph.lastOutput(id, 2);
+                const auto* phase = graph.lastOutput(id, 4);
+                if (gate && accent && phase)
+                    for (std::size_t i = 0; i < ob->frames(); i += stride)
+                        it->second.pushLanes(ob->at(0, i), gate->at(0, i),
+                                             accent->at(0, i), phase->at(0, i));
             }
         }
     }
 
     void build() {
-        for (const auto& fam : rasgo::panel::moduleCatalog())
+        for (const auto& fam : rasgo::panel::seedModuleCatalog())
             for (const char* t : fam.types) {
                 auto n = rasgo::panel::makeModule(t);
                 if (!n) continue;
@@ -521,21 +567,29 @@ inline juce::Colour familyColour(const std::string& family) {
     return juce::Colour::fromHSL(it->second / 360.0f, sat, 0.56f, 1.0f);
 }
 
-class PaletteColumn : public juce::Component {
+class PaletteColumn : public juce::Component, private juce::Timer {
 public:
     // A coluna cresceu de 158 pra 186 px e a caixa LEARN de 172 pra 232:
     // o LEARN é TEXTO DE LEITURA, não rótulo, e a 10 px numa coluna
     // estreita ficava ilegível (relato do autor). Com corpo em 12 px, a
     // largura antiga daria ~4 palavras por linha — aumentar a fonte sem
     // aumentar a coluna só trocaria letra pequena por texto picotado.
-    static constexpr int kWidth = 186;
-    static constexpr int kLearnH = 232;
     static constexpr float kListPt  = 11.0f;   // lista de módulos
-    static constexpr float kLearnPt = 12.0f;   // corpo do LEARN
 
     PaletteColumn() { setOpaque(true); }
 
     void setLanguage(rasgo::panel::Lang l) { lang_ = l; repaint(); }
+    std::function<void()> onReadingSettings;
+    int preferredWidth() const { return reading_.width(); }
+    void setReadingPreferences(rasgo::panel::ReadingPreferences reading) {
+        reading_ = reading;
+        kLearnPt = reading.fontHeight();
+        learnCacheEntry_ = nullptr;
+        resized(); repaint();
+    }
+    juce::Rectangle<int> readingButton() const {
+        return {std::max(0, getWidth() - 72), getHeight() - kLearnH + 3, 68, 18};
+    }
 
     // Layout da lista em coordenadas de CONTEÚDO (sem rolagem). Separado
     // da pintura de propósito: quando eu media a altura dentro do laço de
@@ -545,6 +599,7 @@ public:
     // determina (é o mesmo erro que travou a rolagem do rack).
     void layoutRows() {
         rows_.clear();
+        heads_.clear();
         int y = 10;
         for (const auto& fam : rasgo::panel::moduleCatalog()) {
             heads_.push_back({fam.family, y});
@@ -564,7 +619,12 @@ public:
         contentH_ = y;
     }
 
-    void resized() override { clampScroll(); }
+    void resized() override {
+        kWidth = getWidth();
+        kLearnH = reading_.height(getHeight());
+        rows_.clear(); heads_.clear();
+        clampScroll();
+    }
 
     void paint(juce::Graphics& g) override {
         g.fillAll(T.bg);
@@ -607,10 +667,15 @@ public:
         g.fillRect(0, learnTop, kWidth, kLearnH);
         g.setColour(T.line);
         g.drawHorizontalLine(learnTop, 0.0f, static_cast<float>(kWidth));
+        if (hasKeyboardFocus(false)) {
+            g.setColour(T.accent);
+            g.drawRect(1, learnTop + 1, kWidth - 2, kLearnH - 2, 1);
+        }
         g.setColour(T.accent);
         g.setFont(juce::FontOptions(10.0f));
         g.drawText("LEARN", 8, learnTop + 6, kWidth - 16, 12,
                    juce::Justification::centredLeft, false);
+        g.drawText("Aa (F2)", readingButton(), juce::Justification::centred, false);
 
         // O conteúdo é o MESMO do painel X11: título, depois `quick`
         // (destaque), `understand` (secundário) e `explore` (acento, com
@@ -621,8 +686,8 @@ public:
         const int tx = 8;
         int ty = learnTop + 22;
         const int wrapW = kWidth - 20;
-        const int bottom = getHeight() - 6;
         g.setFont(juce::FontOptions(kLearnPt));
+        learnTrack_ = {}; learnThumb_ = {};
 
         if (noticeActive()) {
             g.setColour(T.accent);
@@ -631,42 +696,80 @@ public:
             return;
         }
 
-        if (learn_ == nullptr) {
+        if (learn_.entry == nullptr) {
             g.setColour(T.textSecondary);
-            g.drawFittedText(str(rasgo::panel::strings::learnIdle),
-                             tx, ty, wrapW, 56,
-                             juce::Justification::topLeft, 5);
+            g.drawFittedText(str(rasgo::panel::strings::learnIdle) + "\n\nF1: LEARN",
+                             tx, ty, wrapW, kLearnH - 32,
+                             juce::Justification::topLeft, 12, 1.0f);
             return;
         }
 
-        g.setColour(T.accent);
-        g.setFont(juce::FontOptions(kLearnPt, juce::Font::bold));
-        g.drawText(learnTitle_, tx, ty, wrapW, 15,
-                   juce::Justification::topLeft, false);
-        g.setFont(juce::FontOptions(kLearnPt));
-        ty += 19;
-
-        const struct { const std::string& s; juce::Colour c; const char* pre; }
-        segs[] = {
-            {learn_->quick,      T.textPrimary,   ""},
-            {learn_->understand, T.textSecondary, ""},
-            {learn_->explore,    T.accent,        "\xe2\x86\x92 "},
-        };
-        for (const auto& seg : segs) {
-            if (seg.s.empty() || ty > bottom) continue;
-            const juce::String txt = u8(seg.pre) + u8(seg.s);
+        // Cabeçalho/valores permanecem à vista; só a explicação rola.
+        // TextLayout desenha o que mediu, sem comprimir letras ou descartar
+        // as últimas frases para caber numa altura fixa.
+        const auto heading = [&](const std::string& text, juce::Colour colour,
+                                 bool bold) {
             juce::AttributedString as;
-            as.append(txt, juce::FontOptions(kLearnPt), seg.c);
+            as.append(u8(text), juce::FontOptions(kLearnPt,
+                bold ? juce::Font::bold : juce::Font::plain), colour);
             juce::TextLayout tl;
             tl.createLayout(as, static_cast<float>(wrapW));
-            const int h = std::min(static_cast<int>(tl.getHeight()) + 2,
-                                   bottom - ty);
-            if (h <= 0) break;
-            g.setColour(seg.c);
-            g.drawFittedText(txt, tx, ty, wrapW, h,
-                             juce::Justification::topLeft, 12);
-            ty += h + 7;
+            tl.draw(g, {static_cast<float>(tx), static_cast<float>(ty),
+                        static_cast<float>(wrapW), tl.getHeight()});
+            ty += static_cast<int>(std::ceil(tl.getHeight())) + 5;
+        };
+        const auto primary = reading_.whiteText ? juce::Colours::white : T.textPrimary;
+        const auto secondary = reading_.whiteText ? juce::Colours::white : T.textSecondary;
+        heading(learn_.title, reading_.whiteText ? juce::Colours::white : T.accent, true);
+        if (!learn_.value.empty()) heading(learn_.value, primary, false);
+
+        if (learnCacheEntry_ != learn_.entry || learnCacheW_ != wrapW) {
+            const std::string texts[] = {learn_.entry->quick, learn_.entry->understand,
+                                         learn_.entry->explore};
+            const juce::Colour colours[] = {primary, secondary,
+                reading_.whiteText ? juce::Colours::white : T.accent};
+            learnContentH_ = 0;
+            for (int i = 0; i < 3; ++i) {
+                learnHeights_[i] = 0;
+                if (texts[i].empty()) continue;
+                juce::AttributedString as;
+                as.append((i == 2 ? u8("\xe2\x86\x92 ") : juce::String{}) + u8(texts[i]),
+                          juce::FontOptions(kLearnPt), colours[i]);
+                learnLayouts_[i].createLayout(as, static_cast<float>(wrapW));
+                learnHeights_[i] = static_cast<int>(std::ceil(learnLayouts_[i].getHeight()));
+                learnContentH_ += learnHeights_[i] + 7;
+            }
+            learnCacheEntry_ = learn_.entry; learnCacheW_ = wrapW;
         }
+        const int viewH = std::max(0, getHeight() - 18 - ty);
+        learn_.setGeometry(learnContentH_, viewH);
+        {
+            juce::Graphics::ScopedSaveState clip(g);
+            g.reduceClipRegion(tx, ty, wrapW, viewH);
+            int y = ty - learn_.scroll;
+            for (int i = 0; i < 3; ++i) {
+                if (learnHeights_[i] == 0) continue;
+                learnLayouts_[i].draw(g, {static_cast<float>(tx), static_cast<float>(y),
+                    static_cast<float>(wrapW), static_cast<float>(learnHeights_[i])});
+                y += learnHeights_[i] + 7;
+            }
+        }
+        if (learn_.maxScroll() > 0 && viewH > 0) {
+            learnTrack_ = {kWidth - 8, ty, 7, viewH};
+            const int h = std::min(viewH, std::max(18, viewH * viewH / learnContentH_));
+            const int y = ty + (viewH - h) * learn_.scroll / learn_.maxScroll();
+            learnThumb_ = {kWidth - 7, y, 5, h};
+            g.setColour(T.line); g.fillRect(learnTrack_);
+            g.setColour(T.textSecondary); g.fillRect(learnThumb_);
+        }
+        static const rasgo::panel::L4 hint{"scroll / F1: read", "role / F1: ler",
+                                          "défiler / F1: lire", "desplaza / F1: leer"};
+        g.setColour(T.textSecondary);
+        g.setFont(juce::FontOptions(10.0f));
+        g.drawText(hasKeyboardFocus(false) ? u8("\xe2\x86\x91\xe2\x86\x93 PgUp/PgDn - Esc")
+                     : learn_.maxScroll() > 0 ? str(hint) : juce::String("F1: LEARN"),
+                   tx, getHeight() - 15, wrapW, 13,
+                   juce::Justification::centredLeft, false);
     }
 
     // dwell de 1 s antes de trocar o conteúdo (senão pisca a cada
@@ -678,23 +781,54 @@ public:
     void setNotice(const juce::String& text) {
         notice_ = text;
         noticeUntil_ = juce::Time::getMillisecondCounter() + 6000;
+        startTimer(6000); // expirar mesmo sem mover o mouse ou mudar um valor
         repaint();
     }
     bool noticeActive() const {
         return notice_.isNotEmpty()
             && juce::Time::getMillisecondCounter() < noticeUntil_;
     }
+    void clearNotice() {
+        stopTimer();
+        if (notice_.isEmpty()) return;
+        notice_.clear(); repaint();
+    }
 
-    void setLearn(const rasgo::panel::LearnEntry* e, const juce::String& title) {
-        if (e == learn_) return;
-        learn_ = e;
-        learnTitle_ = title;
+    void setLearn(const rasgo::panel::LearnEntry* e, const juce::String& title,
+                  const std::string& key = {},
+                  const std::optional<std::string>& value = std::nullopt) {
+        if (learn_.update(e, key, title.toStdString(), value)) repaint();
+    }
+
+    void focusLearn() {
+        clearNotice();
+        setWantsKeyboardFocus(true);
+        grabKeyboardFocus();
         repaint();
+    }
+    const rasgo::panel::LearnPresentation& readingState() const { return learn_; }
+    void focusGained(FocusChangeType) override { repaint(); }
+    void focusLost(FocusChangeType) override { repaint(); }
+    bool keyPressed(const juce::KeyPress& key) override {
+        const int code = key.getKeyCode();
+        if (code == juce::KeyPress::escapeKey || code == juce::KeyPress::F1Key) {
+            if (auto* parent = getParentComponent()) parent->grabKeyboardFocus();
+            return true;
+        }
+        if (code == juce::KeyPress::upKey) learn_.scrollBy(-36);
+        else if (code == juce::KeyPress::downKey) learn_.scrollBy(36);
+        else if (code == juce::KeyPress::pageUpKey) learn_.scrollBy(-std::max(1, learn_.viewHeight));
+        else if (code == juce::KeyPress::pageDownKey) learn_.scrollBy(std::max(1, learn_.viewHeight));
+        else if (code == juce::KeyPress::homeKey) learn_.scrollBy(-learn_.maxScroll());
+        else if (code == juce::KeyPress::endKey) learn_.scrollBy(learn_.maxScroll());
+        else return false;
+        repaint(); return true;
     }
 
     void mouseMove(const juce::MouseEvent& e) override {
         std::string hit;
-        for (const auto& r : rows_)
+        if (e.getPosition().y < getHeight() - kLearnH)
+          for (const auto& r : rows_)
             if (r.bounds.translated(0, -scroll_).contains(e.getPosition())) {
                 hit = r.type;
                 break;
@@ -710,10 +844,29 @@ public:
     std::function<void(const std::string&, juce::Point<int>)> onSpawnDrop;
 
     void mouseDown(const juce::MouseEvent& e) override {
+        spawn_.clear();
+        if (readingButton().contains(e.getPosition())) {
+            if (onReadingSettings) onReadingSettings();
+            return;
+        }
+        if (e.getPosition().y >= getHeight() - kLearnH) {
+            focusLearn();
+            learnBarDrag_ = !learnTrack_.isEmpty()
+                && learnTrack_.expanded(4, 0).contains(e.getPosition());
+            if (learnBarDrag_) {
+                if (!learnThumb_.contains(e.getPosition())) {
+                    const int travel = std::max(1, learnTrack_.getHeight() - learnThumb_.getHeight());
+                    const int y = e.y - learnTrack_.getY() - learnThumb_.getHeight() / 2;
+                    learn_.scrollBy(y * learn_.maxScroll() / travel - learn_.scroll);
+                    repaint();
+                }
+                learnDragFrom_ = {e.y, learn_.scroll};
+            }
+            return; // o texto nunca acerta uma linha invisível da paleta
+        }
         barDrag_ = maxScroll() > 0 && e.getPosition().x >= kWidth - 8
                    && e.getPosition().y < getHeight() - kLearnH;
         if (barDrag_) { dragFrom_ = {e.getPosition().y, scroll_}; return; }
-        spawn_.clear();
         for (const auto& r : rows_)
             if (r.bounds.translated(0, -scroll_).contains(e.getPosition())) {
                 spawn_ = r.type;
@@ -721,11 +874,17 @@ public:
             }
     }
     void mouseUp(const juce::MouseEvent& e) override {
-        barDrag_ = false;
+        barDrag_ = false; learnBarDrag_ = false;
         if (!spawn_.empty() && onSpawnDrop) onSpawnDrop(spawn_, e.getScreenPosition());
         spawn_.clear();
     }
     void mouseDrag(const juce::MouseEvent& e) override {
+        if (learnBarDrag_) {
+            const int travel = std::max(1, learnTrack_.getHeight() - learnThumb_.getHeight());
+            learn_.scrollBy(learnDragFrom_.second
+                + (e.y - learnDragFrom_.first) * learn_.maxScroll() / travel - learn_.scroll);
+            repaint(); return;
+        }
         if (!barDrag_) {
             if (!spawn_.empty() && onSpawnDrag)
                 onSpawnDrag(spawn_, e.getScreenPosition());
@@ -738,8 +897,12 @@ public:
             + (e.getPosition().y - dragFrom_.first) * (trackH + over) / trackH);
         repaint();
     }
-    void mouseWheelMove(const juce::MouseEvent&,
+    void mouseWheelMove(const juce::MouseEvent& e,
                         const juce::MouseWheelDetails& w) override {
+        if (e.getPosition().y >= getHeight() - kLearnH) {
+            learn_.scrollBy(-juce::roundToInt(w.deltaY * 90.0f));
+            repaint(); return;
+        }
         scroll_ = juce::jlimit(0, maxScroll(),
                                scroll_ - juce::roundToInt(w.deltaY * 60.0f));
         repaint();
@@ -748,6 +911,7 @@ public:
     const std::string& hoveredType() const { return hover_; }
 
 private:
+    void timerCallback() override { clearNotice(); }
     struct Row { std::string type; juce::Rectangle<int> bounds; };
 
     juce::String str(const rasgo::panel::L4& s) const {
@@ -762,8 +926,13 @@ private:
     std::vector<Row> rows_;
     std::vector<std::pair<std::string, int>> heads_;   // família, y
     std::string hover_;
-    const rasgo::panel::LearnEntry* learn_ = nullptr;
-    juce::String learnTitle_;
+    rasgo::panel::LearnPresentation learn_;
+    const rasgo::panel::LearnEntry* learnCacheEntry_ = nullptr;
+    juce::TextLayout learnLayouts_[3];
+    int learnHeights_[3]{}, learnCacheW_ = 0, learnContentH_ = 0;
+    juce::Rectangle<int> learnTrack_, learnThumb_;
+    bool learnBarDrag_ = false;
+    std::pair<int, int> learnDragFrom_{0, 0};
     juce::String notice_;
     std::uint32_t noticeUntil_ = 0;
     int scroll_ = 0, contentH_ = 0;
@@ -771,6 +940,9 @@ private:
     std::string spawn_;
     std::pair<int, int> dragFrom_{0, 0};               // mouseY, scroll
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
+    rasgo::panel::ReadingPreferences reading_;
+    int kWidth = 186, kLearnH = 232;
+    float kLearnPt = 12.0f;
 };
 
 // ---- cabeçalho de linha única ------------------------------------------
@@ -780,6 +952,93 @@ private:
 // ausente; eles voltam junto com o recurso.
 class HeaderBar : public juce::Component {
 public:
+    using Act = rasgo::panel::HeaderAction;
+    std::function<void(Act, bool)> onHelp;
+    std::optional<Act> helpAt(juce::Point<int> point) const {
+        if (seedBox_.getBounds().contains(point)) return Act::seedValue;
+        if (!varySlider_.isEmpty() && varySlider_.expanded(3, 6).contains(point))
+            return Act::varyAmount;
+        for (const auto& hit : hits_) if (hit.bounds.contains(point)) return hit.act;
+        return std::nullopt;
+    }
+    std::optional<std::string> helpValue(Act action) const {
+        if (action == Act::seedValue) return seedBox_.getText().toStdString();
+        if (action == Act::varyAmount)
+            return rasgo::panel::formatLearnValue(varyAmount_, "");
+        return std::nullopt;
+    }
+    void focusCommands() {
+        const auto choices = keyboardChoices();
+        if (choices.empty()) return;
+        keyboardAction_ = choices.front().act;
+        grabKeyboardFocus();
+        if (onHelp) onHelp(*keyboardAction_, false);
+        repaint();
+    }
+    int auditGuidance() {
+        int errors = 0;
+        const auto choices = keyboardChoices();
+        for (const auto& choice : choices) {
+            const auto hit = helpAt(choice.bounds.getCentre());
+            if (!hit || *hit != choice.act || !rasgo::panel::headerHelp(choice.act)
+                || !getLocalBounds().contains(choice.bounds)) {
+                ++errors;
+                std::fprintf(stderr, "[guidance] header target mismatch: action=%d width=%d\n",
+                    static_cast<int>(choice.act), getWidth());
+            }
+        }
+        focusCommands();
+        for (const auto& choice : choices) {
+            if (!keyboardAction_ || *keyboardAction_ != choice.act) ++errors;
+            keyPressed(juce::KeyPress(juce::KeyPress::rightKey));
+        }
+        if (!choices.empty() && keyboardAction_ != choices.front().act) ++errors;
+        return errors;
+    }
+    void focusGained(FocusChangeType) override { repaint(); }
+    void focusLost(FocusChangeType) override { repaint(); }
+    bool keyPressed(const juce::KeyPress& key) override {
+        const int code = key.getKeyCode();
+        if (code == juce::KeyPress::escapeKey) {
+            if (auto* parent = getParentComponent()) parent->grabKeyboardFocus();
+            return true;
+        }
+        const auto choices = keyboardChoices();
+        if (choices.empty()) return false;
+        auto it = std::find_if(choices.begin(), choices.end(), [this](const Hit& h) {
+            return keyboardAction_ && h.act == *keyboardAction_;
+        });
+        int index = it == choices.end() ? 0 : static_cast<int>(it - choices.begin());
+        if (code == juce::KeyPress::leftKey || code == juce::KeyPress::rightKey
+            || code == juce::KeyPress::tabKey) {
+            const int direction = code == juce::KeyPress::leftKey
+                || (code == juce::KeyPress::tabKey && key.getModifiers().isShiftDown()) ? -1 : 1;
+            index = (index + direction + static_cast<int>(choices.size()))
+                    % static_cast<int>(choices.size());
+            keyboardAction_ = choices[static_cast<std::size_t>(index)].act;
+            if (onHelp) onHelp(*keyboardAction_, false);
+            repaint(); return true;
+        }
+        const auto action = choices[static_cast<std::size_t>(index)].act;
+        if (code == juce::KeyPress::F1Key) {
+            if (onHelp) onHelp(action, true);
+            return true;
+        }
+        if (action == Act::varyAmount
+            && (code == juce::KeyPress::upKey || code == juce::KeyPress::downKey)) {
+            varyAmount_ = juce::jlimit(0.0f, 2.0f, varyAmount_
+                + (code == juce::KeyPress::upKey ? 0.05f : -0.05f));
+            if (onVaryAmount) onVaryAmount(varyAmount_);
+            if (onHelp) onHelp(action, false);
+            repaint(); return true;
+        }
+        if (code == juce::KeyPress::returnKey || code == juce::KeyPress::spaceKey) {
+            if (action == Act::seedValue) seedBox_.grabKeyboardFocus();
+            else if (action != Act::varyAmount) trigger(action);
+            return true;
+        }
+        return false;
+    }
     static constexpr int kHeight = 46;        // uma fileira
     static constexpr int kRow2 = 28;         // acréscimo da segunda
 
@@ -818,6 +1077,7 @@ public:
 
     HeaderBar() {
         setOpaque(true);
+        setWantsKeyboardFocus(true);
         addAndMakeVisible(seedBox_);
         seedBox_.setJustification(juce::Justification::centredLeft);
         // 20 dígitos: é o comprimento de `uint64` máximo
@@ -892,6 +1152,10 @@ public:
                              static_cast<float>(getWidth()));
         hits_.clear();
 
+        // A pintura anterior pode ter terminado na segunda fileira.
+        // SEED/REPOR pertencem sempre à primeira, antes de medir os comandos.
+        btnY_ = 12;
+
         // marca + "MODULAR", como no X11: logo em tamanho natural (118×15)
         // centrado na faixa de botões
         int x = 14;
@@ -914,8 +1178,10 @@ public:
         seedBox_.setBounds(x, 12, seedBoxW(), 22);
         x += seedBoxW() + 6;
 
-        x += button(g, x, u8("\xE2\x9A\x84 ")
-                    + str(rasgo::panel::strings::hdrSeed),
+        // O dado Unicode aparecia como quadrado em alguns sistemas sem esse
+        // glifo. O nome do comando já indica o sorteio e funciona com a
+        // fonte distribuída pelo instrumento.
+        x += button(g, x, str(rasgo::panel::strings::hdrSeed),
                     flashing(Act::seed), Act::seed);
         // REPOR só existe quando há um seed pra onde voltar. Num patch
         // construído à mão (seed 0) ele seria um botão morto — e botão
@@ -1128,6 +1394,12 @@ public:
             // autor, 18 set. 2026); hoje vêm de `UiLanguage.hpp`.
             x += button(g, x, rackLabel(), rackOut_, Act::rackView);
         }
+        if (hasKeyboardFocus(false) && keyboardAction_)
+            for (const auto& hit : keyboardChoices())
+                if (hit.act == *keyboardAction_) {
+                    g.setColour(T.accent);
+                    g.drawRect(hit.bounds.expanded(2), 1);
+                }
     }
 
     // Régua fina entre grupos de botões. Devolve a largura que ocupa, a
@@ -1185,11 +1457,6 @@ public:
     }
 
 
-    enum class Act { seed, lang, rackView, standby, zoomIn, zoomOut,
-                     vary, mutate, evolve, cross, bank, save,
-                     tutorial, about, rec, open, undo, uncable, restore,
-                     startup };
-
     // Despacho ÚNICO de ação: o clique e o atalho de teclado entram os
     // dois por aqui. Antes o teclado chamava os callbacks direto e pulava
     // o flash — o atalho funcionava "no escuro", sem nada na tela dizer
@@ -1219,12 +1486,26 @@ public:
         case Act::undo:      if (onUndo) onUndo(); break;
         case Act::uncable:   if (onUncable) onUncable(); break;
         case Act::restore:   if (onRestore) onRestore(); break;
+        case Act::seedValue: case Act::varyAmount: break; // edição, não botões
         }
+        if (hasKeyboardFocus(false) && onHelp) onHelp(a, false);
         repaint();
     }
 
 private:
     struct Hit { juce::Rectangle<int> bounds; Act act; };
+    std::optional<Act> keyboardAction_;
+    std::vector<Hit> keyboardChoices() const {
+        auto result = hits_;
+        result.push_back({seedBox_.getBounds(), Act::seedValue});
+        if (!varySlider_.isEmpty()) result.push_back({varySlider_.expanded(3, 6), Act::varyAmount});
+        std::sort(result.begin(), result.end(), [](const Hit& a, const Hit& b) {
+            if (a.bounds.getCentreY() / kRow2 != b.bounds.getCentreY() / kRow2)
+                return a.bounds.getCentreY() / kRow2 < b.bounds.getCentreY() / kRow2;
+            return a.bounds.getX() < b.bounds.getX();
+        });
+        return result;
+    }
 
     static juce::String str(const rasgo::panel::L4& s, rasgo::panel::Lang l) {
         return u8(rasgo::panel::tr(s, l));
@@ -1255,7 +1536,7 @@ private:
     bool commandsFit(const int width) const {
         namespace S = rasgo::panel::strings;
         int need = kBrandW + 6 + seedBoxW() + 6
-                 + labelW(u8("\xE2\x9A\x84 ") + str(S::hdrSeed)) + 6;
+                 + labelW(str(S::hdrSeed)) + 6;
         if (seed_ != 0) need += labelW(str(S::hdrRestore)) + 6;
         for (const auto* l : {&S::hdrChange, &S::hdrEvolve,
                               &S::hdrCross, &S::hdrBank, &S::hdrSave,
@@ -1566,6 +1847,11 @@ public:
         if (si < 0) { insp_.open = false; return; }     // o cabo sumiu
 
         const auto& c = rack_.cableSnap[static_cast<std::size_t>(si)];
+        if (c.source >= rack_.graph.nodeCount() || c.target >= rack_.graph.nodeCount()
+            || (c.hasRelation && c.companionNode >= rack_.graph.nodeCount())) {
+            insp_.open = false;
+            return;
+        }
         const bool hasRel = c.hasRelation;
         // Linhas: título · relação · [companion · AMT] · GANHO · COND ·
         // romper/remover. Grupo 1 da caixa do cabo (2 out. 2026): GANHO e
@@ -1767,9 +2053,11 @@ public:
     // "OSC", "OSC 2"… — desambigua quando há vários do mesmo tipo, como no
     // painel X11
     juce::String moduleLabel(std::size_t nodeId) const {
+        if (nodeId >= rack_.graph.nodeCount()) return "?";
         const std::string ty = rack_.graph.node(nodeId).type();
         int count = 0, mine = -1;
         for (const auto& m : mods_) {
+            if (m.id >= rack_.graph.nodeCount()) continue;
             if (rack_.graph.node(m.id).type() != ty) continue;
             if (m.id == nodeId) mine = count;
             ++count;
@@ -2767,7 +3055,8 @@ public:
     // 1×, para sair nítido — e sem cabos por cima. Para as imagens do guia
     // de módulos do site (pedido do autor, 3 out. 2026); chamado por
     // `RASGO_EXPORTAR_PAINEIS=pasta`. Devolve quantos salvou.
-    int exportPanels(const juce::File& dir, const float scale) {
+    int exportPanels(const juce::File& dir, const float scale,
+                     const juce::StringArray& only = {}) {
         const bool eraSaida = outputOnly_;
         outputOnly_ = false;
         layoutFor(viewportW_, viewportH_);
@@ -2775,6 +3064,7 @@ public:
         int n = 0;
         for (auto& m : mods_) {
             Signal& node = rack_.graph.node(m.id);
+            if (!only.isEmpty() && !only.contains(u8(node.type()))) continue;
             juce::Image img(juce::Image::ARGB,
                             juce::roundToInt(static_cast<float>(m.bounds.getWidth()) * scale),
                             juce::roundToInt(static_cast<float>(m.bounds.getHeight()) * scale),
@@ -2886,8 +3176,44 @@ public:
     // corpo do módulo → o que o MÓDULO é. `key` identifica o objeto pra o
     // dwell saber que o mouse continua no mesmo lugar.
     struct LearnHit { const rasgo::panel::LearnEntry* entry = nullptr;
-                      juce::String title; std::string key; };
+                      juce::String title; std::string key;
+                      std::optional<std::string> value = std::nullopt; };
+    LearnHit learnWidget(const ModBox& m, const Widget& w) const {
+        const auto& node = rack_.graph.node(m.id);
+        const auto type = node.type();
+        const auto* entry = rasgo::panel::lookupLearn(type, w.bind, lang_);
+        if (!entry) return {};
+        LearnHit hit{entry, u8(type) + u8("  \xc2\xb7  ") + u8(w.label),
+                     std::to_string(m.id) + "|" + w.bind};
+        // Só a thread da UI formata strings. Se o áudio está com o grafo,
+        // não esperar nem ler um float simultaneamente à modulação.
+        const ParameterDescriptor* descriptor = nullptr;
+        float base = 0, dsp = 0;
+        {
+            std::unique_lock<std::mutex> lock(rack_.gmx, std::try_to_lock);
+            if (lock.owns_lock()) {
+                descriptor = paramDesc(node, w.bind);
+                if (descriptor) {
+                    base = rack_.graph.parameterUserValue(m.id, w.bind);
+                    dsp = node.parameterValue(w.bind);
+                }
+            }
+        }
+        // Descritores não mudam no áudio; a UI é a única dona da vida dos
+        // nós. Formatação/alocação fica FORA do lock e do callback.
+        if (descriptor)
+            hit.value = "BASE " + rasgo::panel::formatLearnValue(base, descriptor->unit)
+                + "\nDSP " + rasgo::panel::formatLearnValue(dsp, descriptor->unit);
+        return hit;
+    }
     LearnHit learnAt(juce::Point<int> p) const {
+        // O gesto continua sendo daquele controle, mesmo que o arrasto
+        // leve o ponteiro para fora da sua pegada ou da viewport.
+        if (drag_.active)
+            for (const auto& m : mods_)
+                if (m.id == drag_.node)
+                    for (const auto& w : m.panel.widgets)
+                        if (w.bind == drag_.bind) return learnWidget(m, w);
         // PRIORIDADE, e ela é a MESMA do clique do mouse — não por
         // simetria estética, mas porque foi corrigida aqui depois de eu
         // quebrá-la:
@@ -2911,17 +3237,14 @@ public:
         // 1. widget
         for (const auto& m : mods_) {
             if (!m.bounds.contains(p)) continue;
-            const std::string mt = rack_.graph.node(m.id).type();
             for (const auto& w : m.panel.widgets) {
                 if (w.bind.empty()) continue;
                 if (!widgetBounds(m, w).contains(p)) continue;
                 // com o IDIOMA, pelo mesmo motivo do verbete de módulo
                 // adiante: sem a língua, os 803 verbetes de widget
                 // traduzidos ficariam escritos e invisíveis.
-                if (const auto* e =
-                        rasgo::panel::lookupLearn(mt, w.bind, lang_))
-                    return {e, u8(mt) + u8("  \xc2\xb7  ") + u8(w.label),
-                            std::to_string(m.id) + "|" + w.bind};
+                const auto hit = learnWidget(m, w);
+                if (hit.entry) return hit;
                 break;   // widget sem verbete: cai pro módulo, adiante
             }
         }
@@ -2949,11 +3272,34 @@ public:
     // mão do músico num controle ou num cabo — o VARIA não disputa o knob
     // com quem está mexendo nele
     bool interacting() const { return drag_.active || cdrag_.active; }
+    bool editingParameter() const { return drag_.active; }
     void nudgeZoom(int dir) {
         zoom_ = juce::jlimit(0.55f, 1.40f, zoom_ + 0.10f * static_cast<float>(dir));
         layoutFor(viewportW_, viewportH_);
     }
     void refresh() { layoutFor(viewportW_, viewportH_); }
+
+    // IDs, cabos e gestos pertencem ao grafo anterior. A janela pode pintar
+    // antes do próximo tick do timer; não deixar o inspector apontar para
+    // um cabo cuja ponta já não existe no patch carregado.
+    void resetForPatch() {
+        juce::Desktop::getInstance().beginDragAutoRepeat(0);
+        pan_ = {}; mdrag_ = {}; cdrag_ = {}; drag_ = {}; cslide_ = {};
+        insp_ = {}; pendingInspect_ = hoverCable_ = -1;
+        picking_ = false;
+        inspectEnvDone_ = true;
+        dragFeeds_.clear(); cableHits_.clear(); inspHits_.clear();
+        pending_.clear(); scopeView_.clear(); clipSeen_.clear();
+        spawnType_.clear();
+    }
+
+    bool openInspectorForAudit(std::size_t index) {
+        if (index >= rack_.cableSnap.size()) return false;
+        const auto& c = rack_.cableSnap[index];
+        insp_ = {true, c.target, c.targetPort, 0, 0, 0, 0, 0, 0};
+        return true;
+    }
+    bool inspectorOpenForAudit() const { return insp_.open; }
 
 private:
     void paintModule(juce::Graphics& g, ModBox& m) {
@@ -3115,14 +3461,17 @@ private:
         const ParameterDescriptor* d = (st || w.bind.empty())
             ? nullptr : paramDesc(node, w.bind);
         const float norm = (d && d->maximum > d->minimum)
-            ? juce::jlimit(0.0f, 1.0f,
+            ? (w.kind == Widget::Kind::Slider && ui::envelopeTimeSlider(node.type(), w.bind)
+                ? ui::logarithmicControlFraction(value, d->minimum, d->maximum)
+                : juce::jlimit(0.0f, 1.0f,
                            (value - d->minimum) / (d->maximum - d->minimum))
+              )
             : 0.0f;
 
         g.setFont(juce::FontOptions(9.0f));
         switch (w.kind) {
         case Widget::Kind::Knob: {
-            const int r = mmpx(4.0f);
+            const int r = mmpx(ui::knobDiameterMM(w) * 0.5f);
             const juce::Rectangle<int> box(wx, wy, 2 * r, 2 * r);
             if (st) {
                 g.setColour(T.recessed);
@@ -3171,8 +3520,15 @@ private:
             const juce::Rectangle<int> box(wx, wy, s, s);
             if (st) {
                 g.setColour(T.textSecondary);
-                g.drawText(w.label, box.getRight() + 2, wy, mmpx(12.0f), s,
-                           juce::Justification::centredLeft, false);
+                if (w.span > 1.0f) {
+                    const int width = mmpx(w.span);
+                    g.drawFittedText(w.label, box.getCentreX() - width / 2,
+                                     box.getBottom() + mmpx(1.0f), width, mmpx(3.5f),
+                                     juce::Justification::centred, 1, 0.7f);
+                } else {
+                    g.drawText(w.label, box.getRight() + 2, wy, mmpx(12.0f), s,
+                               juce::Justification::centredLeft, false);
+                }
                 break;
             }
             g.setColour(value >= 0.5f ? T.accent : T.recessed);
@@ -3365,6 +3721,42 @@ private:
                 dlabel = juce::String(20.0f * std::log10(std::max(peak, 1.0e-4f)),
                                       0) + "dB";
 
+            } else if (mtype == "LISTEN") {
+                const int row = std::max(1, (dh - 2) / 3);
+                const int label = std::max(10, dw / 10);
+                const char* names[] = {"L", "M", "H"};
+                int hits = 0;
+                for (std::size_t k = rasgo::ui::kLaneLen - 20; k < rasgo::ui::kLaneLen; ++k)
+                    hits |= static_cast<int>(sc.lane(3, k));
+                for (int b = 0; b < 3; ++b) {
+                    const float level = sc.lane(static_cast<std::size_t>(b), rasgo::ui::kLaneLen - 1);
+                    const float fraction = juce::jlimit(0.0f, 1.0f,
+                        1.0f + 20.0f * std::log10(std::max(level, 0.001f)) / 60.0f);
+                    const int y = wy + 1 + b * row;
+                    g.setColour(T.textPrimary);
+                    g.drawText(names[b], wx + 2, y, label, row, juce::Justification::centredLeft);
+                    g.setColour((hits & (1 << b)) != 0 ? T.warning : T.accent);
+                    g.fillRect(wx + label + 2, y + 2,
+                               static_cast<int>(fraction * std::max(0, dw - label - 8)), std::max(1, row - 4));
+                }
+                dlabel.clear();
+            } else if (mtype == "PHRASE") {
+                const int length = std::max(2, static_cast<int>(std::lround(node.parameterValue("length"))));
+                const int step = 1 + static_cast<int>(std::lround(
+                    sc.lane(3, rasgo::ui::kLaneLen - 1) * static_cast<float>(length - 1)));
+                const float span = std::max(1.0f, node.parameterValue("span") / 12.0f);
+                const float current = sc.lane(0, rasgo::ui::kLaneLen - 1);
+                juce::Path path;
+                for (std::size_t k = 0; k < rasgo::ui::kLaneLen; ++k) {
+                    const float px = static_cast<float>(wx + 1)
+                        + static_cast<float>(k * static_cast<std::size_t>(dw - 2)) / (rasgo::ui::kLaneLen - 1);
+                    const float delta = juce::jlimit(-1.0f, 1.0f, (sc.lane(0, k) - current) / span);
+                    const float py = static_cast<float>(wy) + static_cast<float>(dh) * (0.5f - 0.42f * delta);
+                    if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
+                }
+                g.setColour(T.accent);
+                g.strokePath(path, juce::PathStrokeType(1.5f));
+                dlabel = juce::String(step) + "/" + juce::String(length);
             } else if (mtype == "TRIGSEQ") {
                 // 4 lanes de gate (t1–t4) rolando — piano-roll
                 dlabel = "t1-t4";
@@ -3876,10 +4268,7 @@ private:
 // pasta de dados do app (Windows: %APPDATA%\rasgo-modular).
 namespace arranque {
 inline juce::File pasta() {
-    auto d = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
-                 .getChildFile("rasgo-modular");
-    d.createDirectory();
-    return d;
+    return applicationDataDir();
 }
 inline void marca(const char* etapa) {
     static const juce::uint32 t0 = juce::Time::getMillisecondCounter();
@@ -3909,6 +4298,12 @@ public:
     MainComponent() {
         arranque::marca("MainComponent: início");
         loadPrefs();
+        palette_.setReadingPreferences(reading_);
+        palette_.onReadingSettings = [this] { showReadingMenu(); };
+        header_.onHelp = [this](HeaderBar::Act action, bool pin) {
+            showHeaderHelp(action);
+            if (pin) palette_.focusLearn();
+        };
         arranque::marca("preferências lidas");
         rack_.build();
         arranque::marca("rack montado");
@@ -3969,6 +4364,24 @@ public:
             view_->setOutputOnly(!view_->outputOnly());
             saveRackViewPref();
             syncHeader();
+            // O rótulo sozinho não diz se TODOS acrescentou algo: num
+            // patch curto em que todos chegam ao som, as duas vistas são
+            // idênticas. Informar o alcance real evita parecer que o
+            // botão não funcionou ou que TODOS significa catálogo inteiro.
+            const rasgo::panel::L4 noticeAll{
+                "ALL: modules in this patch; more in the palette: ",
+                "TODOS: módulos deste patch; demais na paleta: ",
+                "TOUS : modules de ce patch ; autres dans la palette : ",
+                "TODOS: módulos de este patch; otros en la paleta: "};
+            const rasgo::panel::L4 noticeOutput{
+                "OUTPUT: modules reaching audio: ",
+                "SAÍDA: módulos que chegam ao áudio: ",
+                "SORTIE : modules reliés à l'audio : ",
+                "SALIDA: módulos que llegan al audio: "};
+            const auto count = juce::String(static_cast<int>(view_->visibleModuleCount()))
+                + "/" + juce::String(static_cast<int>(rack_.shown.size()));
+            palette_.setNotice(u8(rasgo::panel::tr(view_->outputOnly()
+                ? noticeOutput : noticeAll, lang_)) + count);
         };
         header_.onStandby = [this] {
             standby_ = !standby_;
@@ -4023,7 +4436,7 @@ public:
             // com um seed fresco. O doador é um grafo solto — nunca
             // processa áudio, só é lido por `crossPatch`.
             SignalGraph donor;
-            for (const auto& fam : rasgo::panel::moduleCatalog())
+            for (const auto& fam : rasgo::panel::seedModuleCatalog())
                 for (const char* t : fam.types)
                     if (auto n = rasgo::panel::makeModule(t))
                         donor.add(std::move(n));
@@ -4074,9 +4487,8 @@ public:
             // arquivo próprio — não sobrescreve a sessão
             auto dir = dataDir().getChildFile("patches");
             dir.createDirectory();
-            const juce::String name = rack_.curSeed
-                ? "seed-" + juce::String(static_cast<juce::int64>(rack_.curSeed))
-                : "patch-" + juce::String(juce::Time::currentTimeMillis() / 1000);
+            const juce::String name = bankPatchName(
+                rack_.curSeed, juce::Time::currentTimeMillis() / 1000);
             savePatch(dir.getChildFile(name + ".rmp"));
         };
 
@@ -4161,6 +4573,58 @@ public:
             }
             const auto b = rasgo::panel::firstOpen(mon, 1280, 760, 0.88f);
             setSize(b.w, b.h);
+        }
+        // Exportação de um patch escolhido: mesmos painéis do instrumento,
+        // sem dispositivo de áudio/MIDI, seed aleatória ou salvar sessão.
+        // O caminho antigo de exportação por seed continua disponível.
+        if (const char* patch = std::getenv("RASGO_EXPORTAR_PATCH")) {
+            panelExport_ = true;
+            const char* destination = std::getenv("RASGO_EXPORTAR_PAINEIS");
+            const auto finish = [](int code) {
+                juce::JUCEApplication::getInstance()->setApplicationReturnValue(code);
+                juce::JUCEApplication::getInstance()->systemRequestedQuit();
+            };
+            if (!destination || !*destination || !*patch || !loadPatch(juce::File(u8(patch)))) {
+                std::fprintf(stderr, "[panels] invalid patch or missing export directory\n");
+                juce::Timer::callAfterDelay(1, [finish] { finish(1); });
+                return;
+            }
+            view_->setOutputOnly(false);
+            syncHeader();
+            const auto only = juce::StringArray::fromTokens(
+                u8(std::getenv("RASGO_EXPORTAR_TIPOS") ? std::getenv("RASGO_EXPORTAR_TIPOS") : ""),
+                ",", "");
+            // Esperar a geometria da janela estabilizar. Processamento é
+            // limitado a 4 s simulados, em memória, na thread de mensagem.
+            const juce::Component::SafePointer<MainComponent> self(this);
+            juce::Timer::callAfterDelay(600, [this, self, dir = u8(destination), only, finish] {
+                if (self == nullptr) return;
+                try {
+                    if (std::getenv("RASGO_TEST_GUIDANCE") && !validateGuidanceExport(juce::File(dir))) {
+                        finish(1); return;
+                    }
+                    rack_.graph.prepare(48000.0f, 2, 128);
+                    rack_.graph.evaluateAllNodes();
+                    AudioBlock block(48000.0f, 2, 128);
+                    for (int i = 0; i < 1500; ++i) {
+                        rack_.graph.process(block, rack_.sink, 0);
+                        rack_.feedScopes(128);
+                    }
+                    for (const auto& [id, trace] : rack_.scopes) rack_.scopeSnap[id] = trace;
+                    const int count = view_->exportPanels(juce::File(dir), 2.0f, only);
+                    std::fprintf(stderr, "[panels] %d exported offline\n", count);
+                    bool valid = count > 0 && (only.isEmpty() || count == only.size());
+                    if (valid && std::getenv("RASGO_TEST_PATCH_SWAP"))
+                        valid = validatePatchSwap();
+                    if (valid && std::getenv("RASGO_TEST_RACK_VIEW"))
+                        valid = validateRackView();
+                    finish(valid ? 0 : 1);
+                } catch (const std::exception& error) {
+                    std::fprintf(stderr, "[panels] %s\n", error.what());
+                    finish(1);
+                }
+            });
+            return;
         }
         arranque::marca("abrindo o áudio");
         setAudioChannels(0, 2);
@@ -4326,6 +4790,7 @@ public:
         for (auto* in : midiIns_) in->stop();
         midiIns_.clear();
         shutdownAudio();
+        if (panelExport_) return;
         // continua daqui na próxima sessão (ABRE · ÚLTIMA, ou `RASGO_RESUME=1`)
         savePatch(dataDir().getChildFile("session.rmp"));
         // fechou normalmente: a próxima abertura não precisa ser a segura
@@ -4337,7 +4802,7 @@ public:
         auto area = getLocalBounds();
         header_.setBounds(area.removeFromTop(
             header_.preferredHeight(getWidth())));
-        palette_.setBounds(area.removeFromLeft(PaletteColumn::kWidth));
+        palette_.setBounds(area.removeFromLeft(palette_.preferredWidth()));
         credits_.setBounds(area.removeFromTop(CreditsStrip::kHeight));
         viewport_.setBounds(area);
         layoutRack();
@@ -4449,6 +4914,17 @@ public:
             if (c == juce::KeyPress::homeKey)     { overlay_.scrollTo(0); return true; }
             if (c == juce::KeyPress::endKey)      { overlay_.scrollTo(1 << 20); return true; }
             closeOverlay();
+            return true;
+        }
+
+        if (c == juce::KeyPress::F1Key) {
+            palette_.focusLearn();
+            return true;
+        }
+        if (c == juce::KeyPress::F2Key) { showReadingMenu(); return true; }
+        if (c == juce::KeyPress::F6Key) {
+            if (header_.hasKeyboardFocus(false)) grabKeyboardFocus();
+            else header_.focusCommands();
             return true;
         }
 
@@ -4660,12 +5136,23 @@ private:
     // parado sobre o MESMO objeto (senão pisca a cada movimento), e fora
     // de qualquer objeto mantém o último. Regra do painel X11.
     void tickLearn() {
+        // F1/clicar no LEARN fixa o verbete para ler com o teclado.
+        // Mover o mouse por outros módulos não troca o texto nessa leitura.
+        if (palette_.hasKeyboardFocus(false) || header_.hasKeyboardFocus(false)) return;
         RackView::LearnHit hit;
         const auto mp = juce::Desktop::getInstance().getMainMouseSource()
                             .getScreenPosition().roundToInt();
         const auto inView = view_->getLocalPoint(nullptr, mp);
-        if (viewport_.getScreenBounds().contains(mp))
+        if (viewport_.getScreenBounds().contains(mp) || view_->editingParameter())
             hit = view_->learnAt(inView);
+        else if (header_.getScreenBounds().contains(mp)) {
+            const auto action = header_.helpAt(header_.getLocalPoint(nullptr, mp));
+            if (action)
+                if (const auto* row = rasgo::panel::headerHelp(*action))
+                    hit = {&row->entries[static_cast<std::size_t>(rasgo::panel::langIndex(lang_))],
+                           u8(rasgo::panel::tr(row->title, lang_)), std::string("header|") + row->key,
+                           header_.helpValue(*action)};
+        }
         if (hit.entry == nullptr) {
             const std::string& t = palette_.hoveredType();
             if (!t.empty())
@@ -4686,10 +5173,12 @@ private:
         if (hit.key != learnKey_) {
             learnKey_ = hit.key;
             learnSince_ = now;
-            return;
+            if (!view_->editingParameter()) return;
         }
-        if (now - learnSince_ >= kLearnDwell && !palette_.noticeActive())
-            palette_.setLearn(hit.entry, hit.title);
+        if (view_->editingParameter()) palette_.clearNotice();
+        if ((view_->editingParameter() || now - learnSince_ >= kLearnDwell)
+            && !palette_.noticeActive())
+            palette_.setLearn(hit.entry, hit.title, hit.key, hit.value);
     }
 
     static constexpr auto kLearnDwell = std::chrono::milliseconds(1000);
@@ -4714,11 +5203,7 @@ private:
     // dois front-ends), e no macOS/Windows dá o lugar nativo em vez de
     // espalhar um diretório de convenção Linux por lá.
     static juce::File dataDir() {
-        auto d = juce::File::getSpecialLocation(
-                     juce::File::userApplicationDataDirectory)
-                 .getChildFile("rasgo-modular");
-        d.createDirectory();
-        return d;
+        return applicationDataDir();
     }
 
     // Tira um módulo da CASE sem tocar nos outros cabos: desliga só os que
@@ -4755,7 +5240,10 @@ private:
             auto n = rasgo::panel::makeModule(type);
             if (!n) return;
             const std::size_t id = rack_.graph.add(std::move(n));
-            rack_.shown.push_back(id);
+            const auto at = rasgo::panel::moduleInsertionIndex(
+                rack_.shown, type,
+                [this](std::size_t i) { return rack_.graph.node(i).type(); });
+            rack_.shown.insert(rack_.shown.begin() + static_cast<std::ptrdiff_t>(at), id);
             rack_.scopes[id];
             rack_.byType[type] = id;
             // Um MASTER novo, com a saída de som vazia (o anterior foi
@@ -4847,13 +5335,18 @@ private:
                     rack_.byType[rack_.graph.node(id).type()] = id;
                 rack_.scopes.clear();
                 rack_.scopeSnap.clear();
+                rack_.cableSnap.clear();
                 rack_.graph.prepare(static_cast<float>(sampleRate_), 2, blockSize_);
                 // o move zerou o alvo ativo — reancorar, senão não sai som
                 rack_.graph.setActiveOutput(rack_.sink);
                 rack_.curSeed = seedInFile;   // 0 = patch editado à mão
+                rack_.allocScopes();
+                rack_.populateMotion();
+                rack_.snapshotCables();
             }
-            rack_.allocScopes();
-            rack_.populateMotion();
+            view_->resetForPatch();
+            palette_.setLearn(nullptr, {});
+            learnKey_.clear();
             syncSignalIn();
             view_->refresh();
             std::fprintf(stderr, "[patch] %s\n", origem.toRawUTF8());
@@ -4870,12 +5363,180 @@ private:
         return rasgo::panel::makeModule(t);
     }
 
+    static juce::String bankPatchName(std::uint64_t seed, juce::int64 epochSeconds) {
+        return seed ? "seed-" + juce::String(static_cast<juce::uint64>(seed))
+                    : "patch-" + juce::String(epochSeconds);
+    }
+
     // ---- preferências -------------------------------------------------
+    bool validatePatchSwap() {
+        // Exercita o caso do crash: inspector aberto sobre um cabo do patch
+        // antigo; em seguida um grafo menor substitui aquele patch antes
+        // do próximo tick. Toda a prova ocorre na configuração de exportação.
+        if (!panelExport_) return false;
+        {
+            std::lock_guard<std::mutex> lk(rack_.gmx);
+            rack_.snapshotCables();
+        }
+        if (rack_.cableSnap.empty()
+            || !view_->openInspectorForAudit(rack_.cableSnap.size() - 1)) return false;
+        const auto before = view_->createComponentSnapshot(view_->getLocalBounds());
+        SignalGraph smaller;
+        smaller.add(std::make_unique<Out>());
+        if (!applyPatchText(smaller.serialize(), "auditoria isolada de troca de patch"))
+            return false;
+        const auto after = view_->createComponentSnapshot(view_->getLocalBounds());
+        const bool valid = before.isValid() && after.isValid()
+            && rack_.graph.nodeCount() == 1 && rack_.cableSnap.empty()
+            && !view_->inspectorOpenForAudit() && view_->visibleModuleCount() == 0;
+        std::fprintf(stderr, "[patch-swap] inspector e snapshots do grafo anterior: %s\n",
+                     valid ? "limpos" : "FALHA");
+        return valid;
+    }
+
+    bool validateRackView() {
+        // Um patch com um módulo órfão torna observável a diferença entre
+        // SAÍDA e TODOS. Exercita o mesmo despacho do botão, sem áudio nem
+        // preferências pessoais (a exportação usa configuração isolada).
+        if (!panelExport_) return false;
+        view_->setOutputOnly(false);
+        const auto exampleAll = view_->visibleModuleCount();
+        view_->setOutputOnly(true);
+        const auto exampleOutput = view_->visibleModuleCount();
+        std::fprintf(stderr, "[rack-view] exemplo: TODOS %zu, SAIDA %zu\n",
+                     exampleAll, exampleOutput);
+        SignalGraph audit;
+        const auto drum = audit.add(rasgo::panel::makeModule("DRUM"));
+        const auto master = audit.add(rasgo::panel::makeModule("MASTER"));
+        audit.add(rasgo::panel::makeModule("NOISE"));
+        const auto output = audit.add(std::make_unique<Out>());
+        audit.connect(drum, 0, master, 0);
+        audit.connect(master, 0, output, 0);
+        if (!applyPatchText(audit.serialize(), "auditoria isolada RACK")) return false;
+        view_->setOutputOnly(false);
+        syncHeader();
+        const auto allBefore = view_->visibleModuleCount();
+        header_.trigger(HeaderBar::Act::rackView);
+        const auto outputCount = view_->visibleModuleCount();
+        header_.trigger(HeaderBar::Act::rackView);
+        const auto allAfter = view_->visibleModuleCount();
+        const bool valid = allBefore == 3 && outputCount == 2 && allAfter == 3
+            && !view_->outputOnly() && rack_.shown.size() == 3;
+        std::fprintf(stderr, "[rack-view] TODOS %zu -> SAIDA %zu -> TODOS %zu: %s\n",
+                     allBefore, outputCount, allAfter, valid ? "ok" : "FALHA");
+        return valid;
+    }
+
+    bool validateGuidanceExport(const juce::File& directory) {
+        // Só é chamado no modo de exportação isolado, antes de abrir áudio.
+        if (!panelExport_) return false;
+        const auto original = reading_;
+        const juce::Point<int> originalSize(getWidth(), getHeight());
+        const auto originalLanguage = lang_;
+        int errors = 0;
+        if (bankPatchName(std::numeric_limits<std::uint64_t>::max(), 123)
+                != "seed-18446744073709551615"
+            || bankPatchName(0, 123) != "patch-123") ++errors;
+        for (const int width : {1024, 1920}) {
+            for (int size = 0; size < 3; ++size) {
+                reading_ = {size, size == 2};
+                palette_.setReadingPreferences(reading_);
+                setSize(width, 780); resized();
+                const auto chrome = header_.createComponentSnapshot(header_.getLocalBounds());
+                if (!chrome.isValid()) ++errors;
+                errors += header_.auditGuidance();
+                header_.keyPressed(juce::KeyPress(juce::KeyPress::F1Key));
+                if (!palette_.hasKeyboardFocus(false)) ++errors;
+                palette_.keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
+                for (auto language : {rasgo::panel::Lang::en, rasgo::panel::Lang::pt,
+                                      rasgo::panel::Lang::fr, rasgo::panel::Lang::es}) {
+                    lang_ = language;
+                    for (const auto& row : rasgo::panel::headerHelpRows()) {
+                        showHeaderHelp(row.action);
+                        if (palette_.readingState().entry != &row.entries[static_cast<std::size_t>(
+                                rasgo::panel::langIndex(language))]) ++errors;
+                    }
+                }
+                const auto pref = dataDir().getChildFile("reading-ui");
+                if (!pref.replaceWithText(u8(reading_.serialize()))
+                    || rasgo::panel::ReadingPreferences::parse(pref.loadFileAsString().toStdString())
+                           .serialize() != reading_.serialize()) ++errors;
+                if (size == 2) {
+                    lang_ = rasgo::panel::Lang::pt;
+                    palette_.setLanguage(lang_); syncHeader();
+                    showHeaderHelp(HeaderBar::Act::bank);
+                    const auto image = createComponentSnapshot(getLocalBounds());
+                    juce::FileOutputStream stream(directory.getChildFile(
+                        "reading-" + juce::String(width) + ".png"));
+                    if (!stream.openedOk()) { ++errors; continue; }
+                    stream.setPosition(0); stream.truncate();
+                    juce::PNGImageFormat png;
+                    if (!png.writeImageToStream(image, stream)) ++errors;
+                }
+            }
+        }
+        reading_ = original; lang_ = originalLanguage;
+        palette_.setReadingPreferences(reading_); palette_.setLanguage(lang_);
+        dataDir().getChildFile("reading-ui").replaceWithText(u8(reading_.serialize()));
+        setSize(originalSize.x, originalSize.y); resized(); syncHeader();
+        std::fprintf(stderr, "[guidance] 2 widths / 3 sizes / 4 languages / 22 topics; errors=%d\n", errors);
+        return errors == 0;
+    }
+
+    void showHeaderHelp(HeaderBar::Act action) {
+        if (const auto* row = rasgo::panel::headerHelp(action)) {
+            palette_.clearNotice();
+            learnKey_ = std::string("header|") + row->key;
+            palette_.setLearn(&row->entries[static_cast<std::size_t>(rasgo::panel::langIndex(lang_))],
+                u8(rasgo::panel::tr(row->title, lang_)), learnKey_, header_.helpValue(action));
+        }
+    }
+
+    void showReadingMenu() {
+        using rasgo::panel::L4;
+        const auto label = [this](L4 text) { return u8(rasgo::panel::tr(text, lang_)); };
+        juce::PopupMenu menu;
+        menu.addSectionHeader(label({"LEARN reading", "Leitura do LEARN", "Lecture du LEARN", "Lectura del LEARN"}));
+        const L4 names[] = {
+            {"Standard — 12 px", "Padrão — 12 px", "Standard — 12 px", "Normal — 12 px"},
+            {"Large — 14 px", "Grande — 14 px", "Grand — 14 px", "Grande — 14 px"},
+            {"Larger — 16 px", "Maior — 16 px", "Plus grand — 16 px", "Mayor — 16 px"}};
+        for (int i = 0; i < 3; ++i) menu.addItem(i + 1, label(names[i]), true, reading_.validSize() == i);
+        menu.addSeparator();
+        menu.addItem(4, label({"White reading text", "Texto de leitura branco", "Texte de lecture blanc", "Texto de lectura blanco"}), true, reading_.whiteText);
+        menu.addItem(5, label({"Restore reading defaults", "Restaurar padrão de leitura", "Rétablir la lecture par défaut", "Restaurar lectura predeterminada"}));
+        const juce::Component::SafePointer<MainComponent> self(this);
+        menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(&palette_)
+            .withTargetScreenArea(palette_.localAreaToGlobal(palette_.readingButton()))
+            .withMinimumWidth(270).withStandardItemHeight(28), [self](int chosen) {
+                if (self == nullptr || chosen == 0) return;
+                if (chosen >= 1 && chosen <= 3) self->reading_.size = chosen - 1;
+                else if (chosen == 4) self->reading_.whiteText = !self->reading_.whiteText;
+                else if (chosen == 5) self->reading_ = {};
+                else return;
+                self->palette_.setReadingPreferences(self->reading_);
+                self->resized();
+                const bool saved = self->dataDir().getChildFile("reading-ui")
+                    .replaceWithText(u8(self->reading_.serialize()));
+                if (!saved) {
+                    const rasgo::panel::L4 error{
+                        "Reading changed, but the preference could not be saved.",
+                        "Leitura alterada, mas não foi possível salvar a preferência.",
+                        "Lecture modifiée, mais la préférence n'a pas pu être enregistrée.",
+                        "Lectura cambiada, pero no se pudo guardar la preferencia."};
+                    self->palette_.setNotice(u8(rasgo::panel::tr(error, self->lang_)));
+                }
+            });
+    }
+
     // Idioma e vista do rack em arquivos próprios de UMA linha, separados
     // do patch: sobrevivem a abrir num seed novo, não só ao `--resume`.
     // Mesma divisão do painel X11 — preferência de quem usa não é estado
     // do documento.
     void loadPrefs() {
+        const auto reading = dataDir().getChildFile("reading-ui");
+        if (reading.existsAsFile() && reading.getSize() <= 64)
+            reading_ = rasgo::panel::ReadingPreferences::parse(reading.loadFileAsString().toStdString());
         const auto lf = dataDir().getChildFile("ui-lang");
         if (lf.existsAsFile())
             lang_ = rasgo::panel::langFromCode(
@@ -4920,6 +5581,7 @@ private:
     // vai usar é ruído — e no macOS é um diálogo de permissão do sistema
     // aparecendo sem motivo. Mesma regra do `syncSignalIn` do painel X11.
     void syncSignalIn() {
+        if (panelExport_) return;
         // "Presente" = alguma SAÍDA do SIGNAL-IN está cabeada. Até a
         // v0.1.2 bastava o módulo existir no grafo — e o rack nasce com
         // um de cada módulo, então o app abria o microfone e TODOS os
@@ -5378,6 +6040,7 @@ private:
     int motionThrottle_ = 0;
     std::uint64_t lastSeed_ = 0;
     bool rackOutputPref_ = false;
+    rasgo::panel::ReadingPreferences reading_;
     rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
     std::atomic<bool> signalIn_{false};   // há SIGNAL-IN no patch?
     std::vector<float> inFifo_;           // entrada intercalada L/R
@@ -5387,6 +6050,7 @@ private:
     std::unique_ptr<juce::FileChooser> chooser_;
     int signalInTick_ = 0;   // syncSignalIn a cada 15 quadros (~0,5 s)
     bool primeiroQuadro_ = false;
+    bool panelExport_ = false;
     bool chooserOpen_ = false;
     std::string learnKey_;
     std::chrono::steady_clock::time_point learnSince_{};

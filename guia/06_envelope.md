@@ -81,6 +81,11 @@ e não precisa que o `ENVELOPE` também controle volume de nada.
 
 ## Os controles, um a um
 
+No layout local 0.1.7-dev, ATK/DEC/SUS/REL são quatro sliders verticais,
+com CURVE/VCA/LVL abaixo. Arraste para cima para aumentar. Os tempos têm
+posição logarítmica (1 ms–10 s); SUS tem posição linear (0–1). Só mudou a
+apresentação: IDs, valores salvos, DSP e comportamento da VARIA são mantidos.
+
 **ATK** (attack, 0,001–10 s) — quanto leva pra chegar ao pico depois do
 gate.
 

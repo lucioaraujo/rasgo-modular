@@ -1,0 +1,26 @@
+rasgo-modular-patch 1
+node 0 CLOCK bpm=100 mult=1 fill=4 length=8 drift=0
+node 1 DRUM tone=70 bend=0.2 decay=0.3 snap=0.05 map=0 drive=0 roll=0 drift=0
+node 2 LISTEN low_cut=200 high_cut=2000 response=0.25 sens=0.65 floor=-54 rearm=120
+node 3 PHRASE length=8 span=12 direction=0 variation=0.3 space=0.2 cadence=0.85 gate_ms=120 seed=17
+node 4 QUANTIZER scale=3 root=0 range=1 glide=0 hysteresis=0.3
+node 5 OSC freq=220 drift=0
+node 6 ENVELOPE attack=0.004 decay=0.18 sustain=0.4 release=0.05
+node 7 VCA level1=0 cv1_amount=1
+node 8 MIXER gain1=-12 gain2=-6 mute3=1 mute4=1
+node 9 MASTER gain=-6 mute=0 limit=1
+node 10 OUT
+cable 0:0 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 2:0 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 8:0 gain=1 conductance=1 feedback=0 state=intact
+cable 2:4 -> 3:1 gain=1 conductance=1 feedback=0 state=intact
+cable 2:1 -> 3:3 gain=1 conductance=1 feedback=0 state=intact
+cable 3:0 -> 4:0 gain=1 conductance=1 feedback=0 state=intact
+cable 4:0 -> 5:0 gain=1 conductance=1 feedback=0 state=intact
+cable 5:0 -> 6:0 gain=1 conductance=1 feedback=0 state=intact
+cable 3:1 -> 6:1 gain=1 conductance=1 feedback=0 state=intact
+cable 6:0 -> 7:0 gain=1 conductance=1 feedback=0 state=intact
+cable 3:2 -> 7:1 gain=1 conductance=1 feedback=0 state=intact
+cable 7:0 -> 8:1 gain=1 conductance=1 feedback=0 state=intact
+cable 8:0 -> 9:0 gain=1 conductance=1 feedback=0 state=intact
+cable 9:0 -> 10:0 gain=1 conductance=1 feedback=0 state=intact

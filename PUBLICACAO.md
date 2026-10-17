@@ -1,10 +1,56 @@
 # Rasgo Modular — prontidão para publicação
 
-Auditoria contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`: as
-cinco camadas e o gate editorial comum. Cada item está marcado com o que
-**foi feito**, não com o que deveria estar pronto.
+## Preparação da v0.1.7 — 18 out. 2026
 
-**Data:** 24 set. 2026 · **Camadas 1 e 2 fechadas.** A CI de três
+A release pública atual é a v0.1.6. O trabalho novo ainda está identificado
+como **0.1.7-dev** no aplicativo e no guia; os downloads e o SEO do site
+continuam apontando para a v0.1.6. As seções abaixo descrevem a preparação
+histórica da primeira publicação e não atestam a v0.1.7.
+
+Nesta rodada, o build completo Linux terminou e os 84 testes CTest passaram
+com os executáveis recém-compilados. Dez testes Python da documentação e a
+verificação estrutural do site passaram. O aplicativo em modo isolado carregou
+`examples/escuta_frase.rmp`, exportou LISTEN/PHRASE e passou a auditoria da
+troca de patch; `examples/painel_tutoriais.rmp` passou a auditoria de RACK,
+inclusive o controle TODOS 3 → SAÍDA 2 → TODOS 3. Essas provas não incluem
+escuta musical nem gestos na janela normal.
+
+Um único `.deb` local foi produzido em `build/` para conferir metadados e
+conteúdo. Ele contém executável, entrada de menu e ícones, mas **não é o
+pacote a oferecer ao público**: foi compilado no Mint 22 e depende de
+`libasound2t64` e glibc 2.38. O pacote distribuível precisa ser construído
+pela matriz da CI em Ubuntu 22.04. Não foi gerado ZIP extra nesta rodada.
+
+Portão ainda aberto antes da publicação completa:
+
+1. Conferir a janela normal da 0.1.7-dev — abrir/trocar patch, TODOS/SAÍDA,
+   rolagem, F1/F2/F6, zoom, sliders, cabeamento e valores BASE/DSP. A
+   exportação isolada não equivale a essa interação.
+2. Fazer escuta curta de LISTEN/PHRASE e avaliar o resultado musical; a
+   prova numérica de áudio não é escuta. Entrada externa é opcional e depende
+   do equipamento disponível.
+3. Revisar o diff, registrar notas da v0.1.7 e executar uma única matriz CI
+   para os seis formatos (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`),
+   seguida dos quatro testes de abertura Linux. Só marcar a release como
+   completa se todos os artefatos existirem e os jobs terminarem verdes.
+4. Apenas depois de confirmar os anexos públicos, mudar os quatro idiomas
+   do site, metadados e guia de módulos de 0.1.6/0.1.7-dev para 0.1.7; testar
+   os seis links e publicar o site. Não antecipar links para arquivos ausentes.
+
+Não foi criada tag nem release nesta auditoria. Um push de desenvolvimento
+por si só atualiza as fontes e, se tocar `website/`, pode publicar o site,
+mas **não** aciona o empacotamento; este depende de tag, pull request ou
+execução manual do workflow.
+
+---
+
+## Histórico da primeira publicação
+
+Auditoria de setembro contra `RASGO_DOCUMENTATION/ESTRATEGIA_DE_PUBLICACAO.md`:
+as cinco camadas e o gate editorial comum. O estado abaixo é histórico, não
+uma checklist vigente da v0.1.7.
+
+**Data histórica:** 24 set. 2026 · **Camadas 1 e 2 fechadas.** A CI de três
 sistemas está verde e gera os três instaladores; a sessão de escuta foi
 executada e documentada. O que falta é operacional: cortar a tag, tornar
 o repositório público e liberar site e portal juntos.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Gera as páginas de guia dos módulos, uma por idioma.
 
-POR QUE É GERADO, e não escrito à mão: os 58 verbetes de módulo já existem
+POR QUE É GERADO, e não escrito à mão: os verbetes de módulo já existem
 no catálogo do instrumento (`apps/panel/LearnCatalog.hpp`), traduzidos nos
 quatro idiomas e cobertos por teste. Escrever uma segunda cópia no site
 criaria duas versões do mesmo texto, que divergem na primeira correção — e
@@ -38,12 +38,12 @@ IDIOMAS = {
         "nav_conceito": "Conceito",
         "nav_modulos": "Módulos",
         "titulo": "Rasgo Modular — guia dos módulos",
-        "descricao": "Os 58 módulos do Rasgo Modular explicados para quem está "
+        "descricao": "Os {total} módulos do Rasgo Modular explicados para quem está "
                      "começando: o que cada um faz com o som, o que muda em cada "
                      "controle e um exercício para fazer no app.",
-        "pill": "58 módulos · 8 famílias",
+        "pill": "{total} módulos · {familias} famílias",
         "h1": "Guia dos módulos",
-        "lead": "Os 58 módulos do Rasgo Modular, família por família. Cada verbete "
+        "lead": "Os {total} módulos do Rasgo Modular, família por família. Cada verbete "
                 "conta o que o módulo faz com o som, como ele se relaciona com os "
                 "vizinhos, o que muda em cada controle, e termina com alguns passos "
                 "para você experimentar no app. Os exercícios partem de um patch em "
@@ -76,12 +76,12 @@ IDIOMAS = {
         "nav_conceito": "Concept",
         "nav_modulos": "Modules",
         "titulo": "Rasgo Modular — module guide",
-        "descricao": "The 58 modules of Rasgo Modular explained for beginners: what each "
+        "descricao": "The {total} modules of Rasgo Modular explained for beginners: what each "
                      "one does to the sound, what every control changes, and an exercise "
                      "to try in the app.",
-        "pill": "58 modules · 8 families",
+        "pill": "{total} modules · {familias} families",
         "h1": "Module guide",
-        "lead": "The 58 modules of Rasgo Modular, family by family. Each entry "
+        "lead": "The {total} modules of Rasgo Modular, family by family. Each entry "
                 "tells you what the module does to the sound, how it relates to its "
                 "neighbours, what each control changes, and ends with a few steps "
                 "to try in the app. The exercises start from a patch where MIXER is "
@@ -114,12 +114,12 @@ IDIOMAS = {
         "nav_conceito": "Concept",
         "nav_modulos": "Modules",
         "titulo": "Rasgo Modular — guide des modules",
-        "descricao": "Les 58 modules du Rasgo Modular expliqués pour qui débute : ce que "
+        "descricao": "Les {total} modules du Rasgo Modular expliqués pour qui débute : ce que "
                      "chacun fait au son, ce que change chaque réglage, et un exercice à "
                      "faire dans l’application.",
-        "pill": "58 modules · 8 familles",
+        "pill": "{total} modules · {familias} familles",
         "h1": "Guide des modules",
-        "lead": "Les 58 modules du Rasgo Modular, famille par famille. Chaque "
+        "lead": "Les {total} modules du Rasgo Modular, famille par famille. Chaque "
                 "notice raconte ce que le module fait au son, comment il se situe "
                 "parmi ses voisins, ce que change chaque réglage, et se termine par "
                 "quelques étapes à essayer dans l’application. Les exercices "
@@ -153,12 +153,12 @@ IDIOMAS = {
         "nav_conceito": "Concepto",
         "nav_modulos": "Módulos",
         "titulo": "Rasgo Modular — guía de los módulos",
-        "descricao": "Los 58 módulos del Rasgo Modular explicados para quien empieza: "
+        "descricao": "Los {total} módulos del Rasgo Modular explicados para quien empieza: "
                      "qué hace cada uno con el sonido, qué cambia cada control y un "
                      "ejercicio para hacer en la aplicación.",
-        "pill": "58 módulos · 8 familias",
+        "pill": "{total} módulos · {familias} familias",
         "h1": "Guía de los módulos",
-        "lead": "Los 58 módulos del Rasgo Modular, familia por familia. Cada "
+        "lead": "Los {total} módulos del Rasgo Modular, familia por familia. Cada "
                 "entrada cuenta qué hace el módulo con el sonido, cómo se relaciona "
                 "con sus vecinos, qué cambia cada control, y termina con unos pasos "
                 "para probar en la aplicación. Los ejercicios parten de un patch en "
@@ -303,7 +303,8 @@ def figura_painel(codigo, tipo):
         return []
     try:
         from PIL import Image
-        w, h = Image.open(arq).size
+        with Image.open(arq) as imagem:
+            w, h = imagem.size
         dim = ' width="%d" height="%d"' % (w // 2, h // 2)
     except Exception:
         dim = ""
@@ -313,6 +314,22 @@ def figura_painel(codigo, tipo):
 
 PAGINA_PRINCIPAL = {"pt": "index.html", "en": "en.html",
                     "fr": "fr.html", "es": "es.html"}
+
+# O guia local pode antecipar módulos da próxima versão. Nunca transformar
+# isso em promessa de que o instalador publicado já os contém.
+EM_DESENVOLVIMENTO = {"LISTEN", "PHRASE"}
+AVISO_DESENVOLVIMENTO = {
+    "pt": "LISTEN e PHRASE estão no desenvolvimento local 0.1.7-dev. Os downloads da versão 0.1.6 contêm os 58 módulos anteriores. Os sliders do ENVELOPE e o CUT maior do FILTER também pertencem ao novo layout em desenvolvimento.",
+    "en": "LISTEN and PHRASE are in local development version 0.1.7-dev. Version 0.1.6 downloads contain the previous 58 modules. ENVELOPE's sliders and FILTER's larger CUT control also belong to the new layout in development.",
+    "fr": "LISTEN et PHRASE sont dans la version locale de développement 0.1.7-dev. Les téléchargements de la version 0.1.6 contiennent les 58 modules précédents. Les curseurs d'ENVELOPE et le plus grand réglage CUT du FILTER font aussi partie de la nouvelle interface en développement.",
+    "es": "LISTEN y PHRASE están en la versión local de desarrollo 0.1.7-dev. Las descargas de la versión 0.1.6 contienen los 58 módulos anteriores. Los deslizadores de ENVELOPE y el control CUT más grande de FILTER también pertenecen a la nueva interfaz en desarrollo.",
+}
+ROTULO_DESENVOLVIMENTO = {
+    "pt": "0.1.7-dev · desenvolvimento local; ainda fora dos downloads 0.1.6.",
+    "en": "0.1.7-dev · local development; not yet in version 0.1.6 downloads.",
+    "fr": "0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.",
+    "es": "0.1.7-dev · desarrollo local; todavía fuera de las descargas 0.1.6.",
+}
 
 
 def wordmark():
@@ -329,7 +346,10 @@ def e(texto):
 
 
 def pagina(codigo, dados, familias, marca):
-    t = dados
+    total = sum(len(f["modulos"]) for f in familias)
+    t = dict(dados)
+    for campo in ("descricao", "pill", "lead"):
+        t[campo] = t[campo].format(total=total, familias=len(familias))
     niveis = NIVEIS[codigo]
     L = []
     L.append("<!doctype html>")
@@ -374,9 +394,11 @@ def pagina(codigo, dados, familias, marca):
     L.append('  <span class="status-pill">%s</span>' % e(t["pill"]))
     L.append("  <h1>%s</h1>" % e(t["h1"]))
     L.append('  <p class="lead">%s</p>' % e(t["lead"]))
+    if any(mod["tipo"] in EM_DESENVOLVIMENTO for fam in familias for mod in fam["modulos"]):
+        L.append('  <p class="note development-note">%s</p>' % e(AVISO_DESENVOLVIMENTO[codigo]))
     L.append("</section>")
     L.append("")
-    # índice das famílias: 58 módulos numa página só precisam de atalho
+    # índice das famílias: uma página longa precisa de atalhos
     L.append('<nav class="familias" aria-label="%s">' % e(t["indice"]))
     for fam in familias:
         L.append('  <a href="#fam-%s">%s <span>%d</span></a>'
@@ -394,6 +416,8 @@ def pagina(codigo, dados, familias, marca):
             verbete = mod[codigo] or mod["pt"]
             L.append('  <article class="modulo" id="mod-%s">' % mod["tipo"])
             L.append("    <h3>%s</h3>" % e(mod["tipo"]))
+            if mod["tipo"] in EM_DESENVOLVIMENTO:
+                L.append('    <p class="development-note">%s</p>' % e(ROTULO_DESENVOLVIMENTO[codigo]))
             L.extend(figura_painel(codigo, mod["tipo"]))
             didatico = ler_verbete(codigo, mod["tipo"])
             if didatico is not None:

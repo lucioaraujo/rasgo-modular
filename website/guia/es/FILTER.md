@@ -5,6 +5,8 @@ FILTER deja pasar parte de las frecuencias de un sonido y corta el resto. Tiene 
 Es el segundo módulo de casi todos los patches: después de una fuente rica en armónicos, como la sierra de un OSC, el filtro esculpe el timbre. Lo que lo distingue es SPRD: en cero, las tres salidas comparten el mismo corte; al subirlo, se separan y se vuelven tres filtros distintos, cada uno en una región del sonido. Con la resonancia al máximo, el filtro empieza a sonar solo, como un oscilador senoidal.
 
 ## Controles
+En la interfaz en desarrollo 0.1.7-dev, CUT tiene un mando mayor que RESO para distinguir el gesto principal de abrir y cerrar el timbre. La diferencia es visual; los rangos y la respuesta sonora permanecen iguales.
+
 - CUT: la frecuencia de corte, de 20 a 20000 Hz. Es el control principal: gírelo y escuche el timbre abrirse y cerrarse.
 - RESO: realza las frecuencias cercanas al corte, dando un timbre más nasal. Al máximo, el filtro empieza a sonar solo.
 - SPRD: separa las tres salidas en frecuencia. En cero, las tres siguen el mismo corte; al máximo, cada una ocupa su región del sonido.

@@ -17,9 +17,10 @@ Duas verificações, e a segunda é a que justifica o arquivo:
    deixaria três botões de download apontando para o vazio — e ninguém
    descobre isso lendo o HTML, só clicando depois de publicado.
 
-   Aqui a versão do `CMakeLists.txt` é comparada com a do `estado.py` e,
-   quando existe `build/CPackConfig.cmake`, com o nome que o CPack de fato
-   gerou nesta máquina.
+   A versão pública vem de seo.py. Quando o CMake está explicitamente em
+   desenvolvimento (-dev), ela pode ser anterior à versão local: não se
+   anuncia um instalador ainda inexistente. O nome do CPack local continua
+   sendo conferido contra a versão local do CMake.
 
 Não abre navegador: continua valendo que nenhum navegador real viu estas
 páginas (ver README).
@@ -105,12 +106,33 @@ def versao_do_cmake():
     return m.group(1)
 
 
+def versao_publicada():
+    texto = (AQUI / "seo.py").read_text(encoding="utf-8")
+    m = re.search(r'^VERSAO = "(\d+\.\d+\.\d+)"', texto, re.M)
+    if not m:
+        problemas.append("seo.py precisa declarar uma versão pública X.Y.Z")
+        return None
+    publicada = m.group(1)
+    local = versao_do_cmake()
+    cmake = (RAIZ / "CMakeLists.txt").read_text(encoding="utf-8")
+    desenvolvimento = bool(re.search(
+        r'set\(RASGO_MODULAR_VERSION_LABEL\s+"\$\{PROJECT_VERSION\}-dev"\)', cmake))
+    if local and publicada != local:
+        anterior = tuple(map(int, publicada.split("."))) < tuple(map(int, local.split(".")))
+        if not (desenvolvimento and anterior):
+            problemas.append("versão pública %s difere do CMake %s sem desenvolvimento posterior explícito"
+                             % (publicada, local))
+    return publicada
+
+
 def conferir_downloads():
     print("\nnomes dos downloads contra o empacotamento")
     versao = versao_do_cmake()
-    if versao is None:
+    publica = versao_publicada()
+    if versao is None or publica is None:
         return
     print("  CMakeLists.txt project() VERSION: %s" % versao)
+    print("  downloads publicados / SEO: %s" % publica)
 
     estado = (AQUI / "estado.py").read_text(encoding="utf-8")
     moldes = re.findall(r'"(rasgo-modular-%s-[^"]+)"', estado)
@@ -146,25 +168,24 @@ def conferir_downloads():
     for arq in ("index.html", "en.html", "fr.html", "es.html"):
         s = (AQUI / arq).read_text(encoding="utf-8")
         for achado in re.findall(r"rasgo-modular-(\d+\.\d+\.\d+)-", s):
-            if achado != versao:
+            if achado != publica:
                 problemas.append(
-                    "%s aponta para a versão %s, mas o projeto está em %s"
-                    % (arq, achado, versao))
+                    "%s aponta para a versão %s, mas a versão pública é %s"
+                    % (arq, achado, publica))
+        for molde in moldes:
+            if molde % publica not in s:
+                problemas.append("%s: download público ausente: %s" % (arq, molde % publica))
 
 
 def conferir_seo():
     """O bloco de seo.py em dia em todas as páginas, e a versão do JSON-LD
-    igual à do CMake. gerar_modulos.py reescreve as páginas de módulos
+    igual à versão pública. gerar_modulos.py reescreve as páginas de módulos
     inteiras e apaga o bloco — sem esta conferência, isso passaria calado."""
     r = subprocess.run([sys.executable, str(AQUI / "seo.py"), "--verificar"],
                        capture_output=True, text=True)
     print(r.stdout.strip())
     if r.returncode != 0:
         problemas.append("metadados desatualizados: " + (r.stdout.strip() or r.stderr.strip()))
-    m = re.search(r'^VERSAO = "([^"]+)"', (AQUI / "seo.py").read_text(encoding="utf-8"), re.M)
-    cm = versao_do_cmake()
-    if m and cm and m.group(1) != cm:
-        problemas.append("seo.py declara VERSAO %s; o CMake diz %s" % (m.group(1), cm))
 
 
 def main():

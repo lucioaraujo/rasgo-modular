@@ -126,7 +126,7 @@ inline float seedGainCorrection(const std::uint64_t seed,
     using namespace rasgo::modular;
 
     SignalGraph prova;
-    for (const auto& grp : moduleCatalog())
+    for (const auto& grp : seedModuleCatalog())
         for (const char* t : grp.types)
             if (auto n = makeModule(t)) prova.add(std::move(n));
     // O sink do rack de prova precisa existir para o motor saber o que

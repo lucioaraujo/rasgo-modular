@@ -66,6 +66,55 @@ private:
     float v_;
 };
 
+// Mesmo contrato do ENVELOPE, mas a apresentação anterior, com quatro knobs.
+// Trocar o desenho de ADSR não pode mudar a amplitude/velocidade do VARIA.
+class LegacyEnvelopePanel final : public Signal {
+    static std::vector<ParameterDescriptor> descriptors() {
+        const Envelope envelope;
+        std::vector<ParameterDescriptor> result;
+        for (const auto& p : envelope.parameters()) result.push_back(p.descriptor);
+        return result;
+    }
+public:
+    LegacyEnvelopePanel() : Signal({}, {}, descriptors()) {}
+    std::string type() const override { return "ENVELOPE"; }
+    Panel panel() const override {
+        Panel result = Envelope{}.panel();
+        for (auto& w : result.widgets)
+            if (w.kind == Widget::Kind::Slider) w.kind = Widget::Kind::Knob;
+        return result;
+    }
+    void process(const std::vector<const AudioBlock*>&,
+                 std::vector<AudioBlock>&) noexcept override {}
+};
+
+void testEnvelopePresentationPreservesMotion() {
+    for (const auto seed : {17ULL, 4242ULL, 987654321ULL}) {
+        SignalGraph before, after;
+        const auto oldNode = before.add(std::make_unique<LegacyEnvelopePanel>());
+        const auto newNode = after.add(std::make_unique<Envelope>());
+        before.prepare(48000, 1, 64);
+        after.prepare(48000, 1, 64);
+        MotionEngine oldMotion, newMotion;
+        oldMotion.inhabit(before, seed, {oldNode});
+        newMotion.inhabit(after, seed, {newNode});
+        EXPECT(oldMotion.fiberCount() == newMotion.fiberCount());
+        bool equal = true;
+        for (int tick = 0; tick < 3600; ++tick) {
+            if (tick == 1800) {
+                before.setParameterBase(oldNode, "attack", 0.12f);
+                after.setParameterBase(newNode, "attack", 0.12f);
+            }
+            const float energy = tick < 1200 ? 0.1f : tick < 2400 ? 0.8f : 0.4f;
+            oldMotion.tick(before, 1.0f / 30.0f, energy);
+            newMotion.tick(after, 1.0f / 30.0f, energy);
+            for (const auto& p : before.node(oldNode).parameters())
+                equal = equal && p.value == after.parameterUserValue(newNode, p.descriptor.id);
+        }
+        check(equal, "ADSR sliders preservam VARIA bit a bit, incluindo edição manual");
+    }
+}
+
 void testWalkStaysInRangeAndMoves() {
     SignalGraph g;
     const auto n = g.add(std::make_unique<Knob>());
@@ -430,6 +479,7 @@ void testIntensidade() {
 }
 
 int main() {
+    testEnvelopePresentationPreservesMotion();
     testIntensidade();
     testWalkStaysInRangeAndMoves();
     testOscillateSweepsBetweenBounds();

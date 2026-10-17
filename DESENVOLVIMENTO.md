@@ -1,5 +1,15 @@
 # Rasgo Modular — notas de desenvolvimento
 
+**Regra atual de validação (17/10/2026):** o desenvolvimento executa e
+documenta primeiro os testes técnicos e interativos que puder fazer sem o
+autor, usando binário identificado e casos que realmente exercitem o recurso.
+Um exemplo não pode ser repassado apenas porque abre ou produz áudio.
+Se a janela real não foi testada, registrar essa lacuna, sem chamá-la de
+validação concluída. Só depois de passar pelo [portão operacional](TAREFAS.md#portão-antes-de-pedir-teste-ao-autor--17102026)
+solicitar uma escuta ou julgamento perceptivo específico, curto e opcional;
+o autor não deve gastar tempo depurando exemplos ou seeds mal preparados.
+O diário abaixo é histórico e não substitui o estado atual em TAREFAS.md.
+
 > Este era o `README.md` até 2 out. 2026. Passou a se chamar
 > `DESENVOLVIMENTO.md` (com `git mv`, histórico preservado) quando o
 > `README.md` virou a apresentação pública em quatro idiomas, como pede o

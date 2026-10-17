@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — guide des modules</title>
-<meta name="description" content="Les 58 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
+<meta name="description" content="Les 60 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — guide des modules">
-<meta property="og:description" content="Les 58 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
+<meta property="og:description" content="Les 60 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Les 58 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
+  "description": "Les 60 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "fr",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -95,9 +95,10 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">58 modules · 8 familles</span>
+  <span class="status-pill">60 modules · 8 familles</span>
   <h1>Guide des modules</h1>
-  <p class="lead">Les 58 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
+  <p class="lead">Les 60 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
+  <p class="note development-note">LISTEN et PHRASE sont dans la version locale de développement 0.1.7-dev. Les téléchargements de la version 0.1.6 contiennent les 58 modules précédents. Les curseurs d'ENVELOPE et le plus grand réglage CUT du FILTER font aussi partie de la nouvelle interface en développement.</p>
 </section>
 
 <nav class="familias" aria-label="Familles">
@@ -105,10 +106,10 @@
   <a href="#fam-TRANSFORM">TRANSFORM <span>14</span></a>
   <a href="#fam-MODULATE">MODULATE <span>6</span></a>
   <a href="#fam-TIME">TIME <span>5</span></a>
-  <a href="#fam-DECISION">DECISION <span>5</span></a>
+  <a href="#fam-DECISION">DECISION <span>6</span></a>
   <a href="#fam-ROUTE">ROUTE <span>4</span></a>
   <a href="#fam-SPACE">SPACE <span>7</span></a>
-  <a href="#fam-OUT">OUT <span>4</span></a>
+  <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
 
 <section class="section" id="fam-SOURCE">
@@ -460,6 +461,7 @@
     <h4>Comment l’aborder</h4>
     <p>C'est le deuxième module de presque tous les patchs : après une source riche en harmoniques, comme la dent de scie d'un OSC, le filtre sculpte le timbre. Sa particularité est SPRD : à zéro, les trois sorties partagent la même coupure ; en le montant, elles s'écartent et deviennent trois filtres différents, chacun sur une région du son. Avec la résonance au maximum, le filtre se met à sonner tout seul, comme un oscillateur sinusoïdal.</p>
     <h4>Commandes</h4>
+    <p>Dans l'interface en développement 0.1.7-dev, le bouton CUT est plus grand que RESO pour distinguer le geste principal d'ouverture et de fermeture du timbre. Cette différence est visuelle ; les plages et la réponse sonore restent identiques.</p>
     <ul class="controles">
       <li><b>CUT</b> : la fréquence de coupure, de 20 à 20000 Hz. C'est le réglage principal : tournez-le et écoutez le timbre s'ouvrir et se fermer.</li>
       <li><b>RESO</b> : renforce les fréquences proches de la coupure, pour un timbre plus nasillard. Au maximum, le filtre se met à sonner seul.</li>
@@ -814,6 +816,7 @@
     <h4>Comment l’aborder</h4>
     <p>Les sources sonnent tout le temps ; ENVELOPE transforme ce flux en phrases. Il a deux usages qui peuvent coexister. Par l'entrée IN et la sortie OUT, il articule le son qui passe. Par la sortie ENV, il fournit la courbe elle-même, que vous pouvez envoyer ouvrir un filtre, changer un timbre ou doser un effet. Les quatre étapes de la courbe ont des noms anglais qu'on trouve sur tous les synthétiseurs : attack, decay, sustain et release, d'où ADSR.</p>
     <h4>Commandes</h4>
+    <p>Dans l'interface en développement 0.1.7-dev, ATK, DEC, SUS et REL sont des curseurs verticaux : tirez vers le haut pour augmenter. Les trois durées suivent une échelle logarithmique de 1 ms à 10 s ; SUS reste un niveau linéaire. CURVE, VCA et LVL se trouvent en dessous. Les paramètres et les patches enregistrés conservent les valeurs de l'interface précédente.</p>
     <ul class="controles">
       <li><b>ATK</b> : l'attaque, le temps que met la note pour atteindre son maximum après l'impulsion. Court, c'est percussif ; long, comme un archet qui entre doucement.</li>
       <li><b>DEC</b> : la décroissance, le temps de la chute après le maximum jusqu'au niveau de SUS.</li>
@@ -1094,7 +1097,7 @@
   </article>
 </section>
 <section class="section" id="fam-DECISION">
-  <h2>DECISION <small>5 modules</small></h2>
+  <h2>DECISION <small>6 modules</small></h2>
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
     <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="Panneau du module QUANTIZER" width="118" height="300" loading="lazy" /></figure>
@@ -1223,6 +1226,34 @@
       <li>Branchez GEIG sur l'entrée GATE d'un DRUM relié au MIXER et montez GEI. Vous entendez des coups à des moments imprévisibles.</li>
       <li>Branchez maintenant une voix qui joue des notes, comme un OSC passant par un ENVELOPE, sur l'entrée IN, avec MODE sur la première position et APER large.</li>
       <li>Branchez OUT sur l'entrée CV1 d'un VCA qui règle un autre son. Le second son suit maintenant le volume de la voix, sans trembler.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PHRASE">
+    <h3>PHRASE</h3>
+    <p class="development-note">0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.</p>
+    <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="Panneau du module PHRASE" width="237" height="300" loading="lazy" /></figure>
+    <h4>Ce que c’est</h4>
+    <p>PHRASE propose un motif et le joue quand des impulsions arrivent sur CLK. L'idée revient à chaque phrase, avec des changements de direction, des silences et des accents que vous réglez. Ses sorties commandent d'autres voix ; reliez un oscillateur et une enveloppe pour l'entendre.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Utilisez CLOCK pour une pulsation régulière ou les attaques du LISTEN pour répondre à un autre son. SEED identifie le motif. VAR transforme ses passages ; à zéro, le dessin qui revient est plus facile à reconnaître. L'entrée PITCH fournit un appui, capturé au début de chaque phrase. Pour choisir une gamme, passez la sortie PITCH par QUANTIZER avec RANGE=1. PHRASE ne contient pas à lui seul un répertoire de styles ou de traditions musicales.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>LEN</b> : longueur de la phrase en événements, de 2 à 16 impulsions. Ce n'est pas une durée fixe en secondes.</li>
+      <li><b>SPAN</b> : étendue du dessin, de 1 à 36 demi-tons, avant quantification.</li>
+      <li><b>DIR</b> : incline le dessin vers le bas ou le haut. Au centre, conserve la direction du motif de base.</li>
+      <li><b>VAR</b> : ampleur des transformations à chaque passage. Commencez à zéro, puis augmentez en écoutant ce que vous reconnaissez encore.</li>
+      <li><b>SPACE</b> : probabilité de silences dans les pas intermédiaires. Le début et la conclusion sont préservés.</li>
+      <li><b>CAD</b> : force du retour à l'appui en fin de phrase.</li>
+      <li><b>GATE</b> : durée de l'articulation, de 5 à 400 ms. Reliez GATE à l'enveloppe de la voix pour entendre les notes articulées.</li>
+      <li><b>SEED</b> : identité numérique du motif, de 1 à 65535. La changer recrée le dessin et recommence ; VARIA laisse ce réglage inchangé.</li>
+    </ul>
+    <p>Entrées : PITCH, appui à 1 V par octave ; CLK, un pas par front montant ; RST, reprise ; STIM, intensité de 0 à 1 ; RET, demande de conclusion au prochain pas. Sorties : PITCH, hauteur tenue ; GATE, articulation ; ACC, accent de 0 à 1 ; END, impulsion de 5 ms à la conclusion ; PHASE, position de 0 à 1 dans la phrase. Sans câble sur STIM, l'intensité vaut 1. Rouvrir le patch recommence la phrase, sans reprendre la position exacte de l'exécution précédente.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Désactivez VARIA. Reliez CLOCK.EUC à PHRASE.CLK, PHRASE.PITCH à QUANTIZER.CV (RANGE=1), puis QUANTIZER.PITCH à OSC.PITCH. Choisissez une gamme sur QUANTIZER.</li>
+      <li>Reliez OSC.SAW à ENVELOPE.IN, PHRASE.GATE à ENVELOPE.GATE et ENVELOPE.OUT au MIXER. Commencez avec VAR=0 et SPACE=0. Écoutez l'idée revenir ; modifiez DIR puis SPAN séparément.</li>
+      <li>Placez un VCA entre la voix et le MIXER : ENVELOPE.OUT vers VCA.IN1, VCA.O1 vers le MIXER, LVL1=0 et CV1=1. Reliez PHRASE.ACC à VCA.CV1 pour entendre les accents. Augmentez VAR, puis SPACE.</li>
+      <li>Remplacez CLOCK par LISTEN.L-HIT sur CLK et reliez LISTEN.LOW à STIM. Le son écouté appelle maintenant les notes et modifie leur intensité. Une impulsion sur RET demande une conclusion au prochain CLK ; END peut appeler une seconde voix.</li>
     </ol>
   </article>
 </section>
@@ -1509,7 +1540,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-OUT">
-  <h2>OUT <small>4 modules</small></h2>
+  <h2>OUT <small>5 modules</small></h2>
   <article class="modulo" id="mod-MIXER">
     <h3>MIXER</h3>
     <figure class="painel"><img src="assets/modulos/MIXER.webp" alt="Panneau du module MIXER" width="166" height="300" loading="lazy" /></figure>
@@ -1596,6 +1627,32 @@
       <li>Dans une mélodie faite avec QUANTIZER, OSC et ENVELOPE, branchez PTCH du QUANTIZER sur PITCH de NOTE-OUT, et PTHR sur 1V/O de l'OSC.</li>
       <li>Branchez l'impulsion qui déclenche l'enveloppe sur GATE de NOTE-OUT, et GTHR sur GATE de l'enveloppe. Le son reste le même.</li>
       <li>Enregistrez un passage avec REC. À côté du fichier audio, le fichier texte de la partition liste chaque note jouée.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-LISTEN">
+    <h3>LISTEN</h3>
+    <p class="development-note">0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.</p>
+    <figure class="painel"><img src="assets/modulos/LISTEN.webp" alt="Panneau du module LISTEN" width="189" height="300" loading="lazy" /></figure>
+    <h4>Ce que c’est</h4>
+    <p>LISTEN suit l'énergie d'un son dans trois régions : grave, médium et aigu. Chaque région fournit un niveau continu et une impulsion lorsqu'elle détecte une attaque. Ces signaux permettent à une autre voix de répondre à ce qui joue.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Un coup grave peut appeler une note ; les cymbales peuvent changer la brillance d'une voix. Les régions se recouvrent : un instrument peut apparaître sur plusieurs sorties. LISTEN mesure des fréquences et des contrastes d'énergie, sans séparer les instruments ni trouver le tempo. THRU conserve le son reçu pour que vous puissiez aussi l'écouter. Les indicateurs montrent les niveaux et signalent les attaques récentes.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>LOW</b> : séparation grave/médium, de 60 à 800 Hz. Déplacer une séparation suspend les attaques pendant 50 ms pour éviter les déclenchements dus au réglage. Une modulation continue peut prolonger cette suspension.</li>
+      <li><b>HIGH</b> : séparation médium/aigu, de 1 à 8 kHz, limitée par la fréquence d'échantillonnage.</li>
+      <li><b>RESP</b> : lisse les niveaux. Augmentez-le pour prolonger l'énergie après chaque coup. La détection des attaques reste indépendante.</li>
+      <li><b>SENS</b> : sensibilité aux attaques. Augmentez-la pour détecter de plus petits contrastes ; réduisez-la si un coup provoque trop d'événements.</li>
+      <li><b>FLOOR</b> : seuil d'amplitude pour déclencher, de −72 à −18 dBFS. Le relever aide à écarter les bruits faibles.</li>
+      <li><b>REARM</b> : attente minimale entre deux attaques de la même région, de 20 à 250 ms. Un réglage élevé peut ignorer des coups rapides.</li>
+    </ul>
+    <p>Entrée : IN, l'audio. Sorties : THRU, l'audio conservé sur chaque canal ; LOW, MID et HIGH, niveaux de 0 à 1 ; L-HIT, M-HIT et H-HIT, impulsions de 5 ms. Le mouvement automatique VARIA laisse les réglages de calibration inchangés.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Désactivez VARIA. Reliez CLOCK.EUC à DRUM.GATE, DRUM.OUT à LISTEN.IN et LISTEN.THRU à une entrée du MIXER. Commencez à faible volume et observez les indicateurs.</li>
+      <li>Reliez L-HIT à PHRASE.CLK. Pour entendre la réponse, reliez PHRASE.PITCH à QUANTIZER.CV, avec RANGE=1 ; QUANTIZER.PITCH à OSC.PITCH ; OSC.SAW à ENVELOPE.IN ; PHRASE.GATE à ENVELOPE.GATE ; ENVELOPE.OUT au MIXER.</li>
+      <li>Modifiez TONE et SNAP du DRUM. Réglez FLOOR et REARM jusqu'à ce que la voix réponde aux coups souhaités. Remplacez L-HIT par H-HIT et écoutez le dialogue changer.</li>
+      <li>Pour varier l'intensité, placez un VCA entre ENVELOPE et MIXER, avec LVL1=0 et CV1=1 ; reliez PHRASE.ACC à VCA.CV1 et LISTEN.LOW à PHRASE.STIM. Pour l'audio externe, envoyez SIGNAL-IN.OUT vers LISTEN.IN et activez vous-même ON sur SIGNAL-IN.</li>
     </ol>
   </article>
 </section>

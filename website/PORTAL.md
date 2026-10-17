@@ -1,7 +1,7 @@
 # Entrada do Rasgo Modular no portal da família
 
 Texto pronto para o card do instrumento em
-[`RASGO_WEBSITE`](../../RASGO_WEBSITE/), nos quatro idiomas.
+[`RASGO_WEBSITE`](../../../RASGO_WEBSITE), nos quatro idiomas.
 
 **Não aplicado aqui de propósito.** O portal é território do Codex — isto é
 material para combinar, não alteração feita. Segue o formato exato dos

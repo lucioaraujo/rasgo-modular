@@ -1,12 +1,544 @@
 # RASGO Modular — tarefas e continuidade
 
-**Atualizado:** 2026-09-04 (marco 3)
-**Estado:** `prototype`
+Atualizado: 2026-10-18.
+Estado publicado: consultar o README e os registros datados ao final deste arquivo.
+Os marcos iniciais abaixo são históricos, não o estado atual da publicação.
 
 Esta é a lista operacional do projeto. A arquitetura conceitual permanece em
 [`RASGO_MODULAR.md`](RASGO_MODULAR.md) (§36 = estado atual); decisões
 transversais e reutilização continuam no inventário global; um dossiê por
 módulo em [`dossies/`](dossies/00_indice.md).
+
+Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
+
+## Preparação de publicação — 18/10/2026
+
+- [x] Build integral Linux 0.1.7-dev, serial e com limite virtual de 5 GiB;
+  84/84 CTests passaram após recompilar. Swap permaneceu livre.
+- [x] Dez testes Python do site e `website/verificar.py` passaram: oito
+  páginas, seis nomes de download e metadados coerentes com a 0.1.6 pública.
+- [x] Abertura/exportação isolada dos dois exemplos e ensaios de troca de
+  patch e RACK: TODOS 3 → SAÍDA 2 → TODOS 3. Isso não é teste da janela
+  normal nem escuta.
+- [x] Um `.deb` local foi gerado e inspecionado. O conteúdo está correto;
+  dependências `libasound2t64`/glibc 2.38 mostram que **não** se deve
+  distribuir este pacote Mint 22 como se fosse o Ubuntu 22.04 da CI.
+- [ ] Concluir o portão interativo e musical descrito abaixo; registrar
+  resultados sem afirmar que uma exportação substituiu a janela ou o ouvido.
+- [ ] Executar a matriz CI **uma vez**, inspecionar seis artefatos e quatro
+  testes de abertura Linux; só então decidir tag/release da 0.1.7.
+- [ ] Após anexos públicos válidos, mudar site, SEO e guias nos quatro
+  idiomas e verificar links reais. Até lá, downloads ficam em 0.1.6.
+
+Detalhes e ordem de publicação: [`PUBLICACAO.md`](PUBLICACAO.md).
+
+## Portão antes de pedir teste ao autor — 17/10/2026
+
+A verificação técnica e interativa é trabalho do desenvolvimento, não uma
+tarefa transferida ao autor. Antes de indicar uma seed, patch ou sequência
+de cliques, o agente deve:
+
+1. Conferir o binário realmente aberto (versão/data/hash), o arquivo exato
+   e o estado inicial; não confundir código novo com app antigo ou sessão
+   pessoal. Usar configuração isolada para ensaios que alteram preferências.
+2. Reproduzir a ação no app, inclusive a volta ao estado anterior, e
+   verificar o resultado visível. Teste de motor ou imagem exportada não
+   equivale a clicar na janela. Se não houver acesso à janela real, marcar
+   essa verificação como não executada; não declará-la aprovada.
+3. Comprovar que o exemplo exercita a diferença procurada. Registrar o
+   resultado esperado e observado (contagens, conexões, controles, áudio).
+   Um exemplo 10/10 nas duas vistas nunca deve ser apresentado para testar
+   o contraste TODOS/SAÍDA. Carregar sem cair não prova comportamento
+   musical nem ausência de travamentos durante o uso.
+4. Fazer as verificações automatizáveis de integridade, áudio e recursos,
+   distinguindo medições de escuta. Investigar falhas antes de envolver o
+   autor; não pedir que ele faça triagem de um caso mal preparado.
+5. Só depois, se restar questão perceptiva que exige seu ouvido ou hardware,
+   propor uma tarefa curta com comando correto, duração, ação, resultado
+   esperado e modo de parar. O autor decide se e quando a faz.
+
+Pendência atual do desenvolvimento: conferir a janela normal do build
+0.1.7-dev, incluindo abertura/troca de patch, contagem e rolagem do RACK,
+F1/F2/F6, zoom e gestos. A escuta de LISTEN/PHRASE não deve ser repassada
+ao autor antes desse portão. O retorno já dado sobre RACK funcionando é
+evidência dessa ação, não aprovação geral do exemplo ou da interface.
+Os registros antigos de "teste manual/escuta do autor" abaixo são histórico;
+este portão governa novos pedidos.
+
+### Diagnóstico de 17/10 — botão RACK após abrir o exemplo
+
+O autor observou que, depois de clicar em RACK · TODOS, pareciam continuar
+somente os módulos da vista SAÍDA. A auditoria nativa, isolada da sessão e
+sem áudio, contou `escuta_frase.rmp`: TODOS 10, SAÍDA 10. Todos os dez nós
+visíveis desse exemplo chegam à saída; portanto, as duas vistas são iguais.
+Num patch de controle com DRUM → MASTER → OUT e NOISE desconectado, o
+despacho real do botão deu TODOS 3 → SAÍDA 2 → TODOS 3. O filtro não apagou
+NOISE. A interface JUCE passa a mostrar a contagem visível/total ao alternar
+e explica no LEARN que TODOS significa *todos os módulos do patch atual*,
+não todo o catálogo. Para abrir o rack semeado de 58 módulos, criar uma nova
+seed (salvando primeiro o patch de exemplo, se houver alterações); LISTEN e
+PHRASE seguem opcionais na paleta. Próximo passo do desenvolvimento: conferir
+visualmente no app normal, com uma seed e com o exemplo, se a contagem e a
+rolagem comunicam bem essa diferença. Não houve mudança de DSP, do arquivo
+`.rmp` nem do catálogo; o teste isolado não substitui essa conferência da
+janela real.
+Após abrir novamente, o autor confirmou que a alternância voltou a funcionar.
+Não há evidência de que a troca tenha removido módulos; a igualdade 10/10
+no exemplo explica por que as duas vistas pareciam idênticas. O fechamento
+anterior ao abrir o exemplo era um defeito separado, corrigido na etapa
+precedente. Build JUCE local de 17/10 às 22:56:28 +02:00, SHA256
+`232d3f8fcfddd7459170b3577b5bd207545ccc15f929bd936a83c0e894da77e5`;
+teste isolado da troca passou, assim como cinco CTests dirigidos em 11,74 s;
+`git diff --check` passou. Sem push, CI ou empacotamento nesta etapa.
+
+Regra para os próximos exemplos e seeds oferecidos ao autor: declarar qual
+função devem demonstrar e conferir previamente que a diferença é observável
+naquele arquivo. Verificar carregamento, estado esperado (módulos/cabos,
+controles e vista), funcionamento sonoro quando pertinente e ida e volta da
+ação pedida. Se as duas condições comparadas forem iguais, o exemplo não é
+adequado para esse teste: usar outro caso, sem fazer o autor investigar uma
+falsa regressão. Não chamar uma seed de "validada ao ouvido" sem escuta real;
+uma prova automática de estrutura ou de áudio offline não substitui isso.
+O `escuta_frase.rmp` permanece exemplo de LISTEN/PHRASE, não de RACK.
+
+Complemento de validação: `tests/test_reactive_modules.cpp` agora mede o
+alcance dos módulos nos dois exemplos reais, além do teste de áudio já
+existente. A execução local confirmou `escuta_frase.rmp` 10/10, 13 notas,
+RMS 0,02518 e pico 0,19939; `painel_tutoriais.rmp` 11/11, 13 notas,
+RMS 0,01873 e pico 0,14649. O teste passou em 0,78 s. Isso protege a
+finalidade declarada dos arquivos: demonstrar LISTEN/PHRASE e os painéis,
+não o contraste entre vistas RACK. É validação automática, não escuta
+musical nem teste da janela em uso. Nenhum exemplo ou seed foi modificado.
+
+Retomada autorizada em 17/10: Studio publicado e .deb 0.1.1 testado pelo autor.
+O pedido atual é avançar o Modular, incluindo os dois módulos novos. A
+prioridade do Studio registrada em 13/10 foi concluída.
+
+## Retomada de 17/10/2026 — LISTEN e PHRASE
+
+Desenvolvimento local 0.1.7-dev; a release pública continua na 0.1.6.
+
+- [x] LISTEN: análise causal em três regiões, seis saídas de nível/ataque,
+  THRU por canal, memória fixa para até oito canais. Calibração fora da VARIA.
+- [x] PHRASE: motivo por CLK externo, direção, âmbito, variação, pausas,
+  acentos, apoio, cadência e retorno solicitado. SEED fora da VARIA.
+- [x] Factory, paleta nas famílias OUT/DECISION, ajuda dos controles nos
+  quatro idiomas, dossiês 61/62 e guias próprios.
+- [x] Rack semeado preservado: `seedModuleCatalog()` conserva os 58 tipos
+  e a ordem existentes. `moduleCatalog()` oferece 60 na paleta; os dois
+  novos entram por gesto. SCOPE/QUANTIZER conservam seus contratos.
+- [x] Inserção de módulos por família e ordem alfabética, tanto no JUCE
+  quanto no painel X11. PHRASE fica entre HARMONY/QUANTIZER e LISTEN
+  antes de NOTE-OUT/SCOPE na ordem padrão; MIXER/MASTER continuam no fim.
+  Instâncias repetidas entram após a última do mesmo tipo. Não há
+  reordenação dos vizinhos, dos patches salvos ou dos IDs de processamento.
+- [x] Bancada DSP inicial: tons, ataques, silêncio, taxas 8–192 kHz,
+  estéreo em oposição, valores inválidos, blocos, reset, cadência, seed,
+  variação, save/load e uma voz reativa completa; zero chamadas de heap
+  em process(). Medição inicial: 6,47 µs/bloco para o par, mono/128/48 kHz
+  (0,24% do orçamento temporal; não representa o custo total do app).
+- [x] Patch de demonstração `examples/escuta_frase.rmp`, sem arquivos de áudio.
+- [x] Build JUCE Linux 0.1.7-dev concluído; oito regressões direcionadas
+  passaram: sete em 27,43 s (módulos reativos, layout, LEARN, seed,
+  equilíbrio de seeds, VARIA e SCOPE), mais clipping com VARIA em 4,35 s.
+- [ ] Desenvolvimento: fechar primeiro o portão técnico acima; depois,
+  se ainda necessária, convidar o autor a uma escuta musical curta de
+  LISTEN/PHRASE com caso e expectativa definidos. Áudio externo variado
+  (voz, pratos e misturas reais) depende de equipamento/decisão do autor.
+- [x] Primeiro lote de interface JUCE: textos mais claros, LEARN rolável,
+  unidade e valores BASE/DSP durante o gesto; leitura fixada por F1/clique
+  com navegação pelo teclado. Validação visual ainda pendente.
+- [x] Hierarquia inicial: CUT maior que RESO no FILTER; quatro sliders
+  verticais ATK/DEC/SUS/REL no ENVELOPE, com parâmetros e VARIA preservados.
+- [x] Guias completos de LISTEN/PHRASE no website local em PT/EN/FR/ES,
+  com imagens reais e indicação explícita de desenvolvimento 0.1.7-dev.
+- [ ] Desenvolvimento: conferir interativamente diferentes zooms/resoluções,
+  arrasto, cabeamento, F1 e valores BASE/DSP na janela normal, em configuração
+  isolada quando apropriado. PNGs nativos em 2× não substituem essa rodada;
+  não delegar a triagem inicial ao autor.
+- [x] Primeiro lote de preferências de leitura: LEARN em 12/14/16 pixels
+  lógicos, coluna/altura proporcionais, texto branco opcional e restauração
+  dos padrões. Preferência local reading-ui, separada do patch.
+- [x] Ajuda dos 22 comandos/campos do cabeçalho em quatro idiomas e navegação
+  por F6/setas/Tab; F1 fixa a leitura. Próximos lotes: preferências gerais
+  de fontes/cores dos módulos e escolha de renderizador, conforme Audiofanzine.
+
+Limites: LISTEN ainda não estima pulso/BPM ou harmonia. PHRASE não importa
+escalas nem inclui gramáticas culturais de fraseado. Croma, pulso, arquivo
+de alturas, microtonalidade e expressividade mais profunda seguem pendentes.
+Nenhum arquivo do Trioio foi copiado; a referência conceitual está nos dossiês.
+Não houve push, release ou execução de CI neste incremento.
+
+Binário do primeiro lote (substituído pelo complemento abaixo):
+`build/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular`,
+17/10/2026 às 02:33:18 +02:00, 18.833.592 bytes, SHA256
+`eac7a5b7d2632c2af7767a6f3f18e04b1edf69a610089ed0e00d32cbca8f1cf1`.
+Versão 0.1.7-dev e nomes LISTEN/PHRASE conferidos no binário. Build serial,
+timeout de 600 s e limite virtual de 5 GiB; memória disponível final 14 GiB,
+swap zerada. Houve avisos do compilador em HarfBuzz/Opus do SDK JUCE;
+testes do projeto com -Werror passaram. A interface foi compilada e o
+layout geométrico passou; não foi aberta nem escutada nesta sessão.
+
+Para testar: `./run` na pasta do Modular; ABRIR →
+`examples/escuta_frase.rmp`. Desligar VARIA na primeira comparação. O exemplo
+em memória produziu 13 notas/8,53 s, RMS 0,02518 e pico 0,19939 (cerca de
+−14 dBFS), incluindo o VCA da voz melódica. Não foi gravado áudio em disco.
+O binário instalado da 0.1.6 não contém esses módulos; usar o build local.
+
+### Complemento de 17/10 — posição ao acrescentar módulos
+
+Objetivo: evitar que módulos novos sejam sempre jogados ao fim do rack.
+`moduleInsertionIndex()` em `apps/panel/ModuleCatalog.hpp` escolhe uma
+âncora dentro da família presente; se ela ainda não existe, usa a primeira
+família posterior. Em um rack movido manualmente, mantém a ordem relativa
+de todos os módulos anteriores, em vez de ordenar o rack inteiro.
+
+Aplicado ao `addModule()` do JUCE e às inserções por paleta/sugestão do
+painel X11. Carregamento, desfazer, gesto de mover e geração por seed não
+passam por essa regra nova. Não conecta cabos nem inclui os dois módulos
+automaticamente em todas as seeds.
+
+Teste ampliado em `tests/test_reactive_modules.cpp`: inserção dos dois
+novos em qualquer ordem, reconstrução dos 60 tipos em ordem inversa,
+duplicatas, ordem manual, família ausente, tipo desconhecido e separação
+entre posição visual/ID do grafo. A serialização DSP permanece idêntica
+antes/depois da mudança somente visual. CTest reativo passou em 0,37 s.
+Build JUCE concluído. Executável local atualizado em 17/10 às 02:55:39
++02:00, 18.838.656 bytes, SHA256
+`6c47e8567b584d0dc3d8f175216dae9345067783a2f62a86fa77888e0ca96262`.
+Conferidos 0.1.7-dev, LISTEN/PHRASE e o símbolo da nova regra de inserção
+no binário; a janela não foi aberta. Painel X11 recompilado às 02:57:16;
+regra de inserção também conferida no seu binário. Builds seriais, limite
+virtual de 5 GiB e timeout de 600 s. Os dois CTests direcionados passaram
+em 9,98 s: módulos reativos/ordenação (0,38 s) e seeds (9,60 s). Não foi
+reexecutada a suíte inteira. `git diff --check` passou; SCOPE e QUANTIZER
+sem alterações. Memória disponível ao fim: 14.124 MiB; swap usada: 256 KiB.
+
+README, arquitetura, changelog e guias 61/62 atualizados com a regra.
+Próximo passo: conferir no app a inserção e movimentação dos dois novos,
+inclusive na vista SAÍDA, e escutar o patch de demonstração; depois retomar
+o lote de acessibilidade ainda pendente. Sem push, release ou CI e sem
+novos arquivos ZIP. Alterações preexistentes foram preservadas.
+
+### Complemento de 17/10 — legibilidade e LEARN no JUCE
+
+Objetivo: ler as explicações inteiras e acompanhar o parâmetro durante o
+gesto, sem interferir no processamento musical nem mudar os patches.
+
+- Textos principais/secundários clareados no tema de produção. Contraste
+  matemático nas três superfícies opacas: 8,40:1 a 17,11:1. Isso não
+  certifica a percepção, o monitor, textos translúcidos ou o tamanho da letra.
+- LEARN com título/valores fixos e explicação rolável por roda, barra ou
+  teclado. TextLayout mede e desenha o mesmo texto, sem compressão para
+  caber na altura disponível. A composição dos parágrafos fica em cache.
+- BASE/DSP e unidade durante hover/arrasto, inclusive fora da pegada do
+  knob. Identidade inclui o ID do nó: duas instâncias não compartilham
+  leitura. Novo valor não reinicia a rolagem. BASE é a intenção do controle;
+  DSP é o último valor do parâmetro no grafo, não todos os CVs internos.
+- F1/clique fixa o verbete para leitura. Setas, PgUp/PgDn e Home/End
+  rolam; Esc/F1 retorna ao rack. Enquanto fixado, inclusive os valores
+  mantêm a última consulta. O gesto num controle retoma o acompanhamento.
+- Snapshot dos floats por try_lock; strings e formatação fora do lock e
+  do callback de áudio. Se não há consulta nova, conserva o último valor
+  apenas daquele controle. Não foi alterado nenhum DSP neste complemento.
+- Corrigidos cliques/hover sobre linhas escondidas sob o LEARN e a
+  expiração dos avisos, agora repintados por timer mesmo sem mexer o mouse.
+
+Arquivos: `apps/juce/RasgoModularApp.cpp`, `LearnEntry.hpp`,
+`LearnPresentation.hpp` e `LearnCatalog.hpp` em `apps/panel/`, novo teste
+`tests/test_learn_presentation.cpp` e alvo em CMake. README, changelog e
+`guia/CABEAMENTO.md` explicam o uso. O painel X11 não recebeu essas mudanças
+de apresentação; nele foi preservada a etapa anterior de inserção por família.
+
+Validação: três CTests passaram em 0,06 s — catálogo LEARN, apresentação
+(formatação, identidade, leitura fresca/retida, rolagem/redimensionamento e
+contraste) e passagem do idioma nos front-ends. Build final JUCE Linux
+concluído, serial, timeout de 600 s e limite virtual de 5 GiB. Nenhuma
+fonte C++/header em apps/src ficou mais recente que o executável; `ldd`
+sem dependências ausentes e `git diff --check` sem erros.
+O primeiro build do teste excedeu o timeout de 120 s por incluir as tabelas
+completas desnecessariamente; separado o tipo LearnEntry do catálogo, o
+teste de apresentação passou a compilar em cerca de um segundo.
+
+Binário atual: `build/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modular`,
+17/10/2026 às 03:10:44 +02:00, 18.852.400 bytes, SHA256
+`4f8c812bb329578c77b52816431cf9257cb9f9d157d1d55581044010ef8cfbb5`.
+Conferidos 0.1.7-dev e os textos BASE/DSP/F1 no executável. Memória
+disponível final: 13.917 MiB; swap usada: 256 KiB, sem crescimento.
+Não foi executada a suíte inteira de 83 alvos, somente os três citados.
+
+Limites/próximo passo: conferir no app texto longo, valores durante o
+arrasto, duas instâncias, foco F1/Esc, idiomas e zoom. Não houve teste de
+janela ou escuta nesta etapa. Preferências de fonte/cor, hierarquia/tamanho
+dos controles, ADSR vertical, ajuda do cabeçalho e seleção de renderizador
+continuam pendentes. Não houve push, release, CI, ZIP ou mudança no Studio.
+
+### Complemento de 17/10 — imagens reais de LISTEN e PHRASE
+
+- [x] Exportação nativa a partir do patch de demonstração, sem saída de
+  áudio/MIDI, sem gravar áudio e sem salvar sessão; filtro por tipos.
+- [x] Imagens WebP nos assets do website e inseridas nos guias locais 61/62.
+  LISTEN: 378×600 / 6.524 bytes. PHRASE: 474×600 / 8.186 bytes. PNGs
+  e evidência de exportação em `build/panels-20261017.FW04ho/` (ignorado).
+- [x] Inspeção visual dos dois PNGs: controles/jacks legíveis, sem corte
+  visível, medidores reais. PHRASE em sustentação, passo 7/8. Não se trata
+  de geração de imagens por IA; é o próprio renderer do app.
+- [x] Script Linux `website/exportar_patch.sh`, sintaxe validada. Limites:
+  5 GiB, CPU 20 s, timeout 30 s; execução bem-sucedida em cerca de 1 s.
+- [x] Isolamento verificado: após a correção, hashes da sessão e log de
+  arranque padrão não mudaram; novo log só na pasta explícita de captura.
+  Na primeira tentativa, o SDK ignorou XDG_CONFIG_HOME e escreveu o log de
+  arranque na pasta padrão; a sessão não foi sobrescrita. Corrigido com
+  `RASGO_EXPORTAR_CONFIG`, sem redefinir HOME.
+
+Build local 0.1.7-dev de 17/10 às 03:33:05 +02:00, 18.862.944 bytes,
+SHA256 `61930e5860deb13dc70e108de653ab4dcb458d59251fdfef69fffd1c710ddefb`.
+Apenas o modo explícito de exportação evita o dispositivo de áudio;
+a abertura normal continua sendo musical. As páginas HTML ainda precisam
+receber os novos guias nos quatro idiomas. Sem push, release ou ZIP.
+
+Sequência autônoma autorizada pelo autor: fechar imagens/guias, implementar
+sliders do ENVELOPE preservando parâmetros e VARIA, avaliar hierarquia do
+FILTER, atualizar as páginas locais em quatro idiomas, validar e documentar.
+Essa sequência não autoriza publicação nem alterar Studio/Performance/Trioio.
+
+### Complemento de 17/10 — sliders, hierarquia e guias em quatro idiomas
+
+Objetivo: concluir o lote de apresentação e documentação dos dois módulos,
+sem transformar uma atualização visual em mudança silenciosa de som.
+
+- ENVELOPE mantém 12 HP, IDs, portas, faixas e processamento. ATK/DEC/SUS/REL
+  passam a sliders verticais; tempos têm posição logarítmica de 1 ms a 10 s
+  e SUS é linear. CURVE/VCA/LVL ficam abaixo. O arrasto conserva a resposta
+  anterior. TRIG ganhou legenda abaixo, depois de a captura real revelar
+  corte na lateral; desenho e área de interação foram corrigidos juntos.
+- FILTER mantém 10 HP e o DSP; CUT tem diâmetro de 12 mm e se distingue
+  de RESO. A geometria é respeitada pelo desenho e hit-test no JUCE/X11.
+- MotionEngine preserva a classificação dos quatro parâmetros ADSR: trocar
+  Knob por Slider não reduz sua movimentação. Regressão compara, valor a
+  valor, a apresentação antiga e a nova em três seeds, 3.600 ticks por seed,
+  energia variável e edição manual no meio da execução.
+- Teste geométrico ampliado para quatro sliders, escala de tempo, hierarquia
+  CUT/RESO e espaço do rótulo TRIG. O restante dos controles mantém o desenho.
+- `website/guia/{pt,en,fr,es}/{LISTEN,PHRASE}.md`: oito verbetes completos,
+  quatro partes por verbete, controles/portas, experiência de cabeamento e
+  limites de escuta/fraseado. Corrigidos os nomes concretos DRUM.GATE e
+  VCA.LVL1/IN1/O1. Guias de ENVELOPE/FILTER revistos nos quatro idiomas.
+- Catálogo exportado do app: 60 tipos, oito famílias. As quatro páginas de
+  módulos são geradas desse catálogo e dos guias; contagem deixou de ser
+  fixa. Identificam 58 módulos publicados e dois em desenvolvimento local.
+  Downloads, páginas principais e metadados continuam na release 0.1.6.
+- `verificar.py` distingue CMake -dev da release pública sem tolerar links
+  para uma versão futura, nem nomes de pacote inconsistentes. Dez regressões
+  Python verificam 240 guias, imagens, artigos, reprodução da geração,
+  receitas e cenários de versão. Corrigido também o fechamento dos arquivos
+  de imagem no gerador; testes passam com ResourceWarning tratado como erro.
+- `examples/painel_tutoriais.rmp` acrescenta FILTER à demonstração sem alterar
+  `escuta_frase.rmp`. Exportação offline dos quatro painéis, sem áudio/MIDI;
+  hashes do log e da sessão pessoal permaneceram iguais. PNGs inspecionados
+  visualmente; TRIG completo, sem corte visível. WebP: ENVELOPE 284×600/6.128 B,
+  FILTER 236×600/6.478 B, LISTEN 378×600/6.524 B, PHRASE 474×600/8.186 B.
+  Dos 58 assets anteriores, só ENVELOPE/FILTER foram alterados; os outros
+  56 conservaram seus hashes. Não há áudio de demonstração gravado em disco.
+
+Evidência local: `build/panels-20261017.FW04ho/`, incluindo logs isolados e
+PNGs reais. Uma tentativa de screenshot do website com Chrome headless
+retornou somente o fundo; não foi aceita como validação visual do site.
+A estrutura e as referências locais passaram no verificador. Não foi
+alterado CSS para compensar um resultado inconclusivo do navegador.
+
+Build final JUCE Linux 0.1.7-dev: 17/10/2026 19:27:48 +02:00, 18.867.040 bytes,
+SHA256 `0d9e32067ab763d7916538eb3eb7760601bd1aa5dd03be7cc45215684099285b`.
+Painel X11 recompilado às 19:19:19. Builds seriais, limite virtual 5 GiB,
+timeout; exportação limitada a 4 s simulados e 30 s de tempo real.
+Os quatro PNGs do build final conservaram os hashes da captura inspecionada;
+não há fontes em apps/src mais novas que esse executável.
+Não houve push, release, CI, pacote de instalação ou ZIP. Nenhum projeto
+irmão foi alterado. Preferências e sessão do músico foram preservadas.
+
+Validação final do lote: 12 CTests direcionados passaram em 41,43 s
+(FILTER, ENVELOPE, módulos reativos, layout, VARIA, clipping sob VARIA,
+patches por seed, equilíbrio das seeds e quatro verificações LEARN).
+Não foi executada a suíte inteira. Dez testes Python passaram em 0,30 s,
+sem avisos de recursos, e as oito páginas passaram em `website/verificar.py`.
+`git diff --check` passou; `ldd` não apontou dependências ausentes.
+Os dois exemplos geraram 13 notas em 8,53 s em memória: demonstração com
+RMS 0,02518/pico 0,19939; variante com FILTER com RMS 0,01873/pico 0,14649.
+Não houve escuta humana desses sinais nesta rodada. Swap permaneceu em
+256 KiB, sem necessidade de limpeza.
+
+#### O que falta para fechar esta atualização
+
+1. Conferir no app normal: arrasto dos quatro sliders, CUT/RESO, idiomas,
+   zoom, F1/Esc e leitura de valores, inserção e movimentação de LISTEN/PHRASE.
+2. Escutar `examples/escuta_frase.rmp` e testar LISTEN com áudio externo real.
+   Os testes em memória confirmam sinal, eventos e limites, não a qualidade
+   musical percebida pelo autor.
+3. Prévia do website em navegador normal, em tela ampla e estreita; a captura
+   headless desta rodada foi inconclusiva. Os links e conteúdos foram
+   verificados localmente, não publicados.
+4. Após aprovação: revisar o diff completo (preservando as alterações
+   preexistentes), commit/push e portão de release multiplataforma com teste
+   dos instaladores. Nada disso foi disparado automaticamente.
+
+Preferências tipográficas, ajuda do cabeçalho, renderizador GPU opcional,
+pulso/croma, aprofundamento do fraseado/QUANTIZER e inclusão dos dois módulos
+na geração automática são próximos lotes. Não são funcionalidades concluídas
+nem precisam ser amontoadas nesta release. A formação inicial de 58 tipos
+das seeds continua preservada; LISTEN/PHRASE entram por gesto do músico.
+
+### Complemento de 17/10 — comandos do cabeçalho e preferências de leitura
+
+Objetivo: concluir a primeira ajuda acessível dos comandos, sem mudar o
+DSP, os módulos semeados ou os patches. Somente o front-end JUCE recebe
+esta implementação; o painel X11 conserva sua interface anterior.
+
+- `apps/panel/HeaderHelp.hpp`: contrato dos 22 comandos/campos e explicações
+  próprias em EN/PT/FR/ES, sem dependência JUCE. Mouse usa o dwell do LEARN;
+  F6 foca o cabeçalho, esquerda/direita ou Tab/Shift+Tab percorrem os controles
+  visíveis, Enter/espaço acionam, F1 fixa a explicação e Esc/F6 retorna ao
+  rack. O campo de seed entra em edição por Enter; intensidade VARIA aceita
+  cima/baixo em passos de 0,05, limitada a 0–2. No rack, espaço conserva o
+  gesto anterior de romper/reatar cabos. Tutorial/Sobre têm prioridade de
+  teclado: os atalhos novos não permitem operar comandos escondidos atrás deles.
+- Os textos foram conferidos contra os callbacks: BANCO grava um patch
+  em patches/ e pode substituir o arquivo da mesma seed; ABRIR é o leitor.
+  EVOLUI aplica seis mutações menores numa operação de efeito imediato,
+  sem prometer uma transição temporal ainda inexistente.
+- `ReadingPreferences.hpp`: leitura 12/14/16 em pixels lógicos JUCE, com
+  largura 186/226/266 e altura preferida 232/272/312. A altura é limitada
+  pela janela, preservando área para a lista. Texto branco opcional na
+  explicação. F2 ou Aa abre menu nos quatro idiomas, com restauração.
+  A fonte dos módulos e do cabeçalho não é alterada por esse menu.
+- Preferência reading-ui versionada, limitada a 64 bytes; arquivo ausente,
+  inválido ou de versão desconhecida volta ao padrão. Gravação falha gera
+  aviso, sem desfazer a escolha em memória. Não se grava preferência em
+  patch, seed ou áudio. Escolha de família tipográfica e cores livres
+  continuam pendentes, assim como preferência de renderizador.
+- Cache do LEARN é invalidado quando muda a leitura; a rolagem é recalculada
+  sem comprimir o corpo. Lista e cabeçalho de famílias são refeitos quando
+  muda a largura, sem acumular cabeçalhos duplicados.
+- Nova regressão `test_ui_guidance.cpp`: 22 comandos únicos, 88 explicações,
+  traduções sem fallback inglês, referência estável; seis combinações de
+  leitura, serialização, conteúdo inválido, limites e janelas pequenas.
+- Validação nativa opcional no exportador: `--check-guidance`. Roda em
+  configuração isolada, sem áudio/MIDI: 1024/1920 de largura, três tamanhos,
+  quatro idiomas, correspondência mouse/teclado, foco F1/Esc e leitura de
+  preferências gravadas em disco. Produz duas capturas reais do app.
+- A primeira rodada nativa encontrou três falhas, uma por tamanho na
+  janela estreita: SEED podia ocupar a segunda linha sobre BANCO/SALVA,
+  porque btnY_ vinha da pintura anterior. Corrigido iniciando cada pintura
+  na linha 12 antes de desenhar SEED/REPOR. Teste continua verificando o
+  acerto de cada alvo visível, sem afrouxar as condições para ficar verde.
+
+Documentação de uso: `guia/CABEAMENTO.md`, README e CHANGELOG. Rotina de
+validação: `website/exportar_patch.sh` e alvo CTest de orientação da UI.
+As capturas e logs ficam locais em `build/guidance-20261017.hZFvdD/`.
+Ainda é necessário uso manual em máquina real; as teclas da auditoria
+nativa são enviadas aos handlers JUCE, não simulam todos os sistemas de
+teclado/janela. Não há teste Windows/macOS nem escuta nesta rodada.
+Sem push, release, CI ou ZIP; nenhuma alteração nos projetos irmãos.
+
+Validação concluída: auditoria JUCE com zero falhas em duas larguras × três
+tamanhos, quatro idiomas × 22 tópicos. Foco F1/Esc e ciclo das opções do
+cabeçalho conferidos pelos handlers; arquivo reading-ui gravado/lido no
+diretório isolado. A captura 1024 revisada mostra SEED novamente na primeira
+linha, separado de BANCO/SALVA; captura 1920 também gerada. A etapa inicial
+com falha foi preservada, e a rodada corrigida está em
+`build/guidance-20261017.hZFvdD/validated/`. Essas capturas acontecem antes
+de abrir áudio: os contadores e medidores não representam uma sessão tocando.
+Os quatro PNGs de módulos mantiveram os hashes do lote anterior.
+
+Build JUCE final 0.1.7-dev: 17/10/2026 19:50:59 +02:00, 18.917.112 bytes,
+SHA256 `85e05f08b40c63e6fd940cf7ac806600090e048aa8bb93b9b294e719d3a89d76`.
+Memória disponível após o build em cerca de 12 GiB; swap manteve 256 KiB.
+Log normal e session.rmp pessoal conservaram seus hashes. A configuração
+do teste terminou com leitura padrão, dentro da pasta isolada. Sem áudio
+gravado ou dispositivo de áudio/MIDI aberto. Builds seriais, limite virtual
+5 GiB e timeout 600 s; validação nativa limitada pelo exportador a 20 s CPU
+e 30 s de relógio. Não se executou a suíte inteira nem builds externos.
+Cinco CTests passaram em 0,02 s: orientação da UI, apresentação LEARN,
+idioma ligado, atalhos e política de abertura. `git diff --check` e a
+sintaxe Bash passaram; nenhuma dependência ausente em ldd e nenhuma fonte
+apps/src mais recente que o executável entregue.
+
+Próximo passo: teste manual de F2/menu, F6/teclado, fontes e gestos no app
+normal, junto da escuta do patch. Depois revisar o diff para publicação.
+Preferências de fonte/cor do rack inteiro e seleção de renderizador continuam
+abertas; a atualização não promete acessibilidade completa em todos os sistemas.
+
+### Complemento de 17/10 — SEED e BANCO no cabeçalho JUCE
+
+Objetivo: concluir a revisão visual do cabeçalho e alinhar a gravação no
+BANCO ao número de seed que o instrumento mostra. Na captura nativa de
+1024 px, o símbolo de dado antes de SEED aparecia como quadrado, por falta
+de glifo. O botão agora usa somente o rótulo traduzido; desenho e medição de
+largura foram alterados juntos. A nova captura foi inspecionada: SEED está
+legível e separado dos demais controles.
+
+O JUCE convertia a seed de 64 bits para inteiro com sinal ao formar o nome
+`seed-N.rmp`. Para valores acima de 2^63−1, isso podia produzir um nome
+negativo, diferente do número exibido e do painel X11. BANCO agora usa a
+representação unsigned completa. O patch e a seed não foram alterados. O
+texto de ajuda em quatro idiomas também informa que um patch sem seed recebe
+nome por horário; a mesma seed guardada novamente substitui seu arquivo.
+Arquivos modificados: `apps/juce/RasgoModularApp.cpp`,
+`apps/panel/HeaderHelp.hpp`, CHANGELOG e este registro.
+
+Validação local: build JUCE serial concluído, limite virtual de 5 GiB e
+timeout de 600 s. Binário 0.1.7-dev de 17/10/2026 às 20:48:05 +02:00,
+18.916.912 bytes, SHA256
+`355ee4b08e62781942dd5b61a03054e43740bc45b34a9f37ac63ca65d60111e2`.
+Auditoria nativa isolada: 2 larguras × 3 tamanhos × 4 idiomas × 22 tópicos,
+zero falhas, incluindo formatação de `18446744073709551615` e patch sem seed.
+Seis CTests pertinentes passaram: cinco de interface/abertura/atalhos e o
+de módulos reativos; o teste de orientação foi recompilado após mudar a
+ajuda e passou novamente. `git diff --check` passou. Capturas finais em
+`build/bank-20261017.ZSbvnZ/`. Hashes da sessão e do log pessoais
+permaneceram iguais; swap em 256 KiB, memória disponível acima de 12 GiB.
+
+Limite: a auditoria verifica o formato do nome e o cabeçalho, mas não clica
+em BANCO no app normal nem escuta o patch. Próximo passo: teste interativo
+de F2/F6/F1, arrasto, zoom e BANCO com uma seed alta em configuração de
+teste; escuta de LISTEN/PHRASE pelo autor e prévia do website em navegador
+normal antes de decidir a publicação. Sem push, CI, pacote ou ZIP nesta etapa.
+
+### Complemento de 17/10 — fechamento ao abrir `escuta_frase.rmp`
+
+O autor informou que o app fechou ao usar ABRIR para carregar o exemplo.
+`~/.config/rasgo-modular/crash.log`, de 17/10 às 22:18:21, contém
+`std::out_of_range`; `addr2line` localizou a primeira função do app em
+`RackView::moduleLabel()`, chamada ao pintar o rack. O arquivo `.rmp`
+permanece íntegro; a falha vinha de referências visuais ao grafo anterior.
+
+Correção no JUCE: ao instalar o novo grafo, invalidar o snapshot de cabos,
+reconstruí-lo sob o lock e preparar os scopes/VARIA no mesmo estado. Antes de
+repintar, limpar o inspetor, cabos em arrasto, gestos de módulos, IDs pendentes,
+cache de vista e ajuda relativa ao patch anterior. O título do inspetor
+fecha se receber IDs fora de faixa e `moduleLabel()` evita consulta inválida.
+O procedimento afeta `applyPatchText`, usado por ABRIR e DESFAZER; o DSP dos
+módulos e o formato `.rmp` permanecem iguais. Arquivos alterados:
+`apps/juce/RasgoModularApp.cpp`, `website/exportar_patch.sh`, CHANGELOG e
+este registro. O `crash.log` original foi preservado como evidência.
+
+Validação: build JUCE 0.1.7-dev final de 17/10 às 22:24:33 +02:00,
+18.925.264 bytes, SHA256
+`7785b58589a136f921458a29f50a5fd6c5fa78d6386bbdd16b027b1d0e634c01`.
+O modo isolado `--check-load-swap` carregou o exemplo, abriu o inspetor
+do último cabo, substituiu por um grafo de um nó e forçou a repintura;
+inspetor/snapshots antigos foram descartados, sem abortar. Evidência local
+em `build/patch-swap-20261017.9i3NBl/`, sem áudio/MIDI nem escrita na
+sessão pessoal. Quatro CTests dirigidos passaram em 10,91 s (módulos
+reativos, patches por seed, orientação da UI e política de abertura).
+`git diff --check` e `bash -n` passaram. Memória disponível final acima
+de 12 GiB; swap em 256 KiB.
+
+Próximo passo: o autor reabrir com `./run` e tentar ABRIR →
+`examples/escuta_frase.rmp` no app normal. A prova isolada cobre a falha
+de pintura identificada; o teste humano com janela e dispositivo de áudio
+ainda precisa confirmar o comportamento completo. Depois prosseguir com
+escuta e interação de LISTEN/PHRASE. Sem push, CI, release, ZIP ou alterações
+nos projetos irmãos.
 
 ## Estado — marco 1-2 (histórico — 2026-09-02)
 
@@ -10744,4 +11276,250 @@ páginas de instalação.
 - testar a v0.1.6 num Mac real;
 - testar no Windows a abertura pelo Menu Iniciar;
 - uma captura do cabo com selo para o site;
+
+## Pedidos registrados em 2026-10-13 — acessibilidade e SCOPE
+
+Registro de tarefas, sem mudança de código nesta etapa. As sugestões entram
+no desenvolvimento progressivo do instrumento, sem promessa de data ou de
+implementação já concluída. As pendências anteriores continuam válidas.
+
+### Retorno do Audiofanzine
+
+Fonte: diálogo transcrito pelo autor, especialmente a mensagem #6 de
+Metalloïd, de 05/10/2026, no
+[tópico do Audiofanzine](https://fr.audiofanzine.com/autoproduction-business/forums/t.838751,rasgo-modular-projet-independant-de-synthese-modulaire.html).
+O participante confirmou que a v0.1.3 abriu e funcionou bem no seu Windows
+10, depois do problema de arranque relatado anteriormente. Esse retorno
+valida a experiência naquela máquina; não identifica sozinho a causa do
+crash nem certifica todas as configurações.
+
+- [ ] Melhorar contraste e legibilidade dos textos. Oferecer uma opção de
+  texto claro e avaliar escolha de fonte, tamanho e cores nas configurações,
+  com persistência e restauração dos padrões. Preservar a identidade visual,
+  sem depender apenas de cor para distinguir funções.
+  Primeiro lote local de 17/10: contraste padrão melhorado no JUCE;
+  segundo lote acrescentou tamanho e texto branco do LEARN com persistência.
+  Família tipográfica, cores livres e preferências do rack inteiro seguem abertas.
+- [x] Primeira hierarquia aplicada em 17/10: CUT maior que RESO no FILTER,
+  com geometria compartilhada pelo desenho e pela área de interação.
+  Revisão de outros controles e validação interativa de zoom continuam abertas.
+- [x] Sliders verticais ADSR no ENVELOPE local em 17/10, preservando valores,
+  modulações e patches. Comparação do VARIA com a apresentação anterior em
+  três seeds passou; imagens reais e guias revistos nos quatro idiomas.
+  Outros módulos com envelopes ficam para avaliação própria, não conversão
+  indiscriminada de todos os knobs.
+- [x] Explicações dos 22 comandos/campos do cabeçalho em quatro idiomas,
+  com navegação F6/setas/Tab e leitura F1, implementadas no JUCE em 17/10.
+  Auditoria nativa mouse/handlers, duas larguras e três tamanhos, passou.
+  Teste manual entre sistemas permanece necessário.
+- [x] Primeira entrega do painel contextual no JUCE em 17/10: função e
+  explicação pedagógica no LEARN, unidade e valores BASE/DSP durante o
+  gesto, rolagem dos textos longos e foco de leitura por teclado. Limites
+  e testes no complemento de 17/10 no topo; validação visual ainda pendente.
+- [ ] Expor a escolha de renderização gráfica nas configurações, onde o
+  backend permitir, mantendo software como alternativa segura. No Windows
+  já existe a seleção por `RASGO_RENDER=gpu`; falta avaliar sua apresentação
+  ao usuário, persistência e necessidade de reiniciar. Medir antes de mudar
+  o padrão; não atribuir o crash antigo à GPU sem evidência.
+- [ ] Validar essas mudanças em diferentes escalas, resoluções e níveis de
+  zoom: textos completos, contraste, controles acessíveis e ausência de
+  sobreposição. Manter um caminho de retorno às configurações padrão.
+
+O zoom para aumentar e diminuir os módulos já existe: não é uma nova
+implementação pendente. Melhorar sua descoberta e explicar que zoom não
+substitui contraste, hierarquia de controles e ajuda contextual.
+
+O elogio ao banco de ressonadores corresponde ao RESONATOR. A associação
+feita pelo participante com o Korg PS-3300 é uma referência de escuta,
+não uma proposta de copiar ou declarar emulação daquele instrumento.
+
+### Novo módulo de escuta — decisão do autor, 2026-10-13
+
+O estudo partiu do SCOPE (não SCORE), mas a decisão posterior do autor é
+criar um módulo novo do Rasgo Modular, com identidade e contrato próprios.
+O SCOPE permanece como está; não substituir suas saídas, seu painel ou sua
+função nos patches existentes. Não é um módulo do Trioio hospedado no Modular:
+Trioio fornece referências e possíveis trechos de código a copiar e adaptar.
+Nome e contrato inicial definidos em 17/10: LISTEN, dossiê 61. PHRASE é o
+segundo módulo novo, complementar ao QUANTIZER, dossiê 62. O registro de 13/10
+abaixo preserva a proposta; implementação e limites atuais estão no topo.
+
+Conferir o contrato do SCOPE como referência de compatibilidade em
+[`Scope.hpp`](src/dsp/Scope.hpp), o
+[dossiê do SCOPE](dossies/29_scope.md) e os
+[testes existentes](tests/test_scope.cpp).
+
+O SCOPE já oferece nível, brilho, altura pelo YIN e detecção de início de
+nota. A altura atual é mais adequada a uma voz isolada; as medidas não
+distinguem regiões de frequência. O objetivo é enriquecer a reação musical
+do patch, não apenas acrescentar desenhos à tela.
+
+- [ ] Primeira etapa: estudar três regiões — grave, médio e agudo — com
+  níveis e inícios de nota independentes. Testar bumbo, pratos, voz, mistura
+  e silêncio. Dividir frequências não equivale a separar instrumentos;
+  impedir que a interface prometa isolamento de fontes.
+  DSP causal implementado no LISTEN e testado com sinais sintéticos;
+  a escuta com voz, pratos e misturas reais continua pendente.
+- [x] Definir primeiro filtros causais, frequências de corte, suavização,
+  unidades, latência e contrato das saídas do novo módulo. Usar identificador
+  próprio, sem renumerar módulos ou portas existentes. Definir explicitamente
+  se haverá THRU; manter o SCOPE e os patches existentes inalterados.
+- [ ] Segunda etapa: investigar pulso/clock seguindo o áudio externo pelo
+  SIGNAL-IN, para orientar CLOCK e TRIGSEQ. Explicitar confiança, tempo de
+  aquisição, limites de andamento e comportamento em silêncio, mudanças
+  de tempo ou perda do pulso; não confundir onset com clock estável.
+- [ ] Depois: estudar croma e fundamental do grave como contexto harmônico
+  local para HARMONY e QUANTIZER. Usar confiança e estados sem estimativa;
+  não apresentar uma janela curta como tonalidade definitiva da peça.
+- [ ] Depois: avaliar saliência harmônica para altura predominante numa
+  mistura, em comparação com o YIN atual. Medir erros, ambiguidades e
+  latência; não prometer transcrição polifônica ou identificação confiável
+  de todas as vozes.
+- [x] Validar processamento por blocos com buffers pré-alocados, custo
+  limitado e sem alocações, bloqueios ou I/O no callback. Se houver análise
+  em worker, usar filas limitadas e resultados com idade/confiança explícitas.
+  Medir CPU e memória antes de habilitar novas análises por padrão.
+- [x] Criar testes de sinais conhecidos e misturas, transientes e silêncio,
+  mudanças de sample rate/bloco, reset e preservação do THRU, se existir.
+  Verificar que o SCOPE continua inalterado; completar dossiê e guia próprios
+  do módulo novo ao implementar, sem anunciar o módulo como disponível antes.
+
+Referência de estudo: Trioio, commit
+`050637f8baf6ff1545965b7e6b0769247d8c201b`, consultado nesta sessão.
+Fontes: [`BandSplit.h`](../TRIOIO/src/core/BandSplit.h),
+[`BandSplit.cpp`](../TRIOIO/src/core/BandSplit.cpp),
+[`Descriptors.h`](../TRIOIO/src/core/Descriptors.h),
+[`Structure.h`](../TRIOIO/src/core/Structure.h) e
+[`LINHAS.md`](../TRIOIO/docs/LINHAS.md).
+
+O divisor atual do Trioio é offline, de fase zero, com passagens para frente
+e para trás. Portanto, também ele precisa de adaptação causal; não pode ser
+copiado diretamente para o callback. Seus descritores usam memória e janelas
+de análise próprias. HPSS centrada, trajetória melódica por Viterbi, seções e
+tonalidade da peça inteira não são recursos imediatamente transferíveis ao
+tempo real. Normalização das linhas para escuta offline também não deve
+alterar silenciosamente o significado das medidas de nível ao vivo.
+
+Se houver reutilização de código: fixar a versão, registrar arquivos e hashes,
+preservar autoria, referências e licença AGPL-3.0-or-later, documentar as
+adaptações e manter cópia local autônoma no Modular. Não criar dependência de
+compilação ou execução do Trioio, nem modificar aquele projeto nesta tarefa.
+
+Candidato secundário: ampliar as possibilidades de alturas do QUANTIZER e
+estudar comportamento melódico em módulo complementar, conforme o detalhamento
+abaixo. Não incorporar um compositor escondido ao quantizador existente.
+
+### Potencialidades adicionais — sondagem do Atlas e do Trioio
+
+Consultados o Atlas (§62, §63, §73–74 e atualizações de descritores/MIR),
+`Descriptors.h`, `Structure.h`, `Reading.h`, `OracleMemory.h`, `Mosaic.h` e
+as descrições de memória do Trioio. Os itens abaixo são possibilidades de
+desenvolvimento, não funções já implementadas no módulo novo.
+
+- [ ] Densidade, atividade e pausas: taxa de ataques numa janela passada,
+  proporção de tempo com som, gate de silêncio com histerese e duração da
+  pausa. Usos: reduzir o acompanhamento quando a entrada adensa e abrir
+  espaço para respostas quando ela cala. Referência: `Summary` do Trioio.
+- [ ] Timbre em movimento: centroide, espalhamento espectral, planura e
+  periodicidade, com controles de suavização. Usos: orientar filtro,
+  distorção e matéria pelo que se escuta. Planura não identifica a origem
+  do ruído; periodicidade não certifica instrumento nem consonância.
+- [ ] Dinâmica do gesto: força de ataque, sustentação, crescimento/queda
+  de energia e contraste ataque/corpo. Oferecer medidas contínuas, não
+  classificar intenção ou emoção. Definir normalização para que uma troca
+  de ganho não vire mudança musical arbitrária.
+- [ ] Novidade local: comparar descritores recentes com um contexto passado
+  limitado e produzir medida/evento de mudança. Usos: disparar variação,
+  transição ou captura de memória. Referências: `contrast` e o estudo de
+  novidade no Trioio; não copiar a segmentação global centrada nem afirmar
+  reconhecimento de estrofe/refrão em tempo real.
+- [ ] Groove e relação com clock externo: após validar pulso, medir desvio
+  dos ataques em relação à grade, acentos e tendências de subdivisão.
+  Usos: sequenciadores acompanharem a execução sem apagar seu microtempo.
+  Compasso, swing e tempo forte são hipóteses com confiança; não pressupor
+  uma grade binária nem inferir polirritmia completa de uma mistura.
+- [ ] Memória curta de descritores/gestos, congelável e reiniciável, com
+  capacidade fixa. Comparar o momento atual com gestos já ouvidos e devolver
+  semelhança ou recorrência ao patch. Referência de pesquisa:
+  [`MOSAICO.md`](../TRIOIO/docs/MOSAICO.md) e `Mosaic.h`; não incluir gravação
+  ou reprodução de amostras nesta primeira versão.
+- [ ] Estudar posteriormente respostas por memória de eventos: aprender
+  uma sequência curta e fornecer gates/alturas recombinados a vozes já
+  existentes. Referência: [`MEMORIA.md`](../TRIOIO/docs/MEMORIA.md) e
+  `OracleMemory.h`. O oráculo é incremental, mas a implementação atual usa
+  vetores/mapas e navegação com alocações; exige limites e adaptação, não é
+  diretamente RT-safe. Avaliar módulo complementar em vez de transformar
+  o módulo de escuta num compositor e sintetizador completo.
+
+Os roteamentos musicais ficam com o músico e os cabos do Modular. Na versão
+inicial, o módulo mede e fornece CV/gates; não decide sozinho trocar todo o
+patch. Tempo de escuta, sensibilidade, memória/congelamento e confiança mínima
+são candidatos a controles; quantidade de saídas e layout ainda serão
+definidos. Análises caras devem poder ser desligadas. Não importar o Trioio
+inteiro ou modelos treinados de terceiros por conveniência.
+
+Prioridade recomendada: bandas/níveis/ataques, atividade/densidade/pausas,
+descritores tímbricos e novidade local; depois pulso/groove; harmonia e
+memória generativa somente após validação de custo, latência e escuta.
+
+### QUANTIZER e comportamento melódico — para desenvolvimento posterior
+
+Inspeção de 2026-10-13: [`Quantizer.hpp`](src/dsp/Quantizer.hpp) contém
+12 escalas, tônica e escala por CV, trigger, glide e histerese. Sua função
+atual é quantizar a altura recebida, não criar uma frase. O dossiê histórico
+do marco 2 não incorpora todas as mudanças posteriores; o código atual é a
+referência para preparar o upgrade.
+
+Direção proposta: manter quantização e construção de frases distinguíveis.
+Ampliar o QUANTIZER como ferramenta de alturas e estudar módulo próprio de
+comportamento melódico, ambos pertencentes ao Rasgo Modular. Contratos,
+nomes e implementação serão definidos em sessão posterior.
+
+- [ ] Ampliar o catálogo com seleção legível/pesquisável, graus editáveis e
+  escalas próprias; não distribuir milhares de escalas pelas posições de um
+  único knob. Preservar as 12 escalas atuais, seus índices e o significado
+  de `scale_cv` usado pelo HARMONY e pelos patches salvos.
+- [ ] Estudar quantização por graus em cents e período configurável, inclusive
+  escalas microtonais e não oitavantes. Adaptar a busca do grau mais próximo
+  e a histerese aos intervalos locais; manter a saída de altura coerente com
+  1 V/oct (1200 cents por unidade), sem confundir período com oitava.
+- [ ] Avaliar seleção/importação de escalas fora do callback, seguida de
+  entrega de estado limitado e pré-alocado ao DSP. Definir teto de graus,
+  validação de dados, persistência e transição segura entre configurações.
+  Formato Scala é candidato, não recurso disponível atualmente.
+- [ ] Validar afinação nas vozes consumidoras e não apenas na saída do
+  quantizador. Testar escalas antigas, graus fracionários, períodos diferentes,
+  transposição, trigger, glide, histerese, save/load e ausência de alocações.
+  Atualizar dossiê e guia com o contrato efetivamente implementado.
+- [ ] Estudar módulo complementar de fraseado: formas distintas de subida e
+  descida, notas de apoio, âmbito, percurso, cadências e variação de motivos,
+  com estímulos e intensidade de transformação escolhidos pelo músico.
+  Ornamentos exigem trajetória/articulação próprias; não são somente outra
+  tabela de notas. Evitar impor fórmulas culturais como regras universais.
+- [ ] Definir ligação opcional com o futuro módulo de escuta: ataques para
+  articulação; pausas como estímulo de resposta ou cadência, não comando
+  obrigatório; contexto harmônico para orientar alturas com confiança mínima.
+  O músico escolhe as conexões; nenhum módulo deve reescrever todo o patch.
+- [ ] Validar consequência musical por comparação e escuta: identidade das
+  frases, variedade de respostas, efeito real dos controles e preservação do
+  gesto de entrada. Pertencer a uma escala não demonstra qualidade de fraseado.
+
+Referências de código/dados a avaliar por cópia fixada, nunca dependência:
+[`ScaleArchive.h`](../TRIOIO/src/core/ScaleArchive.h) (`ScaleBehavior`),
+[`ScaleMachine.h`](../TRIOIO/src/core/ScaleMachine.h),
+[`ESCALAS.md`](../TRIOIO/docs/ESCALAS.md) e
+[`arquivo_trioio.txt`](../TRIOIO/data/escalas/arquivo_trioio.txt).
+Antes de copiar, conferir versão/commit, hashes, licença e créditos de cada
+fonte e registrar adaptações localmente. Manter as fontes culturais e os
+avisos de modelo/aproximação; pontos ainda a conferir no Trioio não devem
+ser promovidos a conhecimento validado no Modular. Escala não equivale à
+reprodução integral de uma tradição musical.
+
+Retomada posterior do Modular: definir contratos e nome do novo módulo de
+escuta, começando pelas três bandas, e depois detalhar o upgrade de alturas
+do QUANTIZER e o módulo de fraseado. Prioridade imediata: publicação do
+Studio, sem inserir estas pesquisas em seus portões de release. Nesta sessão
+foram registrados pedidos, decisão arquitetural e potencialidades; não foram
+implementadas nem validadas novas funções DSP ou de layout. Nenhum código do
+Trioio foi copiado.
 

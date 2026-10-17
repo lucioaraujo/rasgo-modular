@@ -70,7 +70,7 @@ Probe run(std::uint64_t seed, double seconds, float masterGainDb,
         for (const auto& p : byType) if (p.first == t) return p.second;
         return 0;
     };
-    for (const auto& grp : rasgo::panel::moduleCatalog())
+    for (const auto& grp : rasgo::panel::seedModuleCatalog())
         for (const char* t : grp.types) {
             auto n = rasgo::panel::makeModule(t);
             if (!n) continue;

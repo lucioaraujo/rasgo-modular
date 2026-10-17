@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cmath>
 
 namespace rasgo::ui {
 
@@ -40,15 +41,36 @@ inline float panelWidthMM(const int hp) {
 
 struct RectMM { float x, y, w, h; };
 
+inline float knobDiameterMM(const rasgo::modular::Widget& w) {
+    return w.span > 1.0f ? w.span : 8.0f;
+}
+
+inline bool envelopeTimeSlider(const std::string& type, const std::string& bind) {
+    return type == "ENVELOPE" && (bind == "attack" || bind == "decay" || bind == "release");
+}
+
+inline float logarithmicControlFraction(float value, float minimum, float maximum) {
+    if (!(minimum > 0.0f && maximum > minimum)) return 0.0f;
+    return std::clamp(std::log(std::clamp(value, minimum, maximum) / minimum)
+                        / std::log(maximum / minimum), 0.0f, 1.0f);
+}
+
 // Pegada do widget em mm (canto sup-esq do painel na origem). É a área
 // que responde ao clique — mais generosa que o desenho, de propósito.
 inline RectMM footprintMM(const rasgo::modular::Widget& w) {
     using Kind = rasgo::modular::Widget::Kind;
     const float lbl = static_cast<float>(w.label.size());
     switch (w.kind) {
-    case Kind::Knob:   return {w.x - 0.5f, w.y - 1.0f, 10.0f, 15.0f};
+    case Kind::Knob: {
+        const float d = knobDiameterMM(w);
+        return {w.x - 0.5f, w.y - 1.0f, d + 2.0f, d + 7.0f};
+    }
     case Kind::Slider: return {w.x - 1.0f, w.y - 1.0f, 10.0f, 36.0f};
-    case Kind::Toggle: return {w.x - 0.5f, w.y - 0.5f, 5.0f + lbl * 1.7f, 6.0f};
+    case Kind::Toggle:
+        if (w.span > 1.0f)
+            return {w.x + 2.0f - w.span * 0.5f - 0.5f, w.y - 0.5f,
+                    std::max(w.span, 4.0f) + 1.0f, 9.0f};
+        return {w.x - 0.5f, w.y - 0.5f, 5.0f + lbl * 1.7f, 6.0f};
     // o rótulo do jack (fonte cap ~9px, NÃO escala com o zoom) fica
     // centrado em `w.x`, acima do furo — modelamos a largura dele, senão
     // rótulos de 3+ letras a ~9 mm de distância se tocam

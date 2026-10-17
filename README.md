@@ -1,5 +1,38 @@
 # Rasgo Modular
 
+Desenvolvimento local em 17/10/2026: 0.1.7-dev acrescenta LISTEN (escuta em
+três bandas, família OUT) e PHRASE (motivo por estímulos, DECISION), com
+controles explicados em quatro idiomas. Arraste-os da paleta para usar;
+o rack criado por seed conserva sua formação anterior. Patch de demonstração
+dos dois módulos: [escuta_frase.rmp](examples/escuta_frase.rmp).
+Esse exemplo serve para escutar LISTEN e PHRASE. Não serve para comparar as
+vistas RACK: seus 10 módulos visíveis chegam à saída, portanto TODOS e SAÍDA
+mostram os mesmos 10. Para testar a diferença entre as vistas, use um patch
+com pelo menos um módulo desconectado; o teste isolado faz 3 → 2 → 3 módulos.
+O exemplo `painel_tutoriais.rmp` também não serve para comparar essas vistas
+(11/11); ele existe para observar os painéis e controles.
+Antes de solicitar novos testes ao autor, o desenvolvimento confere o app,
+o exemplo e o resultado esperado; a [regra operacional](TAREFAS.md#portão-antes-de-pedir-teste-ao-autor--17102026)
+está nas tarefas. Escuta subjetiva só entra depois desse preparo técnico.
+Guias: [LISTEN](guia/61_listen.md) e [PHRASE](guia/62_phrase.md).
+Ao acrescentar um módulo, ele entra junto de sua família, em ordem alfabética
+(MIXER e MASTER ao final de OUT). A inserção não rearranja os módulos que você
+já posicionou. Os dois novos continuam opcionais, fora do rack semeado inicial.
+Os downloads publicados abaixo continuam na 0.1.6.
+No app JUCE local, o LEARN tem rolagem própria, textos mais claros e
+leituras BASE/DSP com a unidade do parâmetro. F1 fixa a explicação para
+leitura com setas/PgUp/PgDn; Esc devolve o teclado ao rack. Detalhes e
+limites em [Ajuda enquanto você toca](guia/CABEAMENTO.md#ajuda-enquanto-você-toca-017-dev).
+O ENVELOPE local usa quatro sliders verticais para ATK/DEC/SUS/REL, e o
+FILTER destaca CUT com um knob maior. Parâmetros, patches e comportamento
+da VARIA são preservados. As fontes locais do website já incluem guias
+completos e imagens reais dos dois módulos novos em PT/EN/FR/ES; isso
+não significa publicação das páginas nem de novos instaladores.
+O cabeçalho também tem ajuda em quatro idiomas. F6 permite percorrer os
+comandos por teclado; F1 fixa a explicação. F2 ou Aa abre a leitura do
+LEARN em 12/14/16 pixels lógicos e texto branco opcional, com preferência salva
+fora do patch. O ajuste é da caixa de leitura, não de todas as fontes do app.
+
 Localização atual (2026-10-11): `RASGO/PROJETOS_AUTORAIS/RASGO_MODULAR/`.
 O caminho antigo na raiz é um alias de compatibilidade, não outra fonte.
 Criação e desenvolvimento são a finalidade; autoria, licença e identidade

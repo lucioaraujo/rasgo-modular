@@ -119,7 +119,9 @@ public:
             // governam a ENTRADA de fora — microfone, instrumento, MIDI.
             // Mexer neles sozinho não é variar a música: é mexer no
             // aparelho de outra pessoa no meio da execução.
-            if (t == "MIXER" || t == "MASTER" || t == "SIGNAL-IN") continue;
+            // Analysis calibration is chosen by the musician. Moving LISTEN's
+            // crossovers continuously would keep inhibiting its attack gates.
+            if (t == "MIXER" || t == "MASTER" || t == "SIGNAL-IN" || t == "LISTEN") continue;
             for (const auto& w : node.panel().widgets) {
                 int kind;
                 switch (w.kind) {
@@ -130,7 +132,8 @@ public:
                 }
                 if (w.bind.empty() || w.bind.rfind("in:", 0) == 0
                     || w.bind.rfind("out:", 0) == 0
-                    || w.bind == "listen")   // ON do SIGNAL-IN: só à mão
+                    || w.bind == "listen"    // ON do SIGNAL-IN: só à mão
+                    || (t == "PHRASE" && w.bind == "seed")) // motif identity
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;
                 for (const auto& pr : node.parameters())
@@ -144,8 +147,12 @@ public:
                 f.paramId = w.bind;
                 f.kind = kind;
                 f.reach = motionReach(w.bind);
-                // slider nunca ganha amplitude Free — é nota ou fader
-                if (kind == 1 && f.reach == MotionReach::Free)
+                // Sliders de nota/fader mantêm a proteção histórica. No
+                // ENVELOPE, mudar knob para slider é só apresentação: não
+                // pode reduzir a excursão nem mudar a música de seeds antigas.
+                const bool contour = t == "ENVELOPE" && (w.bind == "attack"
+                    || w.bind == "decay" || w.bind == "sustain" || w.bind == "release");
+                if (kind == 1 && f.reach == MotionReach::Free && !contour)
                     f.reach = MotionReach::Hot;
                 f.amp = motionAmplitude(f.reach);
                 f.tau = motionTau(f.reach);

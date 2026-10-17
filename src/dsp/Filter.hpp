@@ -52,8 +52,8 @@ public:
         p.hp = 10;
         p.add(Widget::Kind::Label, "FILTER", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "response", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "CUT", "cutoff", 10.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "RESO", "resonance", 31.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "CUT", "cutoff", 8.0f, 28.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "RESO", "resonance", 31.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SPRD", "spread", 10.0f, 52.0f);
         p.add(Widget::Kind::Knob, "DRIVE", "drive", 31.0f, 52.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 92.0f);

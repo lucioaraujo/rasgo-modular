@@ -50,6 +50,8 @@
 #include "dsp/SampleHold.hpp"
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
+#include "dsp/Listen.hpp"
+#include "dsp/Phrase.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
 #include "dsp/Shifter.hpp"
@@ -66,6 +68,7 @@
 #include "dsp/Vca4.hpp"
 #include "dsp/Vocoder.hpp"
 #include "dsp/Wasp.hpp"
+#include "ui/PanelGeometry.hpp"
 
 #include <iostream>
 #include <memory>
@@ -113,11 +116,13 @@ std::vector<Rect> footprints(const std::string& type, const Panel& p) {
             && w.bind.size() == 3 && w.bind[0] == 'g')
             continue;   // já modelado como célula de grade acima
         switch (w.kind) {
-        case Widget::Kind::Knob:
-            v.push_back({w.x, w.y, kKn, kKn, "knob:" + w.label});
-            v.push_back({w.x + kKn / 2 - tw / 2, w.y - 4.5f, tw, 4.0f,
+        case Widget::Kind::Knob: {
+            const float diameter = w.span > 1.0f ? w.span : kKn;
+            v.push_back({w.x, w.y, diameter, diameter, "knob:" + w.label});
+            v.push_back({w.x + diameter / 2 - tw / 2, w.y - 4.5f, tw, 4.0f,
                          "rot:" + w.label});
             break;
+        }
         case Widget::Kind::Slider:
             v.push_back({w.x, w.y, 8.0f, 32.0f, "sld:" + w.label});
             v.push_back({w.x + 4.0f - tw / 2, w.y + 32.0f, tw, 4.0f,
@@ -186,6 +191,46 @@ void audit(const char* type, const Panel& p) {
 }  // namespace
 
 int main() {
+    const auto envelopePanel = Envelope{}.panel();
+    int sliders = 0;
+    for (const auto& w : envelopePanel.widgets) {
+        const bool adsr = w.bind == "attack" || w.bind == "decay"
+                       || w.bind == "sustain" || w.bind == "release";
+        if (adsr && w.kind == Widget::Kind::Slider) ++sliders;
+        if (w.bind == "mode") {
+            const auto area = rasgo::ui::footprintMM(w);
+            if (w.span <= 1 || area.x < 0
+                || area.x + area.w > rasgo::ui::panelWidthMM(envelopePanel.hp)
+                || area.h < 8) {
+                std::cerr << "TRIG e sua área de leitura devem caber no painel\n";
+                ++g_failures;
+            }
+        }
+    }
+    if (sliders != 4) { std::cerr << "ADSR exige quatro sliders\n"; ++g_failures; }
+    const auto close = [](float a, float b) { return std::fabs(a - b) < 1e-5f; };
+    using namespace rasgo::ui;
+    if (!envelopeTimeSlider("ENVELOPE", "attack")
+        || envelopeTimeSlider("ENVELOPE", "sustain")
+        || envelopeTimeSlider("MIXER", "attack")
+        || !close(logarithmicControlFraction(0.001f, 0.001f, 10), 0)
+        || !close(logarithmicControlFraction(0.1f, 0.001f, 10), 0.5f)
+        || !close(logarithmicControlFraction(10, 0.001f, 10), 1)
+        || !close(logarithmicControlFraction(-1, 0.001f, 10), 0)
+        || !close(logarithmicControlFraction(20, 0.001f, 10), 1)) {
+        std::cerr << "Escala visual dos sliders de tempo incorreta\n"; ++g_failures;
+    }
+    float cutoffDiameter = 0, resonanceDiameter = 0;
+    for (const auto& w : Filter{}.panel().widgets) {
+        if (w.bind == "cutoff") {
+            cutoffDiameter = knobDiameterMM(w);
+            if (footprintMM(w).w < cutoffDiameter) ++g_failures;
+        }
+        if (w.bind == "resonance") resonanceDiameter = knobDiameterMM(w);
+    }
+    if (!(cutoffDiameter > resonanceDiameter && resonanceDiameter > 0)) {
+        std::cerr << "CUT deve ser maior que RESO\n"; ++g_failures;
+    }
     std::vector<std::pair<std::string, std::unique_ptr<Signal>>> mods;
     mods.emplace_back("OSC", std::make_unique<Oscillator>());
     mods.emplace_back("WAVETABLE", std::make_unique<Wavetable>());
@@ -209,6 +254,8 @@ int main() {
     mods.emplace_back("SAMPLER", std::make_unique<Sampler>());
     mods.emplace_back("TURNTABLE", std::make_unique<Turntable>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
+    mods.emplace_back("LISTEN", std::make_unique<Listen>());
+    mods.emplace_back("PHRASE", std::make_unique<Phrase>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("SHIFTER", std::make_unique<Shifter>());
     mods.emplace_back("CRUSH", std::make_unique<Crush>());
