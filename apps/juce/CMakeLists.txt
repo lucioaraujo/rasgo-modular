@@ -67,7 +67,8 @@ target_compile_definitions(RasgoModularApp PRIVATE
     JUCE_USE_XINPUT=0)
 
 if (MSVC)
-    target_compile_options(RasgoModularApp PRIVATE /utf-8)
+    # A unidade principal também agrega o catálogo inteiro; prevenir C1128.
+    target_compile_options(RasgoModularApp PRIVATE /utf-8 /bigobj)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(RasgoModularApp PRIVATE
         -finput-charset=UTF-8 -fexec-charset=UTF-8)

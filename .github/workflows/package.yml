@@ -160,10 +160,14 @@ jobs:
       # paralelo cabem na memória do runner e ainda aproveitam os
       # núcleos: o build demora um pouco mais e TERMINA, que é o que
       # interessa numa CI.
-      - name: Build & run engine tests
-        run: |
-          cmake --build build --config Release --parallel 2
-          ctest --test-dir build -C Release --output-on-failure
+      # Passos separados: no PowerShell um comando nativo que falha não
+      # interrompe necessariamente o comando seguinte. A compilação C1128
+      # de 18 out. aparecia só depois, como teste "Not Run" sem .exe.
+      - name: Build engine tests
+        run: cmake --build build --config Release --parallel 2
+
+      - name: Run engine tests
+        run: ctest --test-dir build -C Release --output-on-failure
 
       - name: Build the JUCE app
         run: cmake --build build --target RasgoModularApp --config Release --parallel 2
