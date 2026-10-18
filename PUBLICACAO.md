@@ -1,13 +1,14 @@
 # Rasgo Modular — prontidão para publicação
 
-## Preparação da v0.1.7 — 18 out. 2026
+## Release v0.1.7 — 18 out. 2026
 
-A release pública atual, conferida com `gh release list` em 18/10, é a v0.1.6.
-As fontes locais do aplicativo, guia e site foram preparadas para a v0.1.7,
-mas não estão publicadas: os downloads públicos continuam na v0.1.6.
-Não enviar `main` nem atualizar Pages antes de confirmar os seis anexos da
-nova release. As seções abaixo descrevem a preparação histórica da primeira
-publicação e não atestam a v0.1.7.
+A [release v0.1.7](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7)
+foi criada pelo run `39140548809` da tag sobre `c70dcda`. Todos os jobs
+terminaram com sucesso: pacotes Linux, Windows e macOS, abertura Linux em
+Debian 12, Ubuntu 24.04, Fedora e Arch, e publicação. O GitHub confirmou
+seis anexos públicos, com nomes e tamanhos não nulos. O site em quatro
+idiomas está preparado localmente; a publicação em Pages será verificada
+separadamente depois do envio de `main`.
 
 Nesta rodada, o build completo Linux terminou e os 84 testes CTest passaram
 com os executáveis recém-compilados. Dez testes Python da documentação e a
@@ -29,7 +30,7 @@ pacote a oferecer ao público**: foi compilado no Mint 22 e depende de
 `libasound2t64` e glibc 2.38. O pacote distribuível precisa ser construído
 pela matriz da CI em Ubuntu 22.04. Não foi gerado ZIP extra nesta rodada.
 
-Portão ainda aberto antes da publicação completa:
+Portões da release:
 
 1. Rodada humana concluída em 18/10: o autor informou que fez os gestos
    solicitados na janela normal, sem novo defeito relatado; não houve estalos,
@@ -38,14 +39,14 @@ Portão ainda aberto antes da publicação completa:
 2. Escuta curta de LISTEN/PHRASE concluída: o autor confirmou diferença
    perceptível em VAR, DIR e SPACE. A medição também confirma a voz no canal
    2. Entrada externa real segue opcional, não requisito desta release.
-3. A matriz de preparação já passou. As fontes locais já não levam `-dev`.
-   Revisar as notas e o diff da versão final e repetir a matriz na tag para os seis formatos
-   (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`). Só marcar a release
-   como completa se os anexos públicos existirem e os jobs terminarem verdes.
-4. Os quatro idiomas, metadados e guia de módulos já estão preparados
-   localmente para 0.1.7 e passaram na verificação estrutural. Somente depois
-   de confirmar os anexos públicos, testar os seis links e enviar `main` para
-   publicar o site. Não antecipar links para arquivos ausentes.
+3. Build final local e 84 testes passaram. A matriz da tag passou e os seis
+   formatos (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`) constam da
+   release pública. Não há `-dev` no executável final.
+4. Quatro idiomas, metadados e guia de módulos preparados localmente; dez
+   testes Python e verificação estrutural passaram. Os seis links HTTP de
+   download retornaram 200. Falta conferir o deploy de Pages.
+
+Registro das tentativas de preparação anteriores à tag:
 
 Primeira matriz manual de preparação (run `39074923719`, commit `07dcb33`):
 Linux e macOS produziram artefatos, mas Windows falhou ao compilar
@@ -67,21 +68,9 @@ pacotes Linux passou em Debian 12, Ubuntu 24.04, Fedora e Arch. O job
 Os três grupos de artefatos pertencem ao Actions, **não** a uma release
 baixável publicamente. Não foram baixados ao HD do autor.
 
-Conferência adicional em 18/10: o run `39076331679` permanece `completed`/
-`success` no GitHub, e `python3 website/verificar.py` passou nas oito páginas,
-nos seis moldes de pacote e no SEO ainda fixado em v0.1.6. Nenhuma nova
-matriz foi disparada. A tag v0.1.7 não existe localmente.
-
-O deploy do site para o commit `07dcb33` passou e a página pública
-respondeu HTTP 200; o HTML efetivamente servido ainda exibe os downloads
-v0.1.6. A matriz verde não fecha os portões de janela normal e escuta do
-0.1.7-dev, nem transforma automaticamente o rótulo `-dev` em versão final.
-
-Não foi criada tag nem release nesta auditoria. Os pushes de desenvolvimento
-atualizaram as fontes, não os downloads. Antes de uma tag final, retirar o
-rótulo `-dev` do app, atualizar o changelog e as páginas nos quatro idiomas;
-a própria tag deve repetir a matriz com esse commit final. Só publicar os
-links depois de confirmar a release com todos os anexos.
+Na preparação, o site público ainda exibia v0.1.6, corretamente. A tag final
+repetiu a matriz sobre o commit definitivo; a publicação de Pages é a etapa
+editorial seguinte e não deve ser confundida com a criação da release.
 
 ---
 

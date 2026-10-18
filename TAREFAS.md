@@ -36,11 +36,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   dez testes e verificação estrutural passaram. Não enviar `main` ainda:
   downloads públicos permanecem em 0.1.6 até existirem os anexos novos.
 - [x] Tirar `-dev` das fontes do aplicativo e fechar notas da v0.1.7.
-- [ ] Concluir build/testes finais, revisar diff, cortar tag sobre commit
-  final e conferir a matriz com os seis anexos públicos. Artefatos do run
-  manual não substituem a release.
-- [ ] Conferir os seis links reais, publicar `main`/Pages e validar o site
-  público nos quatro idiomas.
+- [x] Build/testes finais, revisão do diff, tag v0.1.7 sobre `c70dcda` e
+  matriz `39140548809` concluídos. Release pública não preliminar contém
+  os seis anexos, todos com tamanho não nulo.
+- [x] Conferir os seis links reais: HTTP 200 após redirecionamento do GitHub.
+- [ ] Publicar `main`/Pages e validar o site público nos quatro idiomas.
 
 ### Rodada interativa e gravação de 18/10
 
@@ -75,14 +75,12 @@ necessária outra comparação com a prova offline, conferir o MASTER do exemplo
 em −6 dB antes do REC e escolher um volume físico de escuta seguro.
 Os originais não foram normalizados nem alterados.
 
-Auditoria de publicação, 18/10: `gh release list` confirmou v0.1.6 como
-release pública; o run de preparação `39076331679` está `completed`/
-`success`. `python3 website/verificar.py` passou (oito páginas, seis nomes
-de download, SEO v0.1.6), e não há tag local v0.1.7. Não se disparou nova
-matriz nem se geraram pacotes nesta conferência. Ordem restante: revisar diff
-e notas finais → retirar `-dev` → commit e
-tag v0.1.7 → conferir matriz e seis anexos públicos → atualizar site nos
-quatro idiomas e verificar os links reais.
+Auditoria de publicação, 18/10: o run final da tag `39140548809` passou nos
+três sistemas, nos quatro contêineres Linux e no job de release. Seis anexos
+públicos foram conferidos por nome e tamanho. `python3 website/verificar.py`
+passou nas oito páginas, nos seis moldes de download e no SEO v0.1.7. Ordem
+restante: enviar `main` e confirmar Pages nos quatro
+idiomas. Nenhum ZIP extra foi gerado no HD do autor.
 
 Detalhes e ordem de publicação: [`PUBLICACAO.md`](PUBLICACAO.md).
 
