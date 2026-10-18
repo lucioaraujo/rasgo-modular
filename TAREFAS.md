@@ -37,6 +37,47 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   matriz com os seis anexos públicos. Artefatos do run manual não substituem
   a release: o binário ainda se identifica como 0.1.7-dev.
 
+### Rodada interativa e gravação de 18/10
+
+O autor abriu e tocou o exemplo `escuta_frase.rmp`, gravou uma tomada e
+informou que não houve estalos, travamento nem texto sobreposto. Isso valida
+essas observações na sessão real, não todos os gestos do portão de interface.
+Fonte da análise: `/home/luc/Music/RasgoModular/rec-20261018-134610.wav`
+(118,56 s, estéreo PCM 24 bits/44,1 kHz) e o `.score.txt` homônimo; os dois
+arquivos originais permaneceram intactos.
+
+A partitura confirma a fiação: `DRUM → LISTEN.THRU → MIXER.ch1` e
+`PHRASE → QUANTIZER → OSC → ENVELOPE → VCA → MIXER.ch2`. O autor silenciou e
+reativou ambos os canais, e alterou VAR, DIR e SPACE da PHRASE. Nos dois
+trechos com ch2 silenciado (13–16 s e 20–21,8 s), o RMS do áudio acima de
+180 Hz ficou perto de −72,5 dBFS; nos trechos vizinhos com ch2 ativo,
+entre −53,3 e −57,0 dBFS. Logo, a voz do canal 2 entra efetivamente na
+saída. Isso é medição, não julgamento de timbre ou de fraseado ao ouvido.
+
+A tomada terminou em −50,0 LUFS integrado, pico verdadeiro −33,2 dBTP. O
+MASTER já constava em −24,9818 dB no início da partitura, contra −6 dB no
+arquivo de exemplo. O autor esclareceu que mexeu no volume do MASTER,
+provavelmente antes de iniciar a gravação; o valor registrado é compatível
+com esse gesto. Portanto, o nível baixo desta tomada **não é evidência de
+defeito** nem motivo para mudar a mixagem do exemplo. `MotionEngine` exclui
+MIXER e MASTER. Como a partitura começa no REC, ela não documenta o instante
+exato do ajuste. A tomada continua válida para testar a presença do canal 2;
+não é necessário regravá-la só pelo nível. Ainda falta registrar pelo ouvido
+se VAR/DIR/SPACE mudaram perceptivelmente o fraseado e completar os gestos
+de interface não cobertos antes do gate final de 0.1.7. Se for necessária
+outra comparação com a prova offline, conferir o MASTER do exemplo em −6 dB
+antes do REC e escolher um volume físico de escuta seguro.
+Os originais não foram normalizados nem alterados.
+
+Auditoria de publicação, 18/10: `gh release list` confirmou v0.1.6 como
+release pública; o run de preparação `39076331679` está `completed`/
+`success`. `python3 website/verificar.py` passou (oito páginas, seis nomes
+de download, SEO v0.1.6), e não há tag local v0.1.7. Não se disparou nova
+matriz nem se geraram pacotes nesta conferência. Ordem restante: fechar
+interface/escuta → revisar diff e notas finais → retirar `-dev` → commit e
+tag v0.1.7 → conferir matriz e seis anexos públicos → atualizar site nos
+quatro idiomas e verificar os links reais.
+
 Detalhes e ordem de publicação: [`PUBLICACAO.md`](PUBLICACAO.md).
 
 ## Portão antes de pedir teste ao autor — 17/10/2026
