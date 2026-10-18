@@ -29,10 +29,10 @@ Portão ainda aberto antes da publicação completa:
 2. Fazer escuta curta de LISTEN/PHRASE e avaliar o resultado musical; a
    prova numérica de áudio não é escuta. Entrada externa é opcional e depende
    do equipamento disponível.
-3. Revisar o diff, registrar notas da v0.1.7 e executar uma única matriz CI
-   para os seis formatos (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`),
-   seguida dos quatro testes de abertura Linux. Só marcar a release como
-   completa se todos os artefatos existirem e os jobs terminarem verdes.
+3. A matriz de preparação já passou. Revisar as notas e o diff da versão
+   final, retirar `-dev` e repetir a matriz na tag para os seis formatos
+   (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`). Só marcar a release
+   como completa se os anexos públicos existirem e os jobs terminarem verdes.
 4. Apenas depois de confirmar os anexos públicos, mudar os quatro idiomas
    do site, metadados e guia de módulos de 0.1.6/0.1.7-dev para 0.1.7; testar
    os seis links e publicar o site. Não antecipar links para arquivos ausentes.
@@ -46,9 +46,27 @@ no MSVC. O workflow separa agora build e CTest para não converter falha de
 compilação em um confuso "Not Run". É necessária nova matriz para validar
 o ajuste e os seis formatos; nenhum arquivo desta tentativa é release.
 
-Não foi criada tag nem release nesta auditoria. O push de desenvolvimento
-atualizou as fontes, não os downloads; empacotamento depende de tag, pull
-request ou execução manual do workflow.
+Segunda matriz manual (run [`39076331679`](https://github.com/lucioaraujo/rasgo-modular/actions/runs/39076331679),
+commit `2184460`): **verde**. Compilação e testes em Ubuntu 22.04,
+Windows e macOS; seis formatos com nomes conferidos nos logs:
+`rasgo-modular-0.1.7-linux-x86_64.deb`, `.AppImage`, `.tar.gz`,
+`rasgo-modular-0.1.7-windows-x64.exe`, `.zip` e
+`rasgo-modular-0.1.7-macos-universal.dmg`. O teste de abertura dos
+pacotes Linux passou em Debian 12, Ubuntu 24.04, Fedora e Arch. O job
+`release` foi corretamente ignorado por ser uma execução manual sem tag.
+Os três grupos de artefatos pertencem ao Actions, **não** a uma release
+baixável publicamente. Não foram baixados ao HD do autor.
+
+O deploy do site para o commit `07dcb33` passou e a página pública
+respondeu HTTP 200; o HTML efetivamente servido ainda exibe os downloads
+v0.1.6. A matriz verde não fecha os portões de janela normal e escuta do
+0.1.7-dev, nem transforma automaticamente o rótulo `-dev` em versão final.
+
+Não foi criada tag nem release nesta auditoria. Os pushes de desenvolvimento
+atualizaram as fontes, não os downloads. Antes de uma tag final, retirar o
+rótulo `-dev` do app, atualizar o changelog e as páginas nos quatro idiomas;
+a própria tag deve repetir a matriz com esse commit final. Só publicar os
+links depois de confirmar a release com todos os anexos.
 
 ---
 

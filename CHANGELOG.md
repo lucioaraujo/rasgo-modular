@@ -9,6 +9,15 @@ pronto.
 
 ## Em desenvolvimento — após v0.1.6 — 2026-10-17
 
+- Preparação multiplataforma em 18 out.: 84 testes locais passaram. A
+  primeira matriz CI revelou C1128 no teste integrado LISTEN/PHRASE sob
+  MSVC; `/bigobj` foi aplicado ao teste e ao app, e build/teste passaram
+  a ser etapas separadas para não mascarar a falha. A segunda matriz
+  (`39076331679`) passou em Linux, Windows e macOS, gerou seis formatos
+  e abriu os pacotes Linux em Debian 12, Ubuntu 24.04, Fedora e Arch.
+  Ainda não é a v0.1.7 publicada: faltam a validação interativa/musical,
+  o commit sem `-dev`, a tag e os anexos públicos.
+
 - O botão RACK agora informa a contagem visível/total e esclarece que
   TODOS mostra os módulos do patch aberto, não instancia o catálogo.
   Teste isolado cobre a ida e volta TODOS → SAÍDA → TODOS com módulo órfão.
