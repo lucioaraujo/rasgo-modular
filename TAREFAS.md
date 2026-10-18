@@ -25,13 +25,17 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   distribuir este pacote Mint 22 como se fosse o Ubuntu 22.04 da CI.
 - [ ] Concluir o portão interativo e musical descrito abaixo; registrar
   resultados sem afirmar que uma exportação substituiu a janela ou o ouvido.
-- [ ] Repetir a matriz CI após corrigir o erro MSVC C1128 do teste
-  LISTEN/PHRASE; inspecionar seis artefatos e quatro testes de abertura
-  Linux. A primeira execução de preparação (`39074923719`) produziu
-  Linux/macOS, mas não Windows; `arranque-linux` ficou sem executar.
-  Nenhum arquivo desse run é release.
+- [x] Repetir a matriz CI após corrigir o erro MSVC C1128 do teste
+  LISTEN/PHRASE. Run `39076331679` verde no commit `2184460`:
+  seis formatos confirmados nos logs; abertura Linux passou em Debian 12,
+  Ubuntu 24.04, Fedora e Arch. A primeira tentativa (`39074923719`)
+  falhou no Windows e não constitui release.
 - [ ] Após anexos públicos válidos, mudar site, SEO e guias nos quatro
   idiomas e verificar links reais. Até lá, downloads ficam em 0.1.6.
+- [ ] Depois da validação da janela normal/escuta, tirar `-dev` do app,
+  fechar notas da v0.1.7, cortar tag sobre commit final e conferir a nova
+  matriz com os seis anexos públicos. Artefatos do run manual não substituem
+  a release: o binário ainda se identifica como 0.1.7-dev.
 
 Detalhes e ordem de publicação: [`PUBLICACAO.md`](PUBLICACAO.md).
 
