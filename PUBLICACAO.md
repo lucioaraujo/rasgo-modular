@@ -2,7 +2,8 @@
 
 ## Preparação da v0.1.7 — 18 out. 2026
 
-A release pública atual é a v0.1.6. O trabalho novo ainda está identificado
+A release pública atual, conferida com `gh release list` em 18/10, é a v0.1.6.
+O trabalho novo ainda está identificado
 como **0.1.7-dev** no aplicativo e no guia; os downloads e o SEO do site
 continuam apontando para a v0.1.6. As seções abaixo descrevem a preparação
 histórica da primeira publicação e não atestam a v0.1.7.
@@ -12,8 +13,14 @@ com os executáveis recém-compilados. Dez testes Python da documentação e a
 verificação estrutural do site passaram. O aplicativo em modo isolado carregou
 `examples/escuta_frase.rmp`, exportou LISTEN/PHRASE e passou a auditoria da
 troca de patch; `examples/painel_tutoriais.rmp` passou a auditoria de RACK,
-inclusive o controle TODOS 3 → SAÍDA 2 → TODOS 3. Essas provas não incluem
-escuta musical nem gestos na janela normal.
+inclusive o controle TODOS 3 → SAÍDA 2 → TODOS 3. Depois disso, o autor fez
+uma rodada na janela normal e gravou uma tomada: não observou estalos,
+travamentos ou sobreposições. A análise objetiva confirmou que a voz PHRASE
+entra no canal 2. A tomada está baixa (−50 LUFS, pico −33,2 dBTP; MASTER
+registrado em −25 dB, enquanto o exemplo contém −6 dB). O autor esclareceu
+que ajustou o MASTER, provavelmente antes do REC: isso não é evidência de
+defeito de mixagem. Detalhes e limites em `TAREFAS.md`, “Rodada interativa e
+gravação de 18/10”.
 
 Um único `.deb` local foi produzido em `build/` para conferir metadados e
 conteúdo. Ele contém executável, entrada de menu e ícones, mas **não é o
@@ -23,12 +30,16 @@ pela matriz da CI em Ubuntu 22.04. Não foi gerado ZIP extra nesta rodada.
 
 Portão ainda aberto antes da publicação completa:
 
-1. Conferir a janela normal da 0.1.7-dev — abrir/trocar patch, TODOS/SAÍDA,
+1. Completar a conferência da janela normal da 0.1.7-dev — abrir/trocar patch, TODOS/SAÍDA,
    rolagem, F1/F2/F6, zoom, sliders, cabeamento e valores BASE/DSP. A
-   exportação isolada não equivale a essa interação.
-2. Fazer escuta curta de LISTEN/PHRASE e avaliar o resultado musical; a
-   prova numérica de áudio não é escuta. Entrada externa é opcional e depende
-   do equipamento disponível.
+   exportação isolada e a ausência de estalos/sobreposições na rodada feita
+   não cobrem todos esses gestos.
+2. Registrar a avaliação musical do autor sobre LISTEN/PHRASE (se VAR, DIR e
+   SPACE mudaram perceptivelmente o fraseado). A tomada existente prova que
+   a voz sai pelo canal 2; a partitura e a medição não substituem o ouvido.
+   Se precisar repetir a comparação com a prova offline, conferir primeiro
+   o MASTER do exemplo; volume de escuta seguro continua à escolha do autor.
+   Entrada externa é opcional e depende do equipamento disponível.
 3. A matriz de preparação já passou. Revisar as notas e o diff da versão
    final, retirar `-dev` e repetir a matriz na tag para os seis formatos
    (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`). Só marcar a release
@@ -56,6 +67,11 @@ pacotes Linux passou em Debian 12, Ubuntu 24.04, Fedora e Arch. O job
 `release` foi corretamente ignorado por ser uma execução manual sem tag.
 Os três grupos de artefatos pertencem ao Actions, **não** a uma release
 baixável publicamente. Não foram baixados ao HD do autor.
+
+Conferência adicional em 18/10: o run `39076331679` permanece `completed`/
+`success` no GitHub, e `python3 website/verificar.py` passou nas oito páginas,
+nos seis moldes de pacote e no SEO ainda fixado em v0.1.6. Nenhuma nova
+matriz foi disparada. A tag v0.1.7 não existe localmente.
 
 O deploy do site para o commit `07dcb33` passou e a página pública
 respondeu HTTP 200; o HTML efetivamente servido ainda exibe os downloads

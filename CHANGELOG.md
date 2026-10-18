@@ -18,6 +18,13 @@ pronto.
   Ainda não é a v0.1.7 publicada: faltam a validação interativa/musical,
   o commit sem `-dev`, a tag e os anexos públicos.
 
+- Rodada real do autor com `escuta_frase.rmp`: gravação de 118,6 s sem
+  estalos, travamento ou texto sobreposto percebidos. A partitura e a
+  medição confirmam que a voz PHRASE chega ao canal 2 do MIXER. O MASTER
+  foi baixado pelo autor antes ou perto do REC; o nível baixo dessa tomada
+  não é tratado como defeito. Falta avaliação perceptiva do fraseado e
+  completar os gestos de interface do portão de publicação.
+
 - O botão RACK agora informa a contagem visível/total e esclarece que
   TODOS mostra os módulos do patch aberto, não instancia o catálogo.
   Teste isolado cobre a ida e volta TODOS → SAÍDA → TODOS com módulo órfão.
