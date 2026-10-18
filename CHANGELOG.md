@@ -7,7 +7,7 @@ pronto.
 
 ---
 
-## Em desenvolvimento — após v0.1.6 — 2026-10-17
+## v0.1.7 — 2026-10-18
 
 - Preparação multiplataforma em 18 out.: 84 testes locais passaram. A
   primeira matriz CI revelou C1128 no teste integrado LISTEN/PHRASE sob
@@ -15,15 +15,17 @@ pronto.
   a ser etapas separadas para não mascarar a falha. A segunda matriz
   (`39076331679`) passou em Linux, Windows e macOS, gerou seis formatos
   e abriu os pacotes Linux em Debian 12, Ubuntu 24.04, Fedora e Arch.
-  Ainda não é a v0.1.7 publicada: faltam a validação interativa/musical,
-  o commit sem `-dev`, a tag e os anexos públicos.
+  Esta versão acrescenta LISTEN/PHRASE e os ajustes de interface descritos
+  abaixo. A matriz de preparação é evidência de build; os anexos públicos
+  só existem depois que a tag completar o workflow de release.
 
 - Rodada real do autor com `escuta_frase.rmp`: gravação de 118,6 s sem
   estalos, travamento ou texto sobreposto percebidos. A partitura e a
   medição confirmam que a voz PHRASE chega ao canal 2 do MIXER. O MASTER
   foi baixado pelo autor antes ou perto do REC; o nível baixo dessa tomada
-  não é tratado como defeito. Falta avaliação perceptiva do fraseado e
-  completar os gestos de interface do portão de publicação.
+  não é tratado como defeito. O autor confirmou diferença perceptível em
+  VAR/DIR/SPACE e informou que realizou os gestos de interface solicitados,
+  sem relatar novo defeito.
 
 - O botão RACK agora informa a contagem visível/total e esclarece que
   TODOS mostra os módulos do patch aberto, não instancia o catálogo.
@@ -69,15 +71,14 @@ pronto.
   de todos os CVs internos do módulo. F1/clicar na ajuda fixa a leitura;
   setas/PgUp/PgDn/Home/End rolam; Esc retorna ao rack. Avisos temporários
   expiram sem depender de um novo movimento do mouse.
-- Desenvolvimento local; os instaladores publicados continuam na 0.1.6.
 - ENVELOPE: quatro sliders verticais ATK/DEC/SUS/REL; os tempos são
   apresentados em escala logarítmica e SUS em nível linear. TRIG tem
   legenda abaixo para caber no painel. FILTER: CUT maior que RESO.
   Não muda DSP nem valores salvos; regressão compara VARIA com a
   apresentação anterior, incluindo alteração manual, em três seeds.
 - Guias didáticos de LISTEN/PHRASE e imagens do próprio instrumento nas
-  fontes locais do website em PT/EN/FR/ES. Páginas identificam os dois
-  módulos como 0.1.7-dev; downloads e SEO continuam na release 0.1.6.
+  fontes do website em PT/EN/FR/ES. Páginas, downloads e SEO preparados
+  para 0.1.7; a publicação do site depende dos seis anexos da release.
   Exportação de painéis por patch funciona sem áudio/MIDI e com dados
   de configuração isolados, sem substituir a sessão do músico.
 

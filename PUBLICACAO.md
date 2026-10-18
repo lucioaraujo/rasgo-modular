@@ -3,10 +3,11 @@
 ## Preparação da v0.1.7 — 18 out. 2026
 
 A release pública atual, conferida com `gh release list` em 18/10, é a v0.1.6.
-O trabalho novo ainda está identificado
-como **0.1.7-dev** no aplicativo e no guia; os downloads e o SEO do site
-continuam apontando para a v0.1.6. As seções abaixo descrevem a preparação
-histórica da primeira publicação e não atestam a v0.1.7.
+As fontes locais do aplicativo, guia e site foram preparadas para a v0.1.7,
+mas não estão publicadas: os downloads públicos continuam na v0.1.6.
+Não enviar `main` nem atualizar Pages antes de confirmar os seis anexos da
+nova release. As seções abaixo descrevem a preparação histórica da primeira
+publicação e não atestam a v0.1.7.
 
 Nesta rodada, o build completo Linux terminou e os 84 testes CTest passaram
 com os executáveis recém-compilados. Dez testes Python da documentação e a
@@ -30,23 +31,21 @@ pela matriz da CI em Ubuntu 22.04. Não foi gerado ZIP extra nesta rodada.
 
 Portão ainda aberto antes da publicação completa:
 
-1. Completar a conferência da janela normal da 0.1.7-dev — abrir/trocar patch, TODOS/SAÍDA,
-   rolagem, F1/F2/F6, zoom, sliders, cabeamento e valores BASE/DSP. A
-   exportação isolada e a ausência de estalos/sobreposições na rodada feita
-   não cobrem todos esses gestos.
-2. Registrar a avaliação musical do autor sobre LISTEN/PHRASE (se VAR, DIR e
-   SPACE mudaram perceptivelmente o fraseado). A tomada existente prova que
-   a voz sai pelo canal 2; a partitura e a medição não substituem o ouvido.
-   Se precisar repetir a comparação com a prova offline, conferir primeiro
-   o MASTER do exemplo; volume de escuta seguro continua à escolha do autor.
-   Entrada externa é opcional e depende do equipamento disponível.
-3. A matriz de preparação já passou. Revisar as notas e o diff da versão
-   final, retirar `-dev` e repetir a matriz na tag para os seis formatos
+1. Rodada humana concluída em 18/10: o autor informou que fez os gestos
+   solicitados na janela normal, sem novo defeito relatado; não houve estalos,
+   travamento ou sobreposição na tomada. Essa observação não cobre todas as
+   plataformas ou seeds.
+2. Escuta curta de LISTEN/PHRASE concluída: o autor confirmou diferença
+   perceptível em VAR, DIR e SPACE. A medição também confirma a voz no canal
+   2. Entrada externa real segue opcional, não requisito desta release.
+3. A matriz de preparação já passou. As fontes locais já não levam `-dev`.
+   Revisar as notas e o diff da versão final e repetir a matriz na tag para os seis formatos
    (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`). Só marcar a release
    como completa se os anexos públicos existirem e os jobs terminarem verdes.
-4. Apenas depois de confirmar os anexos públicos, mudar os quatro idiomas
-   do site, metadados e guia de módulos de 0.1.6/0.1.7-dev para 0.1.7; testar
-   os seis links e publicar o site. Não antecipar links para arquivos ausentes.
+4. Os quatro idiomas, metadados e guia de módulos já estão preparados
+   localmente para 0.1.7 e passaram na verificação estrutural. Somente depois
+   de confirmar os anexos públicos, testar os seis links e enviar `main` para
+   publicar o site. Não antecipar links para arquivos ausentes.
 
 Primeira matriz manual de preparação (run `39074923719`, commit `07dcb33`):
 Linux e macOS produziram artefatos, mas Windows falhou ao compilar

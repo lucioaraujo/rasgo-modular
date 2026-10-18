@@ -89,7 +89,7 @@ diferente.
 
 ## Os controles, um a um
 
-No layout local 0.1.7-dev, CUT usa um knob de 12 mm, maior que RESO,
+No layout 0.1.7, CUT usa um knob de 12 mm, maior que RESO,
 para distinguir o controle principal. Área de pega e desenho crescem juntos.
 Não há alteração da resposta DSP, dos parâmetros ou dos patches salvos.
 

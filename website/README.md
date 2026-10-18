@@ -4,12 +4,12 @@ Definição visual e editorial do site do instrumento, conforme
 `RASGO_DOCUMENTATION/design/WEBSITES.md §5` (que lista o que cada site
 deve documentar).
 
-Estado local em 17/10/2026: fontes em atualização para a 0.1.7-dev.
+Estado de publicação preparado em 18/10/2026: páginas da v0.1.7.
 Versão e downloads publicados são registrados no [README principal](../README.md)
 e em [PUBLICACAO.md](../PUBLICACAO.md). Ter um arquivo nesta pasta não
 significa que ele já foi enviado ao site. LISTEN e PHRASE têm guias completos
-e imagens reais nos quatro idiomas, identificados como desenvolvimento local.
-O site mantém os downloads da release pública 0.1.6.
+e imagens reais nos quatro idiomas. Os links da v0.1.7 só devem ser
+publicados depois que a release tiver os seis anexos.
 
 ## Propósito, públicos, idiomas
 
@@ -32,7 +32,7 @@ site em menos idiomas que o produto seria uma regressão.
 |---|---|---|
 | `index.html` (pt) | apresentação completa | esta página |
 | `en.html` · `fr.html` · `es.html` | traduções integrais | `index.html` |
-| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia de 60 módulos: 58 publicados + LISTEN/PHRASE em desenvolvimento | catálogo do app + `guia/<idioma>/<TIPO>.md` |
+| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia dos 60 módulos da v0.1.7 | catálogo do app + `guia/<idioma>/<TIPO>.md` |
 
 Duas páginas por idioma. A segunda segue o precedente do Antitotem, que já
 tem `install.html` por idioma: `.page-nav` no cabeçalho ao lado do seletor
@@ -57,7 +57,7 @@ regressões do website são verificações distintas. Para regenerar:
 ```sh
 ../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
 python3 gerar_modulos.py
-python3 estado.py --depois 0.1.6
+python3 estado.py --depois 0.1.7
 python3 seo.py
 python3 verificar.py
 python3 -B -m unittest discover -s . -p 'test_*.py'
@@ -72,8 +72,8 @@ de `index.html` em vez de copiado para o script, pelo mesmo motivo.
 sem compilar o instrumento.
 
 O guia é a versão de leitura longa; o LEARN continua oferecendo ajuda
-contextual dentro do instrumento. A indicação de uma versão em
-desenvolvimento evita anunciar módulos ausentes dos downloads atuais.
+contextual dentro do instrumento. A página só deve ser enviada quando os
+downloads indicados existirem.
 
 ## Tipografia
 
@@ -229,7 +229,7 @@ Quem usa leitor de tela precisa da imagem, não do rótulo dela.
 `href`/`src` interno aponta para arquivo que existe; **nenhum recurso
 externo** além dos links para o portal e para o GitHub — nada de CDN, nada
 de fonte remota; seletor de idioma e `.page-nav` marcando a página certa em
-cada uma; os 58 módulos presentes nas quatro páginas de guia; nenhum
+cada uma; os 60 módulos presentes nas quatro páginas de guia; nenhum
 resíduo de português nas traduções.
 
 **Ainda não verificado, e é honesto dizer:** nenhum navegador real abriu

@@ -23,19 +23,24 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Um `.deb` local foi gerado e inspecionado. O conteúdo está correto;
   dependências `libasound2t64`/glibc 2.38 mostram que **não** se deve
   distribuir este pacote Mint 22 como se fosse o Ubuntu 22.04 da CI.
-- [ ] Concluir o portão interativo e musical descrito abaixo; registrar
-  resultados sem afirmar que uma exportação substituiu a janela ou o ouvido.
+- [x] Rodada interativa e musical concluída pelo autor em 18/10:
+  gestos solicitados na janela normal executados; sem estalos, travamento
+  ou texto sobreposto relatados; VAR/DIR/SPACE com diferenças perceptíveis.
+  O relato cobre a sessão feita, não todas as seeds ou plataformas.
 - [x] Repetir a matriz CI após corrigir o erro MSVC C1128 do teste
   LISTEN/PHRASE. Run `39076331679` verde no commit `2184460`:
   seis formatos confirmados nos logs; abertura Linux passou em Debian 12,
   Ubuntu 24.04, Fedora e Arch. A primeira tentativa (`39074923719`)
   falhou no Windows e não constitui release.
-- [ ] Após anexos públicos válidos, mudar site, SEO e guias nos quatro
-  idiomas e verificar links reais. Até lá, downloads ficam em 0.1.6.
-- [ ] Depois da validação da janela normal/escuta, tirar `-dev` do app,
-  fechar notas da v0.1.7, cortar tag sobre commit final e conferir a nova
-  matriz com os seis anexos públicos. Artefatos do run manual não substituem
-  a release: o binário ainda se identifica como 0.1.7-dev.
+- [x] Preparar localmente site, SEO e guias nos quatro idiomas para 0.1.7;
+  dez testes e verificação estrutural passaram. Não enviar `main` ainda:
+  downloads públicos permanecem em 0.1.6 até existirem os anexos novos.
+- [x] Tirar `-dev` das fontes do aplicativo e fechar notas da v0.1.7.
+- [ ] Concluir build/testes finais, revisar diff, cortar tag sobre commit
+  final e conferir a matriz com os seis anexos públicos. Artefatos do run
+  manual não substituem a release.
+- [ ] Conferir os seis links reais, publicar `main`/Pages e validar o site
+  público nos quatro idiomas.
 
 ### Rodada interativa e gravação de 18/10
 
@@ -62,19 +67,20 @@ com esse gesto. Portanto, o nível baixo desta tomada **não é evidência de
 defeito** nem motivo para mudar a mixagem do exemplo. `MotionEngine` exclui
 MIXER e MASTER. Como a partitura começa no REC, ela não documenta o instante
 exato do ajuste. A tomada continua válida para testar a presença do canal 2;
-não é necessário regravá-la só pelo nível. Ainda falta registrar pelo ouvido
-se VAR/DIR/SPACE mudaram perceptivelmente o fraseado e completar os gestos
-de interface não cobertos antes do gate final de 0.1.7. Se for necessária
-outra comparação com a prova offline, conferir o MASTER do exemplo em −6 dB
-antes do REC e escolher um volume físico de escuta seguro.
+não é necessário regravá-la só pelo nível. O autor confirmou que VAR/DIR/SPACE
+produziram diferenças perceptíveis e que realizou todos os gestos de interface
+solicitados anteriormente; não relatou novo defeito nesses gestos. Esse é o
+portão humano desta release, não uma certificação de todas as seeds. Se for
+necessária outra comparação com a prova offline, conferir o MASTER do exemplo
+em −6 dB antes do REC e escolher um volume físico de escuta seguro.
 Os originais não foram normalizados nem alterados.
 
 Auditoria de publicação, 18/10: `gh release list` confirmou v0.1.6 como
 release pública; o run de preparação `39076331679` está `completed`/
 `success`. `python3 website/verificar.py` passou (oito páginas, seis nomes
 de download, SEO v0.1.6), e não há tag local v0.1.7. Não se disparou nova
-matriz nem se geraram pacotes nesta conferência. Ordem restante: fechar
-interface/escuta → revisar diff e notas finais → retirar `-dev` → commit e
+matriz nem se geraram pacotes nesta conferência. Ordem restante: revisar diff
+e notas finais → retirar `-dev` → commit e
 tag v0.1.7 → conferir matriz e seis anexos públicos → atualizar site nos
 quatro idiomas e verificar os links reais.
 

@@ -43,7 +43,7 @@ endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
 project(RasgoModularPrototype VERSION 0.1.7 LANGUAGES C CXX)
-set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}-dev")
+set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}")
 
 include(CTest)
 
