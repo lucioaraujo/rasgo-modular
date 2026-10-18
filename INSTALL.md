@@ -23,8 +23,8 @@ que deveria funcionar.
 |---|---|---|---|---|
 | Linux x86-64 | JUCE (`RasgoModularApp`) | ✅ local | ✅ local | ✅ em hardware real |
 | Linux x86-64 | painel X11 (teste) | ✅ local | ✅ local | ✅ em hardware real |
-| Windows x86-64 | JUCE | ✅ CI de preparação 0.1.7 | ✅ versão anterior num Windows 10 real | ✅ versão anterior |
-| macOS (Universal 2) | JUCE | ✅ CI de preparação 0.1.7 | ✅ versão anterior num Mac real | ✅ versão anterior |
+| Windows x86-64 | JUCE | ✅ CI da release 0.1.7 | ✅ versão anterior num Windows 10 real | ✅ versão anterior |
+| macOS (Universal 2) | JUCE | ✅ CI da release 0.1.7 | ✅ versão anterior num Mac real | ✅ versão anterior |
 | Linux ARM | — | ❌ | ❌ | ❌ |
 
 **O que "na CI" quer dizer, e o que NÃO quer.** O workflow de três
