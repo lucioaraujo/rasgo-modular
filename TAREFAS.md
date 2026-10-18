@@ -40,7 +40,9 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   matriz `39140548809` concluídos. Release pública não preliminar contém
   os seis anexos, todos com tamanho não nulo.
 - [x] Conferir os seis links reais: HTTP 200 após redirecionamento do GitHub.
-- [ ] Publicar `main`/Pages e validar o site público nos quatro idiomas.
+- [x] Publicar `main`/Pages e validar o site público nos quatro idiomas:
+  deploy `39144377773` verde; quatro páginas principais com 0.1.7 e quatro
+  guias com LISTEN/PHRASE.
 
 ### Rodada interativa e gravação de 18/10
 
@@ -78,9 +80,12 @@ Os originais não foram normalizados nem alterados.
 Auditoria de publicação, 18/10: o run final da tag `39140548809` passou nos
 três sistemas, nos quatro contêineres Linux e no job de release. Seis anexos
 públicos foram conferidos por nome e tamanho. `python3 website/verificar.py`
-passou nas oito páginas, nos seis moldes de download e no SEO v0.1.7. Ordem
-restante: enviar `main` e confirmar Pages nos quatro
-idiomas. Nenhum ZIP extra foi gerado no HD do autor.
+passou nas oito páginas, nos seis moldes de download e no SEO v0.1.7.
+Fechamento: `main` em `9ffc731`, deploy `39144377773` verde, oito páginas
+públicas conferidas nos quatro idiomas. Nenhum ZIP extra foi gerado no HD
+do autor. Próxima sessão: desenvolvimento dos pedidos de acessibilidade e
+do módulo de escuta registrados abaixo; a validação humana de Windows/macOS
+desta versão permanece opcional e não foi declarada como feita.
 
 Detalhes e ordem de publicação: [`PUBLICACAO.md`](PUBLICACAO.md).
 

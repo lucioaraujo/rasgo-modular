@@ -6,9 +6,10 @@ A [release v0.1.7](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.
 foi criada pelo run `39140548809` da tag sobre `c70dcda`. Todos os jobs
 terminaram com sucesso: pacotes Linux, Windows e macOS, abertura Linux em
 Debian 12, Ubuntu 24.04, Fedora e Arch, e publicação. O GitHub confirmou
-seis anexos públicos, com nomes e tamanhos não nulos. O site em quatro
-idiomas está preparado localmente; a publicação em Pages será verificada
-separadamente depois do envio de `main`.
+seis anexos públicos, com nomes e tamanhos não nulos. O deploy de Pages
+`39144377773` passou após o envio de `main` (`9ffc731`); as quatro páginas
+principais públicas exibem 0.1.7, e os quatro guias públicos contêm os
+verbetes LISTEN e PHRASE. Os seis downloads responderam HTTP 200.
 
 Nesta rodada, o build completo Linux terminou e os 84 testes CTest passaram
 com os executáveis recém-compilados. Dez testes Python da documentação e a
@@ -42,9 +43,9 @@ Portões da release:
 3. Build final local e 84 testes passaram. A matriz da tag passou e os seis
    formatos (`.deb`, AppImage, `.tar.gz`, `.exe`, `.zip`, `.dmg`) constam da
    release pública. Não há `-dev` no executável final.
-4. Quatro idiomas, metadados e guia de módulos preparados localmente; dez
-   testes Python e verificação estrutural passaram. Os seis links HTTP de
-   download retornaram 200. Falta conferir o deploy de Pages.
+4. Quatro idiomas, metadados e guia de módulos passaram em dez testes Python
+   e na verificação estrutural. Os seis links HTTP de download retornaram
+   200; o deploy de Pages e as oito páginas públicas foram conferidos.
 
 Registro das tentativas de preparação anteriores à tag:
 
@@ -69,8 +70,8 @@ Os três grupos de artefatos pertencem ao Actions, **não** a uma release
 baixável publicamente. Não foram baixados ao HD do autor.
 
 Na preparação, o site público ainda exibia v0.1.6, corretamente. A tag final
-repetiu a matriz sobre o commit definitivo; a publicação de Pages é a etapa
-editorial seguinte e não deve ser confundida com a criação da release.
+repetiu a matriz sobre o commit definitivo. A release e Pages foram validados
+separadamente; não se confundiu o sucesso do empacotamento com o do site.
 
 ---
 
