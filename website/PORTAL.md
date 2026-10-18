@@ -36,21 +36,21 @@ loja, verbete, apresentação — usa esta moldura.
 
 ### pt
 
-> Um ambiente modular generativo de 58 módulos que nunca abre em branco:
+> Um ambiente modular generativo de 60 módulos que nunca abre em branco:
 > ele apresenta um patch já montado e soando, como ponto de partida, e
 > quem toca é você — recabeando à mão, ajustando ou construindo do zero.
 > Cada cabo é um objeto com estado, não um fio.
 
 ### en
 
-> A generative modular environment of 58 modules that never opens blank:
+> A generative modular environment of 60 modules that never opens blank:
 > it offers a patch already built and sounding, as a starting point, and
 > you are the one who plays it — re-patching by hand, adjusting or
 > building from scratch. Each cable is an object with state, not a wire.
 
 ### fr
 
-> Un environnement modulaire génératif de 58 modules qui ne s'ouvre jamais
+> Un environnement modulaire génératif de 60 modules qui ne s'ouvre jamais
 > sur une page blanche : il propose un patch déjà monté et sonnant, comme
 > point de départ, et c'est vous qui jouez — en recâblant à la main, en
 > ajustant ou en construisant depuis zéro. Chaque câble est un objet doté
@@ -58,7 +58,7 @@ loja, verbete, apresentação — usa esta moldura.
 
 ### es
 
-> Un entorno modular generativo de 58 módulos que nunca abre en blanco:
+> Un entorno modular generativo de 60 módulos que nunca abre en blanco:
 > ofrece un patch ya montado y sonando, como punto de partida, y quien
 > toca es usted — recableando a mano, ajustando o construyendo desde
 > cero. Cada cable es un objeto con estado, no un hilo.

@@ -5,9 +5,9 @@ quê, e como o som chega até você.
 
 ---
 
-## Ajuda enquanto você toca (0.1.7-dev)
+## Ajuda enquanto você toca (0.1.7)
 
-No aplicativo JUCE local, aponte para um módulo, controle ou jack. Depois
+No aplicativo JUCE, aponte para um módulo, controle ou jack. Depois
 de um segundo, o LEARN explica sua função. Durante o ajuste de um controle,
 a explicação entra imediatamente e acompanha o gesto, mesmo se o ponteiro
 sair da área do knob.
@@ -53,7 +53,7 @@ local do aplicativo, separada dos patches e da seed.
 Esses ajustes se aplicam ao LEARN, não às letras de todos os módulos.
 Escolha de família tipográfica, cores livres e renderizador continuam
 pendentes. O zoom do rack permanece separado das preferências de leitura.
-Não está nos instaladores 0.1.6: use o build local 0.1.7-dev.
+Disponível nos instaladores a partir da v0.1.7.
 
 ---
 

@@ -5,7 +5,7 @@ FILTER laisse passer une partie des fréquences d'un son et coupe le reste. Il a
 C'est le deuxième module de presque tous les patchs : après une source riche en harmoniques, comme la dent de scie d'un OSC, le filtre sculpte le timbre. Sa particularité est SPRD : à zéro, les trois sorties partagent la même coupure ; en le montant, elles s'écartent et deviennent trois filtres différents, chacun sur une région du son. Avec la résonance au maximum, le filtre se met à sonner tout seul, comme un oscillateur sinusoïdal.
 
 ## Controles
-Dans l'interface en développement 0.1.7-dev, le bouton CUT est plus grand que RESO pour distinguer le geste principal d'ouverture et de fermeture du timbre. Cette différence est visuelle ; les plages et la réponse sonore restent identiques.
+Dans la version 0.1.7, le bouton CUT est plus grand que RESO pour distinguer le geste principal d'ouverture et de fermeture du timbre. Cette différence est visuelle ; les plages et la réponse sonore restent identiques.
 
 - CUT : la fréquence de coupure, de 20 à 20000 Hz. C'est le réglage principal : tournez-le et écoutez le timbre s'ouvrir et se fermer.
 - RESO : renforce les fréquences proches de la coupure, pour un timbre plus nasillard. Au maximum, le filtre se met à sonner seul.

@@ -1,15 +1,15 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (7 out. 2026):** a versão atual é a **v0.1.6**, com pacotes
+> **Estado (18 out. 2026):** a versão atual é a **v0.1.7**, com pacotes
 > para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.6)
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7)
 > (antes: v0.1.5 em 7 out., v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
 > 29 set. 2026). Este documento descreve também como
 > construir e rodar a partir do código.
 >
 > **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
 > lá estão os avisos do Windows e do macOS e o que fazer em cada um.
-> *English:* the current version is v0.1.6. Start with
+> *English:* the current version is v0.1.7. Start with
 > ["Installing, step by step"](#installing-step-by-step).
 
 ---
@@ -23,23 +23,22 @@ que deveria funcionar.
 |---|---|---|---|---|
 | Linux x86-64 | JUCE (`RasgoModularApp`) | ✅ local | ✅ local | ✅ em hardware real |
 | Linux x86-64 | painel X11 (teste) | ✅ local | ✅ local | ✅ em hardware real |
-| Windows x86-64 | JUCE | ✅ na CI (verde em 21 set. 2026) | ❌ nunca aberto | ❌ |
-| macOS (Universal 2) | JUCE | ✅ na CI (verde em 21 set. 2026) | ❌ nunca aberto | ❌ |
+| Windows x86-64 | JUCE | ✅ CI de preparação 0.1.7 | ✅ versão anterior num Windows 10 real | ✅ versão anterior |
+| macOS (Universal 2) | JUCE | ✅ CI de preparação 0.1.7 | ✅ versão anterior num Mac real | ✅ versão anterior |
 | Linux ARM | — | ❌ | ❌ | ❌ |
 
 **O que "na CI" quer dizer, e o que NÃO quer.** O workflow de três
-sistemas (`.github/workflows/package.yml`) compila o motor, roda os 77
+sistemas (`.github/workflows/package.yml`) compila o motor, roda os 84
 testes, compila o app e gera o instalador em cada sistema. No macOS ele
 ainda confere com `file`/`lipo`/`otool` que o `.app` é Universal 2 de
 verdade — e a verificação passou com o binário trazendo as duas fatias
 (x86_64 e arm64) e `minos 10.15`, o alvo do projeto, e **não** o do
 runner, que roda macOS 26.
 
-Isso prova que **constrói, passa nos testes e empacota**. Não prova que
-abre, soa e se comporta bem numa máquina real, porque não há Windows nem
-Mac neste ambiente. O Antitotem foi publicado nessa mesma condição, com a
-decisão registrada explicitamente; o mesmo vale ser dito aqui em vez de
-deixar o leitor supor.
+Isso prova que **constrói, passa nos testes e empacota**. As versões
+anteriores foram abertas e tocadas pelo autor em Windows 10 e Mac reais;
+a matriz CI da v0.1.7 não equivale a repetir essa escuta nas duas máquinas.
+Na v0.1.7, a rodada interativa e musical relatada pelo autor foi em Linux.
 
 **Correção de uma afirmação anterior.** Até 21 set. 2026 este documento
 dizia que a CI "prova que constrói e empacota" nos três sistemas. **Não

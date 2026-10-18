@@ -5,7 +5,7 @@ ENVELOPE shapes a note over time: how it starts, how it falls, how much it susta
 Sources sound all the time; ENVELOPE turns that flow into phrases. It has two uses that can happen at once. Through the IN input and OUT output, it articulates the sound that passes through. Through the ENV output, it hands you the curve itself, which you can send to open a filter, change a tone or dose an effect. The four stages of the curve have names that appear on every synthesizer: attack, decay, sustain and release, hence ADSR.
 
 ## Controles
-In development interface 0.1.7-dev, ATK, DEC, SUS and REL are vertical sliders: drag upwards to increase. The three times use a logarithmic scale from 1 ms to 10 s; SUS remains a linear level. CURVE, VCA and LVL sit below them. Parameters and saved patches keep the same values as in the previous interface.
+In version 0.1.7, ATK, DEC, SUS and REL are vertical sliders: drag upwards to increase. The three times use a logarithmic scale from 1 ms to 10 s; SUS remains a linear level. CURVE, VCA and LVL sit below them. Parameters and saved patches keep the same values as in the previous interface.
 
 - ATK: the attack, the time the note takes to reach its peak after the pulse. Short sounds percussive; long, like a bow coming in slowly.
 - DEC: the decay, the time it takes to fall from the peak down to the SUS level.

@@ -43,8 +43,8 @@
   "applicationCategory": "MultimediaApplication",
   "applicationSubCategory": "Modular synthesizer",
   "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.6",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.6",
+  "softwareVersion": "0.1.7",
+  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -98,7 +98,6 @@
   <span class="status-pill">60 modules · 8 families</span>
   <h1>Module guide</h1>
   <p class="lead">The 60 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
-  <p class="note development-note">LISTEN and PHRASE are in local development version 0.1.7-dev. Version 0.1.6 downloads contain the previous 58 modules. ENVELOPE's sliders and FILTER's larger CUT control also belong to the new layout in development.</p>
 </section>
 
 <nav class="familias" aria-label="Families">
@@ -461,7 +460,7 @@
     <h4>How to think about it</h4>
     <p>It is the second module in almost every patch: after a source rich in harmonics, such as an OSC saw, the filter sculpts the tone. What sets it apart is SPRD: at zero, all three outputs share the same cutoff; as you raise it, they move apart and become three different filters, each on its own region of the sound. With resonance at maximum, the filter starts sounding by itself, like a sine oscillator.</p>
     <h4>Controls</h4>
-    <p>In development interface 0.1.7-dev, CUT has a larger knob than RESO to distinguish the main gesture of opening and closing the tone. This difference is visual; ranges and sound response remain unchanged.</p>
+    <p>In version 0.1.7, CUT has a larger knob than RESO to distinguish the main gesture of opening and closing the tone. This difference is visual; ranges and sound response remain unchanged.</p>
     <ul class="controles">
       <li><b>CUT</b>: the cutoff frequency, from 20 to 20000 Hz. This is the main control: turn it and hear the tone open and close.</li>
       <li><b>RESO</b>: emphasizes frequencies near the cutoff, giving a more nasal tone. At maximum the filter starts sounding on its own.</li>
@@ -816,7 +815,7 @@
     <h4>How to think about it</h4>
     <p>Sources sound all the time; ENVELOPE turns that flow into phrases. It has two uses that can happen at once. Through the IN input and OUT output, it articulates the sound that passes through. Through the ENV output, it hands you the curve itself, which you can send to open a filter, change a tone or dose an effect. The four stages of the curve have names that appear on every synthesizer: attack, decay, sustain and release, hence ADSR.</p>
     <h4>Controls</h4>
-    <p>In development interface 0.1.7-dev, ATK, DEC, SUS and REL are vertical sliders: drag upwards to increase. The three times use a logarithmic scale from 1 ms to 10 s; SUS remains a linear level. CURVE, VCA and LVL sit below them. Parameters and saved patches keep the same values as in the previous interface.</p>
+    <p>In version 0.1.7, ATK, DEC, SUS and REL are vertical sliders: drag upwards to increase. The three times use a logarithmic scale from 1 ms to 10 s; SUS remains a linear level. CURVE, VCA and LVL sit below them. Parameters and saved patches keep the same values as in the previous interface.</p>
     <ul class="controles">
       <li><b>ATK</b>: the attack, the time the note takes to reach its peak after the pulse. Short sounds percussive; long, like a bow coming in slowly.</li>
       <li><b>DEC</b>: the decay, the time it takes to fall from the peak down to the SUS level.</li>
@@ -1230,7 +1229,6 @@
   </article>
   <article class="modulo" id="mod-PHRASE">
     <h3>PHRASE</h3>
-    <p class="development-note">0.1.7-dev · local development; not yet in version 0.1.6 downloads.</p>
     <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="PHRASE module panel" width="237" height="300" loading="lazy" /></figure>
     <h4>What it is</h4>
     <p>PHRASE proposes a motif and plays it when pulses arrive at CLK. The idea returns with each phrase, with changes of direction, rests and accents that you control. Its outputs drive other voices; connect an oscillator and an envelope to hear it.</p>
@@ -1631,7 +1629,6 @@
   </article>
   <article class="modulo" id="mod-LISTEN">
     <h3>LISTEN</h3>
-    <p class="development-note">0.1.7-dev · local development; not yet in version 0.1.6 downloads.</p>
     <figure class="painel"><img src="assets/modulos/LISTEN.webp" alt="LISTEN module panel" width="189" height="300" loading="lazy" /></figure>
     <h4>What it is</h4>
     <p>LISTEN follows the energy of incoming sound in three regions: low, mid and high. Each region provides a continuous level and a pulse when it detects an attack. You can use these signals to make another voice respond to what is playing.</p>

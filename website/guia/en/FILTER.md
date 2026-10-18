@@ -5,7 +5,7 @@ FILTER lets part of a sound's frequencies through and cuts the rest. It has thre
 It is the second module in almost every patch: after a source rich in harmonics, such as an OSC saw, the filter sculpts the tone. What sets it apart is SPRD: at zero, all three outputs share the same cutoff; as you raise it, they move apart and become three different filters, each on its own region of the sound. With resonance at maximum, the filter starts sounding by itself, like a sine oscillator.
 
 ## Controles
-In development interface 0.1.7-dev, CUT has a larger knob than RESO to distinguish the main gesture of opening and closing the tone. This difference is visual; ranges and sound response remain unchanged.
+In version 0.1.7, CUT has a larger knob than RESO to distinguish the main gesture of opening and closing the tone. This difference is visual; ranges and sound response remain unchanged.
 
 - CUT: the cutoff frequency, from 20 to 20000 Hz. This is the main control: turn it and hear the tone open and close.
 - RESO: emphasizes frequencies near the cutoff, giving a more nasal tone. At maximum the filter starts sounding on its own.

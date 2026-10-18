@@ -34,7 +34,7 @@ class ModuleGuideTests(unittest.TestCase):
                         self.assertTrue(" ".join(sections[key]).strip())
                     self.assertTrue((gerar.AQUI / "assets" / "modulos" / (module + ".webp")).is_file())
 
-    def test_generated_articles_are_complete_and_label_development(self):
+    def test_generated_articles_are_complete_without_old_development_badges(self):
         for language, data in gerar.IDIOMAS.items():
             page = (gerar.AQUI / data["arquivo"]).read_text(encoding="utf-8")
             articles = re.findall(r'<article class="modulo" id="mod-([^"]+)">(.*?)</article>', page, re.S)
@@ -46,10 +46,8 @@ class ModuleGuideTests(unittest.TestCase):
                     self.assertEqual(article.count("<h4>"), 4)
                     self.assertIn('assets/modulos/%s.webp' % module, article)
                     self.assertIn('loading="lazy"', article)
-                    if module in gerar.EM_DESENVOLVIMENTO:
-                        self.assertIn("0.1.7-dev", article)
-                        self.assertIn("0.1.6", article)
-            self.assertIn(gerar.e(gerar.AVISO_DESENVOLVIMENTO[language]), page)
+                    self.assertNotIn("0.1.7-dev", article)
+            self.assertNotIn("development-note", page)
 
     def test_generation_is_reproducible(self):
         for language, data in gerar.IDIOMAS.items():

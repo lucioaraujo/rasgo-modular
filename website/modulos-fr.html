@@ -43,8 +43,8 @@
   "applicationCategory": "MultimediaApplication",
   "applicationSubCategory": "Modular synthesizer",
   "operatingSystem": "Linux, Windows, macOS",
-  "softwareVersion": "0.1.6",
-  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.6",
+  "softwareVersion": "0.1.7",
+  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -98,7 +98,6 @@
   <span class="status-pill">60 modules · 8 familles</span>
   <h1>Guide des modules</h1>
   <p class="lead">Les 60 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
-  <p class="note development-note">LISTEN et PHRASE sont dans la version locale de développement 0.1.7-dev. Les téléchargements de la version 0.1.6 contiennent les 58 modules précédents. Les curseurs d'ENVELOPE et le plus grand réglage CUT du FILTER font aussi partie de la nouvelle interface en développement.</p>
 </section>
 
 <nav class="familias" aria-label="Familles">
@@ -461,7 +460,7 @@
     <h4>Comment l’aborder</h4>
     <p>C'est le deuxième module de presque tous les patchs : après une source riche en harmoniques, comme la dent de scie d'un OSC, le filtre sculpte le timbre. Sa particularité est SPRD : à zéro, les trois sorties partagent la même coupure ; en le montant, elles s'écartent et deviennent trois filtres différents, chacun sur une région du son. Avec la résonance au maximum, le filtre se met à sonner tout seul, comme un oscillateur sinusoïdal.</p>
     <h4>Commandes</h4>
-    <p>Dans l'interface en développement 0.1.7-dev, le bouton CUT est plus grand que RESO pour distinguer le geste principal d'ouverture et de fermeture du timbre. Cette différence est visuelle ; les plages et la réponse sonore restent identiques.</p>
+    <p>Dans la version 0.1.7, le bouton CUT est plus grand que RESO pour distinguer le geste principal d'ouverture et de fermeture du timbre. Cette différence est visuelle ; les plages et la réponse sonore restent identiques.</p>
     <ul class="controles">
       <li><b>CUT</b> : la fréquence de coupure, de 20 à 20000 Hz. C'est le réglage principal : tournez-le et écoutez le timbre s'ouvrir et se fermer.</li>
       <li><b>RESO</b> : renforce les fréquences proches de la coupure, pour un timbre plus nasillard. Au maximum, le filtre se met à sonner seul.</li>
@@ -816,7 +815,7 @@
     <h4>Comment l’aborder</h4>
     <p>Les sources sonnent tout le temps ; ENVELOPE transforme ce flux en phrases. Il a deux usages qui peuvent coexister. Par l'entrée IN et la sortie OUT, il articule le son qui passe. Par la sortie ENV, il fournit la courbe elle-même, que vous pouvez envoyer ouvrir un filtre, changer un timbre ou doser un effet. Les quatre étapes de la courbe ont des noms anglais qu'on trouve sur tous les synthétiseurs : attack, decay, sustain et release, d'où ADSR.</p>
     <h4>Commandes</h4>
-    <p>Dans l'interface en développement 0.1.7-dev, ATK, DEC, SUS et REL sont des curseurs verticaux : tirez vers le haut pour augmenter. Les trois durées suivent une échelle logarithmique de 1 ms à 10 s ; SUS reste un niveau linéaire. CURVE, VCA et LVL se trouvent en dessous. Les paramètres et les patches enregistrés conservent les valeurs de l'interface précédente.</p>
+    <p>Dans la version 0.1.7, ATK, DEC, SUS et REL sont des curseurs verticaux : tirez vers le haut pour augmenter. Les trois durées suivent une échelle logarithmique de 1 ms à 10 s ; SUS reste un niveau linéaire. CURVE, VCA et LVL se trouvent en dessous. Les paramètres et les patches enregistrés conservent les valeurs de l'interface précédente.</p>
     <ul class="controles">
       <li><b>ATK</b> : l'attaque, le temps que met la note pour atteindre son maximum après l'impulsion. Court, c'est percussif ; long, comme un archet qui entre doucement.</li>
       <li><b>DEC</b> : la décroissance, le temps de la chute après le maximum jusqu'au niveau de SUS.</li>
@@ -1230,7 +1229,6 @@
   </article>
   <article class="modulo" id="mod-PHRASE">
     <h3>PHRASE</h3>
-    <p class="development-note">0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.</p>
     <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="Panneau du module PHRASE" width="237" height="300" loading="lazy" /></figure>
     <h4>Ce que c’est</h4>
     <p>PHRASE propose un motif et le joue quand des impulsions arrivent sur CLK. L'idée revient à chaque phrase, avec des changements de direction, des silences et des accents que vous réglez. Ses sorties commandent d'autres voix ; reliez un oscillateur et une enveloppe pour l'entendre.</p>
@@ -1631,7 +1629,6 @@
   </article>
   <article class="modulo" id="mod-LISTEN">
     <h3>LISTEN</h3>
-    <p class="development-note">0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.</p>
     <figure class="painel"><img src="assets/modulos/LISTEN.webp" alt="Panneau du module LISTEN" width="189" height="300" loading="lazy" /></figure>
     <h4>Ce que c’est</h4>
     <p>LISTEN suit l'énergie d'un son dans trois régions : grave, médium et aigu. Chaque région fournit un niveau continu et une impulsion lorsqu'elle détecte une attaque. Ces signaux permettent à une autre voix de répondre à ce qui joue.</p>

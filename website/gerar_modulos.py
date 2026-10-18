@@ -315,23 +315,6 @@ def figura_painel(codigo, tipo):
 PAGINA_PRINCIPAL = {"pt": "index.html", "en": "en.html",
                     "fr": "fr.html", "es": "es.html"}
 
-# O guia local pode antecipar módulos da próxima versão. Nunca transformar
-# isso em promessa de que o instalador publicado já os contém.
-EM_DESENVOLVIMENTO = {"LISTEN", "PHRASE"}
-AVISO_DESENVOLVIMENTO = {
-    "pt": "LISTEN e PHRASE estão no desenvolvimento local 0.1.7-dev. Os downloads da versão 0.1.6 contêm os 58 módulos anteriores. Os sliders do ENVELOPE e o CUT maior do FILTER também pertencem ao novo layout em desenvolvimento.",
-    "en": "LISTEN and PHRASE are in local development version 0.1.7-dev. Version 0.1.6 downloads contain the previous 58 modules. ENVELOPE's sliders and FILTER's larger CUT control also belong to the new layout in development.",
-    "fr": "LISTEN et PHRASE sont dans la version locale de développement 0.1.7-dev. Les téléchargements de la version 0.1.6 contiennent les 58 modules précédents. Les curseurs d'ENVELOPE et le plus grand réglage CUT du FILTER font aussi partie de la nouvelle interface en développement.",
-    "es": "LISTEN y PHRASE están en la versión local de desarrollo 0.1.7-dev. Las descargas de la versión 0.1.6 contienen los 58 módulos anteriores. Los deslizadores de ENVELOPE y el control CUT más grande de FILTER también pertenecen a la nueva interfaz en desarrollo.",
-}
-ROTULO_DESENVOLVIMENTO = {
-    "pt": "0.1.7-dev · desenvolvimento local; ainda fora dos downloads 0.1.6.",
-    "en": "0.1.7-dev · local development; not yet in version 0.1.6 downloads.",
-    "fr": "0.1.7-dev · développement local ; pas encore dans les téléchargements 0.1.6.",
-    "es": "0.1.7-dev · desarrollo local; todavía fuera de las descargas 0.1.6.",
-}
-
-
 def wordmark():
     """Lê o SVG do wordmark de `index.html` — uma cópia só no site."""
     fonte = (AQUI / "index.html").read_text(encoding="utf-8")
@@ -394,8 +377,6 @@ def pagina(codigo, dados, familias, marca):
     L.append('  <span class="status-pill">%s</span>' % e(t["pill"]))
     L.append("  <h1>%s</h1>" % e(t["h1"]))
     L.append('  <p class="lead">%s</p>' % e(t["lead"]))
-    if any(mod["tipo"] in EM_DESENVOLVIMENTO for fam in familias for mod in fam["modulos"]):
-        L.append('  <p class="note development-note">%s</p>' % e(AVISO_DESENVOLVIMENTO[codigo]))
     L.append("</section>")
     L.append("")
     # índice das famílias: uma página longa precisa de atalhos
@@ -416,8 +397,6 @@ def pagina(codigo, dados, familias, marca):
             verbete = mod[codigo] or mod["pt"]
             L.append('  <article class="modulo" id="mod-%s">' % mod["tipo"])
             L.append("    <h3>%s</h3>" % e(mod["tipo"]))
-            if mod["tipo"] in EM_DESENVOLVIMENTO:
-                L.append('    <p class="development-note">%s</p>' % e(ROTULO_DESENVOLVIMENTO[codigo]))
             L.extend(figura_painel(codigo, mod["tipo"]))
             didatico = ler_verbete(codigo, mod["tipo"])
             if didatico is not None:
