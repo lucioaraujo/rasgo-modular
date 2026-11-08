@@ -722,6 +722,22 @@ inline const LearnTable& learnTable() {
             {"out:sum", {"out1 + out2, com teto suave — mini-mixer de 2 "
                         "canais de brinde.", "", ""}},
         }},
+        {"ARP", {
+            {"chord", {"O acorde a arpejar — os 10 formatos do CHORD: uníssono, oitavas, quinta, maior, menor, sus4, maj7, min7, dim, add9. A CV CHD soma.", "", ""}},
+            {"inversion", {"Inversão (0–3): as notas mais graves sobem uma oitava — o mesmo acorde com outra nota embaixo.", "", ""}},
+            {"octaves", {"Quantas oitavas o arpejo percorre (1–4).", "", ""}},
+            {"mode", {"O caminho pelas notas: 0 sobe, 1 desce, 2 ida e volta, 3 ida e volta repetindo as pontas, 4 aleatório, 5 embaralhado (cada ciclo uma permutação), 6 divergir (do centro para fora), 7 convergir (de fora para o centro).", "Aleatório e embaralhado são SEMEADOS: o mesmo patch toca a mesma sequência. Divergir/convergir é desvio Rasgo.", ""}},
+            {"skip", {"Desvio Rasgo: chance de pausa em cada passo (0–1) — o arpejo respira. Semeado: determinístico.", "", "SKIP ~0,3 com o modo embaralhado: uma linha que parece improvisada."}},
+            {"rate", {"Velocidade do relógio interno (0,01–40 Hz), usado quando CLK está livre — o ARP soa ao carregar.", "", ""}},
+            {"gate_len", {"Duração de cada nota, como fração do passo (5–95 %).", "", ""}},
+            {"in:clock", {"Clock externo: uma nota por pulso. Livre → o relógio interno (RATE).", "", "CLOCK.euclid → CLK: o arpejo no ritmo euclidiano."}},
+            {"in:reset", {"Volta ao começo do ciclo no próximo passo.", "", ""}},
+            {"in:root", {"A tônica em 1 V/oct. Aceita direto a saída ROOT do HARMONY: o arpejo anda com a progressão (desvio Rasgo).", "", "HARMONY.root → ROOT, HARMONY.advance ← um CLOCK lento: progressão arpejada."}},
+            {"in:chord_cv", {"CV que soma ao CHORD: cada 1/9 troca de formato.", "", ""}},
+            {"out:pitch", {"A nota atual em 1 V/oct. Plugue no PITCH de um OSC, WAVETABLE, STRING…", "", ""}},
+            {"out:gate", {"O gate de cada nota (nada nos passos pulados pelo SKIP). Plugue num ENVELOPE ou no TRIG de uma voz.", "", ""}},
+            {"out:eos", {"Pulso no começo de cada ciclo do arpejo.", "", "EOS → ADVANCE do HARMONY: o acorde muda a cada volta do arpejo."}},
+        }},
         {"DYNAMICS", {
             {"thresh", {"Limiar: acima dele (compressor) o som é abaixado; abaixo dele (gate) o som é fechado. −48 a 0 dB; a CV THR soma ±24 dB.", "O detector compara o nível que ouve com o limiar, em dB — a curva estática do compressor (Giannoulis, Massberg e Reiss, 2012).", ""}},
             {"ratio", {"Quanto abaixa: 4 = cada 4 dB acima do limiar viram 1. No máximo (20) vira limitador: nada passa do limiar. No GATE, quanto fecha abaixo dele.", "", ""}},
@@ -2811,6 +2827,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"VCA", {
             "Amplificador controlado por tensão — o volume/nível como CV; "
             "resposta linear ou exponencial.", "", ""}},
+        {"ARP", {
+            "Arpejador — percorre as notas de um acorde no clock: os 10 formatos do CHORD, inversão, até 4 oitavas, 8 caminhos (sobe, desce, ida e volta, aleatório, embaralhado, divergir, convergir).",
+            "Relógio interno quando o CLK está livre: soa ao carregar. Desvios Rasgo: divergir/convergir, SKIP semeado (pausas) e ROOT que aceita a tônica do HARMONY.",
+            "ARP → PITCH de um OSC + GATE → ENVELOPE → VCA; HARMONY.root → ROOT: uma progressão arpejada que anda sozinha."}},
         {"DYNAMICS", {
             "Compressor e gate com sidechain — abaixa o que passa do limiar (ou fecha o que fica abaixo) e devolve o que ouve como sinal: ENV (o nível) e GR (quanto abaixa).",
             "Detector de pico ou RMS → curva em dB com joelho → ataque/release no ganho → GAIN (a formulação de Giannoulis, Massberg e Reiss, 2012). Desvios Rasgo: ENV/GR como modulação, BRTH (o release segue os golpes) e DRIFT (cada golpe varia, semeado).",
@@ -3124,6 +3144,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Voltage-controlled amplifier — volume/level as CV; linear or exponential response.",
             "",
             ""}},
+        {"ARP", {
+            "Arpeggiator — it walks through the notes of a chord on the clock: CHORD's 10 shapes, inversion, up to 4 octaves, 8 paths (up, down, up-down, random, shuffle, diverge, converge).",
+            "Internal clock when CLK is free: it plays on load. Rasgo deviations: diverge/converge, seeded SKIP (rests) and a ROOT that takes HARMONY's root.",
+            "ARP → an OSC's PITCH + GATE → ENVELOPE → VCA; HARMONY.root → ROOT: an arpeggiated progression that moves by itself."}},
         {"DYNAMICS", {
             "Compressor and gate with sidechain — it turns down what passes the threshold (or shuts what stays below) and gives back what it hears as signal: ENV (the level) and GR (how much it turns down).",
             "Peak or RMS detector → dB curve with knee → attack/release on the gain → GAIN (Giannoulis, Massberg and Reiss, 2012). Rasgo deviations: ENV/GR as modulation, BRTH (the release follows the hits) and DRIFT (each hit varies, seeded).",
@@ -3366,6 +3390,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Amplificateur commandé en tension — le volume/niveau comme CV ; réponse linéaire ou exponentielle.",
             "",
             ""}},
+        {"ARP", {
+            "Arpégiateur — il parcourt les notes d’un accord sur l’horloge : les 10 formes du CHORD, renversement, jusqu’à 4 octaves, 8 chemins (monte, descend, aller-retour, aléatoire, mélangé, diverger, converger).",
+            "Horloge interne quand CLK est libre : il sonne au chargement. Écarts Rasgo : diverger/converger, SKIP semé (pauses) et une ROOT qui accepte la tonique du HARMONY.",
+            "ARP → PITCH d’un OSC + GATE → ENVELOPE → VCA ; HARMONY.root → ROOT : une progression arpégée qui avance seule."}},
         {"DYNAMICS", {
             "Compresseur et gate avec sidechain — il baisse ce qui passe le seuil (ou ferme ce qui reste en dessous) et rend ce qu’il entend comme signal : ENV (le niveau) et GR (de combien il baisse).",
             "Détecteur de crête ou RMS → courbe en dB avec genou → attaque/relâchement sur le gain → GAIN (Giannoulis, Massberg et Reiss, 2012). Écarts Rasgo : ENV/GR comme modulation, BRTH (le relâchement suit les coups) et DRIFT (chaque coup varie, semé).",
@@ -3608,6 +3636,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "Amplificador controlado por tensión — el volumen/nivel como CV; respuesta lineal o exponencial.",
             "",
             ""}},
+        {"ARP", {
+            "Arpegiador — recorre las notas de un acorde con el reloj: los 10 formatos del CHORD, inversión, hasta 4 octavas, 8 caminos (sube, baja, ida y vuelta, aleatorio, barajado, divergir, converger).",
+            "Reloj interno cuando CLK está libre: suena al cargar. Desvíos Rasgo: divergir/converger, SKIP sembrado (pausas) y una ROOT que acepta la tónica del HARMONY.",
+            "ARP → PITCH de un OSC + GATE → ENVELOPE → VCA; HARMONY.root → ROOT: una progresión arpegiada que avanza sola."}},
         {"DYNAMICS", {
             "Compresor y gate con sidechain — baja lo que pasa del umbral (o cierra lo que queda por debajo) y devuelve lo que oye como señal: ENV (el nivel) y GR (cuánto baja).",
             "Detector de pico o RMS → curva en dB con rodilla → ataque/release sobre la ganancia → GAIN (Giannoulis, Massberg y Reiss, 2012). Desvíos Rasgo: ENV/GR como modulación, BRTH (el release sigue los golpes) y DRIFT (cada golpe varía, sembrado).",

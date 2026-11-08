@@ -177,6 +177,7 @@ Estado: **✓** pronto · **·** a fazer.
 | 12 | `QUANTIZER` | [`12_quantizer.md`](12_quantizer.md) | ✓ |
 | 62 | `PHRASE` | [`62_phrase.md`](62_phrase.md) | local, após 0.1.6 |
 | 63 | `DYNAMICS` | [`63_dynamics.md`](63_dynamics.md) | local, após 0.1.7 |
+| 64 | `ARP` | [`64_arp.md`](64_arp.md) | local, após 0.1.7 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

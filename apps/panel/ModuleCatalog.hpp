@@ -68,6 +68,7 @@
 #include "dsp/Vca.hpp"
 #include "dsp/Vca4.hpp"
 #include "dsp/Dynamics.hpp"
+#include "dsp/Arp.hpp"
 #include "dsp/Vocoder.hpp"
 #include "dsp/Wasp.hpp"
 
@@ -100,6 +101,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "VCA")        return std::make_unique<Vca>();
     if (t == "VCA4")       return std::make_unique<Vca4>();
     if (t == "DYNAMICS")   return std::make_unique<Dynamics>();
+    if (t == "ARP")        return std::make_unique<Arp>();
     if (t == "VOCODER")    return std::make_unique<Vocoder>();
     if (t == "CONTROL")    return std::make_unique<Control>();
     if (t == "SH")         return std::make_unique<SampleHold>();
@@ -211,6 +213,7 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
             // DYNAMICS (8/11): fora do catálogo da seed, como LISTEN e PHRASE —
             // as seeds antigas continuam gerando os mesmos patches.
             if (family == "TRANSFORM") group.types.push_back("DYNAMICS");
+            if (family == "TIME") group.types.push_back("ARP");
         }
         return groups;
     }();

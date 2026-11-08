@@ -20,9 +20,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   ENV/GR como sinais, BRTH e DRIFT. Teste próprio verde; suíte local; LEARN
   nos 4 idiomas; dossiê e guia. Fora do catálogo da seed.
 - [ ] Escuta do DYNAMICS pelo autor (as receitas do guia são o roteiro).
-- [ ] **ARP** (#64), aprovado: arpejador com tabela de acordes própria,
-  modos clássicos + divergir/convergir, SKIP semeado, ROOT vindo do HARMONY,
-  relógio interno quando o CLOCK está livre.
+- [x] **ARP** (#64), aprovado: arpejador com os formatos do CHORD, 8
+  caminhos (clássicos + divergir/convergir), SKIP semeado, ROOT vindo do
+  HARMONY, relógio interno quando o CLK está livre. Teste próprio verde;
+  LEARN nos 4 idiomas; dossiê e guia. Fora do catálogo da seed.
+- [ ] Escuta do ARP pelo autor (as receitas do guia são o roteiro).
 - [ ] Decisões do autor ainda abertas: alvo de plugin (JUCE, Synth primeiro);
   polifonia (fora por enquanto); ideias generativas do estudo (autômato
   celular, Markov, física).

@@ -40,6 +40,15 @@ DISTRHO Cardinal 26.02. Estudo e licenças em
 [`dossies/ESTUDO_cardinal_catalogo_e_licencas.md`](dossies/ESTUDO_cardinal_catalogo_e_licencas.md);
 contrato em [63](dossies/63_dynamics.md).
 
+## Arpejador — implementação própria
+
+O módulo ARP, de 8/11/2026, é implementação original sob AGPL-3.0-or-later.
+A ideia é pública — os arpejadores de sintetizador dos anos 1970 (Roland
+Jupiter-4, ARP Odyssey) e os seus modos clássicos; o conceito foi lido, sem
+cópia de código, no Bogaudio ARP (GPL-3.0-or-later) e no Arp 3.x da
+Amalgamated Harmonics (BSD-3-Clause), dentro do DISTRHO Cardinal 26.02. A
+tabela de formatos é a do CHORD (#26). Contrato em [64](dossies/64_arp.md).
+
 ## Código de terceiros incorporado
 
 Só três, e nenhum no núcleo de DSP:
