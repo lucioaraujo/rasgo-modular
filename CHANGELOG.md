@@ -18,6 +18,13 @@ pronto.
   variam a cada golpe por acaso semeado. Fora do catálogo da seed (as seeds
   antigas não mudam). Teste próprio; LEARN nos quatro idiomas; dossiê e
   guia. Ainda não ouvido pelo autor.
+- **ARP** (#64, TIME, 8 nov.): arpejador. Os 10 formatos do CHORD, inversão,
+  até 4 oitavas e 8 caminhos (sobe, desce, ida e volta, ida e volta com as
+  pontas, aleatório, embaralhado, divergir, convergir). Relógio interno
+  quando o CLK está livre: soa ao carregar. Desvios Rasgo:
+  divergir/convergir, SKIP (pausas semeadas) e ROOT que aceita a tônica do
+  HARMONY. Fora do catálogo da seed. Teste próprio; LEARN nos quatro
+  idiomas; dossiê e guia. Ainda não ouvido pelo autor.
 
 ---
 
