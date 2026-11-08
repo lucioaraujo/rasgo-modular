@@ -51,6 +51,7 @@
 #include "dsp/Sampler.hpp"
 #include "dsp/Scope.hpp"
 #include "dsp/Listen.hpp"
+#include "dsp/Dynamics.hpp"
 #include "dsp/Phrase.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
@@ -255,6 +256,7 @@ int main() {
     mods.emplace_back("TURNTABLE", std::make_unique<Turntable>());
     mods.emplace_back("SCOPE", std::make_unique<Scope>());
     mods.emplace_back("LISTEN", std::make_unique<Listen>());
+    mods.emplace_back("DYNAMICS", std::make_unique<Dynamics>());
     mods.emplace_back("PHRASE", std::make_unique<Phrase>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("SHIFTER", std::make_unique<Shifter>());

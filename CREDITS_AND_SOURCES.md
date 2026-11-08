@@ -28,6 +28,18 @@ seu divisor offline não foi copiado. PHRASE não incorpora o arquivo de
 escalas ou código do Trioio. Contratos e proveniência nos dossiês
 [61](dossies/61_listen.md) e [62](dossies/62_phrase.md).
 
+## Dinâmica — implementação própria
+
+O módulo DYNAMICS, de 8/11/2026, é implementação original sob
+AGPL-3.0-or-later, na formulação pública de D. Giannoulis, M. Massberg e
+J. D. Reiss, "Digital Dynamic Range Compressor Design — A Tutorial and
+Analysis", *JAES* 60(6), 2012. O conceito foi lido, sem cópia de código, no
+Bogaudio PRESSOR (GPL-3.0-or-later), no ZamComp de Damien Zammit
+(GPL-2.0-or-later) e no Pressed Duck de Cody Geary / CVfunk (MIT), dentro do
+DISTRHO Cardinal 26.02. Estudo e licenças em
+[`dossies/ESTUDO_cardinal_catalogo_e_licencas.md`](dossies/ESTUDO_cardinal_catalogo_e_licencas.md);
+contrato em [63](dossies/63_dynamics.md).
+
 ## Código de terceiros incorporado
 
 Só três, e nenhum no núcleo de DSP:

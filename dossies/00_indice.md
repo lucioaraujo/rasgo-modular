@@ -91,6 +91,7 @@ propriedade do cabo, não um módulo do catálogo.
 | 60 | [`60_vocoder.md`](60_vocoder.md) | `VOCODER` (vocoder de N bandas — Dudley 1938) | TRANSFORM | **implementado** (2026-09-08) |
 | 61 | [`61_listen.md`](61_listen.md) | `LISTEN` (três regiões de escuta, níveis e ataques) | OUT | implementação local, 2026-10-17 |
 | 62 | [`62_phrase.md`](62_phrase.md) | `PHRASE` (motivo interpretado por estímulos) | DECISION | implementação local, 2026-10-17 |
+| 63 | [`63_dynamics.md`](63_dynamics.md) | `DYNAMICS` (compressor e gate com sidechain; ENV/GR como sinais) | TRANSFORM | implementação local, 2026-11-08 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

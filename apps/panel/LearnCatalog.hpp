@@ -722,6 +722,25 @@ inline const LearnTable& learnTable() {
             {"out:sum", {"out1 + out2, com teto suave — mini-mixer de 2 "
                         "canais de brinde.", "", ""}},
         }},
+        {"DYNAMICS", {
+            {"thresh", {"Limiar: acima dele (compressor) o som é abaixado; abaixo dele (gate) o som é fechado. −48 a 0 dB; a CV THR soma ±24 dB.", "O detector compara o nível que ouve com o limiar, em dB — a curva estática do compressor (Giannoulis, Massberg e Reiss, 2012).", ""}},
+            {"ratio", {"Quanto abaixa: 4 = cada 4 dB acima do limiar viram 1. No máximo (20) vira limitador: nada passa do limiar. No GATE, quanto fecha abaixo dele.", "", ""}},
+            {"attack", {"Quão rápido ele começa a abaixar quando o som passa do limiar (0,1–200 ms). Rápido corta o golpe; lento deixa o ataque passar e comprime o corpo.", "", "Ataque ~20 ms num DRUM: o golpe atravessa e a cauda é segurada — mais 'soco'."}},
+            {"release", {"Quão rápido ele solta depois (5 ms–2 s). Curto demais faz o som 'bombear'; longo segura a redução entre as notas.", "", ""}},
+            {"knee", {"Joelho: 0 = a compressão começa de uma vez no limiar; até 12 dB = começa aos poucos antes dele, mais transparente.", "", ""}},
+            {"makeup", {"Ganho de compensação depois da compressão (0–24 dB): devolve o nível que ela tirou.", "", ""}},
+            {"side_mix", {"O que o detector OUVE: 0 = a própria entrada; 1 = o SIDE (qualquer cabo). No meio, uma mistura. Sem SIDE ligado, ouve sempre a entrada.", "É assim que um som abaixa o outro (ducking): o bumbo no SIDE, o pad no IN.", "DRUM → SIDE, um acorde do CHORD → IN, SIDE = 1: o acorde respira no ritmo do bumbo."}},
+            {"detect", {"RMS ligado: o detector ouve a energia média (~10 ms) — reage ao corpo do som, mais musical. Desligado: o pico — reage a cada golpe.", "", ""}},
+            {"mode", {"GATE ligado: vira noise gate (expansor para baixo) — fecha o que fica abaixo do limiar. Desligado: compressor.", "", ""}},
+            {"breath", {"Desvio Rasgo: o release passa a seguir o intervalo entre os golpes que ele ouve — a compressão respira no andamento da música. 0 = release fixo.", "Ele mede o tempo entre um golpe e o próximo e leva o release para ~60 % desse intervalo, na proporção do BRTH.", ""}},
+            {"drift", {"Desvio Rasgo: a cada golpe, ataque e release variam um pouco (até uma oitava de tempo) por um acaso SEMEADO — o bombeamento nunca é mecânico. 0 = fixo. Determinístico.", "", ""}},
+            {"in:in", {"O som a comprimir (mono ou estéreo — os canais são detectados juntos). Sem cabo, o módulo fica calado, como o VCA.", "", ""}},
+            {"in:side", {"Sidechain: qualquer sinal que o detector deve ouvir (com SIDE perto de 1). Sem IN e com SIDE, as saídas ENV e GR seguem se movendo — o módulo vira gerador de modulação.", "", ""}},
+            {"in:thr", {"CV somada ao limiar: −1..+1 = −24..+24 dB.", "", ""}},
+            {"out:out", {"A entrada, comprimida (ou fechada pelo gate), com o GAIN.", "", ""}},
+            {"out:env", {"O nível que o detector ouve, como sinal de controle 0–1 (−60..0 dB), com a mesma balística de ATK/REL. Um seguidor de envelope.", "", "ENV → CUT de um FILTER: o filtro abre com a força do que o detector ouve."}},
+            {"out:gr", {"Quanto ele está abaixando agora, como sinal 0–1 (0..24 dB de redução). Desvio Rasgo: a compressão vira modulação.", "", "GR → um VCA invertido noutro som: um sobe quando o outro é comprimido."}},
+        }},
         {"VCA4", {
             {"level1", {
                 "Ganho manual do canal 1 (o knob que a CV1 soma — "
@@ -2792,6 +2811,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
         {"VCA", {
             "Amplificador controlado por tensão — o volume/nível como CV; "
             "resposta linear ou exponencial.", "", ""}},
+        {"DYNAMICS", {
+            "Compressor e gate com sidechain — abaixa o que passa do limiar (ou fecha o que fica abaixo) e devolve o que ouve como sinal: ENV (o nível) e GR (quanto abaixa).",
+            "Detector de pico ou RMS → curva em dB com joelho → ataque/release no ganho → GAIN (a formulação de Giannoulis, Massberg e Reiss, 2012). Desvios Rasgo: ENV/GR como modulação, BRTH (o release segue os golpes) e DRIFT (cada golpe varia, semeado).",
+            "DRUM → SIDE e um pad → IN: o pad respira com o bumbo. Sem IN, só SIDE: ENV e GR viram um seguidor de envelope de qualquer sinal."}},
         {"VCA4", {
             "Banco de 4 VCAs + um mixer somado (MIX). O `VCA` (#20) é "
             "duplo; este é o banco pra patch grande — Mutable Veils / "
@@ -3101,6 +3124,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Voltage-controlled amplifier — volume/level as CV; linear or exponential response.",
             "",
             ""}},
+        {"DYNAMICS", {
+            "Compressor and gate with sidechain — it turns down what passes the threshold (or shuts what stays below) and gives back what it hears as signal: ENV (the level) and GR (how much it turns down).",
+            "Peak or RMS detector → dB curve with knee → attack/release on the gain → GAIN (Giannoulis, Massberg and Reiss, 2012). Rasgo deviations: ENV/GR as modulation, BRTH (the release follows the hits) and DRIFT (each hit varies, seeded).",
+            "DRUM → SIDE and a pad → IN: the pad breathes with the kick. No IN, only SIDE: ENV and GR become an envelope follower of any signal."}},
         {"VCA4", {
             "Bank of 4 VCAs plus a summed mixer (MIX). `VCA` (#20) is dual; this is the bank for a large patch — Mutable Veils / Intellijel Quad VCA.",
             "The linear/exp CURVE is SHARED. Each channel: LVL + attenuverted CV (summed at the port). MIXG sets the gain of the sum.",
@@ -3339,6 +3366,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Amplificateur commandé en tension — le volume/niveau comme CV ; réponse linéaire ou exponentielle.",
             "",
             ""}},
+        {"DYNAMICS", {
+            "Compresseur et gate avec sidechain — il baisse ce qui passe le seuil (ou ferme ce qui reste en dessous) et rend ce qu’il entend comme signal : ENV (le niveau) et GR (de combien il baisse).",
+            "Détecteur de crête ou RMS → courbe en dB avec genou → attaque/relâchement sur le gain → GAIN (Giannoulis, Massberg et Reiss, 2012). Écarts Rasgo : ENV/GR comme modulation, BRTH (le relâchement suit les coups) et DRIFT (chaque coup varie, semé).",
+            "DRUM → SIDE et une nappe → IN : la nappe respire avec la grosse caisse. Sans IN, seulement SIDE : ENV et GR deviennent un suiveur d’enveloppe de n’importe quel signal."}},
         {"VCA4", {
             "Banc de 4 VCA plus un mélangeur sommé (MIX). `VCA` (#20) est double ; celui-ci est le banc pour un grand patch — Mutable Veils / Intellijel Quad VCA.",
             "La CURVE linéaire/exp est PARTAGÉE. Chaque canal : LVL + CV atténuversée (sommée au port). MIXG donne le gain de la somme.",
@@ -3577,6 +3608,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "Amplificador controlado por tensión — el volumen/nivel como CV; respuesta lineal o exponencial.",
             "",
             ""}},
+        {"DYNAMICS", {
+            "Compresor y gate con sidechain — baja lo que pasa del umbral (o cierra lo que queda por debajo) y devuelve lo que oye como señal: ENV (el nivel) y GR (cuánto baja).",
+            "Detector de pico o RMS → curva en dB con rodilla → ataque/release sobre la ganancia → GAIN (Giannoulis, Massberg y Reiss, 2012). Desvíos Rasgo: ENV/GR como modulación, BRTH (el release sigue los golpes) y DRIFT (cada golpe varía, sembrado).",
+            "DRUM → SIDE y un pad → IN: el pad respira con el bombo. Sin IN, solo SIDE: ENV y GR se vuelven un seguidor de envolvente de cualquier señal."}},
         {"VCA4", {
             "Banco de 4 VCA más un mezclador sumado (MIX). `VCA` (#20) es doble; éste es el banco para un patch grande — Mutable Veils / Intellijel Quad VCA.",
             "La CURVE lineal/exp es COMPARTIDA. Cada canal: LVL + CV atenuvertida (sumada en el puerto). MIXG da la ganancia de la suma.",

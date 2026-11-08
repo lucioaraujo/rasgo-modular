@@ -7,6 +7,20 @@ pronto.
 
 ---
 
+## Em desenvolvimento (depois da v0.1.7)
+
+- **DYNAMICS** (#63, TRANSFORM, 8 nov.): compressor e gate com sidechain,
+  na formulação pública de Giannoulis, Massberg e Reiss (2012). Detector de
+  pico ou RMS, curva em dB com joelho, ataque/release, ganho de
+  compensação (GAIN). Desvios Rasgo: as saídas ENV (o nível que o detector
+  ouve) e GR (quanto ele abaixa) como sinais de controle; BRTH, o release
+  que segue o intervalo entre os golpes; DRIFT, ataque e release que
+  variam a cada golpe por acaso semeado. Fora do catálogo da seed (as seeds
+  antigas não mudam). Teste próprio; LEARN nos quatro idiomas; dossiê e
+  guia. Ainda não ouvido pelo autor.
+
+---
+
 ## v0.1.7 — 2026-10-18
 
 - Preparação multiplataforma em 18 out.: 84 testes locais passaram. A
