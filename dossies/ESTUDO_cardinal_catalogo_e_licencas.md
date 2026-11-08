@@ -96,6 +96,28 @@ As categorias "hardware clone" (78), "expander" (57), "blank" (25) e
 "visual" (55) não são lacunas: o Modular reimplementa conceitos com desvio
 (não clona), não tem expansores e não precisa de painéis vazios.
 
+## 4b. Ideias de módulo que o Modular não tem (passada por conceito)
+
+A comparação por categoria (§3) conta "sequenciador" como coberto se houver
+algum sequenciador. A passada fina procura ideias distintas nas descrições
+dos 1.422 módulos e confere só na tabela de módulos de `RASGO_MODULAR.md`.
+Faltam, além das lacunas do §4:
+
+| Ideia | Exemplos no Cardinal (arte livre) |
+|---|---|
+| autômato celular como sequenciador | voxglitch Glitch Sequencer |
+| cadeia de Markov | ZetaCarinae Rosenchance, GuildensTurn |
+| física — bolas, gravidade, cordas elásticas | JW Bouncy Balls, Sapphire Elastika, voxglitch Hazumi |
+| reverb de mola | Autinn Coil |
+| rede neural pequena | ChowDSP ChowRNN, sonusmodular Neurosc |
+| analisador de espectro | Bogaudio ANALYZER / -XL / RANALYZER |
+| sequências matemáticas (Collatz, Fibonacci) | CVfunk Collatz, alefsbits fibb |
+| microtonal / escalas Scala | h4n4 Xen Quantizer (já pendente no `TAREFAS.md`) |
+
+Limites: busca por palavras nas descrições — pode faltar ideia descrita com
+outros termos, e um "já tem" pode ser parcial (ex.: o mapa contínuo de
+padrões de bateria do Topograph diante de SEQUENCE/TRIGSEQ não foi conferido).
+
 ## 5. Frente 2 — as coleções que cobrem as lacunas (2026-11-08)
 
 Leitura do código (sem copiar) dos módulos de licença limpa — código livre e
