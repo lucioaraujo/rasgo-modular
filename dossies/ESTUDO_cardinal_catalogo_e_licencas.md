@@ -170,8 +170,58 @@ last-note. Não é um módulo a acrescentar: é decisão de arquitetura (o
 canal — como o `Engine` por canal do Bogaudio). Fica registrada como
 pergunta ao autor, não como lacuna a preencher.
 
-## 6. Próximos passos (frente 3)
+## 6. Frente 3 — a arquitetura de host (2026-11-08)
 
-- **Frente 3 — arquitetura de host**: como o Cardinal embrulha o Rack com o
-  DPF (aplicativo e plugin AU/CLAP/LV2/VST2/VST3), a separação UI/DSP e o
-  empacotamento, pensando num Modular que também rode como plugin.
+Leitura de `README.md`, `docs/OVERVIEW.md` e da árvore `src/` do Cardinal.
+
+**Como o Cardinal é montado:**
+
+- **Um binário só, tudo dentro.** Rack, as 85 coleções e os utilitários são
+  compilados juntos e estaticamente; o Cardinal **não carrega módulos de
+  fora** nem fala com a loja do VCV. É o mesmo princípio do Modular (um
+  instrumento autocontido, sem plugins de terceiros em tempo de execução).
+- **O Rack é usado, não bifurcado.** O código original entra como está;
+  cabeçalhos em `include/` são incluídos antes dos do Rack para trocar
+  detalhes de implementação, e `deps/` refaz o build das dependências de
+  forma estática e portável.
+- **DPF faz os formatos de plugin.** O DISTRHO Plugin Framework (ISC)
+  cuida de LV2, VST2, VST3, AU e CLAP (este ainda em andamento) e do
+  aplicativo autônomo. Formato novo se acrescenta no DPF, não no Cardinal.
+- **Os módulos "Core" do Rack foram trocados por módulos do host:**
+  Host Audio, Host MIDI (notas, CC, gate, mapa), Host CV, Host Parameters
+  (24 parâmetros de automação do host viram CV), Host Time (transporte do
+  host). Ou seja: o mundo de fora entra no patch **como módulos** — a mesma
+  ideia da identidade do Modular ("MIDI, áudio e CV são nós adaptadores
+  opcionais", `RASGO_MODULAR.md §35.4.1`).
+- **Variantes pelo papel no host.** "main" (8 entradas/saídas de áudio e 10
+  de CV; fora de AU/VST2, que não têm CV), **Synth** (instrumento, 2
+  saídas) e **FX** (efeito, 2 entradas e 2 saídas) — o mesmo plugin, porque
+  muitos hosts exigem que instrumento e efeito sejam produtos separados.
+  Há ainda Mini (para a web/recursos baixos), Native (autônomo) e Remote
+  (controle por OSC).
+- **Outros hosts dentro do patch:** os módulos Carla e Ildaeil hospedam
+  plugins (LV2/VST) dentro do Cardinal — o caminho inverso.
+- **Licenças:** só coleções compatíveis com a GPLv3 entram; a marca VCV foi
+  retirada para evitar problema de marca registrada.
+
+**O que isso sugere para o Modular** (opções para o autor):
+
+1. **Um alvo de plugin com o JUCE, não com o DPF.** O Modular já tem o
+   núcleo sem framework e o aplicativo em JUCE (`apps/juce/`); o JUCE faz
+   VST3, AU e LV2 (CLAP por extensão) com o mesmo código de aplicativo, sob
+   a mesma via AGPLv3 já usada. O DPF só valeria se o JUCE pesasse demais
+   para um plugin.
+2. **Os nós de fora no papel de "módulos do host":** no modo plugin,
+   SIGNAL-IN recebe o áudio e o MIDI do host, NOTE-OUT manda MIDI de volta e
+   o MASTER entrega a saída — sem mudar o motor (o Modular continua soando
+   sozinho, como instrumento autônomo).
+3. **Duas variantes desde o começo, Synth e FX**, como o Cardinal, pela
+   mesma razão (os hosts separam instrumento e efeito).
+4. **Parâmetros do host como fonte de modulação** (como o Host Parameters) e
+   **o transporte do host** sincronizando o CLOCK (como o Host Time).
+5. Nada disso pede código do Cardinal: é arquitetura, e o JUCE já cobre os
+   formatos.
+
+Para seguir: o autor decide se o Modular ganha um alvo de plugin e, se
+ganhar, em que ordem (Synth primeiro, por ser o caso de uso de um
+instrumento que soa sozinho).
