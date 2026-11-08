@@ -9,6 +9,12 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **SCOPE** (8 nov.): a saída **CONF** (gate de altura confiável), o
+  **KEEP** (o PIT segura a última altura no silêncio, em vez de cair a
+  110 Hz) e o **OCT** (−2..+2 oitavas no PIT). Padrões iguais ao
+  comportamento anterior; fora da seed, da mutação e do VARIA — seeds e
+  patches antigos não mudam.
+
 - **DYNAMICS** (#63, TRANSFORM, 8 nov.): compressor e gate com sidechain,
   na formulação pública de Giannoulis, Massberg e Reiss (2012). Detector de
   pico ou RMS, curva em dB com joelho, ataque/release, ganho de

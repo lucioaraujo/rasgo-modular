@@ -25,6 +25,17 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   HARMONY, relógio interno quando o CLK está livre. Teste próprio verde;
   LEARN nos 4 idiomas; dossiê e guia. Fora do catálogo da seed.
 - [ ] Escuta do ARP pelo autor (as receitas do guia são o roteiro).
+- [x] Correção do estudo: áudio→altura não era lacuna (o SCOPE já tem PIT
+  por YIN). Refinamento aprovado pelo autor e feito: CONF, KEEP, OCT no
+  SCOPE; fora da seed/mutação/VARIA; teste próprio; LEARN nos 4 idiomas;
+  dossiê e guia; suíte 86/86.
+- [ ] Escuta do SCOPE novo pelo autor: voz ou instrumento no SIGNAL-IN →
+  SCOPE; PIT → OSC; CONF → VCA da mesma voz; comparar KEEP ligado e
+  desligado nas pausas.
+- [x] `./run` volta a abrir o app atual: o `build/` antigo (configurado em
+  18/10 para o caminho anterior `RASGO/RASGO_MODULAR`, cache regenerável)
+  foi apagado e `build` virou link para `.local-build/claude-20261108`
+  (excluído localmente em `.git/info/exclude`).
 - [ ] Decisões do autor ainda abertas: alvo de plugin (JUCE, Synth primeiro);
   polifonia (fora por enquanto); ideias generativas do estudo (autômato
   celular, Markov, física).

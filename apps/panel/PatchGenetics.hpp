@@ -77,6 +77,8 @@ inline bool isMutationBlocked(const std::string& id) noexcept {
         // ganhos de nível — mutar isto joga o barramento pra fora e o
         // MASTER limita demais / distorce (o "clipe" reportado 2026-09-05)
         "gain1", "gain2", "gain3", "gain4", "level1", "level2",
+        // SCOPE, depois da v0.1.7: escolhas de quem toca, não de mutação
+        "pit_keep", "pit_oct",
     };
     return blocked.count(id) != 0;
 }

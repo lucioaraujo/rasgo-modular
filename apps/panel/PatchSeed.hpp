@@ -659,7 +659,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 || nm == "sync_enable" || nm == "dc_block" || nm == "limit"
                 || nm == "voices" || nm == "freeze" || nm == "mono"
                 || nm == "gain" || nm == "output" || nm == "out_gain"
-                || nm == "fm_amount" || nm == "listen")
+                || nm == "fm_amount" || nm == "listen"
+                // depois da v0.1.7 — fora do sorteio (seeds antigas iguais)
+                || nm == "pit_keep" || nm == "pit_oct")
                 continue;
             if (f01() > 0.55f) continue;
             const float lo = dsc.minimum, hi = dsc.maximum;

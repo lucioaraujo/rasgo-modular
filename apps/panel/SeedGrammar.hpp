@@ -100,6 +100,9 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
         for (std::size_t p = 0; p < node.outputCount(); ++p) {
             const auto& d = node.outputDescriptor(p);
             const std::string nm = d.name;
+            // Saídas acrescentadas depois da v0.1.7 ficam fora do passeio,
+            // pelo mesmo motivo das entradas abaixo.
+            if (t == "SCOPE" && nm == "conf") continue;
             int c = SEED_SRC_NONE;
             if (d.kind == PortKind::Audio) {
                 if (t == "NOISE" && (nm == "smooth" || nm == "sh")) c = SEED_SRC_RAND;

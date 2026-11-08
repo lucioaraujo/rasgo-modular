@@ -46,6 +46,23 @@ corte do filtro, altura → oscilador, nível → VCA, disparo → envelope).
   O detector de transiente pra ÁUDIO que faltava (Maths ch2/3 é pra CV).
 - **`hold`** (0/1) — congela `level`/`bright`/`pitch` no último valor
   (o `trig` e o `onset` continuam vivos).
+- **`conf`** (CV gate, +2026-11-08, depois da v0.1.7) — 1 enquanto a
+  altura é confiável: período travado (≥ 2 leituras coerentes do YIN) e
+  nível acima de 0,02. Acrescentada no fim das saídas (índice 6): os
+  índices antigos não mudam.
+- **`pit_keep`** (0/1, padrão 0, +2026-11-08) — ligado, o `pitch` segura a
+  última altura confiável no silêncio e no ruído em vez de cair a 0
+  (110 Hz). Padrão desligado = o comportamento anterior, patches salvos
+  iguais. Conceito do Cardinal Audio To CV Pitch (GPL-3.0+, que mantém a
+  última altura confiável), sem código copiado.
+- **`pit_oct`** (−2..+2, arredondado, padrão 0, +2026-11-08) — soma
+  oitavas inteiras ao `pitch`, inclusive no silêncio sem KEEP.
+
+`conf`, `pit_keep` e `pit_oct` ficam fora da seed (sorteio de saídas e de
+parâmetros), da mutação e das fibras do VARIA: as seeds antigas continuam
+gerando o mesmo patch. Teste: `testPitchKeepOctConf` em
+`tests/test_scope.cpp` (220 Hz → +1; silêncio → 0 sem KEEP, +1 com KEEP;
+CONF 1 no tom e 0 no silêncio; OCT −1 e +1,6 → +2).
 
 Params: `trigger` (−1..1), `edge` (0 subida / 1 descida), `reject`
 (0..1 → banda de histerese 0..~0,5), `response` (0..1 → ~2 ms..~800 ms,
