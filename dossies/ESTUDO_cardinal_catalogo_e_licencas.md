@@ -87,7 +87,9 @@ com outro nome ficou de fora: granular = MEMORY, MIDI de entrada = SIGNAL-IN,
 2. **Arpejador** (8; ex.: Amalgamated Harmonics Arp 3.x, Bogaudio ARP,
    ML_modules Arpeggiator). Encaixa entre CHORD/HARMONY e SEQUENCE.
 3. **Áudio → altura** (pitch tracking: Cardinal "Audio To CV Pitch",
-   Sapphire Env). Já previsto no roteiro do LISTEN (etapa de fundamental).
+   Sapphire Env). **Correção de 8/11:** não é lacuna — o SCOPE já tem a
+   saída PIT (v/oct) por YIN, com trava de período e 0 no ruído (ver §5.3).
+   O que falta é o refinamento, não o módulo.
 4. **Polifonia** — 615 módulos do Cardinal são polifônicos (cabos de até 16
    canais, do VCV Rack). No Modular os cabos são mono e o NOTE-OUT/SIGNAL-IN
    são last-note: é decisão de arquitetura, não um módulo a acrescentar.
@@ -177,11 +179,19 @@ Modular já tem perto. As ideias de módulo são **opções para o autor decidir
   ajuste de oitava; mantém a última altura confiável.
 - **Origem pública:** A. de Cheveigné, H. Kawahara, "YIN, a fundamental
   frequency estimator for speech and music", *JASA* 111(4), 2002.
-- **Perto no Modular:** o LISTEN — o roteiro dele já prevê, depois das três
-  regiões, a fundamental do grave e a altura predominante (`TAREFAS.md`,
-  "Novo módulo de escuta"). O caminho natural é YIN reescrito dentro do
-  LISTEN (uma dependência externa como a aubio contraria a regra de
-  instrumentos autônomos e pediria vendorizar a biblioteca inteira).
+- **Já existe no Modular (correção de 8/11 — a primeira versão deste
+  estudo contou como lacuna):** o **SCOPE** tem a saída `PIT` (v/oct, 0 =
+  110 Hz) por YIN, reescrito sem dependência (`src/dsp/Scope.hpp`,
+  `analyzePitch()`; sinal decimado 3×, limiar 0,15, interpolação
+  parabólica, trava de período por 2 leituras coerentes, `HOLD` congela).
+  Diferenças em relação ao Audio To CV Pitch, a decidir pelo autor: (a) no
+  silêncio e no ruído o PIT **cai para 0** (= 110 Hz) — o do Cardinal
+  **mantém a última altura confiável**; (b) não há saída de **confiança**
+  nem gate de "altura válida"; (c) não há ajuste de oitava. O roteiro do
+  LISTEN (`TAREFAS.md`, "Novo módulo de escuta") prevê ainda a fundamental
+  do grave e a altura predominante numa mistura — isso, sim, é novo. Uma
+  dependência externa como a aubio segue fora (regra de instrumentos
+  autônomos).
 
 ### 5.4 Polifonia
 
