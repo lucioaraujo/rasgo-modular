@@ -22,7 +22,8 @@
 //   - Mordax DATA / ALM MUM M8 / Intellijel µScope (scope de rack utilitário);
 //   - centroide espectral pelo diferenciador (Parseval: energia de x' = 2º
 //     momento do espectro) — resultado matemático público;
-//   - detecção de pitch por período entre cruzamentos de zero (ZCR).
+//   - pitch por YIN (de Cheveigné & Kawahara, 2002), que substituiu a
+//     detecção por cruzamentos de zero (ZCR) — ver `analyzePitch()`.
 
 namespace rasgo::modular {
 
