@@ -11,6 +11,22 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## Estudo do Cardinal e módulos novos — 08/11/2026
+
+- [x] Estudo do Cardinal 26.02 nas três frentes (catálogo e licenças,
+  coleções das lacunas, arquitetura de host):
+  [`dossies/ESTUDO_cardinal_catalogo_e_licencas.md`](dossies/ESTUDO_cardinal_catalogo_e_licencas.md).
+- [x] **DYNAMICS** (#63), aprovado pelo autor: compressor/gate com sidechain,
+  ENV/GR como sinais, BRTH e DRIFT. Teste próprio verde; suíte local; LEARN
+  nos 4 idiomas; dossiê e guia. Fora do catálogo da seed.
+- [ ] Escuta do DYNAMICS pelo autor (as receitas do guia são o roteiro).
+- [ ] **ARP** (#64), aprovado: arpejador com tabela de acordes própria,
+  modos clássicos + divergir/convergir, SKIP semeado, ROOT vindo do HARMONY,
+  relógio interno quando o CLOCK está livre.
+- [ ] Decisões do autor ainda abertas: alvo de plugin (JUCE, Synth primeiro);
+  polifonia (fora por enquanto); ideias generativas do estudo (autômato
+  celular, Markov, física).
+
 ## Preparação de publicação — 18/10/2026
 
 - [x] Build integral Linux 0.1.7-dev, serial e com limite virtual de 5 GiB;

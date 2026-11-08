@@ -370,6 +370,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_swirl_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_swirl_tests COMMAND rasgo_modular_swirl_tests)
 
+    add_executable(rasgo_modular_dynamics_tests tests/test_dynamics.cpp)
+    target_link_libraries(rasgo_modular_dynamics_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_dynamics_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_dynamics_tests COMMAND rasgo_modular_dynamics_tests)
+
     add_executable(rasgo_modular_crush_tests tests/test_crush.cpp)
     target_link_libraries(rasgo_modular_crush_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_crush_tests PRIVATE ${rasgo_modular_warnings})
