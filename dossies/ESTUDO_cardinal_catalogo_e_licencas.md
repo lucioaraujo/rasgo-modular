@@ -96,14 +96,82 @@ As categorias "hardware clone" (78), "expander" (57), "blank" (25) e
 "visual" (55) não são lacunas: o Modular reimplementa conceitos com desvio
 (não clona), não tem expansores e não precisa de painéis vazios.
 
-## 5. Próximos passos (frentes 2 e 3)
+## 5. Frente 2 — as coleções que cobrem as lacunas (2026-11-08)
 
-- **Frente 2 — coleções a estudar**, escolhidas pelas lacunas e pela licença
-  limpa (código livre, arte livre): Bogaudio (PRESSOR, LMTR, NSGT, FOLLOW,
-  ARP; GPL-3.0+), Amalgamated Harmonics (Arp; BSD-3), ZamAudio (Compressor;
-  GPL-2.0+), Cardinal (Audio To CV Pitch; GPL-3.0+), CVfunk (Pressed Duck;
-  MIT). Estudo do conceito e do algoritmo, com desvio RASGO; código só com
-  licença, créditos e dependências conferidos.
+Leitura do código (sem copiar) dos módulos de licença limpa — código livre e
+arte livre. Para cada lacuna: o conceito, a origem pública a citar, e o que o
+Modular já tem perto. As ideias de módulo são **opções para o autor decidir**
+(mecânica e som passam por ele); nada foi implementado.
+
+### 5.1 Dinâmica — compressor, gate, limitador, *duck*
+
+- **Bogaudio PRESSOR** (GPL-3.0+, arte livre; `src/Pressor.cpp`,
+  `src/dsp/signal.cpp`): *feed-forward*. O detector lê L+R ou uma mistura
+  com a entrada de **sidechain** (*crossfade* DETECTOR MIX), em **RMS ou
+  pico**; balística assimétrica (ataque até 500 ms, release até 2 s, curso
+  do botão ao quadrado); curva em dB com **joelho suave** de 3 dB; o mesmo
+  motor vira **noise gate** (expansor para baixo, joelho de 6 dB); saída do
+  envelope do detector. Bogaudio LMTR e NSGT são o mesmo motor com outros
+  controles.
+- **ZamAudio ZamComp** (GPL-2.0+, de Damien Zammit): compressor de estúdio —
+  ataque 0,1–100 ms, release 1–500 ms, joelho até 8 dB, ganho de
+  compensação, sidechain, luz de redução de ganho.
+- **CVfunk Pressed Duck** (MIT, Cody Geary): mixer de 6 canais com compressão
+  no barramento ("press") e **duck** — os canais baixam conforme a entrada de
+  sidechain; filtro anti-DC na saída.
+- **Origem pública a citar:** a formulação de manual do compressor digital
+  (detector, balística, curva com joelho) — D. Giannoulis, M. Massberg,
+  J. D. Reiss, "Digital Dynamic Range Compressor Design — A Tutorial and
+  Analysis", *JAES* 60(6), 2012.
+- **Perto no Modular:** o MASTER já tem limitador (só na saída); o *ducking*
+  sai de ENVELOPE/SCOPE em combinação; o LISTEN mede níveis e ataques.
+- **Opções para o autor:** (a) um módulo de dinâmica (compressor/gate com
+  sidechain e saída de envelope — o envelope vira fonte de modulação, no
+  espírito RASGO de que tudo é sinal); (b) um *duck* dentro do MIXER, por
+  canal, alimentado por qualquer sinal; (c) nada novo — documentar a receita
+  com os módulos que existem (fase didática).
+
+### 5.2 Arpejador
+
+- **Bogaudio ARP** (GPL-3.0+): entrada polifônica de notas; modos UP, DOWN,
+  UP-DOWN, UP-DOWN com repetição das pontas, NA ORDEM tocada, ALEATÓRIO e
+  EMBARALHADO (sem repetir até esgotar); duração do gate; HOLD/latch.
+- **Amalgamated Harmonics Arp 3.x** (BSD-3): padrões que **divergem e
+  convergem** a partir de um centro, em passos de escala (maior/menor),
+  com comprimento, deslocamento e repetição; o 3.1 arpeja sobre um acorde.
+- **Origem pública:** o arpejador de sintetizador (Roland Jupiter-4, 1978;
+  ARP 2500/Odyssey) e os modos clássicos; não há algoritmo proprietário.
+- **Perto no Modular:** CHORD e HARMONY geram as notas, SEQUENCE/TRIGSEQ o
+  tempo, PHRASE o motivo — mas não há quem percorra as notas de um acorde.
+- **Opções para o autor:** (a) um ARP que lê o CHORD/HARMONY e percorre as
+  notas no clock (modos clássicos + divergir/convergir); (b) um modo "arpejo"
+  dentro do CHORD; (c) só a receita didática com SEQUENCE.
+
+### 5.3 Áudio → altura (*pitch tracking*)
+
+- **Cardinal Audio To CV Pitch** (GPL-3.0+, Bram Giesen e Filipe Coelho):
+  usa a biblioteca **aubio** (Paul Brossier, GPL-3.0) com o algoritmo
+  **YIN** ("yinfast"); limiar de confiança, tolerância, silêncio em −30 dB,
+  ajuste de oitava; mantém a última altura confiável.
+- **Origem pública:** A. de Cheveigné, H. Kawahara, "YIN, a fundamental
+  frequency estimator for speech and music", *JASA* 111(4), 2002.
+- **Perto no Modular:** o LISTEN — o roteiro dele já prevê, depois das três
+  regiões, a fundamental do grave e a altura predominante (`TAREFAS.md`,
+  "Novo módulo de escuta"). O caminho natural é YIN reescrito dentro do
+  LISTEN (uma dependência externa como a aubio contraria a regra de
+  instrumentos autônomos e pediria vendorizar a biblioteca inteira).
+
+### 5.4 Polifonia
+
+615 módulos do Cardinal são polifônicos (cabos de até 16 canais, herança do
+VCV Rack 2). No Modular os cabos são mono e NOTE-OUT/SIGNAL-IN são
+last-note. Não é um módulo a acrescentar: é decisão de arquitetura (o
+`SignalGraph` precisaria de cabos com N canais e cada módulo, de motores por
+canal — como o `Engine` por canal do Bogaudio). Fica registrada como
+pergunta ao autor, não como lacuna a preencher.
+
+## 6. Próximos passos (frente 3)
+
 - **Frente 3 — arquitetura de host**: como o Cardinal embrulha o Rack com o
   DPF (aplicativo e plugin AU/CLAP/LV2/VST2/VST3), a separação UI/DSP e o
   empacotamento, pensando num Modular que também rode como plugin.
