@@ -2028,6 +2028,19 @@ inline const LearnTable& learnTable() {
                 "áudio). Ruído estável não dispara.",
                 "SCOPE.onset ← uma linha de bateria → dispara ENVELOPE/LPG "
                 "no compasso do áudio; ou re-dispara o SAMPLER."}},
+            {"pit_oct", {
+                "Transpõe o PIT em oitavas inteiras (−2..+2) — o oscilador "
+                "que segue a entrada toca abaixo ou acima dela.", "", ""}},
+            {"pit_keep", {
+                "Ligado: no silêncio e no ruído o PIT segura a última altura "
+                "confiável. Desligado (padrão): o PIT volta a 0 (110 Hz).",
+                "Sem o KEEP, um oscilador ligado no PIT cai para um Lá grave "
+                "a cada pausa da entrada.", ""}},
+            {"out:conf", {
+                "Gate ligado enquanto o PIT é confiável (período estável e "
+                "nível acima do silêncio).", "",
+                "SCOPE.conf → VCA ou LPG da voz que segue o PIT: ela só soa "
+                "quando há nota na entrada."}},
         }},
         {"CRUSH", {
             {"rate", {

@@ -38,13 +38,19 @@ public:
                {"level", PortKind::Control, ""},
                {"bright", PortKind::Control, ""},
                {"pitch", PortKind::Control, "v/oct"},
-               {"onset", PortKind::Control, "gate"}},
+               {"onset", PortKind::Control, "gate"},
+               // depois da v0.1.7 — fica no fim, os índices antigos não mudam
+               {"conf", PortKind::Control, "gate"}},
               {{"trigger", -1.0f, 1.0f, 0.0f, ""},
                {"edge", 0.0f, 1.0f, 0.0f, ""},
                {"reject", 0.0f, 1.0f, 0.1f, ""},
                {"response", 0.0f, 1.0f, 0.3f, ""},
                {"hold", 0.0f, 1.0f, 0.0f, ""},
-               {"sens", 0.0f, 1.0f, 0.4f, ""}}) {}
+               {"sens", 0.0f, 1.0f, 0.4f, ""},
+               // depois da v0.1.7: segurar a última altura confiável e
+               // transpor o PIT em oitavas (padrões = comportamento antigo)
+               {"pit_keep", 0.0f, 1.0f, 0.0f, ""},
+               {"pit_oct", -2.0f, 2.0f, 0.0f, "oct"}}) {}
 
     std::string type() const override { return "SCOPE"; }
 
@@ -59,8 +65,11 @@ public:
         p.add(Widget::Kind::Knob, "RESP", "response", 9.0f, 56.0f);
         p.add(Widget::Kind::Knob, "HOLD", "hold", 27.0f, 56.0f);
         p.add(Widget::Kind::Knob, "SENS", "sens", 45.0f, 56.0f);
+        p.add(Widget::Kind::Knob, "OCT", "pit_oct", 63.0f, 34.0f);
+        p.add(Widget::Kind::Toggle, "KEEP", "pit_keep", 65.3f, 58.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 82.0f);
         p.add(Widget::Kind::Jack, "EXT", "in:ext", 19.0f, 82.0f);
+        p.add(Widget::Kind::Jack, "CONF", "out:conf", 55.0f, 82.0f);
         p.add(Widget::Kind::Jack, "THRU", "out:thru", 7.0f, 106.0f);
         p.add(Widget::Kind::Jack, "TRIG", "out:trig", 19.0f, 106.0f);
         p.add(Widget::Kind::Jack, "LVL", "out:level", 31.0f, 106.0f);
@@ -114,6 +123,9 @@ public:
         const float rejBand = clamp01(parameterValue("reject")) * 0.5f;
         const float response = clamp01(parameterValue("response"));
         const bool hold = parameterValue("hold") >= 0.5f;
+        const bool keep = parameterValue("pit_keep") >= 0.5f;
+        const float octShift = std::round(
+            clampf(parameterValue("pit_oct"), -2.0f, 2.0f));
 
         // seguidores: `response` alonga tudo; ataque sempre << release
         const float atkT = 0.001f + response * response * 0.15f;
@@ -172,12 +184,14 @@ public:
                     else lockCount_ = 0;
                 }
             }
-            if (lockCount_ >= 2 && lvl_ > 0.02f) {
+            const bool confident = lockCount_ >= 2 && lvl_ > 0.02f;
+            if (confident) {
                 const float phz = decSr_ / std::max(1.0f, periodEst_);
                 pitchTarget_ = std::log2(phz / 110.0f);
-            } else {
-                pitchTarget_ = 0.0f;
-            }
+            } else if (!keep) {
+                pitchTarget_ = 0.0f;   // comportamento original: cai a 110 Hz
+            }                          // KEEP: segura a última altura confiável
+            const float conf = confident ? 1.0f : 0.0f;
             if (!hold) pitchOct_ += (pitchTarget_ - pitchOct_) * smCoef;
 
             // ---- trigger: comparador com histerese + borda ----
@@ -213,8 +227,9 @@ public:
                 outputs[1].at(c, f) = trg;
                 outputs[2].at(c, f) = lvl_;
                 outputs[3].at(c, f) = bright_;
-                outputs[4].at(c, f) = pitchOct_;
+                outputs[4].at(c, f) = pitchOct_ + octShift;
                 outputs[5].at(c, f) = ons;
+                outputs[6].at(c, f) = conf;
             }
         }
     }

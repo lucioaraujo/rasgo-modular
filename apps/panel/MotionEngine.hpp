@@ -133,6 +133,7 @@ public:
                 if (w.bind.empty() || w.bind.rfind("in:", 0) == 0
                     || w.bind.rfind("out:", 0) == 0
                     || w.bind == "listen"    // ON do SIGNAL-IN: só à mão
+                    || w.bind == "pit_keep" || w.bind == "pit_oct" // SCOPE: escolha de quem toca
                     || (t == "PHRASE" && w.bind == "seed")) // motif identity
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;

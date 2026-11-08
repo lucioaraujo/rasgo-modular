@@ -84,6 +84,9 @@ o suficiente contam).
 - **`ONS`** (onset) (controle, gate) — um pulso (~2 ms) a cada
   ataque/transiente. **Plugue em:** `ENVELOPE.gate`, `LPG.strike`,
   `SAMPLER.trig` — o patch reage aos ataques do áudio.
+- **`CONF`** (controle, gate) — ligado enquanto o `PIT` é confiável (há
+  uma nota estável na entrada). **Plugue em:** o `VCA` ou o `LPG` da voz
+  que segue o `PIT` — ela só soa quando há nota.
 
 ## Os controles, um a um
 
@@ -101,6 +104,12 @@ múltiplo por ruído.
 
 **SENS** (sens, 0–1) — a sensibilidade do detector de `ONSET`. Alto =
 dispara em qualquer subida; baixo = só ataques fortes.
+
+**OCT** (−2..+2) — transpõe o `PIT` em oitavas inteiras: o oscilador que
+segue a entrada toca abaixo ou acima dela.
+
+**KEEP** (0/1) — ligado, no silêncio o `PIT` segura a última altura
+confiável. Desligado (padrão), o `PIT` volta a 0 (110 Hz) a cada pausa.
 
 ## Como cabear
 

@@ -222,6 +222,7 @@ void testRemainingCatalogModulesHaveAtLeastQuick() {
         "trigger", "edge", "reject", "response", "hold",
         "in:in", "in:ext",
         "out:thru", "out:trig", "out:level", "out:bright", "out:pitch",
+        "pit_oct", "pit_keep", "out:conf",
     });
     expectAllDocumented("SHAPE", {
         "ring", "fold", "symmetry", "wrap", "sat", "level", "drift",

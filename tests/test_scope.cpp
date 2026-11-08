@@ -36,7 +36,7 @@ struct Out {
 // `extHz` >= 0 injeta uma senoide em `ext`.
 Out run(Scope& sc, int blocks, float hz, float amp = 0.5f, float extHz = -1.0f) {
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(7, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB), bext(kSr, 1, kB);
     Out r;
     double ph = 0.0, phe = 0.0;
@@ -84,7 +84,7 @@ int risingEdges(const std::vector<float>& g) {
 void testThruIsClean() {
     Scope sc;
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(7, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB);
     std::uint64_t rng = 99;
     for (int b = 0; b < 20; ++b) {
@@ -293,7 +293,7 @@ void testPitchZeroForNoise() {
 void testHoldFreezes() {
     Scope sc;
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(7, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB);
     double ph = 0.0;
     auto fill = [&](float hz, float amp) {
@@ -361,7 +361,7 @@ void testInGraph() {
 Out runBursts(Scope& sc, int bursts, int periodBlk, float sens = 0.4f) {
     sc.setParameter("sens", sens);
     sc.prepare(kSr, kB);
-    std::vector<AudioBlock> out(6, AudioBlock(kSr, 1, kB));
+    std::vector<AudioBlock> out(7, AudioBlock(kSr, 1, kB));
     AudioBlock bin(kSr, 1, kB);
     Out r;
     double ph = 0.0;
@@ -423,6 +423,47 @@ void testPanel() {
 
 }  // namespace
 
+// KEEP / OCT / CONF (depois da v0.1.7): 220 Hz por 1 s, depois silêncio 1 s.
+struct PitchRun { float pitchTone, pitchSilence, confTone, confSilence; };
+PitchRun toneThenSilence(const bool keep, const float oct) {
+    Scope sc;
+    sc.setParameter("pit_keep", keep ? 1.0f : 0.0f);
+    sc.setParameter("pit_oct", oct);
+    sc.prepare(kSr, kB);
+    std::vector<AudioBlock> out(7, AudioBlock(kSr, 1, kB));
+    AudioBlock bin(kSr, 1, kB);
+    const int half = static_cast<int>(kSr / kB);
+    double ph = 0.0;
+    PitchRun r{};
+    for (int b = 0; b < 2 * half; ++b) {
+        for (std::size_t k = 0; k < kB; ++k) {
+            bin.at(0, k) = b < half ? 0.5f * static_cast<float>(std::sin(ph)) : 0.0f;
+            ph += 2.0 * M_PI * 220.0 / kSr;
+        }
+        std::vector<const AudioBlock*> ins{&bin, nullptr};
+        sc.process(ins, out);
+        if (b == half - 1) { r.pitchTone = out[4].at(0, kB - 1); r.confTone = out[6].at(0, kB - 1); }
+        if (b == 2 * half - 1) { r.pitchSilence = out[4].at(0, kB - 1); r.confSilence = out[6].at(0, kB - 1); }
+    }
+    return r;
+}
+
+void testPitchKeepOctConf() {
+    const auto base = toneThenSilence(false, 0.0f);
+    near(base.pitchTone, 1.0, 0.06);          // 220 Hz = +1 oct sobre 110
+    near(base.pitchSilence, 0.0, 0.06);       // padrão: cai a 0 (como antes)
+    EXPECT(base.confTone > 0.5f);             // nota estável → confiável
+    EXPECT(base.confSilence < 0.5f);          // silêncio → não confiável
+    const auto kept = toneThenSilence(true, 0.0f);
+    near(kept.pitchSilence, 1.0, 0.06);       // KEEP: segura a última altura
+    EXPECT(kept.confSilence < 0.5f);          // mas o CONF diz que não há nota
+    const auto down = toneThenSilence(true, -1.0f);
+    near(down.pitchTone, 0.0, 0.06);          // OCT −1: uma oitava abaixo
+    near(down.pitchSilence, 0.0, 0.06);
+    const auto up = toneThenSilence(false, 1.6f);
+    near(up.pitchTone, 3.0, 0.06);            // OCT arredonda para +2
+}
+
 int main() {
     testThruIsClean();
     testTriggerRisingCountsCycles();
@@ -437,6 +478,7 @@ int main() {
     testPitchTracks();
     testPitchZeroForNoise();
     testHoldFreezes();
+    testPitchKeepOctConf();
     testOnsetFiresOnAttacks();
     testOnsetSilentOnSteadyTone();
     testOnsetSensitivity();
