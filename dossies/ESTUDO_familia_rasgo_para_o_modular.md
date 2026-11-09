@@ -1676,6 +1676,108 @@ de `PESQUISA_REPRESENTACAO_MUSICAL_RASGO.md`; conferido no código
    representação própria em três camadas (Score / Performance /
    Interpretation). Para o NOTEOUT do Modular: saber o que se perde, e
    não chamar a exportação de "a música".
+### 4.6 Navalha 2 (só o JUCE, pedido do autor)
+
+Lidos: `README.md` (estado da etapa, PT), `docs/NOVAS_PERSPECTIVAS.md`
+(inteiro), o início de `docs/AUDITORIA_ENGENHARIA_SAIDA_AUDIO.md`; no
+código, inteiros `src/core/PatternTransform.cpp`, `FragmentGesture.{h,cpp}`,
+`ControlTrace.{h,cpp}`, `FormDirector.h`, e as partes de cenas e de
+contexto de `FormDirector.cpp` e o planejador de frase de
+`AssistedPerformer.cpp`. Autoria: Glerm Soares (Navalha, referência Pd/web
+v0.28.1) e Lúcio Araújo (Navalha 2, reescrita JUCE); AGPLv3. O §2b (acima)
+resumiu documentos do conceito que vivem no lado Pd; aqui só o JUCE.
+
+O que o Modular **já trouxe** do Navalha, com proveniência: o SAMPLER
+(SlicePlayer, varispeed, reverse), o HeritagePitch (PitchShift) e o
+OutputStage do MASTER (guarda de não-finitos, anti-DC, limitador com
+look-ahead de 5 ms guiado por pico verdadeiro 4×).
+
+**As nuances**
+
+1. **Transformar sem destruir.** MUTATION, EROSION e DECONSTRUCT são
+   **funções puras** de (padrão base, MEMORY, intensidades): o padrão
+   original nunca é reescrito. Cada passo tem um limiar fixo (um hash da
+   posição); a intensidade só decide quantos limiares são cruzados. Logo:
+   (a) baixar o knob **devolve exatamente** o original; (b) subir a erosão
+   apaga os passos **sempre na mesma ordem** — o gesto é reproduzível e
+   tem direção, não é um sorteio a cada giro; (c) as células em MEMORY
+   ficam fora de tudo. No Modular, TURING e SEQ mutam reescrevendo o
+   estado: a volta não existe.
+2. **As três transformações têm caráter próprio**, aplicadas em cadeia:
+   a mutação troca (GAP, cópia de outro passo, troca de fonte A↔B, outra
+   fatia, deslocamento); a erosão só **retira** (vira GAP); a
+   desconstrução lê o resultado já mutado e reordena (vizinho anterior,
+   leitura em passo 3, deslocamento para trás). Erosão é perda;
+   desconstrução é rearranjo — não são sinônimos.
+3. **STUTTER e BURST têm limites perceptivos em milissegundos, não em
+   BPM.** STUTTER = a mesma célula 4× com espaçamento de ¼ do passo,
+   **preso entre 14 e 160 ms**; BURST = 8 fragmentos **diferentes**,
+   ¹⁄₈ do passo, **entre 18 e 72 ms**, tirados das células que soam por
+   **saco embaralhado** (uma permutação inteira antes de repetir
+   qualquer uma). Em tempo lento o gesto não vira eco; em tempo rápido
+   não vira zumbido. Isto vale para o CUT-UP.
+4. **"GAP seguro".** Mesmo com lacunas, o co-performer garante um mínimo
+   de células que soam (2 com FORM, 4 sem). O silêncio é material, mas o
+   instrumento não se apaga por acidente.
+5. **TRACE grava o gesto como eventos esparsos**: um ponto só quando o
+   valor muda **e** passaram 38 ms; até 512 pontos; o laço fecha com
+   20 ms de folga. Não é um gravador de CV contínua — é a memória das
+   **decisões** da mão. Para a proposta TRACE (§2b, 12): decidir com o
+   autor entre as duas leituras (gravar a curva, ou gravar as decisões).
+6. **FORM: a cena tem dimensões, não parâmetros.** Cada cena: compassos,
+   energia, variação, densidade, tensão, continuidade, contraste,
+   estabilidade, movimento estéreo, perfil de fatias (LONG 4 / MEDIUM 8
+   / SHORT 16 / MICRO 32) e uma **transição** nomeada — corte,
+   crossfade, dissolução, **acumulação, erosão, ruptura, silêncio**.
+   Cenas padrão: INTRO (4 c., energia 22) → DEVELOPMENT (8, 48) →
+   RUPTURE (4, 72) → CLIMAX (8, 92) → EXIT (4, 28). A cena não manda nos
+   detalhes: ela vira um **contexto** (intensidade = média de variação
+   manual, variação da cena, tensão e instabilidade; energia = média de
+   energia e densidade) que o co-performer lê.
+7. **O co-performer limitado** decide **só no fim de cada frase** e com
+   probabilidades que crescem com a intensidade (trocar de fonte
+   0,18 + 0,42·i; mudar a ordem 0,12 + 0,38·i; editar região
+   0,08 + 0,30·i; cortar 0,14 + 0,40·i). Vocabulário fechado: empurrar,
+   micro, lâmina, **desfazer** (ele pode desfazer o próprio corte),
+   redividir só com intensidade ≥ 0,58. A região nova nasce da anterior
+   (largura × 0,42…1,14, âncora deslocada ±18 % da largura; 20 % de volta
+   ao inteiro). Respeita MEMORY sempre. O AUTO MIX só mexe em balanço,
+   pan e largura.
+8. **Critério de originalidade escrito pelo autor** (NOVAS_PERSPECTIVAS
+   §3): uma função é original quando combina "recorte, temporalidade,
+   gesto e decisão musical", e responde a cinco perguntas — que prática
+   torna possível; que escuta estimula; que controle o músico realmente
+   tem; que indeterminação preserva; **amplia a musicalidade ou só
+   aumenta a quantidade de parâmetros?** E a regra de prioridade (§12):
+   sobe no roteiro o que melhora **dois** eixos sem piorar os outros.
+   Pedagogia: "cortar também é compor; repetir nunca significa repetir
+   exatamente; o acaso precisa de escuta e seleção".
+9. **Engenharia de saída** (auditoria de 9/8): `saturation = 0` tem de ser
+   **bypass de verdade**, não `tanh` com drive 1; o teste de **pior soma**
+   (todas as fontes no máximo, duas vozes, master em 100 %, preview junto)
+   exige saída finita e teto de pico verdadeiro; contratos de impulso e
+   latência do limitador a 44,1/48/96/192 kHz e reinício limpo na troca de
+   taxa. É exatamente o teste de estresse que falta ao MASTER do Modular
+   (achado técnico já listado no TAREFAS).
+
+**O que isto pede ao Modular** (propostas, nada implementado)
+
+- **Transformação reversível** como princípio para TURING, SEQ e futuros
+  sequenciadores: o estado-base nunca é reescrito; MUTATE/ERODE como
+  profundidade com ordem fixa por passo; um conjunto MEMORY de passos
+  protegidos. Para o TURING é uma mudança de identidade (o laço que se
+  reescreve é o conceito do Music Thing) — então como **modo** ou módulo
+  irmão, a decidir com o autor.
+- **CUT-UP** (aprovado, lote 4) herda daqui o desenho exato: STUTTER
+  4×/BURST 8× com os limites em ms, BURST por saco embaralhado, MICRO
+  2–8×, GAP seguro, e as transformações reversíveis sobre as fatias de um
+  buffer ao vivo. Proveniência: Glerm Soares / Lúcio Araújo, AGPLv3.
+- **FORM no Modular**: o Form Engine já previsto (sobre o Motion Engine)
+  pode tomar as **transições nomeadas** (acumulação, erosão, ruptura,
+  silêncio) e a ideia de cena como **contexto** que os módulos leem — e
+  não como preset que os comanda.
+- **MASTER**: o teste de pior soma e os contratos por taxa de amostragem
+  (técnico, sem mudança de som).
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
