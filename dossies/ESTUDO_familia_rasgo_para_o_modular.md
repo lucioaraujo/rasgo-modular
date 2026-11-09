@@ -983,7 +983,7 @@ de vento — dizer isso no LEARN).
 
 ### 4.4 Trioio
 
-Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`. (Continua.)
+Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`, `docs/ESCALAS.md`. (Continua.)
 
 **Nuances**
 
@@ -1015,6 +1015,56 @@ Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`. (Continua.)
 - **Aprender é ajustar tendências, com esquecimento** para não cristalizar
   um perfil de gosto; tudo removível e contestável pelo performer.
 - Três atitudes de escuta: RESPONDER AGORA, LER ANTES, HÍBRIDO.
+
+**`docs/ESCALAS.md`** (lido inteiro) — o material do QUANTIZER microtonal:
+
+- **Banco de 2576 escalas** num **arquivo de texto próprio**, legível e
+  editável (nome, família, **período** em cents — não oitavantes funcionam —,
+  graus em cents ou razões, **fonte citada**, nota se é modelo ou
+  aproximação): melakartas (Venkatamakhin, 1660), EDOs de 5 a 100, gêneros
+  gregos nas 7 espécies, maqamat (Cairo 1932) e makam (53 comas de Holder),
+  thāts e 22 shrutis, temperamentos históricos (Werckmeister, Kirnberger,
+  Vallotti, mesotônicos de 1/4 a 1/11 de coma), justa e séries harmônicas
+  (Partch, Johnston), Bohlen-Pierce (período 3/1), gamelão, **modos
+  nordestinos** (Siqueira 1981), 1753 MOS, CPS (hexany/dekany/eikosany),
+  Euler-Fokker, formas primas de Forte, modos de Messiaen. Escalas do autor e
+  arquivos **Scala (.scl)** entram junto. "Escalas não têm dono; cada uma cita
+  a fonte." Recurso transversal declarado pelo autor (`KNOW-ESCALAS`): outro
+  instrumento copia o arquivo, o gerador e o leitor, com proveniência.
+- **A máquina de escalas** (operações em cents, com período): **rotação**
+  (modo), **alteração** (grau ± semitom, quarto de tom ou coma), **espelho**
+  (o dual: o frígio do jônio), **interpolação** (cada grau anda uma fração até
+  a escala de destino — estados intermediários entre duas escalas), **pivô**
+  (outra tônica com o máximo de notas comuns), **acréscimo/supressão**,
+  **alargamento** do período (1–3 %). Encadeamentos por estratégia (seguir,
+  transfigurar, contrapor, interromper); destinos sorteados **primeiro por
+  família** (senão as 1753 MOS tomam tudo).
+- **Harmonia dos graus**: com escala microtonal ou não oitavante, os acordes
+  são tríades de graus da própria escala — "qualquer escala tem harmonia".
+  **Variante por acorde** (Russell): a nota do acorde que falta na escala
+  substitui o grau vizinho enquanto o acorde dura.
+- **Mapa afetivo** (brilho, terça, tensão, estabilidade, ambiguidade,
+  valência), conferido contra Temperley & Tan (2013) — "tendências
+  declaradas, não verdades"; **intenção** (luminosa, sombria, tensa, serena,
+  suspensa, ambígua, arco) guiando a máquina.
+- **A escala como comportamento** (como a linguagem a usa): subida e descida
+  diferentes, notas de apoio, percurso (sayr/ālāp), frases-assinatura
+  (pakaḍ), ornamentos (meend, andolan, gamaka, blue), cadência, textura
+  (bordão, heterofonia, acordes), ciclo rítmico usual. Prática modal com a
+  nota característica, cadência e vamp por modo.
+- **Misturas** (colagem, híbrido por tetracordes, camadas/polimodalidade,
+  transição por interpolação) e **costuras** entre seções (corte, pivô por
+  nota comum sustentada, ponte pela escala intermediária, sobreposição).
+
+**Para o Modular**: o **QUANTIZER** (e o HARMONY) ganham, por cópia com
+proveniência do arquivo e do leitor do Trioio: banco de escalas com
+**período**, Scala, e — o que é próprio de um módulo — a **máquina de
+escalas por CV** (rotação, espelho, pivô e sobretudo a **interpolação entre
+duas escalas** como um knob/CV contínuo: um quantizador que *transita* de
+uma escala a outra). Comportamento (subida ≠ descida, apoio nos tempos
+fortes) é a camada seguinte. Respeitar a pendência antiga do TAREFAS:
+preservar as 12 escalas atuais, seus índices e o significado de `scale_cv`
+para o HARMONY e os patches salvos; seleção fora do callback.
 
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
