@@ -1234,6 +1234,38 @@ alto, um LOOPER) mascara a curva. Um Form Engine no Modular precisaria de um
 caminho para alcançar todos os níveis (talvez pelo VARIA, que já toca todas
 as fibras). E a respiração antes do clímax é um gesto simples e forte.
 
+**`docs/OUTROS_INSTRUMENTOS.md`, `docs/MUSICALIDADE.md`,
+`docs/REAPROPRIACAO.md`** (lidos em parte) — o **método comum** e a
+**personalidade de cada um**, a nuance que organiza todo este estudo:
+
+- Do `Metodo_RASGO.md` do Studio, citado pelo Trioio: **"mesma genealogia
+  não significa mesma personalidade; diferença de instrumento não significa
+  ausência de método comum"**. Cada instrumento decide por si a unidade
+  musical, o tempo, **se compõe, reage, habita, corta, escuta, negocia ou
+  performa**, a agência e os corpos. "Memória e regras podem ser comuns; no
+  Aquorbium aparecem como hábitos de um ecossistema, no Trioio como
+  estratégia situada e no Synth como política de uma composição por seed."
+  E o Trioio, no seu portão: "**o Rasgo Modular dá módulos para quem toca**".
+- **Gradação da reapropriação**: abstração (linguagem, escala, ciclo, forma)
+  → gesto (contorno, groove, diálogo) → ressíntese de descritores → ressíntese
+  fina → citação (o som de outra obra dentro da nova — "uma mudança de
+  natureza, não de grau"); *détournement*, *découpe*, colagem, *cut-up*,
+  música concreta, plunderphonics, pós-produção, **antropofagia** (Oswald de
+  Andrade, 1928).
+
+**Consequência para todas as propostas deste estudo**: trazer um conceito
+de um irmão para o Modular é **traduzi-lo para a personalidade do Modular** —
+um módulo que **quem toca** patcheia, com entradas, saídas e controles
+legíveis, autônomo quando solto mas sem agência escondida que decida pelo
+músico. O ecossistema do Aquorbium, a estratégia do Trioio e a política de
+seed do Studio não entram como "cérebro" do Modular: entram como **módulos**
+(PREDATOR, RESPONDER, RELATE, GAME…) que o músico pode ligar ou não.
+
+**Ainda não lidos no Trioio** (próxima passada): `LINHAS.md`, `MOSAICO.md`,
+`DESCRITORES.md`, `ESCUTA.md`, `LEITURA_E_GABARITO.md`, `SINTESE.md`,
+`INFLUENCIAS.md`, `REFERENCIAS_POR_MODULO.md`, `MEMORIA.md`, `REGRAS.md`,
+`design.md`, `PROMPTS_E_INTENCOES.md`.
+
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
 altura) e publica um pequeno **barramento semântico** (energia, densidade,
