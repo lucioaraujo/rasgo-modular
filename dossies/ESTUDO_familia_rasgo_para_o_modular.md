@@ -1402,6 +1402,130 @@ memória curta — a ponte entre "o Modular ouve" e "o Modular responde"
 que hoje se faz à mão com cabos. Conferir antes contra o que LISTEN, SCOPE e
 o SIGNAL-IN já entregam.
 
+### 4.5 Antitotem
+
+Lidos inteiros: `docs/MEMORIAL_DE_PROCESSO.md`, `IDEIA_BREADBOARD.md`,
+`COMPATIBILIDADE_CONCEITO_IMPLEMENTACAO.md`, `PESQUISA_CMOS_LUNETTA.md`;
+lidas as partes de levantamento e de brief de `PESQUISA_DERIVA_GENERATIVA.md`
+(CRI-DRF-001), `PESQUISA_RUIDO_GENERATIVO.md` (CRI-NOI-001) e
+`PESQUISA_ACENTUACAO_GENERATIVA.md` (CRI-ACC-001). Ainda faltam:
+SEQUENCER_GENERATIVO, MELODIA, ORQUESTRA_RELACIONAL, REPRESENTACAO,
+COMPASSO, FLUXO_DE_SINAL e DESIGN.
+
+O Modular já trouxe do Antitotem, com proveniência: o PLL (estudo
+OSC5/4046 de `CmosVoice.h`), o DRIFT (`deriveFromMemory`: momentum,
+âncora, viés), o CHAOS (poço duplo, com o "chute" que o próprio autor
+achou necessário) e as cores azul/violeta/bit do NOISE. A leitura funda
+mostra que o que falta não é mais um chip: é a **atitude** do instrumento.
+
+**As nuances (o que a leitura de cabeçalhos não mostrava)**
+
+1. **A conexão não é um cabo neutro.** No breadboard original, ligar dois
+   pontos era passar por um resistor, um diodo, um capacitor ou um
+   alto-falante — algo que atenua, retifica, filtra, acumula. "Feedback é
+   uma cadeia de componentes e transformações, não um valor de ganho
+   abstrato." No Modular todo cabo é um fio ideal; a matéria do caminho
+   não existe. É a maior ausência.
+2. **O desconhecido não é defeito.** Atitude de circuit bending: o
+   resultado que aparece ao mudar rota e velocidade é material — mas isso
+   "não autoriza curto-circuitar saídas" (proteção antes da cor; o 386
+   "não deve ser usado como proteção contra conexões erradas").
+3. **Cinco camadas sem relógio único** — deriva, ritmo, timbre, topologia,
+   decisão —, cada uma no seu tempo, com memória de relações e
+   trajetórias, não só de valores.
+4. **"Uma função só é ativa quando tem rota e controle no painel."** É a
+   mesma régua do Método (ativação ≠ presença): nada escondido em menu; o
+   painel faz as rotas aparecerem como gesto (lição do SX-150).
+5. **Fidelidade declarada.** O breadboard tem três modos (estudo,
+   performance, laboratório) e o projeto distingue sempre: o que o
+   componente faz (datasheet), o que a comunidade Lunetta fez, o que o
+   Antitotem inventa. Nenhum módulo é anunciado como reconstrução
+   histórica; o inventário de chips "não é ficção de completude".
+6. **Seleção ≠ memória.** O S&H depois do 4051 separa duas ações que um
+   scanner funde: escolher a posição e guardar a tensão dela.
+7. **Determinístico que parece acaso.** Os QUATRO RELÓGIOS (40106 × 4
+   numa escada R–2R) não sorteiam nada: são estados binários que se
+   desencontram no tempo, e por isso mantêm "vínculo audível com seus
+   clocks". É diferente do random stepwave (4006 + XOR: memória binária
+   que se realimenta). Os dois podem coexistir, nomeados.
+8. **O limiar é um acontecimento.** O mixer-comparador converte uma
+   relação contínua em decisão: abrir um gate, trocar uma rota, reter um
+   clock, devolver drive. O mixer polarizador expõe o **zero**: somar,
+   opor, anular, inverter a direção de uma modulação.
+9. **Combinação é timbre.** Mistura resistiva preserva relações de
+   amplitude; por diodo introduz direção e retificação. "São conexões
+   diferentes, não dois nomes para mix."
+10. **O 4006 como espaço feito pela lógica.** Atraso de um bit, clockado,
+    com taps somados: "não é reverberação transparente" — granulado,
+    metálico, pulsante, sensível à velocidade. Preservar a relação clock /
+    comprimento / taps / realimentação, "em vez de acrescentar um reverb
+    genérico".
+11. **Deriva ≠ modulação.** "Modulação transforma o presente; deriva
+    transforma aquilo que o instrumento considera seu estado normal."
+    Elementos do brief ainda ausentes no DRIFT do Modular: **CAPTURE**
+    (fixar o estado atual como nova âncora), **resíduo** (depois de uma
+    fase ruidosa não volta exatamente ao limpo — a "cicatriz", ligada pelo
+    autor à estética RASGO: "ruptura, rasgo, desgaste, arqueologia
+    sonora"), os modos de elasticidade (elástico / livre / limitado /
+    atrator) e as **regiões de comportamento** (o mesmo campo, respostas
+    não-lineares distintas por destino: "timing responde muito, pitch
+    pouco, noise só acima de 0,5").
+12. **Ruído como princípio de organização**, não tipo de sinal: matéria,
+    modulador e acontecimento estrutural (campo lento → limiar → evento).
+    O NOISE do Modular cobre bem a matéria; o acontecimento por limiar só
+    existe espalhado (BOXCAR geiger, NOISE poisson).
+13. **O acento é multidimensional.** Sete famílias (dinâmico, métrico,
+    agógico, tímbrico, articulatório, de altura, estrutural — a taxonomia
+    é a do acento fenomenal de Lerdahl & Jackendoff, 1983), hierarquia de
+    níveis 0–3, **herança** (um acento forte contamina o seguinte),
+    **supressão** (período refratário), causas que se combinam. O
+    Aquorbium já tem, sem o nome, o "Accent Field" (`geometricAccent` →
+    dureza, densidade de partículas, irregularidade). No Modular o acento
+    é, módulo a módulo, um ganho.
+
+**O que isto pede ao Modular** (propostas ao autor, nada implementado)
+
+- **VIA** (nome a decidir) — o *cabo com matéria*: um módulo de passagem
+  em que o caminho declara seu componente — resistor (atenua, soma
+  preservando relação), diodo (limiar, retificação, assimetria;
+  direção), capacitor (acoplamento AC, integração, memória curta: o
+  caminho "lembra"), alto-falante (corpo mecânico ressonante que satura).
+  Cada retorno nomeia seu elemento e seu tempo ("mistura com matéria").
+  É a nuance 1 feita módulo, e cabe na régua do Método (o caminho tem
+  presença audível). Conferir antes contra o SHAPE e o FILTER para não
+  duplicar.
+- **SHIFTREG** (proposta 9) ganha sua forma exata: o 4006 como espaço da
+  lógica — 1 bit clockado, comprimento, taps somados, realimentação; e a
+  variante "memória que vaza", em que os bits decidem **rotas de
+  feedback**, não notas. O TURING já é um registrador de valores; o
+  SHIFTREG é registrador de **sinal**.
+- **QUATRO RELÓGIOS** (proposta 10, R2R) mantém o que importa: quatro
+  taxas expostas, glide, e o vínculo audível com os clocks — nunca um
+  sorteio.
+- **COMPARADOR** com mixer polarizador: duas entradas com zero exposto
+  (somar / opor / anular), saídas MIX, INV e COMP (limiar com histerese
+  como acontecimento). Hoje o Modular não tem um comparador de uso geral.
+- Experimentos da tabela do autor que cabem como **aperfeiçoamento** de
+  módulos existentes, um por vez e com A/B: `quase-encontro` (o PLL já tem
+  `lock` contínuo; falta o evento quando as frequências se aproximam ou
+  se afastam, sem corrigir a afinação); `scanner fantasma` (o SWITCH lendo
+  ao mesmo tempo o endereço presente e um residual atrasado); `one-hot
+  ferido` (uma etapa que retém, pula ou devolve o pulso ao clock).
+- **DRIFT**, aperfeiçoamento: CAPTURE (gatilho que fixa a âncora),
+  resíduo (a volta nunca é idêntica) e modos de elasticidade. Antes, reler
+  o código atual para ver o que o `anchor` e o `bias` já fazem.
+- **ACCENT** (nome a decidir) — um campo de acento: várias causas
+  (métrica, salto de altura, posição na frase, externa) somadas num valor
+  contínuo com hierarquia, herança e supressão, distribuído em saídas
+  diferentes (ganho, brilho, articulação). Prior art direta: o
+  `geometricAccent` do Aquorbium e o acento do `AcidBasslineVoice` do
+  Rasgo Synth (um flag, dois destinos).
+
+Fica registrado o cuidado do próprio Antitotem com proveniência: os
+esquemas lidos (Ray Wilson/MFOS, Ian Fritz, Richard Brewster, phono,
+Kevin B., Phil Baljeu, Sam Hoshuyama) são **referência creditada de
+princípio**. Nada de esquema, valores ou PCB entra no Modular.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
