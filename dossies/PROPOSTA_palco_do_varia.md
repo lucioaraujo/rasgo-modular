@@ -85,7 +85,42 @@ item separado, para você aprovar ou não.
   simples convencer.
 - Os `spread` dos módulos continuam como estão.
 
+## 4b. Caminho B — o MIXER recebe sinais de pan (sugestão do autor, 10/11)
+
+"Ou aprimorar o módulo mixer para receber sinais que propiciem variação de
+pan." Conferido: hoje o MIXER tem só as 4 entradas de áudio; e o app **não
+permite ligar cabo num knob** (as modulações de parâmetro só nascem da DRIFT
+da seed). Então o pan, hoje, só se move à mão.
+
+Proposta B:
+
+- **Quatro entradas `PAN 1–4` (CV, −1..+1)** no MIXER, somadas ao knob PAN
+  de cada canal. O knob vira o **centro** do movimento; a CV o desloca.
+  Qualquer módulo move o palco: DRIFT (deriva lenta), PENDULUM (x1/x2 —
+  dois pêndulos acoplados, dois canais que se respondem), BOUNCE, CHAOS,
+  MOUSSE, LFO… É o músico (ou a seed) quem escolhe a causa, com cabo
+  visível — a regra do Antitotem: "uma função só é ativa quando tem rota e
+  controle no painel".
+- **As salvaguardas ficam no próprio MIXER**, valendo para knob e CV:
+  teto de abertura (nunca o extremo), **alisamento** (~50 ms, hoje não há
+  nenhum) e, se você aprovar, o **grave no centro** (4.2).
+- **A seed pode ligar** de vez em quando uma fonte lenta a uma entrada PAN
+  (como já liga a DRIFT em cutoff e ressonância), com profundidade
+  contida — o palco passa a variar sem regra nova no VARIA.
+- **Painel**: o MIXER tem 14 HP e as tiras estão cheias (fader, PAN, MUTE,
+  jack). O jack `PAN` de cada canal entraria entre o MUTE e o jack de
+  áudio; se não couber com folga, o MIXER cresce para 16 HP. Layout a
+  mostrar para você antes de fechar.
+
+**A e B não se excluem.** B é a base: dá a entrada, as salvaguardas e serve a
+qualquer fonte. O PALCO (A) pode vir depois, como **mais uma fonte** — o
+VARIA passaria a mandar sinais para essas mesmas entradas, em vez de girar o
+knob. Minha recomendação: **começar por B**.
+
 ## 5. Decisões para o autor
+
+0. **Caminho B primeiro** (entradas PAN no MIXER), deixando o PALCO para
+   depois — ou os dois juntos?
 
 1. **PALCO como botão próprio ou como parte do VARIA** (ligado sempre que o
    VARIA estiver ligado)?
