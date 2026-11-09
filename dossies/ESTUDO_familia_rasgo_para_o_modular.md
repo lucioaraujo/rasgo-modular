@@ -639,13 +639,38 @@ triagem do ModularGrid Top 100, da EMW, da Soundfreak e da Teia):
   do próprio histórico** (Start/Length ao vivo), Lock por canal com clock
   global, Choke (prioridade entre canais), camada Shift.
 
+- **Catálogo SchneidersLaden** (~1500 itens triados em §12; os achados com
+  apropriação nova): **Silhouette** (SPOT varre um campo circular de 6 entradas:
+  primeiro plano que anda, o resto vira sombra redistribuída — a resposta de
+  hardware à legibilidade, e parente do OBSERVER); **Scrooge** (vozes sem
+  alimentação própria que **roubam energia dos sinais de controle** — recurso
+  compartilhado e escasso); **Eddy** (canal sem entrada normalizado à própria
+  realimentação — o som que existe sem fonte); **Cracklebox** de Waisvisz/STEIM
+  (som cuja identidade depende da pele de quem toca); **Discrete Map** (passo
+  escolhido por **qual limiar um sinal cruza**, não por clock nem por índice);
+  **Collide 4** (amplificador **lock-in** e deslocamento de frequência por
+  Hilbert, que desloca todas as parciais pelo mesmo Hz); **DCSN3** (árvore de
+  decisão em camadas para gates); **Vector Wave** (mistura de 4×4 fontes por um
+  ponto 2D); **Z-8000** (**pool compartilhado**: canais horizontais e verticais
+  lendo os mesmos 16 valores — mexer em um muda várias sequências); **Sofia**
+  (formante FOF travado harmonicamente, o oposto do pulsar livre); **Quasar**
+  (binaural 3D); **Harlequin's Context** (morph entre configurações inteiras de
+  comportamento, não entre valores); **CVilization** (gravador de CV cujo laço
+  **muta**, não repete exato); **Polygogo** (síntese poligonal: a geometria é o
+  motor do som e também o desenho).
+
 **Para o Modular, a partir daqui**: aperfeiçoar o **SH/DRIFT** com o par
 Slope × Shape, Prob e o laço da janela do histórico (DriftLog) — é o
 aperfeiçoamento mais direto e de maior nuance; aperfeiçoar o **SEQUENCE**
 com 4 CVs por passo e paralelo↔serial, e a **transposição acumulativa**;
 um **FILTER** com polos por CV e dois picos cruzados (conferir o que o
 FILTER/WASP já fazem); o **NOISE** com atmosferas em morph; nomear a rota de
-**observação**; considerar o **modo EXP** por módulo.
+**observação**; considerar o **modo EXP** por módulo. Novos que o catálogo sugere e
+nada no Modular faz: **SPOT** (o primeiro plano que varre — talvez o próprio
+OBSERVER), **THRESHOLD MAP** (Discrete Map: o passo pelo limiar cruzado),
+**POOL** (Z-8000: sequências que compartilham valores), **STARVE** (Scrooge:
+energia escassa entre vozes). Conferir antes o que MATRIX, SWITCH, PLANAR e
+SEQUENCE já cobrem.
 
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
