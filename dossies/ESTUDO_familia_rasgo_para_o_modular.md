@@ -820,6 +820,48 @@ periódico cuja fundamental cai num número primo de bins; a energia fora da
 grade é o aliasing; a parte abaixo de 5 kHz soa como tom inarmônico) — para
 OSC, WAVETABLE, SHAPE, WASP, CRUSH, FOLD do Modular.
 
+**Auditoria, movimento e layout** (`ECOSYSTEM_AUDIT.md`,
+`AQUARIUM_SPACE_DESIGN.md`, `SYNTHETIC_TAIL_DESIGN.md`,
+`SCHOOL_MOTION_DESIGN.md`, `GESTURE_MOTION_DESIGN.md`,
+`PHILOSOPHY_MIX_DESIGN.md`, `WINDOW_LAYOUT_DESIGN.md`, lidos):
+
+- **A auditoria do primeiro protótipo** recusou promovê-lo ("pseudocódigo
+  conceitual executável") e listou o que nunca pode acontecer: RNG global,
+  **resultado que depende do tamanho do bloco**, alocação no callback,
+  consulta que sorteia de novo a cada chamada (a mesma entidade em dois lugares
+  no mesmo instante), quebra "rara" que matematicamente é inevitável, presa
+  com conhecimento total, soma sem orçamento de ganho e pan linear,
+  autorreferência só declarada num comentário ("um comentário não conta como
+  integração"). E **nomes de artistas em algoritmos** ("Devine", "Autechre",
+  "Barbieri", "Cortini") foram trocados por **vocabulário autoral que
+  descreve o comportamento** — referências ficam nos créditos.
+- **Critério de excelência do ecossistema**: "não estará pronto porque
+  contém muitas metáforas em classes; estará pronto quando poucas relações
+  forem audíveis, reproduzíveis, seguras e musicalmente profundas" — e cada
+  mecanismo responde o que muda na escuta, quem percebe, qual estado causa e
+  como continua controlável sem virar automação rígida.
+- `HarmonicPhaseBank`: várias fases como múltiplos racionais de **um único
+  relógio** (nenhum acumulador deriva do outro); o relógio longo é reduzido a
+  cada 720.720 ciclos (divisível por 1…16, a redução não quebra nenhuma
+  razão). `FluidMotion`: um estado lido de quatro maneiras (formas,
+  amplitudes, tempos, frequências) — o princípio do Tides. Cauda FDN com
+  matriz Hadamard e uma segunda matriz assinada ("nightmare") cuja
+  interpolação continua contrativa; o FDN segue avançando em bypass (ativar
+  não reinicia a memória).
+- **Layout** (metodologia obrigatória desde 18/9): knob ≥ 52 px, área
+  interativa ≥ 80×92 px, rótulo e valor em áreas próprias (≥ 11 px), **nunca
+  diminuir os mínimos para caber** — reorganizar ou rolar; **controles
+  dependentes mostram a dependência** (ficam inativos quando a influência é
+  zero); posições que são dado musical não se movem para acomodar legendas.
+
+**Para o Modular**: um **teste transversal de invariância ao bloco**
+(renderizar cada módulo com blocos de 64 e de 512 e exigir o mesmo
+resultado) — o mesmo espírito do teste de presença por controle; revisar se
+algum nome de módulo, modo ou rótulo do Modular carrega nome de artista ou
+marca em vez do comportamento; e, na revisão de layout dos painéis pedida
+pelo autor (com as referências do Cardinal), adotar os mínimos e a regra de
+dependência visível do Aquorbium como ponto de partida.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
