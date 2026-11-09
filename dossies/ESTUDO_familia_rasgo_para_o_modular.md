@@ -1176,6 +1176,42 @@ de **Partch** (O/U em entonação justa — combina com o QUANTIZER microtonal);
 (3) as **operações sobre progressões** por CV (inverter função, retrogradar,
 substituir) no HARMONY; conferir o que o HARMONY já tem.
 
+**`docs/JOGO.md`** (lidos: as respostas do autor, os princípios de
+Vitoriamario, as regras como objetos, o ciclo de vida, como inventar
+regras, o estado do jogo, a troca de lugar no diálogo):
+
+- **O autor**: "não se trata de seguir as normas de um jogo de Xenakis, ou
+  matrizes de Caillois — essas teorias são interessantes, porém o Trioio
+  deve ser capaz de **criar suas próprias regras**". Teorias são
+  referências, não normas.
+- **Vitoriamario** ("um ser autônomo — libertário — que se reinventa — se não
+  existia passou a existir"), da fonte apócrifa *Apodrece e vira adubo*:
+  "**confunde-te a ti mesmo**" (jogar contra os próprios hábitos: contradizer
+  a própria regra, escondê-la de si, inverter uma tendência já consolidada —
+  a defesa contra a cristalização) e "**no fim tudo apodrece e vira
+  adubo**" (a regra que sai do jogo se decompõe nos seus campos, que
+  alimentam as próximas).
+- **A regra como objeto**: `quando <condição> · faça <ação> · por <alcance>
+  · custo <recursos> · oculta? · fica?`; ciclo proposta → em jogo → ouvida →
+  julgada → fica | volta | apodrece; nasce do material, de outra regra, do
+  jogo, do autor, por apropriação desviada, do adubo, ou contra si mesma.
+- **Critérios de "musicalmente interessante"**: audível (não só um número);
+  coerente com o material (a quebra é gesto, não acidente); novidade que se
+  aprende (surpreende sem virar ruído); **tem custo**; sobrevive à escuta do
+  autor. Os quatro primeiros, medidos compondo com e sem a regra.
+- **O estado do jogo** (energia, densidade, memória, coerência, surpresa,
+  informação oculta, risco de colapso, liberdade de desvio) **nunca aparece
+  como placar: "o jogo se ouve na música"**.
+- A **troca de lugar** no diálogo (a resposta fala quando a referência fala)
+  e o **"atropelo"** (as duas falam juntas), do catálogo do Studio.
+
+**Para o Modular**: qualquer "módulo de jogo" (o GAME cogitado no
+Asterismus) deve ser **regras próprias com custo e ciclo de vida**, não uma
+matriz de Caillois ou de Xenakis embutida; o Aquorbium já tem uma gramática
+de regras (`OpenRuleProgram`) e o Trioio tem o objeto-regra — juntos, são o
+desenho de partida, a decidir com o autor. E o princípio "o jogo se ouve na
+música, nunca como placar" vale para os mostradores do Modular.
+
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
 altura) e publica um pequeno **barramento semântico** (energia, densidade,
