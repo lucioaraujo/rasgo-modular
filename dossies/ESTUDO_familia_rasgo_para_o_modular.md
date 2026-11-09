@@ -1330,8 +1330,35 @@ músico. O ecossistema do Aquorbium, a estratégia do Trioio e a política de
 seed do Studio não entram como "cérebro" do Modular: entram como **módulos**
 (PREDATOR, RESPONDER, RELATE, GAME…) que o músico pode ligar ou não.
 
-**Ainda não lidos no Trioio** (próxima passada): `LINHAS.md`, `MOSAICO.md`,
-`DESCRITORES.md`, `ESCUTA.md`, `LEITURA_E_GABARITO.md`, `SINTESE.md`,
+**`docs/MEMORIA.md`, `docs/MOSAICO.md`, `docs/LINHAS.md`** (lidos):
+
+- **Oráculo de fatores** (Allauzen, Crochemore e Raffinot, SOFSEM 1999;
+  Assayag e Dubnov 2004 — o algoritmo público do OMax, reescrito sem consultar
+  o código do IRCAM): aprende a sequência de alturas, liga cada ponto ao
+  ponto anterior de **mesmo contexto** (link de sufixo) e navega seguindo
+  adiante ou saltando pelo link — "cada par de notas seguidas continua sendo
+  um par que existe na referência, mas a sequência não é mais a dela:
+  **reconhecível e imprevisível**". Continuidade = 0,85 − 0,5 ×
+  imprevisibilidade. Defeito instrutivo: saltar para um ponto aleatório quando
+  o contexto nunca se repetiu derrubava a fidelidade de 96 % para 83 %.
+- **Mosaico** (síntese concatenativa por corpus; Schwarz, CataRT 2006/2007):
+  cada ataque vira uma unidade com descritores (energia, brilho, ruído,
+  altura, duração); o alvo é o momento presente transformado pela estratégia;
+  a escolha soma **custo do alvo** e **custo da emenda**; e **a unidade traz o
+  timbre do instante de origem** ("o trecho do minuto 1 que volta no minuto 3
+  traz o timbre do minuto 1").
+- **Linhas por região** (divisão de fase zero offline; "a linha é a escuta de
+  uma região do espectro, não de um instrumento") — o LISTEN do Modular já é
+  esse conceito em tempo real.
+
+**Para o Modular**: **ORACLE** (novo) — o oráculo de fatores como módulo:
+aprende alturas (e gates) de uma entrada e improvisa navegando pelos links,
+com um knob de **continuidade**; complementa o MARKOV (que só guarda pares)
+com o reconhecível-e-imprevisível de frases inteiras. **MOSAIC** (novo, mais
+pesado) — concatenação por descritores sobre um buffer vivo (SIGNAL-IN ou
+LOOPER), escolhendo pelo som; parente do MEMORY/SAMPLER.
+
+**Ainda não lidos no Trioio** (próxima passada): `DESCRITORES.md`, `ESCUTA.md`, `LEITURA_E_GABARITO.md`, `SINTESE.md`,
 `INFLUENCIAS.md`, `REFERENCIAS_POR_MODULO.md`, `MEMORIA.md`, `REGRAS.md`,
 `design.md`, `PROMPTS_E_INTENCOES.md`.
 
