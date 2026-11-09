@@ -1132,6 +1132,50 @@ espectro"** e o **"LPG re-disparado por um registrador caótico"** são
 patches que o Modular pode tornar explícitos como receitas ou como modo de
 módulo (o LPG + TURING já existem; conferir o Rungler no TURING).
 
+**`docs/MAQUINA_DE_HARMONIA.md`** (lidos: a harmonia própria do Trioio, as
+operações, o arquivo de cadências, o Brasil, o som da aura, Partch, a
+mistura conceitual de cadências):
+
+- **Harmonia que só um instrumento que escuta pode fazer**: acordes vindos
+  dos parciais medidos (harmonia espectral do que se ouve); cadências do jogo
+  ("quando rarefeito, cadência de engano"), cadências apócrifas; **cadência
+  por timbre, densidade ou registro** — a chegada marcada pela fusão
+  espectral ou pelo rarefazer, não pela função.
+- **Operações sobre progressões** (como as da máquina de escalas):
+  substituir (trítono, relativa, mediante, empréstimo), interpolar
+  (dominante secundária, ii–V, diminuto de passagem), rearmonizar, **inverter
+  a função** (T ↔ D, o contrapor), retrogradar, comprimir/expandir o ritmo
+  harmônico, modular (pivô, nota comum, enarmônica, direta), misturar
+  linguagens. **Arquivo de 51 cadências** com graus, condução e fonte.
+- **O Brasil** (pedido do autor): o **sistema trimodal nordestino** de José
+  Siqueira (lídio, mixolídio e lídio-mixolídio — a "escala nordestina", a
+  acústica de Bartók); o baião de Luiz Gonzaga (I7 como tônica, IV7, ♭VII,
+  Vm7); repente e aboio (bordão, sus4 sobre pedal); **Guerra-Peixe** e o
+  Armorial (modal dissonante, áspero); o **Clube da Esquina** (♭II7M(♯11)
+  como dominante, Vm7, sus4, pedais; "Novena" em Ré dórico); **Hermeto
+  Pascoal** (cores 7M(9)(♯11), 7(♭9)(♯11), chegada cromática ao acorde meio
+  tom acima, *Calendário do Som*).
+- **O som da aura** (Hermeto): a fala ouvida como melodia — cada sílaba vira
+  nota, dobrada em uníssono, e **cada sílaba ganha um acorde em que a nota
+  da fala é uma cor** (9ª, ♯11, 13ª, 7M), nunca a fundamental (Costa-Lima
+  Neto, IASPM Journal).
+- **Partch**: otonalidade (1/1, 5/4, 3/2, 7/4, 9/8, 11/8) e utonalidade (o
+  espelho), unidades do diamante de tonalidades, o pivô O ↔ U; "uma harmonia
+  de movimento entre identidades, não de cadência".
+- **Mistura conceitual de cadências** (Zacharakis, Kaliakatsos-Papakostas,
+  Cambouropoulos, ISMIR 2015; Fauconnier e Turner): misturando a perfeita
+  (V7→I) com a frígia do séc. XV (♭vii→I), **o sistema reencontra sozinho a
+  substituição de trítono** (♭II7→I) — e a backdoor como mistura mais fraca.
+
+**Para o Modular**: (1) **AURA** (nome a decidir) — SIGNAL-IN → altura (o
+PIT do SCOPE) → um acorde por nota em que a nota ouvida é **cor**, nunca
+fundamental, com o baixo andando pelo caminho mais curto: o "som da aura"
+como módulo, a partir de uma voz ao vivo; (2) o **CHORD/HARMONY** ganham
+linguagens brasileiras (nordestina trimodal, mineira, Hermeto) e os acordes
+de **Partch** (O/U em entonação justa — combina com o QUANTIZER microtonal);
+(3) as **operações sobre progressões** por CV (inverter função, retrogradar,
+substituir) no HARMONY; conferir o que o HARMONY já tem.
+
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
 altura) e publica um pequeno **barramento semântico** (energia, densidade,
