@@ -21,10 +21,13 @@ relevante". Registro vivo em
 (§4, um instrumento por vez).
 
 - [x] Asterismus (§4.1), Aquorbium (§4.2), Batruc (§4.3, só leitura; faltam
-  README e bibliografia).
-- [ ] Trioio, Antitotem, Navalha 2 **JUCE** (o Pd não, pedido do autor),
-  Rasgo Synth Studio, Maravi, Maestro, Risco; depois o cruzamento com o
-  Cardinal e a revisão das propostas.
+  README e bibliografia), Trioio (§4.4), Antitotem (§4.5, 4.5b, 4.5c —
+  propostas novas: VIA com as PORTAS do autor como prior art, COMPARADOR,
+  ACCENT, INTERPRET, CHARACTER, BUDGET, SUPPLY; aperfeiçoamentos de
+  DRIFT, PLL, SWITCH e SEQ).
+- [ ] Navalha 2 **JUCE** (o Pd não, pedido do autor), Rasgo Synth Studio,
+  Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a revisão
+  das propostas.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
