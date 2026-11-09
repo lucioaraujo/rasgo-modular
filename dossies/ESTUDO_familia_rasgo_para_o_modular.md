@@ -1095,6 +1095,43 @@ esse arquivo — o TRIGSEQ é genérico e não sabe o que é um sam; e um **camp
 rítmico alimentado pelo LISTEN** (o mapa é o que o Modular ouve, não um mapa
 treinado) é um caminho original para o "ritmo como campo".
 
+**`docs/MAQUINA_DE_TIMBRES.md`** (lidos: princípio, peças, §5.0 "o rasgo
+modular", §6.6 medidas que descartaram caminhos, levas a fazer, portão
+conceitual):
+
+- **Receitas, não 200 instrumentos**: excitador × vibrador × corpo ×
+  articulação × sala; "o estilo é um conjunto, não um timbre" (o choro são
+  papéis: flauta no motivo, bandolim no contracanto, 7 cordas na baixaria…).
+  Nenhuma amostra, nenhum *soundfont*.
+- **O autor, depois de ouvir os timbres realistas**: "ainda muito midi — se
+  possível trazer mais da **síntese modular criativa** para dentro dos
+  timbres, **sons inauditos, não protocolares**". O rumo deixou de ser o
+  realismo: o corpo acústico é ponto de partida e é **atravessado por
+  processos modulares** (genealogia: SHAPE e LPG do Rasgo Modular, Rungler
+  do Studio): dobra movida pelo envelope do próprio som; anel com razão
+  inarmônica tirada do espectro da referência; deslocamento de frequência
+  (Bode, Hilbert); **LPG re-disparado por um Rungler** (o sustentado vira
+  pulsado irregular); gagueira granular; **ressonância simpática** num pente
+  afinado fora da série ("uma corda que não existe ressoa"). E as
+  **quimeras**: o excitador de um instrumento no corpo de outro (prato
+  friccionado, corda cantada, pele soprada).
+- "Está muito amador… sonoridade mais sofisticada, profissional, que gere
+  emoção" → **a produção** (mistura por voz, palco, salas, EQ — Izhaki,
+  Owsinski): grande parte do som profissional vem da cadeia e da mistura.
+- Medir antes de implementar: a sobreamostragem foi **descartada** porque a
+  medida mostrou que o que aparecia fora dos harmônicos era a inarmonicidade
+  natural das cordas, não aliasing.
+
+**Para o Modular**: é a confirmação, vinda de outro instrumento, de que **a
+identidade do Modular é o "inaudito, não protocolar"** — o Trioio foi buscar
+nele justamente isso. Implicações: (1) as **quimeras** já são possíveis no
+Modular por patch (excitador de um módulo no corpo de outro — NOISE/DRUM/
+STRING → RESONATOR, MATTER, SPRING); merecem **receitas no guia** (fase
+didática) mais do que módulos novos; (2) o **"anel com razão inarmônica do
+espectro"** e o **"LPG re-disparado por um registrador caótico"** são
+patches que o Modular pode tornar explícitos como receitas ou como modo de
+módulo (o LPG + TURING já existem; conferir o Rungler no TURING).
+
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
 altura) e publica um pequeno **barramento semântico** (energia, densidade,
