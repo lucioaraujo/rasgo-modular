@@ -1408,9 +1408,10 @@ Lidos inteiros: `docs/MEMORIAL_DE_PROCESSO.md`, `IDEIA_BREADBOARD.md`,
 `COMPATIBILIDADE_CONCEITO_IMPLEMENTACAO.md`, `PESQUISA_CMOS_LUNETTA.md`;
 lidas as partes de levantamento e de brief de `PESQUISA_DERIVA_GENERATIVA.md`
 (CRI-DRF-001), `PESQUISA_RUIDO_GENERATIVO.md` (CRI-NOI-001) e
-`PESQUISA_ACENTUACAO_GENERATIVA.md` (CRI-ACC-001). Ainda faltam:
-REPRESENTACAO, COMPASSO, FLUXO_DE_SINAL e DESIGN (SEQUENCER, MELODIA e
-ORQUESTRA_RELACIONAL estão em §4.5b).
+`PESQUISA_ACENTUACAO_GENERATIVA.md` (CRI-ACC-001). SEQUENCER, MELODIA e ORQUESTRA_RELACIONAL estão em §4.5b; FLUXO_DE_SINAL,
+DESIGN, COMPASSO e REPRESENTACAO em §4.5c (os dois últimos, só o
+levantamento). Não lidos: TAREFAS/TAREFAS_HISTORICO, MIDI_E_PARTITURA,
+JANELA_UNICA, MARCO_SIMPLE_SEQUENCER, TUTORIAIS.
 
 O Modular já trouxe do Antitotem, com proveniência: o PLL (estudo
 OSC5/4046 de `CmosVoice.h`), o DRIFT (`deriveFromMemory`: momentum,
@@ -1493,7 +1494,7 @@ mostra que o que falta não é mais um chip: é a **atitude** do instrumento.
   Cada retorno nomeia seu elemento e seu tempo ("mistura com matéria").
   É a nuance 1 feita módulo, e cabe na régua do Método (o caminho tem
   presença audível). Conferir antes contra o SHAPE e o FILTER para não
-  duplicar.
+  duplicar. **Prior art do autor: as PORTAS do Antitotem (§4.5c, item 1).**
 - **SHIFTREG** (proposta 9) ganha sua forma exata: o 4006 como espaço da
   lógica — 1 bit clockado, comprimento, taps somados, realimentação; e a
   variante "memória que vaza", em que os bits decidem **rotas de
@@ -1623,6 +1624,58 @@ volta para casa: o Modular é o destino original dela.
   disputam (competição) ou cedem umas às outras (cooperação). É a
   ecologia do Aquorbium (proposta PREDATOR) vista pelo lado do tempo.
   Conferir antes contra a proposta PREDATOR para não duplicar.
+#### 4.5c Antitotem — fluxo, design, compasso, representação
+
+Lidos: `FLUXO_DE_SINAL.md` (partes 1–2), `DESIGN.md` (inteiro até
+"Núcleos modulares"), o início de `PESQUISA_COMPASSO_E_METRICA_REAL.md` e
+de `PESQUISA_REPRESENTACAO_MUSICAL_RASGO.md`; conferido no código
+`CmosVoice::feedbackSample()` e `setEnergy()`.
+
+1. **As PORTAS já são o "cabo com matéria".** No Antitotem, seis
+   passagens de retorno combináveis: `FB` (direto), `DIODE` (|x|·2 − 1,
+   retificado), `CAP` (o estado do capacitor: retém e solta), `PULSE`
+   (só o sinal: borda/limiar), `TRANS` (tanh assimétrico com o
+   capacitor) e `REFLUX` ("a diferença entre o sinal recente e a memória
+   capacitiva, como uma corrente que retorna alterada"); abertas várias,
+   fazem a média — "retorno composto". O próximo passo que o próprio
+   autor deixou escrito: que as portas recebam **também LFO, ruído, outro
+   scanner ou memória**, e não só a própria voz. É exatamente o que um
+   módulo do Modular faria: a proposta VIA (§4.5) passa a ter prior art
+   do autor, em código AGPLv3, e o desvio obrigatório é esse — portas
+   para **qualquer** cabo do patch, não só para o retorno de uma voz.
+2. **ENERGIA, a alimentação variável.** Um só controle que, baixo,
+   desacelera o clock, reduz o corpo e faz os osciladores derivarem uns
+   dos outros (`railWander`); alto, devolve presença, acelera e aumenta
+   o atrito nas rotas. "Uma interpretação musical segura, não um modelo
+   de alimentação elétrica real." No Modular não existe uma causa comum
+   que afete vários módulos como a tensão de alimentação afeta um
+   circuito: ideia para um módulo (**SUPPLY**, nome a decidir) cuja saída
+   é ligada a muitos destinos, ou para um barramento — a decidir com o
+   autor; não implementar sem conversa.
+3. **O mixer como pontos de escuta numa série**, não fontes paralelas:
+   desligar o canal RING não tira o anel do som se o FILTRO, que vem
+   depois, estiver ligado. Decidido e mantido pelo autor ("perder essas
+   combinações custaria mais do que a clareza ganha"). No Modular, isto
+   se faz com MULT e MIXER; vale como receita para o LEARN.
+4. **"Uma fonte autônoma"**: a energia própria dos osciladores conduz o
+   objeto; o MIDI não é substituto da lógica interna. É a identidade do
+   Modular também (soa sozinho, MIDI é adaptador).
+5. **Proliferação, não troca de núcleo**: um segundo 4069 é uma segunda
+   etapa, não um substituto do primeiro; cada instância tem CLOCK, CV,
+   ÁUDIO, GATE e RETORNO explícitos. O Antitotem caminha para a forma do
+   Modular; o Modular aprende com ele que cada módulo deve ter um
+   **RETORNO**.
+6. **"Para mim compasso não tem nada a ver com loop de sequencer"** (o
+   autor). Loop ≈ frase; métrica = hierarquia de acento; subdivisão =
+   eixo ortogonal; compasso = conceito próprio. No Modular, o EUCLID
+   mistura comprimento de ciclo e acento; qualquer módulo futuro de
+   "compasso" deve manter os quatro separados.
+7. **O funil de perda.** O intérprete calcula por amostra muito mais do
+   que qualquer exportação preserva (gesto, chegada, ápice…); o MIDI
+   guarda 4 campos por nota. Proposta do autor + ChatGPT: uma
+   representação própria em três camadas (Score / Performance /
+   Interpretation). Para o NOTEOUT do Modular: saber o que se perde, e
+   não chamar a exportação de "a música".
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
