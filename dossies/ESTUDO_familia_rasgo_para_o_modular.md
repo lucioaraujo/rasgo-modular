@@ -983,7 +983,7 @@ de vento — dizer isso no LEARN).
 
 ### 4.4 Trioio
 
-Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`, `docs/ESCALAS.md`. (Continua.)
+Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`, `docs/ESCALAS.md`, `docs/RITMO.md`. (Continua.)
 
 **Nuances**
 
@@ -1065,6 +1065,35 @@ uma escala a outra). Comportamento (subida ≠ descida, apoio nos tempos
 fortes) é a camada seguinte. Respeitar a pendência antiga do TAREFAS:
 preservar as 12 escalas atuais, seus índices e o significado de `scale_cv`
 para o HARMONY e os patches salvos; seleção fora do callback.
+
+**`docs/RITMO.md`** (lido inteiro):
+
+- **Ritmo como campo** (o comportamento do Grids, de Émilie Gillet, MIT — sem
+  código nem mapa): cada compasso da referência vira um ponto num mapa
+  densidade × síncope com o seu padrão; o caminho a cada compasso é
+  transformado pela estratégia (seguir; transfigurar = síncope espelhada;
+  contrapor = densidade complementar; interromper = um compasso vazio em
+  quatro); mistura dos 4 padrões mais próximos; e **golpes deslocados** do
+  tempo ao contratempo quando a posição pede mais síncope do que os padrões
+  têm — "sem isso, mover a posição não mudava o som". **No Grids o mapa é
+  fixo e treinado; no Trioio o mapa é a própria referência.**
+- **Arquivo de 26 ciclos rítmicos com fonte** (iqa' árabe; tāla
+  hindustani e carnático; usul turco e aksak; claves e linhas-guia; **baião**;
+  colotomia do gamelão; compás flamenco de 12; shuffle), com notação própria
+  (golpes, divisões, acentos — o sam —, vazios — o khālī), e a **melodia que
+  chega no ciclo** (a nota de apoio no sam, no gong, no dum) e o **tihai**
+  (a frase três vezes, a última no sam; Clayton 2000).
+- **Groove medido** com dois vieses achados e corrigidos que valem como
+  aviso para qualquer medidor: **"a janela larga inventava swing"** (ataques
+  soltos davam 24–34 % de swing falso — o swing só existe quando os
+  contratempos se *concentram* na região ternária) e **"pulso fraco não tem
+  grade"**. Rubato pelo arco de Todd: w(u) = (u + β((u−½)³+⅛))/(1+β/4).
+
+**Para o Modular**: um **CYCLE** (ciclos das culturas com fonte, acentos,
+sam/gong como saída própria, tihai como evento) seria o lugar certo para
+esse arquivo — o TRIGSEQ é genérico e não sabe o que é um sam; e um **campo
+rítmico alimentado pelo LISTEN** (o mapa é o que o Modular ouve, não um mapa
+treinado) é um caminho original para o "ritmo como campo".
 
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
