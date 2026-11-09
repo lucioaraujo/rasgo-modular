@@ -493,6 +493,58 @@ FM4, mistura, drive, lições, caos e realimentação):
   cinco lições "faça / ouça" no tutorial — o mesmo caminho da fase didática
   do Modular.
 
+**`MODULE_DEVELOPMENT_STANDARD.md`** (lido inteiro) — **a regra que o autor
+chama de "cada módulo no seu tempo"**, escrita no Aquorbium:
+
+- **Três modos obrigatórios** no mesmo motor: autônomo (soa e decide sozinho),
+  performance (controles humanos com transição suave e retorno previsível) e
+  híbrido (o gesto influencia probabilidades e foco, sem substituir o estado).
+- **Seis estados, nunca confundidos**: pesquisada → protótipo de core →
+  integrada ao áudio → operável → **validada tecnicamente** → **aprovada
+  musicalmente**. "Teste automatizado não significa aprovação musical."
+- **Regra de promoção**: **quando há componentes testados mas não ouvidos, a
+  dívida de integração e de escuta tem prioridade sobre criar protótipos
+  novos** — uma família por vez atravessa rota, controle, persistência,
+  bypass, tempo real, layout e **escuta**; só então a próxima.
+- Portões: arquitetura, correção, tempo real, áudio (DC, descontinuidade,
+  espectro), generativo (percurso sem eventos externos, sem repetição curta
+  acidental), performance, escuta ("diferença não é automaticamente
+  melhoria"), orçamento.
+
+**Consequência direta para o Modular agora**: os módulos novos desta sessão
+(DYNAMICS, ARP, CELL, MARKOV, BOUNCE, SPRING, MOUSSE, PENDULUM, PRISM e o
+SCOPE refinado) estão em **"validado tecnicamente"**; nenhum em "aprovado
+musicalmente". Pela regra do próprio autor, o próximo passo é a **escuta, um
+por vez**, antes de abrir o lote 2 (MAGNET, ORBIT…, escritos mas parados).
+
+**`INTEGRATED_MODULE_BANK_DESIGN.md`** e as coortes (`EMERGENT_…`,
+`OPEN_INTERACTION_…`, `GENERATIVE_INTERACTION_…`, lidos inteiros): o
+Aquorbium tem um **laboratório de ~60 componentes C++ testados** em 15
+famílias, atrás de um bypass mestre (`LAB MIX`), à espera de escuta. Muitos
+cobrem lacunas do Modular ou coincidem com propostas desta sessão:
+
+| Componente do Aquorbium | Relação com o Modular |
+|---|---|
+| `CellularAutomatonSequencer` (32 células) | **o CELL do Modular foi escrito sem consultar este** — comparar e unificar |
+| `ShiftRegisterMemory` | é o **SHIFTREG** proposto (Antitotem) |
+| `MotionGestureRecorder` | é o **TRACE** proposto (Navalha) |
+| `FixedLSystemGenerator` | **L-system** (reescrita formal → eventos) — não existe no Modular |
+| `OpenRuleProgram` | uma **gramática de regras** (`fonte < n : destino = v`) avaliada na fronteira de evento — não existe no Modular |
+| `DoubleScrollAttractor`, `LorenzCV`, `TripleSlowDrift`, `SlewRateRandomWalk` | atratores e derivas em várias escalas — o CHAOS/DRIFT do Modular têm um modelo cada |
+| `InteractionProcessor` (ring, XOR, riqueza, duck como estados de uma relação) | um **RELATE** de áudio entre duas fontes |
+| `EnvelopeContagionBus` | contágio de envelopes entre vizinhos sem uníssono — é o "contágio" do Asterismus em CV |
+| `SpectralTransferVocoder`, `LockInFocusExtractor`, `FrequencyIsolator`, `RecentMixWavetable` | transferência espectral, foco síncrono, wavetable do mix recente — análise/resíntese |
+| `PolygonalOscillator` (com X/Y literais) | oscilador poligonal — não existe no Modular |
+| `ReeseVoice`, `DualPeakFilter`, `HarmonicRippleVoice`, `HarmonicMorphOscillator` | vozes e filtros de caráter |
+| `StochasticPulseMask`, `ProbabilityDistribution`, `RandomToLoop`, `PatternRotationMutator`, `NotePermutationMatrix`, `AccumulatingTransposer`, `ThresholdStepSelector`, `BranchingStepRouter`, `ConditionalStageMachine`, `EvolutionLoopMachine`, `BehaviourSceneBank` | a família de decisão/sequência que no Modular está espalhada (TURING, DECISION, ABACUS, SEQUENCE, LOGIC) — conferir um a um o que já existe |
+| `NoInputFeedbackBus`, `PowerStarve`, `ContactCrackleExciter`, `LightweightBinauralSpatializer`, `QuadratureStereoRotator` | mesa sem entrada, "fome" de alimentação, estalo por contato, binaural leve, rotação estéreo |
+
+**Cuidado registrado pelo próprio Aquorbium**: esse laboratório está
+"validado tecnicamente", **não aprovado musicalmente** — copiar daí traz
+código testado, não música aprovada. E a proveniência importa: o
+double-scroll foi comparado ao Joranalogue Orbit 3 (sem copiar circuito
+nem firmware) — a regra RASGO de origem pública e desvio vale também aqui.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
