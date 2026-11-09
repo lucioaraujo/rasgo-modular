@@ -545,6 +545,53 @@ código testado, não música aprovada. E a proveniência importa: o
 double-scroll foi comparado ao Joranalogue Orbit 3 (sem copiar circuito
 nem firmware) — a regra RASGO de origem pública e desvio vale também aqui.
 
+**Autonomia, geometria e decisão** (`AUTONOMOUS_ENERGY_DESIGN.md`,
+`GEOMETRIC_SEQUENCER_DESIGN.md`, `BRAIN_DECISION_DESIGN.md`,
+`DECISION_AND_PERMUTATION_DESIGN.md`, `CONTROL_EVENTS_AND_CLOCK_DESIGN.md`,
+`GEOMETRY_EVOLUTION_DESIGN.md`, `PATTERN_EVOLUTION_DESIGN.md`,
+`MULTIRATE_GENERATORS_DESIGN.md`, lidos inteiros):
+
+- **Relabi** (John Berndt, 2009): "uma pluralidade coordenada de eventos que
+  parece cíclica mas impede a identificação de um padrão uniforme — pulsada e
+  não pulsada ao mesmo tempo". No Aquorbium (`BiomaRelabi`), quatro a cinco
+  oscilações lentas de **taxas não comensuráveis** somadas; os
+  **cruzamentos coletivos** viram eventos (avançam a forma), sem compasso. A
+  referência de produto é o ADDAC 405 (comercial); o conceito é público. **No
+  Modular não há nada assim** — e é muito RASGO: uma terceira via entre o
+  periódico (CLOCK) e o aleatório (SH/NOISE). Candidato **RELABI**.
+- **Decisão em evento, som contínuo**: a decisão acontece num relógio de
+  controle ou num cruzamento; energia, altura e ativação **deslizam** por
+  amostra — "mudanças ecológicas nunca viram degrau".
+- **"O acaso decide *se*; o Cérebro decide *para onde*"**: um registrador de
+  8 bits lido por cinco somas ponderadas dá **inclinações correlacionadas**
+  entre organismos — tendem a subir ou descer juntos, como cardume, sem
+  uníssono. (O Rungler do Studio é parente; a ideia de correlação por pesos
+  diferentes sobre os mesmos bits é a nuance.)
+- **`influence = 0` reproduz o caminho autônomo bit a bit**: os controles de
+  performance somam viés ao estado, não trocam de motor (modo híbrido).
+- **`IntervalQuantizer`** com graus negativos, até 16 intervalos e **período
+  fracionário** (prepara microtonalidade e escalas não oitavantes) —
+  referência direta para o QUANTIZER do Modular.
+- **Memória formal Markov de regiões** (deslocamentos de seção
+  {−5,−3,−2,−1,0,1,3,5}, INERTIA, MUTATION, CONTEXT), avançada só nos
+  cruzamentos coletivos.
+- Componentes isolados com contratos limpos: `BranchingStepRouter` (2 sinais
+  → 8 categorias × 4 variantes), `NotePermutationMatrix` (pool de 16 notas,
+  8 permutações; trocar a linha muda a ordem sem duplicar dados),
+  `ControlEventExtractor` (qualquer CV → cruzamentos com histerese e
+  subida/queda de envoltória), `FractionalLogicClock` (duas razões
+  racionais 1/32–32/1 com AND/OR/XOR), `PatternRotationMutator`,
+  `StepMemoryLayout` (4×8 paralelo ↔ 2×16 ↔ 1×32 sem copiar dados),
+  `DriftCurveShaper` (separa suavidade × família de curva × curvatura),
+  `StepPatternBank`, **`RandomToLoop`** (do acaso renovado ao laço fixo, com o
+  laço que envelhece no meio — o Turing Machine dito com nuance),
+  `FractalCore` e `VectorGenerator` (a mesma matemática a 200 Hz ou 48 kHz).
+
+**Para o Modular**: RELABI (novo); o QUANTIZER com período fracionário
+(junto do banco do Trioio); o TURING/SH conferidos contra `RandomToLoop` e as
+inclinações correlacionadas; um EVENT (CV → eventos com histerese) talvez já
+exista espalhado (LOGIC, SCOPE onset) — conferir antes de propor.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
