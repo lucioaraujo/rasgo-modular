@@ -244,7 +244,15 @@ mecânica da seed.
 
 ### 4.2 Aquorbium
 
-Lido inteiro: `ECOLOGICAL_MUSIC_DESIGN.md` (§§1–6). (Continua.)
+Lidos inteiros os documentos de conceito e de projeto (lista nas seções
+abaixo); fora do método, como combinado: `aquorbium-tarefas.md`,
+`docs/DESENVOLVIMENTO.md`, `CHANGELOG.md` (diários) e `INSTALL.md`.
+Lidos só em parte: `OUTPUT_STAGE_DESIGN.md` (seções de true peak, EBU,
+denormais, aliasing, master criativo), `REALTIME_CONTRACT.md` (diagnóstico),
+`aquorbium-arquitetura.md` (§1, §9–§12). Não lidos: `ORGANISM_VOICE_…`,
+`SPECTRAL_ENVIRONMENT_…`, `PROBABILISTIC_MEMORY_…`, `STRUCTURAL_CONTROL_…`,
+`CPU_BASELINE.md` (os conceitos deles aparecem resumidos no banco integrado
+e no `BRAIN_DECISION_DESIGN.md`).
 
 **Nuances**
 
