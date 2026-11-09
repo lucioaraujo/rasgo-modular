@@ -9,6 +9,12 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **PENDULUM com visor mais alto** (10 nov., pedido do autor: "para que a
+  animação fique menos encolhida"): 30 mm em vez de 16; os knobs desceram
+  para o espaço livre acima dos jacks. O visor ganhou altura própria por
+  módulo (`Widget::height`, `Panel::tall`); todos os outros continuam com
+  16 mm.
+
 - **Relógio da gravação** (10 nov., aprovado pelo autor): gravando, o botão
   mostra o tempo da tomada (`● REC 01:23`); no último meio minuto, também o
   limite (`/ 04:00`), porque a tomada para sozinha aos 4 min (limite mantido

@@ -57,13 +57,17 @@ public:
         Panel p;
         p.hp = 12;
         p.add(Widget::Kind::Label, "PENDULUM", "", 2.5f, 2.0f);
+        // visor mais alto (pedido do autor, 10/11/2026: "para que a
+        // animação fique menos encolhida") — 30 mm em vez de 16; os knobs
+        // descem para o espaço que estava livre acima dos jacks
         p.add(Widget::Kind::Display, "pendulum", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "ENRGY", "energy", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 25.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MASS", "mass", 43.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "DAMP", "damp", 25.0f, 52.0f);
-        p.add(Widget::Kind::Toggle, "AUTO", "auto", 45.3f, 56.0f);
+        p.tall(30.0f);
+        p.add(Widget::Kind::Knob, "ENRGY", "energy", 7.0f, 46.0f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 25.0f, 46.0f);
+        p.add(Widget::Kind::Knob, "MASS", "mass", 43.0f, 46.0f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 7.0f, 68.0f);
+        p.add(Widget::Kind::Knob, "DAMP", "damp", 25.0f, 68.0f);
+        p.add(Widget::Kind::Toggle, "AUTO", "auto", 45.3f, 72.0f);
         p.add(Widget::Kind::Jack, "KICK", "in:kick", 7.0f, 96.0f);
         p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 19.0f, 96.0f);
         p.add(Widget::Kind::Jack, "CROSS", "out:cross", 35.0f, 96.0f);
