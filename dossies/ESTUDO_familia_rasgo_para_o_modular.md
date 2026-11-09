@@ -672,6 +672,59 @@ OBSERVER), **THRESHOLD MAP** (Discrete Map: o passo pelo limiar cruzado),
 energia escassa entre vozes). Conferir antes o que MATRIX, SWITCH, PLANAR e
 SEQUENCE já cobrem.
 
+**Composição** (`COMPOSITIONAL_VARIATION_DESIGN.md`,
+`SEQUENCER_MEMORY_AND_HARMONY_DESIGN.md`, lidos inteiros):
+
+- **A forma A → A′ → B → suspensão**, com **um protagonista por segmento**
+  (A: corpos melódicos; A′: o pulso; B: textura e movimento, leitura
+  retrógrada; suspensão: o espaço). A primeira versão "desenhava quase a mesma
+  curva" (segmentos a ~3 dB de diferença) e o ciclo inteiro durava ~20 s —
+  corrigido para durações de 6/4/6/3 fronteiras. **Lição**: medir o contraste
+  entre seções no render, não só no código.
+- **A gênese da sessão** — o autor: "essa sequência de notas aleatórias é
+  chata; sempre se repete cada vez que eu abro". Causa medida: tônica, modo,
+  registros, órbita, contorno… eram constantes. A semente passou a escolher um
+  **mundo** (tônica e modo, caminho de acordes na tonalidade, registros,
+  órbita de 5–16 passos, contorno, andamento de vida, quem abre, cor de cada
+  corpo, hora e estação em que acorda). **É o conceito "seed como hipótese"
+  do próprio Modular** (`dossies/ESTUDO_seed_composicao_generativa.md` §1.1),
+  reescrito lá antes de existir aqui em código.
+- **Linguagens harmônicas** (de `TRIOIO/docs/MAQUINA_DE_HARMONIA.md`):
+  funcional (T…S…D, meia cadência e autêntica, engano, plagal, dominantes
+  secundárias, sensível e terça picarda no menor), modal (vamps i–♭VII, i–IV,
+  i–♭II, I–♭VII–IV sobre pedal), **brasileira** (I6/9, diminuto de passagem,
+  VI7(♭9), IIm7, V7(9), IV7M, a plagal da bossa ivm6), **impressionista**
+  (*planing* de nonas, tons inteiros, nunca V–I), **cromática** (P, L, R de
+  Cohn); **episódios politonais** (Milhaud) em ~⅓ das sessões.
+- **Condução de vozes por papel**: o baixo toca o baixo do acorde; as vozes do
+  meio, a nota do acorde que menos se move; a melodia canta o modo e pousa no
+  acorde nos tempos fortes; a nota cromática do acorde substitui o grau
+  vizinho (Russell). **A harmonia evolui** (progressão nova, modulação
+  vizinha ou outra linguagem) e **volta para casa** a cada três ciclos.
+- **A emoção da forma**: um **arco de tensão** escolhido pela semente (subir
+  ao clímax e cair; ondas; crescimento lento; calmaria entre duas agitações),
+  período de 4–8 min; tensão = 0,6·arco + 0,4·tensão do acorde. A tensão move
+  densidade de eventos, dinâmica (nunca acima do nível de base), **registro
+  (a melodia sobe uma oitava no clímax)**, **respiração** (cala meio acorde
+  depois de cada cadência) e **retardos 4–3** que resolvem. "O contraste é
+  sutil de propósito; a escuta decide se pede mais."
+- **Motivo, pergunta e resposta** (Schoenberg): ao fechar uma cadência a frase
+  vira motivo; o respondente devolve imitação, inversão, retrógrado ou
+  retrógrado da inversão; a cada duas viradas a melodia reapresenta o motivo.
+  (Defeito instrutivo: com uma só fila, a resposta sobrescrevia o retorno.)
+- **Memória de passos com 4 valores por passo** (altura, gate, viés,
+  desejo) e **leitura direta por CV que não move o cursor sequencial**.
+
+**Para o Modular**: este é o material do **Form Engine** que o próprio
+Modular já desenhou (`ESTUDO_seed_composicao_generativa.md` §3.4) e não
+implementou: o arco de tensão, a respiração depois da cadência, o registro
+no clímax e o motivo que volta — como camada acima do VARIA, decidida com o
+autor. O **HARMONY** do Modular pode ganhar as linguagens (funcional,
+modal, brasileira, impressionista, cromática), a politonalidade e o retorno
+para casa; conferir o que o HARMONY já faz antes de propor. E a seed do
+Modular deve ser auditada contra a mesma queixa ("sempre igual ao abrir") —
+o estudo do próprio Modular (§2.2) já registra essa limitação.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
