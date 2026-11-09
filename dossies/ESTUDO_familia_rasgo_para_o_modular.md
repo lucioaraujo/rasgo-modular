@@ -1409,8 +1409,8 @@ Lidos inteiros: `docs/MEMORIAL_DE_PROCESSO.md`, `IDEIA_BREADBOARD.md`,
 lidas as partes de levantamento e de brief de `PESQUISA_DERIVA_GENERATIVA.md`
 (CRI-DRF-001), `PESQUISA_RUIDO_GENERATIVO.md` (CRI-NOI-001) e
 `PESQUISA_ACENTUACAO_GENERATIVA.md` (CRI-ACC-001). Ainda faltam:
-SEQUENCER_GENERATIVO, MELODIA, ORQUESTRA_RELACIONAL, REPRESENTACAO,
-COMPASSO, FLUXO_DE_SINAL e DESIGN.
+REPRESENTACAO, COMPASSO, FLUXO_DE_SINAL e DESIGN (SEQUENCER, MELODIA e
+ORQUESTRA_RELACIONAL estão em §4.5b).
 
 O Modular já trouxe do Antitotem, com proveniência: o PLL (estudo
 OSC5/4046 de `CmosVoice.h`), o DRIFT (`deriveFromMemory`: momentum,
@@ -1526,6 +1526,103 @@ esquemas lidos (Ray Wilson/MFOS, Ian Fritz, Richard Brewster, phono,
 Kevin B., Phil Baljeu, Sam Hoshuyama) são **referência creditada de
 princípio**. Nada de esquema, valores ou PCB entra no Modular.
 
+#### 4.5b Antitotem — sequenciador, melodia e orquestra relacional
+
+Lidos: `PESQUISA_SEQUENCER_GENERATIVO.md` (§2–3, §7.1–7.3, §10.1–10.2),
+`PESQUISA_MELODIA_GENERATIVA.md` (§2–3, §5),
+`PESQUISA_ORQUESTRA_RELACIONAL_E_TEMPERAMENTO.md` (§1–3, §6.3) e o
+cabeçalho de `src/core/MelodicInterpreter.h` (AGPLv3, do autor).
+
+**Achado de proveniência.** Os briefs de melodia e de "Interpretation
+Engine" foram colados pelo autor a partir de uma conversa **sobre o RASGO
+Modular**; foram aplicados primeiro ao Antitotem por decisão dele. A ideia
+volta para casa: o Modular é o destino original dela.
+
+**As nuances**
+
+1. **"O step possui atributos; o ciclo possui comportamento; a frase
+   possui trajetória."** Três níveis que não se confundem. A arquitetura
+   final do Antitotem tem cinco escalas, e a quinta é **History** — não
+   onde o sistema está, mas por onde já passou (a "topologia com
+   história" do Método).
+2. **O step como zona de potencialidade**: chances resolvidas no momento
+   (gatilho, acento, ratchet, ornamento), não valores fixos; o step tem
+   estado (dormente, ativo, quente, exausto…) e **fadiga** — repetido
+   demais fica menos provável e se recupera devagar (o
+   `ProbabilityMarket` do Rasgo Synth: piso 0,03, teto 0,97, volta ao
+   baseline).
+3. **O cursor como agente físico**: passeio ponderado (vizinhos mais
+   prováveis que saltos), **inércia**, **atratores** (passos que puxam o
+   cursor de volta) e **repelentes** (o recém-visitado fica menos
+   provável). O SEQ do Modular tem forward/backward/pingpong/random/
+   brownian; não tem inércia, atração, repulsão nem fadiga.
+4. **Orçamento de eventos e atenção**: um teto de eventos por compasso
+   disputado entre vozes — "evita que tudo fique complexo ao mesmo tempo,
+   o problema clássico de sistemas generativos" — e a **atenção** que
+   concentra complexidade num eixo de cada vez. No Antitotem foi feito
+   por objeto, sobre o compasso real.
+5. **Silêncio como objeto** (REST/BREATH/GAP/BREAK/DROP/VOID) e a
+   acumulação de silêncio como processo formal; mesma família do GAP do
+   Navalha.
+6. **GLITCH ≠ RUPTURA**, distinção que o autor marca como "muito
+   importante": o glitch perturba; a ruptura **altera a continuidade** do
+   próprio sistema (grade, rota, comprimento, memória, topologia).
+   Vale para o CUT-UP e para qualquer módulo que se chame de ruptura.
+7. **Agrupamento ≠ numerador** (um 7/8 pode ser 2+2+3, 3+2+2, 2+3+2) e
+   **polirritmia ≠ polimetria**. O EUCLID do Modular já escolhe
+   agrupamento com `feel` (estudado do Antitotem); a polimetria sai de
+   relógios diferentes no patch.
+8. **SEQUENCER → INTERPRETER → VOZ, não SEQUENCER → SYNTH.** O
+   sequenciador manda pitch, gate, velocity; um intérprete deriva
+   intervalo, direção, posição na frase, importância, conexão, fôlego,
+   tensão, chegada; só então a voz soa. No Antitotem isso é o
+   `MelodicInterpreter`: glide sempre ligado (do `ThereminVoice`), viés
+   de Narmour (passo pequeno continua, salto volta), três camadas de
+   altura (alvo, chegada, viva), vibrato que nasce depois do ataque,
+   overshoot, energia de frase **separada** do fôlego, memória dos
+   últimos 4 gestos contra a monotonia, timbre por registro, gestos
+   Legato/Staccato/Marcato/Tenuto, densidade → **mais** liberdade
+   interpretativa (e não menos).
+9. **A intenção é vetor, não preset.** "Dolce não é velocity = 45": é
+   uma região num espaço contínuo (energia, suavidade, brilho…), que
+   interpola e combina (70 % dolce, 30 % misterioso). Cinco camadas
+   coexistem: caráter (dura), articulação, gesto local (acontece uma
+   vez), processo (crescendo, morendo), atitude temporal (rubato,
+   empurrado). Contra a caricatura: o **contexto muda o resultado** (o
+   mesmo sforzando no pp e no ff), um **orçamento de expressão**, uma
+   memória anti-caricatura, a **deriva de intenção** e o **resíduo
+   expressivo** (depois do furioso, a volta ao tranquilo ainda carrega
+   tensão).
+10. **Influenciar e ser influenciado**: o intérprete só **reporta** o
+    disparo (`justTriggered`), e quem o chama decide o empurrão no campo
+    comum — fronteira limpa entre decidir e consequência. Pipeline
+    relacional do Rasgo Synth (fase 123): observação → interpretação →
+    ação → resistência → consequência → vestígio.
+
+**O que isto pede ao Modular** (propostas, nada implementado)
+
+- **INTERPRET** (nome a decidir) — o intérprete melódico como módulo:
+  recebe PITCH/GATE (e opcionalmente ACCENT) de qualquer sequenciador e
+  devolve PITCH interpretado (glide por intervalo, overshoot, chegada e
+  altura viva, vibrato progressivo), AMP (articulação, fôlego, energia de
+  frase), BRIGHT (timbre por registro e trajetória) e um estado de frase.
+  Desvio obrigatório em relação ao Antitotem: lá o intérprete **gera** a
+  própria altura a partir da atividade; aqui ele **interpreta** notas
+  que chegam — é outro problema, e as 5 perguntas do Método (§4.0) têm de
+  ser respondidas antes. Código do autor, AGPLv3, cópia só com
+  proveniência e só do que for necessário.
+- **CHARACTER** como camada do INTERPRET (ou módulo à parte): três eixos
+  contínuos (energia, suavidade, brilho) que derivam mais devagar que a
+  frase, com orçamento de expressão e resíduo. Um único CV de caráter,
+  traduzido de modo diferente por cada voz — a "tradução por
+  instrumento".
+- **SEQ**, aperfeiçoamento: um modo de cursor físico (inércia, atrator,
+  repelente) e a fadiga por passo. Um de cada vez, com A/B.
+- **BUDGET** (nome a decidir) — orçamento de eventos compartilhado: 4
+  gates entram, 4 saem; por ciclo há um teto de eventos que as vozes
+  disputam (competição) ou cedem umas às outras (cooperação). É a
+  ecologia do Aquorbium (proposta PREDATOR) vista pelo lado do tempo.
+  Conferir antes contra a proposta PREDATOR para não duplicar.
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
