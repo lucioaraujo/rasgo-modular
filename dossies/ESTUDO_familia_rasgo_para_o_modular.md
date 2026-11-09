@@ -592,6 +592,61 @@ nem firmware) — a regra RASGO de origem pública e desvio vale também aqui.
 inclinações correlacionadas; um EVENT (CV → eventos com histerese) talvez já
 exista espalhado (LOGIC, SCOPE onset) — conferir antes de propor.
 
+**`aquorbium-arquitetura.md`** (lidos: §1 conceito e padrão de excelência,
+laboratório por módulo, matriz de relações, organismos compostos; §9–§12 a
+triagem do ModularGrid Top 100, da EMW, da Soundfreak e da Teia):
+
+- **Padrão de excelência**: pesquisa e hipótese ("uma referência inspira a
+  pergunta; nunca define uma cópia"), protótipo isolado comparado a uma base
+  simples, critérios técnicos, **critérios de instrumento sob gesto real**
+  (faixa útil ampla, transições sem clique, "espaço para surpresa sem perda de
+  domínio"), integração e memória. "O objetivo não é maximizar recursos."
+- **Laboratório por módulo**: todo módulo pode ter uma versão experimental —
+  "o equivalente digital de trocar um resistor por um diodo, realimentar onde
+  não havia realimentação ou aceitar a gambiarra que produz um novo gesto" —
+  com o deslocamento declarado, limites de segurança não negociáveis e um
+  modo de congelar a descoberta para ouvi-la de novo. **Ideia para o
+  Modular**: um modo EXP por módulo, explícito, não um módulo novo.
+- **Três tipos de rota**: som, modulação e **observação** (análise limitada
+  que volta à decisão sem carregar áudio bruto). No Modular, o terceiro tipo
+  existe só implícito (SCOPE, LISTEN, ENV do DYNAMICS) — vale nomeá-lo.
+- **Legibilidade antes da quantidade**: o Top 100 se reduz a ~25–30 princípios
+  distintos; "se cada princípio virar uma espécie audível, o ouvinte não
+  separa mais nada"; **poucas vozes profundas** em vez de muitas rasas.
+- **Princípios de hardware já triados** (apropriação, não clone): "um gerador,
+  várias funções" (Maths, Just Friends, Fractalist, Tides: o mesmo núcleo a
+  taxa de controle ou de áudio; as 4 saídas relacionadas do Tides);
+  probabilidade com distribuição configurável (SAPÈL); máquina de 4 estados
+  aleatório → laço → evolui → trava (RANDOM8); divisores com lógica AND/OR
+  (Time Wizard); estágios com **salto condicional** (Control Forge);
+  endereçamento duplo sequencial/por CV (Step 8); **transposição
+  acumulativa** (Metropolix); matriz de roteamento sequenciada e randomizável
+  (WMD SSM); três caos em escalas de 15 s a 40 min combinados (Triple Sloths);
+  autopatch de LFO (ochd); filtro de **dois picos com cross-modulação**
+  (Belgrad); série↔paralelo em crossfade (Blades); **número de polos por
+  CV** (Rossum Evolution); bandas espaçadas por **sétima maior** (Serge
+  ResEQ); FREQ/SPAN de três filtros que cantam (Three Sisters); a
+  **envoltória de redução de ganho como CV** (Messor — o GR do DYNAMICS já
+  faz); morph de 10 atmosferas de ruído (Noise Cinema); 4 CVs por passo e
+  paralelo↔serial (Sequential Voltage Source, Buchla 123).
+- **Hardware que o autor já tocou** (EMW, §12 — "já provou o valor sonoro na
+  mão"): POT ACTION RECORDER (= o TRACE), RESONANT FILTER SEQUENCER, FIXED
+  FILTER BANK, NOISE CINEMA, MIX SEQUENCER (ARP 2500), ENVELOPE FOLLOWER, VC
+  WAVETABLE LFO (31 formas), MIC INTERFACE, RING MOD (LM1496), GLIDE.
+- **Teia Synthesizers DriftLog** (manual lido pelo Aquorbium): dois eixos do
+  acaso — **Slope** (degrau → glide) × **Shape** (arco/pico, exponencial,
+  Bézier) —, **Prob** (o clock pode passar sem mudança), **loop de uma janela
+  do próprio histórico** (Start/Length ao vivo), Lock por canal com clock
+  global, Choke (prioridade entre canais), camada Shift.
+
+**Para o Modular, a partir daqui**: aperfeiçoar o **SH/DRIFT** com o par
+Slope × Shape, Prob e o laço da janela do histórico (DriftLog) — é o
+aperfeiçoamento mais direto e de maior nuance; aperfeiçoar o **SEQUENCE**
+com 4 CVs por passo e paralelo↔serial, e a **transposição acumulativa**;
+um **FILTER** com polos por CV e dois picos cruzados (conferir o que o
+FILTER/WASP já fazem); o **NOISE** com atmosferas em morph; nomear a rota de
+**observação**; considerar o **modo EXP** por módulo.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
