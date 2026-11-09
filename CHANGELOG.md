@@ -9,6 +9,31 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **A seed volta a ser a identidade do patch** (9 nov., achado do autor:
+  "percebi que o som estava alto"). O patch salvo estava em −14 LUFS, 12 LU
+  acima do alvo de −26: o `out_gain` do MIXER, onde o equilíbrio de volume
+  põe o que não cabe no MASTER, nunca voltava a 0 e subia de clique em
+  clique até +12 dB. A causa era maior: a seed só redefinia o que ela mesma
+  sorteava, e as modulações da DRIFT se somavam às das seeds anteriores (o
+  patch salvo tinha dezenas empilhadas no cutoff e na ressonância). Em 40
+  cliques seguidos, 39 seeds saíam diferentes da mesma seed num rack novo;
+  agora 0. Correção: toda seed parte do rack de fábrica (parâmetros nos
+  valores padrão, modulações limpas — `SignalGraph::clearModulations()`),
+  preservando só o MUTE do MASTER e o ganho/monitor do SIGNAL-IN. Num rack
+  novo nada muda. Mecanismo contra a repetição: `tests/test_seed_identity.cpp`.
+  Picos medidos sempre abaixo do teto (máx. 0,82 contra 0,89): era volume,
+  não saturação.
+- **Todos os módulos entram no sorteio da seed** (9 nov., decisão do autor:
+  "preciso que todos os módulos façam parte das escolhas da seed"): ARP,
+  CELL, MARKOV, BOUNCE, MOUSSE, PENDULUM, SPRING, PRISM, PHRASE e LISTEN
+  saíram da biblioteca para o rack da seed; SPRING e PRISM também entraram
+  na cadeia de processadores da voz (sem isso apareciam em 2,7 % das
+  seeds; agora ~20 %). A biblioteca e o rack são o mesmo catálogo, e o teste
+  de identidade falha se um módulo novo ficar de fora. **As seeds anteriores
+  a 9/11 geram outros patches.** Limite conhecido, não resolvido: o
+  equilíbrio de volume mede 4 s, e um patch que cresce depois disso pode
+  abrir alguns LU acima do alvo (2 em 30 seeds acima de −23 LUFS).
+
 - **Quatro módulos novos** (9 nov., aprovados pelo autor a partir do estudo do
   Cardinal), na BIBLIOTECA, fora da seed, todos soando ao carregar e com
   mostrador próprio: **CELL** (#65, TIME — autômato celular como sequenciador;

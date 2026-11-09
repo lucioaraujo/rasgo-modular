@@ -489,6 +489,15 @@ public:
         prepared_ = false;
     }
 
+    // Remove TODA modulação de parâmetro (links e followers de qualidade).
+    // Consumidor: `seedPatch`, que recompõe o patch do zero — sem isto as
+    // modulações da DRIFT de uma seed se somavam às da seguinte (9/11/2026).
+    void clearModulations() noexcept {
+        parameterLinks_.clear();
+        followers_.clear();
+        prepared_ = false;
+    }
+
     // Atualiza o VALOR DE INTENÇÃO (o knob) de um parâmetro: se ele tem
     // modulação (link de parâmetro ou follower de qualidade), a `base` da
     // modulação passa a ser `value` — a modulação continua ADITIVA sobre o

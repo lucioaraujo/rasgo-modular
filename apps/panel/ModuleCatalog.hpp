@@ -200,47 +200,28 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
               [&](const char* a, const char* b) { return key(a) < key(b); });
 }
 
-// The published seed rack keeps its original node order and RNG inputs.
-// New optional modules are offered in the palette, rather than inserted into
-// every generated patch. Adding a module by hand is an explicit musical act.
+// O rack da seed: TODOS os módulos do instrumento (decisão do autor,
+// 9/11/2026). Um módulo novo entra aqui, na sua família — e as seeds
+// anteriores passam a gerar outros patches, o que fica no CHANGELOG.
 inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
-        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
-        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE"}},
-        {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT"}},
+        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM"}},
+        {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},
     };
     return c;
 }
 
+// Decisão do autor (9/11/2026): "preciso que todos os módulos façam parte
+// das escolhas da seed". A biblioteca e o rack da seed são o MESMO
+// catálogo; `test_seed_identity.cpp` falha se um módulo novo ficar de fora.
 inline const std::vector<CatalogGroup>& moduleCatalog() {
-    static const std::vector<CatalogGroup> c = [] {
-        auto groups = seedModuleCatalog();
-        for (auto& group : groups) {
-            const std::string family = group.family;
-            if (family == "DECISION") group.types.push_back("PHRASE");
-            if (family == "OUT") group.types.push_back("LISTEN");
-            // DYNAMICS entrou no catálogo da seed em 9/11 (decisão do autor:
-            // "por direto no sorteio, mais simples") — as seeds anteriores a
-            // essa data passaram a gerar outros patches.
-            if (family == "TIME") group.types.push_back("ARP");
-            // CELL, MARKOV, BOUNCE, SPRING (9/11): na BIBLIOTECA, fora da seed.
-            if (family == "TIME") group.types.push_back("CELL");
-            if (family == "DECISION") group.types.push_back("MARKOV");
-            if (family == "MODULATE") group.types.push_back("BOUNCE");
-            if (family == "SPACE") group.types.push_back("SPRING");
-            // MOUSSE, PENDULUM, PRISM (9/11): na BIBLIOTECA, fora da seed.
-            if (family == "MODULATE") group.types.push_back("MOUSSE");
-            if (family == "MODULATE") group.types.push_back("PENDULUM");
-            if (family == "SPACE") group.types.push_back("PRISM");
-        }
-        return groups;
-    }();
-    return c;
+    return seedModuleCatalog();
 }
 
 // Inserção visual, não instanciação DSP. Usada somente ao acrescentar um

@@ -420,25 +420,10 @@ void testCatalogAndPersistence() {
     using namespace rasgo::panel;
     std::size_t all = 0, original = 0;
     for (const auto& g : moduleCatalog()) all += g.types.size();
-    for (const auto& g : seedModuleCatalog()) {
-        original += g.types.size();
-        for (const char* t : g.types)
-            check(std::string(t) != "PHRASE" && std::string(t) != "LISTEN"
-                  && std::string(t) != "ARP" && std::string(t) != "CELL"
-                  && std::string(t) != "MARKOV" && std::string(t) != "BOUNCE"
-                  && std::string(t) != "SPRING" && std::string(t) != "MOUSSE"
-                  && std::string(t) != "PENDULUM" && std::string(t) != "PRISM",
-                  "published seed rack preserved");
-    }
-    // LISTEN e PHRASE (17/10) e ARP (8/11): na BIBLIOTECA, fora da seed.
-    // DYNAMICS entrou na seed em 9/11 (decisão do autor).
-    bool dynamicsInSeed = false;
-    for (const auto& g : seedModuleCatalog())
-        for (const char* t : g.types) dynamicsInSeed = dynamicsInSeed || std::string(t) == "DYNAMICS";
-    check(dynamicsInSeed, "DYNAMICS in the seed rack");
-    // CELL, MARKOV, BOUNCE, SPRING (9/11): na BIBLIOTECA, fora da seed.
-    // MOUSSE, PENDULUM, PRISM (9/11): na BIBLIOTECA, fora da seed.
-    check(all == original + 10, "new modules visible in catalogue");
+    for (const auto& g : seedModuleCatalog()) original += g.types.size();
+    // Desde 9/11/2026 todo módulo está no rack da seed (decisão do autor);
+    // o invariante completo vive em `test_seed_identity.cpp`.
+    check(all == original, "every module is part of the seed rack");
     for (const char* t : {"LISTEN", "PHRASE", "DYNAMICS", "ARP", "CELL", "MARKOV", "BOUNCE", "SPRING", "MOUSSE", "PENDULUM", "PRISM"}) {
         auto m = makeModule(t); check(m && m->type() == t, "factory constructs new modules");
         for (Lang lang : {Lang::pt, Lang::en, Lang::fr, Lang::es}) {

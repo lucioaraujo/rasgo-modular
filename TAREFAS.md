@@ -11,6 +11,20 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ 09/11/2026 (noite): identidade da seed e todos os módulos no sorteio
+
+- [x] Som alto depois de vários cliques em SEED: `out_gain` do MIXER preso em
+  +12 dB e modulações da DRIFT acumuladas; a seed agora parte do rack de
+  fábrica. Teste `test_seed_identity` (CHANGELOG).
+- [x] Todos os módulos no rack da seed (decisão do autor).
+- [ ] Escuta do autor: seeds com os módulos novos; conferir se o volume ficou
+  estável entre cliques.
+- [ ] Limite da medição de 4 s do equilíbrio de volume (patches que crescem
+  depois disso): decidir com o autor entre tolerância no teste e medir 8 s.
+- [ ] Novos módulos daqui em diante entram direto no rack da seed (o teste
+  falha se não entrarem) — lembrar de registrar no CHANGELOG que as seeds
+  mudam.
+
 ## ▶ Ponto de retomada — 09/11/2026: leitura aprofundada da família RASGO
 
 Pedido do autor: ler a fundo todos os instrumentos RASGO (e o Cardinal) para
