@@ -111,6 +111,75 @@ existentes". Volume medido: ~1,27 milhão de palavras nos 11 projetos. Método:
 um instrumento por vez, os documentos de conceito e de projeto inteiros (fora
 diários, auditorias e notas de versão), registrando aqui antes de seguir.
 
+### 4.0 O método comum — `RASGO_SYNTH_STUDIO/docs/pt/Metodo_RASGO.md`
+
+Lido (≈ ⅔; faltam "cartografias e descartógrafos" e o fim). É a régua de
+todas as outras leituras.
+
+- **"Genealogia comum, personalidades próprias"**: os instrumentos "não são
+  skins do mesmo motor nem etapas destinadas a convergir".
+- **"O rasgo soa."** "Se a implementação declara um rasgo que não transforma o
+  que se ouve, o rasgo ainda não aconteceu." **Há gesto em rasgar** (força,
+  direção, duração, resistência, uma matéria; preparação, contato, pressão,
+  abertura, propagação, interrupção, vestígio) e **há movimento** (passagem,
+  não ponto entre antes e depois); **como um cismo**, separa enquanto revela
+  e produz **instabilidade** — que "não equivale a aleatoriedade contínua":
+  se tudo é igualmente instável, a instabilidade vira padrão. "Um módulo que
+  produz som sem trajetória, resistência ou consequência pode ter timbre, mas
+  ainda não necessariamente rasga."
+- **Módulos como arquivos abertos**: cada módulo deve poder **expor** com
+  segurança o que tem e o que está fazendo (matéria, gesto, estado, memória,
+  regra, trajetória, energia, resistência, eventos, vestígios) para outros
+  lerem, responderem, contradizerem; "reler não é repetir a saída".
+- **Ativação ≠ presença ≠ agência** — uma flag prova ativação; RMS prova
+  presença; nenhum prova consequência musical. **Oito estados de vida**:
+  disponível, selecionado, manifestado, audível, saliente, influente,
+  afetado, transformador.
+- **Orquestra relacional: tocar junto não é tocar em uníssono.** Cada corpo
+  tem **sensibilidade própria** (a quê é sensível, limiar, saturação, fadiga,
+  curiosidade, resistência, tempo de reação). **"Influenciar não equivale a
+  controlar"**: em vez de "A escreve no parâmetro de B", **A publica → a
+  passagem traduz → B interpreta/resiste → algo muda e soa → fica memória →
+  pode haver resposta**. Agressão, penetração, variação nascida da história
+  das relações.
+- **Contrato mínimo de uma relação** (10 pontos): participantes e direção;
+  o que cada um percebe e publica; o verbo (escutar, seguir, responder,
+  contrariar, imitar, penetrar, agredir, proteger, negociar, recusar,
+  interromper, contaminar); intensidade, alcance, atraso, duração;
+  **permeabilidade e resistência** de quem recebe; tradução entre domínios;
+  memória/fadiga/cicatriz; condição de transformação ou fim; consequência
+  observável; proveniência. A matriz de relações deve ser **esparsa, mutável
+  e assimétrica** ("se todos leem todos o tempo inteiro, surge outra
+  padronização").
+- **Direito de emergir não é obrigação de aparecer**; silêncio, recusa,
+  latência e continuidade são resultados válidos; "o ganho concede margem;
+  não cria gesto".
+- **Topologia**: não uma cadeia fixa fonte → efeito → soma → master, mas
+  regiões, bordas, passagens, atalhos; **o rasgo transforma a topologia**;
+  dentro e fora se misturam; **rotas têm história** (alargam pelo uso,
+  acumulam resíduos, ficam resistentes, somem, bifurcam); o feedback volta
+  "como outra força"; **dividir é transformação de estado com proveniência —
+  nunca duplicação silenciosa ou pan de duas cópias idênticas**.
+
+**O que isso pede ao Modular, em concreto** (o Modular é o instrumento em
+que a topologia é literalmente o patch):
+
+- **Cabos que interpretam** — hoje um cabo de CV soma ao parâmetro (A escreve
+  em B). Um **RELATE** (proposto) pode ser a "passagem que traduz": verbo,
+  permeabilidade, resistência, atraso, fadiga e memória entre duas portas —
+  o contrato de 10 pontos como módulo que o músico põe no caminho.
+- **Módulos que se expõem** — avaliar, módulo a módulo, se o estado
+  interessante sai como saída (o ENV/GR do DYNAMICS, o DENS do CELL, o SURP do
+  MARKOV, o ACC do BOUNCE e o FLIP do PENDULUM já são isso; vários módulos
+  antigos não expõem nada além do áudio).
+- **Rotas com história** — o MATRIX/SWITCH como rotas que se alargam com o uso,
+  acumulam resíduo e resistem (um modo, não um módulo novo).
+- **Instabilidade com dinâmica** — o VARIA (a "mão caótica") deve variar a
+  própria intensidade de instabilidade, ganhar e perder chão; instabilidade
+  constante vira padrão.
+- **Estados de vida** — uma auditoria futura dos patches de seed pelo crivo
+  "audível / saliente / influente" (não só "presente").
+
 ### 4.1 Asterismus
 
 Lidos inteiros: `docs/TRAMA_DE_RELACOES.md`, `docs/MOVIMENTO_FISICO.md`,
