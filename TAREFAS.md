@@ -11,6 +11,42 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ Ponto de retomada — 09/11/2026: leitura aprofundada da família RASGO
+
+Pedido do autor: ler a fundo todos os instrumentos RASGO (e o Cardinal) para
+trazer ao Modular o que ainda não foi usado e aperfeiçoar os módulos
+existentes — "cada módulo no seu tempo"; "o capricho, o detalhe, o nuance é
+relevante". Registro vivo em
+[`dossies/ESTUDO_familia_rasgo_para_o_modular.md`](dossies/ESTUDO_familia_rasgo_para_o_modular.md)
+(§4, um instrumento por vez).
+
+- [x] Asterismus (§4.1), Aquorbium (§4.2), Batruc (§4.3, só leitura; faltam
+  README e bibliografia).
+- [ ] Trioio, Antitotem, Navalha 2 **JUCE** (o Pd não, pedido do autor),
+  Rasgo Synth Studio, Maravi, Maestro, Risco; depois o cruzamento com o
+  Cardinal e a revisão das propostas.
+- **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
+  estão escritos, **sem teste, sem registro e sem commit** (não entram no
+  build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
+  Doppler) antes de ser testado.
+- **Achados técnicos verificados no código do Modular, a corrigir** (cada um
+  com o OK do autor, um por vez):
+  - nenhuma proteção contra **denormais** (FTZ/DAZ) — candidata aos xruns do
+    VARIA (o Aquorbium caiu de 122 % para 52 % no pior bloco com FTZ);
+  - **STRING** sem desconto do atraso do filtro de perda (tende a soar baixa)
+    e teste de altura com tolerância de 6 %;
+  - **Loudness** em fatias de 100 ms (erro de 0,45 LU no momentâneo achado
+    no Aquorbium contra a EBU Tech 3341);
+  - **SPRING** e **PRISM** (desta sessão) com interpolação linear no atraso
+    (trocar por Lagrange cúbico);
+  - **FORMANT** ~30 dB baixo e larguras fixas (medido pela cópia no
+    Aquorbium).
+- **Pela regra do autor** (`AQUORBIUM/MODULE_DEVELOPMENT_STANDARD.md`):
+  antes de abrir protótipos novos, a escuta dos módulos já validados
+  tecnicamente (DYNAMICS, ARP, SCOPE, CELL, MARKOV, BOUNCE, SPRING, MOUSSE,
+  PENDULUM, PRISM), um por vez — proposta: escuta cega A/B/C igualada em RMS,
+  como no Aquorbium.
+
 ## Estudo do Cardinal e módulos novos — 08/11/2026
 
 - [x] Estudo do Cardinal 26.02 nas três frentes (catálogo e licenças,
