@@ -761,6 +761,65 @@ o Modular ainda não pratica:
 - **Memória como decisão de arquitetura**: um corpo de 131 kB não vira membro
   de 25 despachantes; um banco dedicado de 5 instâncias usa 80 % menos.
 
+**Coortes do master, do refinamento e da voz** (`CREATIVE_MASTER_…`,
+`CORE_REFINEMENT_…`, `ADVANCED_VOICE_ECOLOGY_…`, `SPECIALIZED_INTEGRATION_…`,
+`PERCUSSION_AND_HARMONIC_MORPH_…`, lidos):
+
+- **Master criativo separado da proteção técnica**: crossover
+  Linkwitz–Riley de 4ª ordem em 3 bandas, compressão por banda, EQ derivado
+  da mesma separação (sem filtro duplicado), **largura M/S só acima do grave**
+  (a fundação fica no centro), compressão óptica lenta de "cola" antes do
+  limitador; o limitador técnico nunca entra no laço. A **redução de ganho
+  real volta ao cérebro** com ataque, release e teto (0,32) — fecha o laço
+  "a dinâmica final realimenta as decisões".
+- **Detalhes de precisão** que valem como padrão: a **máscara estocástica de
+  pulsos decide só na borda de subida e congela até a descida** (sem alternar
+  dentro de um pulso); o **morph harmônico interpola os coeficientes**, não
+  mistura duas saídas prontas; o **soft take-over** de um polo em toda CV
+  vinda de decisão (eventos e áudio não são suavizados); wavefolder 4× leve
+  com teste espectral honesto ("não demonstra ausência universal de alias").
+- Componentes de voz: `BiomaBassVoice` (FM thru-zero, sub intervalar pelo
+  mesmo quantizador da melodia, wavefold pré-filtro, 2–4 polos,
+  autorregulação por energia), `SchoolWaveVoice` (seis membros de uma fase
+  comum), `RecentMixWavetable`, `FrequencyShifter` por Hilbert,
+  `SpotlightMixer`, `HungerProcessor`, `WaterInertia`.
+
+**Para o Modular**: conferir no Modular a decisão de gates probabilísticos
+(TRIGSEQ, DECISION, ARP SKIP, CELL MUT) contra a regra "decide na borda e
+congela"; o MASTER do Modular já protege — um **MASTER criativo** (bandas,
+largura acima do grave, cola) seria camada à parte, se o autor quiser.
+
+**Saída técnica** (`OUTPUT_STAGE_DESIGN.md`: limitador em true peak,
+EBU Tech 3341, denormais, aliasing, o achado do master criativo) — **três
+auditorias concretas para o Modular**, verificadas no código em 9/11:
+
+1. **Denormais — o Modular não tem proteção nenhuma** (nenhum FTZ/DAZ,
+   nenhum `ScopedNoDenormals` em `src/` nem em `apps/`). No Aquorbium, filtros
+   e ressonadores decaindo no silêncio entravam na faixa denormal (até ~100×
+   mais lenta): o soak de 30 min dava **pior bloco a 122 %** do orçamento;
+   com flush-to-zero ligado pelo próprio motor durante o render
+   (`core/FlushDenormals.h`: MXCSR no x86-64, FPCR no AArch64), caiu para
+   52 %, sem mudar os renders dourados. **No Modular, a memória do projeto
+   registra que os cliques do painel com o VARIA são xruns de reprodução, não
+   o DSP — denormais são uma causa candidata direta desses xruns** (filtros,
+   HALL, SPACE, MATTER, RESONATOR, STRING decaindo). Primeira coisa a medir.
+2. **Loudness**: o `Loudness.hpp` do Modular guarda energia em **fatias de
+   100 ms** — o mesmo desenho em que o Aquorbium achou erro de 0,45 LU no
+   momentâneo (casos #13–14 da EBU Tech 3341); lá as fatias passaram a 10 ms
+   (o integrado continua normativo). Os testes da EBU podem ser sintetizados
+   da descrição publicada, sem arquivo de terceiros.
+3. **Limitador**: o Modular já usa o detector 4× do Navalha
+   (`TruePeak.hpp`) e um limitador por envoltória com look-ahead + teto suave
+   — desenho diferente do que falhou no Aquorbium, mas **sem o teste de
+   estresse** que achou os defeitos lá (seis sinais quentes: true peak
+   exatamente no teto; seno que volta ao teto depois de um pico). Vale rodar
+   o mesmo teste.
+
+E um método reaproveitável: **medida de aliasing por grade prima** (sinal
+periódico cuja fundamental cai num número primo de bins; a energia fora da
+grade é o aliasing; a parte abaixo de 5 kHz soa como tom inarmônico) — para
+OSC, WAVETABLE, SHAPE, WASP, CRUSH, FOLD do Modular.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
