@@ -1212,6 +1212,28 @@ de regras (`OpenRuleProgram`) e o Trioio tem o objeto-regra — juntos, são o
 desenho de partida, a decidir com o autor. E o princípio "o jogo se ouve na
 música, nunca como placar" vale para os mostradores do Modular.
 
+**`docs/COMPOSICAO.md`** (lidos: dramaturgia; gramáticas narrativas):
+
+- **Curva de tensão por estratégia** (Lerdahl & Krumhansl 2007; Farbood 2012;
+  clímax na seção áurea, Howat 1983): seguir = a energia da referência;
+  transfigurar = um arco imposto ao ponto áureo; contrapor = a curva
+  invertida; interromper = cortes. **O clímax só existe quando é claro**; um
+  **silêncio composto** (uma respiração) logo antes dele; o motivo sobe uma
+  oitava no clímax e desce nos vales; os enfeites rareiam nos vales, o
+  essencial nunca.
+- **Gramáticas narrativas** (Freytag; **Kishōtenketsu** — a virada *ten*
+  muda o material, não só o nível; ondas; platô; arco) e misturas de duas.
+- **A lição medida**: na primeira escuta, três gramáticas soaram iguais. Os
+  stems mostraram por quê: as notas seguiam a curva, mas **os gestos do
+  Terceiro Olho soavam constantes e mascaravam a forma**. Depois que *tudo*
+  passou a seguir a curva, a Freytag ganhou 11 dB entre vale e clímax.
+
+**Para o Modular (Form Engine)**: a regra decisiva — **uma forma só se ouve se
+todas as camadas a seguem**; um único módulo constante (um drone, um HALL
+alto, um LOOPER) mascara a curva. Um Form Engine no Modular precisaria de um
+caminho para alcançar todos os níveis (talvez pelo VARIA, que já toca todas
+as fibras). E a respiração antes do clímax é um gesto simples e forte.
+
 **Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
 descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
 altura) e publica um pequeno **barramento semântico** (energia, densidade,
