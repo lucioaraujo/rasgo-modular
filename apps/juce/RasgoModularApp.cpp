@@ -444,6 +444,18 @@ struct Rack {
                         it->second.pushLanes(low->at(0, i), mid->at(0, i),
                                              high->at(0, i), static_cast<float>(mask));
                     }
+            } else if (graph.node(id).type() == "ARP") {
+                // Uma entrada por bloco (não por stride): os 128 lugares
+                // cobrem ~1,4 s a 512 amostras — o bastante para ver as
+                // notas do arpejo, que no anel da onda (~20 ms) seria uma
+                // linha reta. Gate = o máximo do bloco (nenhum passo some).
+                const auto* gate = graph.lastOutput(id, 1);
+                if (gate && ob->frames() > 0) {
+                    float g = 0.0f;
+                    for (std::size_t i = 0; i < gate->frames(); ++i)
+                        g = std::max(g, gate->at(0, i));
+                    it->second.pushLanes(ob->at(0, ob->frames() - 1), g, 0.0f, 0.0f);
+                }
             } else if (graph.node(id).type() == "PHRASE") {
                 const auto* gate = graph.lastOutput(id, 1);
                 const auto* accent = graph.lastOutput(id, 2);
@@ -3740,6 +3752,37 @@ private:
                                static_cast<int>(fraction * std::max(0, dw - label - 8)), std::max(1, row - 4));
                 }
                 dlabel.clear();
+            } else if (mtype == "ARP") {
+                // As notas rolando: a altura (lane 0) em degraus, escalada
+                // pela faixa da janela (no mínimo uma oitava); com gate
+                // aberto o traço é grosso e na cor de destaque.
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                float lo = sc.lane(0, 0), hi = lo;
+                for (std::size_t k = 1; k < nL; ++k) {
+                    lo = std::min(lo, sc.lane(0, k));
+                    hi = std::max(hi, sc.lane(0, k));
+                }
+                if (!std::isfinite(lo) || !std::isfinite(hi)) { lo = 0.0f; hi = 1.0f; }
+                const float mid = 0.5f * (lo + hi);
+                const float span = std::max(1.0f, hi - lo);
+                const auto px = [&](std::size_t k) {
+                    return static_cast<float>(wx + 1)
+                        + static_cast<float>(k * static_cast<std::size_t>(dw - 2)) / static_cast<float>(nL - 1);
+                };
+                const auto py = [&](std::size_t k) {
+                    const float d = juce::jlimit(-0.5f, 0.5f, (sc.lane(0, k) - mid) / span);
+                    return static_cast<float>(wy) + static_cast<float>(dh) * (0.5f - 0.84f * d);
+                };
+                for (std::size_t k = 0; k + 1 < nL; ++k) {
+                    const bool on = sc.lane(1, k) >= 0.5f;
+                    g.setColour(on ? T.accent : T.line);
+                    g.drawLine(px(k), py(k), px(k + 1), py(k), on ? 2.0f : 1.0f);
+                    if (std::fabs(py(k + 1) - py(k)) > 0.5f) {
+                        g.setColour(T.line);
+                        g.drawLine(px(k + 1), py(k), px(k + 1), py(k + 1), 1.0f);
+                    }
+                }
+                dlabel = "arp";
             } else if (mtype == "PHRASE") {
                 const int length = std::max(2, static_cast<int>(std::lround(node.parameterValue("length"))));
                 const int step = 1 + static_cast<int>(std::lround(
