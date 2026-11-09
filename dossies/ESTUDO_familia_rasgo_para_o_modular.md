@@ -1358,7 +1358,38 @@ com o reconhecível-e-imprevisível de frases inteiras. **MOSAIC** (novo, mais
 pesado) — concatenação por descritores sobre um buffer vivo (SIGNAL-IN ou
 LOOPER), escolhendo pelo som; parente do MEMORY/SAMPLER.
 
-**Ainda não lidos no Trioio** (próxima passada): `DESCRITORES.md`, `ESCUTA.md`, `LEITURA_E_GABARITO.md`, `SINTESE.md`,
+**`docs/SINTESE.md`, `DESCRITORES.md`, `ESCUTA.md`, `INFLUENCIAS.md`**
+(lidos em parte):
+
+- O Trioio toca **33 famílias de síntese**, das quais **nove são módulos do
+  Modular** (WAVETABLE, PULSAR, MATTER, STRING, DRUM, OSC→FORMANT, OSC→SHAPE,
+  RESONATOR soprado pelo ruído do Antitotem, OPERATOR, OSC→LPG) — o Modular
+  já é fornecedor de corpos da família.
+- **A escuta do autor como memória do instrumento**: aceitar +1, transformar
+  +0,3 ("gostei da matéria, não do resultado"), rejeitar −1, com nota livre;
+  o placar pesa as famílias, as escolhas e a sala da resposta julgada;
+  esquecimento gradual; arquivo de texto do autor (apagar uma entrada desfaz
+  o efeito). — **Para o Modular**: a seed e o PatchGenetics (MUDA/EVOLUI/CRUZA)
+  poderiam aprender assim com o BANCO de seeds do autor (as seeds guardadas
+  como "aceitar", as descartadas como "rejeitar"), alterando tendências, não
+  fixando um gosto. Decisão do autor.
+- **A árvore de influências, não um catálogo de estilos** — o autor:
+  "todos os estilos possuem variações… nuances, intenções, que vêm da poética
+  de cada artista"; "a ideia é criar algo que não se repita ou se limite em
+  algo engessado"; "nos nutrimos com informações para criarmos algo novo";
+  "**os instrumentos RASGO precisam dos conceitos**"; "**a repetição pode
+  existir se o conceito precisar da repetição**". Nós com conceito, contexto
+  e **traços como tendências** (chances, não regras), herança, polinização
+  entre galhos distantes, mutação.
+- Descritores: medir e não decidir; ataques pelo fluxo espectral com mediana
+  local; HPSS para o pulso; croma do grave para acordes; saliência harmônica
+  para a melodia na mistura.
+
+Não lidos no Trioio: `LEITURA_E_GABARITO.md`, `REFERENCIAS_POR_MODULO.md`,
+`PROMPTS_E_INTENCOES.md`, `REGRAS.md`, `design.md` e os de biblioteca e
+formatos (operacionais).
+
+**Ainda não lidos no Trioio** (registro antigo, substituído acima): `DESCRITORES.md`, `ESCUTA.md`, `LEITURA_E_GABARITO.md`, `SINTESE.md`,
 `INFLUENCIAS.md`, `REFERENCIAS_POR_MODULO.md`, `MEMORIA.md`, `REGRAS.md`,
 `design.md`, `PROMPTS_E_INTENCOES.md`.
 
