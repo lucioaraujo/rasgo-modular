@@ -72,6 +72,9 @@
 #include "dsp/Bounce.hpp"
 #include "dsp/Cell.hpp"
 #include "dsp/Markov.hpp"
+#include "dsp/Mousse.hpp"
+#include "dsp/Pendulum.hpp"
+#include "dsp/Prism.hpp"
 #include "dsp/Spring.hpp"
 #include "dsp/Vocoder.hpp"
 #include "dsp/Wasp.hpp"
@@ -110,6 +113,9 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "MARKOV")     return std::make_unique<Markov>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
+    if (t == "MOUSSE")     return std::make_unique<Mousse>();
+    if (t == "PENDULUM")   return std::make_unique<Pendulum>();
+    if (t == "PRISM")      return std::make_unique<Prism>();
     if (t == "VOCODER")    return std::make_unique<Vocoder>();
     if (t == "CONTROL")    return std::make_unique<Control>();
     if (t == "SH")         return std::make_unique<SampleHold>();
@@ -227,6 +233,10 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
             if (family == "DECISION") group.types.push_back("MARKOV");
             if (family == "MODULATE") group.types.push_back("BOUNCE");
             if (family == "SPACE") group.types.push_back("SPRING");
+            // MOUSSE, PENDULUM, PRISM (9/11): na BIBLIOTECA, fora da seed.
+            if (family == "MODULATE") group.types.push_back("MOUSSE");
+            if (family == "MODULATE") group.types.push_back("PENDULUM");
+            if (family == "SPACE") group.types.push_back("PRISM");
         }
         return groups;
     }();

@@ -56,6 +56,9 @@
 #include "dsp/Bounce.hpp"
 #include "dsp/Cell.hpp"
 #include "dsp/Markov.hpp"
+#include "dsp/Mousse.hpp"
+#include "dsp/Pendulum.hpp"
+#include "dsp/Prism.hpp"
 #include "dsp/Spring.hpp"
 #include "dsp/Phrase.hpp"
 #include "dsp/Resonator.hpp"
@@ -267,6 +270,9 @@ int main() {
     mods.emplace_back("MARKOV", std::make_unique<Markov>());
     mods.emplace_back("BOUNCE", std::make_unique<Bounce>());
     mods.emplace_back("SPRING", std::make_unique<Spring>());
+    mods.emplace_back("MOUSSE", std::make_unique<Mousse>());
+    mods.emplace_back("PENDULUM", std::make_unique<Pendulum>());
+    mods.emplace_back("PRISM", std::make_unique<Prism>());
     mods.emplace_back("PHRASE", std::make_unique<Phrase>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("SHIFTER", std::make_unique<Shifter>());

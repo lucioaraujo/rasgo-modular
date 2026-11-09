@@ -796,6 +796,47 @@ inline const LearnTable& learnTable() {
             {"out:out", {"A mistura de seco e molhado (MIX). Em estéreo, uma mola em cada canal.", "", ""}},
             {"out:wet", {"Só a mola, sem o seco.", "", ""}},
         }},
+        {"MOUSSE", {
+            {"stiff", {"A rigidez da espuma: mole (afunda muito) ↔ dura (afunda pouco).", "", ""}},
+            {"visc", {"A viscosidade: o tempo da parte lenta (0,05–8 s) — quanto o fluido demora a escorrer.", "", ""}},
+            {"slow", {"Quanto da deformação é lenta (fluido) e quanto é instantânea (mola): 0 = borracha, 1 = espuma de memória.", "", ""}},
+            {"recover", {"Quantas vezes mais devagar ela volta do que afunda (1–8).", "", ""}},
+            {"force", {"A força de cada golpe (HIT ou os toques autônomos).", "", ""}},
+            {"fatigue", {"Desvio Rasgo: cada golpe amolece um pouco a espuma, que endurece de novo em ~6 s — golpes seguidos afundam cada vez mais.", "", ""}},
+            {"rate", {"Sem HIT ligado, a espuma é tocada sozinha nesta velocidade (0,05–4 Hz), com força variando por acaso semeado.", "", ""}},
+            {"in:hit", {"Cada gatilho é um empurrão que decai em ~80 ms.", "", ""}},
+            {"in:press", {"Pressão contínua (0–1): um dedo apoiado na espuma.", "", ""}},
+            {"out:depth", {"O quanto a espuma está afundada (0–1): um envelope mole.", "", ""}},
+            {"out:speed", {"A velocidade da deformação (0–1): alta no golpe, baixa na volta lenta.", "", ""}},
+            {"out:rest", {"Gate ligado enquanto a espuma está em repouso.", "", ""}},
+        }},
+        {"PENDULUM", {
+            {"energy", {"A energia do lançamento: de um balanço suave (regular) até de cabeça para baixo (caos, o braço de baixo dá voltas).", "", ""}},
+            {"ratio", {"O comprimento do braço de baixo em relação ao de cima (0,3–2).", "", ""}},
+            {"mass", {"A massa de baixo em relação à de cima (0,2–3).", "", ""}},
+            {"speed", {"A escala de tempo: 1 = um pêndulo de 1 m na Terra (~2 s por balanço).", "", ""}},
+            {"damp", {"O atrito: gasta a energia aos poucos.", "", ""}},
+            {"auto", {"Desvio Rasgo: quando a energia cai a um quinto, um empurrão semeado devolve o movimento — o pêndulo nunca para.", "", ""}},
+            {"in:kick", {"Cada gatilho empurra o braço de baixo: mais energia, mais caos.", "", ""}},
+            {"in:speed_cv", {"CV na velocidade: cada +1 dobra.", "", ""}},
+            {"out:x1", {"Posição horizontal da ponta de cima (−1..1).", "", ""}},
+            {"out:y1", {"Posição vertical da ponta de cima (−1..1).", "", ""}},
+            {"out:x2", {"Posição horizontal da ponta de baixo (−1..1) — a mais caótica.", "", ""}},
+            {"out:y2", {"Posição vertical da ponta de baixo (−1..1).", "", ""}},
+            {"out:cross", {"Pulso quando a ponta de baixo passa pelo meio: o ritmo do balanço.", "", ""}},
+            {"out:flip", {"Pulso quando o braço de baixo dá a volta por cima: o sinal do caos.", "", ""}},
+        }},
+        {"PRISM", {
+            {"disp", {"A dispersão: quanto a cor mais lenta atrasa (0–400 ms).", "", ""}},
+            {"curve", {"Qual cor anda mais devagar: +1 os agudos (como o vidro), −1 os graves (dispersão anômala, desvio Rasgo), 0 todas iguais.", "", ""}},
+            {"spread", {"O leque no estéreo: graves à esquerda, agudos à direita — o arco-íris no espaço.", "", ""}},
+            {"feedback", {"Desvio Rasgo: cada cor volta ao prisma — ecos que se separam em cores a cada volta.", "", ""}},
+            {"mix", {"Seco (0) ↔ molhado (1) na saída OUT.", "", ""}},
+            {"in:in", {"O som a decompor (mono ou estéreo, somado).", "", ""}},
+            {"in:disp_cv", {"CV na dispersão (±200 ms por volt).", "", ""}},
+            {"out:out", {"A mistura de seco e molhado (MIX), com o leque em estéreo.", "", ""}},
+            {"out:wet", {"Só as cores, sem o seco.", "", ""}},
+        }},
         {"DYNAMICS", {
             {"thresh", {"Limiar: acima dele (compressor) o som é abaixado; abaixo dele (gate) o som é fechado. −48 a 0 dB; a CV THR soma ±24 dB.", "O detector compara o nível que ouve com o limiar, em dB — a curva estática do compressor (Giannoulis, Massberg e Reiss, 2012).", ""}},
             {"ratio", {"Quanto abaixa: 4 = cada 4 dB acima do limiar viram 1. No máximo (20) vira limitador: nada passa do limiar. No GATE, quanto fecha abaixo dele.", "", ""}},
@@ -2918,6 +2959,18 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Reverb de mola — o som do tanque de amplificador: o impulso vira um chirp (os graves depois dos agudos) que se repete a cada ida e volta na mola.",
             "Laço com atraso, cascata de all-pass esticados e passa-baixa (Välimäki, Parker e Abel, 2010); duas molas de comprimentos diferentes. Desvios Rasgo: KICK (sacudir o tanque) e TENS por CV (a mola geme).",
             "Uma guitarra no SIGNAL-IN → SPRING; um CLOCK lento → KICK: o tanque estala de tempos em tempos. Um LFO lento → TENS: a mola desafina."}},
+        {"MOUSSE", {
+            "Deformação de um material mole — uma espuma que afunda com o golpe (uma parte na hora, outra devagar) e volta sem pressa: um envelope \"mole\" que responde ao que bate nele.",
+            "O sólido linear padrão da viscoelasticidade (mola + fluido). Desvios Rasgo: FATIGUE (golpes seguidos amolecem a espuma) e o toque autônomo semeado quando HIT está livre.",
+            "DRUM.trig → HIT; DEPTH → CUT de um FILTER: cada batida afunda o brilho, que volta devagar. PRESS ← o ENV do DYNAMICS: a mistura apoiada na espuma."}},
+        {"PENDULUM", {
+            "Pêndulo duplo — um pêndulo pendurado em outro: com pouca energia balança quase regular; com muita, o braço de baixo dá voltas e o movimento vira caos.",
+            "Equações de Lagrange integradas por Runge-Kutta de 4ª ordem (energia conservada sem atrito). Saídas: as posições das duas pontas, CROSS (o ritmo do balanço) e FLIP (o sinal do caos). Desvios Rasgo: AUTO (nunca para) e KICK.",
+            "X2 → PITCH de um OSC via QUANTIZER, CROSS → ENVELOPE: uma melodia que balança e às vezes enlouquece. FLIP → KICK do SPRING."}},
+        {"PRISM", {
+            "O som através de um prisma — separa a entrada em 6 cores (bandas), atrasa cada uma pelo seu \"índice de refração\" e abre as cores em leque no estéreo: um arco-íris no tempo e no espaço.",
+            "Bandas de 120 Hz a 11 kHz; dispersão normal (agudos mais lentos, como no vidro) ou anômala (graves). Desvios Rasgo: a dispersão anômala e o FEEDBACK por cor (ecos que se separam em cores).",
+            "Uma voz percussiva → PRISM, CURVE +1, DISP 200 ms: cada golpe se desfaz do grave ao agudo. Um LFO lento → DISP: o arco-íris respira."}},
         {"DYNAMICS", {
             "Compressor e gate com sidechain — abaixa o que passa do limiar (ou fecha o que fica abaixo) e devolve o que ouve como sinal: ENV (o nível) e GR (quanto abaixa).",
             "Detector de pico ou RMS → curva em dB com joelho → ataque/release no ganho → GAIN (a formulação de Giannoulis, Massberg e Reiss, 2012). Desvios Rasgo: ENV/GR como modulação, BRTH (o release segue os golpes) e DRIFT (cada golpe varia, semeado).",
@@ -3251,6 +3304,18 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Spring reverb — the sound of an amp's tank: the impulse becomes a chirp (lows after highs) that repeats at each trip along the spring.",
             "Delay loop, a cascade of stretched allpasses and a low-pass (Välimäki, Parker and Abel, 2010); two springs of different lengths. Rasgo deviations: KICK (shake the tank) and TENS by CV (the spring groans).",
             "A guitar into SIGNAL-IN → SPRING; a slow CLOCK → KICK: the tank crashes now and then. A slow LFO → TENS: the spring detunes."}},
+        {"MOUSSE", {
+            "Deformation of a soft material — a foam that sinks with the hit (part at once, part slowly) and returns without hurry: a \"soft\" envelope that answers what strikes it.",
+            "The standard linear solid of viscoelasticity (spring + fluid). Rasgo deviations: FATIGUE (repeated hits soften the foam) and the seeded autonomous tap when HIT is free.",
+            "DRUM.trig → HIT; DEPTH → a FILTER's CUT: each beat sinks the brightness, which comes back slowly. PRESS ← DYNAMICS ENV: the mix resting on the foam."}},
+        {"PENDULUM", {
+            "Double pendulum — a pendulum hanging from another: with little energy it swings almost regularly; with a lot, the lower arm loops over and the motion turns chaotic.",
+            "Lagrange's equations integrated by 4th-order Runge-Kutta (energy conserved without friction). Outputs: the positions of both tips, CROSS (the rhythm of the swing) and FLIP (the sign of chaos). Rasgo deviations: AUTO (never stops) and KICK.",
+            "X2 → an OSC's PITCH via QUANTIZER, CROSS → ENVELOPE: a melody that swings and sometimes goes wild. FLIP → SPRING's KICK."}},
+        {"PRISM", {
+            "Sound through a prism — it splits the input into 6 colours (bands), delays each by its \"refractive index\" and fans the colours out in stereo: a rainbow in time and space.",
+            "Bands from 120 Hz to 11 kHz; normal dispersion (highs slower, as in glass) or anomalous (lows). Rasgo deviations: the anomalous dispersion and per-colour FEEDBACK (echoes that split into colours).",
+            "A percussive voice → PRISM, CURVE +1, DISP 200 ms: each hit comes apart from low to high. A slow LFO → DISP: the rainbow breathes."}},
         {"DYNAMICS", {
             "Compressor and gate with sidechain — it turns down what passes the threshold (or shuts what stays below) and gives back what it hears as signal: ENV (the level) and GR (how much it turns down).",
             "Peak or RMS detector → dB curve with knee → attack/release on the gain → GAIN (Giannoulis, Massberg and Reiss, 2012). Rasgo deviations: ENV/GR as modulation, BRTH (the release follows the hits) and DRIFT (each hit varies, seeded).",
@@ -3513,6 +3578,18 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Réverbération à ressort — le son de la cuve d’un ampli : l’impulsion devient un chirp (les graves après les aigus) qui se répète à chaque aller-retour dans le ressort.",
             "Boucle à retard, cascade de passe-tout étirés et passe-bas (Välimäki, Parker et Abel, 2010) ; deux ressorts de longueurs différentes. Écarts Rasgo : KICK (secouer la cuve) et TENS par CV (le ressort gémit).",
             "Une guitare dans SIGNAL-IN → SPRING ; une CLOCK lente → KICK : la cuve claque de temps en temps. Un LFO lent → TENS : le ressort se désaccorde."}},
+        {"MOUSSE", {
+            "Déformation d’un matériau mou — une mousse qui s’enfonce sous le coup (une partie tout de suite, une partie lentement) et revient sans hâte : une enveloppe « molle » qui répond à ce qui la frappe.",
+            "Le solide linéaire standard de la viscoélasticité (ressort + fluide). Écarts Rasgo : FATIGUE (des coups répétés ramollissent la mousse) et la touche autonome semée quand HIT est libre.",
+            "DRUM.trig → HIT ; DEPTH → CUT d’un FILTER : chaque frappe enfonce la brillance, qui revient lentement. PRESS ← ENV du DYNAMICS : le mixage posé sur la mousse."}},
+        {"PENDULUM", {
+            "Pendule double — un pendule suspendu à un autre : avec peu d’énergie il oscille presque régulièrement ; avec beaucoup, le bras du bas fait des tours et le mouvement devient chaos.",
+            "Équations de Lagrange intégrées par Runge-Kutta d’ordre 4 (énergie conservée sans frottement). Sorties : les positions des deux extrémités, CROSS (le rythme du balancement) et FLIP (le signe du chaos). Écarts Rasgo : AUTO (ne s’arrête jamais) et KICK.",
+            "X2 → PITCH d’un OSC via QUANTIZER, CROSS → ENVELOPE : une mélodie qui se balance et parfois s’affole. FLIP → KICK du SPRING."}},
+        {"PRISM", {
+            "Le son à travers un prisme — il sépare l’entrée en 6 couleurs (bandes), retarde chacune selon son « indice de réfraction » et ouvre les couleurs en éventail stéréo : un arc-en-ciel dans le temps et l’espace.",
+            "Bandes de 120 Hz à 11 kHz ; dispersion normale (aigus plus lents, comme dans le verre) ou anormale (graves). Écarts Rasgo : la dispersion anormale et le FEEDBACK par couleur (des échos qui se séparent en couleurs).",
+            "Une voix percussive → PRISM, CURVE +1, DISP 200 ms : chaque coup se défait du grave à l’aigu. Un LFO lent → DISP : l’arc-en-ciel respire."}},
         {"DYNAMICS", {
             "Compresseur et gate avec sidechain — il baisse ce qui passe le seuil (ou ferme ce qui reste en dessous) et rend ce qu’il entend comme signal : ENV (le niveau) et GR (de combien il baisse).",
             "Détecteur de crête ou RMS → courbe en dB avec genou → attaque/relâchement sur le gain → GAIN (Giannoulis, Massberg et Reiss, 2012). Écarts Rasgo : ENV/GR comme modulation, BRTH (le relâchement suit les coups) et DRIFT (chaque coup varie, semé).",
@@ -3775,6 +3852,18 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "Reverb de muelle — el sonido del tanque de un amplificador: el impulso se vuelve un chirp (los graves después de los agudos) que se repite en cada ida y vuelta por el muelle.",
             "Lazo con retardo, cascada de pasa-todo estirados y pasa-bajos (Välimäki, Parker y Abel, 2010); dos muelles de longitudes distintas. Desvíos Rasgo: KICK (sacudir el tanque) y TENS por CV (el muelle gime).",
             "Una guitarra en SIGNAL-IN → SPRING; un CLOCK lento → KICK: el tanque estalla de vez en cuando. Un LFO lento → TENS: el muelle se desafina."}},
+        {"MOUSSE", {
+            "Deformación de un material blando — una espuma que se hunde con el golpe (una parte al instante, otra despacio) y vuelve sin prisa: una envolvente «blanda» que responde a lo que la golpea.",
+            "El sólido lineal estándar de la viscoelasticidad (muelle + fluido). Desvíos Rasgo: FATIGUE (golpes seguidos ablandan la espuma) y el toque autónomo sembrado cuando HIT está libre.",
+            "DRUM.trig → HIT; DEPTH → CUT de un FILTER: cada golpe hunde el brillo, que vuelve despacio. PRESS ← ENV del DYNAMICS: la mezcla apoyada en la espuma."}},
+        {"PENDULUM", {
+            "Péndulo doble — un péndulo colgado de otro: con poca energía oscila casi regular; con mucha, el brazo de abajo da vueltas y el movimiento se vuelve caos.",
+            "Ecuaciones de Lagrange integradas por Runge-Kutta de 4º orden (energía conservada sin fricción). Salidas: las posiciones de las dos puntas, CROSS (el ritmo del vaivén) y FLIP (la señal del caos). Desvíos Rasgo: AUTO (nunca se detiene) y KICK.",
+            "X2 → PITCH de un OSC vía QUANTIZER, CROSS → ENVELOPE: una melodía que se balancea y a veces enloquece. FLIP → KICK del SPRING."}},
+        {"PRISM", {
+            "El sonido a través de un prisma — separa la entrada en 6 colores (bandas), retrasa cada uno por su «índice de refracción» y abre los colores en abanico estéreo: un arco iris en el tiempo y el espacio.",
+            "Bandas de 120 Hz a 11 kHz; dispersión normal (agudos más lentos, como en el vidrio) o anómala (graves). Desvíos Rasgo: la dispersión anómala y el FEEDBACK por color (ecos que se separan en colores).",
+            "Una voz percusiva → PRISM, CURVE +1, DISP 200 ms: cada golpe se deshace de grave a agudo. Un LFO lento → DISP: el arco iris respira."}},
         {"DYNAMICS", {
             "Compresor y gate con sidechain — baja lo que pasa del umbral (o cierra lo que queda por debajo) y devuelve lo que oye como señal: ENV (el nivel) y GR (cuánto baja).",
             "Detector de pico o RMS → curva en dB con rodilla → ataque/release sobre la ganancia → GAIN (Giannoulis, Massberg y Reiss, 2012). Desvíos Rasgo: ENV/GR como modulación, BRTH (el release sigue los golpes) y DRIFT (cada golpe varía, sembrado).",

@@ -395,6 +395,21 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_spring_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_spring_tests COMMAND rasgo_modular_spring_tests)
 
+    add_executable(rasgo_modular_mousse_tests tests/test_mousse.cpp)
+    target_link_libraries(rasgo_modular_mousse_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_mousse_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_mousse_tests COMMAND rasgo_modular_mousse_tests)
+
+    add_executable(rasgo_modular_pendulum_tests tests/test_pendulum.cpp)
+    target_link_libraries(rasgo_modular_pendulum_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_pendulum_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_pendulum_tests COMMAND rasgo_modular_pendulum_tests)
+
+    add_executable(rasgo_modular_prism_tests tests/test_prism.cpp)
+    target_link_libraries(rasgo_modular_prism_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_prism_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_prism_tests COMMAND rasgo_modular_prism_tests)
+
     add_executable(rasgo_modular_dynamics_tests tests/test_dynamics.cpp)
     target_link_libraries(rasgo_modular_dynamics_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_dynamics_tests PRIVATE ${rasgo_modular_warnings})

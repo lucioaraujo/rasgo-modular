@@ -182,6 +182,9 @@ Estado: **✓** pronto · **·** a fazer.
 | 66 | `MARKOV` | [`66_markov.md`](66_markov.md) | local, após 0.1.7 |
 | 67 | `BOUNCE` | [`67_bounce.md`](67_bounce.md) | local, após 0.1.7 |
 | 68 | `SPRING` | [`68_spring.md`](68_spring.md) | local, após 0.1.7 |
+| 69 | `MOUSSE` | [`69_mousse.md`](69_mousse.md) | local, após 0.1.7 |
+| 70 | `PENDULUM` | [`70_pendulum.md`](70_pendulum.md) | local, após 0.1.7 |
+| 71 | `PRISM` | [`71_prism.md`](71_prism.md) | local, após 0.1.7 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

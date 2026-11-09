@@ -97,6 +97,9 @@ propriedade do cabo, não um módulo do catálogo.
 | 66 | [`66_markov.md`](66_markov.md) | `MARKOV` (cadeia de Markov que aprende e improvisa; TEMP, SURP) | DECISION | implementação local, 2026-11-09 |
 | 67 | [`67_bounce.md`](67_bounce.md) | `BOUNCE` (bolas que quicam: gates, acento, alturas; WIND, AUTO) | MODULATE | implementação local, 2026-11-09 |
 | 68 | [`68_spring.md`](68_spring.md) | `SPRING` (reverb de mola; KICK, TENS por CV) | SPACE | implementação local, 2026-11-09 |
+| 69 | [`69_mousse.md`](69_mousse.md) | `MOUSSE` (espuma viscoelástica: envelope mole; FATIGUE) | MODULATE | implementação local, 2026-11-09 |
+| 70 | [`70_pendulum.md`](70_pendulum.md) | `PENDULUM` (pêndulo duplo: posições, CROSS, FLIP; AUTO) | MODULATE | implementação local, 2026-11-09 |
+| 71 | [`71_prism.md`](71_prism.md) | `PRISM` (dispersão do som em 6 cores; anômala, FDBK) | SPACE | implementação local, 2026-11-09 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

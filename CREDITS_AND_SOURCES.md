@@ -65,6 +65,12 @@ cópia de código, em coleções de licença livre dentro do DISTRHO Cardinal 26
 - **SPRING** — V. Välimäki, J. Parker, J. S. Abel, "Parametric Spring
   Reverberation Effect", *JAES* 58(7/8), 2010; Autinn Coil (GPL-3.0-or-later).
 
+Os módulos 69–71 (MOUSSE, PENDULUM, PRISM), de 9/11/2026, partem de ideias do
+autor e de física pública — viscoelasticidade (sólido linear padrão de Zener),
+mecânica de Lagrange do pêndulo duplo, dispersão óptica; o SVF do PRISM segue
+V. Zavalishin, *The Art of VA Filter Design* (2012). Nenhum tem equivalente no
+Cardinal; implementação própria sob AGPL-3.0-or-later.
+
 Contratos em [65](dossies/65_cell.md), [66](dossies/66_markov.md),
 [67](dossies/67_bounce.md) e [68](dossies/68_spring.md).
 
