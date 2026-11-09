@@ -24,8 +24,10 @@ relevante". Registro vivo em
   README e bibliografia), Trioio (§4.4), Antitotem (§4.5, 4.5b, 4.5c —
   propostas novas: VIA com as PORTAS do autor como prior art, COMPARADOR,
   ACCENT, INTERPRET, CHARACTER, BUDGET, SUPPLY; aperfeiçoamentos de
-  DRIFT, PLL, SWITCH e SEQ).
-- [ ] Navalha 2 **JUCE** (o Pd não, pedido do autor), Rasgo Synth Studio,
+  DRIFT, PLL, SWITCH e SEQ), Navalha 2 JUCE (§4.6 — transformação
+  reversível, STUTTER/BURST com limites em ms, TRACE como decisões, FORM
+  como contexto, teste de pior soma no MASTER).
+- [ ] Rasgo Synth Studio,
   Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a revisão
   das propostas.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
