@@ -423,12 +423,17 @@ void testCatalogAndPersistence() {
     for (const auto& g : seedModuleCatalog()) {
         original += g.types.size();
         for (const char* t : g.types)
-            check(std::string(t) != "PHRASE" && std::string(t) != "LISTEN" && std::string(t) != "DYNAMICS"
+            check(std::string(t) != "PHRASE" && std::string(t) != "LISTEN"
                   && std::string(t) != "ARP",
                   "published seed rack preserved");
     }
-    // LISTEN e PHRASE (17/10), DYNAMICS e ARP (8/11): na BIBLIOTECA, fora da seed.
-    check(all == original + 4, "new modules visible in catalogue");
+    // LISTEN e PHRASE (17/10) e ARP (8/11): na BIBLIOTECA, fora da seed.
+    // DYNAMICS entrou na seed em 9/11 (decisão do autor).
+    bool dynamicsInSeed = false;
+    for (const auto& g : seedModuleCatalog())
+        for (const char* t : g.types) dynamicsInSeed = dynamicsInSeed || std::string(t) == "DYNAMICS";
+    check(dynamicsInSeed, "DYNAMICS in the seed rack");
+    check(all == original + 3, "new modules visible in catalogue");
     for (const char* t : {"LISTEN", "PHRASE", "DYNAMICS", "ARP"}) {
         auto m = makeModule(t); check(m && m->type() == t, "factory constructs new modules");
         for (Lang lang : {Lang::pt, Lang::en, Lang::fr, Lang::es}) {

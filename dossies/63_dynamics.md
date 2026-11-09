@@ -44,8 +44,17 @@ xorshift semeado no `prepare()` — mesma entrada, mesma saída.
 **Tempo real.** `process()` não aloca; NaN/∞ na entrada viram zero; o
 contador entre golpes tem teto (sem estouro em sessões longas).
 
-**Fora do catálogo da seed** (como LISTEN e PHRASE): as seeds antigas
-continuam gerando os mesmos patches; o módulo entra pela BIBLIOTECA.
+**Na seed desde 9/11** (decisão do autor: "por direto no sorteio, mais
+simples"; até 8/11 ficava fora, como LISTEN e PHRASE). Entrou no catálogo da
+seed (TRANSFORM, no fim) e na cadeia de processadores do `seedPatch` (6
+opções em vez de 5). Por isso **as seeds anteriores a 9/11 geram outros
+patches**. Na cadeia, a compressão é musical: limiar −30..−12 dB, ratio 2–6,
+ataque 2–30 ms, release 60–400 ms, joelho 3–10 dB, GAIN que devolve só 35 %
+do que a curva tira (até 12 dB), RMS em metade das vezes, BRTH em 35 % e
+DRIFT em 30 %. Em 35 % das vezes, o `DRUM` vai ao SIDE (o pad que respira).
+O GAIN (`makeup`) fica fora do passeio e da mutação, e no VARIA é tratado
+como nível. Sondagem de 1000 seeds: DYNAMICS com IN ligado em 253, com SIDE
+em 173.
 
 ## Testes
 

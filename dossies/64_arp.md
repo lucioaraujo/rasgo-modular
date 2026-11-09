@@ -40,7 +40,8 @@ semeado no `prepare()`: o mesmo patch toca a mesma sequência.
 **Tempo real.** `process()` não aloca; NaN/∞ nas entradas viram zero;
 parâmetros fora da faixa são limitados.
 
-**Fora do catálogo da seed** (como LISTEN, PHRASE e DYNAMICS).
+**Fora do catálogo da seed** (como LISTEN e PHRASE; o DYNAMICS entrou nela
+em 9/11).
 
 ## Testes
 
