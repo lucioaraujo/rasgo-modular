@@ -446,6 +446,53 @@ O MATTER/RESONATOR vão de harmônico a "esticado"; **acrescentar as razões
 da membrana (Bessel) e do vidro** como pontos do eixo STRUCTURE é um
 aperfeiçoamento direto.
 
+**`SYNTH_DEVICE_DESIGN.md`** (lido: origem, contrato, fases 3 e 5, formante,
+FM4, mistura, drive, lições, caos e realimentação):
+
+- **A decisão do autor que vale para todo o RASGO**: "os timbres são
+  consequência de ferramentas bem desenvolvidas de síntese sonora no
+  instrumento e o músico que utilizar o instrumento cria os sons" — "melhor do
+  que você ficar criando timbres". O critério de pronto de uma ferramenta não
+  é um timbre aprovado: é ser **precisa, estável, documentada, tocável**.
+- O Aquorbium **copiou núcleos do Modular** (commit `4ce898f`, com sha256):
+  Operator, Wavetable, Additive, Pulsar, StringVoice, Matter, Formant. E,
+  ao medi-los, **achou coisas que valem de volta para o Modular**:
+  - **FORMANT**: com ganho de pico unitário por banda, um dente de serra saía
+    ~30 dB abaixo de um passa-baixas, e mais baixo com RESSON; lá o ganho
+    passou a ×√k (energia constante quando as bandas estreitam) e as larguras
+    acompanham o trato (Q constante) — no Modular as larguras são fixas;
+  - **STRING**: a cópia saía **4,4 cents baixa** até compensar o atraso do
+    all-pass — **conferir o StringVoice do Modular**;
+  - **FM num ressonador re-afinado a cada amostra explode** (até 1e37) — um
+    ressonador de dois polos re-afinado não conserva energia; lá a FM ficou
+    só nas fontes osciladoras e uma fonte não finita é zerada — **conferir
+    MATTER/RESONATOR/STRING com FM ou pitch por CV de áudio no Modular**;
+  - **DRIVE com aliasing** (−18,6 dB a 7 kHz) consertado por **antialiasing
+    por antiderivada** de 1ª ordem (Parker, Zavalishin & Le Bivic, DAFx 2016),
+    sem latência — **candidato para SHAPE, FILTER drive, WASP, CRUSH do
+    Modular**;
+  - **ADITIVA** cara: só somar parciais acima de −80 dB; sem `floor` no passo
+    de fase; nada a calcular entre notas.
+- **PROPOSTA que escuta o que propõe**: cada patch candidato toca uma nota
+  de teste (0,6 s a 220 Hz), o quase mudo cede lugar ao próximo sorteio da
+  mesma semente (até 8 tentativas) e o escolhido é nivelado a −14 dBFS com
+  pico ≤ 1,5; 600 de 600 propostas a menos de 6 dB do alvo. O documento
+  registra que **a "sugestão por seed" do Modular está escrita no
+  `RASGO_MODULAR.md` mas sem código** — e que o Aquorbium a fez primeiro.
+  **Para o Modular**: a seed poderia **escutar o patch que gera** (render
+  curto offline) e rejeitar o mudo/nivelar — a mesma ideia, no seedPatch.
+- **CAOS como fonte de áudio afinada** (Duffing forçado na frequência da nota,
+  RK4 em subpassos; três regimes no mesmo volume por um seguidor lento; a
+  entrada no caos é por crise, não por duplicação de período — dito assim) —
+  **aperfeiçoamento do CHAOS do Modular** (hoje é campo de controle).
+- **REALIMENTAÇÃO** (mesa sem entrada afinada: atraso no período da nota,
+  passa-baixa, anti-DC e tanh, com a fase dos filtros descontada do atraso —
+  sem isso ficava 14 cents agudo; DESAFINAR soma um tap fora do período e o
+  laço salta de modo) — **fonte nova para o Modular** (FEEDBACK).
+- **Ensinar a tocar**: "preciso aprender a tocar, são muitos parâmetros" →
+  cinco lições "faça / ouça" no tutorial — o mesmo caminho da fase didática
+  do Modular.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
