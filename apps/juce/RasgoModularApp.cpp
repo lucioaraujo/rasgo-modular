@@ -444,6 +444,17 @@ struct Rack {
                         it->second.pushLanes(low->at(0, i), mid->at(0, i),
                                              high->at(0, i), static_cast<float>(mask));
                     }
+            } else if (graph.node(id).type() == "DYNAMICS") {
+                // Uma entrada por bloco, como o ARP: ENV (o último valor)
+                // e GR (o máximo do bloco — um golpe curto não some).
+                const auto* env = graph.lastOutput(id, 1);
+                const auto* gr = graph.lastOutput(id, 2);
+                if (env && gr && env->frames() > 0) {
+                    float r = 0.0f;
+                    for (std::size_t i = 0; i < gr->frames(); ++i)
+                        r = std::max(r, gr->at(0, i));
+                    it->second.pushLanes(env->at(0, env->frames() - 1), r, 0.0f, 0.0f);
+                }
             } else if (graph.node(id).type() == "ARP") {
                 // Uma entrada por bloco (não por stride): os 128 lugares
                 // cobrem ~1,4 s a 512 amostras — o bastante para ver as
@@ -3752,6 +3763,40 @@ private:
                                static_cast<int>(fraction * std::max(0, dw - label - 8)), std::max(1, row - 4));
                 }
                 dlabel.clear();
+            } else if (mtype == "DYNAMICS") {
+                // ENV (0–1 = −60..0 dB) como linha; o limiar (THRES) como
+                // linha tracejada na mesma escala; GR (0–1 = 0..24 dB) como
+                // barras que descem do alto, na cor de alerta.
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const auto px = [&](std::size_t k) {
+                    return static_cast<float>(wx + 1)
+                        + static_cast<float>(k * static_cast<std::size_t>(dw - 2)) / static_cast<float>(nL - 1);
+                };
+                const auto yOf = [&](float v01) {
+                    return static_cast<float>(wy + dh - 2)
+                        - juce::jlimit(0.0f, 1.0f, v01) * static_cast<float>(dh - 4);
+                };
+                const float colw = std::max(1.0f, static_cast<float>(dw - 2) / static_cast<float>(nL));
+                g.setColour(T.warning.withAlpha(0.55f));
+                for (std::size_t k = 0; k < nL; ++k) {
+                    const float r = juce::jlimit(0.0f, 1.0f, sc.lane(1, k));
+                    if (r <= 0.002f) continue;
+                    g.fillRect(px(k), static_cast<float>(wy + 1), colw,
+                               r * static_cast<float>(dh - 2));
+                }
+                const float thr01 = (node.parameterValue("thresh") + 60.0f) / 60.0f;
+                const float ty = yOf(thr01);
+                g.setColour(T.textSecondary);
+                for (float x = static_cast<float>(wx + 2); x < static_cast<float>(wx + dw - 2); x += 6.0f)
+                    g.drawLine(x, ty, std::min(x + 3.0f, static_cast<float>(wx + dw - 2)), ty, 1.0f);
+                juce::Path path;
+                for (std::size_t k = 0; k < nL; ++k) {
+                    if (k == 0) path.startNewSubPath(px(k), yOf(sc.lane(0, k)));
+                    else path.lineTo(px(k), yOf(sc.lane(0, k)));
+                }
+                g.setColour(T.accent);
+                g.strokePath(path, juce::PathStrokeType(1.5f));
+                dlabel = node.parameterValue("mode") >= 0.5f ? "gate" : "comp";
             } else if (mtype == "ARP") {
                 // As notas rolando: a altura (lane 0) em degraus, escalada
                 // pela faixa da janela (no mínimo uma oitava); com gate
