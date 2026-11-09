@@ -69,6 +69,10 @@
 #include "dsp/Vca4.hpp"
 #include "dsp/Dynamics.hpp"
 #include "dsp/Arp.hpp"
+#include "dsp/Bounce.hpp"
+#include "dsp/Cell.hpp"
+#include "dsp/Markov.hpp"
+#include "dsp/Spring.hpp"
 #include "dsp/Vocoder.hpp"
 #include "dsp/Wasp.hpp"
 
@@ -102,6 +106,10 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "VCA4")       return std::make_unique<Vca4>();
     if (t == "DYNAMICS")   return std::make_unique<Dynamics>();
     if (t == "ARP")        return std::make_unique<Arp>();
+    if (t == "CELL")       return std::make_unique<Cell>();
+    if (t == "MARKOV")     return std::make_unique<Markov>();
+    if (t == "BOUNCE")     return std::make_unique<Bounce>();
+    if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "VOCODER")    return std::make_unique<Vocoder>();
     if (t == "CONTROL")    return std::make_unique<Control>();
     if (t == "SH")         return std::make_unique<SampleHold>();
@@ -214,6 +222,11 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
             // "por direto no sorteio, mais simples") — as seeds anteriores a
             // essa data passaram a gerar outros patches.
             if (family == "TIME") group.types.push_back("ARP");
+            // CELL, MARKOV, BOUNCE, SPRING (9/11): na BIBLIOTECA, fora da seed.
+            if (family == "TIME") group.types.push_back("CELL");
+            if (family == "DECISION") group.types.push_back("MARKOV");
+            if (family == "MODULATE") group.types.push_back("BOUNCE");
+            if (family == "SPACE") group.types.push_back("SPRING");
         }
         return groups;
     }();

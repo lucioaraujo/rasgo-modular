@@ -424,7 +424,9 @@ void testCatalogAndPersistence() {
         original += g.types.size();
         for (const char* t : g.types)
             check(std::string(t) != "PHRASE" && std::string(t) != "LISTEN"
-                  && std::string(t) != "ARP",
+                  && std::string(t) != "ARP" && std::string(t) != "CELL"
+                  && std::string(t) != "MARKOV" && std::string(t) != "BOUNCE"
+                  && std::string(t) != "SPRING",
                   "published seed rack preserved");
     }
     // LISTEN e PHRASE (17/10) e ARP (8/11): na BIBLIOTECA, fora da seed.
@@ -433,8 +435,9 @@ void testCatalogAndPersistence() {
     for (const auto& g : seedModuleCatalog())
         for (const char* t : g.types) dynamicsInSeed = dynamicsInSeed || std::string(t) == "DYNAMICS";
     check(dynamicsInSeed, "DYNAMICS in the seed rack");
-    check(all == original + 3, "new modules visible in catalogue");
-    for (const char* t : {"LISTEN", "PHRASE", "DYNAMICS", "ARP"}) {
+    // CELL, MARKOV, BOUNCE, SPRING (9/11): na BIBLIOTECA, fora da seed.
+    check(all == original + 7, "new modules visible in catalogue");
+    for (const char* t : {"LISTEN", "PHRASE", "DYNAMICS", "ARP", "CELL", "MARKOV", "BOUNCE", "SPRING"}) {
         auto m = makeModule(t); check(m && m->type() == t, "factory constructs new modules");
         for (Lang lang : {Lang::pt, Lang::en, Lang::fr, Lang::es}) {
             check(lookupLearnModule(t, lang) != nullptr, "module help in four languages");

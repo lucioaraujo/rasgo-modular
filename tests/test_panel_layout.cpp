@@ -53,6 +53,10 @@
 #include "dsp/Listen.hpp"
 #include "dsp/Dynamics.hpp"
 #include "dsp/Arp.hpp"
+#include "dsp/Bounce.hpp"
+#include "dsp/Cell.hpp"
+#include "dsp/Markov.hpp"
+#include "dsp/Spring.hpp"
 #include "dsp/Phrase.hpp"
 #include "dsp/Resonator.hpp"
 #include "dsp/Shape.hpp"
@@ -259,6 +263,10 @@ int main() {
     mods.emplace_back("LISTEN", std::make_unique<Listen>());
     mods.emplace_back("DYNAMICS", std::make_unique<Dynamics>());
     mods.emplace_back("ARP", std::make_unique<Arp>());
+    mods.emplace_back("CELL", std::make_unique<Cell>());
+    mods.emplace_back("MARKOV", std::make_unique<Markov>());
+    mods.emplace_back("BOUNCE", std::make_unique<Bounce>());
+    mods.emplace_back("SPRING", std::make_unique<Spring>());
     mods.emplace_back("PHRASE", std::make_unique<Phrase>());
     mods.emplace_back("SHAPE", std::make_unique<Shape>());
     mods.emplace_back("SHIFTER", std::make_unique<Shifter>());

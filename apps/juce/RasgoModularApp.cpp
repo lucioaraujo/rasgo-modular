@@ -455,7 +455,22 @@ struct Rack {
                         r = std::max(r, gr->at(0, i));
                     it->second.pushLanes(env->at(0, env->frames() - 1), r, 0.0f, 0.0f);
                 }
-            } else if (graph.node(id).type() == "ARP") {
+            } else if (graph.node(id).type() == "CELL") {
+                // a linha de células (como float exato, 24 bits) e o tamanho
+                if (const auto* cell = dynamic_cast<const rasgo::modular::Cell*>(&graph.node(id)))
+                    it->second.pushLanes(cell->rowAsFloat(),
+                                         graph.node(id).parameterValue("cells"), 0.0f, 0.0f);
+            } else if (graph.node(id).type() == "BOUNCE") {
+                const auto* gate = graph.lastOutput(id, 0);
+                const auto* h1 = graph.lastOutput(id, 2);
+                const auto* h2 = graph.lastOutput(id, 3);
+                const auto* h3 = graph.lastOutput(id, 4);
+                if (gate && h1 && h2 && h3 && gate->frames() > 0) {
+                    const std::size_t last = gate->frames() - 1;
+                    it->second.pushLanes(h1->at(0, last), h2->at(0, last), h3->at(0, last),
+                                         graph.node(id).parameterValue("balls"));
+                }
+            } else if (graph.node(id).type() == "ARP" || graph.node(id).type() == "MARKOV") {
                 // Uma entrada por bloco (não por stride): os 128 lugares
                 // cobrem ~1,4 s a 512 amostras — o bastante para ver as
                 // notas do arpejo, que no anel da onda (~20 ms) seria uma
@@ -3797,7 +3812,43 @@ private:
                 g.setColour(T.accent);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel = node.parameterValue("mode") >= 0.5f ? "gate" : "comp";
-            } else if (mtype == "ARP") {
+            } else if (mtype == "CELL") {
+                // as gerações rolando: uma coluna por bloco, uma linha por célula
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const int cells = std::clamp(static_cast<int>(std::lround(sc.lane(1, nL - 1))), 1, 24);
+                const float colw = static_cast<float>(dw - 2) / static_cast<float>(nL);
+                const float rowh = static_cast<float>(dh - 2) / static_cast<float>(cells);
+                g.setColour(T.accent);
+                for (std::size_t k = 0; k < nL; ++k) {
+                    const auto row = static_cast<std::uint32_t>(std::max(0.0f, sc.lane(0, k)));
+                    for (int i = 0; i < cells; ++i)
+                        if ((row >> i) & 1U)
+                            g.fillRect(static_cast<float>(wx + 1) + colw * static_cast<float>(k),
+                                       static_cast<float>(wy + 1) + rowh * static_cast<float>(i),
+                                       std::max(1.0f, colw), std::max(1.0f, rowh - 0.5f));
+                }
+                dlabel = "rule " + juce::String(static_cast<int>(std::lround(node.parameterValue("rule"))));
+            } else if (mtype == "BOUNCE") {
+                // a altura de cada bola rolando, o chão embaixo
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const int balls = std::clamp(static_cast<int>(std::lround(sc.lane(3, nL - 1))), 1, 3);
+                g.setColour(T.line);
+                g.drawHorizontalLine(wy + dh - 2, static_cast<float>(wx + 1), static_cast<float>(wx + dw - 1));
+                const juce::Colour cols[3] = {T.accent, T.textPrimary, T.warning};
+                for (int b = 0; b < balls; ++b) {
+                    juce::Path path;
+                    for (std::size_t k = 0; k < nL; ++k) {
+                        const float px = static_cast<float>(wx + 1)
+                            + static_cast<float>(k * static_cast<std::size_t>(dw - 2)) / static_cast<float>(nL - 1);
+                        const float py = static_cast<float>(wy + dh - 2)
+                            - juce::jlimit(0.0f, 1.0f, sc.lane(static_cast<std::size_t>(b), k)) * static_cast<float>(dh - 4);
+                        if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
+                    }
+                    g.setColour(cols[b]);
+                    g.strokePath(path, juce::PathStrokeType(1.2f));
+                }
+                dlabel.clear();
+            } else if (mtype == "ARP" || mtype == "MARKOV") {
                 // As notas rolando: a altura (lane 0) em degraus, escalada
                 // pela faixa da janela (no mínimo uma oitava); com gate
                 // aberto o traço é grosso e na cor de destaque.
@@ -3827,7 +3878,7 @@ private:
                         g.drawLine(px(k + 1), py(k), px(k + 1), py(k + 1), 1.0f);
                     }
                 }
-                dlabel = "arp";
+                dlabel = mtype == "MARKOV" ? "markov" : "arp";
             } else if (mtype == "PHRASE") {
                 const int length = std::max(2, static_cast<int>(std::lround(node.parameterValue("length"))));
                 const int step = 1 + static_cast<int>(std::lround(

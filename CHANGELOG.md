@@ -9,6 +9,16 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Quatro módulos novos** (9 nov., aprovados pelo autor a partir do estudo do
+  Cardinal), na BIBLIOTECA, fora da seed, todos soando ao carregar e com
+  mostrador próprio: **CELL** (#65, TIME — autômato celular como sequenciador;
+  MUT e a linha que renasce), **MARKOV** (#66, DECISION — aprende de qual
+  nota se vai para qual e improvisa; TEMP e SURP), **BOUNCE** (#67, MODULATE —
+  bolas que quicam: gates que aceleram, acento, a altura de cada bola; WIND e
+  AUTO) e **SPRING** (#68, SPACE — reverb de mola; KICK sacode o tanque, TENS
+  por CV). Testes próprios; LEARN nos quatro idiomas; dossiês e guias. Ainda
+  não ouvidos pelo autor.
+
 - **SCOPE** (8 nov.): a saída **CONF** (gate de altura confiável), o
   **KEEP** (o PIT segura a última altura no silêncio, em vez de cair a
   110 Hz) e o **OCT** (−2..+2 oitavas no PIT). Padrões iguais ao
