@@ -56,25 +56,29 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 16;
+        // 10 HP (era 16 — pedido do autor, 9/11, como o ARP). O Display
+        // "dynamics" mostra o que o detector ouve (ENV), a linha do limiar e
+        // quanto ele abaixa (GR, barras do alto), rolando.
+        p.hp = 10;
         p.add(Widget::Kind::Label, "DYNAMICS", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Knob, "THRES", "thresh", 9.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 33.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "KNEE", "knee", 57.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "ATK", "attack", 9.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "REL", "release", 33.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "GAIN", "makeup", 57.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "SIDE", "side_mix", 9.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "BRTH", "breath", 33.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 57.0f, 54.0f);
-        p.add(Widget::Kind::Toggle, "RMS", "detect", 9.0f, 70.0f);
-        p.add(Widget::Kind::Toggle, "GATE", "mode", 33.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "SIDE", "in:side", 30.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "THR", "in:thr", 52.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "ENV", "out:env", 30.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GR", "out:gr", 52.0f, 116.0f);
+        p.add(Widget::Kind::Display, "dynamics", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "THRES", "thresh", 5.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 20.5f, 30.0f);
+        p.add(Widget::Kind::Knob, "KNEE", "knee", 36.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "ATK", "attack", 5.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "REL", "release", 20.5f, 50.0f);
+        p.add(Widget::Kind::Knob, "GAIN", "makeup", 36.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "SIDE", "side_mix", 5.0f, 70.0f);
+        p.add(Widget::Kind::Knob, "BRTH", "breath", 20.5f, 70.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 36.0f, 70.0f);
+        p.add(Widget::Kind::Toggle, "RMS", "detect", 13.0f, 82.0f);
+        p.add(Widget::Kind::Toggle, "GATE", "mode", 33.0f, 82.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "SIDE", "in:side", 19.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "THR", "in:thr", 31.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "ENV", "out:env", 19.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "GR", "out:gr", 31.0f, 118.0f);
         return p;
     }
 
