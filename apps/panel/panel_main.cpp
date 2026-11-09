@@ -2369,7 +2369,7 @@ int main() {
         std::filesystem::create_directories(d, ec);
         return d;
     };
-    // carimbo de tempo pra o nome do arquivo: rec-AAAAMMDD-HHMMSS[-N]
+    // carimbo de tempo pra o nome do arquivo: rec-AAAAMMDD-HHMMSS-seedN[-N]
     auto recStamp = [] {
         std::time_t t = std::time(nullptr);
         std::tm tm{};
@@ -2494,6 +2494,7 @@ int main() {
         }
     };
     int recCount = 0;   // só pra o dither/telemetria; o nome vem do timestamp
+    std::uint64_t recSeed = 0;   // seed no início da tomada (vai para o nome)
     auto stopRec = [&] {
         if (recBuf.empty()) { recording.store(false); return; }
         recording.store(false);
@@ -2503,7 +2504,10 @@ int main() {
         const std::filesystem::path dir = recDir();
         // nome por data/hora: rec-AAAAMMDD-HHMMSS. Se já existir (2ª
         // gravação no mesmo segundo), acrescenta -2, -3…
-        std::string stem = recStamp();
+        // + a seed em que a tomada começou (pedido do autor, 9/11/2026);
+        // `manual` quando o patch foi editado à mão (curSeed = 0)
+        std::string stem = recStamp()
+            + (recSeed != 0 ? "-seed" + std::to_string(recSeed) : std::string("-manual"));
         {
             std::error_code ec;
             std::string base = stem;
@@ -2835,6 +2839,7 @@ int main() {
                                  c.target().node, c.target().port);
             }
         }
+        recSeed = curSeed;
         recording.store(true);
         setTitle("RASGO Modular — ● GRAVANDO");
         redraw();

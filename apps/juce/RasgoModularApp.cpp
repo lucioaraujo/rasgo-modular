@@ -5913,6 +5913,8 @@ private:
         recWasOn_ = rack_.recording.load(std::memory_order_relaxed);
     }
 
+    std::uint64_t recSeed_ = 0;   // seed no início da tomada
+
     void startRec() {
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
@@ -5934,6 +5936,7 @@ private:
             // — cronologicamente correto e ilegível, que foi o relato do
             // autor na sessão de escuta de 23 set. 2026.
             rack_.score.setSeed(rack_.curSeed);
+            recSeed_ = rack_.curSeed;   // vai para o nome do arquivo
             rack_.score.setSampleRate(sampleRate_);
             for (const auto id : rack_.shown) {
                 auto& nd = rack_.graph.node(id);
@@ -5969,7 +5972,13 @@ private:
         // acrescenta -2, -3… — decidido ANTES da partitura, que agora
         // cita o arquivo de áudio no cabeçalho
         const juce::Time agora = juce::Time::getCurrentTime();
-        const juce::String stamp = agora.formatted("rec-%Y%m%d-%H%M%S");
+        // o número da seed no nome (pedido do autor, 9/11/2026): a seed em
+        // que a tomada COMEÇOU; `manual` quando o patch foi editado à mão
+        // (curSeed = 0). O `.score.txt` registra o resto da história.
+        const juce::String stamp = agora.formatted("rec-%Y%m%d-%H%M%S")
+            + (recSeed_ != 0
+                   ? "-seed" + juce::String(std::to_string(recSeed_))
+                   : juce::String("-manual"));
         juce::File out = recDir().getChildFile(stamp + ".wav");
         for (int n = 2; out.existsAsFile(); ++n)
             out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");

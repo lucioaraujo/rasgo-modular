@@ -9,6 +9,11 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **A seed no nome da gravação** (10 nov., pedido do autor): o REC grava
+  `rec-AAAAMMDD-HHMMSS-seedN.wav` (e o `.score.txt` com o mesmo nome) — a
+  seed em que a tomada começou; `-manual` quando o patch foi editado à mão.
+  No app e no painel X11.
+
 - **A seed volta a ser a identidade do patch** (9 nov., achado do autor:
   "percebi que o som estava alto"). O patch salvo estava em −14 LUFS, 12 LU
   acima do alvo de −26: o `out_gain` do MIXER, onde o equilíbrio de volume

@@ -291,6 +291,14 @@ com o tap no nome (`rec-….post-safety.wav` e `rec-….pre-safety.wav`) —
 dois arquivos da mesma tomada soando diferente sem explicação seria uma
 armadilha. Ambos em PCM 24 bits.
 
+### Nome do arquivo gravado
+
+`rec-AAAAMMDD-HHMMSS-seedN.wav` em `~/Music/RasgoModular/` (ou em
+`RASGO_REC_DIR`): data e hora do fim da tomada e a **seed em que ela
+começou**; `-manual` no lugar de `-seedN` quando o patch foi editado à mão.
+Ao lado vai o `.score.txt` com o mesmo nome. Duas tomadas no mesmo segundo
+ganham `-2`, `-3`…
+
 ### Formato de saída e de gravação
 
 | | |
