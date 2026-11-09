@@ -242,6 +242,185 @@ emita a estratégia corrente como sinais (quem lidera, quem responde, quando
 interromper) e verbos de coda — a decidir com o autor, porque toca a
 mecânica da seed.
 
+### 4.2 Aquorbium
+
+Lido inteiro: `ECOLOGICAL_MUSIC_DESIGN.md` (§§1–6). (Continua.)
+
+**Nuances**
+
+- **A música vem dos conceitos do instrumento** (diagnóstico do autor em
+  20/10: "musicalmente está muito podre… monolítico… parece um passa tempo…
+  falta tempero"). A correção foi traduzir cada conceito ecológico num
+  conceito musical com referência: nicho acústico (Krause) → orquestração por
+  nichos; predador → cânone que fecha em stretto, captura em uníssono; presa →
+  diminuição, síncope, saltos; migrante → modulação (carrega o centro); séssil
+  → keynote/pedal e memória do predador em aumentação; territorial → sinal em
+  contratempo; cardume coeso/disperso → homorritmia/heterofonia; acasalamento
+  → dueto em terças; rachadura → ruptura e pontilhismo; dia/noite/estação →
+  modo e andamento; massa → nuvem estatística (Xenakis).
+- **Papéis pela estratégia, não pelo índice**; três controles com sentido:
+  **influência** (0 = rota anterior intacta), **reação**, **memória**
+  (repetir ou transformar).
+- **Os estados líquidos** (gelo, fria, temperada, turbulenta, fervura), com
+  **calor latente** (histerese: só muda de estado depois de pago o calor).
+  Cada estado define viscosidade (portamento), turbulência (rubato,
+  heterofonia, fragmentação), cristalinidade (rede pentatônica, grade par),
+  velocidade do som, absorção, bolhas e capacidade do nicho.
+- **Propagação**: cada nota é uma frente de onda; quem ouve, ouve quando ela
+  chega, atenuada por espalhamento e por **absorção ∝ f²**, com **Doppler**; a
+  imitação é do que se OUVIU. **Ecolocalização**: os cliques esperam o eco, e
+  o "buzz" terminal emerge do tempo de ida e volta.
+- **Teia 5×5** (caça, fuga, rivalidade → hoquetus, aliança → homorritmia/
+  heterofonia, corte → cópia para endereçar, guarda → sinais); intensidade
+  sobe rápido, decai devagar. **Harmonia e incompatibilidade** (Plomp–Levelt):
+  tensão → dominante → cromático → cadência; o migrante só modula em água
+  calma.
+- **Densidade**: capacidade do nicho com crescimento **logístico** até o K do
+  meio, repartida por saliência; **efeito Lombard** (fala-se mais alto no
+  ruído); **bolhas de Minnaert** (bolha de 3 mm ≈ 1,09 kHz); **cripse**
+  acústica (a presa congela); decomposição (quem parte vira memória).
+- **Rede de bolhas** das jubartes (espiral ascendente em terças) e **revolução
+  de canto** (Garland 2011: um canto novo é adotado inteiro, não por partes).
+- **O timbre ouve o meio**: um passa-baixa no corte de −3 dB da absorção ao
+  longo do caminho na água — a fervura soa opaca, o gelo límpido, quem nada
+  longe soa mais escuro.
+
+**Para o Modular**
+
+- **PREDATOR** ganha forma concreta: não só Lotka–Volterra em CV, mas os
+  **atos** (cânone com atraso = distância que fecha em stretto; captura em
+  uníssono; fuga por diminuição e síncope) — perto do **RELATE** proposto no
+  Asterismus; os dois podem ser um só módulo de relações entre duas vozes
+  (decisão do autor).
+- **WATER** (novo): um meio com estados líquidos e calor latente, cuja saída
+  é ao mesmo tempo CV (viscosidade → glide, turbulência → rubato) e um
+  **filtro de propagação** (absorção ∝ f² pela distância, Doppler, eco de
+  ecolocalização) — o "som que se propaga pelos líquidos".
+- **BUBBLE** (novo, fonte): bolhas de Minnaert (frequência pelo raio, chiado
+  de fervura), o som de água corrente — uma fonte que o Modular não tem.
+- **SWARM** proposto ganha a referência certa (Blackwell & Bentley 2002) e o
+  modo coeso/disperso → homorritmia/heterofonia.
+- **Aperfeiçoar**: DRIFT/SH com crescimento logístico; HARMONY com tensão por
+  incompatibilidade (Plomp–Levelt) e modulação só "em água calma"; MARKOV
+  (feito) com a **revolução de canto** (adotar um motivo inteiro de uma vez).
+
+**`ECOSYSTEM_DESIGN.md`** (lido inteiro):
+
+- **Invariantes conceituais** que valem como ética de módulo: nenhuma entidade
+  tem visão total; só reage ao que observou; **o desejo altera tendências, não
+  escreve acontecimentos**; o foco local reduz a definição periférica;
+  indivíduos da mesma espécie preservam diferenças; primeiro plano e
+  sustentação são papéis explícitos; a integridade só responde a causas
+  identificáveis; o bioma influencia o master criativo, nunca remove a
+  proteção final.
+- **Observadores e modos de escuta**: quatro pontos de vista fora do aquário
+  (SparseFocus — um subconjunto nítido contra fundo reduzido; EnergyMemory;
+  GeometricCycle — a proeminência circula por regra geométrica;
+  CollectiveDrift) e a **Lupa** (foco aumenta o detalhe, a periferia perde
+  definição). A mixagem é uma **perspectiva**, não um conjunto de faders.
+- **Integridade com histerese**: saudável → trincado → estilhaçado
+  (irreversível na sessão), só por estresse explícito ou por perigo e energia
+  ambos extremos; calma recupera.
+- **Já codado e ainda não usado no Modular**: `HarmonicPhaseBank` (até 8
+  fases derivadas por razões racionais de um só relógio), `FluidMotion` (um
+  estado lido como forma, amplitude, tempo ou frequência, com autopatch
+  limitado), `MotionWaveBank` (8 formas), **`MotionGestureRecorder`** (até
+  2048 pontos XY em laço, com mutação zero = laço exato; é o **TRACE**
+  proposto, já pronto na família), `SchoolSpectralBank` (8 passa-bandas com
+  perfil fixo por cardume e seed), `EcologicalNoiseBed` (texturas por estação
+  e hora; cor por turbidez e temperatura; a trinca reduz a resolução por S&H),
+  `AquariumTail` (FDN de 4 linhas com matriz "nightmare"), `BiomaMarkov`
+  (memória formal avançada por cruzamentos coletivos do campo Relabi), os
+  misturadores de "filosofias" (vetor XY, sequenciador, morph, matriz 4×4).
+- **Critério de entrada de um módulo** (§9) — oito perguntas: pergunta e
+  consequência musical; papel; relação que ainda não existe; modelo
+  matemático e limites; seed, estado e reset; orçamento de CPU, memória e
+  ganho; teste técnico, A/B e escuta; destino (estável, experimental,
+  arquivado). **Proposta: adotar no Modular** como checklist dos módulos
+  novos (os dossiês já cobrem quase tudo; faltam a pergunta musical explícita
+  e o destino).
+
+**`CONCEITOS_VERIFICACAO_E_APROFUNDAMENTO.md`** (lido inteiro) — o documento
+mais importante do Aquorbium para o Modular:
+
+- **Método de verificação** que o Modular deveria adotar nos módulos de
+  conceito: para cada conceito, (1) a fonte diz isso mesmo? (2) onde e como
+  foi usado; (3) **fiel, simplificado (dito) ou errado**; (4) o que a fonte
+  ainda oferece; (5) o módulo concreto e o critério de teste. Várias
+  correções saíram daí (vogais [ɔ]/[ɛ], membrana pelos zeros de Bessel J0–J3,
+  King & Janik: o chamado responde com a **própria** assinatura).
+- **Já codado no Aquorbium, testado e com proveniência** (C++, mesmo autor —
+  reaproveitável no Modular copiando de commit conhecido e adaptando):
+  - **`ChorusPhase`** — coro de fases (rãs de Aihara): competidores em
+    antifase, aliados em fase, corte a ¼; o hoquetus e a homorritmia
+    **emergem**. (O mesmo que o KURAMOTO do Asterismus; a lição: relógios
+    próximos, acoplamento contínuo proporcional ao que ainda se ouve — a
+    primeira versão com períodos de 8 a 32 passos não travava nada.)
+  - **`PopulationCycles`** — Lotka–Volterra integrado **em logaritmos pelo
+    Euler simplético** (órbitas fechadas, populações sempre positivas, sem
+    deriva em 10 ciclos); período 2–5 min; a captura tira presas e alimenta
+    predadores. É o núcleo do **PREDATOR**.
+  - **`LifeCycle`** — energia como alimento, fome que poupa a voz, idade que
+    escurece o corpo, morte que deixa o canto ao recife, renascimento
+    cantando a **recombinação** (cabeça de um pai, cauda do outro, uma
+    mutação).
+  - **`SongForm`** — unidades → frase → tema (repetido 2–4×) → canto (ordem dos
+    temas); o 2º tema responde ao 1º uma terça acima, o 3º contrasta; MEMÓRIA
+    = deriva lenta (uma unidade por volta); revolução copia o canto inteiro.
+    Medido: motivos já ouvidos sobem de ~6–9 % para ~13 %.
+  - **`CodaExchange`** — alfabeto ritmo × andamento × rubato × ornamento; no
+    diálogo o **rubato converge** turno a turno, o **ornamento marca a mudança
+    de assunto**, clãs se formam.
+  - **`SpectralConsonance`** — aspereza de Sethares somada sobre os parciais
+    reais; a consonância depende do timbre e do registro; com um conjunto
+    inarmônico, **a escala nasce dos corpos** (as 7 alturas mais lisas para o
+    espectro). Resultado honesto: no temperamento igual a terça maior bate
+    quase como o trítono.
+  - **`ThermalCloud`** — Pithoprakta: glissandos cujas velocidades seguem
+    **Maxwell–Boltzmann** com σ ∝ √T; a parede do registro reflete; no gelo a
+    nuvem congela.
+  - **`BubbleField`** — bolhas de Minnaert (3,26/R), amortecimento δ ≈ 0,1,
+    altura que sobe (van den Doel), raios por Deane & Stokes (R^−3/2 e
+    R^−10/3), **bolhas acopladas** que se dividem em modo em fase (grave,
+    forte) e antifase (agudo, fraco) (Feuillade); ~30/s na turbulência,
+    ~240/s na fervura.
+  - **`SoundChannel`** — perfil de Munk, canal SOFAR: ao longo, o som vai
+    longe; através, sombra; **a altura decide quem ouve quem**.
+  - Água física: absorção de Ainslie & McColm (relaxações do ácido bórico e
+    do MgSO₄, temperatura, salinidade, pH), velocidade de Mackenzie, **MAR /
+    ÁGUA DOCE**.
+  - **`HabitatHealth`** — ADI e ACI do próprio som (FFT 4096 a cada 85 ms,
+    limiar relativo 30 dB abaixo da banda mais forte): um habitat saudável
+    comporta mais acontecimentos.
+  - **`RoomCoupling`** — o microfone como organismo a mais (Di Scipio), com
+    o acoplamento das caixas **aprendido por regressão** para só a sala
+    contar; Lombard em dB; as vozes fogem do registro da sala. Nada gravado.
+  - Soundmark e hi-fi/lo-fi (Schafer): "**o lo-fi vive na articulação, não na
+    cor**" (medido).
+
+**Para o Modular, a partir daqui** (cada um no seu tempo, com o autor):
+
+- **PREDATOR** = copiar e adaptar `PopulationCycles` (+ os atos do diretor).
+- **BUBBLE** = copiar e adaptar `BubbleField` (uma fonte nova e física).
+- **CLOUD** (novo) = `ThermalCloud`: nuvem de glissandos de Maxwell–Boltzmann
+  com TEMP — a massa estatística de Xenakis como módulo.
+- **HABITAT** (novo, análise) = `HabitatHealth`: ADI/ACI da mistura como CV —
+  o patch pode se autorregular (um habitat lotado pede menos eventos).
+- **Aperfeiçoar HARMONY/QUANTIZER** com `SpectralConsonance` (a escala que
+  nasce do timbre) — além do banco de escalas do Trioio.
+- **Aperfeiçoar PHRASE** com `SongForm` (tema, canto, deriva, revolução) e
+  **RELATE** com `CodaExchange` (rubato que converge, ornamento na mudança).
+- **SIGNAL-IN**: o modo "sala como organismo" de `RoomCoupling` (o
+  acoplamento aprendido é a parte delicada).
+
+**Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
+entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
+tira definição da periferia) — candidato forte, nada parecido no Modular;
+**TRACE** reaproveitando o `MotionGestureRecorder` (copiar com proveniência);
+**HARMONIC PHASES** (um relógio, várias fases em razões racionais) como
+aperfeiçoamento do CLOCK; um leito de ruído ecológico no NOISE (estação,
+turbidez, trinca).
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
