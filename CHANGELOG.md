@@ -9,6 +9,12 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Relógio da gravação** (10 nov., aprovado pelo autor): gravando, o botão
+  mostra o tempo da tomada (`● REC 01:23`); no último meio minuto, também o
+  limite (`/ 04:00`), porque a tomada para sozinha aos 4 min (limite mantido
+  pelo autor). Parar antes, clicando de novo em REC, continua valendo. O
+  contador lê um atômico escrito pelo thread de áudio, não o buffer.
+
 - **A seed no nome da gravação** (10 nov., pedido do autor): o REC grava
   `rec-AAAAMMDD-HHMMSS-seedN.wav` (e o `.score.txt` com o mesmo nome) — a
   seed em que a tomada começou; `-manual` quando o patch foi editado à mão.

@@ -265,10 +265,16 @@ struct Rack {
     RecTap recTap = RecTap::post;
 
     std::atomic<bool> recording{false};
+    // quadros gravados na tomada atual — escrito pelo thread de áudio, lido
+    // pelo cabeçalho para o contador do REC (ler `recBuf.size()` da
+    // interface seria corrida com o `push_back` do áudio)
+    std::atomic<std::uint64_t> recFrames{0};
+    static constexpr double kRecMaxSeconds = 240.0;   // 4 min (decisão do autor)
     std::vector<float> recBuf;       // post-safety
     std::vector<float> recPreBuf;    // pre-safety
     void reserveRec() {
-        const auto n = static_cast<std::size_t>(sampleRate) * 2 * 240;
+        const auto n = static_cast<std::size_t>(sampleRate) * 2
+                     * static_cast<std::size_t>(kRecMaxSeconds);
         if (recTap != RecTap::pre)  recBuf.reserve(n);
         if (recTap != RecTap::post) recPreBuf.reserve(n);
     }
@@ -1191,9 +1197,10 @@ public:
 
     // leitura viva: contagem de módulos/cabos, VU do MASTER e VARIA
     void setReadout(std::size_t visMods, std::size_t totalMods,
-                    std::size_t cables, float vu, bool vary, bool rec) {
+                    std::size_t cables, float vu, bool vary, bool rec,
+                    double recSeconds = 0.0) {
         visMods_ = visMods; totalMods_ = totalMods; cables_ = cables;
-        vu_ = vu; vary_ = vary; recording_ = rec;
+        vu_ = vu; vary_ = vary; recording_ = rec; recSeconds_ = recSeconds;
     }
 
     void paint(juce::Graphics& g) override {
@@ -1278,8 +1285,23 @@ public:
         // preferências de quem usa, não estado do patch)
         rx -= buttonR(g, rx, startLabel(), flashing(Act::startup), Act::startup);
         // REC — ponto cheio quando gravando, como no painel X11
+        // gravando: o botão é também o relógio da tomada (pedido do autor,
+        // 10/11/2026) — `● REC 01:23`; no último meio minuto mostra o
+        // limite (`/ 04:00`), porque a tomada para sozinha nos 4 min
+        const auto mmss = [](double sec) {
+            const int t = std::max(0, static_cast<int>(sec));
+            char b[16];
+            std::snprintf(b, sizeof b, "%02d:%02d", t / 60, t % 60);
+            return juce::String(b);
+        };
+        juce::String recClock;
+        if (recording_) {
+            recClock = " " + mmss(recSeconds_);
+            if (recSeconds_ >= Rack::kRecMaxSeconds - 30.0)
+                recClock += " / " + mmss(Rack::kRecMaxSeconds);
+        }
         rx -= buttonR(g, rx, u8("\xe2\x97\x8f ")
-                      + str(rasgo::panel::strings::hdrRec),
+                      + str(rasgo::panel::strings::hdrRec) + recClock,
                       recording_ || flashing(Act::rec), Act::rec,
                       recording_ ? T.recording : T.accent);
         // (o RACK saiu daqui em 2 out. 2026: foi para junto do ZOOM, no
@@ -1714,6 +1736,7 @@ private:
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
     rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
     bool rackOut_ = false, standby_ = false, vary_ = true, recording_ = false;
+    double recSeconds_ = 0.0;   // tempo da tomada, para o contador do REC
     std::size_t visMods_ = 0, totalMods_ = 0, cables_ = 0;
     float vu_ = 0.0f;
 
@@ -5297,7 +5320,9 @@ private:
 
         header_.setReadout(view_->visibleModuleCount(), rack_.shown.size(),
                            rack_.graph.cableCount(), vu, rack_.motionOn,
-                           rack_.recording.load(std::memory_order_relaxed));
+                           rack_.recording.load(std::memory_order_relaxed),
+                           static_cast<double>(rack_.recFrames.load(std::memory_order_relaxed))
+                               / static_cast<double>(sampleRate_));
         tickLearn();
         pollRecAutoStop();
         view_->setPaletteHover(palette_.hoveredType());
@@ -5920,6 +5945,7 @@ private:
             std::lock_guard<std::mutex> lk(rack_.gmx);
             rack_.recBuf.clear();
             rack_.recPreBuf.clear();
+            rack_.recFrames.store(0, std::memory_order_relaxed);
             rack_.recTap = tapFromEnv();
             rack_.reserveRec();
             rack_.findMasterTap();
@@ -6187,6 +6213,7 @@ private:
                         rack_.recBuf.push_back(carryL_[i]);
                         rack_.recBuf.push_back(carryR_[i]);
                     }
+                rack_.recFrames.fetch_add(blockSize_, std::memory_order_relaxed);
                 if (wantPre
                     && rack_.masterTapNode != static_cast<std::size_t>(-1)) {
                     if (auto* ms = dynamic_cast<rasgo::modular::Master*>(
