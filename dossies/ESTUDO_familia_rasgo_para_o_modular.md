@@ -981,6 +981,50 @@ de vento — dizer isso no LEARN).
 - **PENDULUM**: o próximo passo honesto é a comparação k = 0 / fraco / forte
   de pêndulos acoplados por molas (modos normais), como o Batruc propõe.
 
+### 4.4 Trioio
+
+Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`. (Continua.)
+
+**Nuances**
+
+- **O Terceiro Olho**: perceber ao mesmo tempo o evento, o sistema que o
+  organiza e a possibilidade de transformar esse sistema ("olho 1 participa;
+  olho 2 observa; o Terceiro Olho percebe a estrutura e pode transformá-la").
+  A trapaça é só um dos modos.
+- **Uma nota não é unidade autossuficiente**: seu sentido depende da
+  trajetória, do campo e da consequência. Perguntas que o instrumento deve
+  responder: o que está tentando acontecer; que expectativa foi criada; qual
+  gesto a alterou; "quando uma repetição é estrutura e quando vira
+  automatismo; quando o silêncio é ausência e quando é ação".
+- **Estratégias** (hipóteses temporárias, não presets): seguir; acompanhar
+  com atraso; condensar; expandir; trocar o material; **preservar a energia e
+  mudar o timbre**; **preservar o gesto e negar a tonalidade**; repetir com
+  diferença; ocultar uma transformação; interromper e abrir espaço; mudar a
+  regra do jogo.
+- **Barramento de energia semântico**: a decisão não comanda amostras; publica
+  alvos suavizados (energia, densidade, brilho, harmonicidade, rugosidade,
+  dureza, duração, memória, mutação, espacialidade, intenção de ataque,
+  **grau de silêncio**) e **cada espécie interpreta o mesmo campo do seu
+  jeito** — "o mesmo aumento de tensão pode abrir um banco modal, aumentar
+  partículas granulares, alterar a excitação de uma corda".
+- **Intenção declarada × áudio observado**: a distância entre o que se pediu
+  e o que soou é material ("um pedido de rarefação pode ter produzido muitos
+  ataques"); proveniência em camadas que nunca se confundem (áudio recebido,
+  metadados, prompt original, análise inferida — "nunca afirmar ter recuperado
+  um prompt da forma de onda").
+- **Aprender é ajustar tendências, com esquecimento** para não cristalizar
+  um perfil de gosto; tudo removível e contestável pelo performer.
+- Três atitudes de escuta: RESPONDER AGORA, LER ANTES, HÍBRIDO.
+
+**Para o Modular**: um módulo **RESPONDER** (nome a decidir) — escuta
+descritores (vindos de LISTEN/SCOPE: nível, brilho, densidade de ataques,
+altura) e publica um pequeno **barramento semântico** (energia, densidade,
+brilho, silêncio…) segundo uma **estratégia** escolhida ou derivada
+(seguir, com atraso, condensar, expandir, contrariar, interromper), com
+memória curta — a ponte entre "o Modular ouve" e "o Modular responde"
+que hoje se faz à mão com cabos. Conferir antes contra o que LISTEN, SCOPE e
+o SIGNAL-IN já entregam.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
