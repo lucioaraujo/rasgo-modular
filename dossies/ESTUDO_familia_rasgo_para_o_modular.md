@@ -1755,10 +1755,13 @@ look-ahead de 5 ms guiado por pico verdadeiro 4×).
 9. **Engenharia de saída** (auditoria de 9/8): `saturation = 0` tem de ser
    **bypass de verdade**, não `tanh` com drive 1; o teste de **pior soma**
    (todas as fontes no máximo, duas vozes, master em 100 %, preview junto)
-   exige saída finita e teto de pico verdadeiro; contratos de impulso e
-   latência do limitador a 44,1/48/96/192 kHz e reinício limpo na troca de
-   taxa. É exatamente o teste de estresse que falta ao MASTER do Modular
-   (achado técnico já listado no TAREFAS).
+   exige saída finita e teto de **pico verdadeiro**. *Correção (9/11,
+   conferido no código):* o Modular já tem essa bateria em
+   `tests/test_output_excellence.cpp` (entrada a ±40, DC, NaN/Inf,
+   impulso, Nyquist em antifase, blocos irregulares, troca de taxa de 22,05
+   a 192 kHz, automação sem clique, downmix mono). O que ela **não** mede é
+   o pico **entre amostras**: confere só o pico de amostra contra o teto.
+   Falta também o contrato de latência do look-ahead por taxa.
 
 **O que isto pede ao Modular** (propostas, nada implementado)
 
@@ -1776,8 +1779,25 @@ look-ahead de 5 ms guiado por pico verdadeiro 4×).
   pode tomar as **transições nomeadas** (acumulação, erosão, ruptura,
   silêncio) e a ideia de cena como **contexto** que os módulos leem — e
   não como preset que os comanda.
-- **MASTER**: o teste de pior soma e os contratos por taxa de amostragem
+- **MASTER**: acrescentar à bateria existente a verificação de pico
+  verdadeiro (entre amostras) na saída e o contrato de latência por taxa
   (técnico, sem mudança de som).
+### 4.7 Decisão do autor sobre as propostas de §4.5–4.6 (9/11/2026)
+
+"Excelente, aprovo as sugestões." Aprovadas: VIA (com as PORTAS do
+Antitotem), COMPARADOR, ACCENT, INTERPRET (com CHARACTER), BUDGET, SUPPLY;
+os aperfeiçoamentos de DRIFT (CAPTURE, resíduo, elasticidade), PLL
+(evento de quase-encontro), SWITCH (scanner fantasma) e SEQ (cursor
+físico, fadiga); a transformação reversível com MEMORY; o desenho do
+CUT-UP vindo do Navalha; o FORM como contexto com transições nomeadas;
+o pico verdadeiro e a latência na bateria do MASTER.
+
+Aprovar a proposta não muda a regra de ritmo: **um módulo por vez**, cada
+um com proposta detalhada (nome, painel, comportamento, o que fica de fora)
+antes do código, e a escuta dos dez módulos já validados vem antes de abrir
+protótipos novos. Os itens técnicos sem mudança de som (pico verdadeiro no
+teste do MASTER, denormais) podem andar antes da escuta.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
