@@ -53,22 +53,25 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 16;
+        // 10 HP (era 16 — pedido do autor, 8/11: largo demais). O Display
+        // "arp" mostra as notas rolando (a altura, com os gates em destaque).
+        p.hp = 10;
         p.add(Widget::Kind::Label, "ARP", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Knob, "CHORD", "chord", 9.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "INV", "inversion", 33.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "OCT", "octaves", 57.0f, 14.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 9.0f, 36.0f);
-        p.add(Widget::Kind::Knob, "SKIP", "skip", 33.0f, 36.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 58.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 33.0f, 58.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 8.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 30.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "ROOT", "in:root", 52.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "CHD", "in:chord_cv", 74.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 8.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GT", "out:gate", 30.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "EOS", "out:eos", 52.0f, 116.0f);
+        p.add(Widget::Kind::Display, "arp", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Knob, "CHORD", "chord", 5.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "INV", "inversion", 20.5f, 30.0f);
+        p.add(Widget::Kind::Knob, "OCT", "octaves", 36.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 5.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "SKIP", "skip", 20.5f, 50.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 36.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 5.0f, 70.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 7.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 19.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "ROOT", "in:root", 31.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "CHD", "in:chord_cv", 43.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 7.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "GT", "out:gate", 19.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "EOS", "out:eos", 31.0f, 116.0f);
         return p;
     }
 
