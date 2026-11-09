@@ -862,6 +862,38 @@ marca em vez do comportamento; e, na revisão de layout dos painéis pedida
 pelo autor (com as referências do Cardinal), adotar os mínimos e a regra de
 dependência visível do Aquorbium como ponto de partida.
 
+**Corpos com par no Modular** (`MODAL_RESONATOR_DESIGN.md`,
+`PHYSICAL_STRING_DESIGN.md`, `GRANULAR_CAPTURE_DESIGN.md`, lidos):
+
+- **Modal**: quatro modos complexos que giram e encolhem; o decaimento é
+  dado pelo tempo até 1/e (independe da taxa de amostragem); **`excite()`
+  soma energia sem reiniciar a fase nem apagar a cauda** — "repetir eventos
+  constrói uma história em vez de repetir uma amostra"; teto de energia
+  antes de overflow; corte explícito de caudas subnormais. O eixo MATERIAL
+  vai de harmônico (1, 2, 3, 4) a **membrana** (1; 1,593; 2,136; 2,295 — zeros
+  de Bessel).
+- **Corda**: laço = atraso inteiro N + all-pass fracionário d + FIR de perdas
+  (1−b) + b·z⁻¹, com **N + d + b ≈ fs/f0** (o atraso do filtro de perdas é
+  descontado da afinação); ganho de volta pelo alvo de −60 dB no tempo de
+  decaimento (`g = exp(ln 0,001 / (T·f0))`); a rajada de excitação é gerada
+  **uma amostra por vez** (o custo do ataque não salta no callback);
+  posição de pinça por cancelamento de dois pontos.
+- **Captura granular**: cada grão **congela** duração, velocidade, direção,
+  pan e ganho ao nascer; o pool cheio **recusa e conta** (sem roubo
+  silencioso); a leitura começa no passado com margem para 2× de velocidade
+  (nunca lê onde está sendo escrito); onset pela razão de envoltórias de 3 e
+  50 ms com piso e período refratário.
+
+**Achado verificado no Modular (9/11)**: o **STRING** (`StringVoice.hpp`)
+calcula o atraso como inteiro + all-pass fracionário, mas **não desconta o
+atraso de fase do filtro de perda** (um polo, coeficiente
+`0,05 + (1 − damping)·0,9`) — a corda tende a sair **baixa**, mais quanto mais
+fechado o DAMP; e **o teste aceita 6 % de erro** (~100 cents) na altura.
+A cópia desse núcleo no Aquorbium mediu 4,4 cents baixa e foi corrigida
+compensando o atraso. Correção técnica direta (afinação), com teste em cents.
+**MATTER/RESONATOR**: conferir se `excite` soma ou reinicia, e o ponto
+"membrana" no eixo STRUCTURE.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
