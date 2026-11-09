@@ -28,6 +28,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   idiomas, dossiês, guias; na BIBLIOTECA, fora da seed; suíte 90/90.
 - [ ] Escuta dos quatro pelo autor (as receitas dos guias são o roteiro);
   decidir se algum entra na seed.
+- [x] **MOUSSE** (#69), **PENDULUM** (#70), **PRISM** (#71) — lote 1 das
+  ideias físicas/ópticas aprovadas pelo autor (9/11, "aprovo todos").
+- [ ] Lote 2: MAGNET, ORBIT, PRESSURE, ELASTIC. Lote 3: REFRACT,
+  INTERFERENCE, LENS. Lote 4: TAPE, CUT-UP. (Aprovados; mesma disciplina.)
 - [ ] Escalas microtonais / Scala no QUANTIZER (pendência antiga, abaixo).
 - [x] **ARP** (#64), aprovado: arpejador com os formatos do CHORD, 8
   caminhos (clássicos + divergir/convergir), SKIP semeado, ROOT vindo do

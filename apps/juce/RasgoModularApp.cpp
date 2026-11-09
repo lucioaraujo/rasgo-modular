@@ -460,6 +460,19 @@ struct Rack {
                 if (const auto* cell = dynamic_cast<const rasgo::modular::Cell*>(&graph.node(id)))
                     it->second.pushLanes(cell->rowAsFloat(),
                                          graph.node(id).parameterValue("cells"), 0.0f, 0.0f);
+            } else if (graph.node(id).type() == "MOUSSE") {
+                const auto* depth = graph.lastOutput(id, 0);
+                if (depth && depth->frames() > 0)
+                    it->second.pushLanes(depth->at(0, depth->frames() - 1), 0.0f, 0.0f, 0.0f);
+            } else if (graph.node(id).type() == "PENDULUM") {
+                const auto* x1 = graph.lastOutput(id, 0);
+                const auto* y1 = graph.lastOutput(id, 1);
+                const auto* x2 = graph.lastOutput(id, 2);
+                const auto* y2 = graph.lastOutput(id, 3);
+                if (x1 && y1 && x2 && y2 && x1->frames() > 0) {
+                    const std::size_t last = x1->frames() - 1;
+                    it->second.pushLanes(x1->at(0, last), y1->at(0, last), x2->at(0, last), y2->at(0, last));
+                }
             } else if (graph.node(id).type() == "BOUNCE") {
                 const auto* gate = graph.lastOutput(id, 0);
                 const auto* h1 = graph.lastOutput(id, 2);
@@ -3828,6 +3841,47 @@ private:
                                        std::max(1.0f, colw), std::max(1.0f, rowh - 0.5f));
                 }
                 dlabel = "rule " + juce::String(static_cast<int>(std::lround(node.parameterValue("rule"))));
+            } else if (mtype == "MOUSSE") {
+                // a espuma vista de lado: a superfície afunda de cima para baixo
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const float colw = static_cast<float>(dw - 2) / static_cast<float>(nL);
+                g.setColour(T.accent.withAlpha(0.35f));
+                for (std::size_t k = 0; k < nL; ++k) {
+                    const float d = juce::jlimit(0.0f, 1.0f, sc.lane(0, k));
+                    const float top = static_cast<float>(wy + 1) + d * static_cast<float>(dh - 3);
+                    g.fillRect(static_cast<float>(wx + 1) + colw * static_cast<float>(k), top,
+                               std::max(1.0f, colw), static_cast<float>(wy + dh - 1) - top);
+                }
+                juce::Path path;
+                for (std::size_t k = 0; k < nL; ++k) {
+                    const float px = static_cast<float>(wx + 1) + colw * static_cast<float>(k);
+                    const float py = static_cast<float>(wy + 1) + juce::jlimit(0.0f, 1.0f, sc.lane(0, k)) * static_cast<float>(dh - 3);
+                    if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
+                }
+                g.setColour(T.accent);
+                g.strokePath(path, juce::PathStrokeType(1.5f));
+                dlabel.clear();
+            } else if (mtype == "PENDULUM") {
+                // o pêndulo agora (as duas hastes) e o rastro da ponta de baixo
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const float cx = static_cast<float>(wx) + static_cast<float>(dw) * 0.5f;
+                const float cy = static_cast<float>(wy) + static_cast<float>(dh) * 0.5f;
+                const float r = static_cast<float>(dh) * 0.48f;
+                juce::Path trail;
+                for (std::size_t k = 0; k < nL; ++k) {
+                    const float px = cx + sc.lane(2, k) * r, py = cy - sc.lane(3, k) * r;
+                    if (k == 0) trail.startNewSubPath(px, py); else trail.lineTo(px, py);
+                }
+                g.setColour(T.accent.withAlpha(0.5f));
+                g.strokePath(trail, juce::PathStrokeType(1.0f));
+                const float x1 = cx + sc.lane(0, nL - 1) * r, y1 = cy - sc.lane(1, nL - 1) * r;
+                const float x2 = cx + sc.lane(2, nL - 1) * r, y2 = cy - sc.lane(3, nL - 1) * r;
+                g.setColour(T.textPrimary);
+                g.drawLine(cx, cy, x1, y1, 1.5f);
+                g.drawLine(x1, y1, x2, y2, 1.5f);
+                g.setColour(T.accent);
+                g.fillEllipse(x2 - 2.5f, y2 - 2.5f, 5.0f, 5.0f);
+                dlabel.clear();
             } else if (mtype == "BOUNCE") {
                 // a altura de cada bola rolando, o chão embaixo
                 const std::size_t nL = rasgo::ui::kLaneLen;

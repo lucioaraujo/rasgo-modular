@@ -18,6 +18,13 @@ pronto.
   AUTO) e **SPRING** (#68, SPACE — reverb de mola; KICK sacode o tanque, TENS
   por CV). Testes próprios; LEARN nos quatro idiomas; dossiês e guias. Ainda
   não ouvidos pelo autor.
+- **MOUSSE, PENDULUM, PRISM** (9 nov., ideias do autor sobre física e
+  óptica): **MOUSSE** (#69, MODULATE — uma espuma que afunda e volta devagar,
+  um envelope mole; FATIGUE), **PENDULUM** (#70, MODULATE — pêndulo duplo:
+  posições como CV, CROSS e FLIP; nunca para) e **PRISM** (#71, SPACE — o som
+  em 6 cores atrasadas e abertas em leque; dispersão anômala e realimentação
+  por cor). Na BIBLIOTECA, fora da seed; mostradores, testes, LEARN, dossiês
+  e guias.
 
 - **SCOPE** (8 nov.): a saída **CONF** (gate de altura confiável), o
   **KEEP** (o PIT segura a última altura no silêncio, em vez de cair a
