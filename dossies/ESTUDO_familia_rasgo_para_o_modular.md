@@ -910,6 +910,77 @@ tira definição da periferia) — candidato forte, nada parecido no Modular;
 aperfeiçoamento do CLOCK; um leito de ruído ecológico no NOISE (estação,
 turbidez, trinca).
 
+### 4.3 Batruc (só leitura — o autor edita em paralelo)
+
+Lidos inteiros: `MOVIMENTO_GRAFICO_E_SOM.md`, `OPERACOES_GENERATIVAS.md`,
+`RITMOS_E_CONTAGENS.md`. (Faltam `README.md`, `BIBLIOGRAFIA_DE_ESTUDO.md` e as
+auditorias; `TAREFAS.md` fica fora como diário.)
+
+**A nuance central do Batruc é a honestidade do nome**: "isso é uma analogia
+composicional de onda viajante; não representa automaticamente uma corda";
+"rebote amortecido é um perfil radial com essa aparência; não simula uma
+colisão"; "reflexão geométrica, reflexão óptica e projeção anamórfica são
+fenômenos distintos"; "a deriva atual é periódica e reproduzível, não é caos
+comprovado"; "a transformação não deve receber o nome de 'inversão' se apenas
+alterar ganho ou sortear parâmetros"; "τ é temperatura composicional
+adimensional; não é temperatura física nem mede emoção"; "um 'preset
+Xenakis' sem módulos e resíduos não explica o processo"; "usar palavras como
+superposição ou incerteza não constitui modelo". Parâmetros físicos (massa,
+tensão, velocidade) **só quando participam das equações com unidades
+coerentes**. — **Para o Modular**: revisar os módulos desta sessão por esse
+crivo (ex.: o PRISM é dispersão de verdade, por atraso por banda — honesto;
+o BOUNCE é física de livro-texto — honesto; o "WIND" é acaso semeado com nome
+de vento — dizer isso no LEARN).
+
+**Outras nuances**
+
+- **Uma operação tem fonte, tipo, escopo (célula, compasso, frase, seção,
+  peça), parâmetros, seed, invariantes, resultado e versão anterior**, e só
+  entra na fronteira do seu escopo. Variar uma função são **quatro ações
+  diferentes**: trocar a família matemática, mudar os parâmetros, transformar
+  o resultado ou trocar o destino musical — sempre **fonte → transformação →
+  destino**, com travas, "intensidade zero congela a dimensão", desfazer e A/B.
+- **Três representações consultáveis**: o material calculado, a decisão
+  composicional e os eventos efetivamente tocados. "Expressividade não deve ser
+  reduzida a sorteios independentes nem a um único controle genérico chamado
+  humanize."
+- **Gramani** (*Rítmica*, 1988; *Rítmica viva*, 1996; leituras de Fiaminghi e
+  Ribeiro): associação, dissociação, **inversão de papéis entre vozes**
+  (o ostinato passa a uma voz e a série à outra, numa fronteira de compasso),
+  o ostinato como **tempo moldado**, não metrônomo neutro; padrões culturais
+  com fonte e contexto, nunca presets universais.
+- **Geometria rítmica**: polígonos inscritos (N vértices = N divisões; N e M
+  sobrepostos mostram N:M; o retorno conjunto pelo mmc, **demonstrado pela
+  aritmética, não pela simetria do desenho**); o estudo **Orbit 3:4:5:7** com
+  rastro acumulado; casos de estudo (Tool, Meshuggah) tratados como hipóteses
+  a conferir na gravação.
+- **Eventos de geometria**: cruzamentos de duas curvas com sentido declarado
+  e **teto de eventos por seção**; leis de intensidade pela distância
+  (encontro × afastamento — o mesmo movimento, dois sentidos musicais); afinidade
+  gradual na borda (smoothstep), não liga/desliga.
+- **Espaço classificado antes de compor** (topológico, diferenciável,
+  métrico, espectral, simplético, fibrado, quântico), Chern/Berry com as
+  hipóteses certas, Gordon–Webb–Wolpert (formas diferentes, mesmo espectro).
+- **O Batruc leu o Modular**: VARIA/MotionEngine, MUDA/EVOLUI/CRUZA,
+  PHRASE, DECISION, FUNCTION, EUCLID, SWITCH — como "perguntas de design".
+
+**Para o Modular**
+
+- **SIEVE** (já proposto): a expressão (união, interseção, complemento de
+  `j mod m ∈ R`) **visível e editável** no painel e no LEARN, com o período
+  resultante — nunca "modo Xenakis".
+- **POLYGON** (novo, didático e generativo): camadas N:M:… com fases, gates
+  por camada, gate de coincidência e EOS no realinhamento; o mostrador
+  desenha os polígonos inscritos e o rastro (Orbit) — a geometria rítmica do
+  Batruc como módulo, ligada à fase didática do Modular.
+- **SWAP de papéis** entre duas sequências numa fronteira (Gramani) — talvez
+  um modo do SWITCH; conferir.
+- **EPICYCLE** (já proposto): com a distinção Fibonacci (pesos 1/Fₙ ou
+  velocidades Fₙω₀ — escolhas diferentes, nomeadas) e espiral áurea
+  logarítmica × aproximação por quadrados.
+- **PENDULUM**: o próximo passo honesto é a comparação k = 0 / fraco / forte
+  de pêndulos acoplados por molas (modos normais), como o Batruc propõe.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
