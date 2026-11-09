@@ -23,6 +23,12 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   catálogo da seed + cadeia de processadores; ~25 % das seeds; as seeds
   anteriores mudaram. ARP e DYNAMICS com 10 HP e mostrador próprio.
 - [ ] Escuta do DYNAMICS pelo autor (as receitas do guia são o roteiro).
+- [x] **CELL** (#65), **MARKOV** (#66), **BOUNCE** (#67), **SPRING** (#68),
+  aprovados pelo autor (9/11): DSP, mostradores, testes próprios, LEARN nos 4
+  idiomas, dossiês, guias; na BIBLIOTECA, fora da seed; suíte 90/90.
+- [ ] Escuta dos quatro pelo autor (as receitas dos guias são o roteiro);
+  decidir se algum entra na seed.
+- [ ] Escalas microtonais / Scala no QUANTIZER (pendência antiga, abaixo).
 - [x] **ARP** (#64), aprovado: arpejador com os formatos do CHORD, 8
   caminhos (clássicos + divergir/convergir), SKIP semeado, ROOT vindo do
   HARMONY, relógio interno quando o CLK está livre. Teste próprio verde;

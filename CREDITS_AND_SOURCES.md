@@ -49,6 +49,25 @@ cópia de código, no Bogaudio ARP (GPL-3.0-or-later) e no Arp 3.x da
 Amalgamated Harmonics (BSD-3-Clause), dentro do DISTRHO Cardinal 26.02. A
 tabela de formatos é a do CHORD (#26). Contrato em [64](dossies/64_arp.md).
 
+## CELL, MARKOV, BOUNCE, SPRING — implementações próprias
+
+Os módulos 65–68, de 9/11/2026, são implementação original sob
+AGPL-3.0-or-later, a partir de ideias públicas; os conceitos foram lidos, sem
+cópia de código, em coleções de licença livre dentro do DISTRHO Cardinal 26.02:
+
+- **CELL** — autômatos celulares elementares de S. Wolfram (*Rev. Mod. Phys.*
+  55, 1983); voxglitch Glitch Sequencer (GPL-3.0-or-later).
+- **MARKOV** — a composição por cadeias de Markov de Hiller e Isaacson (*Illiac
+  Suite*, 1957) e de Xenakis (*Analogique A*); ZetaCarinae Rosenchance e
+  GuildensTurn (GPL-3.0-or-later).
+- **BOUNCE** — mecânica de livro-texto (queda livre, restituição); JW-Modules
+  Bouncy Balls (BSD-3-Clause) e voxglitch Hazumi (GPL-3.0-or-later).
+- **SPRING** — V. Välimäki, J. Parker, J. S. Abel, "Parametric Spring
+  Reverberation Effect", *JAES* 58(7/8), 2010; Autinn Coil (GPL-3.0-or-later).
+
+Contratos em [65](dossies/65_cell.md), [66](dossies/66_markov.md),
+[67](dossies/67_bounce.md) e [68](dossies/68_spring.md).
+
 ## Código de terceiros incorporado
 
 Só três, e nenhum no núcleo de DSP:

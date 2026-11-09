@@ -375,6 +375,26 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_arp_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_arp_tests COMMAND rasgo_modular_arp_tests)
 
+    add_executable(rasgo_modular_cell_tests tests/test_cell.cpp)
+    target_link_libraries(rasgo_modular_cell_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_cell_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_cell_tests COMMAND rasgo_modular_cell_tests)
+
+    add_executable(rasgo_modular_markov_tests tests/test_markov.cpp)
+    target_link_libraries(rasgo_modular_markov_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_markov_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_markov_tests COMMAND rasgo_modular_markov_tests)
+
+    add_executable(rasgo_modular_bounce_tests tests/test_bounce.cpp)
+    target_link_libraries(rasgo_modular_bounce_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_bounce_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_bounce_tests COMMAND rasgo_modular_bounce_tests)
+
+    add_executable(rasgo_modular_spring_tests tests/test_spring.cpp)
+    target_link_libraries(rasgo_modular_spring_tests PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_spring_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_spring_tests COMMAND rasgo_modular_spring_tests)
+
     add_executable(rasgo_modular_dynamics_tests tests/test_dynamics.cpp)
     target_link_libraries(rasgo_modular_dynamics_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_dynamics_tests PRIVATE ${rasgo_modular_warnings})

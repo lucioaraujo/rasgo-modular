@@ -93,6 +93,10 @@ propriedade do cabo, não um módulo do catálogo.
 | 62 | [`62_phrase.md`](62_phrase.md) | `PHRASE` (motivo interpretado por estímulos) | DECISION | implementação local, 2026-10-17 |
 | 63 | [`63_dynamics.md`](63_dynamics.md) | `DYNAMICS` (compressor e gate com sidechain; ENV/GR como sinais) | TRANSFORM | implementação local, 2026-11-08 |
 | 64 | [`64_arp.md`](64_arp.md) | `ARP` (arpejador: 10 formatos, 8 caminhos, SKIP semeado) | TIME | implementação local, 2026-11-08 |
+| 65 | [`65_cell.md`](65_cell.md) | `CELL` (autômato celular como sequenciador; MUT, renasce) | TIME | implementação local, 2026-11-09 |
+| 66 | [`66_markov.md`](66_markov.md) | `MARKOV` (cadeia de Markov que aprende e improvisa; TEMP, SURP) | DECISION | implementação local, 2026-11-09 |
+| 67 | [`67_bounce.md`](67_bounce.md) | `BOUNCE` (bolas que quicam: gates, acento, alturas; WIND, AUTO) | MODULATE | implementação local, 2026-11-09 |
+| 68 | [`68_spring.md`](68_spring.md) | `SPRING` (reverb de mola; KICK, TENS por CV) | SPACE | implementação local, 2026-11-09 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado
