@@ -356,11 +356,12 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // cadeia de processamento: 0-3 bus processors em série (por complexity)
     std::size_t bodyNode = voiceNode;
     const char* bodyOut = voiceOutNm;
-    const char* procs[5] = {"FILTER", "SHAPE", "LPG", "PARAMETRIC", "SPACE"};
+    // DYNAMICS desde 9/11 (decisão do autor; as seeds anteriores mudaram)
+    const char* procs[6] = {"FILTER", "SHAPE", "LPG", "PARAMETRIC", "SPACE", "DYNAMICS"};
     const int nProc = static_cast<int>(std::lround(id.complexity * 3.0f))
         + (chance(0.4f) ? 1 : 0);
     for (int pi = 0; pi < nProc; ++pi) {
-        const char* pr = procs[rnd() % 5];
+        const char* pr = procs[rnd() % 6];
         if (!hasT(pr) || firstT(pr) == bodyNode) continue;
         const int ai = pIn(firstT(pr), "in");
         const int so = pOut(bodyNode, bodyOut);
@@ -397,6 +398,28 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
             setP(bodyNode, "gain2", rng(-6.0f, 6.0f));
             setP(bodyNode, "q2", rng(0.6f, 2.5f));
             setP(bodyNode, "mix", 1.0f);
+            bodyOut = "out";
+        } else if (std::string(pr) == "DYNAMICS") {
+            // compressão musical, nunca um susto: limiar −30..−12 dB,
+            // ratio 2–6, ataque 2–30 ms, release 60–400 ms; o GAIN devolve
+            // só parte do que a curva tira (nunca mais que ela abaixa).
+            const float thr = rng(-30.0f, -12.0f);
+            const float ratio = rng(2.0f, 6.0f);
+            setP(bodyNode, "thresh", thr);
+            setP(bodyNode, "ratio", ratio);
+            setP(bodyNode, "attack", rng(2.0f, 30.0f));
+            setP(bodyNode, "release", rng(60.0f, 400.0f));
+            setP(bodyNode, "knee", rng(3.0f, 10.0f));
+            setP(bodyNode, "makeup", std::min(12.0f, -thr * (1.0f - 1.0f / ratio) * 0.35f));
+            setP(bodyNode, "detect", chance(0.5f) ? 1.0f : 0.0f);
+            setP(bodyNode, "breath", chance(0.35f) ? rng(0.3f, 1.0f) : 0.0f);
+            setP(bodyNode, "drift", chance(0.3f) ? rng(0.1f, 0.6f) : 0.0f);
+            // às vezes o bumbo abaixa a voz: o pad que respira
+            if (hasT("DRUM") && chance(0.35f)
+                && connectByName("DRUM", "out", "DYNAMICS", "side"))
+                setP(bodyNode, "side_mix", 1.0f);
+            else
+                setP(bodyNode, "side_mix", 0.0f);
             bodyOut = "out";
         } else {  // SPACE
             setP(bodyNode, "time", rng(0.02f, 1.0f));
@@ -661,7 +684,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 || nm == "gain" || nm == "output" || nm == "out_gain"
                 || nm == "fm_amount" || nm == "listen"
                 // depois da v0.1.7 — fora do sorteio (seeds antigas iguais)
-                || nm == "pit_keep" || nm == "pit_oct")
+                || nm == "pit_keep" || nm == "pit_oct"
+                // GAIN do DYNAMICS: nível, como os outros ganhos
+                || nm == "makeup")
                 continue;
             if (f01() > 0.55f) continue;
             const float lo = dsc.minimum, hi = dsc.maximum;

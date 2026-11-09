@@ -192,7 +192,7 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
 inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
-        {"TRANSFORM", {"FILTER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL"}},
+        {"TRANSFORM", {"FILTER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR"}},
@@ -210,9 +210,9 @@ inline const std::vector<CatalogGroup>& moduleCatalog() {
             const std::string family = group.family;
             if (family == "DECISION") group.types.push_back("PHRASE");
             if (family == "OUT") group.types.push_back("LISTEN");
-            // DYNAMICS (8/11): fora do catálogo da seed, como LISTEN e PHRASE —
-            // as seeds antigas continuam gerando os mesmos patches.
-            if (family == "TRANSFORM") group.types.push_back("DYNAMICS");
+            // DYNAMICS entrou no catálogo da seed em 9/11 (decisão do autor:
+            // "por direto no sorteio, mais simples") — as seeds anteriores a
+            // essa data passaram a gerar outros patches.
             if (family == "TIME") group.types.push_back("ARP");
         }
         return groups;

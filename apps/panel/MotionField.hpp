@@ -46,7 +46,7 @@ inline MotionReach motionReach(const std::string& id) {
         return MotionReach::Structural;
     // ganho de barramento — clamp duro, quase não mexe
     if (has("gain") || has("level") || has("output") || has("master")
-        || has("volume") || has("trim") || has("out_gain"))
+        || has("volume") || has("trim") || has("out_gain") || has("makeup"))
         return MotionReach::Level;
     // poderosos perto do extremo (aspereza / auto-oscilação) — respira, não varre
     if (has("reson") || has("feedback") || has("regen") || has("drive")

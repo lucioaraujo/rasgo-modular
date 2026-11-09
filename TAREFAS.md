@@ -19,6 +19,9 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] **DYNAMICS** (#63), aprovado pelo autor: compressor/gate com sidechain,
   ENV/GR como sinais, BRTH e DRIFT. Teste próprio verde; suíte local; LEARN
   nos 4 idiomas; dossiê e guia. Fora do catálogo da seed.
+- [x] DYNAMICS na seed (9/11, decisão do autor: "por direto no sorteio"):
+  catálogo da seed + cadeia de processadores; ~25 % das seeds; as seeds
+  anteriores mudaram. ARP e DYNAMICS com 10 HP e mostrador próprio.
 - [ ] Escuta do DYNAMICS pelo autor (as receitas do guia são o roteiro).
 - [x] **ARP** (#64), aprovado: arpejador com os formatos do CHORD, 8
   caminhos (clássicos + divergir/convergir), SKIP semeado, ROOT vindo do

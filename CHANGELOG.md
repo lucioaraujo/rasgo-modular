@@ -21,9 +21,12 @@ pronto.
   compensação (GAIN). Desvios Rasgo: as saídas ENV (o nível que o detector
   ouve) e GR (quanto ele abaixa) como sinais de controle; BRTH, o release
   que segue o intervalo entre os golpes; DRIFT, ataque e release que
-  variam a cada golpe por acaso semeado. Fora do catálogo da seed (as seeds
-  antigas não mudam). Teste próprio; LEARN nos quatro idiomas; dossiê e
-  guia. Ainda não ouvido pelo autor.
+  variam a cada golpe por acaso semeado. **Entra na seed** (9 nov., decisão
+  do autor) como um dos processadores da cadeia, em ~1 de cada 4 seeds, às
+  vezes com o DRUM no SIDE — **por isso as seeds anteriores geram outros
+  patches**. Painel de 10 HP com mostrador (ENV, limiar, redução). Teste
+  próprio; LEARN nos quatro idiomas; dossiê e guia. Ainda não ouvido pelo
+  autor.
 - **ARP** (#64, TIME, 8 nov.): arpejador. Os 10 formatos do CHORD, inversão,
   até 4 oitavas e 8 caminhos (sobe, desce, ida e volta, ida e volta com as
   pontas, aleatório, embaralhado, divergir, convergir). Relógio interno

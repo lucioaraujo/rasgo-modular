@@ -79,6 +79,8 @@ inline bool isMutationBlocked(const std::string& id) noexcept {
         "gain1", "gain2", "gain3", "gain4", "level1", "level2",
         // SCOPE, depois da v0.1.7: escolhas de quem toca, não de mutação
         "pit_keep", "pit_oct",
+        // GAIN do DYNAMICS (até +24 dB): nível, não timbre
+        "makeup",
     };
     return blocked.count(id) != 0;
 }
