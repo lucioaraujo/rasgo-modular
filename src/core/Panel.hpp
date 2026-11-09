@@ -60,6 +60,10 @@ struct Widget {
     float x = 0.0f;
     float y = 0.0f;
     float span = 1.0f;  // Display: largura; Knob >1: diâmetro; Toggle >1: largura do rótulo abaixo (mm)
+    // Display: altura (mm). 16 é o padrão de todos os visores (pedido do
+    // autor 2026-09-06); um módulo cuja imagem precisa de mais altura (o
+    // PENDULUM, 10/11/2026) pede a sua com `Panel::tall`.
+    float height = 16.0f;
 };
 
 struct Panel {
@@ -69,6 +73,10 @@ struct Panel {
     void add(const Widget::Kind kind, std::string label, std::string bind,
              const float x, const float y, const float span = 1.0f) {
         widgets.push_back({kind, std::move(label), std::move(bind), x, y, span});
+    }
+    // altura própria para o último widget adicionado (um Display)
+    void tall(const float heightMM) {
+        if (!widgets.empty()) widgets.back().height = heightMM;
     }
 };
 

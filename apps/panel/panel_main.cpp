@@ -1704,7 +1704,7 @@ int main() {
                     dw = std::min(dw, m.w - mmpx(w.x) - mmpx(2.0f));
                     // altura 16 mm (era 13) — osciloscópios/espectros com
                     // mais respiro (pedido do autor 2026-09-06)
-                    const int dh = mmpx(16.0f);
+                    const int dh = mmpx(w.height);   // 16 mm salvo `Panel::tall`
                     XSetForeground(dpy, gc, T.recessed);
                     XFillRectangle(dpy, bb, gc, wx, wy, dw, dh);
                     XSetForeground(dpy, gc, T.line);

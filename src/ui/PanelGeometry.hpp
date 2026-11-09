@@ -79,7 +79,7 @@ inline RectMM footprintMM(const rasgo::modular::Widget& w) {
         return {w.x - half, w.y - 7.0f, 2.0f * half, 13.0f};
     }
     case Kind::Display: return {w.x - 0.5f, w.y - 0.5f,
-                                (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 17.5f};
+                                (w.span > 1.0f ? w.span : 16.0f) + 1.0f, w.height + 1.5f};
     case Kind::Label:  return {w.x - 0.5f, w.y - 0.5f, 2.0f + lbl * 1.9f, 3.5f};
     }
     return {w.x, w.y, 4.0f, 4.0f};

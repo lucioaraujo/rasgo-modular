@@ -149,7 +149,7 @@ std::vector<Rect> footprints(const std::string& type, const Panel& p) {
             break;
         case Widget::Kind::Display:
             v.push_back({w.x - 0.5f, w.y,
-                         (w.span > 1.0f ? w.span : 16.0f) + 1.0f, 16.5f, "disp"});
+                         (w.span > 1.0f ? w.span : 16.0f) + 1.0f, w.height + 0.5f, "disp"});
             break;
         case Widget::Kind::Label:
             v.push_back({w.x - 0.5f, w.y - 0.5f, tw, 4.0f, "hdr"});

@@ -3749,7 +3749,7 @@ private:
                       const bool staticPass) {
         int dw = mmpx(w.span > 1.0f ? w.span : 16.0f);
         dw = std::min(dw, m.bounds.getWidth() - mmpx(w.x) - mmpx(2.0f));
-        const int dh = mmpx(16.0f);
+        const int dh = mmpx(w.height);
         const juce::Rectangle<int> box(wx, wy, dw, dh);
         if (staticPass) {      // só a moldura; o conteúdo anima
             g.setColour(T.recessed);
