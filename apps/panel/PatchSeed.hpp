@@ -204,6 +204,35 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                        {firstT(dt), static_cast<std::size_t>(di)});
     };
 
+    // ---- rack de fábrica: a seed é a identidade do patch ---------
+    // (9/11/2026) Toda seed parte do rack de FÁBRICA — cada parâmetro de
+    // cada módulo volta ao seu valor padrão antes de compor. Antes, a seed
+    // só redefinia o que ela mesma sorteava, e o resto passava de uma seed
+    // para a outra: em 40 seeds clicadas em sequência, 39 saíam diferentes
+    // da mesma seed num rack novo, e o `out_gain` do MIXER (posto pelo
+    // equilíbrio de volume) subia de clique em clique até +12 dB.
+    // Num rack novo isto não muda nada (os valores já são os padrões),
+    // então nenhuma seed muda de som; só deixa de herdar o clique anterior.
+    // Ficam de fora só as escolhas do MÚSICO que nenhuma seed sorteia: o
+    // MUTE do MASTER (proteção dos ouvidos) e o ganho/monitor da entrada
+    // de áudio (SIGNAL-IN gain/listen, ajuste do dispositivo).
+    // `test_seed_identity.cpp` fixa o invariante.
+    // As modulações de parâmetro (as da DRIFT, abaixo) também são do patch
+    // anterior: sem limpar, elas se somavam clique a clique — o patch salvo
+    // do autor tinha dezenas empilhadas no cutoff e na ressonância.
+    g.clearModulations();
+    for (std::size_t n = 0; n < N; ++n) {
+        Signal& node = g.node(n);
+        const std::string t = node.type();
+        for (const auto& pr : node.parameters()) {
+            const std::string& pid = pr.descriptor.id;
+            if (t == "MASTER" && pid == "mute") continue;
+            if (t == "SIGNAL-IN" && (pid == "gain" || pid == "listen")) continue;
+            if (pr.value != pr.descriptor.defaultValue)
+                setP(n, pid.c_str(), pr.descriptor.defaultValue);
+        }
+    }
+
     // ---- limpa tudo ---------------------------------------------
     for (std::size_t i = g.cableCount(); i-- > 0;) {
         const auto tg = g.cable(i).target();
@@ -356,12 +385,15 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // cadeia de processamento: 0-3 bus processors em série (por complexity)
     std::size_t bodyNode = voiceNode;
     const char* bodyOut = voiceOutNm;
-    // DYNAMICS desde 9/11 (decisão do autor; as seeds anteriores mudaram)
-    const char* procs[6] = {"FILTER", "SHAPE", "LPG", "PARAMETRIC", "SPACE", "DYNAMICS"};
+    // DYNAMICS desde 9/11 (decisão do autor; as seeds anteriores mudaram);
+    // SPRING e PRISM também em 9/11 — processadores de áudio só entram no
+    // patch pela cadeia; o passeio quase nunca os alcança (2,7 % das seeds).
+    const char* procs[8] = {"FILTER", "SHAPE", "LPG", "PARAMETRIC", "SPACE", "DYNAMICS",
+                            "SPRING", "PRISM"};
     const int nProc = static_cast<int>(std::lround(id.complexity * 3.0f))
         + (chance(0.4f) ? 1 : 0);
     for (int pi = 0; pi < nProc; ++pi) {
-        const char* pr = procs[rnd() % 6];
+        const char* pr = procs[rnd() % 8];
         if (!hasT(pr) || firstT(pr) == bodyNode) continue;
         const int ai = pIn(firstT(pr), "in");
         const int so = pOut(bodyNode, bodyOut);
@@ -420,6 +452,24 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 setP(bodyNode, "side_mix", 1.0f);
             else
                 setP(bodyNode, "side_mix", 0.0f);
+            bodyOut = "out";
+        } else if (std::string(pr) == "SPRING") {
+            // a mola como espaço: cauda média, gotejamento presente,
+            // mistura contida — nunca o "boing" no máximo por sorteio
+            setP(bodyNode, "decay", rng(0.6f, 0.92f));
+            setP(bodyNode, "tension", rng(0.2f, 0.8f));
+            setP(bodyNode, "damp", rng(0.2f, 0.7f));
+            setP(bodyNode, "drip", rng(0.3f, 0.8f));
+            setP(bodyNode, "mix", rng(0.2f, 0.5f));
+            bodyOut = "out";
+        } else if (std::string(pr) == "PRISM") {
+            // dispersão audível sem desfazer a nota: atraso por banda
+            // até 250 ms, realimentação contida
+            setP(bodyNode, "disp", rng(20.0f, 250.0f));
+            setP(bodyNode, "curve", rng(-1.0f, 1.0f));
+            setP(bodyNode, "spread", rng(0.3f, 0.9f));
+            setP(bodyNode, "feedback", rng(0.0f, 0.5f));
+            setP(bodyNode, "mix", rng(0.3f, 0.7f));
             bodyOut = "out";
         } else {  // SPACE
             setP(bodyNode, "time", rng(0.02f, 1.0f));
@@ -502,6 +552,13 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         // teto em -1 dBFS. (30% / -38,4 dB até 2026-09-05; 50% / -24 dB
         // até 2026-09-10; a pedido do autor.)
         setT("MASTER", "gain", -6.0f);
+        // O `out_gain` do MIXER volta a 0 dB em TODA seed (9/11/2026). O
+        // equilíbrio de volume (`SeedBalance.hpp`) põe ali o que não coube
+        // no MASTER; como nada o zerava, ele só subia de clique em clique e
+        // travava em +12 dB — o patch do autor estava 12 LU acima do alvo
+        // ("percebi que o som estava alto"). 0 é o valor do rack de prova
+        // da medição, então rack vivo e prova voltam a coincidir.
+        setT("MIXER", "out_gain", 0.0f);
         connectByName("MIXER", "out", "MASTER", "in");
         if (haveSink) {
             const int mo = pOut(firstT("MASTER"), "out");
