@@ -26,7 +26,9 @@ relevante". Registro vivo em
   ACCENT, INTERPRET, CHARACTER, BUDGET, SUPPLY; aperfeiçoamentos de
   DRIFT, PLL, SWITCH e SEQ), Navalha 2 JUCE (§4.6 — transformação
   reversível, STUTTER/BURST com limites em ms, TRACE como decisões, FORM
-  como contexto, teste de pior soma no MASTER).
+  como contexto, pico verdadeiro na bateria do MASTER). **Propostas de
+  §4.5–4.6 aprovadas pelo autor em 9/11** (§4.7); um módulo por vez,
+  depois da escuta dos dez já validados.
 - [ ] Rasgo Synth Studio,
   Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a revisão
   das propostas.
