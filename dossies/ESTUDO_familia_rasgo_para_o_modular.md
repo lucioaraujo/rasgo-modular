@@ -413,6 +413,39 @@ mais importante do Aquorbium para o Modular:
 - **SIGNAL-IN**: o modo "sala como organismo" de `RoomCoupling` (o
   acoplamento aprendido é a parte delicada).
 
+**`TIMBRE_BODIES_DESIGN.md`** (lido inteiro):
+
+- Um **segundo corpo por organismo**, misturado ao nativo (MISTURA) com um
+  eixo de caráter (MATÉRIA): voz por três formantes (Peterson & Barney; as
+  vogais [u]-[ɔ]-[ɑ]-[ɛ]-[i]), matéria modal, sopro (ruído num tubo), corda
+  (Karplus–Strong, dedilhada → friccionada), gota (altura que sobe enquanto
+  decai), dobra (Buchla 259), **membrana** (6 modos pelos zeros de Bessel
+  J0–J3, afinação que cede após o golpe), **vidro** (parciais inarmônicos que
+  batem, razões que mudam de copo para copo), coro; e, por física,
+  **ARCO** (McIntyre–Schumacher–Woodhouse: atrito que gruda e escorrega, o
+  movimento de Helmholtz nasce; diagrama de Schelleng — força baixa demais
+  dá o "double slip", a oitava) e **PALHETA** (tubo fechado, só ímpares;
+  acima de certa pressão a palheta fecha e cala).
+- **Timbre ecológico**: o estado do mundo desloca a MATÉRIA (o gelo endurece,
+  o caçador aguça, a presa amacia, o vidro danificado escurece) — tendência,
+  não troca.
+- **Lições de medição** que valem para o Modular: a interpolação linear do
+  atraso fracionário é um passa-baixas que depende da fração (usar passa-tudo
+  de 1ª ordem, Jaffe & Smith); medir com janela de Hann; compensar o atraso
+  dos filtros no laço.
+- **Lição de escuta (decisiva)**: a v2 do arco e da palheta, com corpo de
+  violino, vibrato, ruído de breu e de sopro, ficou "pior… tudo rachado" e
+  foi revertida. **"Realismo não se ganha somando ruído"; escutar o corpo solo
+  antes do conjunto; mudar uma coisa de cada vez e entregar o A/B de cada
+  uma.** É o "cada módulo no seu tempo" do autor.
+
+**Para o Modular**: o STRING tem arco só como "entrada contínua" (não é
+atrito) — um **BOW** de MSW (com o double slip de Schelleng) e uma **REED**
+seriam corpos novos, partindo da **v1** do Aquorbium (a v2 foi rejeitada).
+O MATTER/RESONATOR vão de harmônico a "esticado"; **acrescentar as razões
+da membrana (Bessel) e do vidro** como pontos do eixo STRUCTURE é um
+aperfeiçoamento direto.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
