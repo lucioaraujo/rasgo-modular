@@ -725,6 +725,42 @@ para casa; conferir o que o HARMONY já faz antes de propor. E a seed do
 Modular deve ser auditada contra a mesma queixa ("sempre igual ao abrir") —
 o estudo do próprio Modular (§2.2) já registra essa limitação.
 
+**Corpos e espaço** (`GRANULAR_STRIKER_DESIGN.md`, `MULTITAP_SPACE_DESIGN.md`,
+`PHYSICAL_BODIES_COMPARISON.md`, lidos inteiros) — nuances de engenharia que
+o Modular ainda não pratica:
+
+- **Escuta cega A/B/C**: takes com a mesma seed e os mesmos eventos,
+  **igualados em RMS** (o alvo escolhido pelo maior fator de crista, para
+  ninguém tocar o teto — "loudness não vira atalho para preferência"), a
+  chave revelada só depois do relato do autor (`--reveal`). A primeira
+  escuta achou um defeito real (o contato estocástico da corda antes da
+  memória) e o corpo **não entrou** até a segunda versão. **Proposta para o
+  Modular**: o mesmo protocolo para a escuta dos módulos novos (ex.: SPRING ×
+  HALL × SPACE; MOUSSE × ENVELOPE; PRISM × LOOPER) — sai da opinião sobre
+  um módulo isolado e vai para a função que ele acrescenta.
+- **Presença performática medida**: um controle podia estar "numericamente
+  ativo porém quase silencioso" (−61 dB entre os extremos de SPACE MIX); lá
+  entrou um **critério mínimo de diferença audível por controle** nos testes
+  (−25/−35 dB relativos à mistura). **O Modular não tem esse teste** — e a
+  sessão anterior do Asterismus já perguntou "controles que não fazem nada".
+  Candidato a teste transversal: cada knob de cada módulo, extremo contra
+  extremo, acima de um limiar.
+- **Atraso fracionário**: a interpolação linear é Lagrange de ordem 1 e
+  colore (passa-baixas que depende da fração); o espaço usa **Lagrange
+  cúbico** e limita a velocidade de mudança do atraso (0,2 amostra por
+  amostra) — **o SPRING e o PRISM que escrevi nesta sessão usam interpolação
+  linear**: aperfeiçoamento direto, antes da escuta deles.
+- **Limite do laço por conta, não por limitador escondido**: a soma dos
+  módulos dos coeficientes de Lagrange (1,25) entra no cálculo do ganho
+  máximo de realimentação; "não há limiter ou saturador escondido no corpo".
+  Vale para LOOPER, SPACE, HALL, SPRING, PRISM.
+- **Partículas que congelam os parâmetros ao nascer** (mexer no controle não
+  re-afina uma cauda; o Q é calculado na criação, sem trigonometria por
+  amostra) e **pool fixo com substituição da partícula de menor energia,
+  contada na telemetria** ("sobrecarga nunca fica invisível").
+- **Memória como decisão de arquitetura**: um corpo de 131 kB não vira membro
+  de 25 despachantes; um banco dedicado de 5 instâncias usa 80 % menos.
+
 **Mais para o Modular**: **OBSERVER** (uma mixagem por perspectiva: N
 entradas posicionadas, um ponto de escuta móvel com foco que dá detalhe e
 tira definição da periferia) — candidato forte, nada parecido no Modular;
