@@ -182,7 +182,21 @@ void testTrocaDeSeed() {
     check(txt.find("seed 111\n") < txt.find("seed 222"), "a primeira vem antes");
 }
 
+// A mão do VARIA e o próprio VARIA na partitura (10/11/2026).
+void testVariaNaPartitura() {
+    rasgo::panel::ScoreRecorder r;
+    r.instrument(0.0, "varia ligado intensidade=1.00");
+    r.parameterChange(1.0, 3, "cutoff", 800.0f, 950.0f, true);
+    r.parameterChange(2.0, 3, "cutoff", 950.0f, 400.0f, false);
+    const std::string txt = r.toText();
+    check(txt.find("t=0.000000 instrumento varia ligado intensidade=1.00") != std::string::npos,
+          "estado do VARIA anotado");
+    check(txt.find("t=1.000000 varia 3.cutoff") != std::string::npos, "movimento da mão do VARIA marcado como varia");
+    check(txt.find("t=2.000000 ajuste 3.cutoff") != std::string::npos, "mão do músico continua como ajuste");
+}
+
 int main() {
+    testVariaNaPartitura();
     testTrocaDeSeed();
     testCabecalho();
     testRecordsInOrder();

@@ -4631,6 +4631,11 @@ public:
         // `panel/PatchGenetics.hpp` — o que faltava aqui era só a fiação.
         header_.onVary = [this] {
             rack_.motionOn = !rack_.motionOn;
+            if (rack_.recording.load()) {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                rack_.score.instrument(rack_.recElapsed(),
+                                       rack_.motionOn ? "varia ligado" : "varia desligado");
+            }
             syncHeader();
         };
         header_.onMutate = [this] {
@@ -4759,6 +4764,16 @@ public:
         header_.onVaryAmount = [this](const float v) {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             rack_.motion.setIntensity(v);
+            // intensidade na partitura, só quando andou ≥ 0,05 desde a
+            // última anotação (o knob dispara a cada pixel do arrasto)
+            if (rack_.recording.load()
+                && std::fabs(rack_.motion.intensity() - variaAmountLogged_) >= 0.05f) {
+                variaAmountLogged_ = rack_.motion.intensity();
+                char b[48];
+                std::snprintf(b, sizeof b, "varia intensidade=%.2f",
+                              static_cast<double>(rack_.motion.intensity()));
+                rack_.score.instrument(rack_.recElapsed(), b);
+            }
         };
         header_.setVaryAmount(rack_.motion.intensity());
 
@@ -5325,7 +5340,36 @@ private:
             const float energy = std::min(1.0f, std::max(
                 rack_.outRms.load(std::memory_order_relaxed) * 2.2f,
                 grDb * 0.18f));
-            rack_.motion.tick(rack_.graph, 1.0f / 30.0f, energy);
+            // o LUFS de curto prazo da saída guia o chão e teto da mão
+            rack_.motion.setLoudnessTarget(rasgo::panel::kSeedTargetLufs);
+            rack_.motion.tick(rack_.graph, 1.0f / 30.0f, energy,
+                              rack_.lufsS.load(std::memory_order_relaxed));
+            // A mão do VARIA na partitura (10/11/2026): 1×/s, cada fibra que
+            // andou mais de 2 % do curso desde a última anotação. Sem isto
+            // uma tomada com o VARIA ligado não se reconstrói pelo .score.txt.
+            if (rack_.recording.load(std::memory_order_relaxed)
+                && ++variaScoreTick_ >= 30) {
+                variaScoreTick_ = 0;
+                const double t = rack_.recElapsed();
+                // fibras novas (seed trocada, módulo adicionado): recomeça
+                // a referência sem anotar o salto — a troca já está na
+                // partitura pelo seu próprio evento
+                if (rack_.motion.generation() != variaGen_) {
+                    variaGen_ = rack_.motion.generation();
+                    variaLogged_.clear();
+                }
+                std::size_t i = 0;
+                rack_.motion.forEachFiber([&](std::size_t node, const std::string& pid,
+                                              float v, float lo, float hi) {
+                    if (i >= variaLogged_.size()) { variaLogged_.push_back(v); ++i; return; }
+                    const float last = variaLogged_[i];
+                    if (std::fabs(v - last) > 0.02f * std::max(1e-4f, hi - lo)) {
+                        rack_.score.parameterChange(t, node, pid, last, v, /*byVaria=*/true);
+                        variaLogged_[i] = v;
+                    }
+                    ++i;
+                });
+            }
         }
         for (const auto& [id, sc] : rack_.scopeSnap)
             if (rack_.graph.node(id).type() == "MASTER")
@@ -5952,6 +5996,10 @@ private:
     }
 
     std::uint64_t recSeed_ = 0;   // seed no início da tomada
+    int variaScoreTick_ = 0;      // a mão do VARIA na partitura, 1×/s
+    std::vector<float> variaLogged_;   // último valor anotado por fibra
+    std::uint64_t variaGen_ = 0;       // geração das fibras anotadas
+    float variaAmountLogged_ = -1.0f;  // última intensidade anotada
 
     void startRec() {
         {
@@ -5976,6 +6024,21 @@ private:
             // autor na sessão de escuta de 23 set. 2026.
             rack_.score.setSeed(rack_.curSeed);
             recSeed_ = rack_.curSeed;   // vai para o nome do arquivo
+            // ponto de partida da mão do VARIA nesta tomada, e o estado dele
+            variaLogged_.clear();
+            rack_.motion.forEachFiber([&](std::size_t, const std::string&, float v, float, float) {
+                variaLogged_.push_back(v);
+            });
+            variaScoreTick_ = 0;
+            variaGen_ = rack_.motion.generation();
+            variaAmountLogged_ = rack_.motion.intensity();
+            {
+                char b[64];
+                std::snprintf(b, sizeof b, "varia %s intensidade=%.2f",
+                              rack_.motionOn ? "ligado" : "desligado",
+                              static_cast<double>(rack_.motion.intensity()));
+                rack_.score.instrument(0.0, b);
+            }
             rack_.score.setSampleRate(sampleRate_);
             for (const auto id : rack_.shown) {
                 auto& nd = rack_.graph.node(id);

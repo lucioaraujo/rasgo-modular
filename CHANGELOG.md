@@ -9,6 +9,19 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **VARIA: chão e teto de volume e a mão na partitura** (10 nov., aprovado
+  pelo autor). Numa tomada do autor (seed 12022678860901989809, VARIA em
+  2) o patch andou de −14 a −41 LUFS; reproduzido fora do app, só com o
+  VARIA. Agora: (a) o nível lento da saída (LUFS momentâneo com porta
+  absoluta e relativa, média em potência, ~3 s) é comparado ao alvo da seed
+  (−26); além de 5 LU a mão é puxada para os centros (a seed), cheia em
+  10 LU, e os toggles voltam ao estado da seed sob puxão forte; pausas de
+  patches esparsos não contam, quedas de mais de 4 s contam. Mesma seed:
+  −17 a −32 LUFS. Limite: quedas de ~20 s ainda passam (o puxão chega no
+  fim delas). (b) A partitura anota a mão do VARIA (linhas `varia`, 1×/s,
+  só o que andou mais de 2 % do curso) e o próprio VARIA (`instrumento
+  varia ligado/desligado/intensidade`).
+
 - **Trocas de seed durante a gravação** (10 nov., decisões do autor): o
   nome do arquivo fica com a primeira seed e ganha `-montage`
   (`rec-…-seed111-montage.wav`); a partitura registra cada seed nova com o

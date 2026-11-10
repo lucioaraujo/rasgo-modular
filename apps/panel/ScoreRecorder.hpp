@@ -47,7 +47,7 @@
 namespace rasgo::panel {
 
 struct RasgoEvent {
-    enum class Type { Connection, Modulation, ParameterChange, Note, Seed };
+    enum class Type { Connection, Modulation, ParameterChange, Note, Seed, Instrument };
 
     double time = 0.0;   // segundos — SEMPRE amostra/sr, nunca wall clock
     Type type = Type::ParameterChange;
@@ -62,6 +62,7 @@ struct RasgoEvent {
 
     // ParameterChange
     float fromValue = 0.0f, toValue = 0.0f;
+    bool byVaria = false;   // movido pela mão do VARIA, não pelo músico
 
     // Note (MUSICAL SCORE, via NOTE-OUT — ver `src/dsp/NoteOut.hpp`):
     // `time` acima é o início (nota-liga); os campos abaixo completam.
@@ -120,11 +121,21 @@ public:
 
     void parameterChange(const double t, const std::size_t node,
                          const std::string& paramId, const float from,
-                         const float to) {
+                         const float to, const bool byVaria = false) {
         RasgoEvent e;
         e.time = t; e.type = RasgoEvent::Type::ParameterChange;
         e.targetNode = node; e.targetParamId = paramId;
         e.fromValue = from; e.toValue = to;
+        e.byVaria = byVaria;
+        events_.push_back(std::move(e));
+    }
+
+    // Um controle do instrumento (VARIA ligado/desligado, intensidade) —
+    // não pertence a um módulo; vira linha própria.
+    void instrument(const double t, const std::string& what) {
+        RasgoEvent e;
+        e.time = t; e.type = RasgoEvent::Type::Instrument;
+        e.targetParamId = what;
         events_.push_back(std::move(e));
     }
 
@@ -205,7 +216,8 @@ public:
         // afogaria o que importa. Partitura é o que TOCOU.
         std::vector<std::size_t> usados;
         for (const auto& e : events_) {
-            if (e.type == RasgoEvent::Type::Seed) continue;
+            if (e.type == RasgoEvent::Type::Seed
+                || e.type == RasgoEvent::Type::Instrument) continue;
             usados.push_back(e.targetNode);
             if (e.type == RasgoEvent::Type::Connection
                 || e.type == RasgoEvent::Type::Modulation)
@@ -241,7 +253,8 @@ public:
                     << " deslocamento=" << e.offset << '\n';
                 break;
             case RasgoEvent::Type::ParameterChange:
-                out << "ajuste " << nome(e.targetNode) << '.' << e.targetParamId
+                out << (e.byVaria ? "varia " : "ajuste ")
+                    << nome(e.targetNode) << '.' << e.targetParamId
                     << ' ' << std::setprecision(4) << e.fromValue << " -> "
                     << e.toValue << '\n';
                 break;
@@ -251,6 +264,9 @@ public:
                     << " intensidade=" << e.noteVelocity
                     << " duração=" << e.noteDuration
                     << (e.noteAccent ? " acento" : "") << '\n';
+                break;
+            case RasgoEvent::Type::Instrument:
+                out << "instrumento " << e.targetParamId << '\n';
                 break;
             case RasgoEvent::Type::Seed:
                 if (e.seed != 0)
