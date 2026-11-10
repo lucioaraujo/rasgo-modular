@@ -83,8 +83,11 @@ relevante". Registro vivo em
   autor** ("gosto de todos"), um por vez, com portão conceitual.
 - [x] Maravi (§4.9, 10/11): propostas TOM (tonalidade de quem canta →
   QUANTIZER), TAP e FRASE (LBDM).
-- [ ] Maestro, Risco; depois o cruzamento com o Cardinal e a revisão das
-  propostas.
+- [x] Maestro (§4.10: stems por canal no REC, pacote de proveniência) e
+  Risco (§4.11: fronteira — texto/fórmula é território do Risco; vestígio
+  sempre silenciável).
+- [ ] Cruzamento com o Cardinal e revisão das propostas; README e
+  bibliografia do Batruc; documentos restantes do Trioio.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
