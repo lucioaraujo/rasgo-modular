@@ -8,6 +8,7 @@
 
 #include "dsp/Loudness.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <vector>
@@ -137,6 +138,34 @@ void testMomentaryFollowsTheWindow() {
     near(m.integrated(), -23.0f, 0.5f, "o integrado não cai junto");
 }
 
+// EBU Tech 3341 V4, casos #13–14 (máximo do momentâneo): um tom de 400 ms a
+// −26 dBFS por canal (−23 LUFS), deslocado no tempo em passos de 20 ms; o
+// máximo do momentâneo lido ao vivo deve dar −23,0 ±0,1 em todos. Com
+// fatias de 100 ms o tom nunca cabia inteiro na janela e o erro chegava a
+// ~0,45 LU (achado do Aquorbium, OUTPUT_STAGE_DESIGN.md, 22/10/2026).
+void testMomentaryMaxWithShiftedTone() {
+    const float sr = 48000.0f;
+    const double amp = std::pow(10.0, -26.0 / 20.0) * std::sqrt(2.0);
+    const double dp = 2.0 * M_PI * 1000.0 / sr;
+    float worst = 0.0f;
+    for (int k = 0; k < 10; ++k) {
+        LoudnessMeter m;
+        m.prepare(sr);
+        const long lead = static_cast<long>(sr * (0.5 + 0.02 * k));
+        const long tone = static_cast<long>(sr * 0.4);
+        float maxM = LoudnessMeter::kSilence;
+        double ph = 0.0;
+        for (long i = 0; i < lead + tone + static_cast<long>(sr); ++i) {
+            float v = 0.0f;
+            if (i >= lead && i < lead + tone) { v = static_cast<float>(amp * std::sin(ph)); ph += dp; }
+            m.push(v, v);
+            maxM = std::max(maxM, m.momentary());
+        }
+        worst = std::max(worst, std::fabs(maxM + 23.0f));
+    }
+    near(-23.0f + worst, -23.0f, 0.1f, "EBU 3341 #13–14: máximo do momentâneo com tom deslocado");
+}
+
 void testNonFiniteDoesNotPoison() {
     LoudnessMeter m;
     m.prepare(48000.0f);
@@ -232,6 +261,7 @@ void testTargetComparison() {
 }  // namespace
 
 int main() {
+    testMomentaryMaxWithShiftedTone();
     testEbuReferenceLevel();
     testKWeightingUnityAt1k();
     testSampleRateIndependence();
