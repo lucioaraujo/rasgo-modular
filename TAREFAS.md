@@ -25,8 +25,17 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Régua de qualidade técnica das seeds (`test_seed_quality`).
 - [ ] Proposta do PALCO / entradas PAN (`dossies/PROPOSTA_palco_do_varia.md`):
   falta decidir B primeiro ou junto do PALCO.
-- [ ] Quatro canais da seed (`dossies/PROPOSTA_quatro_canais_da_seed.md`):
-  aguardando 3 decisões do autor (distribuição, casas na seed, ARP/MARKOV).
+- [x] Quatro canais da seed implementados com os valores da proposta
+  (o autor disse "avance"): 1000 seeds → 1 canal 24 %, 2 = 30 %, 3 = 27 %,
+  4 = 20 % (antes 48/34/18/0). Régua de qualidade passa, também com 4 vozes
+  forçadas; nenhuma fonte crua no MIXER. **Todas as seeds mudaram.**
+- [ ] Escuta do autor dos quatro canais. Em aberto: casas do palco na seed
+  (`kSeedOpensStage`, hoje desligado — pans no centro, decisão de 8/9);
+  ARP/MARKOV meio a meio (ajustável); teste de máscara por registro medido
+  ainda não feito (o registro é garantido na construção: oitava acima ou
+  abaixo).
+- [ ] Atenção: um build que recompila o JUCE com -j4 travou a máquina
+  (10/11). Usar `nice -n 15 cmake --build build -j2`.
 
 ## ▶ 09/11/2026 (noite): identidade da seed e todos os módulos no sorteio
 

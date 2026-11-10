@@ -57,7 +57,17 @@ struct SeedIdentity {
     int root = 0, scale = 2;
     float bpm = 112.0f;
     int mult = 1;
+    // (10/11/2026) quantas vozes o patch tem no MIXER: 1 = só a voz;
+    // 2 = + contravoz (altura própria); 3 = + textura; 4 = + eco ou pulso.
+    // Ver `dossies/PROPOSTA_quatro_canais_da_seed.md`.
+    int ensemble = 1;
 };
+
+// A seed abre os canais nas suas casas do palco (pans fora do centro)?
+// Desligado: o autor pediu os pans no centro em toda seed (8/9/2026) e a
+// decisão de abrir o palco na seed ainda é dele (proposta dos quatro
+// canais, §7.2). As casas ficam prontas; ligar é trocar esta constante.
+inline constexpr bool kSeedOpensStage = false;
 
 inline std::uint64_t seedBits(std::uint64_t seed, std::uint64_t stream) {
     std::uint64_t z = seed + 0x9E3779B97F4A7C15ULL * (stream + 1ULL);
@@ -92,14 +102,29 @@ inline SeedIdentity seedIdentity(std::uint64_t seed) {
     const float t = seedUnit(s, 13);
     id.bpm = 46.0f + t * t * 110.0f;   // 46..156, enviesado pra devagar
     id.mult = seedUnit(s, 14) < 0.18f ? 2 : (seedUnit(s, 14) > 0.93f ? 4 : 1);
+    // conjunto: fluxo próprio (16), ligado à complexidade — patch simples
+    // tende a poucas vozes, denso a muitas (média ~20/30/30/20 %)
+    {
+        static constexpr float cum[3][3] = {
+            {0.35f, 0.70f, 0.90f},   // simples: 35/35/20/10 %
+            {0.15f, 0.45f, 0.75f},   // média:   15/30/30/25 %
+            {0.05f, 0.25f, 0.60f}};  // densa:    5/20/35/40 %
+        const int band = id.complexity < 0.25f ? 0 : (id.complexity < 0.55f ? 1 : 2);
+        const float u = seedUnit(s, 16);
+        id.ensemble = u < cum[band][0] ? 1 : u < cum[band][1] ? 2 : u < cum[band][2] ? 3 : 4;
+    }
     return id;
 }
 
 // ============================================================================
 
-inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
+// `forceEnsemble` (1..4) só para teste: força o tamanho do conjunto (a
+// régua de qualidade roda também com 4 vozes, o pior caso de soma).
+inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
+                      int forceEnsemble = 0) {
     using namespace rasgo::modular;
-    const SeedIdentity id = seedIdentity(seed);
+    SeedIdentity id = seedIdentity(seed);
+    if (forceEnsemble >= 1 && forceEnsemble <= 4) id.ensemble = forceEnsemble;
     std::uint64_t rs = seed ? seed : 0x9E3779B97F4A7C15ULL;
     auto rnd = [&rs]() -> std::uint64_t {
         rs ^= rs << 13; rs ^= rs >> 7; rs ^= rs << 17; return rs;
@@ -293,28 +318,31 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     if (!hasT(vc.mod)) vc = {"OSC", "saw"};
     std::size_t voiceNode = firstT(vc.mod);
     const char* voiceOutNm = vc.out;
+    float voiceHz = 0.0f;   // base de altura da voz (0 = sem altura: ruído)
 
     // parâmetros + excitação da voz
     if (std::string(vc.mod) == "OSC") {
         // registro variado: ~70% grave, ~30% médio. Teto do médio em
         // 340 Hz — com +2 oitavas do QUANTIZER a nota mais alta chega a
         // ~1,4 kHz (musical), não a ~5 kHz.
-        setP(voiceNode, "freq",
-             chance(0.7f) ? rng(38.0f, 175.0f) : rng(175.0f, 340.0f));
+        voiceHz = chance(0.7f) ? rng(38.0f, 175.0f) : rng(175.0f, 340.0f);
+        setP(voiceNode, "freq", voiceHz);
         setP(voiceNode, "pw", rng(0.25f, 0.75f));   // não vira trem de picos
         setP(voiceNode, "drift", rng(0.0f, 0.4f));
         setP(voiceNode, "sub_2", chance(0.4f) ? 1.0f : 0.0f);
         if (pIn(voiceNode, "pitch") >= 0)
             connectByName("QUANTIZER", "pitch", "OSC", "pitch");
     } else if (std::string(vc.mod) == "CHORD") {
-        setP(voiceNode, "freq", rng(50.0f, 180.0f));
+        voiceHz = rng(50.0f, 180.0f);
+        setP(voiceNode, "freq", voiceHz);
         setP(voiceNode, "chord", rng(0.0f, 1.0f));
         setP(voiceNode, "voices", static_cast<float>(2 + rnd() % 3));
         setP(voiceNode, "detune", rng(0.0f, 0.5f));
         setP(voiceNode, "wave", rng(0.0f, 1.0f));
         connectByName("QUANTIZER", "pitch", "CHORD", "pitch");
     } else if (std::string(vc.mod) == "MATTER" || std::string(vc.mod) == "STRING") {
-        setP(voiceNode, "freq", rng(60.0f, 260.0f));
+        voiceHz = rng(60.0f, 260.0f);
+        setP(voiceNode, "freq", voiceHz);
         setP(voiceNode, "exciter", rng(0.4f, 0.95f));
         setP(voiceNode, "damping", rng(0.05f, 0.6f));
         if (std::string(vc.mod) == "MATTER")
@@ -348,7 +376,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         setP(voiceNode, "spray", rng(0.0f, 0.5f));
         setP(voiceNode, "feedback", rng(0.0f, 0.7f));
         setP(voiceNode, "blend", rng(0.5f, 1.0f));
-        if (hasT("OSC")) { setT("OSC", "freq", rng(50.0f, 200.0f));
+        if (hasT("OSC")) { voiceHz = rng(50.0f, 200.0f); setT("OSC", "freq", voiceHz);
             connectByName("QUANTIZER", "pitch", "OSC", "pitch");
             connectByName("OSC", "saw", "MEMORY", "in"); }
     } else if (std::string(vc.mod) == "SHAPE") {
@@ -356,7 +384,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         setP(voiceNode, "symmetry", rng(-0.8f, 0.8f));
         setP(voiceNode, "sat", rng(0.0f, 0.5f));
         setP(voiceNode, "level", 0.9f);
-        if (hasT("OSC")) { setT("OSC", "freq", rng(50.0f, 180.0f));
+        if (hasT("OSC")) { voiceHz = rng(50.0f, 180.0f); setT("OSC", "freq", voiceHz);
             connectByName("QUANTIZER", "pitch", "OSC", "pitch");
             connectByName("OSC", "tri", "SHAPE", "in");
             if (chance(0.5f)) connectByName("OSC", "sub", "SHAPE", "mod"); }
@@ -534,7 +562,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
     // canal da voz mira ~−6 dBFS de barramento — folga pra as camadas,
     // os cabos do passeio e a modulação. Era rng(-2, +5): +5 dB mandava
     // o barramento pra +2..+8 dBFS e o MASTER limitava demais (o "clipe").
-    setT("MIXER", "gain1", rng(-10.0f, -2.0f));
+    const float gain1 = rng(-10.0f, -2.0f);
+    setT("MIXER", "gain1", gain1);
     // pan SEMPRE no centro em todo seed (pedido do autor, 2026-09-08) — ele
     // abre no palco à mão se quiser. Era rng(-0.4, 0.4).
     setT("MIXER", "pan1", 0.0f);
@@ -568,6 +597,190 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
                 catch (...) {}
             }
         }
+    }
+
+    // ================ CONJUNTO: os quatro canais (10/11/2026) =========
+    // Um papel por canal (`dossies/PROPOSTA_quatro_canais_da_seed.md`):
+    //   ch1 voz (acima) · ch2 contravoz · ch3 textura (depois do passeio)
+    //   · ch4 eco ou pulso. Quantos soam é o gene `ensemble`.
+    // Pedido do autor: "mais seeds utilizando os quatro canais, sobretudo
+    // para resultados polifônicos e mais espacialidades de pan"; condição:
+    // nenhum problema técnico de qualidade de som (`test_seed_quality`).
+    // Antes: 48 % das seeds com 1 canal, 0 % com 4, e nenhuma camada com
+    // altura própria.
+    const bool wantStage = kSeedOpensStage;
+    const float side = chance(0.5f) ? 1.0f : -1.0f;   // lado da contravoz
+    auto toChannel = [&](std::size_t n, const char* out, int ch,
+                         float gainDb, float home) -> bool {
+        if (!hasT("MIXER")) return false;
+        const std::size_t mx = firstT("MIXER");
+        const std::string c = std::to_string(ch);
+        const int ci = pIn(mx, ("ch" + c).c_str()), so = pOut(n, out);
+        if (ci < 0 || so < 0) return false;
+        if (!connect({n, static_cast<std::size_t>(so)}, {mx, static_cast<std::size_t>(ci)}))
+            return false;
+        setP(mx, ("gain" + c).c_str(), std::max(-30.0f, gainDb));
+        setP(mx, ("pan" + c).c_str(), wantStage ? home : 0.0f);
+        return true;
+    };
+    auto freeNode = [&](const char* t) { return hasT(t) && !spine[firstT(t)]; };
+    int voices = 1;
+
+    // ---- ch2 CONTRAVOZ: segunda linha com altura própria -----------
+    // As notas vêm da voz: ARP (raiz = a nota da voz → acorde em torno da
+    // melodia) ou MARKOV (aprende as transições da voz e improvisa na
+    // mesma língua). Num relógio próprio, mais lento quando há mais vozes.
+    // Registro: uma oitava acima ou abaixo da voz, para não se mascararem;
+    // e nunca acima de 330 Hz de base (com a melodia e o arpejo por cima,
+    // a nota mais alta fica em ~2,6 kHz, não no assobio).
+    if (id.ensemble >= 2 && hasT("QUANTIZER")) {
+        const bool up = voiceHz <= 0.0f || voiceHz * 2.0f <= 330.0f;
+        // ARP abaixo só com a voz alta o bastante para duas oitavas
+        // abaixo (o arpejo sobe até uma oitava a partir da raiz)
+        const bool arpOk = freeNode("ARP") && (up || voiceHz >= 220.0f);
+        const bool mkOk = freeNode("MARKOV") && (up || voiceHz >= 110.0f);
+        const bool useArp = arpOk && (!mkOk || chance(0.5f));
+        float singerHz = voiceHz <= 0.0f ? rng(90.0f, 220.0f)
+                       : up ? voiceHz * 2.0f
+                       : voiceHz * (useArp ? 0.25f : 0.5f);
+        singerHz = std::clamp(singerHz, 55.0f, 330.0f);
+
+        // quem canta: STRING/MATTER (golpe próprio, corpo e decaimento)
+        // ou um oscilador → LPG (o LPG é o envelope e o filtro)
+        struct SG { const char* mod; const char* pitchIn; const char* trigIn; bool lpg; };
+        const SG opts[6] = {{"STRING", "freq_mod", "pluck", false},
+                            {"MATTER", "freq_mod", "strike", false},
+                            {"PULSAR", "pitch", nullptr, true},
+                            {"WAVETABLE", "pitch", nullptr, true},
+                            {"ADDITIVE", "pitch", nullptr, true},
+                            {"OPERATOR", "pitch", nullptr, true}};
+        const SG* sg = nullptr;
+        for (int tries = 0; tries < 8 && !sg; ++tries) {
+            const SG& o = opts[rnd() % 6];
+            if (!freeNode(o.mod) || firstT(o.mod) == voiceNode) continue;
+            if (o.lpg && !freeNode("LPG")) continue;
+            sg = &o;
+        }
+        const char* gen = useArp ? "ARP" : "MARKOV";
+        if (sg && (arpOk || mkOk)) {
+            const std::size_t gn = firstT(gen), sn = firstT(sg->mod);
+            // relógio: CLOCK dividido pela LOGIC; a contravoz não passa
+            // de ~4 notas/s (2,5 com 3–4 vozes)
+            const float clockHz = id.bpm / 60.0f * static_cast<float>(id.mult);
+            const float maxHz = id.ensemble >= 3 ? 2.5f : 4.0f;
+            int div = id.ensemble >= 3 ? pick4(2, 3, 4, 4) : pick4(1, 2, 2, 3);
+            div = std::clamp(std::max(div, static_cast<int>(std::ceil(clockHz / maxHz))), 1, 32);
+            bool clocked = false;
+            if (freeNode("LOGIC")) {
+                setT("LOGIC", "divide", static_cast<float>(div));
+                setT("LOGIC", "gate_len", rng(0.3f, 0.7f));
+                clocked = connectByName("CLOCK", "clock", "LOGIC", "clock")
+                       && connectByName("LOGIC", "div", gen, "clock");
+                if (clocked) spine[firstT("LOGIC")] = 1;
+            }
+            setP(gn, "rate", std::clamp(clockHz / static_cast<float>(div), 0.2f, maxHz));
+            setP(gn, "gate_len", rng(0.3f, 0.75f));
+            if (useArp) {
+                setP(gn, "chord", static_cast<float>(rnd() % 10));
+                setP(gn, "inversion", static_cast<float>(rnd() % 3));
+                setP(gn, "octaves", 1.0f);
+                setP(gn, "mode", static_cast<float>(rnd() % 8));
+                setP(gn, "skip", chance(0.4f) ? rng(0.1f, 0.35f) : 0.0f);
+                connectByName("QUANTIZER", "pitch", "ARP", "root");
+            } else {
+                setP(gn, "temp", rng(0.5f, 1.4f));
+                setP(gn, "memory", rng(0.5f, 0.95f));
+                setP(gn, "learn", 1.0f);
+                setP(gn, "octave", 0.0f);
+                connectByName("QUANTIZER", "pitch", "MARKOV", "learn_pitch");
+                connectByName("QUANTIZER", "gate", "MARKOV", "learn_gate");
+            }
+            spine[gn] = 1;
+
+            std::size_t outNode = sn; const char* outNm = "out";
+            setP(sn, "freq", singerHz);
+            bool sung = connectByName(gen, "pitch", sg->mod, sg->pitchIn);
+            if (!sg->lpg) {
+                if (std::string(sg->mod) == "STRING") {
+                    setP(sn, "decay", rng(0.5f, 0.9f));
+                    setP(sn, "damping", rng(0.2f, 0.65f));
+                } else {
+                    setP(sn, "structure", rng(0.0f, 0.8f));
+                    setP(sn, "brightness", rng(0.25f, 0.6f));
+                    setP(sn, "damping", rng(0.25f, 0.65f));
+                }
+                setP(sn, "exciter", rng(0.4f, 0.85f));
+                sung = sung && connectByName(gen, "gate", sg->mod, sg->trigIn);
+            } else {
+                const std::size_t lp = firstT("LPG");
+                setP(lp, "mode", rng(0.3f, 1.0f));
+                setP(lp, "response", rng(0.1f, 0.45f));
+                setP(lp, "resonance", rng(0.0f, 0.35f));
+                setP(lp, "offset", 0.0f);
+                const std::string m = sg->mod;
+                if (m == "PULSAR") { setP(sn, "formant", rng(0.8f, 3.0f)); setP(sn, "level", 0.7f); }
+                if (m == "OPERATOR") setP(sn, "index", rng(0.05f, 0.4f));
+                if (m == "ADDITIVE") setP(sn, "tilt", rng(0.2f, 0.6f));
+                if (m == "WAVETABLE") setP(sn, "pos", rng(0.0f, 1.0f));
+                sung = sung && connectByName(sg->mod, "out", "LPG", "in")
+                            && connectByName(gen, "gate", "LPG", "strike");
+                if (sung) { spine[lp] = 1; outNode = lp; }
+            }
+            if (sung && toChannel(outNode, outNm, 2, gain1 - rng(4.0f, 8.0f), 0.30f * side)) {
+                spine[sn] = 1;
+                ++voices;
+            }
+        }
+    }
+
+    // ---- ch4 ECO (o corpo da voz num lugar) ou PULSO (percussão) -------
+    if (id.ensemble >= 4) {
+        bool done = false;
+        if (chance(0.6f)) {
+            struct EC { const char* mod; const char* wet; };
+            const EC ecs[5] = {{"SPRING", "wet"}, {"PRISM", "wet"}, {"SPACE", "wet"},
+                               {"LOOPER", "wet"}, {"HALL", "l"}};
+            // um espaço que já está na cadeia da voz dá a sua cauda
+            // separada; senão, um espaço livre ouve o corpo da voz
+            for (const EC& e : ecs)
+                if (!done && hasT(e.mod) && spine[firstT(e.mod)] && firstT(e.mod) != voiceNode
+                    && toChannel(firstT(e.mod), e.wet, 4, gain1 - rng(3.0f, 8.0f), -0.40f * side))
+                    done = true;
+            for (int tries = 0; tries < 6 && !done; ++tries) {
+                const EC& e = ecs[rnd() % 5];
+                if (!freeNode(e.mod)) continue;
+                const std::size_t en = firstT(e.mod);
+                const int ai = pIn(en, "in"), so = pOut(bodyNode, bodyOut);
+                if (ai < 0 || so < 0) continue;
+                if (!connect({bodyNode, static_cast<std::size_t>(so)}, {en, static_cast<std::size_t>(ai)}))
+                    continue;
+                const std::string m = e.mod;
+                if (m == "SPRING") { setP(en, "decay", rng(0.6f, 0.9f)); setP(en, "damp", rng(0.3f, 0.7f));
+                                     setP(en, "drip", rng(0.2f, 0.6f)); }
+                if (m == "PRISM") { setP(en, "disp", rng(40.0f, 250.0f)); setP(en, "feedback", rng(0.0f, 0.4f)); }
+                if (m == "SPACE") { setP(en, "time", rng(0.15f, 0.9f)); setP(en, "feedback", rng(0.2f, 0.6f));
+                                    setP(en, "diffusion", rng(0.5f, 0.95f)); }
+                if (m == "LOOPER") { setP(en, "time", rng(0.2f, 1.2f)); setP(en, "feedback", rng(0.2f, 0.6f));
+                                     setP(en, "age", rng(0.2f, 0.6f)); }
+                if (m == "HALL") { setP(en, "size", rng(0.4f, 0.9f)); setP(en, "decay", rng(0.4f, 0.8f));
+                                   setP(en, "damp", rng(0.3f, 0.7f)); setP(en, "mix", 1.0f); }
+                spine[en] = 1;
+                done = toChannel(en, e.wet, 4, gain1 - rng(3.0f, 8.0f), -0.40f * side);
+            }
+        }
+        if (!done && freeNode("DRUM")) {
+            const std::size_t dn = firstT("DRUM");
+            setP(dn, "tone", rng(40.0f, 140.0f));
+            setP(dn, "bend", rng(0.2f, 0.7f));
+            setP(dn, "decay", rng(0.15f, 0.55f));
+            setP(dn, "snap", rng(0.05f, 0.4f));
+            setP(dn, "drive", chance(0.3f) ? rng(0.0f, 0.3f) : 0.0f);
+            if (connectByName("CLOCK", chance(0.5f) ? "accent" : "euclid", "DRUM", "gate")) {
+                spine[dn] = 1;
+                done = toChannel(dn, "out", 4, rng(-20.0f, -12.0f), -0.40f * side);
+            }
+        }
+        if (done) ++voices;
     }
 
     // ================ PASSEIO PONDERADO (o coração) ================
@@ -633,28 +846,24 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed) {
         return t == "FILTER" || t == "WASP" || t == "LPG"
             || t == "SPACE" || t == "PARAMETRIC";
     };
-    if (hasT("MIXER")) {
-        std::size_t mx = firstT("MIXER");
-        const char* chs[2] = {"ch2", "ch3"};
-        const int nLayers = chance(0.5f) ? (chance(0.35f) ? 2 : 1) : 0;
-        int used = 0;
-        for (int sc = 0; sc < 6 && used < nLayers; ++sc)
+    // (10/11/2026) A textura é o papel do canal 3: entra com 3 ou mais
+    // vozes no conjunto (antes: ch2/ch3 em metade das seeds). Com 4 vozes,
+    // mais baixa — mais vozes, menos espaço para cada uma.
+    if (hasT("MIXER") && id.ensemble >= 3) {
+        bool layered = false;
+        const float tex = id.ensemble >= 4 ? rng(-26.0f, -14.0f) : rng(-24.0f, -11.0f);
+        for (int sc = 0; sc < 6 && !layered; ++sc)
             for (const Port& p : src[sc]) {
-                if (used >= nLayers) break;
+                if (layered) break;
                 if (p.node == bodyNode || !isProcessedBus(p.node)) continue;
                 if (reaches(p.node, sink)) continue;      // já chega à saída
-                const int ci = pIn(mx, chs[used]);
-                if (ci < 0 || (ci < (int)inUsed[mx].size() && inUsed[mx][ci])) continue;
-                if (connect(p, {mx, static_cast<std::size_t>(ci)})) {
-                    setP(mx, (std::string("gain") + std::to_string(used + 2)).c_str(),
-                         rng(-24.0f, -11.0f));
-                    // pan no centro (idem pan1) — o autor abre o palco à mão
-                    setP(mx, (std::string("pan") + std::to_string(used + 2)).c_str(),
-                         0.0f);
-                    ++used;
-                }
+                if (toChannel(p.node, g.node(p.node).outputDescriptor(p.port).name.c_str(),
+                              3, tex, -0.45f * side))
+                    layered = true;
             }
+        if (layered) ++voices;
     }
+    (void)voices;
 
     // ================ DRIFT: o patch evolui sozinho ===============
     if (hasT("DRIFT") && id.motion > 0.1f) {

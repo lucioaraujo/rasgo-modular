@@ -9,6 +9,18 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Seed: os quatro canais do MIXER** (10 nov., pedido do autor; **todas
+  as seeds mudam**). Gene novo `ensemble` (1–4 vozes, ligado à
+  complexidade). ch1 voz; ch2 **contravoz** com altura própria — ARP (raiz
+  na nota da voz) ou MARKOV (aprende a voz), cantada por STRING, MATTER ou
+  PULSAR/WAVETABLE/ADDITIVE/OPERATOR → LPG, uma oitava acima ou abaixo, 4–8
+  dB abaixo da voz, relógio próprio pela LOGIC (≤ 4 notas/s, ≤ 2,5 com 3–4
+  vozes); ch3 textura (a camada processada de antes); ch4 eco (cauda de
+  SPRING/PRISM/SPACE/LOOPER/HALL sobre a voz) ou pulso (DRUM). Em 1000
+  seeds: 24/30/27/20 % com 1/2/3/4 canais (antes 48/34/18/0). Pans seguem
+  no centro (`kSeedOpensStage = false`). `test_seed_quality` agora também
+  roda com 4 vozes forçadas e reprova fonte crua no MIXER.
+
 - **MIXER: grave no centro e pan sem clique** (10 nov., aprovado pelo
   autor). Cada canal se divide num grave (um polo em ~150 Hz, soma exata);
   só o resto segue o PAN — o grave não pende nem enfraquece em mono. Com o
