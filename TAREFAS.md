@@ -79,7 +79,8 @@ relevante". Registro vivo em
 - [x] Rasgo Synth Studio (§4.8, 10/11): fim do Método + catálogo de 142
   mecanismos cruzado com o Modular; proposta ao autor (COERÊNCIA, BLEFE,
   APÓCRIFO, FIBRA no ADDITIVE, garantia de limite e Heisenberg na seed,
-  peneiras/afinações no QUANTIZER, LOOP/EOA no ENVELOPE).
+  peneiras/afinações no QUANTIZER, LOOP/EOA no ENVELOPE) — **aprovadas pelo
+  autor** ("gosto de todos"), um por vez, com portão conceitual.
 - [ ] Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a
   revisão das propostas.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
