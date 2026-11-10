@@ -146,3 +146,7 @@ Fora (outra personalidade ou repetição): imitações de marca (Maug*, CZ*,
 
 Cada item, se aprovado, passa pelo portão conceitual (estudo §4.8.1) num
 dossiê próprio antes do código.
+
+**Decisão do autor (10/11/2026):** "excelente, aprovo todas, pode ser na
+sequência normal de desenvolvimento" — os cinco itens de §8 entram na fila
+(estudo §4.12), um por vez, cada um com dossiê e portão conceitual.

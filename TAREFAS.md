@@ -97,6 +97,10 @@ relevante". Registro vivo em
   (segundo consumidor); REGRAS do autor → proposta `regras.txt` da seed;
   denormais medidos (12,9 s → 1,1 s); quimeras como receitas didáticas;
   saliência harmônica e croma do grave para o TOM.
+- [x] Pesquisa do grave no Cardinal (`dossies/PESQUISA_cardinal_baixo_e_osciladores.md`):
+  LADDER, gramática do baixo (ACCENT + 2º envelope), OSC com phase
+  distortion/unísono/sub-harmônica, VCA com saturação, FUNCTION como LFO
+  de baixo — **aprovados** pelo autor, na sequência normal.
 - **Etapa de leitura da família concluída em 10/11/2026.** Fila de
   propostas em §4.12 (+ REGRAS da seed); cada uma com dossiê e portão
   conceitual, depois da escuta do autor.
