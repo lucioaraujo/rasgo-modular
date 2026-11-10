@@ -76,9 +76,12 @@ relevante". Registro vivo em
   como contexto, pico verdadeiro na bateria do MASTER). **Propostas de
   §4.5–4.6 aprovadas pelo autor em 9/11** (§4.7); um módulo por vez,
   depois da escuta dos dez já validados.
-- [ ] Rasgo Synth Studio,
-  Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a revisão
-  das propostas.
+- [x] Rasgo Synth Studio (§4.8, 10/11): fim do Método + catálogo de 142
+  mecanismos cruzado com o Modular; proposta ao autor (COERÊNCIA, BLEFE,
+  APÓCRIFO, FIBRA no ADDITIVE, garantia de limite e Heisenberg na seed,
+  peneiras/afinações no QUANTIZER, LOOP/EOA no ENVELOPE).
+- [ ] Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a
+  revisão das propostas.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
