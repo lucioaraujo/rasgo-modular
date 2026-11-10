@@ -21,6 +21,14 @@
 //   - mixer de barramento clássico - ganho por canal + soma + ganho de
 //     saída; fan-in explícito (aqui um nó, não N cabos numa porta).
 //
+// GRAVE NO CENTRO (2026-11-10, aprovado pelo autor): cada canal se divide
+// num grave (um polo em ~150 Hz) e no resto (= sinal − grave, soma exata);
+// só o resto segue o PAN, o grave fica sempre no centro — o grave não
+// pende para um lado nem enfraquece em mono. Com PAN no centro o resultado
+// é o de antes. O PAN anda por uma rampa (~30 ms), sem degrau nem clique.
+// Princípio lido no Asterismus (`PerformanceSkyPan.hpp`, do autor);
+// crossover complementar de um polo é técnica pública.
+//
 // SEGURANÇA DE BARRAMENTO (2026-09-05): a soma passa por um joelho `tanh`
 // bem suave — **transparente até 1,0 (0 dBFS)** (mixagem sensata não é
 // tocada; os testes de soma linear continuam exatos), comprime de leve
@@ -86,28 +94,32 @@ public:
         const std::size_t frames = out.frames();
         const std::size_t channels = out.channels();
 
-        float gainLin[4], panL[4], panR[4];
+        float gainLin[4], panTarget[4];
         bool on[4];
         for (int c = 0; c < 4; ++c) {
             const std::string n = std::to_string(c + 1);
             on[c] = parameterValue("mute" + n) < 0.5f && inputs[c] != nullptr;
             gainLin[c] = dbToGain(parameterValue("gain" + n));
-            const float pan =
-                clampf(parameterValue("pan" + n), -1.0f, 1.0f);
-            const float t = (pan + 1.0f) * 0.7853982f;  // 0..π/2
-            panL[c] = std::cos(t);
-            panR[c] = std::sin(t);
+            panTarget[c] = clampf(parameterValue("pan" + n), -1.0f, 1.0f);
+            if (!primed_) pan_[c] = panTarget[c];
         }
+        primed_ = true;
         const float outGain = dbToGain(parameterValue("out_gain"));
+        constexpr float kCentre = 0.70710678f;   // cos(π/4): o centro da lei
 
         for (std::size_t frame = 0; frame < frames; ++frame) {
             float l = 0.0f, r = 0.0f;
             for (int c = 0; c < 4; ++c) {
+                pan_[c] += (panTarget[c] - pan_[c]) * panK_;
                 if (!on[c])
                     continue;
                 const float s = inputs[c]->at(0, frame) * gainLin[c];
-                l += s * panL[c];
-                r += s * panR[c];
+                low_[c] += (s - low_[c]) * lowK_;
+                const float lo = low_[c];
+                const float hi = s - lo;
+                const float t = (pan_[c] + 1.0f) * 0.7853982f;  // 0..π/2
+                l += lo * kCentre + hi * std::cos(t);
+                r += lo * kCentre + hi * std::sin(t);
             }
             l = busKnee(l * outGain);
             r = busKnee(r * outGain);
@@ -122,7 +134,22 @@ public:
         }
     }
 
+    void prepare(const float sampleRate, const std::size_t blockSize) override {
+        Signal::prepare(sampleRate, blockSize);
+        const float sr = std::isfinite(sampleRate) && sampleRate >= 8000.0f
+            ? sampleRate : 48000.0f;
+        lowK_ = 1.0f - std::exp(-2.0f * 3.14159265f * 150.0f / sr);
+        panK_ = 1.0f - std::exp(-1.0f / (0.030f * sr));
+        for (int c = 0; c < 4; ++c) low_[c] = 0.0f;
+        primed_ = false;
+    }
+
 private:
+    float low_[4] = {0, 0, 0, 0};
+    float pan_[4] = {0, 0, 0, 0};
+    float lowK_ = 0.02f, panK_ = 0.0007f;
+    bool primed_ = false;
+
     static float clampf(const float v, const float lo, const float hi) noexcept {
         return v < lo ? lo : (v > hi ? hi : v);
     }

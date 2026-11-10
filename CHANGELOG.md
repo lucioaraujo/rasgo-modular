@@ -9,6 +9,13 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **MIXER: grave no centro e pan sem clique** (10 nov., aprovado pelo
+  autor). Cada canal se divide num grave (um polo em ~150 Hz, soma exata);
+  só o resto segue o PAN — o grave não pende nem enfraquece em mono. Com o
+  PAN no centro, o som é o de antes. O PAN anda por uma rampa de ~30 ms.
+  Princípio do Asterismus (`PerformanceSkyPan.hpp`). Régua de qualidade
+  das seeds nova (`test_seed_quality`).
+
 - **VARIA: chão e teto de volume e a mão na partitura** (10 nov., aprovado
   pelo autor). Numa tomada do autor (seed 12022678860901989809, VARIA em
   2) o patch andou de −14 a −41 LUFS; reproduzido fora do app, só com o

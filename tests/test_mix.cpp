@@ -43,43 +43,108 @@ Frame mixOnce(Mixer& m, const float* chIn /*4*/, int blocks = 4) {
     return {out[0].at(0, 0), out[0].at(1, 0)};
 }
 
+// RMS de L e R com um seno de `hz` no canal 1 (o resto mudo), depois de
+// assentar rampa e filtro
+Frame mixSine(Mixer& m, const float hz, int blocks = 200) {
+    m.prepare(kSr, 64);
+    std::vector<AudioBlock> out(1, AudioBlock(kSr, 2, 64));
+    AudioBlock a(kSr, 1, 64), z(kSr, 1, 64);
+    for (std::size_t i = 0; i < 64; ++i) z.at(0, i) = 0.0f;
+    std::vector<const AudioBlock*> in{&a, &z, &z, &z};
+    double ph = 0.0, el = 0.0, er = 0.0; long n = 0;
+    for (int k = 0; k < blocks; ++k) {
+        for (std::size_t i = 0; i < 64; ++i, ph += 2.0 * M_PI * hz / kSr)
+            a.at(0, i) = static_cast<float>(std::sin(ph));
+        m.process(in, out);
+        if (k >= blocks / 2)
+            for (std::size_t i = 0; i < 64; ++i, ++n) {
+                el += out[0].at(0, i) * out[0].at(0, i);
+                er += out[0].at(1, i) * out[0].at(1, i);
+            }
+    }
+    return {static_cast<float>(std::sqrt(el / n)), static_cast<float>(std::sqrt(er / n))};
+}
+
 void testMixerPanLaw() {
     Mixer m;
-    const float in[4] = {1.0f, 0.0f, 0.0f, 0.0f};
-    // pan centro -> potência constante: L = R = cos(45°) = 0,707
+    // agudo (4 kHz): a lei de potência constante de sempre
     m.setParameter("pan1", 0.0f);
-    Frame f = mixOnce(m, in);
-    near(f.l, 0.70710678f);
-    near(f.r, 0.70710678f);
-    // pan totalmente à esquerda -> L = 1, R = 0
+    Frame f = mixSine(m, 4000.0f);
+    near(f.l, 0.70710678f * 0.70710678f, 6e-3f);   // RMS de seno × 0,707
+    near(f.r, 0.70710678f * 0.70710678f, 6e-3f);
     m.setParameter("pan1", -1.0f);
-    f = mixOnce(m, in);
-    near(f.l, 1.0f);
-    near(f.r, 0.0f);
-    // pan totalmente à direita
+    f = mixSine(m, 4000.0f);
+    check(f.l > 0.68f && f.r < 0.04f, "agudo segue o pan: todo à esquerda");
     m.setParameter("pan1", 1.0f);
-    f = mixOnce(m, in);
-    near(f.l, 0.0f);
-    near(f.r, 1.0f);
+    f = mixSine(m, 4000.0f);
+    check(f.r > 0.68f && f.l < 0.04f, "agudo segue o pan: todo à direita");
+}
+
+// GRAVE NO CENTRO (10/11/2026): abaixo de ~150 Hz o canal fica no centro
+// mesmo com o PAN no extremo; no centro, nada muda.
+void testMixerGraveNoCentro() {
+    Mixer m;
+    m.setParameter("pan1", -1.0f);
+    const Frame g = mixSine(m, 40.0f);
+    const float difDb = 20.0f * std::log10(std::max(g.l, 1e-6f) / std::max(g.r, 1e-6f));
+    check(difDb < 3.0f, "grave de 40 Hz quase igual nos dois lados com PAN todo à esquerda");
+    // constante (DC) é todo grave: centro exato
+    const float in[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+    m.setParameter("pan1", -1.0f);
+    const Frame d = mixOnce(m, in, 400);
+    near(d.l, d.r, 2e-3f);
+    // PAN no centro: igual à lei de antes, em qualquer frequência
+    m.setParameter("pan1", 0.0f);
+    for (const float hz : {40.0f, 150.0f, 1000.0f}) {
+        const Frame c = mixSine(m, hz);
+        near(c.l, c.r, 1e-3f);
+        near(c.l, 0.5f, 1.2e-2f);   // janela não é múltiplo do período em 40 Hz
+    }
+}
+
+// a RAMPA do PAN: girar de um extremo ao outro entre dois blocos não vira
+// degrau na saída
+void testMixerPanSemClique() {
+    Mixer m;
+    m.setParameter("pan1", -1.0f);
+    m.prepare(kSr, 64);
+    std::vector<AudioBlock> out(1, AudioBlock(kSr, 2, 64));
+    AudioBlock a(kSr, 1, 64), z(kSr, 1, 64);
+    for (std::size_t i = 0; i < 64; ++i) z.at(0, i) = 0.0f;
+    std::vector<const AudioBlock*> in{&a, &z, &z, &z};
+    double ph = 0.0; float last = 0.0f, maxStep = 0.0f;
+    for (int k = 0; k < 400; ++k) {
+        if (k == 200) m.setParameter("pan1", 1.0f);
+        for (std::size_t i = 0; i < 64; ++i, ph += 2.0 * M_PI * 2000.0 / kSr)
+            a.at(0, i) = static_cast<float>(0.5 * std::sin(ph));
+        m.process(in, out);
+        for (std::size_t i = 0; i < 64; ++i) {
+            if (k > 10) maxStep = std::max(maxStep, std::fabs(out[0].at(0, i) - last));
+            last = out[0].at(0, i);
+        }
+    }
+    // seno de 2 kHz a 0,5: o passo natural entre amostras é ~0,13
+    check(maxStep < 0.16f, "pan de um extremo ao outro sem degrau na saída");
 }
 
 void testMixerGainAndMute() {
+    // (desde 10/11/2026 um sinal constante é todo GRAVE e fica no centro;
+    // ganho e mute são testados com os canais no centro)
     Mixer m;
     const float in[4] = {1.0f, 1.0f, 0.0f, 0.0f};
-    m.setParameter("pan1", -1.0f);   // ch1 na esquerda
-    m.setParameter("pan2", 1.0f);    // ch2 na direita
     m.setParameter("gain1", -6.0206f);  // metade
-    Frame f = mixOnce(m, in);
-    near(f.l, 0.5f, 5.0e-3f);
-    near(f.r, 1.0f);
-    m.setParameter("mute2", 1.0f);
-    f = mixOnce(m, in);
-    near(f.r, 0.0f);
+    m.setParameter("gain2", -60.0f);    // ch2 calado pelo ganho
+    Frame f = mixOnce(m, in, 400);
+    near(f.l, 0.5f * 0.70710678f, 5.0e-3f);
+    near(f.r, 0.5f * 0.70710678f, 5.0e-3f);
+    m.setParameter("gain2", 0.0f);
+    m.setParameter("mute2", 1.0f);      // ch2 calado pelo mute
+    f = mixOnce(m, in, 400);
+    near(f.l, 0.5f * 0.70710678f, 5.0e-3f);
     // out_gain
-    m.setParameter("mute2", 0.0f);
     m.setParameter("out_gain", -6.0206f);
-    f = mixOnce(m, in);
-    near(f.r, 0.5f, 5.0e-3f);
+    f = mixOnce(m, in, 400);
+    near(f.r, 0.25f * 0.70710678f, 5.0e-3f);
 }
 
 void testMixerMonoGraph() {
@@ -299,6 +364,8 @@ void testPanels() {
 
 int main() {
     testMixerPanLaw();
+    testMixerGraveNoCentro();
+    testMixerPanSemClique();
     testMixerGainAndMute();
     testMixerMonoGraph();
     testMasterWidth();

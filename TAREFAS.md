@@ -19,8 +19,14 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   4 línguas. **Só no app JUCE**: o painel X11 tem a seed no nome, mas não
   o relógio, nem `-montage`, nem a troca de seed na partitura.
 - [x] PENDULUM com visor de 30 mm (altura de visor por módulo).
-- [ ] Proposta do PALCO / entradas PAN no MIXER
-  (`dossies/PROPOSTA_palco_do_varia.md`): aguardando as decisões do autor.
+- [x] VARIA: chão e teto de volume e a mão na partitura (8099e59).
+- [x] MIXER: grave no centro e rampa de pan (aprovado); abertura máxima 0,55
+  aprovada (vale para PALCO/PAN quando vierem).
+- [x] Régua de qualidade técnica das seeds (`test_seed_quality`).
+- [ ] Proposta do PALCO / entradas PAN (`dossies/PROPOSTA_palco_do_varia.md`):
+  falta decidir B primeiro ou junto do PALCO.
+- [ ] Quatro canais da seed (`dossies/PROPOSTA_quatro_canais_da_seed.md`):
+  aguardando 3 decisões do autor (distribuição, casas na seed, ARP/MARKOV).
 
 ## ▶ 09/11/2026 (noite): identidade da seed e todos os módulos no sorteio
 
