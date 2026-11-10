@@ -126,14 +126,23 @@ public:
                     burst_ = 0.0f;
             }
 
+            // (10/11/2026) cada modo na FORMA DE ROTAÇÃO: o estado (x, y)
+            // gira pelo ângulo ω e encolhe por r — re-afinar o modo muda só
+            // o ângulo, nunca a energia guardada. A forma direta de antes
+            // (a1·z1 − a2·z2) amplificava o estado quando ω mudava de golpe:
+            // com FM de áudio na `freq_mod` a saída ia a NaN/Inf (bancada
+            // da auditoria; o mesmo achado do Aquorbium na cópia). Resposta
+            // ao impulso igual: b·rⁿ·sin(nω).
             float y = 0.0f;
             for (auto& m : modes_) {
                 if (m.amp <= 0.0f)
                     continue;
-                const float v = m.a1 * m.z1 - m.a2 * m.z2 + m.b0 * excitation;
-                m.z2 = m.z1;
-                m.z1 = v;
-                y += v * m.amp;
+                const float nx = m.r * (m.c * m.x - m.s * m.y) + m.b0 * excitation;
+                const float ny = m.r * (m.s * m.x + m.c * m.y);
+                m.x = nx;
+                m.y = ny;
+                if (!std::isfinite(m.y) || !std::isfinite(m.x)) { m.x = m.y = 0.0f; continue; }
+                y += m.y * m.amp;
             }
             y = softLimit(y * 3.0f);
 
@@ -147,8 +156,8 @@ public:
 private:
     static constexpr int kModes = 24;
     struct Mode {
-        float a1 = 0.0f, a2 = 0.0f, b0 = 0.0f, amp = 0.0f;
-        float z1 = 0.0f, z2 = 0.0f;
+        float c = 1.0f, s = 0.0f, r = 0.0f, b0 = 0.0f, amp = 0.0f;
+        float x = 0.0f, y = 0.0f;
     };
 
     static float clampf(const float v, const float lo, const float hi) noexcept {
@@ -183,22 +192,25 @@ private:
             Mode& m = modes_[i];
             if (f >= nyq || f <= 0.0f) {
                 m.amp = 0.0f;
-                m.a1 = m.a2 = m.b0 = 0.0f;
+                m.b0 = 0.0f;
+                m.x = m.y = 0.0f;   // modo fora da faixa: não guarda estado velho
                 continue;
             }
             const float w = 6.2831853f * f / sampleRate_;
             const float t60 = t60Base / (1.0f + static_cast<float>(i) * 0.35f);
             float r = std::exp(-6.9077553f / (t60 * sampleRate_));  // ln(1000)
             r = r > 0.99995f ? 0.99995f : r;
-            m.a1 = 2.0f * r * std::cos(w);
-            m.a2 = r * r;
+            m.c = std::cos(w);
+            m.s = std::sin(w);
+            m.r = r;
             // amplitude alvo do modo: brilho (rolloff) x posição de excitação
             const float posWeight =
                 std::fabs(std::sin(n * 3.14159265f * position));
             const float targetAmp = std::pow(n, -brightExp) * posWeight;
-            // b0 escala a resposta impulsiva ~proporcional a targetAmp
-            // (sin(w) compensa o ganho natural do ressoador a baixa freq)
-            m.b0 = targetAmp * std::sin(w);
+            // b0 escala a resposta impulsiva (forma de rotação: y = b·rⁿ·
+            // sin(nω), sem o fator 1/sin ω da forma direta — por isso o
+            // b0 não leva mais ×sin ω e a amplitude por modo é a mesma)
+            m.b0 = targetAmp;
             m.amp = 1.0f;
             if (targetAmp > ampNorm)
                 ampNorm = targetAmp;

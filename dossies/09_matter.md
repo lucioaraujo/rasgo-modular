@@ -180,3 +180,15 @@ FREQ/STRUCT/BRIGHT/DAMP, POS/EXCITE/MIX, jacks). Testado isolado
 (ring/decay, altura, damping, timbre, estabilidade) antes do patch.
 Entra numa peça como o corpo percussivo: `CLOCK → MATTER.strike`,
 `structure`/`freq` de um `TURING`, saída → `SPACE`.
+
+## Modos na forma de rotação (10/11/2026, correção técnica)
+
+A auditoria dos módulos (`AUDITORIA_modulos_e_cardinal.md` §2.1) mediu: FM
+em taxa de áudio na `freq_mod` (±3 oitavas a 331 Hz) levava a saída a
+**NaN/Inf**. Causa: cada modo era um ressoador de dois polos em forma
+direta (`a1·z1 − a2·z2`), re-afinado a cada bloco mantendo o estado — nessa
+forma, mudar ω de golpe amplifica a energia guardada. Agora cada modo é a
+**forma de rotação** (o estado gira por ω e encolhe por r; re-afinar muda só
+o ângulo), com resposta ao impulso igual (b·rⁿ·sin nω) e uma rede de
+segurança que zera um modo não finito. Teste `testAudioRateFmStaysFinite`.
+O Aquorbium achou o mesmo na cópia deste módulo.
