@@ -7,6 +7,7 @@
 #include "io/AsciiPanel.hpp"
 
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
@@ -81,6 +82,57 @@ void testPluckPitch() {
         for (const float v : r)
             EXPECT(std::isfinite(v) && std::fabs(v) < 2.0f);
     }
+}
+
+// (10/11/2026) Afinação fina: autocorrelação com interpolação parabólica
+// (a resolução de lag inteiro era ~0,7 % e o teste antigo aceitava 6 %).
+// O filtro de perda acrescenta atraso ao laço — sem descontá-lo, a corda
+// soava baixa, e tanto mais quanto mais fechado o DAMP.
+float acFreqFine(const std::vector<float>& v, std::size_t a, std::size_t b,
+                 const float expectHz) {
+    const int lagLo = static_cast<int>(kSampleRate / (expectHz * 1.3f));
+    const int lagHi = static_cast<int>(kSampleRate / (expectHz * 0.77f)) + 1;
+    std::vector<double> ac(static_cast<std::size_t>(lagHi + 2), 0.0);
+    for (int lag = lagLo - 1; lag <= lagHi + 1; ++lag) {
+        double acc = 0.0;
+        for (std::size_t i = a; i + lag < b && i + lag < v.size(); ++i)
+            acc += static_cast<double>(v[i]) * v[i + lag];
+        ac[static_cast<std::size_t>(lag)] = acc;
+    }
+    int best = lagLo;
+    for (int lag = lagLo; lag <= lagHi; ++lag)
+        if (ac[static_cast<std::size_t>(lag)] > ac[static_cast<std::size_t>(best)]) best = lag;
+    const double y0 = ac[static_cast<std::size_t>(best - 1)], y1 = ac[static_cast<std::size_t>(best)],
+                 y2 = ac[static_cast<std::size_t>(best + 1)];
+    const double den = y0 - 2.0 * y1 + y2;
+    const double off = std::fabs(den) > 1e-12 ? 0.5 * (y0 - y2) / den : 0.0;
+    return kSampleRate / static_cast<float>(best + off);
+}
+
+void testPluckTuningCents() {
+    for (const float damp : {0.0f, 0.4f, 0.8f})
+        for (const float hz : {110.0f, 220.0f, 440.0f, 880.0f}) {
+            StringVoice s;
+            s.setParameter("freq", hz);
+            s.setParameter("decay", 0.9f);
+            s.setParameter("damping", damp);
+            s.setParameter("exciter", 0.7f);
+            const auto r = pluckRing(s, 24000);
+            // Notas que sustentam: mede no regime (depois do ataque, cujo
+            // ruído desvia a medida). DAMP alto nas agudas: a corda morre
+            // em poucos ms — mede logo depois do ataque, com tolerância
+            // maior (altura curta demais para medir fino). Antes da
+            // correção: até −49 cents (440 Hz, DAMP 0,8).
+            const bool dies = damp >= 0.8f && hz >= 440.0f;
+            const float f = dies ? acFreqFine(r, 300, 2400, hz)
+                                 : acFreqFine(r, 3000, 12000, hz);
+            const float tol = dies ? 25.0f : 10.0f;
+            const float cents = 1200.0f * std::log2(f / hz);
+            if (std::getenv("STRING_CENTS") || std::fabs(cents) > tol)
+                std::cerr << "  STRING " << hz << " Hz, damp " << damp << ": "
+                          << cents << " cents\n";
+            check(std::fabs(cents) <= tol, "a corda afina (±10 cents; ±25 nas que morrem em ms)");
+        }
 }
 
 void testDecayControlsSustain() {
@@ -192,6 +244,7 @@ void testPanel() {
 
 int main() {
     testPluckPitch();
+    testPluckTuningCents();
     testDecayControlsSustain();
     testDampingBrightness();
     testBowedStability();

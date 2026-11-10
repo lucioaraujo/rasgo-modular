@@ -171,3 +171,30 @@ parâmetros. `panel()` próprio (12 HP: display da corda +
 FREQ/DECAY/DAMP/POS, EXCITE/DRIVE/MIX, jacks). Testado isolado (altura,
 sustain, brilho, arco, determinismo) antes do patch. Numa peça:
 `QUANTIZER → STRING.freq_mod`, `CLOCK → STRING.pluck`, saída → `SPACE`.
+
+## Afinação do laço (10/11/2026, correção técnica aprovada pelo autor)
+
+O filtro de perda (1 polo) dentro do laço também atrasa o sinal, e o código
+não descontava esse atraso: a corda soava **baixa**, tanto mais quanto mais
+fechado o DAMP e mais aguda a nota. Medido com autocorrelação interpolada
+(`test_string`, `testPluckTuningCents`), DECAY 0,9:
+
+| DAMP | 110 Hz | 220 Hz | 440 Hz | 880 Hz |
+|---|---|---|---|---|
+| 0 (antes → depois) | +1,0 → +1,0 | +0,7 → +0,9 | +0,1 → +0,6 | −2,8 → +3,3 |
+| 0,4 | −2,2 → +0,4 | −5,0 → +0,5 | −10,6 → +0,8 | −18,5 → +5,2 |
+| 0,8 | −12,1 → +1,2 | −24,2 → +2,2 | −39,6 → +10,2* | −82,1 → +11,9* |
+
+(cents; * notas que morrem em poucos ms, medidas logo após o ataque.)
+
+Correção: o atraso de fase do filtro de perda na frequência da nota,
+`atan2(b·sin ω0, 1 − b·cos ω0)/ω0` com `b = 1 − a`, sai do comprimento do
+laço; e o coeficiente do all-pass fracionário passa à forma exata em ω0,
+`c = sin(ω0(1−d)/2)/sin(ω0(1+d)/2)` (a forma `(1−d)/(1+d)` só vale perto de
+ω = 0). Referência: J. O. Smith III, *Physical Audio Signal Processing*
+(afinação do laço de Karplus–Strong); Jaffe & Smith (1983).
+
+**Muda o som**: toda STRING com DAMP acima de ~0,3 sobe para a altura
+pedida (antes ficava até quase um semitom abaixo nas agudas). O Trioio usa
+uma cópia fixada do DSP do Modular (§4.4b do estudo da família): se a cópia
+incluir a STRING, a correção pode ser oferecida a ele.
