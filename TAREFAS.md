@@ -11,6 +11,24 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ 11/11/2026 (madrugada): correções técnicas e auditoria dos módulos
+
+- [x] Correções técnicas aprovadas ("ok pra todas"), cada uma com teste e
+  commit: denormais no núcleo (55e6808), STRING afinada (173c96e), loudness
+  em 10 ms e sem log10 no áudio (d9a5966), Lagrange em SPRING/PRISM
+  (68a5e59), FORMANT no nível (11a0c53), MASTER com pico verdadeiro e
+  latência na bateria (ca88a80), MATTER finito com FM de áudio (57ad708).
+  95/95 testes; app recompilado em 11/11 00:00.
+- [x] Auditoria dos 69 módulos + Cardinal (`dossies/AUDITORIA_modulos_e_cardinal.md`).
+- [ ] **Decisão do autor**: instâncias (o mesmo módulo várias vezes) — §1
+  da auditoria recomenda instâncias com limite por família.
+- [ ] Próximo técnico (proposto): crossfade nas trocas discretas que estalam
+  (OPERATOR algo, SWIRL type, LOOPER reverse/hold, BOXCAR scan, FUNCTION
+  slope, MEMORY freeze) e rampa no MUTE do MIXER; depois medir o aliasing
+  dos 16 módulos não-lineares sem OS/ADAA.
+- [ ] Escuta do autor: STRING (agora afinada), FORMANT (bem mais presente),
+  SPRING/PRISM (caudas mais brilhantes).
+
 ## ▶ 10/11/2026: gravação e visores
 
 - [x] REC: número da seed no nome (`-seedN`, `-manual`, `-montage` quando a
