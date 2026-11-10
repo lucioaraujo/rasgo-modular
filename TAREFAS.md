@@ -11,6 +11,17 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ 10/11/2026: gravação e visores
+
+- [x] REC: número da seed no nome (`-seedN`, `-manual`, `-montage` quando a
+  seed muda durante a tomada — decisões do autor); trocas de seed na
+  partitura; relógio no botão; limite de 4 min mantido. Ajuda do REC nas
+  4 línguas. **Só no app JUCE**: o painel X11 tem a seed no nome, mas não
+  o relógio, nem `-montage`, nem a troca de seed na partitura.
+- [x] PENDULUM com visor de 30 mm (altura de visor por módulo).
+- [ ] Proposta do PALCO / entradas PAN no MIXER
+  (`dossies/PROPOSTA_palco_do_varia.md`): aguardando as decisões do autor.
+
 ## ▶ 09/11/2026 (noite): identidade da seed e todos os módulos no sorteio
 
 - [x] Som alto depois de vários cliques em SEED: `out_gain` do MIXER preso em

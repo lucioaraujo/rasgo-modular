@@ -167,7 +167,23 @@ void testCabecalho() {
           "clear() limpa também o cabeçalho");
 }
 
+// Troca de seed no meio da tomada (10/11/2026): a partitura registra a
+// seed nova no tempo certo; o cabeçalho continua com a primeira.
+void testTrocaDeSeed() {
+    rasgo::panel::ScoreRecorder r;
+    r.setSeed(111);
+    r.connection(0.0, 1, 0, 2, 0);
+    r.seedChange(12.5, 222);
+    r.connection(12.5, 3, 0, 4, 0);
+    const std::string txt = r.toText();
+    check(txt.find("seed 111\n") != std::string::npos, "cabeçalho com a primeira seed");
+    check(txt.find("t=12.500000 seed 222 (patch recomposto)") != std::string::npos,
+          "a troca de seed aparece com o tempo");
+    check(txt.find("seed 111\n") < txt.find("seed 222"), "a primeira vem antes");
+}
+
 int main() {
+    testTrocaDeSeed();
     testCabecalho();
     testRecordsInOrder();
     testTextFormatContainsFields();

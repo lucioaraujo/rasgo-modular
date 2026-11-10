@@ -47,7 +47,7 @@
 namespace rasgo::panel {
 
 struct RasgoEvent {
-    enum class Type { Connection, Modulation, ParameterChange, Note };
+    enum class Type { Connection, Modulation, ParameterChange, Note, Seed };
 
     double time = 0.0;   // segundos — SEMPRE amostra/sr, nunca wall clock
     Type type = Type::ParameterChange;
@@ -71,6 +71,10 @@ struct RasgoEvent {
     float noteVelocity = 1.0f;
     double noteDuration = 0.0;
     bool noteAccent = false;
+
+    // Seed (10/11/2026): troca de seed DURANTE a tomada. O nome do arquivo
+    // leva só a primeira (decisão do autor); as seguintes ficam aqui.
+    std::uint64_t seed = 0;
 };
 
 // Descrição de um módulo para o texto da partitura.
@@ -136,6 +140,16 @@ public:
         events_.push_back(std::move(e));
     }
 
+    // Troca de seed no meio da tomada: o patch inteiro foi recomposto. A
+    // seed basta para reproduzi-lo; quem chama registra em seguida, no
+    // mesmo `t`, os cabos do patch novo.
+    void seedChange(const double t, const std::uint64_t newSeed) {
+        RasgoEvent e;
+        e.time = t; e.type = RasgoEvent::Type::Seed;
+        e.seed = newSeed;
+        events_.push_back(std::move(e));
+    }
+
     std::size_t eventCount() const noexcept { return events_.size(); }
     const std::vector<RasgoEvent>& events() const noexcept { return events_; }
     void clear() noexcept { events_.clear(); nodes_.clear(); seed_ = 0;
@@ -191,6 +205,7 @@ public:
         // afogaria o que importa. Partitura é o que TOCOU.
         std::vector<std::size_t> usados;
         for (const auto& e : events_) {
+            if (e.type == RasgoEvent::Type::Seed) continue;
             usados.push_back(e.targetNode);
             if (e.type == RasgoEvent::Type::Connection
                 || e.type == RasgoEvent::Type::Modulation)
@@ -236,6 +251,12 @@ public:
                     << " intensidade=" << e.noteVelocity
                     << " duração=" << e.noteDuration
                     << (e.noteAccent ? " acento" : "") << '\n';
+                break;
+            case RasgoEvent::Type::Seed:
+                if (e.seed != 0)
+                    out << "seed " << e.seed << " (patch recomposto)\n";
+                else
+                    out << "seed manual (patch recomposto)\n";
                 break;
             }
         }
