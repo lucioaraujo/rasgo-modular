@@ -288,6 +288,11 @@ public:
     // no limitador — se ficar bem acima de `outputPeak()`, o pico de
     // amostra sozinho estava escondendo estouro
     float inputTruePeak() const noexcept { return truePeak_; }
+    // Contrato de latência (10/11/2026): o look-ahead atrasa a saída em
+    // round(lookaheadMs · taxa) amostras, em qualquer taxa — 3 ms = 144 a
+    // 48 kHz, 132 a 44,1 kHz, 576 a 192 kHz. Quem grava ou alinha com
+    // outro sinal desconta isto. Fixado em `test_output_excellence`.
+    std::size_t latencySamples() const noexcept { return len_ > 0 ? len_ - 1 : 0; }
     std::uint64_t nonFiniteCount() const noexcept { return nonFinite_; }
     void clearTelemetry() noexcept {
         grDb_ = 0.0f; outPeak_ = 0.0f; truePeak_ = 0.0f; bodyGrDb_ = 0.0f;

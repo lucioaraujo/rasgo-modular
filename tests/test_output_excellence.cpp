@@ -15,10 +15,13 @@
 // PCM24/float.
 
 #include "core/SignalGraph.hpp"
+#include "dsp/Loudness.hpp"
 #include "dsp/Master.hpp"
 #include "panel/SinkOut.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <cstdio>
 #include <limits>
 #include <vector>
@@ -268,7 +271,84 @@ void testMonoDownmix() {
 
 }  // namespace
 
+// ---- 10. contrato de latência e pico verdadeiro na saída (10/11/2026) -----
+// Aprovado pelo autor (estudo §4.6–4.7: "o pico verdadeiro e a latência na
+// bateria do MASTER"). A bateria conferia só o pico de AMOSTRA contra o teto.
+
+void testLatencyContract() {
+    for (const float sr : {22050.0f, 44100.0f, 48000.0f, 96000.0f, 192000.0f}) {
+        Chain ch;
+        ch.prepare(sr, 64);
+        const std::size_t lat = ch.master.latencySamples();
+        const std::size_t want = static_cast<std::size_t>(std::lround(0.003f * sr));
+        check(lat == want, "latência declarada = round(3 ms × taxa)");
+        // impulso baixo (o limitador não age): o pico sai `lat` amostras depois
+        AudioBlock in(sr, 2, 64);
+        long t = 0, peakAt = -1; float peak = 0.0f;
+        for (int b = 0; b < static_cast<int>(lat / 64 + 4); ++b) {
+            for (std::size_t i = 0; i < 64; ++i) {
+                const float v = (t + static_cast<long>(i) == 10) ? 0.25f : 0.0f;
+                in.at(0, i) = v; in.at(1, i) = v;
+            }
+            const AudioBlock& o = ch.run(in);
+            for (std::size_t i = 0; i < 64; ++i)
+                if (std::fabs(o.at(0, i)) > peak) { peak = std::fabs(o.at(0, i)); peakAt = t + static_cast<long>(i); }
+            t += 64;
+        }
+        const long delay = peakAt - 10;
+        // o filtro ultrassônico (2 polos, ~21 kHz) soma um atraso de grupo
+        // pequeno: 0–1 amostra até 96 kHz, ~2 a 192 kHz (~10 µs). Tolerância
+        // em TEMPO: 1 amostra ou 20 µs, o que for maior.
+        const long tol = std::max(1L, std::lround(20e-6 * sr));
+        if (std::labs(delay - static_cast<long>(lat)) > tol)
+            std::fprintf(stderr, "  latência %.0f Hz: declarada %zu, medida %ld\n", sr, lat, delay);
+        check(std::labs(delay - static_cast<long>(lat)) <= tol,
+              "o impulso sai com o atraso declarado (+ o atraso de grupo do filtro ultrassônico)");
+    }
+}
+
+// Sinais que escondem pico ENTRE amostras: seno em taxa/4 com fase de 45°
+// (as amostras caem em ±0,707 do pico: o pico de amostra erra 3 dB), seno em
+// taxa/6 e um quase-Nyquist, todos +12 dB acima do teto. A saída medida por
+// um medidor independente de pico verdadeiro (sobreamostragem 4×,
+// `Loudness.hpp`) não pode passar do teto com folga de interpolação.
+void testOutputTruePeak() {
+    struct Case { const char* name; double hz, phase; };
+    const Case cases[] = {{"taxa/4, 45°", kSr / 4.0, M_PI / 4.0},
+                          {"taxa/6", kSr / 6.0, 0.3},
+                          {"quase Nyquist", kSr * 0.45, 0.1},
+                          {"997 Hz", 997.0, 0.0}};
+    const double amp = 4.0;   // +12 dB acima de 1,0
+    for (const auto& c : cases) {
+        Chain ch;
+        ch.master.setParameter("gain", 6.0f);   // pior caso: o limitador trabalha
+        ch.prepare(kSr, 64);
+        TruePeakMeter tp;
+        tp.prepare(kSr);
+        AudioBlock in(kSr, 2, 64);
+        double ph = c.phase;
+        const double dp = 2.0 * M_PI * c.hz / kSr;
+        for (int b = 0; b < 1500; ++b) {
+            for (std::size_t i = 0; i < 64; ++i, ph += dp) {
+                const float v = static_cast<float>(amp * std::sin(ph));
+                in.at(0, i) = v; in.at(1, i) = v;
+            }
+            const AudioBlock& o = ch.run(in);
+            if (b >= 100)
+                for (std::size_t i = 0; i < 64; ++i) tp.push(o.at(0, i), o.at(1, i));
+        }
+        const float ceilDb = 20.0f * std::log10(kCeil);
+        if (tp.dBTP() > ceilDb + 0.1f)
+            std::fprintf(stderr, "  pico verdadeiro (%s): %.2f dBTP, teto %.2f\n", c.name, tp.dBTP(), ceilDb);
+        if (std::getenv("TP_DB"))
+            std::fprintf(stderr, "  pico verdadeiro (%s): %.2f dBTP, teto %.2f\n", c.name, tp.dBTP(), ceilDb);
+        check(tp.dBTP() <= ceilDb + 0.1f, "pico verdadeiro da saída dentro do teto (+0,1 dB de folga do medidor)");
+    }
+}
+
 int main() {
+    testLatencyContract();
+    testOutputTruePeak();
     testPathologicalInputs();
     testImpulse();
     testExtremeFrequencies();

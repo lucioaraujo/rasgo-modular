@@ -26,6 +26,10 @@ pronto.
   brilhantes.
   (5) **FORMANT**: ganho ×√k e largura que acompanha o SHIFT — saía de −28 a
   0 dB da entrada conforme RES/SHIFT, agora de −10 a +3 dB.
+  (6) **MASTER**: a bateria de saída passou a medir o **pico verdadeiro**
+  (medidor independente, 4×) no pior caso — −1,13 dBTP no máximo, teto −1 —
+  e o **contrato de latência** do look-ahead: round(3 ms × taxa) amostras
+  (144 a 48 kHz), declarado em `Master::latencySamples()`. Sem mudança de som.
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos

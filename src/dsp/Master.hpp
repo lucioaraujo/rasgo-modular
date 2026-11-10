@@ -182,6 +182,8 @@ public:
     // telemetria da proteção (leitura não RT-crítica; p/ um medidor de GR
     // no painel ou pra um módulo SEGUIR a própria redução de ganho)
     float gainReductionDb() const noexcept { return out_.gainReductionDb(); }
+    // atraso do look-ahead do limitador, em amostras (ver OutputStage)
+    std::size_t latencySamples() const noexcept { return out_.latencySamples(); }
     // quanto o governador de corpo está atenuando o agudo (dB de shelf)
     float bodyGuardDb() const noexcept { return out_.bodyGuardDb(); }
 
