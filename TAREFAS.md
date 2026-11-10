@@ -23,8 +23,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] MIXER: grave no centro e rampa de pan (aprovado); abertura máxima 0,55
   aprovada (vale para PALCO/PAN quando vierem).
 - [x] Régua de qualidade técnica das seeds (`test_seed_quality`).
-- [ ] Proposta do PALCO / entradas PAN (`dossies/PROPOSTA_palco_do_varia.md`):
-  falta decidir B primeiro ou junto do PALCO.
+- [x] PALCO no MIXER (modos, móbile, P1–P4, FRASE, visor, 18 HP) e a
+  seed abrindo o palco — decisões do autor de 10/11 (dossiê 16 §9).
+- [ ] Escuta do autor do PALCO e do painel de 18 HP ("se não ficar bom eu
+  te aviso"). Em aberto: VARIA em VELOC/ABERT; visor no painel X11.
 - [x] Quatro canais da seed implementados com os valores da proposta
   (o autor disse "avance"): 1000 seeds → 1 canal 24 %, 2 = 30 %, 3 = 27 %,
   4 = 20 % (antes 48/34/18/0). Régua de qualidade passa, também com 4 vozes

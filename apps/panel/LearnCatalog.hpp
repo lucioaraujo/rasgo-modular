@@ -1067,6 +1067,22 @@ inline const LearnTable& learnTable() {
             {"in:ch4", {"Entrada de áudio do canal 4.", "", ""}},
             {"out:out", {"Soma estéreo dos 4 canais — normalmente vai "
                         "pro MASTER.", "", ""}},
+            {"stage", {"PALCO: MANUAL (o PAN é o lugar), RODA, CÂNONE, "
+                       "GESTO ou PÊNDULO. Fora do MANUAL o PAN vira a casa "
+                       "e um móbile equilibra o palco pelo peso do som: "
+                       "o mais forte fica perto do centro, o leve se move.",
+                       "", ""}},
+            {"stage_rate", {"Velocidade do trajeto do PALCO (período de "
+                            "60 s a 6 s).", "", ""}},
+            {"stage_width", {"Abertura do trajeto em torno das casas; o "
+                             "palco nunca passa de 0,55.", "", ""}},
+            {"in:pan1", {"CV de pan do canal 1 (−1..+1), somada ao lugar.", "", ""}},
+            {"in:pan2", {"CV de pan do canal 2.", "", ""}},
+            {"in:pan3", {"CV de pan do canal 3.", "", ""}},
+            {"in:pan4", {"CV de pan do canal 4.", "", ""}},
+            {"in:phrase", {"Gatilho de frase: no GESTO, cada pulso leva um "
+                           "canal a um lugar novo que reequilibra o palco.",
+                           "", ""}},
         }},
         {"MASTER", {
             {"gain", {
@@ -3157,7 +3173,8 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "um tape-stop na virada."}},
         {"MIXER", {
             "Mixer de 4 canais — nível (slider), pan e mute por canal + "
-            "saída geral. Onde o músico faz o balanço.",
+            "saída geral, e o PALCO: trajetos de pan equilibrados por um "
+            "móbile que pesa o som de cada canal.",
             "Isento da Motion Engine — os pans e níveis são teus.", ""}},
         {"MASTER", {
             "Estágio de saída estéreo — largura, guarda de corpo e "
@@ -3457,7 +3474,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "NO BPM quantisation — beatmatching is a gesture, as on vinyl.",
             "LFO → SCR: the record scratches in time. ENVELOPE → BRK: a tape-stop on the turnaround."}},
         {"MIXER", {
-            "4-channel mixer — level (slider), pan and mute per channel plus a master out. Where the musician does the balance.",
+            "4-channel mixer — level (slider), pan and mute per channel plus a master out, and the STAGE: pan paths balanced by a mobile that weighs each channel's sound.",
             "Exempt from the Motion Engine — the pans and levels are yours.",
             ""}},
         {"MASTER", {
@@ -3731,7 +3748,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "AUCUNE quantification de BPM — le beatmatch est un geste, comme sur vinyle.",
             "LFO → SCR : le disque scratche dans la mesure. ENVELOPPE → BRK : un tape-stop au retournement."}},
         {"MIXER", {
-            "Mélangeur 4 canaux — niveau (curseur), panoramique et mute par canal, plus une sortie générale. Là où le musicien fait l’équilibre.",
+            "Mélangeur 4 canaux — niveau (curseur), panoramique et mute par canal, plus une sortie générale, et la SCÈNE : des trajets de panoramique équilibrés par un mobile qui pèse le son de chaque canal.",
             "Exempt de la Motion Engine — les panoramiques et les niveaux sont à vous.",
             ""}},
         {"MASTER", {
@@ -4005,7 +4022,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "SIN cuantización de BPM — el beatmatch es un gesto, como en el vinilo.",
             "LFO → SCR: el disco rasca en compás. ENVOLVENTE → BRK: un tape-stop en la vuelta."}},
         {"MIXER", {
-            "Mezclador de 4 canales — nivel (deslizador), paneo y mute por canal, más una salida general. Donde el músico hace el balance.",
+            "Mezclador de 4 canales — nivel (deslizador), paneo y mute por canal, más una salida general, y el ESCENARIO: trayectos de paneo equilibrados por un móvil que pesa el sonido de cada canal.",
             "Exento de la Motion Engine — los paneos y los niveles son suyos.",
             ""}},
         {"MASTER", {

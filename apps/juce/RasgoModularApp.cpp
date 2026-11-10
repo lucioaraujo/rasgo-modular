@@ -470,6 +470,12 @@ struct Rack {
                 const auto* depth = graph.lastOutput(id, 0);
                 if (depth && depth->frames() > 0)
                     it->second.pushLanes(depth->at(0, depth->frames() - 1), 0.0f, 0.0f, 0.0f);
+            } else if (graph.node(id).type() == "MIXER") {
+                // PALCO: o lugar de cada canal, um registro por bloco (o
+                // rastro mostra o trajeto dos últimos segundos)
+                if (const auto* mx = dynamic_cast<const rasgo::modular::Mixer*>(&graph.node(id)))
+                    it->second.pushLanes(mx->stagePosition(0), mx->stagePosition(1),
+                                         mx->stagePosition(2), mx->stagePosition(3));
             } else if (graph.node(id).type() == "PENDULUM") {
                 const auto* x1 = graph.lastOutput(id, 0);
                 const auto* y1 = graph.lastOutput(id, 1);
@@ -3897,6 +3903,42 @@ private:
                 g.setColour(T.accent);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel.clear();
+            } else if (mtype == "MIXER") {
+                // PALCO: o tempo desce; cada canal deixa o rastro do seu
+                // lugar (esquerda–direita); embaixo, o agora — o ponto cresce
+                // com o peso — e o traço do centro de gravidade (o móbile).
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const float x0 = static_cast<float>(wx + 2), ww = static_cast<float>(dw - 4);
+                auto px = [&](float p) { return x0 + (juce::jlimit(-1.0f, 1.0f, p / 0.55f) * 0.5f + 0.5f) * ww; };
+                const float top = static_cast<float>(wy + 2), bot = static_cast<float>(wy + dh - 6);
+                g.setColour(T.line);
+                g.drawVerticalLine(static_cast<int>(px(0.0f)), top, bot + 4.0f);
+                const juce::Colour cols[4] = {T.textPrimary, T.accent, T.warning, T.textSecondary};
+                const auto* mx = dynamic_cast<const rasgo::modular::Mixer*>(&node);
+                for (int c = 0; c < 4; ++c) {
+                    const float wgt = mx ? mx->stageWeight(c) : 0.0f;
+                    if (wgt <= 0.0f) continue;
+                    juce::Path path;
+                    for (std::size_t k = 0; k < nL; ++k) {
+                        const float y = top + (bot - top) * static_cast<float>(k) / static_cast<float>(nL - 1);
+                        const float xx = px(sc.lane(static_cast<std::size_t>(c), k));
+                        if (k == 0) path.startNewSubPath(xx, y); else path.lineTo(xx, y);
+                    }
+                    g.setColour(cols[c].withAlpha(0.6f));
+                    g.strokePath(path, juce::PathStrokeType(1.0f));
+                    const float r = 1.5f + 3.5f * juce::jlimit(0.0f, 1.0f, wgt);
+                    g.setColour(cols[c]);
+                    g.fillEllipse(px(sc.lane(static_cast<std::size_t>(c), nL - 1)) - r, bot - r, 2 * r, 2 * r);
+                }
+                if (mx && node.parameterValue("stage") >= 0.5f) {
+                    const float cx = px(mx->stageCentre());
+                    g.setColour(T.accent);
+                    g.drawLine(cx - 4.0f, bot + 4.0f, cx + 4.0f, bot + 4.0f, 1.5f);
+                    g.drawLine(cx, bot + 1.0f, cx, bot + 4.0f, 1.5f);
+                }
+                static const char* modes[5] = {"MANUAL", "RODA", "CANONE", "GESTO", "PENDULO"};
+                const int md = juce::jlimit(0, 4, static_cast<int>(std::lround(node.parameterValue("stage"))));
+                dlabel = juce::String(juce::CharPointer_UTF8(md == 2 ? "CÂNONE" : md == 4 ? "PÊNDULO" : modes[md]));
             } else if (mtype == "PENDULUM") {
                 // o pêndulo agora (as duas hastes) e o rastro da ponta de baixo
                 const std::size_t nL = rasgo::ui::kLaneLen;
