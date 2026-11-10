@@ -98,10 +98,14 @@ public:
         float value = 0.0f;
         float boldMul = 1.0f;
         float toggleDwell = 0.0f;     // s desde o último flip
+        // PALCO do MIXER (10/11/2026): janela ABSOLUTA em torno da seed
+        // (> 0 liga), e a fibra solta de vez se o músico girar o knob
+        float absWin = 0.0f;
+        bool stage = false, released = false;
     };
 
     // varre `shown` e monta uma fibra por knob/slider/toggle (menos
-    // MIXER/MASTER). `seed` mistura curSeed do painel — 0 = estável.
+    // MASTER; do MIXER só VELOC/ABERT do PALCO). `seed` mistura curSeed do painel — 0 = estável.
     void inhabit(rasgo::modular::SignalGraph& graph, const std::uint64_t seed,
                  const std::vector<std::size_t>& shown) {
         fibers_.clear();
@@ -125,8 +129,21 @@ public:
             // aparelho de outra pessoa no meio da execução.
             // Analysis calibration is chosen by the musician. Moving LISTEN's
             // crossovers continuously would keep inhibiting its attack gates.
-            if (t == "MIXER" || t == "MASTER" || t == "SIGNAL-IN" || t == "LISTEN") continue;
+            //
+            // (10/11/2026, aprovado pelo autor) O MIXER ganha DUAS fibras:
+            // VELOC e ABERT do PALCO, e só fora do MANUAL — quanto o palco
+            // respira, não onde as vozes estão nem quanto soam. GAIN, PAN,
+            // MUTE, OUT e MODO continuam do músico e da seed.
+            if (t == "MASTER" || t == "SIGNAL-IN" || t == "LISTEN") continue;
+            const bool mixer = t == "MIXER";
+            if (mixer) {
+                bool hasStage = false;
+                for (const auto& pr : node.parameters())
+                    if (pr.descriptor.id == "stage") hasStage = true;
+                if (!hasStage || graph.parameterUserValue(id, "stage") < 0.5f) continue;
+            }
             for (const auto& w : node.panel().widgets) {
+                if (mixer && w.bind != "stage_rate" && w.bind != "stage_width") continue;
                 int kind;
                 switch (w.kind) {
                 case rasgo::modular::Widget::Kind::Knob:   kind = 0; break;
@@ -170,6 +187,13 @@ public:
                     && (f.reach == MotionReach::Structural)
                     && (range >= 3.0f);
                 f.value = f.center;
+                if (mixer) {
+                    // faixa curta em torno da seed (ABERT ±0,25, VELOC
+                    // ±0,2) e lenta: muda a escala do trajeto inteiro
+                    f.stage = true;
+                    f.absWin = w.bind == "stage_width" ? 0.25f : 0.20f;
+                    f.tau = std::max(f.tau, 6.0f);
+                }
 
                 // projeção semeada por (seed, node, paramId)
                 std::uint64_t h = 1469598103934665603ULL;
@@ -343,8 +367,17 @@ public:
             // longe do que a engine escreveu por último, é a mão dele —
             // re-ancora a fibra ali (a mão passa a respirar em torno do
             // novo valor, não volta pro anterior).
+            if (f.released) continue;
             const float userVal = graph.parameterUserValue(f.node, f.paramId);
-            if (std::fabs(userVal - f.value)
+            if (f.stage) {
+                // PALCO: o músico girou VELOC/ABERT, ou pôs o MIXER em
+                // MANUAL → a fibra solta (até a próxima seed)
+                if (std::fabs(userVal - f.value) > 0.012f * std::max(1e-4f, range) + 1e-5f
+                    || graph.parameterUserValue(f.node, "stage") < 0.5f) {
+                    f.released = true;
+                    continue;
+                }
+            } else if (std::fabs(userVal - f.value)
                 > 0.012f * std::max(1e-4f, range) + 1e-5f) {
                 f.center = clampf(userVal, f.pmin, f.pmax);
                 f.value = f.center;
@@ -417,9 +450,14 @@ public:
             // (freq 8–8000, cutoff 20–20000) respira em torno de onde
             // está, não varre milhares de Hz.
             const float relWin = std::max(std::fabs(f.center), 1e-3f) * 4.0f;
-            const float win = std::min(range,
-                std::min(effAmp * range, effAmp * relWin) * 1.4f + 1e-4f);
+            const float win = f.absWin > 0.0f
+                ? f.absWin * std::min(1.0f, intensity_)
+                : std::min(range, std::min(effAmp * range, effAmp * relWin) * 1.4f + 1e-4f);
             float target = f.center + raw * (win / 1.4f) * cableK;
+            // ABERT segue a energia (Navalha): denso e forte → palco mais
+            // aberto; rarefeito → vozes mais juntas
+            if (f.stage && f.paramId == "stage_width")
+                target += (energy - 0.5f) * win;
             target = clampf(target, f.center - win, f.center + win);
             target = clampf(target, f.pmin, f.pmax);
             // duck protetor: perto do clip, converge pro centro

@@ -3175,7 +3175,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Mixer de 4 canais — nível (slider), pan e mute por canal + "
             "saída geral, e o PALCO: trajetos de pan equilibrados por um "
             "móbile que pesa o som de cada canal.",
-            "Isento da Motion Engine — os pans e níveis são teus.", ""}},
+            "Pans e níveis são teus: a Motion Engine só respira a VELOC e a ABERT do PALCO (fora do MANUAL), perto do valor da seed.", ""}},
         {"MASTER", {
             "Estágio de saída estéreo — largura, guarda de corpo e "
             "limitador true-peak; o teto do patch.",
@@ -3475,7 +3475,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "LFO → SCR: the record scratches in time. ENVELOPE → BRK: a tape-stop on the turnaround."}},
         {"MIXER", {
             "4-channel mixer — level (slider), pan and mute per channel plus a master out, and the STAGE: pan paths balanced by a mobile that weighs each channel's sound.",
-            "Exempt from the Motion Engine — the pans and levels are yours.",
+            "The pans and levels are yours: the Motion Engine only breathes the STAGE speed and width (outside MANUAL), close to the seed value.",
             ""}},
         {"MASTER", {
             "Stereo output stage — width, body guard and a true-peak limiter; the ceiling of the patch.",
@@ -3749,7 +3749,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "LFO → SCR : le disque scratche dans la mesure. ENVELOPPE → BRK : un tape-stop au retournement."}},
         {"MIXER", {
             "Mélangeur 4 canaux — niveau (curseur), panoramique et mute par canal, plus une sortie générale, et la SCÈNE : des trajets de panoramique équilibrés par un mobile qui pèse le son de chaque canal.",
-            "Exempt de la Motion Engine — les panoramiques et les niveaux sont à vous.",
+            "Les panoramiques et les niveaux sont à vous : la Motion Engine ne fait respirer que la vitesse et l'ouverture de la SCÈNE (hors MANUAL), près de la valeur de la graine.",
             ""}},
         {"MASTER", {
             "Étage de sortie stéréo — largeur, garde de corps et limiteur true-peak ; le plafond du patch.",
@@ -4023,7 +4023,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "LFO → SCR: el disco rasca en compás. ENVOLVENTE → BRK: un tape-stop en la vuelta."}},
         {"MIXER", {
             "Mezclador de 4 canales — nivel (deslizador), paneo y mute por canal, más una salida general, y el ESCENARIO: trayectos de paneo equilibrados por un móvil que pesa el sonido de cada canal.",
-            "Exento de la Motion Engine — los paneos y los niveles son suyos.",
+            "Los paneos y los niveles son suyos: la Motion Engine solo hace respirar la velocidad y la apertura del ESCENARIO (fuera de MANUAL), cerca del valor de la semilla.",
             ""}},
         {"MASTER", {
             "Etapa de salida estéreo — anchura, guarda de cuerpo y limitador true-peak; el techo del patch.",

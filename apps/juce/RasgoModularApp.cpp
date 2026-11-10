@@ -3936,9 +3936,8 @@ private:
                     g.drawLine(cx - 4.0f, bot + 4.0f, cx + 4.0f, bot + 4.0f, 1.5f);
                     g.drawLine(cx, bot + 1.0f, cx, bot + 4.0f, 1.5f);
                 }
-                static const char* modes[5] = {"MANUAL", "RODA", "CANONE", "GESTO", "PENDULO"};
-                const int md = juce::jlimit(0, 4, static_cast<int>(std::lround(node.parameterValue("stage"))));
-                dlabel = juce::String(juce::CharPointer_UTF8(md == 2 ? "CÂNONE" : md == 4 ? "PÊNDULO" : modes[md]));
+                // sem texto: o desenho basta (pedido do autor, 10/11)
+                dlabel.clear();
             } else if (mtype == "PENDULUM") {
                 // o pêndulo agora (as duas hastes) e o rastro da ponta de baixo
                 const std::size_t nL = rasgo::ui::kLaneLen;
