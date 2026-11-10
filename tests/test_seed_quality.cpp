@@ -20,6 +20,11 @@
 // limitador 0 %, pico ≤ 0,55, DC ≤ 0,0011, agudo ≤ −21,6 dB, LUFS −37,4 a
 // −21,9 (mediana −25,9). Não substitui escuta: garante que nada do que
 // não deveria chegar ao alto-falante chegue.
+//
+// (10/11/2026, quatro canais) A régua roda também com o conjunto FORÇADO
+// a 4 vozes (o pior caso de soma), e conta, em 1000 seeds, quantos canais
+// do MIXER cada uma usa; reprova se uma fonte CRUA (OSC, PLL, CHORD,
+// NOISE, FUNCTION, CHAOS) entrar direto num canal do MIXER.
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Loudness.hpp"
@@ -33,6 +38,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <string>
 
 using namespace rasgo::modular;
 
@@ -53,13 +59,31 @@ struct Medida {
     double pico = 0.0, lufs = -70.0, agudoDb = -99.0, limitPct = 0.0, dc = 0.0;
 };
 
-Medida medir(const std::uint64_t seed) {
-    SignalGraph g;
+void montar(SignalGraph& g) {
     for (const auto& f : rasgo::panel::seedModuleCatalog())
         for (const char* t : f.types)
             if (auto n = rasgo::panel::makeModule(t)) g.add(std::move(n));
+}
+
+// canais do MIXER ligados; marca se algum recebe fonte crua
+int canaisDoMixer(SignalGraph& g, bool& cru) {
+    int n = 0;
+    for (std::size_t i = 0; i < g.cableCount(); ++i) {
+        const auto& c = g.cable(i);
+        if (g.node(c.target().node).type() != "MIXER") continue;
+        ++n;
+        const std::string t = g.node(c.source().node).type();
+        if (t == "OSC" || t == "PLL" || t == "CHORD" || t == "NOISE"
+            || t == "FUNCTION" || t == "CHAOS") cru = true;
+    }
+    return n;
+}
+
+Medida medir(const std::uint64_t seed, const int forcar = 0) {
+    SignalGraph g;
+    montar(g);
     const auto sink = g.add(std::make_unique<rasgo::panel::SinkOut>());
-    rasgo::panel::seedPatch(g, seed);
+    rasgo::panel::seedPatch(g, seed, forcar);
     g.prepare(kSr, 2, kB);
     g.setActiveOutput(sink);
     rasgo::panel::balanceSeedLevel(g, seed, kSr, kB);
@@ -101,10 +125,33 @@ Medida medir(const std::uint64_t seed) {
 }  // namespace
 
 int main() {
+    // contagem estrutural (sem áudio): 1000 seeds
+    {
+        int hist[5] = {0, 0, 0, 0, 0};
+        int crus = 0;
+        SignalGraph g;
+        montar(g);
+        g.add(std::make_unique<rasgo::panel::SinkOut>());
+        for (int k = 1; k <= 1000; ++k) {
+            rasgo::panel::seedPatch(g, static_cast<std::uint64_t>(k) * 0x2545F4914F6CDD1DULL);
+            bool cru = false;
+            const int c = std::min(4, canaisDoMixer(g, cru));
+            ++hist[c];
+            if (cru) ++crus;
+        }
+        std::printf("canais do MIXER em 1000 seeds: 1=%d 2=%d 3=%d 4=%d (0=%d)\n",
+                    hist[1], hist[2], hist[3], hist[4], hist[0]);
+        check(crus == 0, "nenhuma fonte crua direto num canal do MIXER", 0);
+        check(hist[0] == 0, "toda seed tem a voz no MIXER", 0);
+        check(hist[4] >= 100, "pelo menos 10 % das seeds com os quatro canais", 0);
+    }
     int foraDaFaixa = 0;
-    for (int k = 1; k <= kSeeds; ++k) {
-        const std::uint64_t s = static_cast<std::uint64_t>(k) * 0x9E3779B97F4A7C15ULL;
-        const Medida m = medir(s);
+    for (int k = 1; k <= 2 * kSeeds; ++k) {
+        // as 24 primeiras como a seed decide; as 24 seguintes com 4 vozes
+        const int forcar = k > kSeeds ? 4 : 0;
+        const std::uint64_t s = static_cast<std::uint64_t>(k - (forcar ? kSeeds : 0))
+                              * 0x9E3779B97F4A7C15ULL;
+        const Medida m = medir(s, forcar);
         check(m.finito, "saída finita", k);
         check(m.pico <= rasgo::panel::SinkOut::kCeiling + 1e-4, "pico dentro do teto", k);
         check(m.limitPct <= 5.0, "limitador do MASTER segurando no máximo 5 % do tempo", k);
@@ -112,6 +159,7 @@ int main() {
         check(m.agudoDb <= -15.0, "agudo acima de 8 kHz abaixo de -15 dB do total", k);
         check(m.lufs <= -16.0, "nenhuma seed acima de -16 LUFS", k);
         check(m.lufs >= -45.0, "nenhuma seed inaudível (abaixo de -45 LUFS)", k);
+        if (forcar) continue;   // a faixa de volume vale para as seeds como são
         if (m.lufs > -19.0 || m.lufs < -34.0) {
             ++foraDaFaixa;
             std::printf("  (seed n.º %d fora de -34…-19: %.1f LUFS)\n", k, m.lufs);

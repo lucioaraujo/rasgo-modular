@@ -1,6 +1,10 @@
 # Proposta — os quatro canais da seed (conjunto, papéis e palco)
 
-Data: 10/11/2026. Estado: **desenho para aprovação, nada implementado**.
+Data: 10/11/2026. Estado: **implementado em 10/11** ("avance" do autor),
+com os valores deste desenho: distribuição do §2, ARP/MARKOV ~meio a meio
+(o registro decide quando só um cabe), pans **no centro** — as casas do §3
+estão no código atrás de `kSeedOpensStage` (desligado) até a decisão do
+autor. Falta o teste de máscara por registro medido (§5).
 Pedido do autor: "acho interessante que hajam mais seeds utilizando os
 quatro canais, sobretudo para resultados polifônicos e mais espacialidades
 de pan". Condição: "não há problema de mudar a composição de todas as
