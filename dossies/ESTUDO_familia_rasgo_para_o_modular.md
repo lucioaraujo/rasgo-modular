@@ -1798,6 +1798,109 @@ antes do código, e a escuta dos dez módulos já validados vem antes de abrir
 protótipos novos. Os itens técnicos sem mudança de som (pico verdadeiro no
 teste do MASTER, denormais) podem andar antes da escuta.
 
+### 4.8 Rasgo Synth Studio — o fim do Método e o catálogo de 142 mecanismos (10/11/2026)
+
+Lidos por inteiro: `docs/pt/Metodo_RASGO.md` (da §"Contaminações" ao fim,
+completando §4.0) e `docs/pt/_catalogo_mecanismos.md` (142 fichas, fases
+1–123). Só leitura: o Studio é GPLv3, outro instrumento, outra
+personalidade — daqui sai conceito, não código.
+
+#### 4.8.1 O fim do Método e o que ele pede ao Modular
+
+- **Contaminação** é "vestígio ativo", não mistura média. No Modular, um
+  cabo hoje não deixa nada depois de desligado. Uma rota com **resíduo**
+  (o RELATE de §4.0, ou um modo do MATRIX/SWITCH) seria contaminação no
+  sentido do Método.
+- **Cartografias e descartógrafos.** A cartografia é "o registro
+  provisório das relações que realmente se formaram" — é exatamente o que
+  a partitura do REC (`ScoreRecorder`) começou a ser: cabos, trocas de
+  seed, a mão do VARIA. Falta registrar **rupturas** (o [espaço] que rompe
+  todos os cabos, um cabo arrancado) como acontecimentos do mapa.
+  Descartógrafo é **papel**, não classe de módulo: o mesmo módulo cartografa
+  e desfaz conforme a relação.
+- **Jogo numa topologia rasgável**: módulos podem ser peça, território,
+  regra, recurso, memória, obstáculo, testemunha. Uma saída oferecida é uma
+  possibilidade de jogo: ler, recusar, ocultar, reinterpretar, devolver em
+  feedback são jogadas diferentes. Sem vencedor obrigatório.
+- **Transformação da escuta**: evitar padronização perceptível entre seeds;
+  surpresa com consequência. Vale para o que fizemos hoje: os quatro canais
+  e o PALCO tornam as seeds mais diferentes entre si, mas "voz no ch1 sempre
+  perto do centro" pode virar padrão audível — vigiar na escuta.
+- **"Segurança técnica pertence ao fim da cadeia, não como censura prévia"**.
+  Ponto honesto: a seed do Modular tem muitas faixas contidas por medo de
+  agudo e de volume (pedidas pelo autor depois de escutas reais). O Método
+  pede que a proteção fique no fim (MASTER, régua de qualidade) e que a
+  composição possa ousar. A régua `test_seed_quality` (10/11) é o
+  instrumento para afrouxar faixas uma a uma **com prova**, em vez de
+  manter o teto por precaução. Não mexo sem o autor.
+- **Portão conceitual antes do código** (10 perguntas: território,
+  tensão, unidade musical, o que percebe/conserva/transforma/recusa/
+  esquece, regra/recurso/risco, consequência, diferença para o que existe
+  e para o mesmo território noutro instrumento, como a escuta reconhece
+  êxito e efeito só nominal, proveniência). Os dossiês do Modular têm
+  parte disso; **proposta**: acrescentar estas perguntas ao modelo de
+  dossiê de todo módulo novo.
+- **Critério para preservar personalidade** (5 perguntas, a última: "é
+  possível provar a diferença por render A/B e escuta cega?"). O PALCO e o
+  móbile de hoje responderam às quatro primeiras na proposta; a quinta
+  (A/B cego) ainda não foi feita.
+
+#### 4.8.2 O catálogo contra o Modular
+
+**Já existe no Modular, por outro caminho** (não importar de novo):
+saturação/dobra (SHAPE), osciladores com morph e sync (OSC, WAVETABLE),
+ressoador modal (RESONATOR, MATTER), granular (MEMORY), Turing (TURING),
+euclidiano (CLOCK), lag (GLIDE), nivelador (DYNAMICS + equilíbrio da seed),
+overflow que enrola (CRUSH `wrap`), vetor XY (PLANAR), FM de operadores
+(OPERATOR), vocoder e formante (VOCODER, FORMANT), resíntese espectral
+(SPECTRA), Markov (MARKOV), partitura por peça (ScoreRecorder), identidade
+por seed com fluxos separados (PatchSeed, desde 9/11).
+
+**Ausente — e com cara de RASGO** (o que o Modular ganharia de verdade;
+cada um entraria como MÓDULO com rota e controle visíveis, regra do
+Antitotem — no Studio são eventos internos do motor, aqui não podem ser):
+
+| Do Studio | Tradução possível no Modular | Unidade |
+|---|---|---|
+| **BluffSignal** — sinal idêntico seja verdade ou blefe; quem responde constrói confiança (EMA) e recusa de vez depois de uma traição | módulo **BLEFE**: entrada de sinal, taxa de verdade; saídas SINAL (sempre igual), VERDADE (oculta, só para quem quiser trapacear), CONFIANÇA (CV) e RESPOSTA (gate que some depois da traição) | relação |
+| **ApocryphalTear + MontageEditCut + ParenthesisGlitch** — a peça cita o próprio passado (≥ 20 s), ao contrário e corroída, ou num corte seco em cruzamento de zero; ou um parêntese de gagueira enquanto o motor segue | módulo **APÓCRIFO** (ou modo do LOOPER): grava a saída do patch e, por gatilho ou chance, devolve um trecho do passado — três modos: citação corroída, corte de montagem limpo, parêntese | memória |
+| **RasgoFracture** — parciais como fibras (Fiber Bundle Model, limiar de Weibull), tensão crescente, carga redistribuída aos vizinhos, cicatriz permanente; o fundamental nunca rasga | aperfeiçoamento do **ADDITIVE** (ou módulo FIBRA): entrada TENSÃO; parciais rasgam e não voltam até um RESET; saída RASGO (gate a cada fibra rompida) | matéria |
+| **CoherenceCollapse** — entropia de Shannon das últimas alturas; ordem demais também rompe | módulo **COERÊNCIA**: escuta um pitch, mede a entropia, solta um gate COLAPSO quando a linha fica previsível demais por N compassos (para ligar no RESET de um sequenciador, no KICK de um pêndulo…) | regra |
+| **RasgarGesture** — pressão acumulada contra resistência; chão, pressão, rasgo, propagação, cicatriz | candidato a ser a **forma** acima do VARIA (o Form Engine pendente), não um módulo | seção |
+| **Garantia de limite** — se nenhum mecanismo de limite sorteou "sim", a seed força um, escolhido pela própria seed | regra da **seed**: pelo menos um módulo de limite/ruptura no patch | seed |
+| **Heisenberg** — precisão rítmica e de afinação inversamente acopladas | gene da **seed** (um eixo: grade rígida + afinação vaga ↔ afinação presa + ritmo fraturado) | seed |
+| **Contaminação áudio → clock; self-feedback** | já possível por cabo (SCOPE/LISTEN → CLOCK, → CHAOS); a seed poderia ligá-los às vezes | seed |
+| **Sieves de Xenakis; justa/pitagórica; 24/19/31-EDO** | modos do **QUANTIZER** (escala "não catalogada" checada contra o catálogo) | altura |
+| **Neo-Riemann P/L/R** | modo do **HARMONY** | harmonia |
+| **Phasing (Reich); polimetria coprima; aksak; força métrica 2-ádica** | **CLOCK** com segunda saída levemente defasada; saída de ACENTO métrico; ou módulo de métrica | tempo |
+| **Bloom** (melodia fractal), **condução por distância** | modos de SEQUENCE/TURING | frase |
+| **EnvelopeLoopPulse** — envelope que se recicla e solta pulso no fim do ataque | aperfeiçoamento do **ENVELOPE** (LOOP + jack EOA) | gesto |
+| **FractureFolder** — ponto de reflexão com jitter, dobra não periódica | aperfeiçoamento do **SHAPE** (`tear`) | timbre |
+| **Gendyn, Rungler, VOSIM, Walsh, Polivoks** (filtro instável + VCA tanh) | fontes/filtros clássicos ausentes; prioridade menor — o Modular já tem muitas fontes | timbre |
+| **Self-epitaph; índice JSONL; seed de um trecho de áudio** | infra do **REC**: seed e partitura dentro do WAV (chunk RIFF), índice das gravações, "VARIAR AGORA" = nova seed derivada do som do instante | arquivo |
+
+**Recusados para o Modular** (pertencem à personalidade do Studio):
+o arco narrativo de peça integral, o álbum, o mercado de probabilidades
+entre renders, a temperatura da CPU, o Modo Selvagem (quebra "mesma seed,
+mesmo patch"), os arquétipos de bateria nomeados, as vozes de galo/scat/
+coro — o Modular é um instrumento de patch que soa sozinho, não um
+compositor de faixas.
+
+#### 4.8.3 Proposta ao autor (para escolher, um por vez, depois da escuta)
+
+1. **COERÊNCIA** — pequeno, original (ordem também rompe), dá ao patch
+   uma regra que se escuta a si mesma.
+2. **BLEFE** — o primeiro módulo de **jogo** de verdade no Modular
+   (confiança, traição, recusa), com consequência audível.
+3. **APÓCRIFO** — a tradução mais direta do nome RASGO: o patch rasga o
+   próprio tempo citando o passado.
+4. **FIBRA no ADDITIVE** — rasgo como matéria, com cicatriz.
+5. Seed: **Garantia de limite** e o gene **Heisenberg**.
+6. QUANTIZER com **peneiras e afinações**; ENVELOPE com **LOOP/EOA**.
+
+Cada um passa pelo portão conceitual (§4.8.1) num dossiê próprio antes do
+código.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
