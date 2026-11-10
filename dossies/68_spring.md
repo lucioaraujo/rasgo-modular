@@ -40,3 +40,15 @@ no Autinn Coil (GPL-3.0+), dentro do Cardinal 26.02.
 
 Modelo simplificado (sem o ramo de alta frequência do artigo nem o modelo de
 transdutor); a escuta do autor ainda não foi feita.
+
+## Leitura fracionária por Lagrange cúbico (10/11/2026, correção técnica aprovada pelo autor)
+
+A linha de atraso era lida com interpolação **linear**, que é um passa-baixa
+dependente da fração: no meio do caminho entre duas amostras, 8 kHz a 48 kHz
+sai ~1,25 dB mais baixo, e quando o atraso anda o brilho oscila junto; dentro
+do laço com realimentação a perda se acumula a cada volta. Agora a leitura é
+Lagrange de 3ª ordem (`src/dsp/DelayRead.hpp`; Laakso, Välimäki, Karjalainen
+& Laine, "Splitting the Unit Delay", 1996), com recuo para a linear abaixo
+de 3 amostras de atraso. Teste em `test_spring` (`testFractionalReadKeepsTheTreble`):
+linear < −1 dB, Lagrange entre −0,35 e +0,1 dB. Muda levemente o som: caudas
+um pouco mais brilhantes.

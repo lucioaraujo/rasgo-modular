@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SignalGraph.hpp"
+#include "dsp/DelayRead.hpp"
 
 #include <algorithm>
 #include <array>
@@ -129,12 +130,8 @@ public:
                 const float target = 0.001f * disp * shape(b, curve) * sr_ + 1.0f;
                 if (band.delaySm < 0.0f) band.delaySm = target;
                 band.delaySm += (target - band.delaySm) * smooth;
-                float rp = static_cast<float>(band.w) - band.delaySm;
-                while (rp < 0.0f) rp += static_cast<float>(len);
-                const auto i0 = static_cast<std::size_t>(rp) % len;
-                const auto i1 = (i0 + 1) % len;
-                const float fr = rp - std::floor(rp);
-                const float delayed = band.line[i0] + (band.line[i1] - band.line[i0]) * fr;
+                // Lagrange cúbico (10/11/2026; era linear — `DelayRead.hpp`)
+                const float delayed = readDelayLagrange(band.line.data(), len, band.w, band.delaySm);
                 // passa-faixa SVF (Zavalishin, TPT) na entrada + a realimentação da banda
                 const float v = x + fb * delayed;
                 const float hp = (v - (k + band.g) * band.bp - band.lo) / (1.0f + band.g * (band.g + k));
