@@ -296,6 +296,9 @@ armadilha. Ambos em PCM 24 bits.
 `rec-AAAAMMDD-HHMMSS-seedN.wav` em `~/Music/RasgoModular/` (ou em
 `RASGO_REC_DIR`): data e hora do fim da tomada e a **seed em que ela
 começou**; `-manual` no lugar de `-seedN` quando o patch foi editado à mão.
+Se a seed foi trocada durante a tomada, o nome ganha `-montage`
+(`rec-…-seed111-montage.wav`): o número sozinho não a reproduz — a
+partitura registra cada troca de seed com o tempo.
 Ao lado vai o `.score.txt` com o mesmo nome. Duas tomadas no mesmo segundo
 ganham `-2`, `-3`…
 

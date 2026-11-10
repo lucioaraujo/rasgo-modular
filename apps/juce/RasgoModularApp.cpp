@@ -586,6 +586,19 @@ struct Rack {
         // ao vivo (ver a explicação longa em `SeedBalance.hpp`), e é
         // determinística: o mesmo seed dá o mesmo ganho.
         rasgo::panel::balanceSeedLevel(graph, s, sampleRate, blockFrames);
+
+        // Seed trocada DURANTE a tomada: o nome do arquivo fica com a
+        // primeira (decisão do autor, 10/11/2026); a partitura registra a
+        // nova seed e os cabos do patch recomposto, no tempo da tomada.
+        if (recording.load(std::memory_order_relaxed)) {
+            const double t = recElapsed();
+            score.seedChange(t, s);
+            for (std::size_t i = 0; i < graph.cableCount(); ++i) {
+                const auto& c = graph.cable(i);
+                score.connection(t, c.source().node, c.source().port,
+                                 c.target().node, c.target().port);
+            }
+        }
     }
 };
 
@@ -6001,10 +6014,22 @@ private:
         // o número da seed no nome (pedido do autor, 9/11/2026): a seed em
         // que a tomada COMEÇOU; `manual` quando o patch foi editado à mão
         // (curSeed = 0). O `.score.txt` registra o resto da história.
+        // Seed trocada durante a tomada → `-montage` depois da primeira
+        // (decisão do autor, 10/11/2026: "uma forma de edição manual, mas
+        // com uso de seeds"); o número sozinho não reproduz a tomada, a
+        // partitura sim. REPOR na mesma seed não conta.
+        bool montagem = false;
+        {
+            std::lock_guard<std::mutex> lk(rack_.gmx);
+            for (const auto& e : rack_.score.events())
+                if (e.type == rasgo::panel::RasgoEvent::Type::Seed && e.seed != recSeed_)
+                    montagem = true;
+        }
         const juce::String stamp = agora.formatted("rec-%Y%m%d-%H%M%S")
             + (recSeed_ != 0
                    ? "-seed" + juce::String(std::to_string(recSeed_))
-                   : juce::String("-manual"));
+                   : juce::String("-manual"))
+            + (montagem ? juce::String("-montage") : juce::String());
         juce::File out = recDir().getChildFile(stamp + ".wav");
         for (int n = 2; out.existsAsFile(); ++n)
             out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");

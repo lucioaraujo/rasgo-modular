@@ -110,10 +110,10 @@ inline const std::array<HeaderHelpRow, 22>& headerHelpRows() {
             "Alterner entre tous les modules du patch actuel et ceux reliés à la sortie audio. Le catalogue entier n'est pas chargé ; ajoutez des modules depuis la palette. Rien n'est supprimé.",
             "Alterna entre todos los módulos del patch actual y los que llegan a la salida de audio. No carga el catálogo entero; añada otros desde la paleta. Los ocultos no se borran."}),
         row(A::rec, "rec", S::hdrRec, {
-            "Start or stop recording the stereo output to WAV. Patch saving and audio recording are separate actions; watch the recording indicator.",
-            "Inicia ou termina a gravação da saída estéreo em WAV. Salvar patch e gravar áudio são ações diferentes; acompanhe o indicador de gravação.",
-            "Démarre ou arrête l'enregistrement stéréo en WAV. Sauvegarde du patch et enregistrement audio sont deux actions distinctes ; surveillez l'indicateur.",
-            "Inicia o termina la grabación estéreo en WAV. Guardar el patch y grabar audio son acciones distintas; observe el indicador de grabación."}),
+            "Start or stop recording the stereo output to WAV (up to 4 min; the button shows the elapsed time). Saved in Music/RasgoModular as rec-date-time-seedN.wav, or -manual for a hand-edited patch; -montage is added if the seed changed during the take. Patch saving and audio recording are separate actions.",
+            "Inicia ou termina a gravação da saída estéreo em WAV (até 4 min; o botão mostra o tempo). Vai para Música/RasgoModular como rec-data-hora-seedN.wav, ou -manual para patch editado à mão; ganha -montage se a seed mudou durante a gravação. Salvar patch e gravar áudio são ações diferentes.",
+            "Démarre ou arrête l'enregistrement stéréo en WAV (jusqu'à 4 min ; le bouton affiche le temps). Enregistré dans Musique/RasgoModular sous rec-date-heure-seedN.wav, ou -manual pour un patch modifié à la main ; -montage s'ajoute si la graine a changé pendant la prise. Sauvegarde du patch et enregistrement audio sont deux actions distinctes.",
+            "Inicia o termina la grabación estéreo en WAV (hasta 4 min; el botón muestra el tiempo). Se guarda en Música/RasgoModular como rec-fecha-hora-seedN.wav, o -manual para un patch editado a mano; se añade -montage si la semilla cambió durante la toma. Guardar el patch y grabar audio son acciones distintas."}),
         row(A::startup, "startup", {"START", "ABRE", "DÉPART", "INICIO"}, {
             "Choose how the next launch opens: a new seed, your initial patch, or the last session. Choosing the initial-patch option stores the current patch as that starting point.",
             "Escolhe como será a próxima abertura: seed nova, seu patch inicial ou última sessão. Escolher o patch inicial guarda o patch atual como esse ponto de partida.",

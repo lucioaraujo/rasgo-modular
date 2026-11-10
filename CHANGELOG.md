@@ -9,6 +9,12 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Trocas de seed durante a gravação** (10 nov., decisões do autor): o
+  nome do arquivo fica com a primeira seed e ganha `-montage`
+  (`rec-…-seed111-montage.wav`); a partitura registra cada seed nova com o
+  tempo e os cabos do patch recomposto. Patch editado à mão continua
+  `-manual`.
+
 - **PENDULUM com visor mais alto** (10 nov., pedido do autor: "para que a
   animação fique menos encolhida"): 30 mm em vez de 16; os knobs desceram
   para o espaço livre acima dos jacks. O visor ganhou altura própria por
