@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Denormals.hpp"
 #include "Graph.hpp"  // AudioBlock, PortDescriptor, PortKind, Parameter, ParameterDescriptor
 #include "Panel.hpp"
 
@@ -1042,6 +1043,9 @@ public:
         if (!prepared_)
             throw std::logic_error("prepare() must run before process()");
         checkNode(outputNode);
+        // FTZ/DAZ durante o bloco inteiro (ver `Denormals.hpp`): caudas que
+        // decaem no silêncio não viram números desnormalizados lentos.
+        const ScopedNoDenormals noDenormals;
 
         // Modelo de conexão 3 — BARRAMENTO SEMÂNTICO. Resolve as
         // QUALIDADES (energia/brilho/densidade/tensão/movimento) a partir
