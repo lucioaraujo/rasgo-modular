@@ -135,11 +135,14 @@ interessantes". Decisões do autor: os quatro trajetos servem; contrapeso
 ativo e original; no MIXER; 18 HP; contrapeso desligado no MANUAL.
 Estudo e comparação com o Cardinal em `PROPOSTA_palco_do_varia.md` §4c–4d.
 
-- Painel 18 HP: tiras como antes (MUTE subiu para y72) + jack **P1–P4**
-  (CV de pan, −1..+1, soma ao lugar) acima do jack de áudio; coluna
-  PALCO à direita: MODO, VELOC, ABERT, visor `palco` (o tempo desce,
-  cada canal deixa o rastro do lugar, o ponto cresce com o peso, o traço
-  embaixo é o centro de gravidade) e jack FRASE.
+- Painel 18 HP (layout refeito no mesmo dia, pedido do autor "melhore o
+  layout do mixer"): quatro tiras de 15 mm (slider, PAN, MUTE, jack
+  **P1–P4** — CV de pan, −1..+1, soma ao lugar — e jack de áudio, os jacks
+  alinhados ao centro do knob); o visor `palco` embaixo, na largura das
+  tiras, porque o eixo dele é o próprio estéreo (o tempo desce, cada canal
+  deixa o rastro do lugar, o ponto cresce com o peso, o traço embaixo é o
+  centro de gravidade; sem texto, pedido do autor); coluna da direita:
+  PALCO (MODO, VELOC, ABERT, FRASE) e a saída (OUT, L+R).
 - Modos: MANUAL / RODA / CÂNONE / GESTO / PÊNDULO (ver o cabeçalho de
   `src/dsp/Mixer.hpp`). Fora do MANUAL o PAN é a casa.
 - Móbile: peso = energia lenta (~1,5 s) da parte aguda; alcance
