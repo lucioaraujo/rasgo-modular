@@ -20,7 +20,10 @@ pronto.
   máximo do momentâneo errava 0,44 LU nos casos #13–14 da EBU Tech 3341
   (achado do Aquorbium); o integrado não muda. E o integrado deixou de
   refazer milhares de `log10` a cada bloco de áudio no thread de áudio:
-  agora só a cada bloco novo de 100 ms.
+  agora só a cada bloco novo de 100 ms. (4) **SPRING e PRISM**: leitura da
+  linha de atraso por Lagrange cúbico (era linear, que abafava ~1,25 dB a
+  8 kHz e fazia o brilho oscilar com o atraso). Caudas um pouco mais
+  brilhantes.
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos

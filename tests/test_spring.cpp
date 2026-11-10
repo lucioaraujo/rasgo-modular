@@ -113,7 +113,34 @@ void testTensionCvAndRobustness() {
 
 }  // namespace
 
+// (10/11/2026) A leitura fracionária da linha (SPRING e PRISM): um seno de
+// 8 kHz lido no meio do caminho entre duas amostras. A linear abafava
+// ~1,25 dB (cos(π·8/48)); o Lagrange cúbico fica a poucos décimos.
+float delayReadGainDb(const bool lagrange) {
+    const std::size_t len = 1024;
+    std::vector<float> line(len, 0.0f);
+    std::size_t w = 0;
+    double ein = 0.0, eout = 0.0, ph = 0.0;
+    const double dp = 2.0 * M_PI * 8000.0 / 48000.0;
+    for (int n = 0; n < 48000; ++n, ph += dp) {
+        const float x = static_cast<float>(std::sin(ph));
+        line[w] = x;
+        w = (w + 1) % len;
+        const float y = lagrange ? readDelayLagrange(line.data(), len, w, 100.5f)
+                                 : readDelayLinear(line.data(), len, w, 100.5f);
+        if (n > 2000) { ein += static_cast<double>(x) * x; eout += static_cast<double>(y) * y; }
+    }
+    return static_cast<float>(10.0 * std::log10(eout / ein));
+}
+
+void testFractionalReadKeepsTheTreble() {
+    const float lin = delayReadGainDb(false), lag = delayReadGainDb(true);
+    check(lin < -1.0f, "a leitura linear abafa 8 kHz (referência: ~−1,25 dB)");
+    check(lag > -0.35f && lag < 0.1f, "o Lagrange cúbico mantém 8 kHz (a poucos décimos de dB)");
+}
+
 int main() {
+    testFractionalReadKeepsTheTreble();
     testTailAndDecay();
     testEchoAtLoopLength();
     testMixAndKick();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SignalGraph.hpp"
+#include "dsp/DelayRead.hpp"
 
 #include <algorithm>
 #include <array>
@@ -139,13 +140,10 @@ public:
             for (int s = 0; s < 2; ++s) {
                 auto& sp = springs_[static_cast<std::size_t>(s)];
                 const float d = std::min(static_cast<float>(len - 4), baseDelay * (s == 0 ? 1.0f : 1.137f));
-                // leitura com interpolação linear (a tensão anda sem clique)
-                float rp = static_cast<float>(sp.w) - d;
-                while (rp < 0.0f) rp += static_cast<float>(len);
-                const auto i0 = static_cast<std::size_t>(rp) % len;
-                const auto i1 = (i0 + 1) % len;
-                const float fr = rp - std::floor(rp);
-                float y = sp.line[i0] + (sp.line[i1] - sp.line[i0]) * fr;
+                // leitura fracionária por Lagrange cúbico (10/11/2026; era
+                // linear, que abafava os agudos conforme a tensão andava —
+                // ver `DelayRead.hpp`); a tensão anda sem clique
+                float y = readDelayLagrange(sp.line.data(), len, sp.w, d);
                 for (auto& st : sp.ap) y = st.run(y, a);
                 sp.lp += (y - sp.lp) * lpCoef;
                 // anti-DC no laço
