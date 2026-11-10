@@ -93,7 +93,13 @@ relevante". Registro vivo em
   (móbile = analogia nomeada), cadeia da ruptura com histerese e destino da
   energia, relações ecológicas entre vozes, evidência contra humanização
   aleatória.
-- [ ] Documentos restantes do Trioio.
+- [x] Documentos restantes do Trioio (§4.4b): o Trioio copia DSP do Modular
+  (segundo consumidor); REGRAS do autor → proposta `regras.txt` da seed;
+  denormais medidos (12,9 s → 1,1 s); quimeras como receitas didáticas;
+  saliência harmônica e croma do grave para o TOM.
+- **Etapa de leitura da família concluída em 10/11/2026.** Fila de
+  propostas em §4.12 (+ REGRAS da seed); cada uma com dossiê e portão
+  conceitual, depois da escuta do autor.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
