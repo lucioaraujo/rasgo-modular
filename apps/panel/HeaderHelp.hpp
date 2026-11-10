@@ -40,10 +40,10 @@ inline const std::array<HeaderHelpRow, 22>& headerHelpRows() {
             "Saisissez ou collez jusqu'à 20 chiffres. Entrée génère cette graine ; quitter sans confirmer rétablit le numéro actuel. Pour conserver vos modifications manuelles, enregistrez le patch.",
             "Escriba o pegue hasta 20 dígitos. Enter genera esa semilla; salir sin confirmar repone el número actual. Para conservar cambios manuales, guarde el patch."}),
         row(A::vary, "vary", S::hdrVary, {
-            "Enable or pause continuous parameter movement. Cables and your own gestures still act. MIXER, MASTER, external input and LISTEN calibration are left to you.",
-            "Liga ou pausa o movimento contínuo dos parâmetros. Cabos e seus gestos continuam atuando. MIXER, MASTER, entrada externa e calibração do LISTEN ficam por sua conta.",
-            "Active ou suspend le mouvement continu des paramètres. Câbles et gestes manuels continuent d'agir. MIXER, MASTER, entrée externe et calibration LISTEN restent à votre main.",
-            "Activa o pausa el movimiento continuo de parámetros. Cables y gestos manuales siguen actuando. MIXER, MASTER, entrada externa y calibración LISTEN quedan a su cargo."}),
+            "Enable or pause continuous parameter movement. Cables and your own gestures still act. MIXER (except the STAGE's speed and width), MASTER, external input and LISTEN calibration are left to you.",
+            "Liga ou pausa o movimento contínuo dos parâmetros. Cabos e seus gestos continuam atuando. MIXER (menos a velocidade e a abertura do PALCO), MASTER, entrada externa e calibração do LISTEN ficam por sua conta.",
+            "Active ou suspend le mouvement continu des paramètres. Câbles et gestes manuels continuent d'agir. MIXER (sauf la vitesse et l'ouverture de la SCÈNE), MASTER, entrée externe et calibration LISTEN restent à votre main.",
+            "Activa o pausa el movimiento continuo de parámetros. Cables y gestos manuales siguen actuando. MIXER (salvo la velocidad y la apertura del ESCENARIO), MASTER, entrada externa y calibración LISTEN quedan a su cargo."}),
         row(A::varyAmount, "vary-amount", {"VARY intensity", "Intensidade VARIA", "Intensité VARIER", "Intensidad VARIAR"}, {
             "Set movement intensity from 0 to 2. Zero freezes automatic movement; 1 is the usual range; 2 allows wider gestures. This is not a volume control.",
             "Ajusta a intensidade do movimento de 0 a 2. Zero congela o movimento automático; 1 é a faixa habitual; 2 permite gestos mais amplos. Não é controle de volume.",

@@ -2,6 +2,7 @@
 // da camada de composição descrita em
 // `dossies/ESTUDO_seed_composicao_generativa.md §3`.
 
+#include "dsp/Mixer.hpp"
 #include "core/SignalGraph.hpp"
 #include "panel/MotionEngine.hpp"
 #include "panel/ModuleCatalog.hpp"   // fibras do `inhabit` precisam de módulos reais
@@ -300,6 +301,49 @@ void testMixerMasterExempt() {
     check(g.parameterUserValue(mx, "pan1") == 0.0f, "MIXER.pan1 intocado");
 }
 
+// (10/11/2026) o VARIA no PALCO: só VELOC e ABERT, só fora do MANUAL,
+// dentro da faixa curta da seed; nunca GAIN, PAN, MUTE, OUT nem MODO; e
+// solta a fibra quando o músico gira o knob.
+void testVariaNoPalco() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    const auto mx = g.add(std::make_unique<rasgo::modular::Mixer>());
+    g.prepare(48000.0f, 1, 64);
+    {
+        MotionEngine m;
+        m.inhabit(g, 42ULL, {v, mx});
+        EXPECT(m.fiberCount() == 5);   // MANUAL: nada do MIXER
+    }
+    g.node(mx).setParameter("stage", 1.0f);
+    g.node(mx).setParameter("stage_rate", 0.4f);
+    g.node(mx).setParameter("stage_width", 0.6f);
+    std::vector<std::pair<std::string, float>> fixos;
+    for (const auto& pr : g.node(mx).parameters())
+        if (pr.descriptor.id != "stage_rate" && pr.descriptor.id != "stage_width")
+            fixos.emplace_back(pr.descriptor.id, pr.value);
+    MotionEngine m;
+    m.setIntensity(2.0f);
+    m.inhabit(g, 42ULL, {v, mx});
+    EXPECT(m.fiberCount() == 7);       // + VELOC e ABERT
+    float wlo = 9, whi = -9, rlo = 9, rhi = -9;
+    for (int i = 0; i < 9000; ++i) {
+        m.tick(g, 0.033f, (i / 900) % 2 ? 0.9f : 0.1f);
+        const float w = g.parameterUserValue(mx, "stage_width");
+        const float r = g.parameterUserValue(mx, "stage_rate");
+        wlo = std::min(wlo, w); whi = std::max(whi, w);
+        rlo = std::min(rlo, r); rhi = std::max(rhi, r);
+    }
+    check(wlo >= 0.6f - 0.25f - 1e-4f && whi <= 0.6f + 0.25f + 1e-4f, "ABERT na faixa ±0,25 da seed");
+    check(rlo >= 0.4f - 0.20f - 1e-4f && rhi <= 0.4f + 0.20f + 1e-4f, "VELOC na faixa ±0,2 da seed");
+    check(whi - wlo > 0.05f, "o VARIA mexe na ABERT");
+    for (const auto& [id, val] : fixos)
+        check(g.parameterUserValue(mx, id) == val, "GAIN/PAN/MUTE/OUT/MODO intocados");
+    // o músico gira ABERT: a fibra solta e o valor dele fica
+    g.node(mx).setParameter("stage_width", 0.95f);
+    for (int i = 0; i < 600; ++i) m.tick(g, 0.033f, 0.5f);
+    check(g.parameterUserValue(mx, "stage_width") == 0.95f, "ABERT girada à mão fica com o músico");
+}
+
 void testInhabitDeterminism() {
     auto run = [] {
         SignalGraph g;
@@ -548,6 +592,7 @@ int main() {
     testInhabitMovesAndStaysSane();
     testStructuralBarelyMoves();
     testMixerMasterExempt();
+    testVariaNoPalco();
     testInhabitDeterminism();
     testHandEditWins();
     testHotStaysGentle();
