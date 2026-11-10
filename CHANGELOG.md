@@ -24,6 +24,8 @@ pronto.
   linha de atraso por Lagrange cúbico (era linear, que abafava ~1,25 dB a
   8 kHz e fazia o brilho oscilar com o atraso). Caudas um pouco mais
   brilhantes.
+  (5) **FORMANT**: ganho ×√k e largura que acompanha o SHIFT — saía de −28 a
+  0 dB da entrada conforme RES/SHIFT, agora de −10 a +3 dB.
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos
