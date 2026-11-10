@@ -115,28 +115,31 @@ public:
         // 18 HP desde 10/11 (eram 14): a coluna PALCO à direita
         p.hp = 18;
         p.add(Widget::Kind::Label, "MIXER", "", 2.5f, 2.0f);
-        // passe de ergonomia 2026-09-06: o toggle MUTE subiu (y82->y76) e
-        // o jack do canal desceu (y98->y102) — os rótulos "M" e "1..4"
-        // estavam se tocando entre as duas fileiras.
+        // Layout de 10/11/2026 (18 HP, pedido do autor: "melhore o layout
+        // do mixer"). Quatro tiras à esquerda, com o jack alinhado ao
+        // centro do knob; o visor do PALCO embaixo, na LARGURA das tiras —
+        // o eixo do visor é o próprio estéreo (esquerda → direita); a
+        // coluna da direita junta os controles do PALCO e a saída.
         for (int c = 0; c < 4; ++c) {
             const std::string n = std::to_string(c + 1);
-            const float x = 8.0f + static_cast<float>(c) * 16.0f;
-            p.add(Widget::Kind::Slider, ("CH" + n), "gain" + n, x, 12.0f);
-            p.add(Widget::Kind::Knob, "PAN", "pan" + n, x, 60.0f);
-            p.add(Widget::Kind::Toggle, "MUTE", "mute" + n, x, 72.0f);
-            p.add(Widget::Kind::Jack, "P" + n, "in:pan" + n, x, 91.0f);
-            p.add(Widget::Kind::Jack, n, "in:ch" + n, x, 104.0f);
+            const float x = 4.0f + static_cast<float>(c) * 15.0f;   // borda do knob/slider
+            const float cx = x + 4.5f;                                 // centro da tira
+            p.add(Widget::Kind::Slider, ("CH" + n), "gain" + n, x + 0.5f, 9.0f);
+            p.add(Widget::Kind::Knob, "PAN", "pan" + n, x, 52.0f);
+            p.add(Widget::Kind::Toggle, "MUTE", "mute" + n, x, 64.0f);
+            p.add(Widget::Kind::Jack, "P" + n, "in:pan" + n, cx, 82.0f);
+            p.add(Widget::Kind::Jack, n, "in:ch" + n, cx, 95.0f);
         }
-        // coluna PALCO
-        p.add(Widget::Kind::Label, "PALCO", "", 70.0f, 2.0f);
-        p.add(Widget::Kind::Knob, "MODO", "stage", 72.0f, 12.0f);
-        p.add(Widget::Kind::Knob, "VELOC", "stage_rate", 72.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ABERT", "stage_width", 72.0f, 48.0f);
-        p.add(Widget::Kind::Display, "palco", "", 68.5f, 64.0f, 21.0f);
-        p.tall(22.0f);
-        p.add(Widget::Kind::Jack, "FRASE", "in:phrase", 72.0f, 96.0f);
-        p.add(Widget::Kind::Knob, "OUT", "out_gain", 8.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "L+R", "out:out", 72.0f, 116.0f);
+        p.add(Widget::Kind::Display, "palco", "", 3.0f, 102.5f, 57.5f);
+        p.tall(19.0f);
+        // coluna PALCO + saída
+        p.add(Widget::Kind::Label, "PALCO", "", 67.0f, 9.0f);
+        p.add(Widget::Kind::Knob, "MODO", "stage", 70.0f, 19.0f);
+        p.add(Widget::Kind::Knob, "VELOC", "stage_rate", 70.0f, 37.0f);
+        p.add(Widget::Kind::Knob, "ABERT", "stage_width", 70.0f, 55.0f);
+        p.add(Widget::Kind::Jack, "FRASE", "in:phrase", 74.5f, 82.0f);
+        p.add(Widget::Kind::Knob, "OUT", "out_gain", 70.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "L+R", "out:out", 74.5f, 120.0f);
         return p;
     }
 
