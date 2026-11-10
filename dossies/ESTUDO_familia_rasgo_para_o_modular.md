@@ -1050,6 +1050,59 @@ de vento — dizer isso no LEARN).
 - **PENDULUM**: o próximo passo honesto é a comparação k = 0 / fraco / forte
   de pêndulos acoplados por molas (modos normais), como o Batruc propõe.
 
+#### 4.3b Batruc — README e bibliografia (lidos em 10/11/2026)
+
+Lidos: `README.md` (§"Equilíbrio, gravidade e escultura" até "O que o
+Batruc pode acrescentar") e `BIBLIOGRAFIA_DE_ESTUDO.md` inteiro. Só leitura.
+
+- **Calder já estava no Batruc.** O README do Batruc cita os móbiles de
+  Calder, torque (`τ = r × F`), braço de alavanca e equilíbrio — e separa
+  duas vias que a interface deve **nomear**: simulação física (com unidades)
+  e **analogia escultórico-composicional** ("usa ideias de peso, tensão ou
+  equilíbrio como regras musicais sem alegar simular um objeto físico").
+  O móbile do PALCO (feito hoje no MIXER) é a segunda: o "peso" é energia
+  sonora, o "braço" é a posição no estéreo. Registrado no dossiê 16 §9.
+  Também do Batruc: "um estado musical de equilíbrio não precisa ser
+  silêncio" — o móbile equilibra sem prender no centro.
+- **A cadeia da ruptura**: ação → força → deformação → energia armazenada
+  → limite → ruptura/liberação → consequência e novo equilíbrio, com
+  **histerese** e um **estado explícito de ruptura** (para não oscilar
+  junto ao limiar), limites de energia e eventos, e "a ruptura precisa
+  declarar **para onde vai a energia** armazenada (transiente, cauda,
+  dissipação ou silêncio)". Regra de desenho para FIBRA, APÓCRIFO e
+  COERÊNCIA (§4.8): cada um com histerese, estado de ruptura visível e
+  destino da energia declarado.
+- **Relações ecológicas entre vozes** (`EcologicalRelations`): apoio,
+  imitação, afastamento, competição; cada voz percebe só o ataque anterior
+  da fonte, com memória limitada, determinístico. E as funções do baixo:
+  **apoio**, **resposta** (procura as lacunas da outra voz), **primeiro
+  plano**. Para a contravoz do Modular (§ quatro canais): hoje ela imita
+  (MARKOV) ou harmoniza (ARP); "resposta nas lacunas" seria uma terceira
+  função, a investigar na escuta.
+- **Inversão de papéis** (Gramani): trocar ostinato e série entre duas
+  vozes numa fronteira, preservando a agenda original para A/B — reforça o
+  SWAP proposto em §4.3.
+- **Contra a "humanização" aleatória, com evidência**: Senn et al. (2016,
+  CC BY) — versões quantizadas e com o microtiming dos músicos tiveram
+  avaliações igualmente altas; ampliar os desvios **reduziu** o groove.
+  Para o Modular: o `drift`/`swing` do CLOCK e o INTERPRET (§4.5) devem ser
+  intenção limitada, nunca ruído por padrão.
+- **Hove et al. (PNAS 2014)**: o ouvido codifica melhor o tempo no grave —
+  argumento a favor do grave no centro e de cuidar do encaixe rítmico do
+  grave na mixagem, não só do gráfico.
+- **Bibliografia que serve ao Modular**: Huron, *Sweet Anticipation*
+  (expectativa e surpresa — fundamento da COERÊNCIA e da saída SURP do
+  MARKOV); Lerdahl & Jackendoff e Cooper & Meyer (agrupamento — FRASE);
+  London, *Hearing in Time* (quando uma razão deixa de ser pulso — POLYGON,
+  polimetria); J. O. Smith, *Physical Audio Signal Processing* (o atraso do
+  filtro de perda no STRING, pendência técnica); Välimäki/Huovilainen 2007 e
+  Välimäki/Pekonen/Nam 2012 (DPW e polyBLEP são métodos distintos — conferir
+  como os osciladores do Modular se descrevem).
+- **Honestidade de nome, de novo**: mapa logístico não é "ruído aleatório";
+  razão áurea entre LFOs evita período comum, mas "orgânico" é hipótese de
+  escuta; τ é temperatura composicional. Mesmo crivo para os textos do
+  Modular.
+
 ### 4.4 Trioio
 
 Lidos inteiros: `docs/TRIOIO_CONCEITO.md`, `docs/TRIOIO_CEREBRO.md`, `docs/ESCALAS.md`, `docs/RITMO.md`. (Continua.)

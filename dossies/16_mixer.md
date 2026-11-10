@@ -157,6 +157,12 @@ Estudo e comparação com o Cardinal em `PROPOSTA_palco_do_varia.md` §4c–4d.
   ∓0,40).
 - Testes (`test_mix`): teto 0,55 e movimento nos 4 modos; móbile
   equilibra e move o leve; MANUAL intocado.
+- **Analogia, não simulação** (crivo do Batruc, README §"Equilíbrio,
+  gravidade e escultura", que também cita Calder): o móbile usa a lei da
+  alavanca como **regra composicional** — o "peso" é energia sonora, o
+  "braço" é a posição no estéreo, a "mola" que assenta é um filtro de
+  segunda ordem. Não simula um objeto físico; os textos da interface não
+  devem dizer que simulam.
 - Limites: o painel X11 não desenha o visor `palco` (só o app JUCE); o
   VARIA continua sem tocar o MIXER (pode vir a mexer em VELOC/ABERT, se o
   autor quiser); a soma mono perde até ~0,8 dB com um canal a 0,55.
