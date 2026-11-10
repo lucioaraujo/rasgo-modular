@@ -16,7 +16,11 @@ pronto.
   atraso do filtro de perda agora é descontado do laço e o all-pass usa o
   coeficiente exato; antes a corda soava até 82 cents baixa (880 Hz, DAMP
   0,8), agora fica a poucos cents. Muda o som de patches com STRING e DAMP
-  alto. Dossiê 11.
+  alto. Dossiê 11. (3) **Loudness**: fatias de 10 ms (eram 100 ms) — o
+  máximo do momentâneo errava 0,44 LU nos casos #13–14 da EBU Tech 3341
+  (achado do Aquorbium); o integrado não muda. E o integrado deixou de
+  refazer milhares de `log10` a cada bloco de áudio no thread de áudio:
+  agora só a cada bloco novo de 100 ms.
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos

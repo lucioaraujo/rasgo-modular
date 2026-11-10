@@ -168,17 +168,25 @@ public:
         designKWeighting();
         tp_.prepare(sr_);
 
-        // sub-blocos de 100 ms: 4 deles = momentary (400 ms), 30 =
-        // short-term (3 s), e a sobreposição de 75% do integrated cai
-        // naturalmente em passos de 100 ms
-        subLen_ = static_cast<std::size_t>(std::lround(sr_ * 0.1f));
+        // sub-blocos de 10 ms (10/11/2026; eram 100 ms): 40 deles =
+        // momentary (400 ms), 300 = short-term (3 s). Com fatias de 100
+        // ms um tom de 400 ms fora da borda nunca cabia inteiro na janela
+        // e o máximo do momentâneo errava ~0,45 LU (EBU Tech 3341 #13–14;
+        // achado do Aquorbium, `OUTPUT_STAGE_DESIGN.md`, 22/10/2026). O
+        // integrated continua com blocos de 400 ms a cada 100 ms (a
+        // sobreposição de 75% da norma): um bloco fecha a cada 10 fatias.
+        subLen_ = static_cast<std::size_t>(std::lround(sr_ * 0.01f));
         if (subLen_ == 0) subLen_ = 1;
 
         hist_.assign(kShortTermSubs, 0.0);
         histCount_ = 0;
         histWrite_ = 0;
+        subsSinceBlock_ = 0;
         blocks_.clear();
-        blocks_.reserve(4096);          // ~27 min de tomada sem realocar
+        blocks_.reserve(4096);          // 4096 blocos × 100 ms ≈ 6,8 min sem realocar
+        blockLufs_.clear();
+        blockLufs_.reserve(4096);
+        integratedDirty_ = true;
         subAcc_ = 0.0;
         subFill_ = 0;
         for (auto& s : state_) s = Biquad2State{};
@@ -203,10 +211,17 @@ public:
         histWrite_ = (histWrite_ + 1) % kShortTermSubs;
         if (histCount_ < kShortTermSubs) ++histCount_;
 
-        // um bloco de 400 ms fecha a cada sub-bloco novo depois do 4º —
-        // é exatamente a sobreposição de 75% que a norma pede
-        if (histCount_ >= kMomentarySubs && blocks_.size() < blocks_.capacity())
-            blocks_.push_back(windowMeanSquare(kMomentarySubs));
+        // um bloco de 400 ms fecha a cada 100 ms (10 fatias) depois de
+        // haver 400 ms de material — a sobreposição de 75% da norma
+        if (++subsSinceBlock_ >= kBlockHopSubs) {
+            subsSinceBlock_ = 0;
+            if (histCount_ >= kMomentarySubs && blocks_.size() < blocks_.capacity()) {
+                const double z = windowMeanSquare(kMomentarySubs);
+                blocks_.push_back(z);
+                blockLufs_.push_back(lufs(z));
+                integratedDirty_ = true;
+            }
+        }
     }
 
     // LUFS das janelas móveis. `kSilence` enquanto não houver material.
@@ -229,31 +244,46 @@ public:
     }
 
     // LUFS integrado com as duas portas da norma.
+    //
+    // (10/11/2026) O app chama isto a cada bloco de áudio, no thread de
+    // áudio. Antes, cada chamada percorria todos os blocos guardados (até
+    // 4096) com dois `log10` por bloco — milhares de logaritmos por bloco
+    // de áudio numa tomada longa. Agora o LUFS de cada bloco é calculado
+    // uma vez, quando ele entra, e o integrado só é refeito quando chega
+    // bloco novo (a cada 100 ms); entre um e outro, devolve o guardado.
     float integrated() const noexcept {
+        if (!integratedDirty_) return integratedCache_;
+        integratedDirty_ = false;
+        integratedCache_ = computeIntegrated();
+        return integratedCache_;
+    }
+
+private:
+    float computeIntegrated() const noexcept {
         if (blocks_.empty()) return kSilence;
 
         // porta absoluta: −70 LUFS
         double sum = 0.0;
         std::size_t n = 0;
-        for (const double z : blocks_)
-            if (lufs(z) > -70.0f) { sum += z; ++n; }
+        for (std::size_t i = 0; i < blocks_.size(); ++i)
+            if (blockLufs_[i] > -70.0f) { sum += blocks_[i]; ++n; }
         if (n == 0) return kSilence;
 
         // porta relativa: −10 LU abaixo da média dos que passaram
         const float relative = lufs(sum / static_cast<double>(n)) - 10.0f;
         sum = 0.0;
         n = 0;
-        for (const double z : blocks_)
-            if (lufs(z) > -70.0f && lufs(z) > relative) { sum += z; ++n; }
+        for (std::size_t i = 0; i < blocks_.size(); ++i)
+            if (blockLufs_[i] > -70.0f && blockLufs_[i] > relative) { sum += blocks_[i]; ++n; }
         if (n == 0) return kSilence;
 
         return lufs(sum / static_cast<double>(n));
     }
 
-private:
-    // 400 ms e 3 s em sub-blocos de 100 ms
-    static constexpr std::size_t kMomentarySubs = 4;
-    static constexpr std::size_t kShortTermSubs = 30;
+    // 400 ms e 3 s em sub-blocos de 10 ms; blocos do integrated a cada 100 ms
+    static constexpr std::size_t kMomentarySubs = 40;
+    static constexpr std::size_t kShortTermSubs = 300;
+    static constexpr std::size_t kBlockHopSubs = 10;
 
     // `L = -0,691 + 10·log10(soma das energias ponderadas)`. O `z` que
     // chega aqui já é a soma dos dois canais (peso 1,0 em cada), então a
@@ -341,7 +371,11 @@ private:
 
     std::vector<double> hist_;        // energias dos sub-blocos de 100 ms
     std::size_t histWrite_ = 0, histCount_ = 0;
+    std::size_t subsSinceBlock_ = 0;
     std::vector<double> blocks_;      // blocos de 400 ms p/ o integrated
+    std::vector<float> blockLufs_;    // o LUFS de cada bloco, calculado uma vez
+    mutable bool integratedDirty_ = true;
+    mutable float integratedCache_ = kSilence;
     TruePeakMeter tp_;
 };
 
