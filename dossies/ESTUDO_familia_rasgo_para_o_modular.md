@@ -2033,6 +2033,49 @@ Uma ideia do Risco que vale para o Modular sem invadir o território:
 **vestígio opcional e silenciável** — toda memória residual (o APÓCRIFO de
 §4.8, as rotas com resíduo de §4.0) deve ter controle visível para apagar.
 
+### 4.12 Cruzamento com o Cardinal e revisão das propostas (10/11/2026)
+
+Método: as propostas de §4.5–4.11 contra os 92 plugins do Cardinal 26.02
+(`/media/luc/2tb_interno/cardinal-26.02/plugins`, nome + descrição +
+etiquetas de cada módulo; e o código quando a descrição não bastava). A
+pergunta é a do Método: **o que seria só mais um módulo que o Cardinal já
+tem, e o que é próprio do RASGO?** Conceito estudado, nenhum código copiado.
+
+| Proposta | No Cardinal | Leitura |
+|---|---|---|
+| **COERÊNCIA** (ordem demais rompe) | nada (o Neuron do NLC é comparador, não mede previsibilidade) | **original** |
+| **BLEFE** (confiança, traição, recusa) | nada (SNAKIA é o jogo da cobrinha como modulador) | **original** |
+| **APÓCRIFO** (citar o próprio passado ≥ 20 s, corte de montagem, parêntese) | só gagueira/ratchet dentro do passo (HetrickCV Phasor Stutter) | **original**; o parêntese sozinho é comum |
+| **FIBRA** (parciais que rasgam com cicatriz) | nada | **original** |
+| **TOM** (tonalidade de quem canta → QUANTIZER) | nada que detecte tonalidade | **original** no rack |
+| **FRASE** (fronteira de célula por LBDM) | nada (PhraseSeq é sequenciador) | **original** |
+| **PALCO / móbile** (feito hoje) | nenhum mixer pesa o estéreo pelo som (§4d da proposta do palco) | **original** |
+| **ACCENT**, **CHARACTER** (Antitotem) | nada | próprios |
+| **BUDGET** (orçamento de eventos) | só portas de probabilidade e o Topograph (densidade de padrão) | próprio no sentido de orçamento compartilhado |
+| Peneiras de Xenakis no QUANTIZER | microtonal por Scala existe (Xen Quantizer, GrandeModular QuantMT); **peneira, não** | a peneira é a parte nova; afinações Scala são prática comum |
+| Neo-Riemann P/L/R | nada | novo no rack (há no Ornament & Crime, hardware) |
+| ENVELOPE com LOOP/EOA | comum (Befaco Rampage, Tidal Modulator, Venom AD/ASR) | aperfeiçoamento **útil, não original** |
+| Phasing / polimetria | existe (HetrickCV Polymetric Phasors, FehlerFabrik Lilt) | comum; só faz sentido ligado ao nosso CLOCK |
+| RUNGLER / Benjolin | existe (HetrickCV Rungler, Venom Benjolin) | **comum** — baixa prioridade |
+| GENDYN, VOSIM, Walsh, Polivoks | nada | fontes clássicas ausentes nos dois; úteis, não RASGO por si |
+| INTERPRET / humanização | existe (HetrickCV Phasor Humanizer, Groove Box) | o INTERPRET do Antitotem (leitura de contexto) vai além |
+| TAP | só "tap" de atraso; nenhum tap tempo como módulo | pequeno, útil |
+| Stems por canal no REC | gravadores existem; nenhum ligado a papéis de mixagem | infraestrutura nossa |
+
+**Revisão das prioridades**, pelo critério "o que só o RASGO faria", e
+mantendo a ordem do autor (um por vez, depois da escuta):
+
+1. **COERÊNCIA** — pequeno, original, conversa com MARKOV e PALCO.
+2. **TOM** — fecha o ciclo microfone → harmonia do patch, original no rack.
+3. **BLEFE** — o primeiro módulo de jogo de verdade.
+4. **APÓCRIFO** — o rasgo do tempo.
+5. **FIBRA** (ADDITIVE) — o rasgo da matéria.
+6. **FRASE** e **TAP** — a escuta do gesto de quem toca.
+7. Aperfeiçoamentos úteis mas comuns: ENVELOPE LOOP/EOA, peneiras no
+   QUANTIZER (a peneira é a parte nova), stems no REC.
+8. Fontes clássicas ausentes (GENDYN, VOSIM, Walsh, Polivoks) e RUNGLER —
+   só se a escuta pedir.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
