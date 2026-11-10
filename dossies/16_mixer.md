@@ -126,3 +126,34 @@ slider de ganho + knob de pan + toggle de mute + jack, e OUT + jack de
 saída). Testado isolado (lei de pan, ganho, mute, mono) antes do patch.
 No patch: vozes → `MIXER` → `MASTER` → saída. É o primeiro nó estéreo
 do instrumento.
+
+## 9. PALCO e o móbile (10/11/2026, aprovado pelo autor)
+
+Pedido: "precisamos encontrar um meio de trabalhar o pan que não seja no
+centro, porém que não seja aleatório, com bom balanço, trajetos
+interessantes". Decisões do autor: os quatro trajetos servem; contrapeso
+ativo e original; no MIXER; 18 HP; contrapeso desligado no MANUAL.
+Estudo e comparação com o Cardinal em `PROPOSTA_palco_do_varia.md` §4c–4d.
+
+- Painel 18 HP: tiras como antes (MUTE subiu para y72) + jack **P1–P4**
+  (CV de pan, −1..+1, soma ao lugar) acima do jack de áudio; coluna
+  PALCO à direita: MODO, VELOC, ABERT, visor `palco` (o tempo desce,
+  cada canal deixa o rastro do lugar, o ponto cresce com o peso, o traço
+  embaixo é o centro de gravidade) e jack FRASE.
+- Modos: MANUAL / RODA / CÂNONE / GESTO / PÊNDULO (ver o cabeçalho de
+  `src/dsp/Mixer.hpp`). Fora do MANUAL o PAN é a casa.
+- Móbile: peso = energia lenta (~1,5 s) da parte aguda; alcance
+  0,55·√(peso médio/peso) (40–100 %); centro de gravidade em ±0,10,
+  correção ∝ 1/peso (o leve anda); mola amortecida ~2,5 s, ζ 0,6. Teto
+  0,55. Calculado por bloco; o PAN de cada amostra continua na rampa de
+  30 ms.
+- Seed: com 2+ vozes, RODA 30 % / CÂNONE 25 % / GESTO 30 % (frase = EOS do
+  ARP quando ele é a contravoz) / PÊNDULO 15 % (PENDULUM x1/x2 → P2 e P3
+  ou P4, período ~6–20 s); com 1 voz, MANUAL no centro. A seed abre os
+  canais nas casas (voz 0, contravoz ±0,30, textura ∓0,45, eco/pulso
+  ∓0,40).
+- Testes (`test_mix`): teto 0,55 e movimento nos 4 modos; móbile
+  equilibra e move o leve; MANUAL intocado.
+- Limites: o painel X11 não desenha o visor `palco` (só o app JUCE); o
+  VARIA continua sem tocar o MIXER (pode vir a mexer em VELOC/ABERT, se o
+  autor quiser); a soma mono perde até ~0,8 dB com um canal a 0,55.

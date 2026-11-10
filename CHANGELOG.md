@@ -9,6 +9,15 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
+  **todas as seeds mudam**). Pan que não é centro nem sorteio: modos
+  MANUAL / RODA / CÂNONE / GESTO / PÊNDULO; fora do MANUAL o PAN é a casa
+  e um **móbile** (a lei da alavanca de Calder) equilibra o palco pelo
+  peso do som de cada canal — o forte fica perto do centro, o leve se
+  move, a correção balança e assenta. Entradas P1–P4 (CV de pan) e FRASE;
+  visor do palco; painel de 14 para 18 HP. A seed escolhe o trajeto e
+  abre os canais nas casas. Textos nas 4 línguas. Dossiê 16 §9.
+
 - **Seed: os quatro canais do MIXER** (10 nov., pedido do autor; **todas
   as seeds mudam**). Gene novo `ensemble` (1–4 vozes, ligado à
   complexidade). ch1 voz; ch2 **contravoz** com altura própria — ARP (raiz

@@ -64,10 +64,10 @@ struct SeedIdentity {
 };
 
 // A seed abre os canais nas suas casas do palco (pans fora do centro)?
-// Desligado: o autor pediu os pans no centro em toda seed (8/9/2026) e a
-// decisão de abrir o palco na seed ainda é dele (proposta dos quatro
-// canais, §7.2). As casas ficam prontas; ligar é trocar esta constante.
-inline constexpr bool kSeedOpensStage = false;
+// Ligado em 10/11/2026 junto com o PALCO do MIXER — o autor: "precisamos
+// encontrar um meio de trabalhar o pan que não seja no centro, porém que
+// não seja aleatório" (antes: centro em toda seed, pedido de 8/9/2026).
+inline constexpr bool kSeedOpensStage = true;
 
 inline std::uint64_t seedBits(std::uint64_t seed, std::uint64_t stream) {
     std::uint64_t z = seed + 0x9E3779B97F4A7C15ULL * (stream + 1ULL);
@@ -863,7 +863,35 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             }
         if (layered) ++voices;
     }
-    (void)voices;
+
+    // ================ PALCO: o trajeto da seed (10/11/2026) ============
+    // Com 2+ vozes no MIXER, a seed escolhe um trajeto (RODA, CÂNONE,
+    // GESTO ou PÊNDULO) e o móbile do MIXER equilibra pelo peso do som.
+    // Com 1 voz, MANUAL e centro (não há o que equilibrar).
+    if (hasT("MIXER")) {
+        const std::size_t mx = firstT("MIXER");
+        int mode = 0;
+        if (voices >= 2) {
+            const float u = f01();
+            mode = u < 0.30f ? 1 : u < 0.55f ? 2 : u < 0.85f ? 3 : 4;
+            if (mode == 4 && !freeNode("PENDULUM")) mode = 1;
+        }
+        setP(mx, "stage", static_cast<float>(mode));
+        setP(mx, "stage_rate", rng(0.15f, 0.65f));
+        setP(mx, "stage_width", rng(0.4f, 0.9f));
+        if (mode == 0) setP(mx, "pan1", 0.0f);
+        if (mode == 3 && hasT("ARP") && spine[firstT("ARP")])
+            connectByName("ARP", "eos", "MIXER", "phrase");   // gesto por frase
+        if (mode == 4) {
+            const std::size_t pn = firstT("PENDULUM");
+            setP(pn, "damp", rng(0.0f, 0.2f));
+            setP(pn, "speed", rng(0.1f, 0.35f));   // período ~6–20 s: o palco anda, não treme
+            const bool a = connectByName("PENDULUM", "x1", "MIXER", "pan2");
+            const bool b = connectByName("PENDULUM", "x2", "MIXER", chance(0.5f) ? "pan3" : "pan4");
+            if (a || b) spine[pn] = 1;
+            else setP(mx, "stage", 1.0f);
+        }
+    }
 
     // ================ DRIFT: o patch evolui sozinho ===============
     if (hasT("DRIFT") && id.motion > 0.1f) {

@@ -7,6 +7,7 @@
 #include "dsp/FunctionGenerator.hpp"
 #include "io/AsciiPanel.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -125,6 +126,87 @@ void testMixerPanSemClique() {
     }
     // seno de 2 kHz a 0,5: o passo natural entre amostras é ~0,13
     check(maxStep < 0.16f, "pan de um extremo ao outro sem degrau na saída");
+}
+
+// --- PALCO (10/11/2026) ------------------------------------------------------
+// roda o MIXER com 4 senos (níveis dados), CV de pan opcional, e devolve o
+// lugar de cada canal ao fim; acumula o maior |lugar| visto e a excursão.
+struct Palco { float pos[4] = {0, 0, 0, 0}, maxAbs = 0.0f, excur[4] = {0, 0, 0, 0}, cog = 0.0f;
+               bool finite = true; };
+Palco runPalco(Mixer& m, const float level[4], const double seconds, const float panCv = 0.0f) {
+    m.prepare(kSr, 256);
+    std::vector<AudioBlock> out(1, AudioBlock(kSr, 2, 256));
+    AudioBlock ch[4] = {AudioBlock(kSr, 1, 256), AudioBlock(kSr, 1, 256),
+                        AudioBlock(kSr, 1, 256), AudioBlock(kSr, 1, 256)};
+    AudioBlock cv(kSr, 1, 256);
+    const float hz[4] = {440.0f, 660.0f, 990.0f, 1320.0f};
+    std::vector<const AudioBlock*> in{&ch[0], &ch[1], &ch[2], &ch[3], &cv, &cv, &cv, &cv};
+    Palco r; float lo[4] = {9, 9, 9, 9}, hi[4] = {-9, -9, -9, -9};
+    double ph = 0.0;
+    const long nb = static_cast<long>(seconds * kSr / 256);
+    for (long b = 0; b < nb; ++b) {
+        for (std::size_t i = 0; i < 256; ++i, ph += 1.0 / kSr) {
+            for (int c = 0; c < 4; ++c)
+                ch[c].at(0, i) = level[c] * static_cast<float>(std::sin(2.0 * M_PI * hz[c] * ph));
+            cv.at(0, i) = panCv * static_cast<float>(std::sin(2.0 * M_PI * 0.2 * ph));
+        }
+        m.process(in, out);
+        for (std::size_t i = 0; i < 256; ++i)
+            if (!std::isfinite(out[0].at(0, i)) || !std::isfinite(out[0].at(1, i))) r.finite = false;
+        for (int c = 0; c < 4; ++c) {
+            const float p = m.stagePosition(c);
+            r.maxAbs = std::max(r.maxAbs, std::fabs(p));
+            if (b > nb / 4) { lo[c] = std::min(lo[c], p); hi[c] = std::max(hi[c], p); }
+        }
+    }
+    for (int c = 0; c < 4; ++c) { r.pos[c] = m.stagePosition(c); r.excur[c] = hi[c] - lo[c]; }
+    r.cog = m.stageCentre();
+    return r;
+}
+
+void testPalcoTetoEMovimento() {
+    // os quatro trajetos: nunca além de 0,55; todos andam; saída finita
+    for (int mode = 1; mode <= 4; ++mode) {
+        Mixer m;
+        m.setParameter("stage", static_cast<float>(mode));
+        m.setParameter("stage_rate", 1.0f);      // período de 6 s
+        m.setParameter("stage_width", 1.0f);
+        m.setParameter("pan1", 0.5f); m.setParameter("pan2", -0.5f);
+        m.setParameter("pan3", 0.3f); m.setParameter("pan4", -0.3f);
+        const float lv[4] = {0.2f, 0.2f, 0.2f, 0.2f};
+        const Palco r = runPalco(m, lv, 14.0, mode == 4 ? 1.0f : 0.0f);
+        check(r.finite, "palco: saída finita");
+        check(r.maxAbs <= Mixer::kStageMax + 1e-5f, "palco: nunca além da abertura máxima 0,55");
+        float moved = 0.0f;
+        for (float e : r.excur) moved = std::max(moved, e);
+        check(moved > 0.1f, "palco: o trajeto anda");
+    }
+}
+
+void testPalcoMobile() {
+    // sem vento (ABERT 0): canal 1 forte à esquerda, canal 2 fraco ao
+    // centro. O móbile equilibra o centro de gravidade em ±0,10 (com
+    // folga da mola) — e quem anda é o leve.
+    Mixer m;
+    m.setParameter("stage", 1.0f);
+    m.setParameter("stage_width", 0.0f);
+    m.setParameter("pan1", -0.4f); m.setParameter("pan2", 0.0f);
+    const float lv[4] = {0.4f, 0.1f, 0.0f, 0.0f};
+    const Palco r = runPalco(m, lv, 12.0);
+    check(std::fabs(r.cog) <= 0.13f, "móbile: centro de gravidade equilibrado");
+    check(std::fabs(r.pos[1] - 0.0f) > 2.0f * std::fabs(r.pos[0] + 0.4f), "móbile: o leve se move mais");
+    check(r.pos[1] > 0.1f, "móbile: o leve vai para o lado oposto ao pesado");
+}
+
+void testPalcoManualIntocado() {
+    // MANUAL: o PAN é o lugar, nada se move, o contrapeso desliga
+    Mixer m;
+    m.setParameter("pan1", -0.8f); m.setParameter("pan2", 0.3f);
+    const float lv[4] = {0.4f, 0.1f, 0.0f, 0.0f};
+    const Palco r = runPalco(m, lv, 4.0);
+    near(r.pos[0], -0.8f, 1e-5f);
+    near(r.pos[1], 0.3f, 1e-5f);
+    check(r.excur[0] < 1e-6f && r.excur[1] < 1e-6f, "manual: nada se move sozinho");
 }
 
 void testMixerGainAndMute() {
@@ -363,6 +445,9 @@ void testPanels() {
 }  // namespace
 
 int main() {
+    testPalcoTetoEMovimento();
+    testPalcoMobile();
+    testPalcoManualIntocado();
     testMixerPanLaw();
     testMixerGraveNoCentro();
     testMixerPanSemClique();
