@@ -478,7 +478,66 @@ void testIntensidade() {
     m.setIntensity(0.6f);   check(m.intensity() == 0.6f, "guarda o valor dado");
 }
 
+// CHÃO E TETO de volume (10/11/2026): com o nível lento longe do nível de
+// casa, a mão é puxada para o centro (a seed); de volta ao nível, ela se
+// solta. Origem: uma tomada do autor que andou de −14 a −36 LUFS.
+void testChaoETetoDeVolume() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.setIntensity(2.0f);
+    m.inhabit(g, 4242ULL, {v});
+    const float centro = g.parameterUserValue(v, "cutoff");
+    // aprende a casa num nível estável (energia 0,3 ≈ −10,5 dB)
+    for (int i = 0; i < 300; ++i) m.tick(g, 1.0f / 30.0f, 0.3f);
+    EXPECT(m.homePull() < 0.05f);
+    // o som some (≈ −40 dB) por 25 s: a mão volta para casa
+    float maxLonge = 0.0f;
+    for (int i = 0; i < 750; ++i) {
+        m.tick(g, 1.0f / 30.0f, 0.01f);
+        if (i > 600) maxLonge = std::max(maxLonge,
+            std::fabs(g.parameterUserValue(v, "cutoff") - centro));
+    }
+    check(m.homePull() > 0.9f, "som sumido por muito tempo: a mão é puxada para casa");
+    check(m.levelDeviationDb() < -20.0f, "o desvio medido é o do som sumido");
+    check(maxLonge < 0.05f * centro, "puxada, a mão fica perto do centro da seed");
+    // o nível volta: a mão se solta
+    for (int i = 0; i < 900; ++i) m.tick(g, 1.0f / 30.0f, 0.3f);
+    check(m.homePull() < 0.05f, "nível de volta: a mão se solta");
+    // estrondo prolongado (energia 1, +10,5 dB) também puxa
+    for (int i = 0; i < 900; ++i) m.tick(g, 1.0f / 30.0f, 1.0f);
+    // +10,5 dB acima de casa: além do limiar de 8 dB, puxão parcial (~0,4)
+    check(m.homePull() > 0.3f, "estrondo prolongado também puxa");
+}
+
+// Com LUFS momentâneo (o modo do app): alvo absoluto −26; um patch
+// esparso (golpes e pausas) no alvo NÃO pode ser lido como baixo.
+void testChaoETetoComLufs() {
+    SignalGraph g;
+    const auto v = g.add(std::make_unique<Voice>());
+    g.prepare(48000.0f, 1, 64);
+    MotionEngine m;
+    m.setLoudnessTarget(-26.0f);
+    m.inhabit(g, 99ULL, {v});
+    for (int i = 0; i < 900; ++i) m.tick(g, 1.0f / 30.0f, 0.3f, -26.0f);
+    check(m.homePull() < 0.05f, "no alvo: a mão fica solta");
+    // esparso: 400 ms de golpe a −22, 600 ms de pausa (silêncio)
+    for (int i = 0; i < 900; ++i)
+        m.tick(g, 1.0f / 30.0f, 0.3f, (i % 30) < 12 ? -22.0f : -75.0f);
+    check(m.homePull() < 0.05f, "patch esparso no alvo não é lido como baixo");
+    // alto por 30 s
+    for (int i = 0; i < 900; ++i) m.tick(g, 1.0f / 30.0f, 0.3f, -14.0f);
+    check(m.homePull() > 0.9f, "12 LU acima do alvo: a mão é puxada para casa");
+    // queda sustentada (não é pausa): também puxa
+    for (int i = 0; i < 1200; ++i) m.tick(g, 1.0f / 30.0f, 0.3f, -26.0f);
+    for (int i = 0; i < 900; ++i) m.tick(g, 1.0f / 30.0f, 0.3f, -40.0f);
+    check(m.homePull() > 0.9f, "queda sustentada de 14 LU: a mão é puxada");
+}
+
 int main() {
+    testChaoETetoComLufs();
+    testChaoETetoDeVolume();
     testEnvelopePresentationPreservesMotion();
     testIntensidade();
     testWalkStaysInRangeAndMoves();

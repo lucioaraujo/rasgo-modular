@@ -105,6 +105,10 @@ public:
     void inhabit(rasgo::modular::SignalGraph& graph, const std::uint64_t seed,
                  const std::vector<std::size_t>& shown) {
         fibers_.clear();
+        ++generation_;
+        homeLearned_ = 0.0f; refAcc_ = 0.0f; slowDb_ = -60.0f; homePull_ = 0.0f;
+        slowPow_ = 0.0f; relGatedFor_ = 0.0f;
+        slowPrimed_ = false;
         field_.seed(seed ^ 0xA5A5C0FFEEULL);
         boldRng_ = seed ? (seed * 0x2545F4914F6CDD1DULL) ^ 0xD1B54A32D192ED03ULL
                         : 0xD1B54A32D192ED03ULL;
@@ -197,9 +201,48 @@ public:
     }
     float intensity() const noexcept { return intensity_; }
 
+    // Para a partitura (10/11/2026): o que a mão escreveu por último em cada
+    // fibra. `fn(node, paramId, value, pmin, pmax)`.
+    // muda a cada `inhabit` (seed nova, módulo novo…): as fibras são outras
+    std::uint64_t generation() const noexcept { return generation_; }
+    template <class Fn> void forEachFiber(Fn&& fn) const {
+        for (const auto& f : fibers_) fn(f.node, f.paramId, f.value, f.pmin, f.pmax);
+    }
+
+    // CHÃO E TETO de volume da mão (10/11/2026, aprovado pelo autor). Numa
+    // gravação do autor com o VARIA mais intenso, o patch andou 4 min de
+    // −14 a −36 LUFS — a mão o levou a uma região alta e depois a uma
+    // quase muda, e o equilíbrio de volume da seed não alcança isso (mede só
+    // a abertura). Os CENTROS das fibras são a seed (equilibrada a −26 LUFS),
+    // então voltar para perto deles devolve o volume — sem compressor, sem
+    // tocar em MIXER/MASTER.
+    //
+    // Referência: com o LUFS momentâneo da saída (o app passa), o alvo
+    // ABSOLUTO da seed (−26 LUFS, `setLoudnessTarget`) — medido na própria
+    // tomada do autor: com o VARIA em 2, a seed sobe 6 LU nos primeiros
+    // segundos, e uma referência aprendida ali já nasceria alta. Sem LUFS
+    // (chamadores antigos, testes), cai no nível lento dos primeiros
+    // segundos depois do `inhabit`. Nível lento: média com ~3 s.
+    // Desvio além de 8 dB → a mão é puxada para casa, cheia em 14 dB; volta
+    // a se soltar quando o nível retorna. O som segue variando; só não
+    // passa minutos estourado ou sumido.
+    static constexpr float kHomeLearnSeconds = 6.0f;
+    static constexpr float kHomeSlowTau = 3.0f;
+    // limiares medidos na tomada do autor (seed 12022678860901989809, VARIA
+    // em 2): 8/14 dB deixava a região baixa (−33 LUFS, 7 LU abaixo) solta
+    static constexpr float kHomeStartDb = 5.0f;
+    static constexpr float kHomeFullDb = 10.0f;
+    static constexpr float kHomeWarmupSeconds = 4.0f;   // o medidor ainda enche
+    float homePull() const noexcept { return homePull_; }
+    void setLoudnessTarget(const float lufs) noexcept { targetLufs_ = lufs; }
+    float levelDeviationDb() const noexcept {
+        return homeLearned_ >= kHomeLearnSeconds ? slowDb_ - refDb_ : 0.0f;
+    }
+
     // avança `dt` s. `energy` (0..1) do som acelera a mão (realimentação).
     void tick(rasgo::modular::SignalGraph& graph, const float dt,
-              const float energy = 0.5f) noexcept {
+              const float energy = 0.5f,
+              const float loudnessLufs = std::numeric_limits<float>::quiet_NaN()) noexcept {
         tickBindings(graph, dt);
         if (fibers_.empty()) return;
 
@@ -234,6 +277,62 @@ public:
         // segura — o autor reportou clip com a engine ligada.
         const float duckAll = energy > 0.82f
             ? std::min(1.0f, (energy - 0.82f) * 3.5f) : 0.0f;
+
+        // chão e teto (ver `homePull`): o mesmo puxão para o centro, nos
+        // dois sentidos, guiado pelo nível LENTO contra o nível de casa
+        {
+            const bool absolute = std::isfinite(loudnessLufs);
+            // Com LUFS: a leitura MOMENTÂNEA (400 ms) com a mesma lógica do
+            // integrado da EBU R128 — porta absoluta em −70 e porta
+            // RELATIVA 10 LU abaixo do nível atual, média em POTÊNCIA.
+            // Num patch esparso (golpes e pausas) o curto prazo em dB lia
+            // −32 a −50 com o integrado em −26 (seed 99999), e a mão
+            // ficava presa em casa à toa.
+            // a porta relativa vale para PAUSAS; uma queda que dura mais
+            // de 4 s é o patch que ficou baixo de verdade (a tomada do autor
+            // caiu 20 LU e ficou lá) — essas leituras passam a contar
+            const bool relGated = absolute && slowPrimed_
+                && loudnessLufs > -69.0f && loudnessLufs < slowDb_ - 10.0f;
+            relGatedFor_ = relGated ? relGatedFor_ + dt : 0.0f;
+            const bool silence = absolute
+                && (loudnessLufs <= -69.0f || (relGated && relGatedFor_ < 4.0f));
+            const float db = absolute
+                ? loudnessLufs
+                : 20.0f * std::log10(std::max(energy, 1.0e-4f));
+            if (!silence) {
+                if (absolute) {
+                    const float p = std::pow(10.0f, db / 10.0f);
+                    if (!slowPrimed_) { slowPow_ = p; slowPrimed_ = true; }
+                    slowPow_ += (p - slowPow_) * (1.0f - std::exp(-dt / kHomeSlowTau));
+                    slowDb_ = 10.0f * std::log10(std::max(slowPow_, 1.0e-12f));
+                } else {
+                    if (!slowPrimed_) { slowDb_ = db; slowPrimed_ = true; }
+                    slowDb_ += (db - slowDb_) * (1.0f - std::exp(-dt / kHomeSlowTau));
+                }
+            }
+            if (absolute && homeLearned_ < kHomeWarmupSeconds) {
+                homeLearned_ += dt;   // o medidor ainda enche
+            } else if (silence) {
+                // pausa (ou bloco 10 LU abaixo): segura o nível lento
+            } else if (absolute) {
+                refDb_ = targetLufs_;
+                homeLearned_ = std::max(homeLearned_, kHomeLearnSeconds);
+                const float dev = std::fabs(slowDb_ - refDb_);
+                const float goal = dev <= kHomeStartDb ? 0.0f
+                    : std::min(1.0f, (dev - kHomeStartDb) / (kHomeFullDb - kHomeStartDb));
+                homePull_ += (goal - homePull_) * (1.0f - std::exp(-dt / 1.5f));
+            } else if (homeLearned_ < kHomeLearnSeconds) {
+                refAcc_ += db * dt;
+                homeLearned_ += dt;
+                if (homeLearned_ >= kHomeLearnSeconds)
+                    refDb_ = refAcc_ / homeLearned_;
+            } else {
+                const float dev = std::fabs(slowDb_ - refDb_);
+                const float goal = dev <= kHomeStartDb ? 0.0f
+                    : std::min(1.0f, (dev - kHomeStartDb) / (kHomeFullDb - kHomeStartDb));
+                homePull_ += (goal - homePull_) * (1.0f - std::exp(-dt / 1.5f));
+            }
+        }
 
         const double fx = field_.nx(), fy = field_.ny(), fz = field_.nz();
         for (std::size_t i = 0; i < fibers_.size(); ++i) {
@@ -296,7 +395,13 @@ public:
                 // outra música a cada segundo.
                 minDwell /= std::max(0.5f, std::min(2.0f, intensity_));
                 const float thr = 0.58f;
-                if (f.toggleDwell >= minDwell) {
+                // chão/teto: puxada forte, o toggle volta ao estado da seed
+                // (um toggle não tem meio-caminho; e é ele que muda o
+                // volume de uma vez — medido na tomada do autor)
+                if (homePull_ > 0.5f) {
+                    const float home = f.center >= 0.5f ? 1.0f : 0.0f;
+                    if (f.value != home) { f.value = home; f.toggleDwell = 0.0f; }
+                } else if (f.toggleDwell >= minDwell) {
                     if (raw > thr && f.value < 0.5f) {
                         f.value = 1.0f; f.toggleDwell = 0.0f;
                     } else if (raw < -thr && f.value >= 0.5f) {
@@ -318,9 +423,11 @@ public:
             target = clampf(target, f.center - win, f.center + win);
             target = clampf(target, f.pmin, f.pmax);
             // duck protetor: perto do clip, converge pro centro
-            const float duck = duckAll
+            // o chão/teto puxa TODAS as fibras por igual: é a casa inteira
+            // (a seed equilibrada) que devolve o volume, não só os quentes
+            const float duck = std::max(duckAll
                 * ((f.reach == MotionReach::Hot
-                    || f.reach == MotionReach::Level) ? 1.0f : 0.55f);
+                    || f.reach == MotionReach::Level) ? 1.0f : 0.55f), homePull_);
             target += (f.center - target) * duck;
             if (f.quantize) target = std::round(target);
 
@@ -333,6 +440,12 @@ public:
 
 private:
     float intensity_ = 1.0f;   // knob VARIA — ver setIntensity
+    // chão e teto de volume (ver `homePull`)
+    float homeLearned_ = 0.0f, refAcc_ = 0.0f, refDb_ = -20.0f;
+    float slowDb_ = -60.0f, homePull_ = 0.0f, slowPow_ = 0.0f, relGatedFor_ = 0.0f;
+    bool slowPrimed_ = false;
+    std::uint64_t generation_ = 0;
+    float targetLufs_ = -26.0f;   // alvo da seed (`SeedBalance.hpp`)
     void tickBindings(rasgo::modular::SignalGraph& graph, const float dt) noexcept {
         for (auto& b : bindings_) {
             float v = b.value;
