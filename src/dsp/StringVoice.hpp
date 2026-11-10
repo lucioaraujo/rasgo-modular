@@ -2,6 +2,7 @@
 
 #include "core/SignalGraph.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -114,18 +115,34 @@ public:
         if (dampMod)
             damping = clampf(damping + dampMod->at(0, 0), 0.0f, 1.0f);
 
-        // atraso total do laço = sr/f0 = D (inteiro) + frac; frac via
-        // all-pass de 1ª ordem (Jaffe & Smith)
-        const float loopDelay = sampleRate_ / f0;
+        // filtro de perda no laço: 1-polo LP, mais fechado com `damping`
+        const float lpA = 0.05f + (1.0f - damping) * 0.9f;
+
+        // atraso total do laço = sr/f0 = D (inteiro) + frac + atraso do
+        // filtro de perda; frac via all-pass de 1ª ordem (Jaffe & Smith).
+        // (10/11/2026) O filtro de perda também atrasa: atraso de fase do
+        // 1-polo y += a·(x − y) em ω0 = atan2(b·sin ω0, 1 − b·cos ω0)/ω0,
+        // b = 1 − a — de ~0,7 amostra (DAMP padrão) a ~19 (DAMP no
+        // máximo). Sem descontá-lo a corda soava baixa, até ~49 cents
+        // (440 Hz, DAMP 0,8; `test_string` mede em cents). J. O. Smith,
+        // *Physical Audio Signal Processing* (afinação do laço de KS).
+        const float w0 = 6.28318531f * f0 / sampleRate_;
+        const float lpB = 1.0f - lpA;
+        const float lpDelay =
+            std::atan2(lpB * std::sin(w0), 1.0f - lpB * std::cos(w0)) / w0;
+        const float loopDelay = std::max(2.5f, sampleRate_ / f0 - lpDelay);
         int intDelay = static_cast<int>(loopDelay - 0.5f);
         if (intDelay < 2) intDelay = 2;
         if (static_cast<std::size_t>(intDelay) >= bufLen_ - 2)
             intDelay = static_cast<int>(bufLen_) - 3;
         const float frac = loopDelay - static_cast<float>(intDelay);
-        const float apCoeff = (1.0f - frac) / (1.0f + frac);
-
-        // filtro de perda no laço: 1-polo LP, mais fechado com `damping`
-        const float lpA = 0.05f + (1.0f - damping) * 0.9f;
+        // coeficiente EXATO do all-pass para o atraso de fase `frac` em ω0
+        // (a forma (1−d)/(1+d) só vale perto de ω = 0 e deixava ~+10 cents
+        // nas notas agudas): c = sin(ω0(1−d)/2) / sin(ω0(1+d)/2)
+        const float apDen = std::sin(0.5f * w0 * (1.0f + frac));
+        const float apCoeff = std::fabs(apDen) > 1e-6f
+            ? clampf(std::sin(0.5f * w0 * (1.0f - frac)) / apDen, -0.99f, 0.99f)
+            : (1.0f - frac) / (1.0f + frac);
         // ganho de realimentação (sustain), sempre < 1
         const float fbGain = 0.86f + decay * 0.139f;   // 0,86 .. 0,999
         const float driveGain = 1.0f + drive * 5.0f;

@@ -9,6 +9,15 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Correções técnicas** (10 nov., aprovadas pelo autor). (1) **Denormais**:
+  o grafo processa com FTZ/DAZ ligados (e restaura ao sair) — caudas no
+  silêncio não viram números lentos; a régua de qualidade caiu de 53,3 s
+  para 43,6 s; candidata aos estalos com o VARIA. (2) **STRING afinada**: o
+  atraso do filtro de perda agora é descontado do laço e o all-pass usa o
+  coeficiente exato; antes a corda soava até 82 cents baixa (880 Hz, DAMP
+  0,8), agora fica a poucos cents. Muda o som de patches com STRING e DAMP
+  alto. Dossiê 11.
+
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos
   MANUAL / RODA / CÂNONE / GESTO / PÊNDULO; fora do MANUAL o PAN é a casa
