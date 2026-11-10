@@ -117,6 +117,54 @@ qualquer fonte. O PALCO (A) pode vir depois, como **mais uma fonte** — o
 VARIA passaria a mandar sinais para essas mesmas entradas, em vez de girar o
 knob. Minha recomendação: **começar por B**.
 
+## 4c. Pan que não é centro nem sorteio (pedido do autor, 10/11 noite)
+
+"Precisamos encontrar um meio de trabalhar o pan que não seja no centro,
+porém que não seja aleatório, com bom balanço, trajetos interessantes."
+
+### O que o Cardinal tem (lido no código, `cardinal-26.02/plugins`)
+
+| Módulo | Ideia | Nota |
+|---|---|---|
+| stoermelder **Orbit** (GPL-3) | a cada gatilho, cada voz ganha um lugar novo (normal, normal espelhada, uniforme ou externa) e depois **deriva** linearmente para o centro ou para as bordas; filtro de 5 ms contra clique | o lugar é sorteado; lei de pan linear (cai 6 dB no centro) |
+| forsitan **pavo** (GPL-3; o Splay do SuperCollider) | N vozes **espaçadas por igual** entre −spread e +spread, em torno de um CENTER; ganho compensado por √(1/N) | distribuição, não trajeto |
+| stocaudio **Spread** (GPL-3) | o mesmo espaçamento por igual, linear | idem |
+| GlueTheGiant **MetroCityBus** (GPL-3) | **pan follow**: um único trajeto de pan (CV); a voz *c* repete o trajeto com atraso *c*·d — **cânone no espaço** | o mais musical do lote |
+| Bogaudio **FourFO** / HetrickCV **PhasorQuadrature** | quatro fases a 90° | quatro canais em **roda** |
+| admiral **Shifts** (MIT) | balanço de Bernoulli: o peso pula entre dois lados por gatilho | é sorteio |
+| MindMeld **BassMaster** | grave mono, agudo aberto | já temos (grave no centro) |
+| Venom **Pan3D** | X/Y/Z para 8 saídas | fora do nosso estéreo |
+
+Nenhum deles cuida do **balanço** entre as vozes: cada uma anda por si.
+
+### Sugestão: palco com contrapeso
+
+1. **Casas** complementares por papel (voz perto do centro, contravoz e
+   eco em lados opostos, textura do outro lado), lado decidido pela seed.
+2. **Um trajeto por seed**, escolhido entre poucos e nomeados:
+   - **RODA** — os canais giram em torno das casas com fases defasadas
+     (90° com 4 vozes, 120° com 3); a soma das posições é zero por
+     construção;
+   - **CÂNONE** — a voz faz um trajeto lento; a contravoz o repete
+     atrasada e espelhada, o eco depois dela (ideia do pan follow);
+   - **GESTO** — a cada frase (EOS do ARP, fim do ciclo do CLOCK) o canal
+     vai para um lugar novo **escolhido para reequilibrar** (o lado com
+     menos peso), com deslize de 1–4 s (a deriva do Orbit, a inércia da
+     Navalha);
+   - **PÊNDULO** — os dois pêndulos acoplados do PENDULUM movem contravoz
+     e eco (precisa das entradas PAN do caminho B).
+3. **Contrapeso** (a parte nossa): o MIXER mede o peso de cada canal (RMS
+   lento) e o centro de gravidade do palco; se ele passa de ±0,12, as
+   casas inteiras deslizam devagar para o lado oposto. Voz forte à
+   esquerda puxa as outras para a direita. Balanço sem prender no centro.
+4. Salvaguardas: abertura máx. 0,55 (aprovada), grave no centro (feito),
+   lei de potência constante, velocidade limitada, nada de salto.
+
+Onde mora: no MIXER (um seletor PALCO: CENTRO / RODA / CÂNONE / GESTO,
+mais uma taxa), com as entradas PAN 1–4 do caminho B para fontes
+externas. A seed escolhe o trajeto; o VARIA pode mexer só na taxa e na
+abertura. Conceito estudado, nenhum código copiado.
+
 ## 5. Decisões para o autor
 
 0. **Caminho B primeiro** (entradas PAN no MIXER), deixando o PALCO para
