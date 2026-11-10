@@ -86,8 +86,10 @@ relevante". Registro vivo em
 - [x] Maestro (§4.10: stems por canal no REC, pacote de proveniência) e
   Risco (§4.11: fronteira — texto/fórmula é território do Risco; vestígio
   sempre silenciável).
-- [ ] Cruzamento com o Cardinal e revisão das propostas; README e
-  bibliografia do Batruc; documentos restantes do Trioio.
+- [x] Cruzamento com o Cardinal e revisão das prioridades (§4.12):
+  COERÊNCIA, TOM, BLEFE, APÓCRIFO, FIBRA, FRASE/TAP são originais no rack;
+  ENVELOPE LOOP/EOA, phasing, Rungler e Scala são comuns.
+- [ ] README e bibliografia do Batruc; documentos restantes do Trioio.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
