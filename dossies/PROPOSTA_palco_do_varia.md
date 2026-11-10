@@ -165,6 +165,86 @@ mais uma taxa), com as entradas PAN 1–4 do caminho B para fontes
 externas. A seed escolhe o trajeto; o VARIA pode mexer só na taxa e na
 abertura. Conceito estudado, nenhum código copiado.
 
+## 4d. Decisões de 10/11 noite e o contrapeso elaborado
+
+Autor: "os quatro servem; contrapeso ativo, consegue elaborar de uma forma
+original?; no mixer".
+
+### Os mixers do Cardinal (126 módulos com etiqueta Mixer/Panning, lidos)
+
+O que existe lá: soma e VCA (Fundamental, Befaco, Venom, Bogaudio MIX4/8,
+mscHack); barramentos e grupos (MindMeld MixMaster — lei de pan
+escolhível, largura, DIM, mono; GlueTheGiant); matrizes (Bogaudio
+MATRIX, stoermelder INTERMIX); crossfade vetorial (HetrickCV Vector Mix,
+Venom Cross Fade 3D); compressão e ducking (CVfunk Pressed Duck);
+saturação de console (rackwindows Console); fades automáticos (mscHack
+ASAF8); instantâneos (Bidoo ACnE, Frames); grave mono (MindMeld
+BassMaster); espalhadores (Orbit, pavo, Spread, MetroCityBus); e o
+stoermelder **ARENA**: fontes e pontos de escuta num plano XY, o nível
+cai com a distância dentro de um raio, e os pontos andam por trajetos
+**desenhados à mão** (16 sequências de 128 pontos) ou por passeio
+aleatório.
+
+Procurado no código: nenhum mixer do Cardinal pesa o estéreo pelo **som
+que está tocando** — todo pan é posição dada (knob, CV, sorteio, trajeto
+gravado). O que o nosso MIXER já tem de diferente: grave no centro por
+canal com soma exata (só o BassMaster faz algo parecido, e no barramento
+inteiro), joelho de barramento transparente até 0 dBFS, e as quatro
+vozes com papéis compostos pela seed.
+
+### O contrapeso como MÓBILE (a proposta original)
+
+Referência: os móbiles de Alexander Calder — peças penduradas em braços
+que se equilibram pela **lei da alavanca** (peso × distância de um lado =
+peso × distância do outro). O vento os move; eles nunca caem para um lado.
+
+No MIXER:
+
+1. **Peso = o som de agora.** Cada canal pesa a sua energia lenta (~1,5 s)
+   — só a parte aguda, a que de fato vai para o lado (o grave já mora no
+   centro e não pesa). Canal calado não pesa e não puxa nada.
+2. **Alcance pela alavanca.** Quanto mais pesado, mais curto o braço: o
+   alcance de cada canal é 0,55 × √(peso médio / peso dele), entre 40 % e
+   100 %. A voz forte fica perto do centro sem regra de "voz no centro";
+   o eco e a textura, leves, vão longe. Se a voz cala, o braço dela cresce.
+3. **Equilíbrio.** O centro de gravidade do palco (Σ peso·posição / Σ
+   peso) fica dentro de ±0,10. Passou disso, o móbile se corrige — e quem
+   anda é o **leve**: a correção de cada canal é proporcional a 1/peso
+   (mínimo esforço para uma inércia que cresce com o quadrado do peso).
+   A voz quase não se mexe; as camadas atravessam.
+4. **Assentamento.** A correção tem inércia (~2 s) e um leve
+   amortecimento: depois de um golpe forte de um lado, o palco **balança e
+   assenta**, como o móbile depois de tocado — não se corrige seco.
+5. **O vento são os trajetos** (RODA, CÂNONE, GESTO, PÊNDULO): eles
+   propõem; o móbile dispõe. A energia do som (já medida pelo VARIA) pode
+   ser o vento mais forte ou mais fraco.
+
+Resultado: nem centro, nem sorteio — o lugar de cada voz é a consequência
+do peso dela e do peso das outras. Um acento do DRUM à direita empurra a
+contravoz para a esquerda por um instante; uma nota longa da voz
+desloca o conjunto devagar.
+
+### Proposta de painel (para o autor ver antes)
+
+O MIXER passa de 14 para 18 HP; as quatro tiras ficam como estão e entra
+uma coluna PALCO à direita:
+
+```
+ CH1  CH2  CH3  CH4 │ PALCO
+ ▮    ▮    ▮    ▮   │ (◯) PALCO   MÃO·RODA·CÂNONE·GESTO·PÊNDULO
+                    │ (◯) VELOC
+ (◯)  (◯)  (◯)  (◯) │ (◯) ABERT
+ PAN  PAN  PAN  PAN │ [visor: 4 pontos no palco + o centro de gravidade]
+ [M]  [M]  [M]  [M] │ ◎ FRASE  (gatilho do GESTO)
+ ◎p1  ◎p2  ◎p3  ◎p4 │
+ ◎1   ◎2   ◎3   ◎4  │ (◯)OUT          ◎ L+R
+```
+
+PAN de cada canal vira a **casa** quando o PALCO não está em MÃO; em MÃO
+tudo funciona como hoje (o contrapeso desliga: o músico manda). As
+entradas p1–p4 somam ao lugar em qualquer modo; o PÊNDULO é o modo em que
+só elas movem os canais (a seed liga o PENDULUM nelas).
+
 ## 5. Decisões para o autor
 
 0. **Caminho B primeiro** (entradas PAN no MIXER), deixando o PALCO para
