@@ -39,6 +39,7 @@ namespace rasgo::modular {
 class Formant final : public Signal {
 public:
     static constexpr int kBands = 5;
+    static constexpr float kFormantCal = 1.0f;
     static constexpr int kVowels = 5;   // A E I O U
 
     Formant()
@@ -144,8 +145,11 @@ public:
                 float fk = std::exp(std::log(fa) * (1.0f - t) + std::log(fb) * t)
                          * shMul * (1.0f + det[k]);
                 fk = clampf(fk, 20.0f, nyqCut);
+                // (10/11/2026) a largura acompanha o SHIFT (Q constante): o
+                // trato maior ou menor muda a escala das bandas, não só o
+                // centro — antes, SHIFT para cima estreitava as bandas.
                 const float bw = (kBw[seg][k] * (1.0f - t) + kBw[seg + 1][k] * t)
-                               / resDiv;
+                               * shMul / resDiv;
                 const float gDb = kGain[seg][k] * (1.0f - t) + kGain[seg + 1][k] * t;
                 float gLin = std::pow(10.0f, gDb / 20.0f);
                 const float kk = clampf(bw / fk, 0.02f, 2.0f);
@@ -161,8 +165,15 @@ public:
                     gLin = gLin * (1.0f - voc) + gVoc * voc;
                 }
 
+                // (10/11/2026) ganho ×√k em vez de ×k (pico unitário): com
+                // pico unitário, um som largo (serra, ruído) perde energia
+                // na proporção da largura — a FORMANT saía ~25 dB abaixo
+                // da entrada e mais baixo ainda com RES. ×√k mantém a
+                // energia de um espectro largo quando as bandas estreitam
+                // (achado do Aquorbium na cópia deste módulo,
+                // SYNTH_DEVICE_DESIGN.md). `kFormantCal` acerta o nível.
                 const float bnd = svf_[k].runBand(x, fk, kk, sr_);
-                wet += bnd * kk * gLin;
+                wet += bnd * std::sqrt(kk) * gLin * kFormantCal;
             }
 
             const float y = softLimit(x * (1.0f - mix) + wet * mix * 1.6f);

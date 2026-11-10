@@ -202,3 +202,19 @@ fala); `NOISE → FORMANT`, `res` alto (5 tons por vogal — coro sintético);
 `SEQUENCE → FORMANT.vowel` (melodia de vogais sobre um drone);
 **vocoder:** uma voz/`SIGNAL-IN` → `FORMANT.mod`, um `OSC.saw`/pad rico →
 `FORMANT.in`, `vocoder = 1` (o sinte fala).
+
+## Nível e larguras (10/11/2026, correção técnica aprovada pelo autor)
+
+Medido (`test_formant`, `testLevelComparableToInput`): uma serra de 110 Hz
+pela FORMANT (MIX 1), 5 vogais × RES 0/0,4/1 × SHIFT −1/0/+1.
+
+- **Antes:** de −27,9 a +0,5 dB da entrada — com RES no padrão (0,4) já
+  ~−25 dB. Causa: ganho de pico unitário por banda (`bnd·k`): um espectro
+  largo perde energia na proporção da largura da banda; e a largura não
+  acompanhava o SHIFT (subir o trato estreitava as bandas).
+- **Depois:** de −10,1 a +3,2 dB (mediana ~−6). Ganho ×√k (energia
+  constante de um espectro largo quando as bandas estreitam) e largura ×
+  SHIFT (Q constante). Achado e correção do Aquorbium na cópia deste módulo
+  (`AQUORBIUM/SYNTH_DEVICE_DESIGN.md`); aqui reaplicado no original.
+- **Muda o som**: a FORMANT fica bem mais presente (até ~20 dB) em patches
+  com RES alto; o equilíbrio de volume da seed absorve no total.

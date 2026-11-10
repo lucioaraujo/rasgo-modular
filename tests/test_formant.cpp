@@ -5,6 +5,8 @@
 #include "dsp/Formant.hpp"
 #include "io/AsciiPanel.hpp"
 
+#include <algorithm>
+#include <cstdlib>
 #include <cmath>
 #include <cstdint>
 #include <functional>
@@ -88,6 +90,53 @@ double rms(const std::vector<float>& x) {
     const std::size_t a = x.size() / 2;
     for (std::size_t i = a; i < x.size(); ++i) s += x[i] * (double)x[i];
     return std::sqrt(s / (double)(x.size() - a));
+}
+
+// (10/11/2026) NÍVEL: uma serra de 110 Hz pela FORMANT (MIX 1) deve sair
+// num nível comparável ao da entrada em todas as vogais e com qualquer RES.
+// Antes, com ganho de pico unitário por banda, saía ~30 dB abaixo, e mais
+// baixo com RES (achado do Aquorbium, SYNTH_DEVICE_DESIGN.md, na cópia
+// deste módulo).
+float formantLevelDb(const float vowel, const float res, const float shift = 0.0f) {
+    Formant m;
+    m.setParameter("vowel", vowel);
+    m.setParameter("res", res);
+    m.setParameter("shift", shift);
+    m.setParameter("mix", 1.0f);
+    m.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(1, AudioBlock(48000.0f, 1, 256));
+    AudioBlock in(48000.0f, 1, 256);
+    std::vector<const AudioBlock*> ins{&in, nullptr, nullptr, nullptr};
+    double ph = 0.0, ei = 0.0, eo = 0.0;
+    for (int b = 0; b < 300; ++b) {
+        for (std::size_t i = 0; i < 256; ++i) {
+            in.at(0, i) = static_cast<float>(0.5 * (2.0 * ph - 1.0));
+            ph += 110.0 / 48000.0; ph -= std::floor(ph);
+        }
+        m.process(ins, out);
+        if (b >= 60)
+            for (std::size_t i = 0; i < 256; ++i) {
+                ei += static_cast<double>(in.at(0, i)) * in.at(0, i);
+                eo += static_cast<double>(out[0].at(0, i)) * out[0].at(0, i);
+            }
+    }
+    return static_cast<float>(10.0 * std::log10(eo / ei));
+}
+
+void testLevelComparableToInput() {
+    float lo = 99.0f, hi = -99.0f;
+    for (const float v : {0.0f, 0.25f, 0.5f, 0.75f, 1.0f})
+        for (const float r : {0.0f, 0.4f, 1.0f})
+            for (const float sh : {-1.0f, 0.0f, 1.0f}) {
+                const float db = formantLevelDb(v, r, sh);
+                if (std::getenv("FORMANT_DB"))
+                    std::cerr << "  FORMANT vogal " << v << " res " << r << " shift " << sh
+                              << ": " << db << " dB\n";
+                lo = std::min(lo, db); hi = std::max(hi, db);
+            }
+    std::cerr << "  FORMANT nível (serra 110 Hz): " << lo << " .. " << hi << " dB da entrada\n";
+    check(lo > -14.0f, "a FORMANT não some (nenhum caso abaixo de −14 dB da entrada)");
+    check(hi < 4.0f, "a FORMANT não estoura (nenhum caso acima de +4 dB da entrada)");
 }
 
 void testVowelAPeaks() {
@@ -264,6 +313,7 @@ void testPanel() {
 }  // namespace
 
 int main() {
+    testLevelComparableToInput();
     testVowelAPeaks();
     testVowelF2Moves();
     testShiftRaisesSpectrum();
