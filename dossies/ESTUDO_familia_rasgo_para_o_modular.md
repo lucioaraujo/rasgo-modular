@@ -1901,6 +1901,11 @@ compositor de faixas.
 Cada um passa pelo portão conceitual (§4.8.1) num dossiê próprio antes do
 código.
 
+**Decisão do autor (10/11/2026):** "excelente, gosto de todos" — as seis
+propostas de §4.8.3 aprovadas como direção. Entram um por vez, cada um com
+dossiê e portão conceitual antes do código, na fila depois das propostas
+de §4.7 e da escuta dos módulos já validados ("cada módulo no seu tempo").
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
