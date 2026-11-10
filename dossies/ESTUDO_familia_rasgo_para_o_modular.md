@@ -1906,6 +1906,62 @@ propostas de §4.8.3 aprovadas como direção. Entram um por vez, cada um com
 dossiê e portão conceitual antes do código, na fila depois das propostas
 de §4.7 e da escuta dos módulos já validados ("cada módulo no seu tempo").
 
+### 4.9 Maravi — a escuta que escreve (10/11/2026)
+
+Lidos: `README.md`, `tools/transcribe_monophonic.py`, `key_detection.py`,
+`tap_tempo.py`, `phrasing.py`, `downbeat.py` (AGPL-3.0, autor: Lúcio de
+Araújo). O Maravi não soa: transforma uma melodia gravada em partitura.
+É o **sentido inverso** do Antitotem — o próprio conceito do Maravi diz
+(§4.4 do `MARAVI_CONCEITO.md`): o Antitotem sabe onde a frase começa
+porque a gerou; o Maravi precisa inferir do áudio. O Modular pode ter os
+dois lados no mesmo patch, ao vivo.
+
+**O que o Maravi sabe e o Modular não:**
+
+- **Uma linha de cada vez: "o ataque mais recente vence"** (não a mais
+  aguda — achado do autor no choro: um fá real começava enquanto um sol
+  ainda soava). Ataques a menos de 45 ms são a mesma nota dobrada; dois
+  pedaços da mesma altura com lacuna < 30 ms e um deles < 90 ms são uma
+  nota fragmentada. O SCOPE já dá altura (YIN), ONSET e CONF ao vivo; falta
+  transformar isso em **notas** limpas.
+- **Tonalidade por Krumhansl–Kessler**, com o histograma de classes de
+  altura **ponderado pela duração** (a semibreve pesa mais que a fusa de
+  passagem), correlação com os 24 perfis, e a **margem** para o segundo
+  colocado como medida honesta de ambiguidade (relativa, modulação,
+  cromatismo), não de erro.
+- **Tap tempo no mesmo take** (ideia do autor): quatro palmas dão o
+  andamento (mediana dos intervalos) **e** o tempo forte (a melodia entra
+  na batida seguinte), por construção. Faixa plausível 20–400 BPM.
+- **Fronteira de frase por LBDM** (Cambouropoulos 2001, a forma computável
+  das regras de agrupamento de Lerdahl & Jackendoff): fronteira onde um
+  valor grande coincide com uma mudança grande — salto depois de graus
+  conjuntos, nota longa depois de curtas, silêncio. Sem modelo treinado.
+- **Tempo forte**: testar as fases possíveis do compasso e pontuar cada uma
+  por ataque na batida, nota longa e acento.
+- **Postura**: o resultado é **hipótese**, revisada por gente; não inventar
+  ornamento; cada limiar declarado como "arbitrário, nunca calibrado por
+  escuta" quando é o caso.
+
+**Tradução para o Modular** (a entrada de fora vira parte do patch — o que
+o autor acabou de experimentar com o microfone pelo PALCO):
+
+| Ideia do Maravi | No Modular | Liga em |
+|---|---|---|
+| tonalidade K–K ponderada por duração, com margem | módulo **TOM**: entra PITCH + GATE (do SCOPE ou SIGNAL-IN); sai ROOT e SCALE como CV, e CERTEZA (a margem) | QUANTIZER `root_cv`/`scale_cv` — o patch passa a tocar no tom de quem canta |
+| tap tempo | módulo **TAP** (ou modo do CLOCK): N golpes → andamento pela mediana, e o "um" na batida seguinte | CLOCK `ext_clock`/`reset` |
+| LBDM | saída **FRASE** de um módulo de escuta: gate na fronteira de célula da melodia que entra | MIXER `phrase` (GESTO do PALCO), APÓCRIFO, COERÊNCIA |
+| "ataque mais recente vence" + fusão de fragmentos | o miolo do TOM/NOTA: de altura contínua a notas | — |
+| tempo forte por fases | saída UM (gate no tempo forte inferido) | resets de sequenciador |
+
+Diferença de personalidade a manter: no Maravi a análise é offline e
+revisada; no Modular ela é **causal** (só o passado), ao vivo, e o erro é
+material musical — um tom mal inferido é uma harmonia que responde torto,
+não uma partitura errada. A CERTEZA vai para fora como CV justamente para
+o patch poder decidir o que fazer com a dúvida.
+
+**Proposta**: TOM primeiro (pequeno, usa o SCOPE que já existe, e fecha o
+ciclo microfone → harmonia do patch); TAP e FRASE depois.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio

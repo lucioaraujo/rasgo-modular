@@ -81,8 +81,10 @@ relevante". Registro vivo em
   APÓCRIFO, FIBRA no ADDITIVE, garantia de limite e Heisenberg na seed,
   peneiras/afinações no QUANTIZER, LOOP/EOA no ENVELOPE) — **aprovadas pelo
   autor** ("gosto de todos"), um por vez, com portão conceitual.
-- [ ] Maravi, Maestro, Risco; depois o cruzamento com o Cardinal e a
-  revisão das propostas.
+- [x] Maravi (§4.9, 10/11): propostas TOM (tonalidade de quem canta →
+  QUANTIZER), TAP e FRASE (LBDM).
+- [ ] Maestro, Risco; depois o cruzamento com o Cardinal e a revisão das
+  propostas.
 - **Lote 2 parado** até a escuta: `src/dsp/Magnet.hpp` e `src/dsp/Orbit.hpp`
   estão escritos, **sem teste, sem registro e sem commit** (não entram no
   build). O ORBIT deve seguir o céu do Asterismus (swing kepleriano,
