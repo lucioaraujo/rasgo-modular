@@ -135,6 +135,41 @@ void testControlSnapshot() {
     EXPECT(coherent);
 }
 
+// (10/11/2026) FTZ/DAZ durante o processamento: um número que viraria
+// desnormalizado dentro de um módulo sai zero; fora do grafo, o estado do
+// processador volta ao que era (quem chama não fica alterado).
+class Tiny final : public Signal {
+public:
+    Tiny() : Signal({}, {{"out", PortKind::Audio, ""}}, {}) {}
+    std::string type() const override { return "TEST.TINY"; }
+    float seen = -1.0f;
+    void process(const std::vector<const AudioBlock*>&,
+                 std::vector<AudioBlock>& outputs) noexcept override {
+        volatile float a = 1.0e-30f, b = 1.0e-10f;   // 1e-40: abaixo do menor normal
+        seen = a * b;
+        for (std::size_t c = 0; c < outputs[0].channels(); ++c)
+            for (std::size_t f = 0; f < outputs[0].frames(); ++f)
+                outputs[0].at(c, f) = seen;
+    }
+};
+
+void testNoDenormalsInsideTheGraph() {
+#if defined(__SSE__) || defined(__aarch64__)
+    SignalGraph graph;
+    auto tiny = std::make_unique<Tiny>();
+    Tiny* t = tiny.get();
+    const auto n = graph.add(std::move(tiny));
+    graph.prepare(48000.0f, 1, 16);
+    AudioBlock out(48000.0f, 1, 16);
+    graph.process(out, n, 0);
+    check(t->seen == 0.0f, "dentro do grafo, o desnormalizado vira zero (FTZ)");
+    volatile float a = 1.0e-30f, b = 1.0e-10f;
+    const float outside = a * b;
+    check(outside != 0.0f && std::fpclassify(outside) == FP_SUBNORMAL,
+          "fora do grafo, o estado do processador foi restaurado");
+#endif
+}
+
 void testChainAndFanIn() {
     SignalGraph graph;
     const auto a = graph.add(std::make_unique<Constant>(0.5f));
@@ -630,6 +665,7 @@ void testActiveAndConnectedSets() {
 int main() {
     testControlSnapshot();
     testChainAndFanIn();
+    testNoDenormalsInsideTheGraph();
     testDisconnectAndReconnect();
     testConnectionRupture();
     testFeedback();
