@@ -205,7 +205,32 @@ void testPanel() {
 
 }  // namespace
 
+// (10/11/2026) FM em taxa de áudio na `freq_mod` (±3 oitavas a 331 Hz): a
+// forma direta dos modos amplificava o estado a cada re-afinação e a saída
+// ia a NaN/Inf (auditoria dos módulos). Na forma de rotação, fica finita.
+void testAudioRateFmStaysFinite() {
+    Matter m;
+    m.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(1, AudioBlock(48000.0f, 1, 256));
+    AudioBlock fm(48000.0f, 1, 256), st(48000.0f, 1, 256);
+    std::vector<const AudioBlock*> ins{nullptr, &st, &fm, nullptr};
+    double ph = 0.0;
+    bool finite = true;
+    for (int b = 0; b < 400; ++b) {
+        for (std::size_t i = 0; i < 256; ++i) {
+            ph += 2.0 * M_PI * 331.0 / 48000.0;
+            fm.at(0, i) = static_cast<float>(3.0 * std::sin(ph));
+            st.at(0, i) = ((b * 256 + static_cast<int>(i)) % 4800) < 10 ? 1.0f : 0.0f;
+        }
+        m.process(ins, out);
+        for (std::size_t i = 0; i < 256; ++i)
+            if (!std::isfinite(out[0].at(0, i)) || std::fabs(out[0].at(0, i)) > 1.5f) finite = false;
+    }
+    check(finite, "MATTER com FM de áudio continua finito e limitado");
+}
+
 int main() {
+    testAudioRateFmStaysFinite();
     testRingsAndDecays();
     testPitchTracks();
     testDampingControlsDecay();

@@ -30,6 +30,9 @@ pronto.
   (medidor independente, 4×) no pior caso — −1,13 dBTP no máximo, teto −1 —
   e o **contrato de latência** do look-ahead: round(3 ms × taxa) amostras
   (144 a 48 kHz), declarado em `Master::latencySamples()`. Sem mudança de som.
+  (7) **MATTER**: com FM de áudio na altura, a saída ia a NaN/Inf; os modos
+  passaram à forma de rotação (re-afinar não muda a energia). Achado da
+  auditoria dos módulos (`dossies/AUDITORIA_modulos_e_cardinal.md`).
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos
