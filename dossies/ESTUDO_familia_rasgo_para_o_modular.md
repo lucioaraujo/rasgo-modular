@@ -1962,6 +1962,77 @@ o patch poder decidir o que fazer com a dúvida.
 **Proposta**: TOM primeiro (pequeno, usa o SCOPE que já existe, e fecha o
 ciclo microfone → harmonia do patch); TAP e FRASE depois.
 
+### 4.10 Maestro — a interação entre instrumentos (10/11/2026)
+
+Lidos: `README.md`, `ANALISE_INTERACOES_MUSICAIS.md`, `CONTRATO_SESSAO.md`
+e a linha do Modular em `RASGO_DOCUMENTATION/architecture/
+ORQUESTRACAO_INSTRUMENTOS.md`. O Maestro é a engenharia de **interação
+entre** instrumentos RASGO (primeira fase: estúdio e álbum; palco depois).
+Não absorve motores: cada instrumento declara portas e capacidades.
+
+**Como o Maestro vê o Modular hoje**: "P1 — nó de áudio/evento"; "primeiro
+laboratório para patch entre áudio, evento e controle"; limite registrado:
+"a existência de módulos de entrada não garante roteamento entre processos
+**nem saída isolada por nó**".
+
+**O que isso pede ao Modular** (preparar o instrumento, sem implementar o
+Maestro):
+
+- **Relação ≠ cabo.** O Maestro insiste: "um cabo de áudio, sozinho, não diz
+  ao instrumento o que a música significa"; cada relação declara o que sai
+  de A, o que B entende, como B responde (segue, transforma, contrapõe,
+  preenche, interrompe…) e o que o músico conserva. É o mesmo pedido do
+  Método (§4.0, RELATE) visto de fora: o Modular é o lugar onde uma relação
+  tipada pode ser um módulo.
+- **Stems por papel.** Desde hoje o MIXER tem papéis (voz, contravoz,
+  textura, eco/pulso). O REC poderia gravar, além da mistura, **um WAV por
+  canal do MIXER** — a "saída isolada por nó" que o Maestro diz faltar, e
+  material direto para Navalha (corte) e Trioio (resposta).
+- **Pacote de material com proveniência.** O REC já grava seed e partitura
+  ao lado do WAV. Faltaria: SHA-256 do WAV na partitura, versão do app,
+  e (com o "epitáfio" do Studio, §4.8) seed + partitura dentro do próprio
+  WAV — o arquivo carrega a própria origem quando viaja.
+- **Descritores com confiança.** O vocabulário proposto (pulso, onset,
+  altura, duração, densidade, acento, envelope, contorno, seção, tensão)
+  sempre com "unidade, confiança e procedência". O TOM (§4.9) com a saída
+  CERTEZA já segue isso; os módulos de escuta (SCOPE, LISTEN) também
+  poderiam expor confiança onde ainda não expõem.
+- **MIDI de execução, não de intenção.** No circuito "Maravi → MIDI →
+  Modular", o MIDI é instrução de execução: o SIGNAL-IN já recebe; o patch
+  reinterpreta. Nada a mudar, só a postura.
+- **Recursos.** Máquina de 4 núcleos; o set inteiro nunca foi medido. O
+  Modular precisa saber seu próprio custo por patch (os xruns do VARIA
+  seguem anotados como questão de reprodução, não de DSP).
+
+**Proposta**: stems por canal no REC e o pacote de proveniência (SHA-256,
+versão) — pequenos, úteis já para o próprio autor, e preparam o Modular
+como nó do Maestro sem antecipar protocolo nenhum.
+
+### 4.11 Risco — a escrita como matéria (10/11/2026)
+
+Lidos: `README.md` e `TAREFAS.md` (AGPL-3.0, incubação documental, **sem
+código**). O Risco investiga escrita, caracteres, grafismo e matemática como
+matéria de composição: inscrever, riscar, sobrepor, apagar, percorrer,
+reler. Fórmulas (bytebeat como antecedente, não motor), sinais como
+identidade, desenho ou operação; palimpsesto; memória residual opcional e
+silenciável.
+
+**O que isso pede ao Modular é sobretudo uma fronteira.** O território do
+Risco (texto, glifo, fórmula escrita) é dele, e ainda está sendo pensado.
+Pelo critério de personalidade do Método (§4.8.1), o Modular **não** deve
+ganhar agora um sequenciador de texto, um módulo de fórmula/bytebeat ou uma
+leitura de imagem — antecipar isso estreitaria o Risco antes de ele nascer.
+
+O fluxo, por enquanto, é no sentido contrário: o Risco lista MEMORY,
+SEQUENCE (StepSequencer), RESONATOR e CRUSH do Modular como **candidatos a
+adaptação** (com proveniência, sem dependência de build). Isso pede ao
+Modular só o de sempre: módulos com contrato claro, testados, sem alocação
+no áudio — legíveis para serem copiados por um irmão.
+
+Uma ideia do Risco que vale para o Modular sem invadir o território:
+**vestígio opcional e silenciável** — toda memória residual (o APÓCRIFO de
+§4.8, as rotas com resíduo de §4.0) deve ter controle visível para apagar.
+
 ## 3. Limites
 
 Leitura por documentos e cabeçalhos; o conteúdo de cada mecanismo do Studio
