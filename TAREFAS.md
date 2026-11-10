@@ -25,8 +25,13 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Régua de qualidade técnica das seeds (`test_seed_quality`).
 - [x] PALCO no MIXER (modos, móbile, P1–P4, FRASE, visor, 18 HP) e a
   seed abrindo o palco — decisões do autor de 10/11 (dossiê 16 §9).
-- [ ] Escuta do autor do PALCO e do painel de 18 HP ("se não ficar bom eu
-  te aviso"). Em aberto: VARIA em VELOC/ABERT; visor no painel X11.
+- [x] VARIA em VELOC/ABERT do PALCO (aprovado; 62ec8c0); layout do MIXER
+  refeito (250317a); visor sem texto (pedido do autor).
+- [x] Autor tocou com microfone (SIGNAL-IN L → MIXER) com o PALCO:
+  "ficou interessante" (10/11 noite).
+- [ ] Escuta continuada do PALCO e do painel de 18 HP. Em aberto: visor do
+  palco no painel X11; ajuda do SIGNAL-IN poderia dizer "L/R" em vez de
+  "out" nos textos que citam a porta.
 - [x] Quatro canais da seed implementados com os valores da proposta
   (o autor disse "avance"): 1000 seeds → 1 canal 24 %, 2 = 30 %, 3 = 27 %,
   4 = 20 % (antes 48/34/18/0). Régua de qualidade passa, também com 4 vozes
