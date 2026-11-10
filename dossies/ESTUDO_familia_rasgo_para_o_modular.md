@@ -1455,6 +1455,67 @@ memória curta — a ponte entre "o Modular ouve" e "o Modular responde"
 que hoje se faz à mão com cabos. Conferir antes contra o que LISTEN, SCOPE e
 o SIGNAL-IN já entregam.
 
+#### 4.4b Trioio — o que faltava (lido em 10/11/2026)
+
+Lidos: `docs/REGRAS.md` (inteiro), `docs/PROMPTS_E_INTENCOES.md` (camadas,
+vocabulário, pedido × soado), `docs/LEITURA_E_GABARITO.md` (croma do grave,
+melodia na mistura, fase do pulso, tempo forte, compasso de 3),
+`docs/REFERENCIAS_POR_MODULO.md` (Denormals, ModularRasgo, ModularVoice) e
+o cabeçalho de `src/core/ModularRasgo.h`. `design.md` é a interface do
+Trioio — personalidade dele, fica fora.
+
+- **O Trioio usa o DSP do Modular.** `ModularVoice` hospeda "pequenas
+  cadeias de módulos reais do Rasgo Modular", a partir de uma **cópia
+  fixada** em `third_party/rasgo_modular_dsp` (commit e checksums no
+  PROVENANCE). O Trioio é o **segundo consumidor** — pela regra do
+  inventário global, o que torna esse DSP candidato a referência comum.
+  Consequência para o Modular: mudar um módulo aqui **não** muda o Trioio
+  (é cópia), mas os dossiês dos módulos copiados deveriam dizer "copiado
+  pelo Trioio em <commit>", para a correção de um bug poder ser oferecida a
+  ele. A conferir quais módulos e qual commit.
+- **REGRAS do autor** (do Atlas §55, *constraints* do OpenMusic): um arquivo
+  de texto, uma regra por linha — `proibido`, `obrigatório`,
+  `condicionado … se <condição>`, `incompatível … e …`, `âmbito`, `máximo
+  salto`, `exceção <0..1>`. "A escuta puxa; as regras mandam." **Uma regra
+  não entendida impede a resposta** e aponta a linha; **sem regras, o
+  resultado é idêntico**. Para o Modular é a tradução direta de tudo o que
+  o autor pediu à seed ao longo de meses ("sem hiper agudo", "pan no
+  centro", "DYNAMICS no sorteio"…): um **`regras.txt` da seed** —
+  `proibido voz NOISE`, `obrigatório contravoz`, `âmbito 40 84`,
+  `proibido PALCO GESTO`, `condicionado DRUM se ensemble 4` — lido pela
+  `PatchSeed`, verificado na carga, listado na partitura. Hoje essas
+  vontades viram constantes no código; as regras devolveriam a decisão ao
+  autor sem recompilar.
+- **Denormais com número**: no Trioio, FTZ/DAZ (`ScopedNoDenormals`) levou a
+  mistura de uma resposta de 12,9 s para 1,1 s. Reforça a pendência
+  técnica do Modular (nenhuma proteção hoje); candidata aos xruns do VARIA.
+- **Quimeras e simpáticas** (`ModularRasgo`, "sons inauditos, não
+  protocolares"): o excitador de um instrumento no corpo de outro (o prato
+  friccionado, a corda cantada, a pele soprada) e um pente afinado fora da
+  série ("o instrumento ressoa uma corda que não existe"). No Modular isso
+  já é **patch** — SIGNAL-IN → `STRING.in` (a corda cantada), NOISE →
+  `MATTER.in` (o prato friccionado), RESONATOR afinado fora da escala.
+  Material pronto para as **receitas** da fase didática.
+- **Para o TOM (§4.9)**: o YIN se perde na mistura (28 % de quadros com
+  altura no Suno); a **saliência harmônica** (núcleo do MELODIA, Salamon &
+  Gómez 2012; Klapuri 2006: soma dos harmônicos com peso 0,8^(h−1), picos a
+  partir de 250 Hz) acha a melodia em 86–91 %. E o **croma do grave**
+  desfaz ambiguidades (Dó6 × Lám7: 100 % com o grave, 50 % sem). O TOM
+  começa com o SCOPE (voz sozinha, YIN); mistura pede saliência.
+- **Fase do pulso**: a média circular dos ataques erra (o bumbo antecipado
+  puxa); "a grade que soma mais envelope" acerta. Para o TAP/tempo forte.
+  E a honestidade: confiança 0,01–0,05 nas gravações reais = "o método não
+  decide" — dito, não escondido.
+- **Três camadas que nunca se substituem**: o pedido original, a intenção
+  traduzida (com as palavras **não lidas** listadas — "diz o que não
+  entendeu, em vez de inventar") e o que a escuta inferiu; e a comparação
+  pedido × soado vira frase. Para o Modular: a dica de palavra do VARIA e a
+  partitura do REC poderiam registrar o pedido e o medido lado a lado.
+
+**Proposta nova desta leitura**: **REGRAS da seed** (`regras.txt`) — a
+maior, e a que mais devolve decisão ao autor. Entra na fila de §4.12 depois
+da escuta, como as outras.
+
 ### 4.5 Antitotem
 
 Lidos inteiros: `docs/MEMORIAL_DE_PROCESSO.md`, `IDEIA_BREADBOARD.md`,
