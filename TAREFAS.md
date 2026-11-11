@@ -26,6 +26,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   (OPERATOR algo, SWIRL type, LOOPER reverse/hold, BOXCAR scan, FUNCTION
   slope, MEMORY freeze) e rampa no MUTE do MIXER; depois medir o aliasing
   dos 16 módulos não-lineares sem OS/ADAA.
+- [x] Decisões do autor (11/11): **instâncias sim** (recomendação: com limite
+  por família, ordem app → partitura/VARIA → seed); **estalos e aliasing**:
+  seguir; **medição do volume da seed em 8 s** (770 ms por SEED, era 392);
+  **painel X11 fica como está** (bancada antiga, não acompanha o app);
+  **push depois de terminar estas etapas**, com a suíte verde.
 - [ ] Escuta do autor: STRING (agora afinada), FORMANT (bem mais presente),
   SPRING/PRISM (caudas mais brilhantes).
 
@@ -70,7 +75,7 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Todos os módulos no rack da seed (decisão do autor).
 - [ ] Escuta do autor: seeds com os módulos novos; conferir se o volume ficou
   estável entre cliques.
-- [ ] Limite da medição de 4 s do equilíbrio de volume (patches que crescem
+- [x] (11/11: medição passou a 8 s, decisão do autor) Limite da medição de 4 s do equilíbrio de volume (patches que crescem
   depois disso): decidir com o autor entre tolerância no teste e medir 8 s.
 - [ ] Novos módulos daqui em diante entram direto no rack da seed (o teste
   falha se não entrarem) — lembrar de registrar no CHANGELOG que as seeds

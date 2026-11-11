@@ -86,6 +86,8 @@ public:
             for (int k = 0; k < kStages; ++k) apS_[c][k] = 0.0f;
         }
         phL_ = 0.0f;
+        typeApplied_ = -1;
+        typeFadeIn_ = false;
         wobCnt_ = 0;
         wob_ = 0.0f;
         rng_ = 0x5117E7E1D5A1C0FFULL;
@@ -102,8 +104,18 @@ public:
         const AudioBlock* rmB = inputs[1];
         const AudioBlock* mmB = inputs[2];
 
-        const int type = static_cast<int>(std::lround(
+        const int requested = static_cast<int>(std::lround(
             clampf(parameterValue("type"), 0.0f, 3.0f)));
+        // (11/11/2026) troca de TYPE sem estalo (auditoria dos módulos:
+        // salto 0,16 contra 0,02 parado): no bloco em que o TYPE muda, o
+        // efeito desce até o seco com o tipo ANTIGO; no bloco seguinte,
+        // sobe com o novo. O seco segue contínuo — nada de buraco.
+        float wetG0 = 1.0f, wetG1 = 1.0f;
+        if (typeApplied_ < 0) typeApplied_ = requested;
+        if (typeFadeIn_) { wetG0 = 0.0f; wetG1 = 1.0f; typeFadeIn_ = false; }
+        else if (requested != typeApplied_) { wetG0 = 1.0f; wetG1 = 0.0f; }
+        const int type = typeApplied_;
+        if (requested != typeApplied_) { typeApplied_ = requested; typeFadeIn_ = true; }
         const float depth = clamp01(parameterValue("depth"));
         const float feedback = clampf(parameterValue("feedback"), -1.0f, 1.0f);
         const float spread = clamp01(parameterValue("spread"));
@@ -144,6 +156,14 @@ public:
             if (type == 3) {
                 wetL = phaser(0, in, feedback, depth, tri(phL_), tone);
                 wetR = phaser(1, in, feedback, depth, tri(phR), tone);
+                // (11/11/2026) o phaser não usa a linha de atraso, mas ela
+                // continua sendo gravada: ao voltar a chorus/flanger/ensemble,
+                // a linha tem o som de agora, não o de antes da troca (sem
+                // isto, o eco velho emendava no novo ~12 ms depois e estalava)
+                for (int c = 0; c < 2; ++c) {
+                    buf_[c][w_[c]] = compress(in, age);
+                    w_[c] = (w_[c] + 1) % len_;
+                }
             } else {
                 wetL = modLine(0, in, fbAmt, age, depth, phL_,
                                kBaseMs[type], kModMs[type], voices, tone);
@@ -151,8 +171,10 @@ public:
                                kBaseMs[type], kModMs[type], voices, tone);
             }
 
-            float oL = in + (wetL - in) * mix;
-            float oR = in + (wetR - in) * mix;
+            const float wg = wetG0 + (wetG1 - wetG0)
+                * (static_cast<float>(f) + 1.0f) / static_cast<float>(frames);
+            float oL = in + (wetL - in) * mix * wg;
+            float oR = in + (wetR - in) * mix * wg;
             oL = clampf(oL, -4.0f, 4.0f);
             oR = clampf(oR, -4.0f, 4.0f);
             for (std::size_t c = 0; c < outL.channels(); ++c) outL.at(c, f) = oL;
@@ -162,6 +184,8 @@ public:
 
 private:
     static constexpr int kStages = 6;
+    int typeApplied_ = -1;
+    bool typeFadeIn_ = false;
 
     static float clampf(const float v, const float lo, const float hi) noexcept {
         return v < lo ? lo : (v > hi ? hi : v);

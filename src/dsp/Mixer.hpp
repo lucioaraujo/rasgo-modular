@@ -159,7 +159,7 @@ public:
         }
         stage(inputs, frames, on, panTarget);
         for (int c = 0; c < 4; ++c)
-            if (!primed_) pan_[c] = panTarget[c];
+            if (!primed_) { pan_[c] = panTarget[c]; muteG_[c] = on[c] ? 1.0f : 0.0f; }
         primed_ = true;
         float hiPow[4] = {0, 0, 0, 0};
         const float outGain = dbToGain(parameterValue("out_gain"));
@@ -169,9 +169,12 @@ public:
             float l = 0.0f, r = 0.0f;
             for (int c = 0; c < 4; ++c) {
                 pan_[c] += (panTarget[c] - pan_[c]) * panK_;
-                if (!on[c])
+                // (11/11/2026) MUTE com rampa (~30 ms, a mesma do PAN):
+                // antes cortava seco e estalava (auditoria dos módulos)
+                muteG_[c] += ((on[c] ? 1.0f : 0.0f) - muteG_[c]) * panK_;
+                if (inputs[c] == nullptr || (!on[c] && muteG_[c] < 1.0e-4f))
                     continue;
-                const float s = inputs[c]->at(0, frame) * gainLin[c];
+                const float s = inputs[c]->at(0, frame) * gainLin[c] * muteG_[c];
                 low_[c] += (s - low_[c]) * lowK_;
                 const float lo = low_[c];
                 const float hi = s - lo;
@@ -374,6 +377,7 @@ private:
     std::atomic<float> shownCog_{0.0f};
 
     float low_[4] = {0, 0, 0, 0};
+    float muteG_[4] = {1, 1, 1, 1};
     float pan_[4] = {0, 0, 0, 0};
     float lowK_ = 0.02f, panK_ = 0.0007f;
     bool primed_ = false;

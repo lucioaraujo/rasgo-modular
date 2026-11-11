@@ -230,3 +230,20 @@ E = escuta/ergonomia); **no Cardinal**; **proposta**.
    BLEFE, APÓCRIFO, FIBRA, FRASE/TAP, REGRAS da seed, LADDER, gramática do
    baixo, OSC (PD/unísono/sub), VCA saturado, ENVELOPE LOOP/EOA, QUANTIZER
    (peneiras/afinações), e os aperfeiçoamentos de §4.7.
+
+## 5. Feito em 11/11/2026 — estalos
+
+A bancada refinada (o salto parado medido em vários pontos do curso) tirou
+OPERATOR `algo`, BOXCAR `scan` e FUNCTION `slope` da lista: o "salto" era a
+própria forma de onda, não estalo. Ficaram, e foram corrigidos, com teste
+(`tests/test_declick.cpp`, salto logo após a troca × longe dela):
+
+| Caso | antes | depois | como |
+|---|---|---|---|
+| LOOPER `reverse` | 0,63 | 0,02 | crossfade de 5 ms entre o modo antigo e o novo |
+| LOOPER `hold` (troca) | 0,63 | 0,02 | idem |
+| LOOPER em HOLD, emenda de cada volta | 0,44 | 0,02 | crossfade de 5 ms no fim do laço (achado novo) |
+| LOOPER ao soltar o HOLD | 0,44 | 0,02 | emenda suave da fita (achado novo) |
+| SWIRL `type` | 0,36 | 0,02 | o efeito passa pelo seco; a linha segue gravada no phaser (achado novo) |
+| MEMORY `freeze` | 0,28 | 0,01 | costura do buffer ao congelar e ao descongelar |
+| MIXER `mute` | 0,35 | 0,01 | rampa de ~30 ms |

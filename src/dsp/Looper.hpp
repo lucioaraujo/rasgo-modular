@@ -76,6 +76,10 @@ public:
         dSmooth_ = clampf(parameterValue("time") * sr_, 4.0f,
                           static_cast<float>(n - 4));
         revPh_ = 0.0f;
+        xfLen_ = std::max(1, static_cast<int>(0.005f * sampleRate));
+        xfLeft_ = 0;
+        fadeInLeft_ = 0;
+        modeHold_ = modeRev_ = xfOldHold_ = xfOldRev_ = false;
         lpZ_ = 0.0f;
         wowPh_ = 0.0f;
         flutPh_ = 0.0f;
@@ -133,6 +137,18 @@ public:
                 holdAnchor_ = w_;
                 holdCount_ = 0;
             }
+            // borda de SAÍDA: a gravação recomeça e a fita ganha uma emenda
+            // (o som de antes do HOLD encosta no de agora). Sem transição, o
+            // eco estalava ao passar por ela (11/11/2026). O fim do que foi
+            // gravado desce em ~5 ms e o novo sobe em ~5 ms.
+            if (!holdA && prevHold_) {
+                const std::size_t n = static_cast<std::size_t>(xfLen_);
+                for (std::size_t k = 0; k < n && k < len_; ++k) {
+                    const float g = static_cast<float>(k + 1) / static_cast<float>(n);
+                    buf_[(w_ + len_ - 1 - k) % len_] *= g;
+                }
+                fadeInLeft_ = xfLen_;
+            }
             prevHold_ = holdA;
 
             // wow & flutter
@@ -142,36 +158,61 @@ public:
                                      + 0.0015f * std::sin(6.28318f * flutPh_));
 
             // ---- leitura ----
-            float wet;
-            const double wRef =
-                holdA ? static_cast<double>(holdAnchor_)
-                      : static_cast<double>(w_);
-            if (revA) {
-                const float d = dSmooth_;
-                const float gA = 0.5f - 0.5f * std::cos(6.28318f * revPh_);
-                const float gB = 1.0f - gA;
-                const float pB = revPh_ + 0.5f - std::floor(revPh_ + 0.5f);
-                const float a = readBuf(wRef - 1.0 - static_cast<double>(revPh_ * d));
-                const float b = readBuf(wRef - 1.0 - static_cast<double>(pB * d));
-                wet = a * gA + b * gB;
-                revPh_ += 1.0f / d;
-                revPh_ -= std::floor(revPh_);
-            } else if (holdA) {
-                const float d = dSmooth_;
-                const float ph =
-                    std::fmod(static_cast<float>(holdCount_), std::max(1.0f, d));
-                wet = readBuf(static_cast<double>(holdAnchor_) - d
-                              + static_cast<double>(ph));
-            } else if (heads == 1) {
-                wet = readBuf(wRef - static_cast<double>(dSmooth_ * (1.0f + wow)));
-            } else {
+            // (11/11/2026) a leitura de cada modo é PURA (não avança
+            // estado), para poder ler o modo antigo e o novo ao mesmo tempo
+            // durante a troca: HOLD e REV estalavam ao virar (auditoria dos
+            // módulos, salto 0,13–0,16 contra 0,02 parado).
+            const float d = dSmooth_;
+            auto readWet = [&](const bool hold, const bool rev) -> float {
+                const double wRef = hold ? static_cast<double>(holdAnchor_)
+                                         : static_cast<double>(w_);
+                if (rev) {
+                    const float gA = 0.5f - 0.5f * std::cos(6.28318f * revPh_);
+                    const float gB = 1.0f - gA;
+                    const float pB = revPh_ + 0.5f - std::floor(revPh_ + 0.5f);
+                    const float a = readBuf(wRef - 1.0 - static_cast<double>(revPh_ * d));
+                    const float b = readBuf(wRef - 1.0 - static_cast<double>(pB * d));
+                    return a * gA + b * gB;
+                }
+                if (hold) {
+                    // laço congelado de comprimento d; nos últimos ~5 ms de
+                    // cada volta, funde com o trecho logo antes do começo do
+                    // laço, que é o que vem a seguir — a emenda do fim com o
+                    // começo não estala (11/11/2026: estalava a cada volta,
+                    // salto 0,44 medido em `test_declick`)
+                    const float dd = std::max(1.0f, d);
+                    const float ph = std::fmod(static_cast<float>(holdCount_), dd);
+                    const double base = static_cast<double>(holdAnchor_) - dd;
+                    const float x = std::min(static_cast<float>(xfLen_), 0.25f * dd);
+                    const float main = readBuf(base + static_cast<double>(ph));
+                    if (ph <= dd - x) return main;
+                    const float g = (ph - (dd - x)) / x;
+                    return main * (1.0f - g) + readBuf(base + static_cast<double>(ph - dd)) * g;
+                }
+                if (heads == 1)
+                    return readBuf(wRef - static_cast<double>(d * (1.0f + wow)));
                 static constexpr float kHeadRatio[4] = {1.0f, 0.75f, 0.5f, 0.25f};
                 float acc = 0.0f;
                 for (int h = 0; h < heads; ++h)
                     acc += readBuf(wRef - static_cast<double>(
-                        dSmooth_ * kHeadRatio[h] * (1.0f + wow)));
-                wet = acc / static_cast<float>(heads);
+                        d * kHeadRatio[h] * (1.0f + wow)));
+                return acc / static_cast<float>(heads);
+            };
+            if (holdA != modeHold_ || revA != modeRev_) {
+                xfOldHold_ = modeHold_;
+                xfOldRev_ = modeRev_;
+                xfLeft_ = xfLen_;
+                modeHold_ = holdA;
+                modeRev_ = revA;
             }
+            float wet = readWet(holdA, revA);
+            if (xfLeft_ > 0) {
+                const float t = static_cast<float>(xfLeft_) / static_cast<float>(xfLen_);
+                wet = wet * (1.0f - t) + readWet(xfOldHold_, xfOldRev_) * t;
+                --xfLeft_;
+            }
+            revPh_ += 1.0f / d;
+            revPh_ -= std::floor(revPh_);
 
             // ---- caráter de fita no laço ----
             float fb = wet;
@@ -182,7 +223,12 @@ public:
 
             // ---- escrita ----
             if (!holdA) {
-                buf_[w_] = x + fb * fbk;
+                float g = 1.0f;
+                if (fadeInLeft_ > 0) {
+                    g = 1.0f - static_cast<float>(fadeInLeft_) / static_cast<float>(xfLen_);
+                    --fadeInLeft_;
+                }
+                buf_[w_] = (x + fb * fbk) * g;
                 w_ = (w_ + 1) % len_;
             }
             ++holdCount_;
@@ -224,6 +270,9 @@ private:
     float sr_ = 48000.0f;
     float dSmooth_ = 14400.0f;
     float revPh_ = 0.0f;
+    // crossfade da troca de modo (HOLD/REV), ~5 ms
+    int xfLen_ = 240, xfLeft_ = 0, fadeInLeft_ = 0;
+    bool modeHold_ = false, modeRev_ = false, xfOldHold_ = false, xfOldRev_ = false;
     float lpZ_ = 0.0f;
     float wowPh_ = 0.0f, flutPh_ = 0.0f;
     bool prevHold_ = false;
