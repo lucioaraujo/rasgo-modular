@@ -9,6 +9,7 @@ Voyez-le comme une main sur un bouton de volume, actionnée par un autre module.
 - CV1, CV2 : à quel point le signal de contrôle agit, et dans quel sens. Négatif inverse : le volume baisse quand le contrôle monte.
 - RSP1, RSP2 : la courbe de réponse. À zéro, linéaire ; au maximum, exponentielle, plus naturelle pour le volume.
 - DRIFT : une petite oscillation lente des deux volumes.
+- SAT : la couleur d'un VCA analogique. Il sature l'entrée avant le gain, comme la paire de transistors d'un OTA : un peu épaissit le son, beaucoup le comprime et le réchauffe. À 0, le VCA est propre.
 Entrées : IN1 et IN2, les sons ; CV1 et CV2, les contrôles. Sorties : O1, O2 et SUM, la somme des deux.
 
 ## Experimente

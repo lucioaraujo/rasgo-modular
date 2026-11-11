@@ -11,6 +11,8 @@ Where OSC gives you a fixed sound to sculpt afterwards, WAVETABLE is born in mot
 - WARP: bends the reading of each cycle and adds harmonics with a digital accent, without changing frames.
 - FM: how much the signal on the FM input moves the pitch.
 - DRIFT: a small, slow wobble in the tuning.
+- DEF: the table deformation; at 0, the usual WAVETABLE.
+- MODO: fold (the shape being read is folded over itself) or tear (on each cycle the reading jumps to another point of the table, without clicks).
 Inputs: 1V/O for pitch, POS to move the position, FM, CAP for the sound to capture, and GRAB, a pulse that tells it to capture a new cycle.
 
 ## Experimente

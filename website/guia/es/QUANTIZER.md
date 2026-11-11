@@ -5,11 +5,14 @@ QUANTIZER ata una señal continua a las notas de una escala. Un valor que sube y
 Las señales de control varían de forma continua, y las notas musicales no. Sin un cuantizador, una melodía generada al azar cae entre las notas y suena desafinada. QUANTIZER redondea cada valor a la nota más cercana de la escala elegida. Con un pulso en la entrada TRIG, solo cambia de nota en el pulso, y la melodía gana ritmo. La salida GATE pulsa cada vez que la nota cambia de verdad, lo que sirve para disparar una envolvente solo en las notas nuevas. Las entradas ROOT y SCL cambian la tónica y la escala por cable: conectadas a las salidas de HARMONY, la tonalidad de la melodía cambia a lo largo de la música.
 
 ## Controles
-- SCALE: la escala, entre doce: cromática, mayor, menor natural, dórica, frigia dominante, lidia, menor melódica, pentatónica menor, pentatónica mayor, hirajoshi, tonos enteros y solo octavas.
+- SCALE: la escala, entre trece: cromática, mayor, menor natural, dórica, frigia dominante, lidia, menor melódica, pentatónica menor, pentatónica mayor, hirajoshi, tonos enteros, solo octavas y la criba.
 - ROOT: la tónica, la nota de partida de la escala, de do a si.
 - RANGE: cuántas octavas cubre la señal de entrada, de 1 a 6. Más octavas, saltos más grandes.
 - GLIDE: hace que la altura se deslice de una nota a la siguiente.
 - HYST: un margen de tolerancia. Con una señal inestable, la nota no salta sin parar entre dos vecinas.
+- AFIN: la afinación, aplicada después de elegir la nota: temperamento igual de 12 notas (como antes), justa, pitagórica, mesotónica, 19 o 31 divisiones de la octava. Las tres históricas se miden desde la tónica y la siguen cuando cambia.
+- M1, R1, M2, R2: la criba de Xenakis, usada por la escala número 13. Una nota entra si el resto de su división por M1 es R1, o si el resto de su división por M2 es R2. Con un M que no divide 12, la escala no se repite en la octava.
+- AND: cambia el o de la criba por y: la nota tiene que pasar las dos cribas. Si ninguna nota pasa, la criba vuelve al o, para no quedarse nunca muda.
 Entradas: CV, la señal a cuantizar; TRSP, para transponer antes de cuantizar; TRIG, el pulso que decide cuándo cambiar de nota; ROOT y SCL, que, conectadas, mandan en la tónica y la escala en lugar de las perillas. Salidas: PTCH, la altura; GATE, un pulso en cada nota nueva; ST, la nota en semitonos.
 
 ## Experimente

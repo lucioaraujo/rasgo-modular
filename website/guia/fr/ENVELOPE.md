@@ -15,7 +15,9 @@ Dans la version 0.1.7, ATK, DEC, SUS et REL sont des curseurs verticaux : tirez 
 - TRIG : dans une position, la note se maintient tant que dure l'impulsion ; dans l'autre, chaque impulsion déclenche la courbe entière, sans attendre.
 - VCA : à quel point le volume intégré agit sur le son qui passe. À zéro, le son traverse sans changer et seule la sortie ENV compte.
 - LVL : le volume de sortie.
+- LOOP : l'enveloppe recommence seule à la fin et devient un cycle qui joue sans gate. En LOOP, SUS ne tient plus : il devient le niveau où la chute s'achève et où le relâchement commence.
 Entrées : IN, le son ; GATE, l'impulsion qui déclenche la note ; TIME, pour accélérer ou ralentir toutes les étapes. Sorties : OUT, le son articulé ; ENV, la courbe.
+La sortie EOC donne une impulsion courte à la fin de chaque enveloppe, ou de chaque cycle en LOOP.
 
 ## Experimente
 1. Branchez la sortie SAW d'un OSC sur l'entrée IN, OUT sur une entrée du MIXER, et la sortie EUC du CLOCK sur GATE. Vous entendez des notes.

@@ -9,7 +9,9 @@ Otros módulos sortean valores, como TURING y DECISION, o pasean despacio, como 
 - DRIVE: la fuerza que empuja la bola entre los valles. Más alto, saltos más grandes y más frecuentes.
 - DAMP: el rozamiento. Alto, la bola se asienta en un valle y casi se detiene; bajo, oscila mucho y salta de un lado al otro.
 - FRZ: congela el movimiento en el valor actual.
+- MODO: el atractor. Doble pozo (como antes), Rössler, que con DRIVE recorre la ruta de duplicación de período hasta el caos, o Aizawa, una esfera atravesada por un tubo.
 Entradas: RSD, un pulso que da un empujón nuevo; RTM, para modular la velocidad. Salida: OUT.
+Las salidas Y y Z dan las otras coordenadas del atractor.
 
 ## Experimente
 1. Arme una voz: la SAW de un OSC a la entrada IN de un FILTER, LO del FILTER al MIXER.

@@ -13,7 +13,9 @@ OSC can also lock to another oscillator, but all at once (that is sync). PLL doe
 - FM: how much the signal on the FM input moves the pitch.
 - FBK: how much of its own signal goes back into the circuit, adding texture without detuning.
 - FTYP: picks one of six feedback types, each with a different color.
+- PERTO: the near-meeting threshold, in Hz. When the beating between the frequencies gets slower than this, they meet.
 Inputs: 1V/O for pitch, FM, and REF, the reference to follow. Outputs: OUT, RING (the PLL multiplied by the reference) and LOCK, a control signal showing how locked it is.
+The ENC output pulses when the frequencies meet, SEP when they move apart again, and BAT gives the beating as CV.
 
 ## Experimente
 1. Connect OUT to a MIXER input. With nothing on REF it is an ordinary oscillator; turn SHAPE to hear the waveforms.

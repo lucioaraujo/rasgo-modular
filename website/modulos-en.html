@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — module guide</title>
-<meta name="description" content="The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
+<meta name="description" content="The 88 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — module guide">
-<meta property="og:description" content="The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
+<meta property="og:description" content="The 88 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "The 60 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
+  "description": "The 88 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "en",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -95,19 +95,19 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">60 modules · 8 families</span>
+  <span class="status-pill">88 modules · 8 families</span>
   <h1>Module guide</h1>
-  <p class="lead">The 60 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
+  <p class="lead">The 88 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
 </section>
 
 <nav class="familias" aria-label="Families">
   <a href="#fam-SOURCE">SOURCE <span>13</span></a>
-  <a href="#fam-TRANSFORM">TRANSFORM <span>14</span></a>
-  <a href="#fam-MODULATE">MODULATE <span>6</span></a>
-  <a href="#fam-TIME">TIME <span>5</span></a>
-  <a href="#fam-DECISION">DECISION <span>6</span></a>
-  <a href="#fam-ROUTE">ROUTE <span>4</span></a>
-  <a href="#fam-SPACE">SPACE <span>7</span></a>
+  <a href="#fam-TRANSFORM">TRANSFORM <span>16</span></a>
+  <a href="#fam-MODULATE">MODULATE <span>13</span></a>
+  <a href="#fam-TIME">TIME <span>10</span></a>
+  <a href="#fam-DECISION">DECISION <span>14</span></a>
+  <a href="#fam-ROUTE">ROUTE <span>6</span></a>
+  <a href="#fam-SPACE">SPACE <span>11</span></a>
   <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
 
@@ -117,7 +117,7 @@
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="OSC module panel" width="142" height="300" loading="lazy" /></figure>
     <h4>What it is</h4>
-    <p>OSC is an oscillator: it produces a steady, unchanging tone, the raw material almost every synthesizer sound is built from. It gives you five waveforms at once, each on its own output jack: sine, triangle, sawtooth, pulse, and a voice one or two octaves below (the sub). Pick one, or use several.</p>
+    <p>OSC is an oscillator: it produces a steady, unchanging tone, the raw material almost every synthesizer sound is built from. It gives you five waveforms at once, each on its own output jack: sine, triangle, sawtooth, pulse, and a lower voice locked to the phase (the sub, from one octave down to one sixteenth of the frequency). Pick one, or use several.</p>
     <h4>How to think about it</h4>
     <p>Think of OSC as raw material. On its own it sounds plain, and that is on purpose: the character comes from what you connect after it, such as a filter that takes away brightness or an envelope that shapes each note. If you want a voice with a personality of its own, STRING and MATTER already have one; if you want a tone that changes by itself, try WAVETABLE. OSC is the predictable foundation, which makes it the best place to learn.</p>
     <h4>Controls</h4>
@@ -127,11 +127,13 @@
       <li><b>PW</b>: the pulse width, which only affects the PLS output. In the middle the wave is square and sounds hollow; near the ends it gets thin and nasal.</li>
       <li><b>FM</b>: how much the signal on the FM input moves the pitch. With another oscillator there and this knob turned up, the tone turns metallic, like a bell.</li>
       <li><b>DRIFT</b>: a small, slow wobble in the tuning, like an analog oscillator. At zero the note stays perfectly still.</li>
-      <li><b>SUB2</b>: sets whether the SUB output sits one octave (off) or two octaves (on) below the note.</li>
       <li><b>SYNC</b>: enables the SYNC input. With it on, another, slower oscillator forces this one to restart its cycle, and turning FREQ changes the tone instead of the pitch.</li>
       <li><b>PROX</b>: blends each output with a darker version of itself. A way to soften the sound without using up a filter.</li>
+      <li><b>PD</b>: phase distortion, on the SIN output only. The phase is bent before the sine, and the tone goes from a pure sine to a bright wave, like the phase distortion synthesizers of the 1980s.</li>
+      <li><b>UNI</b>: unison, on the SAW output only: seven slightly detuned saws. It goes from a single saw to a thick chorus.</li>
+      <li><b>SUBD</b>: the sub divider, from 2 to 16. The SUB output stays locked to the oscillator's phase: one octave down at 2, two at 4, and intervals outside the octave at other values.</li>
     </ul>
-    <p>Inputs: 1V/O takes pitch from a sequencer or quantizer, FM and PWM accept modulation, and SYNC takes the oscillator that drives the sync.</p>
+    <p>Inputs: 1V/O takes pitch from a sequencer or quantizer, FM and PWM accept modulation, and SYNC takes the oscillator that drives the sync. The SUBD input moves the divider by CV.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect the SAW output of OSC to a MIXER input and listen to a steady buzz.</li>
@@ -155,6 +157,8 @@
       <li><b>WARP</b>: bends the reading of each cycle and adds harmonics with a digital accent, without changing frames.</li>
       <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
       <li><b>DRIFT</b>: a small, slow wobble in the tuning.</li>
+      <li><b>DEF</b>: the table deformation; at 0, the usual WAVETABLE.</li>
+      <li><b>MODO</b>: fold (the shape being read is folded over itself) or tear (on each cycle the reading jumps to another point of the table, without clicks).</li>
     </ul>
     <p>Inputs: 1V/O for pitch, POS to move the position, FM, CAP for the sound to capture, and GRAB, a pulse that tells it to capture a new cycle.</p>
     <h4>Try this</h4>
@@ -181,8 +185,9 @@
       <li><b>COMB</b>: carves regular notches into the spectrum, like a comb filter. At zero nothing changes.</li>
       <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
       <li><b>DRIFT</b>: lets each partial detune and breathe a little, slowly. At zero the sound is completely stable.</li>
+      <li><b>TENS</b>: the tension on the bundle of partials. Each of the 64 partials is a fibre with its own strength; under tension the fibres break one by one, sometimes in avalanches, and the tone empties out. The break is permanent, until a pulse at RST.</li>
     </ul>
-    <p>Inputs: 1V/O for pitch, TILT and STRCH to modulate those two controls, and FM.</p>
+    <p>Inputs: 1V/O for pitch, TILT and STRCH to modulate those two controls, and FM. The TENS input adds tension by CV, RST restores the bundle, the RSG output pulses on each broken fibre, and INT tells how much of the bundle is still intact.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect OUT to a MIXER input with TILT in the middle. You hear a soft note.</li>
@@ -288,8 +293,9 @@
       <li><b>FM</b>: how much the signal on the FM input moves the pitch.</li>
       <li><b>FBK</b>: how much of its own signal goes back into the circuit, adding texture without detuning.</li>
       <li><b>FTYP</b>: picks one of six feedback types, each with a different color.</li>
+      <li><b>PERTO</b>: the near-meeting threshold, in Hz. When the beating between the frequencies gets slower than this, they meet.</li>
     </ul>
-    <p>Inputs: 1V/O for pitch, FM, and REF, the reference to follow. Outputs: OUT, RING (the PLL multiplied by the reference) and LOCK, a control signal showing how locked it is.</p>
+    <p>Inputs: 1V/O for pitch, FM, and REF, the reference to follow. Outputs: OUT, RING (the PLL multiplied by the reference) and LOCK, a control signal showing how locked it is. The ENC output pulses when the frequencies meet, SEP when they move apart again, and BAT gives the beating as CV.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect OUT to a MIXER input. With nothing on REF it is an ordinary oscillator; turn SHAPE to hear the waveforms.</li>
@@ -451,7 +457,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-TRANSFORM">
-  <h2>TRANSFORM <small>14 modules</small></h2>
+  <h2>TRANSFORM <small>16 modules</small></h2>
   <article class="modulo" id="mod-FILTER">
     <h3>FILTER</h3>
     <figure class="painel"><img src="assets/modulos/FILTER.webp" alt="FILTER module panel" width="118" height="300" loading="lazy" /></figure>
@@ -474,6 +480,30 @@
       <li>Turn CUT slowly from one side to the other and hear the brightness come and go.</li>
       <li>Raise RESO halfway and do it again: the cutoff becomes pronounced, almost a voice.</li>
       <li>Connect the ENV output of an ENVELOPE to the FC input, with CLOCK on the envelope's GATE input. The filter opens on every pulse, a sound heard in a great deal of electronic music.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-LADDER">
+    <h3>LADDER</h3>
+    <figure class="painel"><img src="assets/modulos/LADDER.webp" alt="LADDER module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>LADDER is the ladder filter, the bass filter: four 6 dB stages in cascade, with the output of the last one fed back to the input as resonance. It is the design R. Moog patented in 1969, here with a knob that goes from the transistor ladder, round, to the diode ladder, acid.</p>
+    <h4>How to think about it</h4>
+    <p>FILTER is clean and stable; LADDER is the filter that compresses and thickens when pushed. Three things set it apart. DIODO couples the stages, and halfway there are ladders that do not exist as circuits. The peak stays tuned to CUT at any DIODO setting, and at RESO 1 the ladder sings a tuned sine. And COMP gives back the bass that, in the original ladder, disappears as resonance rises.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>CUT</b>: the cutoff frequency, from 20 Hz to 20 kHz.</li>
+      <li><b>RESO</b>: the resonance. At 1, the ladder self-oscillates; 0.9 means the same closeness to the threshold at any DIODO.</li>
+      <li><b>DRIVE</b>: pushes the input into the saturation inside the loop; the output level is compensated.</li>
+      <li><b>COMP</b>: gives back the bass. At 1, the bass stays whole at any resonance; at 0, it sinks as in the original.</li>
+      <li><b>DIODO</b>: from 0 (transistors, round) to 1 (diodes, acid), continuously.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, FC moves the cutoff at one volt per octave, Q moves the resonance. Outputs: LP4 is the 24 dB per octave output, LP2 the tap after the second stage, 12 dB per octave, brighter.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the SAW output of an OSC into IN, LP4 into a VCA and the VCA into the MIXER. Set CUT near 200 Hz.</li>
+      <li>Raise RESO with COMP at 1: the peak sings and the bass stays. Lower COMP and hear the bass sink.</li>
+      <li>Set DIODO to 1, RESO to 0.85 and DRIVE to 0.6, with a short envelope on FC: the acid bass.</li>
+      <li>Unpatch IN, set RESO to 1 and patch the pitch of a QUANTIZER into FC: the ladder plays the melody like an oscillator.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-FORMANT">
@@ -618,6 +648,7 @@
       <li><b>CV1, CV2</b>: how much the control signal acts, and in which direction. Negative inverts: the volume drops as the control rises.</li>
       <li><b>RSP1, RSP2</b>: the response curve. At zero, linear; at maximum, exponential, which sounds more natural for volume.</li>
       <li><b>DRIFT</b>: a small, slow wobble in both volumes.</li>
+      <li><b>SAT</b>: the colour of an analogue VCA. It saturates the input before the gain, like the transistor pair of an OTA: a little fattens the sound, a lot compresses and warms it. At 0, the VCA is clean.</li>
     </ul>
     <p>Inputs: IN1 and IN2, the sounds; CV1 and CV2, the controls. Outputs: O1, O2 and SUM, the two added together.</p>
     <h4>Try this</h4>
@@ -667,6 +698,7 @@
       <li><b>SAT</b>: rounds off the peaks after the fold, softening the result.</li>
       <li><b>LVL</b>: the output volume.</li>
       <li><b>DRIFT</b>: a slow wobble in the amount of folding.</li>
+      <li><b>TEAR</b>: the fold that tears. An ordinary fold always reflects at the same point; with TEAR above 0, the point changes on every cycle of the input, drawn at the zero crossing, without clicks. The shape becomes slightly different on each cycle.</li>
     </ul>
     <p>Inputs: IN, the sound; MOD, the second signal for RING; FCV, to modulate the fold.</p>
     <h4>Try this</h4>
@@ -804,9 +836,38 @@
       <li>Connect the BI output of a FUNCTION to IN2 and listen through the SUM output instead of O1: both modulations act together.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-DYNAMICS">
+    <h3>DYNAMICS</h3>
+    <figure class="painel"><img src="assets/modulos/DYNAMICS.webp" alt="DYNAMICS module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>DYNAMICS is a compressor. It holds down peaks so the sound sits closer together, and it lets one sound duck another, like the pad that breathes when the kick hits. Here it does a third thing: what it hears and how much it reduces come out as control signals, to move any other module.</p>
+    <h4>How to think about it</h4>
+    <p>Think of a sound engineer with a hand on the fader: when the sound goes over the threshold, the hand pulls down; when the sound drops, it gives the level back. RATIO is the strength of the hand, ATK and REL are its haste. The SIDE input changes what it listens to: with a kick there, the kick decides when everything else ducks. Two Rasgo twists work on time: BRTH makes the release follow the interval between hits, and DRIFT varies attack and release on each hit.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>THRES</b>: the threshold, from −48 to 0 dB. Above it, the sound is turned down.</li>
+      <li><b>RATIO</b>: how much it turns down. At 4, every 4 dB above the threshold becomes 1; at 20, it becomes a limiter.</li>
+      <li><b>KNEE</b>: all at once (0) or gradually (up to 12 dB).</li>
+      <li><b>ATK, REL</b>: the time to go down (0.1 to 200 ms) and to come back (5 ms to 2 s).</li>
+      <li><b>GAIN</b>: gives back the lost level, up to 24 dB.</li>
+      <li><b>SIDE</b>: the detector listens to the IN input (0) or the SIDE input (1).</li>
+      <li><b>RMS</b>: measures average energy instead of peaks; it sounds smoother.</li>
+      <li><b>GATE</b>: inverts the curve into a noise gate, which closes what stays below the threshold.</li>
+      <li><b>BRTH</b>: the release follows the tempo of the hits it hears.</li>
+      <li><b>DRIFT</b>: seeded chance in attack and release, hit by hit.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, SIDE what the detector should hear, THR moves the threshold. Outputs: OUT is the compressed sound, ENV the level it hears, GR how much it is reducing right now.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch a TRIGSEQ into a DRUM and the DRUM into the SIDE input. Patch a CHORD into IN and OUT into the MIXER.</li>
+      <li>Leave SIDE at 1, RATIO at 6, ATK short and REL near 200 ms: the chord ducks on every kick.</li>
+      <li>Raise BRTH: the release starts to breathe with the rhythm.</li>
+      <li>Patch the ENV output into the CUT of a FILTER on another sound: the filter opens with the strength of what the compressor hears.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-MODULATE">
-  <h2>MODULATE <small>6 modules</small></h2>
+  <h2>MODULATE <small>13 modules</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="ENVELOPE module panel" width="142" height="300" loading="lazy" /></figure>
@@ -825,8 +886,9 @@
       <li><b>TRIG</b>: in one position, the note holds as long as the pulse lasts; in the other, each pulse fires the whole curve without waiting.</li>
       <li><b>VCA</b>: how much the built-in volume acts on the sound passing through. At zero the sound goes through unchanged and only the ENV output matters.</li>
       <li><b>LVL</b>: the output volume.</li>
+      <li><b>LOOP</b>: the envelope restarts by itself when it ends, becoming a cycle that plays without a gate. In LOOP, SUS no longer holds: it becomes the level where the fall ends and the release begins.</li>
     </ul>
-    <p>Inputs: IN, the sound; GATE, the pulse that fires the note; TIME, to speed up or slow down all stages. Outputs: OUT, the articulated sound; ENV, the curve.</p>
+    <p>Inputs: IN, the sound; GATE, the pulse that fires the note; TIME, to speed up or slow down all stages. Outputs: OUT, the articulated sound; ENV, the curve. The EOC output gives a short pulse at the end of each envelope, or of each cycle in LOOP.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect the SAW output of an OSC to the IN input, OUT to a MIXER input, and the EUC output of CLOCK to GATE. You hear notes.</li>
@@ -899,8 +961,10 @@
       <li><b>STRD</b>: at zero the four outputs move almost together; at maximum each goes its own way.</li>
       <li><b>ANCHR</b>: the memory. At zero the walk never returns; high, it tends to come back to places it has been, which gives the piece something like recurring themes.</li>
       <li><b>BIAS</b>: moves the resting point up or down.</li>
+      <li><b>RESID</b>: the residue. The return to the landmark is never identical: each return shifts the field a little.</li>
+      <li><b>ELAST</b>: how the field returns to rest: spring (as before), rubber (free near the centre, strong pull at the edges) or plastic (no return: the rest point moves to where the field lingers).</li>
     </ul>
-    <p>Inputs: ADV, a pulse that forces a step; RATE, to modulate the speed. Outputs: A, B, C and D, the four aspects of the walk; FLD, the unweighted walk; EVT, a pulse on each step.</p>
+    <p>Inputs: ADV, a pulse that forces a step; RATE, to modulate the speed. Outputs: A, B, C and D, the four aspects of the walk; FLD, the unweighted walk; EVT, a pulse on each step. The CAPT input stores the landmark now, the place the drift returns to.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Build any voice that goes through a FILTER and a SPACE before the MIXER.</li>
@@ -922,8 +986,9 @@
       <li><b>DRIVE</b>: the force pushing the ball between the valleys. Higher means bigger, more frequent jumps.</li>
       <li><b>DAMP</b>: the friction. High, the ball settles in a valley and nearly stops; low, it swings widely and jumps from side to side.</li>
       <li><b>FRZ</b>: freezes the movement at its current value.</li>
+      <li><b>MODO</b>: the attractor. Double well (as before), Rössler, which with DRIVE follows the period-doubling route to chaos, or Aizawa, a sphere pierced by a tube.</li>
     </ul>
-    <p>Inputs: RSD, a pulse that gives a fresh push; RTM, to modulate the speed. Output: OUT.</p>
+    <p>Inputs: RSD, a pulse that gives a fresh push; RTM, to modulate the speed. Output: OUT. The Y and Z outputs give the attractor's other coordinates.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER.</li>
@@ -957,9 +1022,182 @@
       <li>Turn CORR from one end to the other. On one side, high notes come out dark; in the middle, no relationship; on the other, high notes come out bright.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-BOUNCE">
+    <h3>BOUNCE</h3>
+    <figure class="painel"><img src="assets/modulos/BOUNCE.webp" alt="BOUNCE module panel" width="98" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>BOUNCE drops balls that bounce, lower and faster each time, until they stop. There are up to three balls. Each bounce is a gate, the force of the bounce is an accent, and the height of each ball is a CV that rises and falls.</p>
+    <h4>How to think about it</h4>
+    <p>It is a rhythm that speeds up by itself, like a ping-pong ball dropped on a table. ELAST decides how much the ball gives back on each bounce, GRAV is its haste. With AUTO, the balls that stop are thrown again, and WIND nudges them gently, so the module plays forever without repeating.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>BALLS</b>: how many balls, from 1 to 3.</li>
+      <li><b>GRAV</b>: gravity. Higher, faster bounces.</li>
+      <li><b>ELAST</b>: how much each bounce gives back. Near 1, the ball takes long to stop.</li>
+      <li><b>SPRD</b>: how much the balls are dropped from different heights.</li>
+      <li><b>WIND</b>: a light wind that prevents exact repeats.</li>
+      <li><b>AUTO</b>: throws again the balls that have stopped.</li>
+    </ul>
+    <p>Inputs: DROP drops the balls again, GRAV moves gravity by CV. Outputs: GT is the gate of each bounce, ACC the force of the bounce, H1, H2 and H3 the height of each ball.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch GT into a DRUM and the DRUM into the MIXER: hear the bouncing speed up until it stops.</li>
+      <li>Patch ACC into the level of the DRUM: the first bounces sound stronger.</li>
+      <li>Patch H1 into a QUANTIZER and the QUANTIZER into an OSC: a falling melody.</li>
+      <li>Patch GT into the CLK of an ARP: the arpeggio speeds up with the ball.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-MOUSSE">
+    <h3>MOUSSE</h3>
+    <figure class="painel"><img src="assets/modulos/MOUSSE.webp" alt="MOUSSE module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>MOUSSE is a foam. Press it, and part of it sinks at once and part flows down slowly; let go, and it comes back unhurried. The DEPTH output is how far it has sunk: an envelope made not of straight lines but of matter.</p>
+    <h4>How to think about it</h4>
+    <p>An ordinary envelope rises and falls along lines. The foam has memory: hits in a row sink it further, and with FATG it softens with use. STIFF is its hardness, SLOW how fluid it is, RET how many times slower the return is than the descent. With nothing at HIT, it is played by itself at the pace of RATE.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>STIFF</b>: the hardness. Hard, it sinks little and returns fast.</li>
+      <li><b>VISC</b>: the viscosity, the time it takes to flow, from 0.05 to 8 s.</li>
+      <li><b>SLOW</b>: how much of the sinking is slow rather than immediate.</li>
+      <li><b>RET</b>: how many times slower the return is, from 1 to 8.</li>
+      <li><b>FORCE</b>: the force of each hit.</li>
+      <li><b>FATG</b>: fatigue; hits in a row soften the foam.</li>
+      <li><b>RATE</b>: the pace of internal hits, when nothing is patched into HIT.</li>
+    </ul>
+    <p>Inputs: HIT gives a hit, PRESS leans on it with continuous force. Outputs: DEPTH is how far it has sunk, SPEED how fast, REST a gate when the foam is at rest.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch a DRUM into HIT and DEPTH into the CUT of a FILTER, with the cable attenuated and inverted: each hit darkens the sound and the brightness returns slowly.</li>
+      <li>Raise FATG and play hits in a row: the foam gives way.</li>
+      <li>Patch the ENV output of DYNAMICS into PRESS: the mix itself pushes the foam.</li>
+      <li>Patch REST into the gate of an ENVELOPE: a sound only when the foam rests.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PENDULUM">
+    <h3>PENDULUM</h3>
+    <figure class="painel"><img src="assets/modulos/PENDULUM.webp" alt="PENDULUM module panel" width="98" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>PENDULUM is a double pendulum: a pendulum with another hanging from its tip. With little energy, it swings almost like a clock; with a lot, the lower arm loops over and the motion never repeats. The positions of both tips come out as CV.</p>
+    <h4>How to think about it</h4>
+    <p>It is the classic example of chaos: a simple law, an unpredictable result. ENRGY is the chaos knob. Low, order; high, loops. CROSS marks the rhythm of the swing, and FLIP marks each full loop, the moment chaos appears.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>ENRGY</b>: the energy of the swing; above halfway, chaos appears.</li>
+      <li><b>RATIO</b>: the ratio between the lengths of the two arms.</li>
+      <li><b>MASS</b>: the ratio between the masses.</li>
+      <li><b>SPEED</b>: the speed of the pendulum's time.</li>
+      <li><b>DAMP</b>: friction; with it, the pendulum gradually loses strength.</li>
+      <li><b>AUTO</b>: gives a push when the pendulum nearly stops.</li>
+    </ul>
+    <p>Inputs: KICK gives a push, SPD moves the speed by CV. Outputs: X1 and Y1 are the tip of the first arm, X2 and Y2 that of the second, CROSS a gate on each pass through the centre, FLIP a gate on each full loop.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch X2 into a QUANTIZER and the QUANTIZER into an OSC, and CROSS into an ENVELOPE controlling the voice's VCA: a swinging melody.</li>
+      <li>Raise ENRGY slowly and hear the melody go from regular to unpredictable.</li>
+      <li>Patch FLIP into the ADV of HARMONY: the chord changes when chaos appears.</li>
+      <li>Patch X1 into the pan of a MIXER channel: the sound circles in space.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-EPICYCLE">
+    <h3>EPICYCLE</h3>
+    <figure class="painel"><img src="assets/modulos/EPICYCLE.webp" alt="EPICYCLE module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>EPICYCLE draws with circles: up to eight, each one turning on the rim of the one before. The tip of the last one traces a figure, and its coordinates come out as signals. It is a drawn Fourier series, the same idea as Ptolemy's epicycles.</p>
+    <h4>How to think about it</h4>
+    <p>The same machine works at two scales. With few circles and a slow RATE, it is gesture and rhythm: a figure that comes back. With many circles and the pitch of a note at PTCH, it turns at the speed of sound and becomes timbre. MODO chooses the family of figures, and DESV detunes the speeds so the figure never closes.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the speed of the first circle, from 0.01 Hz to 2 kHz.</li>
+      <li><b>CIRC</b>: how many circles, from 1 to 8.</li>
+      <li><b>MODO</b>: square (odd speeds), saw (all speeds), Fibonacci radii or Fibonacci speeds.</li>
+      <li><b>DESV</b>: the deviation of the speeds; above 0, the figure never closes.</li>
+      <li><b>FASE</b>: the starting phase of the circles.</li>
+    </ul>
+    <p>Inputs: PTCH takes the pitch at one volt per octave, for timbre mode; RST restarts the figure. Outputs: X and Y are the coordinates of the tip, R the distance from the centre, ANG the angle, GT a pulse when Y crosses zero going up.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>With RATE at 0.2 Hz and CIRC at 3, patch X into the cutoff of a FILTER and Y into the pan of a MIXER channel: the sound draws a figure in space.</li>
+      <li>Patch GT into an ENVELOPE: the figure becomes rhythm.</li>
+      <li>Patch X into the MIXER, set CIRC to 8 and patch the pitch of a QUANTIZER into PTCH: now the figure is a timbre.</li>
+      <li>Change MODO and raise DESV slowly: the timbre opens out and never returns to the same place.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SUPPLY">
+    <h3>SUPPLY</h3>
+    <figure class="painel"><img src="assets/modulos/SUPPLY.webp" alt="SUPPLY module panel" width="65" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>SUPPLY is the patch's power supply, put into a module with cables. In a circuit, when the battery weakens, everything changes together: the clock slows, the sound loses body and the oscillators drift out of tune with each other. SUPPLY brings that common cause into the patch.</p>
+    <h4>How to think about it</h4>
+    <p>ENERG is the supply voltage. The load, the patch's own sound, makes that voltage sag, like a battery under strain: the more the patch sounds, the further the rail sinks. What is left comes out at TRILHO, to patch wherever you like. The drifts D1 to D4 only appear when the rail is low and make the voices drift apart; with a full rail, they come back together. Nothing is hidden: SUPPLY only acts where there is a cable.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>ENERG</b>: the supply voltage.</li>
+      <li><b>QUEDA</b>: how much the load makes the rail sag.</li>
+      <li><b>TEMPO</b>: how long the rail takes to sag and recover, from 0.05 to 5 s.</li>
+      <li><b>DERIVA</b>: how far the voices drift apart when the rail is low.</li>
+    </ul>
+    <p>Inputs: CARGA takes the patch's sound, ENERG moves the voltage by CV. Outputs: TRILHO is the remaining voltage, D1 to D4 four tuning drifts (up to 60 cents), FALHA a pulse at the blackout and another at the recovery.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the MIXER output into CARGA and TRILHO into the CV1 of a voice's VCA: the patch loses body when it plays loud.</li>
+      <li>Patch D1 into the 1V/O of one OSC and D2 into another's. Lower ENERG: the voices go out of tune with each other.</li>
+      <li>Raise ENERG again: they come back together.</li>
+      <li>Patch FALHA into the CIT of APOCRIFO: the blackout tears through time.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-MAGNET">
+    <h3>MAGNET</h3>
+    <figure class="painel"><img src="assets/modulos/MAGNET.webp" alt="MAGNET module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>MAGNET is a grid of 8 by 8 small magnets, each pointing up or down. Each magnet wants to align with its neighbours, and temperature shakes them. A head moves across the grid, one cell per pulse, and the magnet under it gives the gate.</p>
+    <h4>How to think about it</h4>
+    <p>It is the Ising model, from the physics of materials. Below the critical temperature (near 2.27), large domains form and the rhythm is stable. Above it, noise wins. Near it, domains of every size appear and vanish: this is the edge of chaos, and it is where the module sounds most alive. A negative COUPL makes the magnets oppose their neighbours, like a chessboard.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TEMP</b>: the temperature; the transition is near 2.27.</li>
+      <li><b>COUPL</b>: the coupling. Positive, the magnets align; negative, they oppose each other.</li>
+      <li><b>FIELD</b>: an external magnet that pushes the whole grid one way.</li>
+      <li><b>SWEEP</b>: how many attempts to flip magnets there are on each pulse.</li>
+      <li><b>RATE</b>: the internal clock, when nothing is patched into CLK.</li>
+      <li><b>GATE</b>: the length of each gate.</li>
+    </ul>
+    <p>Inputs: CLK advances one pulse, QNCH heats everything at once and the grid reorganises itself, TEMP and FLD move temperature and field by CV. Outputs: GT is the head's gate, MAG the magnetisation, ENER the energy of the grid, FLIP how much of the grid flipped on this pulse.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch GT into a DRUM. With TEMP at 1, hear an almost frozen rhythm; at 4, a rhythm of noise.</li>
+      <li>Set TEMP near 2.3: domains appear and vanish, and the rhythm breathes.</li>
+      <li>Patch a rare trigger into QNCH: the grid falls apart and reorganises.</li>
+      <li>Patch MAG into the cutoff of a FILTER: the tone follows which way the grid leans.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-ORBIT">
+    <h3>ORBIT</h3>
+    <figure class="painel"><img src="assets/modulos/ORBIT.webp" alt="ORBIT module panel" width="98" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>ORBIT is a small solar system: a sun in the centre and two or three planets in gravity. The positions of the planets come out as CV, and their meetings come out as pulses.</p>
+    <h4>How to think about it</h4>
+    <p>These are Newton's and Kepler's laws playing the patch. Wider orbits take longer, so the planets move in rhythms that nearly line up and drift apart. MASS makes the planets pull on each other: low, the orbits are regular; high, they break down into chaos. A planet that escapes returns to its orbit, so the system never gets lost. LIGHT delays the conjunction pulse by the distance, like light that takes time to arrive.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>PLNTS</b>: how many planets, 2 or 3.</li>
+      <li><b>RATIO</b>: how far apart the orbits are.</li>
+      <li><b>ECC</b>: how flattened the ellipses are.</li>
+      <li><b>MASS</b>: how much the planets pull on each other.</li>
+      <li><b>SPEED</b>: the speed of the system's time.</li>
+      <li><b>LIGHT</b>: the delay of the conjunction by distance, up to about 1 s.</li>
+    </ul>
+    <p>Inputs: NUDGE pushes the first planet and changes the shape of its orbit, SPD moves the speed by CV. Outputs: X1 and Y1 are the position of the first planet, X2 and Y2 that of the second, DIST the distance between them, CONJ a pulse at conjunction, PERI a pulse when the first planet passes closest to the sun.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch CONJ into a DRUM and PERI into another: two slow rhythms that almost repeat.</li>
+      <li>Patch X1 into a QUANTIZER and the QUANTIZER into an OSC: a melody in orbit.</li>
+      <li>Raise MASS slowly: the orbits break down and the rhythm becomes unpredictable.</li>
+      <li>Patch DIST into the MIX of a SPACE: as the planets drift apart, the space opens up.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
-  <h2>TIME <small>5 modules</small></h2>
+  <h2>TIME <small>10 modules</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="CLOCK module panel" width="189" height="300" loading="lazy" /></figure>
@@ -980,8 +1218,9 @@
       <li><b>ACC-A, ACC-B</b>: accents fall on steps that are multiples of these numbers. With 4 and 3, for instance, the accents form a three-against-four pattern.</li>
       <li><b>AND</b>: decides whether an accent needs both numbers at once or just one of them.</li>
       <li><b>FEEL</b>: how many parts each beat is divided into: two, three (triplets), five, seven, nine, eleven, or a division drawn at random on each step.</li>
+      <li><b>PHAS</b>: Steve Reich's phasing. The FASE output is a second clock slightly faster, up to 3 %, that drifts away from the main one and comes back into line.</li>
     </ul>
-    <p>Inputs: EXT, to follow outside pulses; RST, to go back to the start; BPM, to modulate the tempo. Outputs: CLK, EUC and ACC.</p>
+    <p>Inputs: EXT, to follow outside pulses; RST, to go back to the start; BPM, to modulate the tempo. Outputs: CLK, EUC and ACC. The MET output gives the metric strength of the current step: 1 on the first step of the cycle, less on weak beats.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Connect EUC to the GATE input of a DRUM, and the DRUM's OUT to a MIXER input.</li>
@@ -1049,13 +1288,17 @@
     <h4>Controls</h4>
     <ul class="controles">
       <li><b>LEN</b>: how many of the eight steps are in the phrase.</li>
-      <li><b>MODE</b>: the reading order: forwards, backwards, back and forth, random, or wandering step by step.</li>
+      <li><b>MODE</b>: the reading order: forwards, backwards, back and forth, random, wandering step by step, or the cursor, a body that moves through the steps pushed by the clock and attracted or repelled by a target.</li>
       <li><b>RATE</b>: the internal clock, used when nothing reaches CLK.</li>
       <li><b>GATE</b>: how long each note stays on within its step. Short sounds detached; long, connected.</li>
       <li><b>GLIDE</b>: makes the pitch slide from one note to the next.</li>
       <li><b>RANGE</b>: how many octaves the eight values cover, up to two.</li>
       <li><b>P1 to P8</b>: the pitch of each step.</li>
       <li><b>G1 to G8</b>: turns each step on or silences it.</li>
+      <li><b>INERC</b>: in cursor mode, how much the cursor keeps its speed from one pulse to the next.</li>
+      <li><b>FORCA</b>: in cursor mode, the force towards the ALVO step: positive attracts, and the cursor lingers near it; negative repels.</li>
+      <li><b>ALVO</b>: the step that attracts or repels the cursor.</li>
+      <li><b>FADIG</b>: fatigue. Each step that plays gets tired and, too tired, stays silent that time: repetition wears out. Works in any mode.</li>
     </ul>
     <p>Inputs: CLK, the pulse that advances; RST, to go back to the first step. Outputs: PTCH, the pitch; GATE, the note's pulse; EOS, a pulse at the end of each phrase.</p>
     <h4>Try this</h4>
@@ -1094,9 +1337,127 @@
       <li>Turn MAP slowly and hear the groove change style. Then play with the densities.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-ARP">
+    <h3>ARP</h3>
+    <figure class="painel"><img src="assets/modulos/ARP.webp" alt="ARP module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>ARP is an arpeggiator: it plays a chord note by note, and so a chord becomes a melody. It chooses the notes (one of the ten chord shapes of CHORD, with inversion and octaves) and the path through them. With nothing patched, it plays on its own clock.</p>
+    <h4>How to think about it</h4>
+    <p>Separate two questions: which notes, and in what order. CHORD, INV and OCT answer the first; MODE answers the second (up, down, up and down, random, shuffled, from the centre outwards, from the outside in). SKIP opens gaps in the line, and the gaps are always the same for the same patch, so the line sounds played and repeats the same way.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>CHORD</b>: the chord shape, from 0 to 9.</li>
+      <li><b>INV</b>: the inversion, from 0 to 3.</li>
+      <li><b>OCT</b>: across how many octaves the arpeggio spreads, from 1 to 4.</li>
+      <li><b>MODE</b>: the path through the notes, from 0 to 7.</li>
+      <li><b>SKIP</b>: the chance that a step stays silent.</li>
+      <li><b>RATE</b>: the internal clock, used when nothing is patched into CLK.</li>
+      <li><b>GATE</b>: the length of each note, from 5 to 95 % of the step.</li>
+    </ul>
+    <p>Inputs: CLK advances one step per pulse, RST goes back to the start, ROOT takes the tonic (one volt per octave), CHD changes the chord shape. Outputs: PTCH is the note, GT the gate of each note, EOS a pulse on each full round.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch PTCH into the 1V/O of an OSC, the OSC output into a VCA and the VCA into the MIXER. Patch GT into an ENVELOPE and the ENVELOPE into the VCA.</li>
+      <li>Turn MODE and hear the same chord take other shapes.</li>
+      <li>Set MODE to 5, SKIP to 0.3 and OCT to 3: it sounds like an improvised line.</li>
+      <li>Patch the root output of HARMONY into ROOT: the arpeggio now moves with the progression.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-CELL">
+    <h3>CELL</h3>
+    <figure class="painel"><img src="assets/modulos/CELL.webp" alt="CELL module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>CELL is a cellular automaton: a row of cells, lit or unlit, that rewrites itself on every pulse. Each cell looks at itself and its two neighbours, and a rule (a number from 0 to 255) decides whether it stays lit. The module reads this pattern with a head: the cell under it gives the gate, and the next three choose the note.</p>
+    <h4>How to think about it</h4>
+    <p>It is a score that writes itself by a very simple law. Some rules give patterns that never repeat (30, 110), others give triangles (90) or things that travel (184). You do not compose the notes, you compose the law. MUT adds a little chance, so the line neither dies nor gets stuck.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal clock, when nothing is patched into CLK.</li>
+      <li><b>RULE</b>: the rule, from 0 to 255. Start with 30, 90, 110 and 184.</li>
+      <li><b>CELLS</b>: how many cells the row has, from 8 to 24.</li>
+      <li><b>HEAD</b>: where the reading head sits.</li>
+      <li><b>RANGE</b>: the range of the notes, up to 2 octaves.</li>
+      <li><b>MUT</b>: the chance of a cell flipping at random.</li>
+      <li><b>GATE</b>: the length of each note.</li>
+    </ul>
+    <p>Inputs: CLK advances one generation, RST restarts the row, RULE changes the rule by CV. Outputs: PTCH is the note, GT the gate, DENS the share of lit cells, EOS a pulse when the row is reborn.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch GT into a DRUM and the DRUM into the MIXER. With RULE at 30, hear a rhythm that never repeats the same way.</li>
+      <li>Patch PTCH into an OSC and GT into an ENVELOPE controlling a VCA after the OSC. Turn RULE slowly.</li>
+      <li>Patch DENS into the CUT of a FILTER: the more life in the row, the brighter the sound.</li>
+      <li>Patch EOS into the ADV of HARMONY: the chord changes when the row is reborn.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-TAP">
+    <h3>TAP</h3>
+    <figure class="painel"><img src="assets/modulos/TAP.webp" alt="TAP module panel" width="65" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>TAP gives the patch the tempo of whoever is playing. Tap three or more times on the TAP input (a button, a key, handclaps through SIGNAL-IN): it measures the interval and starts giving a pulse on every beat, by itself, at your tempo. The first tap is the downbeat, the one.</p>
+    <h4>How to think about it</h4>
+    <p>It is the count-in before the band comes in. TAP uses the median of the taps, so one crooked tap does not spoil the count. If the taps are too irregular, it does not invent a tempo: it waits for a better count. A pause and a new count change the tempo.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>COMP</b>: how many beats the bar has, from 1 to 16. The UM output comes back every COMP beats.</li>
+      <li><b>DISP</b>: how much irregularity it accepts in the count.</li>
+    </ul>
+    <p>Inputs: TAP takes the taps, RST forgets the tempo. Outputs: CLK is the pulse on each beat, UM the downbeat, BPM the tempo as CV, TRAV a gate while there is a tempo.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch SIGNAL-IN into SCOPE and the ONS output of SCOPE into TAP. Turn on the ON of SIGNAL-IN.</li>
+      <li>Patch CLK into the external clock input of CLOCK: the whole patch follows your pulse.</li>
+      <li>Tap one, two, three, four and start playing: the patch is already at your tempo.</li>
+      <li>Set COMP to 3 and patch UM into the RST of a SEQUENCE: the phrase restarts on every waltz bar.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-POLYGON">
+    <h3>POLYGON</h3>
+    <figure class="painel"><img src="assets/modulos/POLYGON.webp" alt="POLYGON module panel" width="114" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>POLYGON is polymeter drawn as a figure. There is one shared cycle and up to four layers; each layer is a polygon of N vertices inscribed in that cycle, and each vertex is a pulse. A triangle and a square in the same cycle give three against four.</p>
+    <h4>How to think about it</h4>
+    <p>Think of a clock with several invisible hands, each dividing the cycle into different equal parts. The pulses of each layer are regular; the interest lies where they meet. The COINC output marks those meetings, and that is where music usually asks for an accent. F rotates each polygon, up to one side, to shift the layer without changing its division.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>N1, N2, N3, N4</b>: how many vertices each layer has, from 0 (off) to 16.</li>
+      <li><b>F1, F2, F3, F4</b>: the rotation of each layer, up to one side of the polygon.</li>
+      <li><b>CICLO</b>: the length of the cycle, from 0.25 to 32 s, when nothing is patched into CLK.</li>
+      <li><b>PASSOS</b>: with a clock at CLK, how many pulses the cycle lasts.</li>
+    </ul>
+    <p>Inputs: CLK drives the cycle by pulses, RST restarts. Outputs: G1 to G4 are the pulses of each layer, COINC pulses when two or more vertices fall together, EOS at the end of each cycle, FASE is the position in the cycle.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>With N1 at 3 and N2 at 4, patch G1 into a DRUM and G2 into another: three against four.</li>
+      <li>Patch COINC into a third sound: only the meetings.</li>
+      <li>Set N3 to 5 and turn F3 slowly: the layer of five slides over the others.</li>
+      <li>Patch the CLOCK into CLK with PASSOS at 16: the polymeter follows the patch's tempo.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-BUDGET">
+    <h3>BUDGET</h3>
+    <figure class="painel"><img src="assets/modulos/BUDGET.webp" alt="BUDGET module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>BUDGET gives the voices a budget of events. Four gates go in and out, but per cycle only TETO events get through in total. When the budget runs out, further gates are left out until the cycle starts again.</p>
+    <h4>How to think about it</h4>
+    <p>Density is not quality. BUDGET makes the patch choose: with a small budget, each note is worth more. There are two economies. Compete: whoever arrives first takes it. Cooperate: each voice that plays has its share, and only goes beyond it if the others have not yet spent theirs.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>TETO</b>: how many events fit in each cycle, from 1 to 32.</li>
+      <li><b>COOP</b>: off, the voices compete; on, they cooperate.</li>
+      <li><b>CICLO</b>: the length of the cycle, from 0.25 to 16 s, when nothing is patched into CLK.</li>
+    </ul>
+    <p>Inputs: G1 to G4 take the voices' gates, CLK restarts the cycle on each pulse. Outputs: O1 to O4 are the gates that got through, SALDO what is left of the budget, FIM a pulse when it runs out.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the gates of two voices into G1 and G2, and O1 and O2 into their envelopes.</li>
+      <li>With TETO at 6, hear the voices compete for the cycle.</li>
+      <li>Turn on COOP: the two start sharing the budget.</li>
+      <li>Patch SALDO into the cutoff of a FILTER: the sound darkens as the budget is spent.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-DECISION">
-  <h2>DECISION <small>6 modules</small></h2>
+  <h2>DECISION <small>14 modules</small></h2>
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
     <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="QUANTIZER module panel" width="118" height="300" loading="lazy" /></figure>
@@ -1106,11 +1467,14 @@
     <p>Control signals vary continuously, and musical notes don't. Without a quantizer, a melody generated by chance falls between the notes and sounds out of tune. QUANTIZER rounds each value to the nearest note of the chosen scale. With a pulse on the TRIG input, it only changes note on the pulse, and the melody gains a rhythm. The GATE output pulses whenever the note actually changes, which is handy for firing an envelope only on new notes. The ROOT and SCL inputs change the tonic and the scale by cable: connected to the outputs of HARMONY, the melody's key changes as the music goes on.</p>
     <h4>Controls</h4>
     <ul class="controles">
-      <li><b>SCALE</b>: the scale, out of twelve: chromatic, major, natural minor, Dorian, Phrygian dominant, Lydian, melodic minor, minor pentatonic, major pentatonic, hirajoshi, whole tone, and octaves only.</li>
+      <li><b>SCALE</b>: the scale, out of thirteen: chromatic, major, natural minor, Dorian, Phrygian dominant, Lydian, melodic minor, minor pentatonic, major pentatonic, hirajoshi, whole tone, octaves only, and the sieve.</li>
       <li><b>ROOT</b>: the tonic, the scale's starting note, from C to B.</li>
       <li><b>RANGE</b>: how many octaves the input signal covers, from 1 to 6. More octaves, bigger leaps.</li>
       <li><b>GLIDE</b>: makes the pitch slide from one note to the next.</li>
       <li><b>HYST</b>: a tolerance margin. With an unsteady signal, the note doesn't keep flipping between two neighbors.</li>
+      <li><b>AFIN</b>: the tuning, applied after the note is chosen: 12-tone equal temperament (as before), just, Pythagorean, meantone, 19 or 31 divisions of the octave. The three historical tunings are measured from the tonic and follow it when it changes.</li>
+      <li><b>M1, R1, M2, R2</b>: Xenakis's sieve, used by scale number 13. A note passes if its remainder when divided by M1 is R1, or if its remainder when divided by M2 is R2. With an M that does not divide 12, the scale does not repeat at the octave.</li>
+      <li><b>AND</b>: turns the sieve's or into and: a note has to pass both sieves. If no note passes, the sieve falls back to or, so it never goes silent.</li>
     </ul>
     <p>Inputs: CV, the signal to quantize; TRSP, to transpose before quantizing; TRIG, the pulse that decides when to change note; ROOT and SCL, which, when patched, take over the tonic and the scale from the knobs. Outputs: PTCH, the pitch; GATE, a pulse on each new note; ST, the note in semitones.</p>
     <h4>Try this</h4>
@@ -1124,19 +1488,20 @@
     <h3>HARMONY</h3>
     <figure class="painel"><img src="assets/modulos/HARMONY.webp" alt="HARMONY module panel" width="118" height="300" loading="lazy" /></figure>
     <h4>What it is</h4>
-    <p>HARMONY decides which keys the music passes through. From time to time, or on each pulse at the ADV input, it picks a new tonal center, following one of six moves that jazz and film musicians have used for decades. The ROOT output gives the new tonic on the same pitch scale the oscillators understand.</p>
+    <p>HARMONY decides which keys the music passes through. From time to time, or on each pulse at the ADV input, it picks a new tonal center, following one of seven moves that jazz and film musicians have used for decades. The ROOT output gives the new tonic on the same pitch scale the oscillators understand.</p>
     <h4>How to think about it</h4>
     <p>QUANTIZER keeps the melody in tune, but always in the same key. Music tends to travel, and each style travels its own way. The MOVE control picks the route: Coltrane, which leaps a major third on each change and closes a cycle of three keys, as in Giant Steps; tritone substitution, which reaches the next key by an unexpected path; chromatic mediant, third-related shifts with a film-score feel; modal interchange, which keeps the tonic and changes the mode; modal jazz, which hardly ever moves; and backdoor, which rises a whole step.</p>
     <p>Connect the ROOT output to the ROOT input of QUANTIZER and the SCALE output to the SCL input. On each change the melody's scale changes, and each note moves to the nearest note of the new scale: the melody stays in the same register, with another colour. To hear the melody jump to the new centre, also connect the ROOT output to the TRSP input of QUANTIZER.</p>
     <h4>Controls</h4>
     <ul class="controles">
-      <li><b>MOVE</b>: the kind of route, among the six described above.</li>
+      <li><b>MOVE</b>: the kind of route, among the seven described.</li>
       <li><b>RATE</b>: the pace of the changes, when nothing reaches ADV. It ranges from one change every few minutes to two per second.</li>
       <li><b>ROOT</b>: the starting tonic, which the module returns to when it gets a pulse on RST.</li>
       <li><b>S-LO, S-HI</b>: the range of scales that can be drawn on each change.</li>
       <li><b>HOLD</b>: the chance of a change being skipped, which lengthens some sections.</li>
+      <li><b>CICLO</b>: in the neo-Riemannian move, the path through the transformations: free walk, hexatonic cycle (P and L in turn), octatonic cycle (P and R in turn), or LR, the walking fifths.</li>
     </ul>
-    <p>Inputs: ADV, the pulse that asks for a change; RST, to go back to the start. Outputs: ROOT, the tonic as a pitch; SCALE, the scale number; CHG, a pulse on each change.</p>
+    <p>Inputs: ADV, the pulse that asks for a change; RST, to go back to the start. Outputs: ROOT, the tonic as a pitch; SCALE, the scale number; CHG, a pulse on each change. The seventh move is neo-Riemannian: the triad undergoes P (parallel), R (relative) or L (leading-tone exchange), each moving a single note by one or two semitones. The OP output tells which transformation happened.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>Build the QUANTIZER melody: the CV output of a TURING, driven by CLOCK, into QUANTIZER's CV input, and QUANTIZER's PTCH into the 1V/O of an OSC running through an ENVELOPE to the MIXER.</li>
@@ -1227,6 +1592,201 @@
       <li>Connect OUT to the CV1 input of a VCA that controls another sound. The second sound now follows the voice's volume, without trembling.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-MARKOV">
+    <h3>MARKOV</h3>
+    <figure class="painel"><img src="assets/modulos/MARKOV.webp" alt="MARKOV module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>MARKOV is a Markov chain: it learns where a melody goes from where (after this note came that one three times, that other one once) and improvises by drawing the next note from what it learned. With nothing patched, it already plays, starting with a pentatonic walk.</p>
+    <h4>How to think about it</h4>
+    <p>It is a student who imitates the style of what it hears, not the exact notes. TEMP is its daring: near 0 it repeats the most common path, near 2 it invents. MEM is how much it remembers. The SURP output tells how unexpected each note was, and that can move the patch too.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal clock, when nothing is patched into CLK.</li>
+      <li><b>GATE</b>: the length of each note.</li>
+      <li><b>TEMP</b>: how daring the draw is, from 0 to 2.</li>
+      <li><b>MEM</b>: how much of what it learned it keeps.</li>
+      <li><b>LEARN</b>: turns learning on or off. Off, it freezes its vocabulary.</li>
+      <li><b>OCT</b>: transposes the output by octaves.</li>
+    </ul>
+    <p>Inputs: CLK advances one note, LRN.P and LRN.G take the melody to learn (pitch and gate), RST starts over. Outputs: PTCH is the note, GT the gate, SURP the degree of surprise.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch PTCH into an OSC and GT into an ENVELOPE controlling a VCA. Hear the opening walk.</li>
+      <li>Patch the pitch and gate of a PHRASE into LRN.P and LRN.G: MARKOV starts answering in that voice's style.</li>
+      <li>After teaching it, turn LEARN off and raise TEMP: it improvises with the vocabulary it kept.</li>
+      <li>Patch SURP into the MIX of a SPACE: unexpected notes get an echo.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-COHERENCE">
+    <h3>COHERENCE</h3>
+    <figure class="painel"><img src="assets/modulos/COHERENCE.webp" alt="COHERENCE module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>COHERENCE measures how predictable a melody is and breaks when it becomes too ordered. It keeps the latest notes and computes their Shannon entropy: a repeated note gives order 1, all twelve notes equally give 0. When order stays above the threshold long enough, it fires a rupture pulse.</p>
+    <h4>How to think about it</h4>
+    <p>We tend to think rupture is born of chaos. Here it is the opposite: extreme order also breaks. Pressure rises with each predictable note; after PAC notes in a row, it breaks. The rupture leaves a scar: the window forgets its older half and, for CIC notes, pressure does not rise again. The module makes no sound: it decides when, and the cable decides what.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>JAN</b>: the window, how many notes it remembers, from 4 to 32.</li>
+      <li><b>LIM</b>: the order threshold above which pressure rises.</li>
+      <li><b>PAC</b>: patience, how many notes in a row above the threshold before it breaks.</li>
+      <li><b>CIC</b>: the scar, how many notes after a rupture without new pressure.</li>
+    </ul>
+    <p>Inputs: PTCH takes the pitch, GATE marks each note (without it, each change of pitch counts), RST forgets everything. Outputs: ORD is the measured order, PRES the accumulated pressure, COL the rupture pulse, SURP the surprise of each note.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the pitch and gate of a QUANTIZER playing a short SEQUENCE into PTCH and GATE.</li>
+      <li>Patch COL into the RST of a TURING feeding another voice: when the first line repeats too much, the other one remakes itself.</li>
+      <li>Patch PRES into the cutoff of a FILTER: the tone opens while tension grows and closes at the rupture.</li>
+      <li>Patch SURP into the level of a VCA: the rare note sounds louder.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-KEY">
+    <h3>KEY</h3>
+    <figure class="painel"><img src="assets/modulos/KEY.webp" alt="KEY module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>KEY listens to whoever is playing, estimates the key and hands the tonic and scale to QUANTIZER. The patch then answers in the key of whoever sings or plays over it, instead of staying in the scale the seed chose.</p>
+    <h4>How to think about it</h4>
+    <p>It counts how long each of the twelve notes has sounded (a long note weighs more than a passing one) and compares that picture with the Krumhansl and Kessler key profiles. The key only changes when another wins for ESTAB notes in a row, so it does not flicker between neighbouring keys. The CERT output says when the key is ambiguous, instead of hiding it. The display shows the twelve notes, the tonic and the key name.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>MEM</b>: how long it remembers, from 2 to 60 s. Short follows modulations; long stays firm.</li>
+      <li><b>ESTAB</b>: how many notes in a row a new key must win to count.</li>
+    </ul>
+    <p>Inputs: PTCH takes the pitch, GATE marks each note, RST forgets everything. Outputs: ROOT is the tonic, SCL the scale, CERT the certainty, MUD a pulse on each key change.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch SIGNAL-IN into SCOPE, the PIT output of SCOPE into PTCH and the ONS output into GATE. Patch ROOT and SCL into the tonic and scale inputs of QUANTIZER.</li>
+      <li>Turn on the ON of SIGNAL-IN and sing a melody in D minor: the display shows Dm and the patch starts playing in that key.</li>
+      <li>Patch MUD into the FRASE input of the MIXER, with the stage in gesture mode: each key change moves the stage.</li>
+      <li>Without a microphone: a MARKOV into a QUANTIZER, that QUANTIZER into KEY and KEY into a second QUANTIZER. The second voice follows the key the first one seems to be in.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-ACCENT">
+    <h3>ACCENT</h3>
+    <figure class="painel"><img src="assets/modulos/ACCENT.webp" alt="ACCENT module panel" width="114" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>ACCENT gives a line its phrasing. A performer does not accent with volume alone: the accented note is louder, brighter and shorter, and there are many reasons to accent it. ACCENT gathers those causes, each with its own weight, into an emphasis from 0 to 1, and sends that emphasis to several outputs at once: level, brightness, length, sweep.</p>
+    <h4>How to think about it</h4>
+    <p>There are six causes of accent: the downbeat (METR), the size of the leap (SALTO), the highest note of the recent phrase (APICE), the accent coming from outside (EXT), the note after a long note (AGOG) and an outside accent on a weak beat (SINC). Three controls shape the whole: HER leaves a tail on the next note, SUPR keeps everything from becoming an accent, ROT makes the downbeat drift slowly. PROF is how much of this reaches the outputs.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>METR</b>: the weight of the downbeat of each cycle.</li>
+      <li><b>SALTO</b>: the weight of the size of the interval from the previous note.</li>
+      <li><b>APICE</b>: the weight of the highest note of the last eight.</li>
+      <li><b>EXT</b>: the weight of the accent coming in at the ACC input.</li>
+      <li><b>AGOG</b>: the weight of the note that follows a long note.</li>
+      <li><b>SINC</b>: the weight of an outside accent on a weak beat.</li>
+      <li><b>CICLO</b>: how many notes the metric cycle has, from 2 to 16.</li>
+      <li><b>ROT</b>: how fast the downbeat moves.</li>
+      <li><b>HER</b>: the tail an accent leaves on the next note.</li>
+      <li><b>SUPR</b>: after a strong accent, the next one costs more.</li>
+      <li><b>PROF</b>: how deeply the emphasis reaches the outputs.</li>
+    </ul>
+    <p>Inputs: GATE marks each note, PTCH takes the pitch, ACC the outside accent, RST restarts the cycle. Outputs: ENF is the emphasis, VCA the level, FC brightness for a filter, DEC length for an envelope, SWP a sweep that rises with accents in a row, GT a gate on accented notes only, NIV the emphasis in four steps (0, one third, two thirds, 1).</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Play a SEQUENCE line through a QUANTIZER into an OSC. Patch the pitch and gate of the QUANTIZER into PTCH and GATE.</li>
+      <li>Patch the VCA output into the CV1 of the voice's VCA: the line starts breathing like a phrase.</li>
+      <li>Run the OSC through a LADDER and patch SWP into its FC: accents in a row climb the sweep, as in an acid bass.</li>
+      <li>Set CICLO to 5 and ROT to 0.5: the downbeat moves and the notes stay the same.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-BLEFE">
+    <h3>BLEFE</h3>
+    <figure class="painel"><img src="assets/modulos/BLEFE.webp" alt="BLEFE module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>BLEFE is a game of trust made of signals. Each trigger becomes a signal, which always sounds the same, truth or bluff. A window later, the truth is confirmed and the bluff is not. With each resolution, trust moves: it rises with truths and falls with bluffs. When trust that was built up collapses, that is betrayal, and the response refuses until forgiveness.</p>
+    <h4>How to think about it</h4>
+    <p>A random number has no intention; a bluff does. The module does not draw notes, it creates a relationship between voices: a voice that answers while it trusts, hesitates when it doubts and falls silent once betrayed. VERD is the rate of truth, MEM how fast trust changes, LIM the point of betrayal. The RST input is forgiveness. SEED fixes the game: the same seed gives the same truths and lies.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>VERD</b>: the rate of truth, from 0 to 1.</li>
+      <li><b>JAN</b>: the window between the signal and the confirmation, from 0.05 to 4 s.</li>
+      <li><b>MEM</b>: how fast trust moves.</li>
+      <li><b>LIM</b>: below this level, trust that was built becomes betrayal.</li>
+      <li><b>SEED</b>: the seed of the game.</li>
+    </ul>
+    <p>Inputs: IN takes the triggers, RST forgives and starts over. Outputs: SIG is the signal, always the same; VERD gives away the hidden truth at once, for whoever wants to cheat; CONF pulses when the truth is confirmed; CNF is the level of trust; RESP is the response, which goes silent after betrayal; TRAI pulses at the moment of betrayal.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the CLOCK into IN, SIG into the gate of an ENVELOPE and CONF into a DRUM: the signal and the confirmation sound as two sounds.</li>
+      <li>Patch RESP into the CV1 of another voice's VCA: it answers while it trusts.</li>
+      <li>Start with VERD at 0.9 and then turn it to 0.2. The answering voice grows, hesitates and falls silent.</li>
+      <li>Patch the EOS of a SEQUENCE into RST: with each phrase, the relationship starts over.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-FRONTEIRA">
+    <h3>FRONTEIRA</h3>
+    <figure class="painel"><img src="assets/modulos/FRONTEIRA.webp" alt="FRONTEIRA module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>FRONTEIRA listens to a melody and marks where a new idea begins. We hear a boundary where something changes: a leap after steps, a long note after short ones, a rest. The module measures those three changes note by note and pulses when their strength passes the threshold.</p>
+    <h4>How to think about it</h4>
+    <p>It is Cambouropoulos's model, built on the grouping rules of Lerdahl and Jackendoff. To know whether a note is a boundary it needs to hear the next one, so the pulse arrives one note later. A long silence closes the phrase at once. PHRASE generates a motif; FRONTEIRA listens.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>LIM</b>: the strength threshold above which a change becomes a boundary.</li>
+      <li><b>MEM</b>: how many notes it uses as the reference for what is normal.</li>
+      <li><b>MIN</b>: the minimum number of notes between two boundaries.</li>
+      <li><b>SIL</b>: how much silence closes the phrase, from 0.3 to 4 s.</li>
+    </ul>
+    <p>Inputs: PTCH takes the pitch, GATE marks each note. Outputs: FRONT pulses at the start of each cell, FORCA is the strength of the last boundary, NOTAS how many notes the cell had, FIM pulses when silence closes the phrase.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch SIGNAL-IN into SCOPE, the PIT output of SCOPE into PTCH and the ONS output into GATE. Turn on the ON of SIGNAL-IN.</li>
+      <li>Patch FRONT into the FRASE input of the MIXER, with the stage in gesture mode: each new idea from the player moves the stage.</li>
+      <li>Patch FIM into the RST of a SEQUENCE: when the player stops, the accompaniment restarts with the next phrase.</li>
+      <li>Patch NOTAS into the length of an ENVELOPE: long phrases ask for longer notes.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-COMPARADOR">
+    <h3>COMPARADOR</h3>
+    <figure class="painel"><img src="assets/modulos/COMPARADOR.webp" alt="COMPARADOR module panel" width="65" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>COMPARADOR mixes two signals with polarity and decides when the mix crosses a threshold. The A and B knobs have zero in the centre: to the right the input adds, to the left it comes in inverted. The COMP output is a gate that stays high while the mix is above the threshold.</p>
+    <h4>How to think about it</h4>
+    <p>It is a balance. With A to the right and B to the left, the mix is the difference between the two signals; with the same signal in both, it cancels out. The decision comes after: the gate opens when the balance tips one way. Hysteresis keeps it from flickering when the signal is noisy near the threshold.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>A, B</b>: how much each input comes in, from −1 (inverted) to 1.</li>
+      <li><b>OFS</b>: shifts the whole mix up or down.</li>
+      <li><b>LIM</b>: the decision threshold.</li>
+      <li><b>HIST</b>: hysteresis, a margin around the threshold.</li>
+    </ul>
+    <p>Inputs: A and B take the signals, LIM moves the threshold by CV. Outputs: MIX is the mix, INV the mix upside down, COMP the decision gate, CRUZ a pulse on each change of side.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch two slow FUNCTION modules, at different speeds, into A and B. Set A to the right and B to the left.</li>
+      <li>Patch COMP into the gate of an ENVELOPE and CRUZ into a DRUM: two slow movements crossing become rhythm.</li>
+      <li>Patch the same signal into A and B with A at 1 and B at −1: the mix disappears.</li>
+      <li>Patch the LVL of a SCOPE into A and set LIM to the middle: when the player passes a certain volume, another voice comes in.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-INTERPRET">
+    <h3>INTERPRET</h3>
+    <figure class="painel"><img src="assets/modulos/INTERPRET.webp" alt="INTERPRET module panel" width="98" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>INTERPRET plays the incoming notes the way a performer would. It does not invent notes: it takes the pitch and gate of any sequencer and returns the played note, with a glide across the interval, a small overshoot on leaps, vibrato that grows on long notes, articulation by context, breath and brightness.</p>
+    <h4>How to think about it</h4>
+    <p>The score says the note; the performer says how. The module looks at the recent notes: it marks the leap, sustains the peak of the phrase, shortens two quick notes, ties the rest. Breath is spent over the phrase and comes back in a rest. Three axes of character (ENERG, SUAV, BRILHO) give the personality, and DERIVA makes it change slowly. With EXPR at 0, the note comes out raw.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>EXPR</b>: how much interpretation; at 0, the raw note.</li>
+      <li><b>GLIDE</b>: the time to slide between notes, up to 0.3 s.</li>
+      <li><b>VIB</b>: the depth of vibrato on long notes.</li>
+      <li><b>ENERG</b>: the energetic character, which marks the leaps.</li>
+      <li><b>SUAV</b>: the smooth character, which ties the notes.</li>
+      <li><b>BRILHO</b>: the bright character, which opens the tone at the peak.</li>
+      <li><b>DERIVA</b>: how much the character changes over time.</li>
+    </ul>
+    <p>Inputs: PTCH takes the pitch, GATE the gate of each note, CAR moves the character by CV. Outputs: PTCH is the played pitch, AMP the dynamics, BRT the brightness, FRASE the position in the phrase, GT the articulated gate.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the pitch and gate of a QUANTIZER into PTCH and GATE. Patch the PTCH output into the 1V/O of an OSC and GT into the voice's envelope.</li>
+      <li>Set EXPR to 0 and then to 0.8: compare the raw note with the played one.</li>
+      <li>Patch AMP into the CV1 of the voice's VCA and BRT into the filter cutoff: the line gains dynamics and colour.</li>
+      <li>Raise VIB and GLIDE on a slow line: it starts to sing.</li>
+    </ol>
+  </article>
   <article class="modulo" id="mod-PHRASE">
     <h3>PHRASE</h3>
     <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="PHRASE module panel" width="237" height="300" loading="lazy" /></figure>
@@ -1256,7 +1816,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-ROUTE">
-  <h2>ROUTE <small>4 modules</small></h2>
+  <h2>ROUTE <small>6 modules</small></h2>
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="SWITCH module panel" width="142" height="300" loading="lazy" /></figure>
@@ -1271,6 +1831,8 @@
       <li><b>DEMUX</b>: off, four inputs to one output; on, one input to four outputs.</li>
       <li><b>GLID</b>: a gradual transition between positions, in which the two sources blend for a moment. At zero the cut is clean.</li>
       <li><b>SLEW</b>: smooths the switch to avoid clicks. Best to always leave a little.</li>
+      <li><b>FANT</b>: the ghost scanner. The switch remembers its last addresses, and the FANT output reads the place where it has been, like a trail.</li>
+      <li><b>ATRAS</b>: how many steps back the ghost reads, from 1 to 3.</li>
     </ul>
     <p>Inputs: A, B, C and D, the sources; CLK, the pulse that advances; RST, to go back to the first position; ADR, to choose the position with a signal. Outputs: OA, OB, OC and OD; STP, the current position as a control signal.</p>
     <h4>Try this</h4>
@@ -1295,6 +1857,7 @@
       <li><b>RING</b>: instead of adding the inputs on an output, multiplies them, which produces metallic tones with audio signals.</li>
       <li><b>SAT</b>: saturation that keeps the level in check when you feed the matrix back into itself.</li>
       <li><b>DRIFT</b>: makes the 16 cells wander slowly.</li>
+      <li><b>HIST</b>: routes with history. Each crossing keeps the wear of what has passed through it: a used path widens and an abandoned one narrows. The matrix remembers where the sound has gone.</li>
     </ul>
     <p>Inputs: IN1 to IN4. Outputs: OUT1 to OUT4.</p>
     <h4>Try this</h4>
@@ -1351,9 +1914,60 @@
       <li>Connect Y' to the FC input of a FILTER in the sound's path: the filter follows the movement.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-VIA">
+    <h3>VIA</h3>
+    <figure class="painel"><img src="assets/modulos/VIA.webp" alt="VIA module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>VIA is the signal's path treated as matter. There are seven gates the sound can pass through: resistor, diode, capacitor, pulse, transistor, backflow and loudspeaker. The open ones are combined by their average. Each leaves the mark of a component on the sound.</p>
+    <h4>How to think about it</h4>
+    <p>In a circuit, the wire is never neutral: the diode cuts, the capacitor holds and releases, the loudspeaker has a body and saturates. VIA puts those behaviours between any two modules, on an audio or a control cable. The first six gates come from Antitotem; FALANTE is a resonant body tuned by CORPO. With no gate open, the path is silent.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RES</b>: the resistor: the signal, attenuated.</li>
+      <li><b>DIODO</b>: rectifies; only the top side of the wave passes, with direction.</li>
+      <li><b>CAP</b>: the capacitor, which holds and releases slowly.</li>
+      <li><b>PULSO</b>: the edge only; the signal becomes a threshold, almost a step.</li>
+      <li><b>TRANS</b>: the asymmetric curve of the transistor, together with the capacitor.</li>
+      <li><b>REFLX</b>: backflow, the difference between the signal and the capacitor's memory: a current that returns altered.</li>
+      <li><b>FALANTE</b>: the body of a loudspeaker, which resonates and saturates.</li>
+      <li><b>MEM</b>: the capacitor's time, from 1 ms to 2 s.</li>
+      <li><b>CORPO</b>: the loudspeaker's resonance, from 40 to 400 Hz.</li>
+      <li><b>NIVEL</b>: the output level.</li>
+    </ul>
+    <p>Inputs: IN takes the signal, MEM moves the capacitor's time. Outputs: OUT is the transformed signal, CAP the state of the capacitor as CV.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Run a voice through VIA with only RES open: the sound passes unchanged.</li>
+      <li>Open FALANTE and turn CORPO: the voice takes on the body of a small or a large cabinet.</li>
+      <li>Close everything and open only DIODO and CAP: an eaten-away tone with memory.</li>
+      <li>Patch an LFO into IN and use the CAP output to move a filter: VIA also treats control signals.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-RELATE">
+    <h3>RELATE</h3>
+    <figure class="painel"><img src="assets/modulos/RELATE.webp" alt="RELATE module panel" width="65" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>RELATE takes two voices and returns them transformed by the relationship between them. An envelope follower measures when each one sounds, and a verb decides what that relationship does.</p>
+    <h4>How to think about it</h4>
+    <p>In a group, musicians do not play alone: one answers, another gives way, a third catches on. RELATE puts that listening between two voices of the patch. There are five verbs. Shadow: B sounds where A sounded, some time later. Hocket: one gives way when the other sounds. Contagion: the slow envelope of each one contaminates the other, and the two start breathing together. Friction: where both sound together, the mix gains their product, which heals slowly once the meeting passes. Ring: the mix is the pure product of the two.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>VERBO</b>: the relationship, from 0 to 4 (shadow, hocket, contagion, friction, ring).</li>
+      <li><b>INT</b>: the intensity of the relationship.</li>
+      <li><b>TEMPO</b>: the delay of the shadow and the slowness of the other relationships.</li>
+    </ul>
+    <p>Inputs: A and B take the two voices. Outputs: OA and OB are the transformed voices, MIX their sum, ENC the meeting, from 0 to 1.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the main voice into A and the counter-voice into B, and OA and OB into two MIXER channels.</li>
+      <li>With VERBO on hocket, hear the voices start taking turns.</li>
+      <li>Switch to shadow and raise TEMPO: the second voice becomes the rhythmic echo of the first.</li>
+      <li>Patch ENC into the MIX of a SPACE: when the two meet, the space opens up.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-SPACE">
-  <h2>SPACE <small>7 modules</small></h2>
+  <h2>SPACE <small>11 modules</small></h2>
   <article class="modulo" id="mod-SPACE">
     <h3>SPACE</h3>
     <figure class="painel"><img src="assets/modulos/SPACE.webp" alt="SPACE module panel" width="142" height="300" loading="lazy" /></figure>
@@ -1534,6 +2148,102 @@
       <li>Record a phrase as with SAMPLER: the voice on IN and the DIV output of a LOGIC, with DIV at 16, on REC. Connect OUT to the MIXER and turn LOOP on.</li>
       <li>Connect the BI output of a FUNCTION at about 2 Hz to SCR and raise GRAB to the middle. The record goes back and forth, a scratch.</li>
       <li>Remove the cable from SCR. Connect the GATE output of a DECISION with low BIAS to BRK. Every now and then, the record brakes and spins up again.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SPRING">
+    <h3>SPRING</h3>
+    <figure class="painel"><img src="assets/modulos/SPRING.webp" alt="SPRING module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>SPRING is a spring reverb. In an amplifier, a real spring carries the sound from one end to the other, and each trip back and forth arrives with the lows delayed relative to the highs: that is the "boing". The module imitates this with a delay loop and filters that spread the frequencies in time.</p>
+    <h4>How to think about it</h4>
+    <p>It is less a space than an object: a metal tank that sounds on its own. TENS is the length of the spring, DRIP how much "boing" it has, DAMP the brightness, DECAY how long it lasts. The KICK input shakes the tank, like someone bumping the amplifier.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>DECAY</b>: how long the tail lasts.</li>
+      <li><b>TENS</b>: the spring tension; it changes the pitch of the "boing".</li>
+      <li><b>DAMP</b>: takes brightness out of the tail.</li>
+      <li><b>DRIP</b>: how much of the spring's characteristic dispersion comes through.</li>
+      <li><b>MIX</b>: the balance between the original sound and the spring.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, KICK shakes the tank, TENS moves the tension by CV. Outputs: OUT is the mix, WET the spring only.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Run a voice through SPRING with MIX at 0.4, DRIP high and DAMP low: the surf sound.</li>
+      <li>Patch a slow CLOCK into KICK: the tank crashes by itself.</li>
+      <li>Patch a slow LFO into TENS: the echo detunes and groans.</li>
+      <li>Send WET to its own MIXER channel: the spring becomes an instrument.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PRISM">
+    <h3>PRISM</h3>
+    <figure class="painel"><img src="assets/modulos/PRISM.webp" alt="PRISM module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>PRISM splits sound into colours, as a prism splits light. There are six bands, from low to high, each delayed by its own index and placed somewhere in the stereo field. A hit becomes a rainbow that runs down in time.</p>
+    <h4>How to think about it</h4>
+    <p>In glass, each colour travels at its own speed. Here DISP is the thickness of the glass and CURVE the direction: positive, the highs arrive later, as with light; negative, the lows arrive later, which glass does not do. FDBK sends each colour back into the prism, and the echoes separate more on each pass.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>DISP</b>: the maximum delay between colours, up to 400 ms.</li>
+      <li><b>CURVE</b>: the direction and shape of the dispersion, from −1 to 1.</li>
+      <li><b>SPRD</b>: how widely the colours spread in stereo.</li>
+      <li><b>FDBK</b>: how much of each colour goes back into the prism.</li>
+      <li><b>MIX</b>: the balance between the original and the dispersed sound.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, DISP moves the dispersion by CV. Outputs: OUT is the mix, WET the dispersed sound only.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Run a DRUM through PRISM with CURVE at 1, DISP at 200 ms and SPRD at maximum: each hit runs from low to high, from one side to the other.</li>
+      <li>Set CURVE to −1 and compare.</li>
+      <li>Raise FDBK to 0.7, with DISP at 80 ms and MIX at 0.6: coloured echoes.</li>
+      <li>Patch a slow LFO into DISP: the rainbow breathes.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-APOCRIFO">
+    <h3>APOCRIFO</h3>
+    <figure class="painel"><img src="assets/modulos/APOCRIFO.webp" alt="APOCRIFO module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>APOCRIFO brings the distant past into the present, as a rupture. LOOPER repeats the now; APOCRIFO quotes what sounded at least IDADE seconds ago. It records the input, never its own output: the apocryphal never quotes itself.</p>
+    <h4>How to think about it</h4>
+    <p>There are three ways to quote. Corroded: the passage comes back reversed and eaten away, with the present ducked underneath, like a corrupted memory. Cut: an editing cut, the passage comes back clean once and the splices fall on zero crossings, like the tape editor's blade. Parenthesis: the now stutters for an instant while the patch carries on underneath, and returns exactly where the patch already is. A quote comes from a trigger at CIT or by itself, through CHANCE.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>MODO</b>: corroded (0), cut (1) or parenthesis (2).</li>
+      <li><b>IDADE</b>: how far back the quote comes from, from 5 to 55 s.</li>
+      <li><b>DUR</b>: how long the quoted passage lasts.</li>
+      <li><b>CHANCE</b>: how often spontaneous quotes happen; at 0, only by trigger.</li>
+      <li><b>PROF</b>: the depth of the quote over the present.</li>
+      <li><b>SEED</b>: the seed that chooses the passages.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, CIT fires a quote. Outputs: OUT is the sound with the quotes, ATIVO a gate while a quote sounds, IDADE how far back it came from.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the MIXER output into IN and OUT into the MASTER.</li>
+      <li>Set CHANCE to 0.3, MODO to corroded and IDADE to 30: now and then, the piece from half a minute ago tears through the middle.</li>
+      <li>Switch to cut mode and patch the COL of COHERENCE into CIT: when the line gets too predictable, the piece cuts to the past.</li>
+      <li>Patch the IDADE output into the cutoff of a FILTER: the older the quote, the darker it is.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-CUTUP">
+    <h3>CUTUP</h3>
+    <figure class="painel"><img src="assets/modulos/CUTUP.webp" alt="CUTUP module panel" width="81" height="206" loading="lazy" /></figure>
+    <h4>What it is</h4>
+    <p>CUTUP cuts up the patch's own sound in tempo. It keeps the last four seconds and, when called, makes an editing gesture over the last beats of the clock: a stutter, a shuffled burst, a microscopic repeat or a silence.</p>
+    <h4>How to think about it</h4>
+    <p>It is the cut-up technique of William Burroughs and tape collage, put on the bus. Gestures come by gate, each at its own input, or by themselves through CHANCE. Each fragment has soft 3 ms edges, and so does the whole gesture, so the cut does not click.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>CHANCE</b>: how often spontaneous gestures happen; at 0, only by gate.</li>
+      <li><b>MICRO</b>: how many repeats the microscopic gesture has, from 2 to 8.</li>
+      <li><b>MIX</b>: the balance between the original and the cut-up sound.</li>
+      <li><b>SEED</b>: the seed that chooses gestures and slices.</li>
+    </ul>
+    <p>Inputs: IN takes the sound, CLK the patch's clock, STUT fires the stutter, BURST the burst of shuffled slices, MICRO the microscopic repeat, GAP a beat of silence. Outputs: OUT is the cut-up sound, ATIVO a gate while a gesture sounds.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Patch the MIXER output into IN, OUT into the MASTER and the CLOCK into CLK.</li>
+      <li>Set CHANCE to 0.15: now and then, the patch cuts itself up right in time.</li>
+      <li>Patch the Euclidean output of CLOCK into STUT: the stutter falls on the beats of the rhythm.</li>
+      <li>Patch the EOS of a SEQUENCE into GAP: each phrase ends with a cut silence.</li>
     </ol>
   </article>
 </section>

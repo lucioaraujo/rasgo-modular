@@ -10,6 +10,8 @@ In a patch that transforms itself, changing material matters as much as changing
 - DEMUX: off, four inputs to one output; on, one input to four outputs.
 - GLID: a gradual transition between positions, in which the two sources blend for a moment. At zero the cut is clean.
 - SLEW: smooths the switch to avoid clicks. Best to always leave a little.
+- FANT: the ghost scanner. The switch remembers its last addresses, and the FANT output reads the place where it has been, like a trail.
+- ATRAS: how many steps back the ghost reads, from 1 to 3.
 Inputs: A, B, C and D, the sources; CLK, the pulse that advances; RST, to go back to the first position; ADR, to choose the position with a signal. Outputs: OA, OB, OC and OD; STP, the current position as a control signal.
 
 ## Experimente

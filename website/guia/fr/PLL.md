@@ -13,7 +13,9 @@ OSC peut aussi s'accrocher à un autre oscillateur, mais d'un seul coup (c'est l
 - FM : à quel point le signal sur l'entrée FM fait bouger la hauteur.
 - FBK : quelle part de son propre signal revient dans le circuit, ajoutant de la texture sans désaccorder.
 - FTYP : choisit entre six types de retour, chacun avec sa couleur.
+- PERTO : le seuil de la quasi-rencontre, en Hz. Quand le battement entre les fréquences devient plus lent que cela, elles se rencontrent.
 Entrées : 1V/O pour la hauteur, FM et REF, la référence à suivre. Sorties : OUT, RING (le PLL multiplié par la référence) et LOCK, un signal de contrôle qui indique à quel point il est accroché.
+La sortie ENC pulse quand les fréquences se rencontrent, SEP quand elles s'éloignent à nouveau, et BAT donne le battement en CV.
 
 ## Experimente
 1. Branchez OUT sur une entrée du MIXER. Sans rien sur REF, c'est un oscillateur ordinaire ; tournez SHAPE pour entendre les formes.

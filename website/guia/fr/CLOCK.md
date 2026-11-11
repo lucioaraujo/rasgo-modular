@@ -16,7 +16,9 @@ Au lieu de programmer coup par coup, vous décrivez le rythme avec deux nombres.
 - ACC-A, ACC-B : les accents tombent sur les pas multiples de ces nombres. Avec 4 et 3, par exemple, les accents forment un motif de trois contre quatre.
 - AND : décide si l'accent exige les deux nombres à la fois ou si l'un des deux suffit.
 - FEEL : en combien de parties se divise chaque battement : deux, trois (triolets), cinq, sept, neuf, onze, ou une division tirée au sort à chaque pas.
+- PHAS : le phasing de Steve Reich. La sortie FASE est une deuxième horloge un peu plus rapide, jusqu'à 3 %, qui s'éloigne de la principale puis retombe en phase.
 Entrées : EXT, pour suivre des impulsions extérieures ; RST, pour revenir au début ; BPM, pour moduler le tempo. Sorties : CLK, EUC et ACC.
+La sortie MET donne la force métrique du pas actuel : 1 sur le premier pas du cycle, moins sur les temps faibles.
 
 ## Experimente
 1. Branchez EUC sur l'entrée GATE d'un DRUM, et OUT du DRUM sur une entrée du MIXER.

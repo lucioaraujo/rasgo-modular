@@ -1,5 +1,5 @@
 ## O que é
-HARMONY décide par quelles tonalités passe la musique. De temps en temps, ou à chaque impulsion sur l'entrée ADV, il choisit un nouveau centre tonal, selon l'un des six mouvements que les musiciens de jazz et de cinéma utilisent depuis des décennies. La sortie ROOT donne la nouvelle tonique sur la même échelle de hauteur que celle que comprennent les oscillateurs.
+HARMONY décide par quelles tonalités passe la musique. De temps en temps, ou à chaque impulsion sur l'entrée ADV, il choisit un nouveau centre tonal, selon l'un des sept mouvements que les musiciens de jazz et de cinéma utilisent depuis des décennies. La sortie ROOT donne la nouvelle tonique sur la même échelle de hauteur que celle que comprennent les oscillateurs.
 
 ## Como pensar nele
 QUANTIZER garde la mélodie juste, mais toujours dans la même tonalité. La musique aime voyager, et chaque style voyage à sa façon. Le réglage MOVE choisit le parcours : Coltrane, qui saute d'une tierce majeure à chaque changement et boucle un cycle de trois tonalités, comme dans Giant Steps ; substitution tritonique, qui rejoint la tonalité suivante par un chemin inattendu ; médiante chromatique, des changements par tierce à la couleur de musique de film ; emprunt modal, qui garde la tonique et change le mode ; jazz modal, qui ne bouge presque jamais ; et backdoor, qui monte d'un ton entier.
@@ -7,12 +7,14 @@ QUANTIZER garde la mélodie juste, mais toujours dans la même tonalité. La mus
 Branchez la sortie ROOT sur l'entrée ROOT du QUANTIZER et la sortie SCALE sur l'entrée SCL. À chaque changement, la gamme de la mélodie change, et chaque note passe à la plus proche de la nouvelle gamme : la mélodie reste dans le même registre, avec une autre couleur. Pour entendre la mélodie sauter vers le nouveau centre, branchez aussi la sortie ROOT sur l'entrée TRSP du QUANTIZER.
 
 ## Controles
-- MOVE : le type de parcours, parmi les six décrits plus haut.
+- MOVE : le type de parcours, parmi les sept décrits.
 - RATE : le rythme des changements, quand rien n'arrive sur ADV. D'un changement toutes les quelques minutes à deux par seconde.
 - ROOT : la tonique de départ, vers laquelle le module revient quand il reçoit une impulsion sur RST.
 - S-LO, S-HI : la plage des gammes qui peuvent être tirées au sort à chaque changement.
 - HOLD : la probabilité qu'un changement soit ignoré, ce qui allonge certaines sections.
+- CICLO : dans le mouvement néo-riemannien, le chemin à travers les transformations : promenade libre, cycle hexatonique (P et L en alternance), cycle octatonique (P et R en alternance) ou LR, les quintes qui marchent.
 Entrées : ADV, l'impulsion qui demande un changement ; RST, pour revenir au début. Sorties : ROOT, la tonique en hauteur ; SCALE, le numéro de la gamme ; CHG, une impulsion à chaque changement.
+Le septième mouvement est néo-riemannien : l'accord parfait subit P (la parallèle), R (la relative) ou L (l'échange de la sensible), chacune déplaçant une seule note d'un ou deux demi-tons. La sortie OP indique quelle transformation a eu lieu.
 
 ## Experimente
 1. Montez la mélodie du QUANTIZER : la sortie CV d'un TURING, mené par le CLOCK, sur l'entrée CV du QUANTIZER, et PTCH du QUANTIZER sur 1V/O d'un OSC qui passe par un ENVELOPE jusqu'au MIXER.

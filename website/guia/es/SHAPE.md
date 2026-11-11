@@ -12,6 +12,7 @@ Un filtro quita armónicos a un sonido rico; SHAPE hace el camino inverso, a par
 - SAT: redondea los picos después del pliegue, suavizando el resultado.
 - LVL: el volumen de salida.
 - DRIFT: una oscilación lenta en la cantidad de pliegue.
+- TEAR: el pliegue que rasga. Un pliegue común se refleja siempre en el mismo punto; con TEAR por encima de 0, el punto cambia en cada ciclo de la entrada, sorteado en el paso por cero, sin chasquidos. La forma queda un poco distinta en cada ciclo.
 Entradas: IN, el sonido; MOD, la segunda señal para RING; FCV, para modular el pliegue.
 
 ## Experimente

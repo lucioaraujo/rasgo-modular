@@ -11,7 +11,10 @@ A patch nobody is touching tends to go round in circles after a while. DRIFT is 
 - STRD: at zero the four outputs move almost together; at maximum each goes its own way.
 - ANCHR: the memory. At zero the walk never returns; high, it tends to come back to places it has been, which gives the piece something like recurring themes.
 - BIAS: moves the resting point up or down.
+- RESID: the residue. The return to the landmark is never identical: each return shifts the field a little.
+- ELAST: how the field returns to rest: spring (as before), rubber (free near the centre, strong pull at the edges) or plastic (no return: the rest point moves to where the field lingers).
 Inputs: ADV, a pulse that forces a step; RATE, to modulate the speed. Outputs: A, B, C and D, the four aspects of the walk; FLD, the unweighted walk; EVT, a pulse on each step.
+The CAPT input stores the landmark now, the place the drift returns to.
 
 ## Experimente
 1. Build any voice that goes through a FILTER and a SPACE before the MIXER.

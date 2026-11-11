@@ -4,11 +4,16 @@ Definição visual e editorial do site do instrumento, conforme
 `RASGO_DOCUMENTATION/design/WEBSITES.md §5` (que lista o que cada site
 deve documentar).
 
-Estado de publicação preparado em 18/10/2026: páginas da v0.1.7.
+Estado de publicação preparado em 11/11/2026: páginas da v0.1.8, com os 88
+módulos. Os 28 que entraram depois da v0.1.7 ganharam verbetes completos nos
+quatro idiomas e imagens do painel. As imagens foram exportadas sem áudio
+(`RASGO_EXPORTAR_PATCH`), a partir de um patch de demonstração que liga cada
+entrada livre à serra do OSC, ao CLK do CLOCK ou ao BI do FUNCTION. Antes,
+em 18/10/2026: páginas da v0.1.7.
 Versão e downloads publicados são registrados no [README principal](../README.md)
 e em [PUBLICACAO.md](../PUBLICACAO.md). Ter um arquivo nesta pasta não
 significa que ele já foi enviado ao site. LISTEN e PHRASE têm guias completos
-e imagens reais nos quatro idiomas. Os links da v0.1.7 só devem ser
+e imagens reais nos quatro idiomas. Os links de uma versão só devem ser
 publicados depois que a release tiver os seis anexos.
 
 ## Propósito, públicos, idiomas
@@ -32,7 +37,7 @@ site em menos idiomas que o produto seria uma regressão.
 |---|---|---|
 | `index.html` (pt) | apresentação completa | esta página |
 | `en.html` · `fr.html` · `es.html` | traduções integrais | `index.html` |
-| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia dos 60 módulos da v0.1.7 | catálogo do app + `guia/<idioma>/<TIPO>.md` |
+| `modulos.html` · `modulos-en.html` · `modulos-fr.html` · `modulos-es.html` | guia dos 88 módulos da v0.1.8 | catálogo do app + `guia/<idioma>/<TIPO>.md` |
 
 Duas páginas por idioma. A segunda segue o precedente do Antitotem, que já
 tem `install.html` por idioma: `.page-nav` no cabeçalho ao lado do seletor
@@ -47,7 +52,7 @@ repositório. O site resume e aponta; cópia editada à mão diverge.
 
 ## O guia dos módulos é GERADO, e por quê
 
-As quatro páginas são montadas pelo gerador. O catálogo de 60 tipos vem
+As quatro páginas são montadas pelo gerador. O catálogo de 88 tipos vem
 do app (`LearnCatalog.hpp` e `ReactiveLearn.hpp`); os textos didáticos
 completos vêm de `guia/<idioma>/<TIPO>.md`, conforme `ESTILO.md`.
 Cada texto tem explicação, função musical, controles e experiência guiada.
@@ -57,7 +62,7 @@ regressões do website são verificações distintas. Para regenerar:
 ```sh
 ../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
 python3 gerar_modulos.py
-python3 estado.py --depois 0.1.7
+python3 estado.py --depois 0.1.8
 python3 seo.py
 python3 verificar.py
 python3 -B -m unittest discover -s . -p 'test_*.py'
@@ -229,7 +234,7 @@ Quem usa leitor de tela precisa da imagem, não do rótulo dela.
 `href`/`src` interno aponta para arquivo que existe; **nenhum recurso
 externo** além dos links para o portal e para o GitHub — nada de CDN, nada
 de fonte remota; seletor de idioma e `.page-nav` marcando a página certa em
-cada uma; os 60 módulos presentes nas quatro páginas de guia; nenhum
+cada uma; os 88 módulos presentes nas quatro páginas de guia; nenhum
 resíduo de português nas traduções.
 
 **Ainda não verificado, e é honesto dizer:** nenhum navegador real abriu

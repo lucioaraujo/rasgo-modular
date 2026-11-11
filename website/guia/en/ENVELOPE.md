@@ -15,7 +15,9 @@ In version 0.1.7, ATK, DEC, SUS and REL are vertical sliders: drag upwards to in
 - TRIG: in one position, the note holds as long as the pulse lasts; in the other, each pulse fires the whole curve without waiting.
 - VCA: how much the built-in volume acts on the sound passing through. At zero the sound goes through unchanged and only the ENV output matters.
 - LVL: the output volume.
+- LOOP: the envelope restarts by itself when it ends, becoming a cycle that plays without a gate. In LOOP, SUS no longer holds: it becomes the level where the fall ends and the release begins.
 Inputs: IN, the sound; GATE, the pulse that fires the note; TIME, to speed up or slow down all stages. Outputs: OUT, the articulated sound; ENV, the curve.
+The EOC output gives a short pulse at the end of each envelope, or of each cycle in LOOP.
 
 ## Experimente
 1. Connect the SAW output of an OSC to the IN input, OUT to a MIXER input, and the EUC output of CLOCK to GATE. You hear notes.

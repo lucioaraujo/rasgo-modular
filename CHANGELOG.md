@@ -7,7 +7,24 @@ pronto.
 
 ---
 
-## Em desenvolvimento (depois da v0.1.7)
+## v0.1.8 — 2026-11-11
+
+**Resumo.** De 60 a 88 módulos. Novos: LADDER, ACCENT, BLEFE, APOCRIFO,
+TAP, FRONTEIRA, COMPARADOR, EPICYCLE, POLYGON, VIA, RELATE, CUTUP, BUDGET,
+INTERPRET, SUPPLY, MAGNET e ORBIT, além dos que entraram depois da v0.1.7
+(DYNAMICS, ARP, CELL, MARKOV, BOUNCE, SPRING, MOUSSE, PENDULUM, PRISM,
+COHERENCE, KEY). Quinze módulos ganharam funções, desligadas por padrão,
+para que os patches antigos soem iguais: OSC, QUANTIZER, HARMONY, VCA,
+ENVELOPE, ADDITIVE, CLOCK, SHAPE, CHAOS, WAVETABLE, MATRIX, DRIFT, PLL,
+SWITCH e SEQUENCE. A seed ganhou regras novas, e as seeds da v0.1.7 geram
+outros patches. Mudou também o manuseio do rack. Os guias do site cobrem os
+88 módulos nos quatro idiomas, conferidos contra os rótulos do painel
+(`website/checar_guia.py`). Testes: 116 no CTest, todos passando no Linux.
+A rodada interativa do autor foi em Linux; Windows e macOS ficam com a
+matriz da CI da tag.
+
+Os itens abaixo, do mais novo para o mais antigo, são o registro da versão.
+
 
 - **Correção: a seed volta a compor com o rack inteiro** (11 nov., relato
   do autor: "os seeds mudaram, não estão mais tão interessantes", "mais

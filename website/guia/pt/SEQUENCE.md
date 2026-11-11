@@ -6,13 +6,17 @@ O TURING faz a frase nascer do acaso; a SEQUENCE parte de uma frase que você de
 
 ## Controles
 - LEN: quantos dos oito passos entram na frase.
-- MODE: a ordem de leitura: para a frente, para trás, ida e volta, sorteada, ou vagando passo a passo.
+- MODE: a ordem de leitura: para a frente, para trás, ida e volta, sorteada, vagando passo a passo, ou o cursor, um corpo que anda pelos passos empurrado pelo relógio e atraído ou repelido por um alvo.
 - RATE: o relógio interno, usado quando nada chega em CLK.
 - GATE: quanto tempo cada nota fica ligada dentro do passo. Curto soa destacado; longo, ligado.
 - GLIDE: faz a altura escorregar de uma nota à seguinte.
 - RANGE: quantas oitavas os oito valores cobrem, até duas.
 - P1 a P8: a altura de cada passo.
 - G1 a G8: liga ou silencia cada passo.
+- INERC: no modo cursor, o quanto o cursor guarda a velocidade de um pulso a outro.
+- FORCA: no modo cursor, a força na direção do ALVO: positiva atrai, e o cursor se demora perto dele; negativa repele.
+- ALVO: o passo que atrai ou repele o cursor.
+- FADIG: a fadiga. Cada passo que toca se cansa e, cansado demais, cala nessa vez: a repetição se gasta. Vale em qualquer modo.
 Entradas: CLK, o pulso que avança; RST, para voltar ao primeiro passo. Saídas: PTCH, a altura; GATE, o pulso da nota; EOS, um pulso a cada fim de frase.
 
 ## Experimente

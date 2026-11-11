@@ -9,6 +9,7 @@ Think of it as a hand on a volume knob, moved by another module. With an envelop
 - CV1, CV2: how much the control signal acts, and in which direction. Negative inverts: the volume drops as the control rises.
 - RSP1, RSP2: the response curve. At zero, linear; at maximum, exponential, which sounds more natural for volume.
 - DRIFT: a small, slow wobble in both volumes.
+- SAT: the colour of an analogue VCA. It saturates the input before the gain, like the transistor pair of an OTA: a little fattens the sound, a lot compresses and warms it. At 0, the VCA is clean.
 Inputs: IN1 and IN2, the sounds; CV1 and CV2, the controls. Outputs: O1, O2 and SUM, the two added together.
 
 ## Experimente

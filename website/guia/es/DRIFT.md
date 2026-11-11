@@ -11,7 +11,10 @@ Un patch que nadie toca tiende a dar vueltas en círculo después de un rato. DR
 - STRD: en cero, las cuatro salidas andan casi juntas; al máximo, cada una va por su lado.
 - ANCHR: la memoria. En cero, el paseo nunca vuelve; alta, tiende a regresar a lugares por los que ya pasó, lo que da a la pieza algo así como temas que reaparecen.
 - BIAS: desplaza el punto de reposo hacia arriba o hacia abajo.
+- RESID: el residuo. La vuelta a la marca nunca es idéntica: cada vuelta desplaza un poco el campo.
+- ELAST: cómo vuelve el campo al reposo: resorte (como antes), goma (libre cerca del centro, tirón fuerte en los bordes) o plástico (sin vuelta: el reposo se mueve hacia donde el campo se demora).
 Entradas: ADV, un pulso que fuerza un paso; RATE, para modular la velocidad. Salidas: A, B, C y D, los cuatro aspectos del paseo; FLD, el paseo sin pesos; EVT, un pulso en cada paso.
+La entrada CAPT guarda ahora la marca, el lugar al que vuelve la deriva.
 
 ## Experimente
 1. Arme cualquier voz que pase por un FILTER y por un SPACE antes del MIXER.

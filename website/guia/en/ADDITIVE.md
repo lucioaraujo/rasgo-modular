@@ -13,7 +13,9 @@ The four central knobs shape the whole spectrum at once, so you never have to to
 - COMB: carves regular notches into the spectrum, like a comb filter. At zero nothing changes.
 - FM: how much the signal on the FM input moves the pitch.
 - DRIFT: lets each partial detune and breathe a little, slowly. At zero the sound is completely stable.
+- TENS: the tension on the bundle of partials. Each of the 64 partials is a fibre with its own strength; under tension the fibres break one by one, sometimes in avalanches, and the tone empties out. The break is permanent, until a pulse at RST.
 Inputs: 1V/O for pitch, TILT and STRCH to modulate those two controls, and FM.
+The TENS input adds tension by CV, RST restores the bundle, the RSG output pulses on each broken fibre, and INT tells how much of the bundle is still intact.
 
 ## Experimente
 1. Connect OUT to a MIXER input with TILT in the middle. You hear a soft note.

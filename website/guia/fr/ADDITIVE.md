@@ -13,7 +13,9 @@ Les quatre boutons centraux modèlent tout le spectre d'un coup, sans que vous a
 - COMB : creuse des vallées régulières dans le spectre, comme un filtre en peigne. À zéro, rien ne change.
 - FM : à quel point le signal sur l'entrée FM fait bouger la hauteur.
 - DRIFT : fait se désaccorder et respirer un peu chaque partiel, lentement. À zéro, le son est parfaitement stable.
+- TENS : la tension sur le faisceau de partiels. Chacun des 64 partiels est une fibre avec sa propre résistance ; sous tension, les fibres cèdent une à une, parfois en avalanche, et le timbre se vide. La rupture est définitive, jusqu'à une impulsion sur RST.
 Entrées : 1V/O pour la hauteur, TILT et STRCH pour moduler ces deux réglages, et FM.
+L'entrée TENS ajoute de la tension par CV, RST restaure le faisceau, la sortie RSG pulse à chaque fibre rompue et INT indique la part du faisceau encore intacte.
 
 ## Experimente
 1. Branchez OUT sur une entrée du MIXER, TILT au milieu. Vous entendez une note douce.
