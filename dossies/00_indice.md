@@ -104,6 +104,8 @@ propriedade do cabo, não um módulo do catálogo.
 | 73 | [`73_key.md`](73_key.md) | `KEY` (o tom de quem toca: Krumhansl–Kessler ponderado por duração; ROOT/SCL no formato do QUANTIZER) | DECISION | implementação local, 2026-11-11 |
 | 74 | [`74_ladder.md`](74_ladder.md) | `LADDER` (o filtro do grave: escada ZDF transistor↔diodo contínua, pico afinado, compensação do grave exata, laço a 2×) | TRANSFORM | implementação local, 2026-11-11 |
 | 75 | [`75_accent.md`](75_accent.md) | `ACCENT` (o campo de acento: métrica, salto, ápice, externo, agógico, síncope; herança, supressão, rotação; seis destinos e o empilhamento da 303) | DECISION | implementação local, 2026-11-11 |
+| 76 | [`76_blefe.md`](76_blefe.md) | `BLEFE` (o jogo do sinal: verdade ou blefe soam igual; confiança, traição, recusa, perdão) | DECISION | implementação local, 2026-11-11 |
+| 77 | [`77_apocrifo.md`](77_apocrifo.md) | `APOCRIFO` (cita o próprio passado: corroída, corte de montagem no zero, parêntese) | SPACE | implementação local, 2026-11-11 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

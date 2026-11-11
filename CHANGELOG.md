@@ -9,6 +9,19 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote do rasgo** (11 nov., "pode avançar nos módulos restantes"; estudo da
+  família §4.8.3).
+  - **Módulo novo: BLEFE (#76).** O jogo do sinal: verdade ou blefe soam
+    igual. Tem confiança por média móvel, traição só depois de confiança
+    construída, recusa e perdão (RST). Família DECISÃO.
+  - **Módulo novo: APÓCRIFO (#77).** Cita o próprio passado (até 60 s) em
+    três modos: corroída, corte de montagem no cruzamento de zero e
+    parêntese. Família SPACE.
+  - **ADDITIVE: FIBRA.** Os parciais rasgam sob tensão (Fiber Bundle Model,
+    Weibull, avalanches), com cicatriz até o RST. TENS = 0 é o de antes.
+  - Os dois módulos novos entram no rack da seed (**as seeds mudam**); a
+    tensão do ADDITIVE fica fora do sorteio e do VARIA.
+
 - **Lote da harmonia** (11 nov., recomendações seguidas com "avance").
   - **QUANTIZER: CRIVO**, peneiras de Xenakis com união ou interseção de
     duas classes de resíduo, à vista nos knobs. A escala pode não se repetir

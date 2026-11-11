@@ -110,6 +110,20 @@ fundos (formante ou filtro em pente).
 por parcial, de senoides lentas incomensuráveis (sem RNG, reprodutível).
 0 = estático.
 
+## FIBRA: o rasgo da matéria
+
+**TENS** (knob e jack) põe **tensão** no feixe de parciais. Cada parcial é
+uma fibra, com sua resistência. A que mais soa carrega mais. Quando passa do
+limite, ela **rasga**: estala e cala, e a carga dela vai às vizinhas, que
+podem rasgar juntas numa avalanche. O fundamental nunca rasga. A cicatriz
+fica: o som se esvazia e não volta, até um gatilho em **RST** tecer um feixe
+novo. **RSG** pulsa a cada rasgo e **INT** diz quanto do feixe continua
+inteiro. TENS em 0 é o ADDITIVE de sempre.
+
+Receita: um envelope muito lento (`FUNCTION`, 60 s) no TENS, e o RSG no
+gatilho de um `DRUM` baixinho. Cada fibra que rasga se ouve duas vezes: no
+timbre que perde um harmônico e no golpe.
+
 ## Como cabear
 
 **Autônomo** — `FREQ` fixo, `DRIFT` pequeno, um LFO no `STRCH`:

@@ -582,6 +582,16 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_accent_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_accent_tests COMMAND rasgo_modular_accent_tests)
 
+    add_executable(rasgo_modular_blefe_tests tests/test_blefe.cpp)
+    target_include_directories(rasgo_modular_blefe_tests PRIVATE src)
+    target_compile_options(rasgo_modular_blefe_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_blefe_tests COMMAND rasgo_modular_blefe_tests)
+
+    add_executable(rasgo_modular_apocrifo_tests tests/test_apocrifo.cpp)
+    target_include_directories(rasgo_modular_apocrifo_tests PRIVATE src)
+    target_compile_options(rasgo_modular_apocrifo_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_apocrifo_tests COMMAND rasgo_modular_apocrifo_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})

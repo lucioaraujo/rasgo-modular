@@ -158,6 +158,7 @@ public:
                     || w.bind == "sub_div" // OSC: o divisor muda a nota do grave aos saltos
                     || w.bind == "tuning" || w.bind.rfind("sieve_", 0) == 0
                     || w.bind == "nr_cycle" // afinação, crivo, ciclo: estrutura, do músico
+                    || (t == "ADDITIVE" && w.bind == "tension") // FIBRA: rasga para sempre
                     || (t == "PHRASE" && w.bind == "seed")) // motif identity
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;

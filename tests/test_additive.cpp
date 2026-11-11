@@ -239,6 +239,59 @@ void testPanel() {
 
 }  // namespace
 
+
+// FIBRA: sob tensão os parciais rasgam, o fundamental sobrevive, a
+// cicatriz fica até o RST; sem tensão, nada muda
+void testFiberTearing() {
+    Additive a;
+    a.setParameter("freq", 110.0f);
+    a.setParameter("tilt", 0.8f);
+    a.setParameter("tension", 0.0f);
+    render(a, 2000);
+    check(a.broken() == 0, "TENS 0: nenhuma fibra rasga");
+
+    Additive b;
+    b.setParameter("freq", 110.0f);
+    b.setParameter("tilt", 0.8f);
+    b.setParameter("tension", 1.0f);
+    b.prepare(kSr, kB);
+    std::vector<AudioBlock> out(3, AudioBlock(kSr, 1, kB));
+    AudioBlock rst(kSr, 1, kB);
+    std::vector<const AudioBlock*> ins{nullptr, nullptr, nullptr, nullptr, nullptr, &rst};
+    int pulses = 0, maxAtOnce = 0, last = 0;
+    float prev = 0.0f, intactMin = 1.0f;
+    bool finite = true;
+    for (int blk = 0; blk < int(20.0f * kSr / kB); ++blk) {   // 20 s
+        for (std::size_t k = 0; k < kB; ++k) rst.at(0, k) = 0.0f;
+        b.process(ins, out);
+        for (std::size_t k = 0; k < kB; ++k) {
+            if (prev < 0.5f && out[1].at(0, k) >= 0.5f) ++pulses;
+            prev = out[1].at(0, k);
+            if (!std::isfinite(out[0].at(0, k)) || std::fabs(out[0].at(0, k)) > 1.0f) finite = false;
+        }
+        intactMin = std::min(intactMin, out[2].at(0, kB - 1));
+        const int nb = b.broken();
+        maxAtOnce = std::max(maxAtOnce, nb - last);
+        last = nb;
+    }
+    std::cerr << "   FIBRA: " << b.broken() << " fibras rasgadas em 20 s, " << pulses
+              << " pulsos, maior avalanche " << maxAtOnce << ", INT " << intactMin << "\n";
+    check(b.broken() > 10, "TENS 1: as fibras rasgam");
+    check(b.fiberAlive(0), "o fundamental sobrevive");
+    check(pulses > 0 && intactMin < 1.0f, "RSG pulsa, INT cai");
+    check(maxAtOnce >= 2, "avalanche: mais de uma fibra num instante");
+    check(finite, "o estalo fica limitado");
+    // a cicatriz: sem tensão, nada volta
+    b.setParameter("tension", 0.0f);
+    const int scars = b.broken();
+    for (int blk = 0; blk < 400; ++blk) b.process(ins, out);
+    check(b.broken() == scars, "a cicatriz fica");
+    // RST: um tecido novo
+    for (std::size_t k = 0; k < kB; ++k) rst.at(0, k) = 1.0f;
+    b.process(ins, out);
+    check(b.broken() == 0, "RST: o feixe se refaz");
+}
+
 int main() {
     testHarmonicDecay();
     testTiltBrightens();
@@ -253,6 +306,7 @@ int main() {
     testBounded();
     testAutonomous();
     testPanel();
+    testFiberTearing();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular ADDITIVE tests passed\n";
