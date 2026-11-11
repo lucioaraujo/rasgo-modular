@@ -257,3 +257,74 @@ Leitura de `README.md`, `docs/OVERVIEW.md` e da árvore `src/` do Cardinal.
 Para seguir: o autor decide se o Modular ganha um alvo de plugin e, se
 ganhar, em que ordem (Synth primeiro, por ser o caso de uso de um
 instrumento que soa sozinho).
+
+## 7. Melodia, harmonia, escalas e as famílias menores (2026-11-11)
+
+Pedido do autor durante a CI da v0.1.8: "o que temos no cardinal sobre
+melodias, harmonias, escalas?" e "o que há de inspiração no cardinal para
+suprir as deficiências de cada família?". Varredura dos manifestos
+(`plugin.json`) da extração local (§1), por tags e descrições. As licenças
+variam (MIT, BSD-3, GPL, CC0): pela convenção da família, entra **o
+conceito**, com origem citada e desvio próprio, **nunca o código**.
+
+### 7.1 Melodia, harmonia, escalas (85 módulos; os que trazem ideia nova)
+
+- **Variação harmônica:**
+  - AmalgamatedHarmonics Galaxy (acordes pelo círculo de quintas), Fifths
+    and Fourths (o círculo como controle), Bombe (registrador de
+    deslocamento de acordes), Progress;
+  - PS-PurrSoftware ModeScaleProgressions (progressões por grau no modo);
+  - EnigmaCurry NegativeHarmony (espelho no eixo tonal, Levy);
+  - unless_modules avoider (evita as notas a evitar sobre o acorde);
+  - AaronStatic DiatonicCV, forsitan interea (qualidade, voicing, inversão,
+    harmonizar), CVfunk Weave (permutações do acorde).
+- **Escalas além das 12:**
+  - Venom NORSIQ (não oitavantes por intervalos; acorde → escala) e HQ (série
+    harmônica/sub-harmônica de uma raiz; cf. `SpectralConsonance` do Studio);
+  - GrandeModular QuantMT, Quant Intervals, Microtonal Chords e Notes;
+  - ImpromptuModular AdaptiveQuantizer (escala que se adapta; cf. KEY);
+  - AriaSalvatrice Quale (acorde ↔ escala); h4n4 Xen Quantizer (Scala).
+- **Melodia:**
+  - Autinn Fluencerator (melodia aleatória com restrições de cantabilidade);
+  - AlgoritmArte MusiFrog (sapo num lago harmônico);
+  - Biset Tree Seed (melodias que crescem em árvore);
+  - unless_modules mr. chainkov (Markov; cf. MARKOV).
+
+### 7.2 Famílias menores do Modular
+
+Contagem na v0.1.8: SOURCE 13, TRANSFORM 16, MODULATE 13, TIME 10,
+DECISION 14, ROUTE 6, SPACE 11, OUT 5.
+
+- **OUT:**
+  - analisador de espectro (Bogaudio ANALYZER) e visor polar das 12 notas por
+    FFT (CVfunk Flower Patch);
+  - visor XY/estéreo;
+  - gravador de gesto/CV (FehlerFabrik Fax, Stoermelder ReMOVE, voxglitch XY);
+  - envios e retornos (GlueTheGiant Bus Route); stems no REC.
+- **ROUTE:**
+  - porta de Bernoulli (Mutable Branches, Admiral Shifts);
+  - crossfader/morph (Befaco Morphader);
+  - morph de estados do patch (Stoermelder TRANSIT);
+  - espalhamento estéreo (Biset Omega);
+  - da família: SWARM.
+- **TIME:**
+  - mapa topográfico de bateria (Valley Topograph, conceito do Grids);
+  - tempo por fasor com swing, humanização e stutter (série HetrickCV);
+  - rajadas orgânicas (Befaco Burst; CVfunk Collatz, Picus);
+  - relógio probabilístico (FehlerFabrik Monte);
+  - explorador estocástico (Venom Rhythm Explorer);
+  - Rungler (HetrickCV);
+  - da família: ECLIPSE, SEASON.
+- **SPACE:**
+  - reverb FDN (ChowFDN) e placa Dattorro (Valley Plateau);
+  - fita com memória seletiva (PathSet IceTray) e eco BBD (MUS-X);
+  - multi-tap (CVfunk Tri Delay) e Haas (Sonus);
+  - física como espaço (Sapphire Elastika, Nucleus);
+  - picotador de breakbeat (voxglitch Autobreak; cf. CUTUP).
+
+Leitura: os buracos maiores são TIME (o tempo numa grade só; faltam tempo
+curvo, rajadas e mapas) e ROUTE (falta roteamento que decide e transforma).
+Isso conversa com o "padrão sempre similar" das seeds (`TAREFAS.md`, 11/11,
+noite). Limite: busca por tags e palavras; um módulo descrito com outros
+termos pode ter ficado de fora.
+

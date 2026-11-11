@@ -27,6 +27,97 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - Pendente: displays próprios de EPICYCLE, POLYGON, ORBIT e MAGNET (hoje os
   visores mostram um traço genérico); fase didática.
 
+## Ideias e pedidos do autor — 11/11/2026 (noite), durante a CI da v0.1.8
+
+Registro fiel da conversa. Nada aqui foi implementado; cada item espera
+proposta e OK do autor, "cada módulo no seu tempo". Comentários do autor não
+são ordens de implementar.
+
+**Próximas etapas de desenvolvimento** (decisão do autor, 11/11/2026, depois
+da v0.1.8): "aprofundamento de possibilidades de seeds, módulos com um leque
+expandido de receitas e experimentações — estudos de conexões, propostas
+conceituais, síntese".
+
+1. **Seeds:** aprofundar as possibilidades de composição (ver
+   "Seeds — aprofundamento" abaixo).
+2. **Receitas:** um leque maior de receitas por módulo, com a tabela de
+   encaixes que serve à seed e à inserção cabeada.
+3. **Experimentação:** estudos de conexões entre módulos e propostas
+   conceituais.
+4. **Síntese:** aprofundar a síntese, inclusive ligada à harmonia.
+5. **Módulos novos** para enriquecer o instrumento, a começar pelas
+   famílias menores (OUT, ROUTE, TIME, SPACE). Fontes: o estudo da família
+   (SWARM, ECLIPSE, SEASON, PREDATOR, GENDYN, RUNGLER) e o §7 do estudo do
+   Cardinal. Um por vez, com dossiê e portão conceitual antes do código.
+
+Antes do código: uma proposta escrita para o autor ler, baseada no estudo da
+família, no estudo do Cardinal e no diagnóstico abaixo.
+
+**Decidido pelo autor para a próxima versão**
+
+- [ ] **Papéis dos módulos novos na seed** — o autor: "deveria ter já
+  inserido, não me referi aos novos módulos". INTERPRET, RELATE, POLYGON,
+  MAGNET, EPICYCLE, VIA e CUTUP (RECORTE). Patch pronto em
+  `.local-build/em_espera/2026-11-11_seed_papeis_novos.patch`, testado contra
+  a régua de qualidade. A poda do processador sem entrada vai separada, para
+  escuta (o FILTER mudo no ch3 já existia nas seeds aprovadas).
+- [ ] **Visor do KEY** ("ok, faça na próxima versão"): hoje o nome do tom
+  está em 9 px, cinza, por cima das barras, e o autor só via a cor da tônica.
+  Fazer: nome do tom grande e legível, a nota que soa agora ao lado
+  ("Dm · A"), e a barra da nota atual com contorno, separada da tônica.
+
+**Ideias para propor (esperam o autor)**
+
+- **Inserção cabeada:** módulo arrastado para uma seed de que se gostou
+  entra já ligado onde faz sentido. Recomendação: cabos-fantasma, com clique
+  para aceitar, tecla para o próximo encaixe e Esc para deixar solto.
+  Alternativas: automático com DESFAZ, ou menu. Pré-requisito: uma **tabela de
+  encaixes por módulo**, lida pela seed e pela inserção. Hoje 42 dos 88
+  módulos têm receita própria no código da seed; 46 só entram pela passada
+  genérica.
+- **KEY e o patch inteiro:** hoje o KEY ouve uma linha de alturas (PTCH +
+  GATE), por desenho. Possibilidades: um modo de áudio que estime o tom do
+  conjunto por croma/FFT (por exemplo, da saída do MIXER), ou uma saída de tom
+  no SCOPE, desligada por padrão. O SCOPE tem contrato preservado (13/10).
+- **Seeds — aprofundamento** (pedido do autor: composição, síntese,
+  conceitos, relação dos módulos, música generativa, originalidade, física,
+  matemática, acústica; ritmos, melodias, harmonias; caminhos, percursos,
+  trajetórias; eventos musicais; variação; algoritmos mais elaborados).
+  Diagnóstico medido no código:
+  - **escala** sorteada só entre as 6 primeiras do QUANTIZER, todas
+    heptatônicas (`id.scale = 1 + bits % 6`). Pentatônicas, hirajoshi, tons
+    inteiros e crivo nunca entram;
+  - **afinação** só muda pelo gene Heisenberg (~25 %);
+  - **âmbito** de 1–2 oitavas, que o DRIFT segura entre 0,7 e 1,6;
+  - **modulação** do HARMONY só como papel de limite (~15 %);
+  - **espinha única:** CLOCK → TURING/SEQUENCE → QUANTIZER → voz → ENVELOPE
+    → MIXER. CLOCK em 100 %, QUANTIZER 95 %, ENVELOPE 90 %;
+  - **tempo numa grade só:** CLOCK sempre em 16 passos, tudo derivado dele.
+    DRIFT, SWING, Heisenberg e VARIA oscilam em volta da grade. BOUNCE,
+    ORBIT, PENDULUM, MAGNET e POLYGON nunca são o relógio da peça.
+
+  Direções a propor: várias espinhas, cada uma com o seu princípio de tempo e
+  de altura; escalas com pesos, incluindo pentatônicas, hirajoshi, tons
+  inteiros e crivos semeados; afinação como identidade; um gene de intervalo
+  (estreito/graus conjuntos ↔ largo/saltos); modulação mais frequente;
+  variação harmônica (graus, círculo de quintas, harmonia negativa, notas a
+  evitar, condução de vozes); a máquina de escalas do Trioio (§4.4 do estudo
+  da família: banco `KNOW-ESCALAS` de 2576 escalas citadas; rotação,
+  alteração, espelho, interpolação, pivô; harmonia dos graus; intenção e mapa
+  afetivo; a escala como comportamento); síntese ligada à harmonia (a escala
+  que nasce do timbre: `SpectralConsonance` do Studio, os corpos do
+  Aquorbium; fontes GENDYN, Rungler, VOSIM, Walsh). Tudo pela régua de
+  qualidade e com leveza (poucos genes, não um sistema pesado de regras).
+- **Duplicar SEQUENCE na seed** (e talvez TURING, ARP, CELL): melodias que
+  defasam (5 × 8 passos), sequenciador de sequenciador (TRSP/tônica),
+  melodia + baixo, pergunta e resposta. Hoje só OSC, VCA, ENVELOPE, LPG,
+  STRING e MATTER se duplicam. A cópia deve entrar por uma corrente própria
+  do sorteio, para não mudar as seeds atuais.
+- **Famílias menores** (OUT 5, ROUTE 6, TIME 10, SPACE 11) e **melodia,
+  harmonia e escalas no Cardinal**: levantamento de 11/11 em
+  `dossies/ESTUDO_cardinal_catalogo_e_licencas.md` §7. Só conceito, nunca
+  código.
+
 ## ▶ 11/11/2026 (madrugada): correções técnicas e auditoria dos módulos
 
 - [x] **Push** (11/11, autorizado pelo autor depois das etapas): 88 commits,
