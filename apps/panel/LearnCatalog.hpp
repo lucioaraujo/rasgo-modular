@@ -769,6 +769,19 @@ inline const LearnTable& learnTable() {
             {"out:gate", {"O gate de cada nota improvisada.", "", ""}},
             {"out:surprise", {"Desvio Rasgo: quão improvável foi a nota tocada (0 = a esperada, 1 = a mais rara). Uma CV para mover o resto do patch.", "", ""}},
         }},
+        {"COHERENCE", {
+            {"window", {"Quantas notas a COERÊNCIA lembra para medir a ordem (4–32).", "", ""}},
+            {"threshold", {"A partir de que ordem a linha conta como previsível demais (0–1). Acima disto, a pressão sobe.", "", ""}},
+            {"patience", {"Quantas notas previsíveis seguidas até romper (1–16). A pressão sobe 1/PAC por nota; uma nota imprevisível a corta pela metade.", "", ""}},
+            {"scar", {"A cicatriz: por quantas notas, depois de romper, a pressão não sobe (0–16).", "", ""}},
+            {"in:pitch", {"A linha a escutar, em 1 V/oct (só a classe de altura conta: 12 notas).", "", ""}},
+            {"in:gate", {"Cada gate aqui é uma nota. Sem cabo, conta uma nota quando a classe de altura muda.", "", ""}},
+            {"in:reset", {"Esquece a janela e zera a pressão.", "", ""}},
+            {"out:order", {"A ordem da linha (0–1): 1 = sempre a mesma nota; 0 = as 12 por igual. É 1 menos a entropia de Shannon da janela.", "", ""}},
+            {"out:pressure", {"A pressão acumulada (0–1): sobe com ordem seguida e vira o pulso de COLAPSO ao romper.", "", ""}},
+            {"out:collapse", {"Um pulso quando a ordem rompe — para resetar um sequenciador, chutar um pêndulo, abrir um filtro.", "", ""}},
+            {"out:surprise", {"Quão rara era a nota que acabou de soar, na janela antes dela (0 = a mais comum, 1 = nunca ouvida).", "", ""}},
+        }},
         {"BOUNCE", {
             {"balls", {"Quantas bolas quicam (1–3), cada uma lançada de uma altura.", "", ""}},
             {"gravity", {"A gravidade, em alturas por s² (1–40): mais gravidade, quiques mais rápidos. 9,8 → a primeira queda dura ~0,45 s.", "", ""}},
@@ -2967,6 +2980,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Cadeia de Markov que aprende e improvisa — conta as transições entre as notas que ouve (12 classes de altura) e toca sorteando a próxima pelas transições da atual.",
             "Primeira ordem, a ideia da Illiac Suite (Hiller e Isaacson, 1957) e de Xenakis. Desvios Rasgo: TEMP (do repetir ao inventar), SURP (quão rara foi a nota) e MEM (esquecer). Sem nada ligado, caminha por uma pentatônica: soa ao carregar.",
             "PHRASE (ou SIGNAL-IN → SCOPE) → LRN.P/LRN.G; MARKOV → um segundo OSC: uma voz que improvisa com o vocabulário da primeira."}},
+        {"COHERENCE", {
+            "A ordem que se rompe — escuta uma linha de alturas, mede quanto ela está previsível (entropia de Shannon das últimas notas) e, quando fica ordenada demais por tempo demais, rompe: um pulso em COLAPSO.",
+            "Inverte a ideia de que a ruptura vem do caos: a ordem extrema também rompe. Shannon (1948), a expectativa de Huron; conceito do Rasgo Synth Studio. A ruptura deixa cicatriz: a janela esquece a metade mais antiga e a pressão descansa.",
+            "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST do SEQUENCE (a linha que se repete demais se refaz); PRES → CUTOFF de um FILTER: a tensão se ouve crescer."}},
         {"BOUNCE", {
             "Bolas que quicam — até 3 bolas caem sob gravidade e perdem energia a cada quique: gates que aceleram sozinhos, acento que cai e a altura de cada bola como CV.",
             "Queda livre e colisão parcialmente elástica (física de livro-texto). Desvios Rasgo: WIND (cada quique varia, semeado) e AUTO (as bolas paradas são relançadas — toca para sempre).",
@@ -3313,6 +3330,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Markov chain that learns and improvises — it counts the transitions between the notes it hears (12 pitch classes) and plays by drawing the next from the current one's transitions.",
             "First order, the idea of the Illiac Suite (Hiller and Isaacson, 1957) and of Xenakis. Rasgo deviations: TEMP (from repeating to inventing), SURP (how rare the note was) and MEM (forgetting). With nothing patched, it walks a pentatonic: it plays on load.",
             "PHRASE (or SIGNAL-IN → SCOPE) → LRN.P/LRN.G; MARKOV → a second OSC: a voice that improvises with the first one's vocabulary."}},
+        {"COHERENCE", {
+            "Order that breaks — it listens to a line of pitches, measures how predictable it is (Shannon entropy of the last notes) and, when it stays too ordered for too long, it breaks: a pulse at COLLAPSE.",
+            "It inverts the idea that rupture comes from chaos: extreme order breaks too. Shannon (1948), Huron's expectation; concept from the Rasgo Synth Studio. The break leaves a scar: the window forgets its older half and the pressure rests.",
+            "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST of SEQUENCE (a line that repeats too much remakes itself); PRES → CUTOFF of a FILTER: you hear the tension grow."}},
         {"BOUNCE", {
             "Bouncing balls — up to 3 balls fall under gravity and lose energy at every bounce: gates that speed up by themselves, an accent that falls and each ball's height as CV.",
             "Free fall and partially elastic collision (textbook physics). Rasgo deviations: WIND (each bounce varies, seeded) and AUTO (stopped balls are dropped again — it plays forever).",
@@ -3587,6 +3608,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Chaîne de Markov qui apprend et improvise — elle compte les transitions entre les notes qu’elle entend (12 classes de hauteur) et joue en tirant la suivante parmi les transitions de l’actuelle.",
             "Premier ordre, l’idée de l’Illiac Suite (Hiller et Isaacson, 1957) et de Xenakis. Écarts Rasgo : TEMP (de répéter à inventer), SURP (à quel point la note était rare) et MEM (oublier). Sans rien de branché, elle marche sur une pentatonique : elle sonne au chargement.",
             "PHRASE (ou SIGNAL-IN → SCOPE) → LRN.P/LRN.G ; MARKOV → un second OSC : une voix qui improvise avec le vocabulaire de la première."}},
+        {"COHERENCE", {
+            "L’ordre qui se rompt — écoute une ligne de hauteurs, mesure à quel point elle est prévisible (entropie de Shannon des dernières notes) et, quand elle reste trop ordonnée trop longtemps, elle rompt : une impulsion en COLLAPSE.",
+            "Renverse l’idée que la rupture vient du chaos : l’ordre extrême rompt aussi. Shannon (1948), l’attente selon Huron ; concept du Rasgo Synth Studio. La rupture laisse une cicatrice : la fenêtre oublie sa moitié la plus ancienne et la pression se repose.",
+            "QUANTIZER.PTCH/GATE → COHERENCE ; COL → RST du SEQUENCE (une ligne qui se répète trop se refait) ; PRES → CUTOFF d’un FILTER : on entend la tension monter."}},
         {"BOUNCE", {
             "Balles qui rebondissent — jusqu’à 3 balles tombent sous la gravité et perdent de l’énergie à chaque rebond : des gates qui accélèrent d’eux-mêmes, un accent qui baisse et la hauteur de chaque balle en CV.",
             "Chute libre et collision partiellement élastique (physique de manuel). Écarts Rasgo : WIND (chaque rebond varie, semé) et AUTO (les balles arrêtées sont relâchées — il joue pour toujours).",
@@ -3861,6 +3886,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "Cadena de Markov que aprende e improvisa — cuenta las transiciones entre las notas que oye (12 clases de altura) y toca sorteando la siguiente según las transiciones de la actual.",
             "Primer orden, la idea de la Illiac Suite (Hiller e Isaacson, 1957) y de Xenakis. Desvíos Rasgo: TEMP (de repetir a inventar), SURP (cuán rara fue la nota) y MEM (olvidar). Sin nada conectado, camina por una pentatónica: suena al cargar.",
             "PHRASE (o SIGNAL-IN → SCOPE) → LRN.P/LRN.G; MARKOV → un segundo OSC: una voz que improvisa con el vocabulario de la primera."}},
+        {"COHERENCE", {
+            "El orden que se rompe — escucha una línea de alturas, mide cuán previsible es (entropía de Shannon de las últimas notas) y, cuando queda demasiado ordenada por demasiado tiempo, se rompe: un pulso en COLLAPSE.",
+            "Invierte la idea de que la ruptura viene del caos: el orden extremo también rompe. Shannon (1948), la expectativa de Huron; concepto del Rasgo Synth Studio. La ruptura deja cicatriz: la ventana olvida su mitad más antigua y la presión descansa.",
+            "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST del SEQUENCE (una línea que se repite demasiado se rehace); PRES → CUTOFF de un FILTER: se oye crecer la tensión."}},
         {"BOUNCE", {
             "Pelotas que rebotan — hasta 3 pelotas caen por la gravedad y pierden energía en cada rebote: gates que se aceleran solos, un acento que cae y la altura de cada pelota como CV.",
             "Caída libre y choque parcialmente elástico (física de manual). Desvíos Rasgo: WIND (cada rebote varía, sembrado) y AUTO (las pelotas detenidas se lanzan de nuevo — toca para siempre).",
