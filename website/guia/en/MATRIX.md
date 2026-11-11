@@ -11,6 +11,7 @@ The grid: each cell has two digits, the input and then the output. Cell 23, for 
 - RING: instead of adding the inputs on an output, multiplies them, which produces metallic tones with audio signals.
 - SAT: saturation that keeps the level in check when you feed the matrix back into itself.
 - DRIFT: makes the 16 cells wander slowly.
+- HIST: routes with history. Each crossing keeps the wear of what has passed through it: a used path widens and an abandoned one narrows. The matrix remembers where the sound has gone.
 Inputs: IN1 to IN4. Outputs: OUT1 to OUT4.
 
 ## Experimente

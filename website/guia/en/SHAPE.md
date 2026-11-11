@@ -12,6 +12,7 @@ A filter removes harmonics from a rich sound; SHAPE goes the other way, starting
 - SAT: rounds off the peaks after the fold, softening the result.
 - LVL: the output volume.
 - DRIFT: a slow wobble in the amount of folding.
+- TEAR: the fold that tears. An ordinary fold always reflects at the same point; with TEAR above 0, the point changes on every cycle of the input, drawn at the zero crossing, without clicks. The shape becomes slightly different on each cycle.
 Inputs: IN, the sound; MOD, the second signal for RING; FCV, to modulate the fold.
 
 ## Experimente

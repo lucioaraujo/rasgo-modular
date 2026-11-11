@@ -11,6 +11,7 @@ La cuadrícula: cada celda tiene dos cifras, la entrada y luego la salida. La ce
 - RING: en lugar de sumar las entradas en una salida, las multiplica, lo que produce timbres metálicos con señales de audio.
 - SAT: una saturación que contiene el nivel cuando usted realimenta la matriz.
 - DRIFT: hace que las 16 celdas paseen despacio.
+- HIST: rutas con historia. Cada cruce guarda el desgaste de lo que pasó por él: el camino usado se ensancha y el abandonado se estrecha. La matriz recuerda por dónde anduvo el sonido.
 Entradas: IN1 a IN4. Salidas: OUT1 a OUT4.
 
 ## Experimente

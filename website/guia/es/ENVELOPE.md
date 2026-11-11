@@ -15,7 +15,9 @@ En la versión 0.1.7, ATK, DEC, SUS y REL son deslizadores verticales: arrastre 
 - TRIG: en una posición, la nota se sostiene mientras dure el pulso; en la otra, cada pulso dispara la curva entera, sin esperar.
 - VCA: cuánto actúa el volumen incorporado sobre el sonido que pasa. En cero, el sonido atraviesa sin cambios y solo importa la salida ENV.
 - LVL: el volumen de salida.
+- LOOP: la envolvente vuelve a empezar sola al terminar y se convierte en un ciclo que suena sin gate. En LOOP, SUS deja de sostener y pasa a ser el nivel donde termina la caída y empieza la liberación.
 Entradas: IN, el sonido; GATE, el pulso que dispara la nota; TIME, para acelerar o retardar todas las etapas. Salidas: OUT, el sonido articulado; ENV, la curva.
+La salida EOC da un pulso corto al final de cada envolvente, o de cada ciclo en LOOP.
 
 ## Experimente
 1. Conecte la salida SAW de un OSC a la entrada IN, OUT a una entrada del MIXER, y la salida EUC del CLOCK a GATE. Oye notas.

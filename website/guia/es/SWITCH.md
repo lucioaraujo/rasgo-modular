@@ -10,6 +10,8 @@ En un patch que se transforma, cambiar de material importa tanto como cambiar de
 - DEMUX: apagado, cuatro entradas a una salida; encendido, una entrada a cuatro salidas.
 - GLID: una transición gradual entre posiciones, en la que las dos fuentes se mezclan por un instante. En cero, el corte es seco.
 - SLEW: suaviza el cambio para evitar chasquidos. Conviene dejar siempre un poco.
+- FANT: el escáner fantasma. El conmutador recuerda sus últimas direcciones, y la salida FANT lee el lugar donde estuvo, como un rastro.
+- ATRAS: cuántos pasos atrás lee el fantasma, de 1 a 3.
 Entradas: A, B, C y D, las fuentes; CLK, el pulso que avanza; RST, para volver a la primera posición; ADR, para elegir la posición con una señal. Salidas: OA, OB, OC y OD; STP, la posición actual como señal de control.
 
 ## Experimente

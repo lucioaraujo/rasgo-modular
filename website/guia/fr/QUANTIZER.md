@@ -5,11 +5,14 @@ QUANTIZER accroche un signal continu aux notes d'une gamme. Une valeur qui monte
 Les signaux de contrôle varient de façon continue, les notes de musique non. Sans quantificateur, une mélodie née du hasard tombe entre les notes et sonne faux. QUANTIZER arrondit chaque valeur à la note la plus proche de la gamme choisie. Avec une impulsion sur l'entrée TRIG, il ne change de note qu'à l'impulsion, et la mélodie prend un rythme. La sortie GATE pulse chaque fois que la note change vraiment, ce qui sert à déclencher une enveloppe seulement sur les nouvelles notes. Les entrées ROOT et SCL changent la tonique et la gamme par câble : reliées aux sorties de HARMONY, la tonalité de la mélodie change au fil de la musique.
 
 ## Controles
-- SCALE : la gamme, parmi douze : chromatique, majeure, mineure naturelle, dorienne, phrygienne dominante, lydienne, mineure mélodique, pentatonique mineure, pentatonique majeure, hirajoshi, tons entiers et octaves seules.
+- SCALE : la gamme, parmi treize : chromatique, majeure, mineure naturelle, dorienne, phrygienne dominante, lydienne, mineure mélodique, pentatonique mineure, pentatonique majeure, hirajoshi, tons entiers, octaves seules et le crible.
 - ROOT : la tonique, la note de départ de la gamme, de do à si.
 - RANGE : combien d'octaves couvre le signal d'entrée, de 1 à 6. Plus d'octaves, des sauts plus grands.
 - GLIDE : fait glisser la hauteur d'une note à la suivante.
 - HYST : une marge de tolérance. Avec un signal instable, la note ne saute pas sans cesse entre deux voisines.
+- AFIN : l'accord, appliqué après le choix de la note : tempérament égal à 12 notes (comme avant), juste, pythagoricien, mésotonique, 19 ou 31 divisions de l'octave. Les trois accords historiques sont mesurés depuis la tonique et la suivent quand elle change.
+- M1, R1, M2, R2 : le crible de Xenakis, utilisé par la gamme numéro 13. Une note passe si le reste de sa division par M1 vaut R1, ou si le reste de sa division par M2 vaut R2. Avec un M qui ne divise pas 12, la gamme ne se répète pas à l'octave.
+- AND : change le ou du crible en et : la note doit passer les deux cribles. Si aucune note ne passe, le crible revient au ou, pour ne jamais devenir muet.
 Entrées : CV, le signal à quantifier ; TRSP, pour transposer avant de quantifier ; TRIG, l'impulsion qui décide quand changer de note ; ROOT et SCL, qui, câblées, commandent la tonique et la gamme à la place des boutons. Sorties : PTCH, la hauteur ; GATE, une impulsion à chaque nouvelle note ; ST, la note en demi-tons.
 
 ## Experimente

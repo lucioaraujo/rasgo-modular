@@ -11,6 +11,8 @@ Là où OSC donne un son fixe que l'on sculpte ensuite, WAVETABLE naît en mouve
 - WARP : déforme la lecture de chaque cycle et ajoute des harmoniques à l'accent numérique, sans changer d'image.
 - FM : à quel point le signal sur l'entrée FM fait bouger la hauteur.
 - DRIFT : une petite oscillation lente de l'accord.
+- DEF : la déformation de la table ; à 0, le WAVETABLE habituel.
+- MODO : pli (la forme lue est repliée sur elle-même) ou déchirure (à chaque cycle, la lecture saute vers un autre point de la table, sans clic).
 Entrées : 1V/O pour la hauteur, POS pour déplacer la position, FM, CAP pour le son à capturer et GRAB, une impulsion qui déclenche la capture d'un nouveau cycle.
 
 ## Experimente

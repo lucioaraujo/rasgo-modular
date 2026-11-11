@@ -9,7 +9,9 @@ D'autres modules tirent des valeurs au sort, comme TURING et DECISION, ou se pro
 - DRIVE : la force qui pousse la bille entre les vallées. Plus haut, des sauts plus grands et plus fréquents.
 - DAMP : le frottement. Haut, la bille se pose dans une vallée et s'arrête presque ; bas, elle oscille largement et saute d'un côté à l'autre.
 - FRZ : fige le mouvement sur sa valeur actuelle.
+- MODO : l'attracteur. Double puits (comme avant), Rössler, qui avec DRIVE suit la route du doublement de période jusqu'au chaos, ou Aizawa, une sphère traversée par un tube.
 Entrées : RSD, une impulsion qui donne une nouvelle poussée ; RTM, pour moduler la vitesse. Sortie : OUT.
+Les sorties Y et Z donnent les autres coordonnées de l'attracteur.
 
 ## Experimente
 1. Montez une voix : la SAW d'un OSC sur l'entrée IN d'un FILTER, LO du FILTER dans le MIXER.

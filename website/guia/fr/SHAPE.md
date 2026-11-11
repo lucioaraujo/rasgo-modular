@@ -12,6 +12,7 @@ Un filtre retire des harmoniques à un son riche ; SHAPE fait le chemin inverse,
 - SAT : arrondit les crêtes après le repli, ce qui adoucit le résultat.
 - LVL : le volume de sortie.
 - DRIFT : une oscillation lente de la quantité de repli.
+- TEAR : le pli qui déchire. Un pli ordinaire se réfléchit toujours au même point ; avec TEAR au-dessus de 0, le point change à chaque cycle de l'entrée, tiré au passage par zéro, sans clic. La forme devient un peu différente à chaque cycle.
 Entrées : IN, le son ; MOD, le second signal pour RING ; FCV, pour moduler le repli.
 
 ## Experimente

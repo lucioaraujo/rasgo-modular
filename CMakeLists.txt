@@ -42,7 +42,7 @@ if (APPLE)
 endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
-project(RasgoModularPrototype VERSION 0.1.7 LANGUAGES C CXX)
+project(RasgoModularPrototype VERSION 0.1.8 LANGUAGES C CXX)
 set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}")
 
 include(CTest)

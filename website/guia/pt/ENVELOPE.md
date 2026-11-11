@@ -15,7 +15,9 @@ Na interface 0.1.7, ATK, DEC, SUS e REL são sliders verticais: arraste para cim
 - TRIG: em uma posição, a nota se sustenta enquanto o pulso durar; na outra, cada pulso dispara a curva inteira, sem esperar.
 - VCA: quanto o volume embutido age sobre o som que passa. Em zero, o som atravessa sem mudar e só a saída ENV importa.
 - LVL: o volume de saída.
+- LOOP: o envelope recomeça sozinho ao terminar e vira um ciclo que toca sem gate. Em LOOP, SUS deixa de segurar e passa a ser o nível em que a queda termina e a soltura começa.
 Entradas: IN, o som; GATE, o pulso que dispara a nota; TIME, para acelerar ou retardar todas as etapas. Saídas: OUT, o som articulado; ENV, a curva.
+A saída EOC dá um pulso curto no fim de cada envelope, ou de cada ciclo em LOOP.
 
 ## Experimente
 1. Ligue a saída SAW de um OSC na entrada IN, OUT numa entrada do MIXER, e a saída EUC do CLOCK em GATE. Você ouve notas.

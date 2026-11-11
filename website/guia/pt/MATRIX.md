@@ -11,6 +11,7 @@ A grade: cada célula tem dois algarismos, a entrada e depois a saída. A célul
 - RING: em vez de somar as entradas numa saída, multiplica, o que produz timbres metálicos com sinais de áudio.
 - SAT: uma saturação que segura o volume quando você realimenta a matriz.
 - DRIFT: faz as 16 células passearem devagar.
+- HIST: rotas com história. Cada cruzamento guarda o desgaste do que passou por ele: o caminho usado se alarga e o abandonado se estreita. A matriz lembra por onde o som andou.
 Entradas: IN1 a IN4. Saídas: OUT1 a OUT4.
 
 ## Experimente

@@ -14,6 +14,7 @@ interpretado por estímulos ao catálogo. São módulos próprios do Modular;
 SCOPE e QUANTIZER mantêm seus contratos. O catálogo completo da paleta
 se distingue do rack histórico semeado, cuja ordem está congelada em
 `seedModuleCatalog()`. Incluídos na v0.1.7.
+A v0.1.8 (11/11/2026) leva o catálogo a 88 módulos; ver `CHANGELOG.md`.
 Ao acrescentar um módulo no rack, `moduleInsertionIndex()` usa a família
 e a ordem de exibição para escolher a posição; não muda os IDs DSP nem a
 ordem relativa dos módulos existentes. Patches carregados conservam sua

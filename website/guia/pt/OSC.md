@@ -1,5 +1,5 @@
 ## O que é
-O OSC é um oscilador: ele produz uma nota contínua, sempre igual, a partir da qual quase todo som de sintetizador é construído. Ele entrega cinco formas de onda ao mesmo tempo, cada uma num jack de saída: seno, triângulo, dente de serra, pulso e uma voz uma ou duas oitavas abaixo (o sub). Você escolhe qual usar, ou usa várias.
+O OSC é um oscilador: ele produz uma nota contínua, sempre igual, a partir da qual quase todo som de sintetizador é construído. Ele entrega cinco formas de onda ao mesmo tempo, cada uma num jack de saída: seno, triângulo, dente de serra, pulso e uma voz mais grave travada na fase (o sub, de uma oitava abaixo até um dezesseis avos da frequência). Você escolhe qual usar, ou usa várias.
 
 ## Como pensar nele
 Pense no OSC como a matéria-prima. Sozinho ele soa cru, e é de propósito: o caráter vem do que você liga depois dele, como um filtro que tira brilho ou um envelope que dá forma à nota. Se você quer uma voz com personalidade pronta, o STRING e o MATTER já trazem isso; se quer um timbre que se transforma sozinho, experimente o WAVETABLE. O OSC é a base previsível, e por isso é o melhor lugar para aprender.
@@ -10,10 +10,13 @@ Pense no OSC como a matéria-prima. Sozinho ele soa cru, e é de propósito: o c
 - PW: a largura do pulso, que só afeta a saída PLS. No meio, a onda é quadrada e soa oca; perto das pontas, fica fina e anasalada.
 - FM: quanto o sinal ligado na entrada FM mexe na altura. Com outro oscilador ali e este knob alto, o timbre fica metálico, de sino.
 - DRIFT: uma oscilação lenta e pequena na afinação, como a de um oscilador analógico. Em zero, a nota fica perfeitamente parada.
-- SUB2: escolhe se a saída SUB fica uma oitava (desligado) ou duas (ligado) abaixo da nota.
 - SYNC: liga a entrada SYNC. Com ela ativa, outro oscilador mais lento força este a recomeçar o ciclo, e girar FREQ passa a mudar o timbre em vez da altura.
 - PROX: mistura cada saída com uma versão mais escura de si mesma. É um jeito de amaciar o som sem gastar um filtro.
+- PD: a distorção de fase, só na saída SIN. A fase é dobrada antes do seno, e o timbre vai do seno puro a uma onda brilhante, como nos sintetizadores de phase distortion dos anos 1980.
+- UNI: o unísono, só na saída SAW: sete serras levemente desafinadas entre si. Sobe de uma serra simples a um coro espesso.
+- SUBD: o divisor do sub, de 2 a 16. A saída SUB fica travada na fase do oscilador, uma oitava abaixo em 2, duas em 4, e em intervalos fora da oitava nos outros valores.
 Entradas: 1V/O recebe a altura vinda de um sequenciador ou quantizador, FM e PWM aceitam modulação, e SYNC recebe o oscilador que comanda o sincronismo.
+A entrada SUBD move o divisor por CV.
 
 ## Experimente
 1. Ligue a saída SAW do OSC numa entrada do MIXER e ouça um zumbido constante.

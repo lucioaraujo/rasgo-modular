@@ -12,6 +12,7 @@ O filtro tira harmônicos de um som rico; o SHAPE faz o caminho inverso, a parti
 - SAT: arredonda os picos depois da dobra, amaciando o resultado.
 - LVL: o volume de saída.
 - DRIFT: uma oscilação lenta na quantidade de dobra.
+- TEAR: a dobra que rasga. Uma dobra comum reflete sempre no mesmo ponto; com TEAR acima de 0, o ponto muda a cada ciclo da entrada, sorteado na passagem por zero, sem estalo. A forma fica um pouco diferente a cada ciclo.
 Entradas: IN, o som; MOD, o segundo sinal para o RING; FCV, para modular a dobra.
 
 ## Experimente

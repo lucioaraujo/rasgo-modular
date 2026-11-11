@@ -13,7 +13,9 @@ Os quatro knobs centrais moldam o espectro inteiro de uma vez, sem que você pre
 - COMB: abre vales regulares no espectro, como um filtro em pente. Em zero, nada muda.
 - FM: quanto o sinal na entrada FM mexe na altura.
 - DRIFT: faz cada parcial desafinar e respirar um pouco, de forma lenta. Em zero, o som é totalmente estável.
+- TENS: a tensão sobre o feixe de parciais. Cada um dos 64 parciais é uma fibra com a sua resistência; sob tensão, as fibras rompem uma a uma, às vezes em avalanche, e o timbre se esvazia. A ruptura é para sempre, até um pulso em RST.
 Entradas: 1V/O para a altura, TILT e STRCH para modular esses dois controles, e FM.
+A entrada TENS soma tensão por CV, RST restaura o feixe, a saída RSG pulsa a cada fibra rompida e INT diz quanto do feixe continua inteiro.
 
 ## Experimente
 1. Ligue OUT numa entrada do MIXER, com TILT no meio. Você ouve uma nota suave.

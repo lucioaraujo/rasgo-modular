@@ -1,5 +1,5 @@
 ## O que é
-OSC est un oscillateur : il produit une note continue et stable, la matière première de presque tous les sons de synthétiseur. Il fournit cinq formes d'onde à la fois, chacune sur sa propre sortie : sinus, triangle, dent de scie, impulsion, et une voix une ou deux octaves plus bas (le sub). Vous choisissez celle que vous voulez, ou vous en utilisez plusieurs.
+OSC est un oscillateur : il produit une note continue et stable, la matière première de presque tous les sons de synthétiseur. Il fournit cinq formes d'onde à la fois, chacune sur sa propre sortie : sinus, triangle, dent de scie, impulsion, et une voix plus grave calée sur la phase (le sub, d'une octave plus bas jusqu'à un seizième de la fréquence). Vous choisissez celle que vous voulez, ou vous en utilisez plusieurs.
 
 ## Como pensar nele
 Voyez OSC comme une matière brute. Seul, il sonne nu, et c'est voulu : le caractère vient de ce que vous branchez ensuite, comme un filtre qui retire de la brillance ou une enveloppe qui donne forme à la note. Si vous cherchez une voix qui a déjà sa personnalité, STRING et MATTER en ont une ; si vous voulez un timbre qui se transforme tout seul, essayez WAVETABLE. OSC est la base prévisible, et c'est pour cela qu'il est le meilleur endroit pour apprendre.
@@ -10,10 +10,13 @@ Voyez OSC comme une matière brute. Seul, il sonne nu, et c'est voulu : le carac
 - PW : la largeur d'impulsion, qui n'agit que sur la sortie PLS. Au milieu, l'onde est carrée et sonne creux ; vers les extrémités, elle devient fine et nasillarde.
 - FM : à quel point le signal branché sur l'entrée FM fait bouger la hauteur. Avec un autre oscillateur à cet endroit et ce bouton haut, le timbre devient métallique, comme une cloche.
 - DRIFT : une petite oscillation lente de l'accord, comme celle d'un oscillateur analogique. À zéro, la note reste parfaitement immobile.
-- SUB2 : place la sortie SUB une octave (éteint) ou deux octaves (allumé) sous la note.
 - SYNC : active l'entrée SYNC. Avec elle, un autre oscillateur plus lent force celui-ci à recommencer son cycle, et tourner FREQ change alors le timbre au lieu de la hauteur.
 - PROX : mélange chaque sortie avec une version plus sombre d'elle-même. Une façon d'adoucir le son sans y consacrer un filtre.
+- PD : la distorsion de phase, sur la sortie SIN seulement. La phase est pliée avant le sinus, et le timbre va du sinus pur à une onde brillante, comme les synthétiseurs à distorsion de phase des années 1980.
+- UNI : l'unisson, sur la sortie SAW seulement : sept dents de scie légèrement désaccordées. On passe d'une dent de scie simple à un chœur épais.
+- SUBD : le diviseur du sub, de 2 à 16. La sortie SUB reste calée sur la phase de l'oscillateur : une octave plus bas à 2, deux à 4, et des intervalles hors de l'octave pour les autres valeurs.
 Entrées : 1V/O reçoit la hauteur venant d'un séquenceur ou d'un quantificateur, FM et PWM acceptent une modulation, et SYNC reçoit l'oscillateur qui commande la synchronisation.
+L'entrée SUBD déplace le diviseur par CV.
 
 ## Experimente
 1. Branchez la sortie SAW d'OSC sur une entrée du MIXER et écoutez un bourdonnement continu.

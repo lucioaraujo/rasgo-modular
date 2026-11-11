@@ -16,7 +16,9 @@ En lugar de programar golpe a golpe, usted describe el ritmo con dos números. L
 - ACC-A, ACC-B: los acentos caen en los pasos múltiplos de estos números. Con 4 y 3, por ejemplo, los acentos forman un patrón de tres contra cuatro.
 - AND: decide si el acento necesita los dos números a la vez o basta con uno.
 - FEEL: en cuántas partes se divide cada pulso: dos, tres (tresillos), cinco, siete, nueve, once, o una división sorteada en cada paso.
+- PHAS: el phasing de Steve Reich. La salida FASE es un segundo reloj un poco más rápido, hasta un 3 %, que se aleja del principal y vuelve a coincidir.
 Entradas: EXT, para seguir pulsos de fuera; RST, para volver al principio; BPM, para modular el tempo. Salidas: CLK, EUC y ACC.
+La salida MET da la fuerza métrica del paso actual: 1 en el primer paso del ciclo, menos en los tiempos débiles.
 
 ## Experimente
 1. Conecte EUC a la entrada GATE de un DRUM, y OUT del DRUM a una entrada del MIXER.

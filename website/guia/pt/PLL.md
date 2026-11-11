@@ -13,7 +13,9 @@ O OSC também pode se prender a outro oscilador, mas de um golpe só (o sync). O
 - FM: quanto o sinal na entrada FM mexe na altura.
 - FBK: quanto o próprio sinal volta para dentro do circuito, acrescentando textura sem desafinar.
 - FTYP: escolhe entre seis tipos de retorno, cada um com uma cor diferente.
+- PERTO: o limiar do quase-encontro, em Hz. Quando o batimento entre as frequências fica mais lento que isso, elas se encontram.
 Entradas: 1V/O para a altura, FM e REF, a referência a seguir. Saídas: OUT, RING (o PLL multiplicado pela referência) e LOCK, um sinal de controle que indica o quanto ele está travado.
+A saída ENC pulsa quando as frequências se encontram, SEP quando voltam a se afastar, e BAT dá o batimento como CV.
 
 ## Experimente
 1. Ligue OUT numa entrada do MIXER. Sem nada em REF, é um oscilador comum; gire SHAPE para ouvir as formas.

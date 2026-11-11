@@ -13,7 +13,9 @@ Las cuatro perillas centrales moldean todo el espectro a la vez, sin que tenga q
 - COMB: abre valles regulares en el espectro, como un filtro de peine. En cero no cambia nada.
 - FM: cuánto mueve la altura la señal de la entrada FM.
 - DRIFT: hace que cada parcial se desafine y respire un poco, despacio. En cero, el sonido es totalmente estable.
+- TENS: la tensión sobre el haz de parciales. Cada uno de los 64 parciales es una fibra con su propia resistencia; bajo tensión, las fibras se rompen una a una, a veces en avalancha, y el timbre se vacía. La ruptura es para siempre, hasta un pulso en RST.
 Entradas: 1V/O para la altura, TILT y STRCH para modular esos dos controles, y FM.
+La entrada TENS suma tensión por CV, RST restaura el haz, la salida RSG pulsa con cada fibra rota e INT indica cuánto del haz sigue entero.
 
 ## Experimente
 1. Conecte OUT a una entrada del MIXER, con TILT en el centro. Oye una nota suave.

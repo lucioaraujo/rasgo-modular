@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — guia dos módulos</title>
-<meta name="description" content="Os 60 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app." />
+<meta name="description" content="Os 88 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — guia dos módulos">
-<meta property="og:description" content="Os 60 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.">
+<meta property="og:description" content="Os 88 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Os 60 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.",
+  "description": "Os 88 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "pt-BR",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -95,19 +95,19 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">60 módulos · 8 famílias</span>
+  <span class="status-pill">88 módulos · 8 famílias</span>
   <h1>Guia dos módulos</h1>
-  <p class="lead">Os 60 módulos do Rasgo Modular, família por família. Cada verbete conta o que o módulo faz com o som, como ele se relaciona com os vizinhos, o que muda em cada controle, e termina com alguns passos para você experimentar no app. Os exercícios partem de um patch em que o MIXER já está ligado ao MASTER, como em toda semente. Dentro do instrumento, a caixa LEARN mostra um resumo de cada módulo e de cada controle quando você passa o mouse sobre eles.</p>
+  <p class="lead">Os 88 módulos do Rasgo Modular, família por família. Cada verbete conta o que o módulo faz com o som, como ele se relaciona com os vizinhos, o que muda em cada controle, e termina com alguns passos para você experimentar no app. Os exercícios partem de um patch em que o MIXER já está ligado ao MASTER, como em toda semente. Dentro do instrumento, a caixa LEARN mostra um resumo de cada módulo e de cada controle quando você passa o mouse sobre eles.</p>
 </section>
 
 <nav class="familias" aria-label="Famílias">
   <a href="#fam-SOURCE">SOURCE <span>13</span></a>
-  <a href="#fam-TRANSFORM">TRANSFORM <span>14</span></a>
-  <a href="#fam-MODULATE">MODULATE <span>6</span></a>
-  <a href="#fam-TIME">TIME <span>5</span></a>
-  <a href="#fam-DECISION">DECISION <span>6</span></a>
-  <a href="#fam-ROUTE">ROUTE <span>4</span></a>
-  <a href="#fam-SPACE">SPACE <span>7</span></a>
+  <a href="#fam-TRANSFORM">TRANSFORM <span>16</span></a>
+  <a href="#fam-MODULATE">MODULATE <span>13</span></a>
+  <a href="#fam-TIME">TIME <span>10</span></a>
+  <a href="#fam-DECISION">DECISION <span>14</span></a>
+  <a href="#fam-ROUTE">ROUTE <span>6</span></a>
+  <a href="#fam-SPACE">SPACE <span>11</span></a>
   <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
 
@@ -117,7 +117,7 @@
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="Painel do módulo OSC" width="142" height="300" loading="lazy" /></figure>
     <h4>O que é</h4>
-    <p>O OSC é um oscilador: ele produz uma nota contínua, sempre igual, a partir da qual quase todo som de sintetizador é construído. Ele entrega cinco formas de onda ao mesmo tempo, cada uma num jack de saída: seno, triângulo, dente de serra, pulso e uma voz uma ou duas oitavas abaixo (o sub). Você escolhe qual usar, ou usa várias.</p>
+    <p>O OSC é um oscilador: ele produz uma nota contínua, sempre igual, a partir da qual quase todo som de sintetizador é construído. Ele entrega cinco formas de onda ao mesmo tempo, cada uma num jack de saída: seno, triângulo, dente de serra, pulso e uma voz mais grave travada na fase (o sub, de uma oitava abaixo até um dezesseis avos da frequência). Você escolhe qual usar, ou usa várias.</p>
     <h4>Como pensar nele</h4>
     <p>Pense no OSC como a matéria-prima. Sozinho ele soa cru, e é de propósito: o caráter vem do que você liga depois dele, como um filtro que tira brilho ou um envelope que dá forma à nota. Se você quer uma voz com personalidade pronta, o STRING e o MATTER já trazem isso; se quer um timbre que se transforma sozinho, experimente o WAVETABLE. O OSC é a base previsível, e por isso é o melhor lugar para aprender.</p>
     <h4>Controles</h4>
@@ -127,11 +127,13 @@
       <li><b>PW</b>: a largura do pulso, que só afeta a saída PLS. No meio, a onda é quadrada e soa oca; perto das pontas, fica fina e anasalada.</li>
       <li><b>FM</b>: quanto o sinal ligado na entrada FM mexe na altura. Com outro oscilador ali e este knob alto, o timbre fica metálico, de sino.</li>
       <li><b>DRIFT</b>: uma oscilação lenta e pequena na afinação, como a de um oscilador analógico. Em zero, a nota fica perfeitamente parada.</li>
-      <li><b>SUB2</b>: escolhe se a saída SUB fica uma oitava (desligado) ou duas (ligado) abaixo da nota.</li>
       <li><b>SYNC</b>: liga a entrada SYNC. Com ela ativa, outro oscilador mais lento força este a recomeçar o ciclo, e girar FREQ passa a mudar o timbre em vez da altura.</li>
       <li><b>PROX</b>: mistura cada saída com uma versão mais escura de si mesma. É um jeito de amaciar o som sem gastar um filtro.</li>
+      <li><b>PD</b>: a distorção de fase, só na saída SIN. A fase é dobrada antes do seno, e o timbre vai do seno puro a uma onda brilhante, como nos sintetizadores de phase distortion dos anos 1980.</li>
+      <li><b>UNI</b>: o unísono, só na saída SAW: sete serras levemente desafinadas entre si. Sobe de uma serra simples a um coro espesso.</li>
+      <li><b>SUBD</b>: o divisor do sub, de 2 a 16. A saída SUB fica travada na fase do oscilador, uma oitava abaixo em 2, duas em 4, e em intervalos fora da oitava nos outros valores.</li>
     </ul>
-    <p>Entradas: 1V/O recebe a altura vinda de um sequenciador ou quantizador, FM e PWM aceitam modulação, e SYNC recebe o oscilador que comanda o sincronismo.</p>
+    <p>Entradas: 1V/O recebe a altura vinda de um sequenciador ou quantizador, FM e PWM aceitam modulação, e SYNC recebe o oscilador que comanda o sincronismo. A entrada SUBD move o divisor por CV.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue a saída SAW do OSC numa entrada do MIXER e ouça um zumbido constante.</li>
@@ -155,6 +157,8 @@
       <li><b>WARP</b>: deforma a leitura de cada ciclo e acrescenta harmônicos com um sotaque digital, sem trocar de quadro.</li>
       <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
       <li><b>DRIFT</b>: uma pequena oscilação lenta na afinação.</li>
+      <li><b>DEF</b>: a deformação da tabela; em 0, o WAVETABLE de sempre.</li>
+      <li><b>MODO</b>: dobra (a forma lida é dobrada sobre si) ou rasgo (a cada ciclo, a leitura salta para outro ponto da tabela, sem estalo).</li>
     </ul>
     <p>Entradas: 1V/O para a altura, POS para mover a posição, FM, CAP para o som a ser capturado e GRAB, um pulso que manda capturar um ciclo novo.</p>
     <h4>Experimente</h4>
@@ -181,8 +185,9 @@
       <li><b>COMB</b>: abre vales regulares no espectro, como um filtro em pente. Em zero, nada muda.</li>
       <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
       <li><b>DRIFT</b>: faz cada parcial desafinar e respirar um pouco, de forma lenta. Em zero, o som é totalmente estável.</li>
+      <li><b>TENS</b>: a tensão sobre o feixe de parciais. Cada um dos 64 parciais é uma fibra com a sua resistência; sob tensão, as fibras rompem uma a uma, às vezes em avalanche, e o timbre se esvazia. A ruptura é para sempre, até um pulso em RST.</li>
     </ul>
-    <p>Entradas: 1V/O para a altura, TILT e STRCH para modular esses dois controles, e FM.</p>
+    <p>Entradas: 1V/O para a altura, TILT e STRCH para modular esses dois controles, e FM. A entrada TENS soma tensão por CV, RST restaura o feixe, a saída RSG pulsa a cada fibra rompida e INT diz quanto do feixe continua inteiro.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue OUT numa entrada do MIXER, com TILT no meio. Você ouve uma nota suave.</li>
@@ -288,8 +293,9 @@
       <li><b>FM</b>: quanto o sinal na entrada FM mexe na altura.</li>
       <li><b>FBK</b>: quanto o próprio sinal volta para dentro do circuito, acrescentando textura sem desafinar.</li>
       <li><b>FTYP</b>: escolhe entre seis tipos de retorno, cada um com uma cor diferente.</li>
+      <li><b>PERTO</b>: o limiar do quase-encontro, em Hz. Quando o batimento entre as frequências fica mais lento que isso, elas se encontram.</li>
     </ul>
-    <p>Entradas: 1V/O para a altura, FM e REF, a referência a seguir. Saídas: OUT, RING (o PLL multiplicado pela referência) e LOCK, um sinal de controle que indica o quanto ele está travado.</p>
+    <p>Entradas: 1V/O para a altura, FM e REF, a referência a seguir. Saídas: OUT, RING (o PLL multiplicado pela referência) e LOCK, um sinal de controle que indica o quanto ele está travado. A saída ENC pulsa quando as frequências se encontram, SEP quando voltam a se afastar, e BAT dá o batimento como CV.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue OUT numa entrada do MIXER. Sem nada em REF, é um oscilador comum; gire SHAPE para ouvir as formas.</li>
@@ -451,7 +457,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-TRANSFORM">
-  <h2>TRANSFORM <small>14 módulos</small></h2>
+  <h2>TRANSFORM <small>16 módulos</small></h2>
   <article class="modulo" id="mod-FILTER">
     <h3>FILTER</h3>
     <figure class="painel"><img src="assets/modulos/FILTER.webp" alt="Painel do módulo FILTER" width="118" height="300" loading="lazy" /></figure>
@@ -474,6 +480,30 @@
       <li>Gire CUT devagar de um lado ao outro e ouça o brilho entrar e sair.</li>
       <li>Suba RESO até a metade e repita: o corte fica marcado, quase uma voz.</li>
       <li>Ligue a saída ENV de um ENVELOPE na entrada FC, com o CLOCK na entrada GATE do envelope. O filtro abre a cada pulso, no efeito que se ouve em tanta música eletrônica.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-LADDER">
+    <h3>LADDER</h3>
+    <figure class="painel"><img src="assets/modulos/LADDER.webp" alt="Painel do módulo LADDER" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O LADDER é o filtro em escada, o filtro do grave: quatro degraus de 6 dB em cascata, com a saída do último devolvida à entrada como ressonância. É o desenho que R. Moog patenteou em 1969, aqui com um knob que vai da escada de transistores, redonda, à escada de diodos, ácida.</p>
+    <h4>Como pensar nele</h4>
+    <p>O FILTER é limpo e estável; o LADDER é o filtro que se comprime e encorpa quando é empurrado. Três coisas o distinguem. DIODO acopla os degraus, e no meio do caminho há escadas que não existem em circuito. O pico fica afinado no CUT em qualquer posição de DIODO, e em RESO 1 a escada canta uma senoide afinada. E COMP devolve o grave que, na escada original, some quando a ressonância sobe.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CUT</b>: a frequência de corte, de 20 Hz a 20 kHz.</li>
+      <li><b>RESO</b>: a ressonância. Em 1, a escada auto-oscila; 0,9 significa a mesma proximidade do limiar em qualquer DIODO.</li>
+      <li><b>DRIVE</b>: empurra a entrada contra a saturação dentro do laço; o nível de saída é compensado.</li>
+      <li><b>COMP</b>: devolve o grave. Em 1, o grave fica inteiro com qualquer ressonância; em 0, afunda como no original.</li>
+      <li><b>DIODO</b>: de 0 (transistores, redondo) a 1 (diodos, ácido), contínuo.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, FC move o corte em 1 volt por oitava, Q move a ressonância. Saídas: LP4 é a saída de 24 dB por oitava, LP2 a tomada do segundo degrau, de 12 dB por oitava, mais brilhante.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída SAW de um OSC em IN, LP4 num VCA e o VCA no MIXER. Ponha CUT perto de 200 Hz.</li>
+      <li>Suba RESO com COMP em 1: o pico canta e o grave fica. Baixe COMP e ouça o grave afundar.</li>
+      <li>Ponha DIODO em 1, RESO em 0,85 e DRIVE em 0,6, com um envelope curto em FC: o baixo ácido.</li>
+      <li>Tire o cabo de IN, ponha RESO em 1 e ligue a altura de um QUANTIZER em FC: a escada toca a melodia como um oscilador.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-FORMANT">
@@ -618,6 +648,7 @@
       <li><b>CV1, CV2</b>: o quanto o sinal de controle age, e em que sentido. Negativo inverte: o volume cai quando o controle sobe.</li>
       <li><b>RSP1, RSP2</b>: a curva de resposta. Em zero, linear; no máximo, exponencial, que soa mais natural para volume.</li>
       <li><b>DRIFT</b>: uma oscilação lenta e pequena nos dois volumes.</li>
+      <li><b>SAT</b>: a cor de um VCA analógico. Satura a entrada antes do ganho, como o par de transistores de um OTA: um pouco engorda o som, muito o comprime e o aquece. Em 0, o VCA é limpo.</li>
     </ul>
     <p>Entradas: IN1 e IN2, os sons; CV1 e CV2, os controles. Saídas: O1, O2 e SUM, a soma dos dois.</p>
     <h4>Experimente</h4>
@@ -667,6 +698,7 @@
       <li><b>SAT</b>: arredonda os picos depois da dobra, amaciando o resultado.</li>
       <li><b>LVL</b>: o volume de saída.</li>
       <li><b>DRIFT</b>: uma oscilação lenta na quantidade de dobra.</li>
+      <li><b>TEAR</b>: a dobra que rasga. Uma dobra comum reflete sempre no mesmo ponto; com TEAR acima de 0, o ponto muda a cada ciclo da entrada, sorteado na passagem por zero, sem estalo. A forma fica um pouco diferente a cada ciclo.</li>
     </ul>
     <p>Entradas: IN, o som; MOD, o segundo sinal para o RING; FCV, para modular a dobra.</p>
     <h4>Experimente</h4>
@@ -804,9 +836,38 @@
       <li>Ligue a saída BI de um FUNCTION em IN2 e escute a saída SUM no lugar de O1: as duas modulações agem juntas.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-DYNAMICS">
+    <h3>DYNAMICS</h3>
+    <figure class="painel"><img src="assets/modulos/DYNAMICS.webp" alt="Painel do módulo DYNAMICS" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O DYNAMICS é um compressor. Ele segura os picos para o som ficar mais junto, e deixa um som abaixar outro, como o pad que respira quando o bumbo bate. Aqui ele faz uma terceira coisa: o que ele ouve e quanto ele abaixa saem como sinais de controle, para mover qualquer outro módulo.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense num técnico de som com a mão no fader: quando o som passa do limiar, ele abaixa; quando o som cai, ele devolve. RATIO é a força da mão, ATK e REL são a pressa dela. A entrada SIDE troca o que ele escuta: com um bumbo ali, é o bumbo que decide quando o resto abaixa. Dois desvios Rasgo mexem no tempo: BRTH faz a volta seguir o intervalo entre os golpes, e DRIFT varia ataque e volta a cada golpe.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>THRES</b>: o limiar, de −48 a 0 dB. Acima dele, o som é abaixado.</li>
+      <li><b>RATIO</b>: quanto abaixa. Com 4, cada 4 dB acima do limiar viram 1; com 20, vira um limitador.</li>
+      <li><b>KNEE</b>: de uma vez (0) ou aos poucos (até 12 dB).</li>
+      <li><b>ATK, REL</b>: o tempo de descer (0,1 a 200 ms) e o de voltar (5 ms a 2 s).</li>
+      <li><b>GAIN</b>: devolve o nível perdido, até 24 dB.</li>
+      <li><b>SIDE</b>: o detector ouve a entrada IN (0) ou a entrada SIDE (1).</li>
+      <li><b>RMS</b>: mede a energia média em vez do pico; soa mais suave.</li>
+      <li><b>GATE</b>: inverte a curva e vira um noise gate, que fecha o que fica abaixo do limiar.</li>
+      <li><b>BRTH</b>: a volta acompanha o andamento dos golpes que ele ouve.</li>
+      <li><b>DRIFT</b>: um acaso semeado no ataque e na volta, golpe a golpe.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, SIDE o que o detector deve ouvir, THR move o limiar. Saídas: OUT é o som comprimido, ENV o nível que ele ouve, GR quanto ele abaixa agora.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue um TRIGSEQ num DRUM e o DRUM na entrada SIDE. Ligue um CHORD em IN e OUT no MIXER.</li>
+      <li>Deixe SIDE em 1, RATIO em 6, ATK curto e REL perto de 200 ms: o acorde abaixa a cada bumbo.</li>
+      <li>Suba BRTH: a volta passa a respirar no ritmo.</li>
+      <li>Ligue a saída ENV no CUT de um FILTER noutro som: o filtro abre com a força do que o compressor ouve.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-MODULATE">
-  <h2>MODULATE <small>6 módulos</small></h2>
+  <h2>MODULATE <small>13 módulos</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="Painel do módulo ENVELOPE" width="142" height="300" loading="lazy" /></figure>
@@ -825,8 +886,9 @@
       <li><b>TRIG</b>: em uma posição, a nota se sustenta enquanto o pulso durar; na outra, cada pulso dispara a curva inteira, sem esperar.</li>
       <li><b>VCA</b>: quanto o volume embutido age sobre o som que passa. Em zero, o som atravessa sem mudar e só a saída ENV importa.</li>
       <li><b>LVL</b>: o volume de saída.</li>
+      <li><b>LOOP</b>: o envelope recomeça sozinho ao terminar e vira um ciclo que toca sem gate. Em LOOP, SUS deixa de segurar e passa a ser o nível em que a queda termina e a soltura começa.</li>
     </ul>
-    <p>Entradas: IN, o som; GATE, o pulso que dispara a nota; TIME, para acelerar ou retardar todas as etapas. Saídas: OUT, o som articulado; ENV, a curva.</p>
+    <p>Entradas: IN, o som; GATE, o pulso que dispara a nota; TIME, para acelerar ou retardar todas as etapas. Saídas: OUT, o som articulado; ENV, a curva. A saída EOC dá um pulso curto no fim de cada envelope, ou de cada ciclo em LOOP.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue a saída SAW de um OSC na entrada IN, OUT numa entrada do MIXER, e a saída EUC do CLOCK em GATE. Você ouve notas.</li>
@@ -899,8 +961,10 @@
       <li><b>STRD</b>: em zero, as quatro saídas andam quase juntas; no máximo, cada uma vai para um lado.</li>
       <li><b>ANCHR</b>: a memória. Em zero, o passeio nunca volta; alto, ele tende a retornar a lugares por onde já passou, o que dá à peça algo como temas que reaparecem.</li>
       <li><b>BIAS</b>: desloca o ponto de repouso para cima ou para baixo.</li>
+      <li><b>RESID</b>: o resíduo. A volta ao marco nunca é idêntica: cada volta desloca um pouco o campo.</li>
+      <li><b>ELAST</b>: como o campo volta ao repouso: mola (o de sempre), borracha (livre perto do centro, puxão forte nas bordas) ou plástico (sem volta: o repouso anda para onde o campo se demora).</li>
     </ul>
-    <p>Entradas: ADV, um pulso que força um passo; RATE, para modular a velocidade. Saídas: A, B, C e D, os quatro aspectos do passeio; FLD, o passeio sem pesos; EVT, um pulso a cada passo.</p>
+    <p>Entradas: ADV, um pulso que força um passo; RATE, para modular a velocidade. Saídas: A, B, C e D, os quatro aspectos do passeio; FLD, o passeio sem pesos; EVT, um pulso a cada passo. A entrada CAPT guarda agora o marco, o lugar a que a deriva volta.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Monte uma voz qualquer que passe por um FILTER e por um SPACE antes do MIXER.</li>
@@ -922,8 +986,9 @@
       <li><b>DRIVE</b>: a força que empurra a bola entre os vales. Mais alto, saltos maiores e mais frequentes.</li>
       <li><b>DAMP</b>: o atrito. Alto, a bola assenta num vale e quase para; baixo, ela oscila muito e pula de um lado para o outro.</li>
       <li><b>FRZ</b>: congela o movimento no valor atual.</li>
+      <li><b>MODO</b>: o atrator. Poço duplo (o de sempre), Rössler, que com DRIVE percorre a rota de duplicação de período até o caos, ou Aizawa, uma esfera atravessada por um tubo.</li>
     </ul>
-    <p>Entradas: RSD, um pulso que dá um empurrão novo; RTM, para modular a velocidade. Saída: OUT.</p>
+    <p>Entradas: RSD, um pulso que dá um empurrão novo; RTM, para modular a velocidade. Saída: OUT. As saídas Y e Z dão as outras coordenadas do atrator.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Faça uma voz: SAW de um OSC na entrada IN de um FILTER, LO do FILTER no MIXER.</li>
@@ -957,9 +1022,182 @@
       <li>Gire CORR de um extremo ao outro. Num lado, notas agudas vêm escuras; no meio, sem relação; no outro, notas agudas vêm brilhantes.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-BOUNCE">
+    <h3>BOUNCE</h3>
+    <figure class="painel"><img src="assets/modulos/BOUNCE.webp" alt="Painel do módulo BOUNCE" width="98" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O BOUNCE solta bolas que quicam, cada vez mais baixo e mais rápido, até parar. São até três bolas. Cada quique é um gate, a força do quique é um acento, e a altura de cada bola é uma CV que sobe e desce.</p>
+    <h4>Como pensar nele</h4>
+    <p>É um ritmo que acelera sozinho, como uma bola de pingue-pongue largada na mesa. ELAST decide quanto a bola devolve a cada quique, GRAV é a pressa. Com AUTO, as bolas que param são relançadas, e WIND as empurra de leve, então o módulo toca para sempre sem se repetir.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>BALLS</b>: quantas bolas, de 1 a 3.</li>
+      <li><b>GRAV</b>: a gravidade. Mais alta, quiques mais rápidos.</li>
+      <li><b>ELAST</b>: quanto cada quique devolve. Perto de 1, a bola demora a parar.</li>
+      <li><b>SPRD</b>: o quanto as bolas são soltas de alturas diferentes.</li>
+      <li><b>WIND</b>: um vento leve que impede repetições exatas.</li>
+      <li><b>AUTO</b>: relança as bolas que pararam.</li>
+    </ul>
+    <p>Entradas: DROP solta as bolas de novo, GRAV move a gravidade por CV. Saídas: GT é o gate de cada quique, ACC a força do quique, H1, H2 e H3 a altura de cada bola.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue GT num DRUM e o DRUM no MIXER: ouça o quique acelerar até parar.</li>
+      <li>Ligue ACC no nível do DRUM: os primeiros quiques soam mais fortes.</li>
+      <li>Ligue H1 num QUANTIZER e o QUANTIZER num OSC: uma melodia que cai.</li>
+      <li>Ligue GT no CLK de um ARP: o arpejo acelera junto com a bola.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-MOUSSE">
+    <h3>MOUSSE</h3>
+    <figure class="painel"><img src="assets/modulos/MOUSSE.webp" alt="Painel do módulo MOUSSE" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O MOUSSE é uma espuma. Aperte, e parte dela afunda na hora e parte escorre devagar; solte, e ela volta sem pressa. A saída DEPTH é o quanto ela está afundada: um envelope que não é feito de retas, mas de matéria.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um envelope comum sobe e desce por linhas. A espuma tem memória: golpes seguidos a afundam mais, e com FATG ela amolece com o uso. STIFF é a dureza, SLOW o quanto ela é fluida, RET quantas vezes a volta é mais lenta que a descida. Sem nada em HIT, ela é tocada sozinha no ritmo de RATE.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>STIFF</b>: a dureza. Dura, afunda pouco e volta rápido.</li>
+      <li><b>VISC</b>: a viscosidade, o tempo de escorrer, de 0,05 a 8 s.</li>
+      <li><b>SLOW</b>: quanto do afundamento é lento em vez de imediato.</li>
+      <li><b>RET</b>: quantas vezes a volta é mais lenta, de 1 a 8.</li>
+      <li><b>FORCE</b>: a força de cada golpe.</li>
+      <li><b>FATG</b>: a fadiga; golpes seguidos amolecem a espuma.</li>
+      <li><b>RATE</b>: o ritmo dos golpes internos, quando nada está ligado em HIT.</li>
+    </ul>
+    <p>Entradas: HIT dá um golpe, PRESS apoia a mão com força contínua. Saídas: DEPTH é o afundamento, SPEED a velocidade dele, REST um gate quando a espuma descansa.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue um DRUM em HIT e DEPTH no CUT de um FILTER, com o cabo atenuado e invertido: cada golpe escurece e o brilho volta devagar.</li>
+      <li>Suba FATG e toque golpes seguidos: a espuma vai cedendo.</li>
+      <li>Ligue a saída ENV do DYNAMICS em PRESS: a própria mistura empurra a espuma.</li>
+      <li>Ligue REST no gate de um ENVELOPE: um som só quando a espuma descansa.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PENDULUM">
+    <h3>PENDULUM</h3>
+    <figure class="painel"><img src="assets/modulos/PENDULUM.webp" alt="Painel do módulo PENDULUM" width="98" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O PENDULUM é um pêndulo duplo: um pêndulo com outro pendurado na ponta. Com pouca energia, ele balança quase como um relógio; com muita, o braço de baixo dá voltas e o movimento nunca se repete. As posições das duas pontas saem como CV.</p>
+    <h4>Como pensar nele</h4>
+    <p>É o exemplo clássico de caos: uma lei simples, um resultado imprevisível. ENRGY é o botão do caos. Embaixo, ordem; em cima, voltas. CROSS marca o ritmo do balanço, e FLIP marca cada volta inteira, o instante em que o caos aparece.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>ENRGY</b>: a energia do balanço; acima da metade, o caos aparece.</li>
+      <li><b>RATIO</b>: a razão entre os comprimentos dos dois braços.</li>
+      <li><b>MASS</b>: a razão entre as massas.</li>
+      <li><b>SPEED</b>: a velocidade do tempo do pêndulo.</li>
+      <li><b>DAMP</b>: o atrito; com ele, o pêndulo vai perdendo força.</li>
+      <li><b>AUTO</b>: dá um empurrão quando o pêndulo quase para.</li>
+    </ul>
+    <p>Entradas: KICK dá um empurrão, SPD move a velocidade por CV. Saídas: X1 e Y1 são a ponta do primeiro braço, X2 e Y2 a do segundo, CROSS um gate a cada passagem pelo centro, FLIP um gate a cada volta inteira.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue X2 num QUANTIZER e o QUANTIZER num OSC, e CROSS num ENVELOPE que controla o VCA da voz: uma melodia que balança.</li>
+      <li>Suba ENRGY devagar e ouça a melodia passar de regular a imprevisível.</li>
+      <li>Ligue FLIP no ADV do HARMONY: o acorde muda quando o caos aparece.</li>
+      <li>Ligue X1 no pan de um canal do MIXER: o som gira no espaço.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-EPICYCLE">
+    <h3>EPICYCLE</h3>
+    <figure class="painel"><img src="assets/modulos/EPICYCLE.webp" alt="Painel do módulo EPICYCLE" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O EPICYCLE desenha com círculos: até oito, cada um girando na borda do anterior. A ponta do último traça uma figura, e as coordenadas dela saem como sinais. É uma série de Fourier desenhada, a mesma ideia dos epiciclos de Ptolomeu.</p>
+    <h4>Como pensar nele</h4>
+    <p>A mesma máquina serve a duas escalas. Com poucos círculos e RATE lento, ela é gesto e ritmo: uma figura que volta. Com muitos círculos e a altura de uma nota em PTCH, ela gira na velocidade do som e vira timbre. MODO escolhe a família de figuras, e DESV desafina as velocidades para que a figura nunca feche.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: a velocidade do primeiro círculo, de 0,01 Hz a 2 kHz.</li>
+      <li><b>CIRC</b>: quantos círculos, de 1 a 8.</li>
+      <li><b>MODO</b>: quadrada (velocidades ímpares), serra (todas as velocidades), raios de Fibonacci ou velocidades de Fibonacci.</li>
+      <li><b>DESV</b>: o desvio das velocidades; acima de 0, a figura nunca se fecha.</li>
+      <li><b>FASE</b>: a fase de partida dos círculos.</li>
+    </ul>
+    <p>Entradas: PTCH recebe a altura em 1 volt por oitava, para o modo de timbre; RST recomeça a figura. Saídas: X e Y são as coordenadas da ponta, R a distância ao centro, ANG o ângulo, GT um pulso quando Y cruza o zero subindo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Com RATE em 0,2 Hz e CIRC em 3, ligue X no corte de um FILTER e Y no pan de um canal do MIXER: o som desenha uma figura no espaço.</li>
+      <li>Ligue GT num ENVELOPE: a figura vira ritmo.</li>
+      <li>Ligue X no MIXER, ponha CIRC em 8 e ligue a altura de um QUANTIZER em PTCH: agora a figura é um timbre.</li>
+      <li>Troque MODO e suba DESV devagar: o timbre se abre e não volta ao mesmo lugar.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SUPPLY">
+    <h3>SUPPLY</h3>
+    <figure class="painel"><img src="assets/modulos/SUPPLY.webp" alt="Painel do módulo SUPPLY" width="65" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O SUPPLY é a alimentação do patch, posta num módulo com cabos. Num circuito, quando a bateria enfraquece, tudo muda junto: o relógio desacelera, o som perde corpo e os osciladores desafinam uns dos outros. O SUPPLY traz essa causa comum para o patch.</p>
+    <h4>Como pensar nele</h4>
+    <p>ENERG é a tensão de alimentação. A carga, o som do próprio patch, faz essa tensão ceder, como uma bateria sob esforço: quanto mais o patch soa, mais o trilho afunda. O que sobra sai em TRILHO, para ligar onde você quiser. As derivas D1 a D4 só aparecem com o trilho baixo e fazem as vozes se desencontrarem; com o trilho cheio, elas voltam juntas. Nada é invisível: o SUPPLY só age onde há cabo.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>ENERG</b>: a tensão de alimentação.</li>
+      <li><b>QUEDA</b>: o quanto a carga faz o trilho ceder.</li>
+      <li><b>TEMPO</b>: a demora do trilho para ceder e voltar, de 0,05 a 5 s.</li>
+      <li><b>DERIVA</b>: o quanto as vozes se desencontram com o trilho baixo.</li>
+    </ul>
+    <p>Entradas: CARGA recebe o som do patch, ENERG move a tensão por CV. Saídas: TRILHO é a tensão que sobra, D1 a D4 quatro derivas de afinação (até 60 cents), FALHA um pulso no apagão e outro na volta.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída do MIXER em CARGA e TRILHO no CV1 do VCA de uma voz: o patch perde corpo quando soa forte.</li>
+      <li>Ligue D1 no 1V/O de um OSC e D2 no de outro. Baixe ENERG: as vozes se desafinam uma da outra.</li>
+      <li>Suba ENERG de novo: elas voltam juntas.</li>
+      <li>Ligue FALHA no CIT do APOCRIFO: o apagão rasga o tempo.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-MAGNET">
+    <h3>MAGNET</h3>
+    <figure class="painel"><img src="assets/modulos/MAGNET.webp" alt="Painel do módulo MAGNET" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O MAGNET é uma grade de 8 por 8 pequenos ímãs, cada um apontando para cima ou para baixo. Cada ímã quer se alinhar com os vizinhos, e a temperatura os agita. Uma cabeça anda pela grade, uma casa por pulso, e o ímã sob ela dá o gate.</p>
+    <h4>Como pensar nele</h4>
+    <p>É o modelo de Ising, da física dos materiais. Abaixo da temperatura crítica (perto de 2,27), formam-se domínios grandes e o ritmo fica estável. Acima, o ruído vence. Perto dela, domínios de todos os tamanhos aparecem e somem: é a borda do caos, e é ali que o módulo soa mais vivo. COUPL negativo faz os ímãs se oporem aos vizinhos, como um tabuleiro de xadrez.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>TEMP</b>: a temperatura; a transição fica perto de 2,27.</li>
+      <li><b>COUPL</b>: o acoplamento. Positivo, os ímãs se alinham; negativo, se opõem.</li>
+      <li><b>FIELD</b>: um ímã externo que empurra a grade inteira para um lado.</li>
+      <li><b>SWEEP</b>: quantas tentativas de virar ímãs há a cada pulso.</li>
+      <li><b>RATE</b>: o relógio interno, quando nada está ligado em CLK.</li>
+      <li><b>GATE</b>: a duração de cada gate.</li>
+    </ul>
+    <p>Entradas: CLK avança um pulso, QNCH esquenta tudo de uma vez e a grade volta a se organizar, TEMP e FLD movem temperatura e campo por CV. Saídas: GT é o gate da cabeça, MAG a magnetização, ENER a energia da grade, FLIP quanto da grade virou neste pulso.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue GT num DRUM. Com TEMP em 1, ouça um ritmo quase parado; em 4, um ritmo de ruído.</li>
+      <li>Ponha TEMP perto de 2,3: domínios aparecem e somem, e o ritmo respira.</li>
+      <li>Ligue um gatilho raro em QNCH: a grade se desfaz e se reorganiza.</li>
+      <li>Ligue MAG no corte de um FILTER: o timbre segue para que lado a grade pende.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-ORBIT">
+    <h3>ORBIT</h3>
+    <figure class="painel"><img src="assets/modulos/ORBIT.webp" alt="Painel do módulo ORBIT" width="98" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O ORBIT é um pequeno sistema solar: um sol no centro e dois ou três planetas em gravidade. As posições dos planetas saem como CV, e os encontros entre eles saem como pulsos.</p>
+    <h4>Como pensar nele</h4>
+    <p>São as leis de Newton e de Kepler tocando o patch. Órbitas mais afastadas demoram mais, então os planetas andam em ritmos que quase se alinham e se desencontram. MASS faz os planetas se puxarem uns aos outros: baixa, as órbitas são regulares; alta, elas se desfazem em caos. Um planeta que escapa volta à sua órbita, então o sistema nunca se perde. LIGHT atrasa o pulso de conjunção pela distância, como a luz que demora a chegar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>PLNTS</b>: quantos planetas, 2 ou 3.</li>
+      <li><b>RATIO</b>: o quanto as órbitas se afastam umas das outras.</li>
+      <li><b>ECC</b>: o achatamento das elipses.</li>
+      <li><b>MASS</b>: o quanto os planetas se puxam entre si.</li>
+      <li><b>SPEED</b>: a velocidade do tempo do sistema.</li>
+      <li><b>LIGHT</b>: o atraso da conjunção pela distância, até cerca de 1 s.</li>
+    </ul>
+    <p>Entradas: NUDGE empurra o primeiro planeta e muda a forma da órbita, SPD move a velocidade por CV. Saídas: X1 e Y1 são a posição do primeiro planeta, X2 e Y2 a do segundo, DIST a distância entre eles, CONJ um pulso na conjunção, PERI um pulso quando o primeiro planeta passa mais perto do sol.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue CONJ num DRUM e PERI noutro: dois ritmos lentos que quase se repetem.</li>
+      <li>Ligue X1 num QUANTIZER e o QUANTIZER num OSC: uma melodia em órbita.</li>
+      <li>Suba MASS devagar: as órbitas se desfazem e o ritmo fica imprevisível.</li>
+      <li>Ligue DIST no MIX de um SPACE: quando os planetas se afastam, o espaço se abre.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
-  <h2>TIME <small>5 módulos</small></h2>
+  <h2>TIME <small>10 módulos</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="Painel do módulo CLOCK" width="189" height="300" loading="lazy" /></figure>
@@ -980,8 +1218,9 @@
       <li><b>ACC-A, ACC-B</b>: os acentos caem nos passos múltiplos destes números. Com 4 e 3, por exemplo, os acentos formam um padrão de três contra quatro.</li>
       <li><b>AND</b>: decide se o acento precisa dos dois números ao mesmo tempo ou basta um deles.</li>
       <li><b>FEEL</b>: em quantas partes cada batida se divide: em dois, em três (tercinas), em cinco, sete, nove, onze, ou numa divisão sorteada a cada passo.</li>
+      <li><b>PHAS</b>: o phasing de Steve Reich. A saída FASE é um segundo relógio um pouco mais rápido, até 3 %, que se afasta do principal e volta a coincidir.</li>
     </ul>
-    <p>Entradas: EXT, para seguir pulsos de fora; RST, para voltar ao começo; BPM, para modular o andamento. Saídas: CLK, EUC e ACC.</p>
+    <p>Entradas: EXT, para seguir pulsos de fora; RST, para voltar ao começo; BPM, para modular o andamento. Saídas: CLK, EUC e ACC. A saída MET dá a força métrica do passo atual: 1 no primeiro passo do ciclo, menos nos tempos fracos.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Ligue EUC na entrada GATE de um DRUM, e OUT do DRUM numa entrada do MIXER.</li>
@@ -1049,13 +1288,17 @@
     <h4>Controles</h4>
     <ul class="controles">
       <li><b>LEN</b>: quantos dos oito passos entram na frase.</li>
-      <li><b>MODE</b>: a ordem de leitura: para a frente, para trás, ida e volta, sorteada, ou vagando passo a passo.</li>
+      <li><b>MODE</b>: a ordem de leitura: para a frente, para trás, ida e volta, sorteada, vagando passo a passo, ou o cursor, um corpo que anda pelos passos empurrado pelo relógio e atraído ou repelido por um alvo.</li>
       <li><b>RATE</b>: o relógio interno, usado quando nada chega em CLK.</li>
       <li><b>GATE</b>: quanto tempo cada nota fica ligada dentro do passo. Curto soa destacado; longo, ligado.</li>
       <li><b>GLIDE</b>: faz a altura escorregar de uma nota à seguinte.</li>
       <li><b>RANGE</b>: quantas oitavas os oito valores cobrem, até duas.</li>
       <li><b>P1 a P8</b>: a altura de cada passo.</li>
       <li><b>G1 a G8</b>: liga ou silencia cada passo.</li>
+      <li><b>INERC</b>: no modo cursor, o quanto o cursor guarda a velocidade de um pulso a outro.</li>
+      <li><b>FORCA</b>: no modo cursor, a força na direção do ALVO: positiva atrai, e o cursor se demora perto dele; negativa repele.</li>
+      <li><b>ALVO</b>: o passo que atrai ou repele o cursor.</li>
+      <li><b>FADIG</b>: a fadiga. Cada passo que toca se cansa e, cansado demais, cala nessa vez: a repetição se gasta. Vale em qualquer modo.</li>
     </ul>
     <p>Entradas: CLK, o pulso que avança; RST, para voltar ao primeiro passo. Saídas: PTCH, a altura; GATE, o pulso da nota; EOS, um pulso a cada fim de frase.</p>
     <h4>Experimente</h4>
@@ -1094,9 +1337,127 @@
       <li>Gire MAP devagar e ouça o groove mudar de estilo. Depois mexa nas densidades.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-ARP">
+    <h3>ARP</h3>
+    <figure class="painel"><img src="assets/modulos/ARP.webp" alt="Painel do módulo ARP" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O ARP é um arpejador: toca um acorde nota por nota, e assim um acorde vira melodia. Ele escolhe as notas (um dos dez formatos de acorde do CHORD, com inversão e oitavas) e o caminho por elas. Sem nada ligado, toca no próprio relógio.</p>
+    <h4>Como pensar nele</h4>
+    <p>Separe duas perguntas: quais notas, e em que ordem. CHORD, INV e OCT respondem a primeira; MODE responde a segunda (subindo, descendo, ida e volta, ao acaso, embaralhado, do centro para fora, de fora para o centro). SKIP abre buracos na linha, e os buracos são sempre os mesmos para o mesmo patch, então a linha soa tocada e se repete igual.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CHORD</b>: o formato do acorde, de 0 a 9.</li>
+      <li><b>INV</b>: a inversão, de 0 a 3.</li>
+      <li><b>OCT</b>: por quantas oitavas o arpejo se espalha, de 1 a 4.</li>
+      <li><b>MODE</b>: o caminho pelas notas, de 0 a 7.</li>
+      <li><b>SKIP</b>: a chance de um passo ficar em silêncio.</li>
+      <li><b>RATE</b>: o relógio interno, usado quando nada está ligado em CLK.</li>
+      <li><b>GATE</b>: a duração de cada nota, de 5 a 95 % do passo.</li>
+    </ul>
+    <p>Entradas: CLK avança um passo por pulso, RST volta ao começo, ROOT recebe a tônica (1 volt por oitava), CHD troca o formato do acorde. Saídas: PTCH é a nota, GT o gate de cada nota, EOS um pulso a cada volta completa.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue PTCH no 1V/O de um OSC, a saída do OSC num VCA e o VCA no MIXER. Ligue GT num ENVELOPE e o ENVELOPE no VCA.</li>
+      <li>Gire MODE e ouça o mesmo acorde ganhar outros desenhos.</li>
+      <li>Ponha MODE em 5, SKIP em 0,3 e OCT em 3: parece uma linha improvisada.</li>
+      <li>Ligue a saída root do HARMONY em ROOT: o arpejo passa a andar com a progressão.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-CELL">
+    <h3>CELL</h3>
+    <figure class="painel"><img src="assets/modulos/CELL.webp" alt="Painel do módulo CELL" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O CELL é um autômato celular: uma linha de casas acesas ou apagadas que se reescreve a cada pulso. Cada casa olha para si e para as duas vizinhas, e uma regra (um número de 0 a 255) decide se ela fica acesa. O módulo lê esse desenho com uma cabeça: a casa sob ela dá o gate, e as três seguintes escolhem a nota.</p>
+    <h4>Como pensar nele</h4>
+    <p>É uma partitura que se escreve sozinha por uma lei muito simples. Algumas regras dão desenhos que nunca se repetem (30, 110), outras dão triângulos (90) ou coisas que andam (184). Você não compõe as notas, compõe a lei. MUT acrescenta um pequeno acaso, para a linha não morrer nem travar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o relógio interno, quando nada está ligado em CLK.</li>
+      <li><b>RULE</b>: a regra, de 0 a 255. Comece por 30, 90, 110 e 184.</li>
+      <li><b>CELLS</b>: quantas casas tem a linha, de 8 a 24.</li>
+      <li><b>HEAD</b>: onde fica a cabeça de leitura.</li>
+      <li><b>RANGE</b>: o alcance das notas, até 2 oitavas.</li>
+      <li><b>MUT</b>: a chance de uma casa trocar ao acaso.</li>
+      <li><b>GATE</b>: a duração de cada nota.</li>
+    </ul>
+    <p>Entradas: CLK avança uma geração, RST recomeça a linha, RULE muda a regra por CV. Saídas: PTCH é a nota, GT o gate, DENS a proporção de casas acesas, EOS um pulso quando a linha renasce.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue GT num DRUM e o DRUM no MIXER. Com RULE em 30, ouça um ritmo que não se repete igual.</li>
+      <li>Ligue PTCH num OSC e GT num ENVELOPE que controla um VCA depois do OSC. Gire RULE devagar.</li>
+      <li>Ligue DENS no CUT de um FILTER: quanto mais vida na linha, mais brilho.</li>
+      <li>Ligue EOS no ADV do HARMONY: o acorde muda quando a linha renasce.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-TAP">
+    <h3>TAP</h3>
+    <figure class="painel"><img src="assets/modulos/TAP.webp" alt="Painel do módulo TAP" width="65" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O TAP dá ao patch o andamento de quem toca. Bata três ou mais vezes na entrada TAP (um botão, uma tecla, palmas pelo SIGNAL-IN): ele mede o intervalo e passa a dar um pulso a cada tempo, sozinho, no seu andamento. A primeira batida é o tempo forte, o um.</p>
+    <h4>Como pensar nele</h4>
+    <p>É a contagem antes de a banda entrar. O TAP usa a mediana das batidas, então uma batida torta não estraga a conta. Se as batidas forem irregulares demais, ele não inventa um andamento: espera uma contagem melhor. Uma pausa e uma contagem nova trocam o andamento.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>COMP</b>: de quantos tempos é o compasso, de 1 a 16. A saída UM volta a cada COMP tempos.</li>
+      <li><b>DISP</b>: quanta irregularidade ele aceita na contagem.</li>
+    </ul>
+    <p>Entradas: TAP recebe as batidas, RST esquece o andamento. Saídas: CLK é o pulso a cada tempo, UM o tempo forte, BPM o andamento como CV, TRAV um gate enquanto o andamento está travado.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o SIGNAL-IN no SCOPE e a saída ONS do SCOPE em TAP. Ligue o ON do SIGNAL-IN.</li>
+      <li>Ligue CLK na entrada de relógio externo do CLOCK: o patch inteiro passa a seguir o seu pulso.</li>
+      <li>Bata um, dois, três, quatro e comece a tocar: o patch já está no andamento.</li>
+      <li>Ponha COMP em 3 e ligue UM no RST de um SEQUENCE: a frase recomeça em cada compasso de valsa.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-POLYGON">
+    <h3>POLYGON</h3>
+    <figure class="painel"><img src="assets/modulos/POLYGON.webp" alt="Painel do módulo POLYGON" width="114" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O POLYGON é um polímetro desenhado como figura. Há um ciclo comum e até quatro camadas; cada camada é um polígono de N vértices inscrito nesse ciclo, e cada vértice é um pulso. Um triângulo e um quadrado no mesmo ciclo dão três contra quatro.</p>
+    <h4>Como pensar nele</h4>
+    <p>Pense num relógio com vários ponteiros invisíveis, cada um marcando o ciclo em partes iguais diferentes. Os pulsos de cada camada são regulares; o interesse está onde eles se encontram. A saída COINC marca esses encontros, e é ali que a música costuma pedir um acento. F gira cada polígono, até um lado, para deslocar a camada sem mudar a sua divisão.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>N1, N2, N3, N4</b>: quantos vértices tem cada camada, de 0 (desligada) a 16.</li>
+      <li><b>F1, F2, F3, F4</b>: a rotação de cada camada, até um lado do polígono.</li>
+      <li><b>CICLO</b>: a duração do ciclo, de 0,25 a 32 s, quando nada está ligado em CLK.</li>
+      <li><b>PASSOS</b>: com um relógio em CLK, quantos pulsos dura o ciclo.</li>
+    </ul>
+    <p>Entradas: CLK conduz o ciclo por pulsos, RST recomeça. Saídas: G1 a G4 são os pulsos de cada camada, COINC pulsa quando dois ou mais vértices caem juntos, EOS no fim de cada ciclo, FASE é a posição no ciclo.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Com N1 em 3 e N2 em 4, ligue G1 num DRUM e G2 noutro: três contra quatro.</li>
+      <li>Ligue COINC num terceiro som: só os encontros.</li>
+      <li>Ponha N3 em 5 e gire F3 devagar: a camada de cinco desliza sobre as outras.</li>
+      <li>Ligue o CLOCK em CLK e PASSOS em 16: o polímetro passa a andar no andamento do patch.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-BUDGET">
+    <h3>BUDGET</h3>
+    <figure class="painel"><img src="assets/modulos/BUDGET.webp" alt="Painel do módulo BUDGET" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O BUDGET dá às vozes um orçamento de eventos. Quatro gates entram e saem, mas por ciclo só passam TETO eventos no total. Quando o orçamento acaba, os gates seguintes ficam de fora até o ciclo recomeçar.</p>
+    <h4>Como pensar nele</h4>
+    <p>Densidade não é qualidade. O BUDGET faz o patch escolher: com pouco orçamento, cada nota vale mais. Há duas economias. Compete: quem chega primeiro leva. Coopera: cada voz que toca tem a sua parte, e só passa da parte se as outras ainda não gastaram a delas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>TETO</b>: quantos eventos cabem em cada ciclo, de 1 a 32.</li>
+      <li><b>COOP</b>: desligado, as vozes competem; ligado, cooperam.</li>
+      <li><b>CICLO</b>: a duração do ciclo, de 0,25 a 16 s, quando nada está ligado em CLK.</li>
+    </ul>
+    <p>Entradas: G1 a G4 recebem os gates das vozes, CLK recomeça o ciclo a cada pulso. Saídas: O1 a O4 são os gates que passaram, SALDO o que resta do orçamento, FIM um pulso quando ele acaba.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue os gates de duas vozes em G1 e G2, e O1 e O2 nos envelopes delas.</li>
+      <li>Com TETO em 6, ouça as vozes disputarem o ciclo.</li>
+      <li>Ligue COOP: as duas passam a dividir o orçamento.</li>
+      <li>Ligue SALDO no corte de um FILTER: o som escurece à medida que o orçamento se gasta.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-DECISION">
-  <h2>DECISION <small>6 módulos</small></h2>
+  <h2>DECISION <small>14 módulos</small></h2>
   <article class="modulo" id="mod-QUANTIZER">
     <h3>QUANTIZER</h3>
     <figure class="painel"><img src="assets/modulos/QUANTIZER.webp" alt="Painel do módulo QUANTIZER" width="118" height="300" loading="lazy" /></figure>
@@ -1106,11 +1467,14 @@
     <p>Sinais de controle variam de forma contínua, e notas musicais não. Sem um quantizador, uma melodia gerada por acaso cai entre as notas e soa desafinada. O QUANTIZER arredonda cada valor para a nota mais próxima da escala escolhida. Com um pulso na entrada TRIG, ele só troca de nota no pulso, e a melodia ganha ritmo. A saída GATE pulsa sempre que a nota muda de fato, o que serve para disparar um envelope só em notas novas. As entradas ROOT e SCL trocam a tônica e a escala por cabo: ligadas às saídas do HARMONY, a tonalidade da melodia muda ao longo da música.</p>
     <h4>Controles</h4>
     <ul class="controles">
-      <li><b>SCALE</b>: a escala, entre doze: cromática, maior, menor natural, dórica, frígia dominante, lídia, menor melódica, pentatônica menor, pentatônica maior, hirajoshi, tons inteiros e só oitavas.</li>
+      <li><b>SCALE</b>: a escala, entre treze: cromática, maior, menor natural, dórica, frígia dominante, lídia, menor melódica, pentatônica menor, pentatônica maior, hirajoshi, tons inteiros, só oitavas e o crivo.</li>
       <li><b>ROOT</b>: a tônica, a nota de partida da escala, de dó a si.</li>
       <li><b>RANGE</b>: quantas oitavas o sinal de entrada cobre, de 1 a 6. Mais oitavas, saltos maiores.</li>
       <li><b>GLIDE</b>: faz a altura escorregar de uma nota à seguinte.</li>
       <li><b>HYST</b>: uma margem de tolerância. Com um sinal instável, a nota não fica pulando entre duas vizinhas.</li>
+      <li><b>AFIN</b>: a afinação, aplicada depois da escolha da nota: temperada de 12 notas (a de sempre), justa, pitagórica, mesotônica, 19 ou 31 divisões da oitava. As três históricas são medidas a partir da tônica e a acompanham quando ela muda.</li>
+      <li><b>M1, R1, M2, R2</b>: o crivo de Xenakis, usado na escala número 13. Uma nota entra se o resto da divisão por M1 for R1, ou se o resto da divisão por M2 for R2. Com M que não divide 12, a escala não se repete na oitava.</li>
+      <li><b>AND</b>: troca o ou do crivo por e: a nota precisa passar nas duas peneiras. Se nenhuma nota passar, o crivo volta ao ou, para nunca ficar mudo.</li>
     </ul>
     <p>Entradas: CV, o sinal a quantizar; TRSP, para transpor antes de quantizar; TRIG, o pulso que decide quando trocar de nota; ROOT e SCL, que, com cabo, mandam na tônica e na escala no lugar dos knobs. Saídas: PTCH, a altura; GATE, um pulso a cada nota nova; ST, a nota em semitons.</p>
     <h4>Experimente</h4>
@@ -1124,19 +1488,20 @@
     <h3>HARMONY</h3>
     <figure class="painel"><img src="assets/modulos/HARMONY.webp" alt="Painel do módulo HARMONY" width="118" height="300" loading="lazy" /></figure>
     <h4>O que é</h4>
-    <p>O HARMONY decide por quais tonalidades a música passa. De tempos em tempos, ou a cada pulso na entrada ADV, ele escolhe um novo centro tonal, seguindo um entre seis movimentos que músicos de jazz e de cinema usam há décadas. A saída ROOT informa a tônica nova na mesma escala de altura que os osciladores entendem.</p>
+    <p>O HARMONY decide por quais tonalidades a música passa. De tempos em tempos, ou a cada pulso na entrada ADV, ele escolhe um novo centro tonal, seguindo um entre sete movimentos que músicos de jazz e de cinema usam há décadas. A saída ROOT informa a tônica nova na mesma escala de altura que os osciladores entendem.</p>
     <h4>Como pensar nele</h4>
     <p>O QUANTIZER deixa a melodia afinada, mas sempre no mesmo tom. Músicas costumam viajar, e cada estilo viaja de um jeito. O controle MOVE escolhe o percurso: Coltrane, que salta uma terça maior a cada troca e fecha um ciclo de três tons, como em Giant Steps; substituição de trítono, que chega ao tom seguinte por um caminho inesperado; mediante cromática, mudanças de terça com efeito de trilha de cinema; intercâmbio modal, que mantém a tônica e troca o modo; jazz modal, que quase nunca sai do lugar; e backdoor, que sobe um tom inteiro.</p>
     <p>Ligue a saída ROOT na entrada ROOT do QUANTIZER e a saída SCALE na entrada SCL. A cada troca, a escala da melodia muda, e cada nota passa para a mais próxima da escala nova: a melodia fica na mesma região, com outra cor. Para ouvir a melodia saltar para o centro novo, ligue a saída ROOT também na entrada TRSP do QUANTIZER.</p>
     <h4>Controles</h4>
     <ul class="controles">
-      <li><b>MOVE</b>: o tipo de percurso, entre os seis descritos acima.</li>
+      <li><b>MOVE</b>: o tipo de percurso, entre os sete descritos.</li>
       <li><b>RATE</b>: o ritmo das trocas, quando nada chega em ADV. Vai de uma troca a cada poucos minutos a duas por segundo.</li>
       <li><b>ROOT</b>: a tônica de partida, para onde o módulo volta quando recebe um pulso em RST.</li>
       <li><b>S-LO, S-HI</b>: a faixa de escalas que podem ser sorteadas nas trocas.</li>
       <li><b>HOLD</b>: a chance de uma troca ser ignorada, o que alonga algumas seções.</li>
+      <li><b>CICLO</b>: no movimento neo-riemanniano, o caminho pelas transformações: passeio livre, ciclo hexatônico (P e L alternados), ciclo octatônico (P e R alternados) ou LR, as quintas que caminham.</li>
     </ul>
-    <p>Entradas: ADV, o pulso que pede uma troca; RST, para voltar ao começo. Saídas: ROOT, a tônica como altura; SCALE, o número da escala; CHG, um pulso a cada troca.</p>
+    <p>Entradas: ADV, o pulso que pede uma troca; RST, para voltar ao começo. Saídas: ROOT, a tônica como altura; SCALE, o número da escala; CHG, um pulso a cada troca. O sétimo movimento é o neo-riemanniano: a tríade sofre P (a paralela), R (a relativa) ou L (a troca da sensível), e cada uma move uma só nota por um ou dois semitons. A saída OP diz qual transformação aconteceu.</p>
     <h4>Experimente</h4>
     <ol class="passos">
       <li>Monte a melodia do QUANTIZER: a saída CV de um TURING, movido pelo CLOCK, na entrada CV do QUANTIZER, e PTCH do QUANTIZER em 1V/O de um OSC que passe por um ENVELOPE até o MIXER.</li>
@@ -1227,6 +1592,201 @@
       <li>Ligue OUT na entrada CV1 de um VCA que controle outro som. O segundo som passa a seguir o volume da voz, sem tremer.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-MARKOV">
+    <h3>MARKOV</h3>
+    <figure class="painel"><img src="assets/modulos/MARKOV.webp" alt="Painel do módulo MARKOV" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O MARKOV é uma cadeia de Markov: ele aprende de onde se vai para onde numa melodia (depois desta nota veio aquela três vezes, aquela outra uma vez) e improvisa sorteando a próxima nota pelo que aprendeu. Sem nada ligado, ele já toca, começando numa caminhada pentatônica.</p>
+    <h4>Como pensar nele</h4>
+    <p>É um aluno que imita o estilo de quem ouve, não as notas exatas. TEMP é a ousadia: perto de 0 ele repete o caminho mais comum, perto de 2 ele inventa. MEM é quanto ele lembra. A saída SURP diz quão inesperada foi cada nota, e isso também pode mover o patch.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o relógio interno, quando nada está ligado em CLK.</li>
+      <li><b>GATE</b>: a duração de cada nota.</li>
+      <li><b>TEMP</b>: a ousadia do sorteio, de 0 a 2.</li>
+      <li><b>MEM</b>: quanto do que aprendeu ele guarda.</li>
+      <li><b>LEARN</b>: liga ou desliga o aprendizado. Desligado, ele congela o vocabulário.</li>
+      <li><b>OCT</b>: transpõe a saída em oitavas.</li>
+    </ul>
+    <p>Entradas: CLK avança uma nota, LRN.P e LRN.G recebem a melodia a aprender (altura e gate), RST recomeça. Saídas: PTCH é a nota, GT o gate, SURP o grau de surpresa.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue PTCH num OSC e GT num ENVELOPE que controla um VCA. Ouça a caminhada inicial.</li>
+      <li>Ligue a altura e o gate de um PHRASE em LRN.P e LRN.G: o MARKOV passa a responder no estilo daquela voz.</li>
+      <li>Depois de ensinar, desligue LEARN e suba TEMP: ele improvisa com o vocabulário que guardou.</li>
+      <li>Ligue SURP no MIX de um SPACE: as notas inesperadas ganham eco.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-COHERENCE">
+    <h3>COHERENCE</h3>
+    <figure class="painel"><img src="assets/modulos/COHERENCE.webp" alt="Painel do módulo COHERENCE" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O COHERENCE mede o quanto uma melodia é previsível e rompe quando ela fica ordenada demais. Ele guarda as últimas notas e calcula a entropia de Shannon delas: uma nota repetida dá ordem 1, as doze notas por igual dão 0. Quando a ordem passa do limiar por tempo suficiente, ele dispara um pulso de ruptura.</p>
+    <h4>Como pensar nele</h4>
+    <p>Costuma-se pensar que a ruptura nasce do caos. Aqui é o contrário: a ordem extrema também rompe. A pressão sobe a cada nota previsível; depois de PAC notas seguidas, ela rompe. A ruptura deixa cicatriz: a janela esquece a metade mais antiga e, por CIC notas, a pressão não volta a subir. O módulo não soa: ele decide quando, e o cabo decide o quê.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>JAN</b>: a janela, quantas notas ele lembra, de 4 a 32.</li>
+      <li><b>LIM</b>: o limiar de ordem acima do qual a pressão sobe.</li>
+      <li><b>PAC</b>: a paciência, quantas notas seguidas acima do limiar até romper.</li>
+      <li><b>CIC</b>: a cicatriz, quantas notas depois da ruptura sem nova pressão.</li>
+    </ul>
+    <p>Entradas: PTCH recebe a altura, GATE marca cada nota (sem ele, conta cada mudança de altura), RST esquece tudo. Saídas: ORD é a ordem medida, PRES a pressão acumulada, COL o pulso de ruptura, SURP a surpresa de cada nota.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a altura e o gate de um QUANTIZER que toca um SEQUENCE curto em PTCH e GATE.</li>
+      <li>Ligue COL no RST de um TURING que alimenta outra voz: quando a primeira linha se repete demais, a outra se refaz.</li>
+      <li>Ligue PRES no corte de um FILTER: o timbre abre enquanto a tensão cresce e fecha na ruptura.</li>
+      <li>Ligue SURP no nível de um VCA: a nota rara soa mais forte.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-KEY">
+    <h3>KEY</h3>
+    <figure class="painel"><img src="assets/modulos/KEY.webp" alt="Painel do módulo KEY" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O KEY ouve quem toca, estima o tom e entrega a tônica e a escala ao QUANTIZER. Assim o patch passa a responder no tom de quem canta ou toca por cima, em vez de ficar na escala que a seed escolheu.</p>
+    <h4>Como pensar nele</h4>
+    <p>Ele conta quanto tempo cada uma das doze notas soou (a nota longa pesa mais que a de passagem) e compara esse retrato com os perfis de tonalidade de Krumhansl e Kessler. O tom só muda quando outro vence por ESTAB notas seguidas, para não tremular entre tons vizinhos. A saída CERT diz quando o tom é ambíguo, em vez de esconder isso. O visor mostra as doze notas, a tônica e o nome do tom.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>MEM</b>: quanto tempo ele lembra, de 2 a 60 s. Curto segue as modulações; longo fica firme.</li>
+      <li><b>ESTAB</b>: quantas notas seguidas um tom novo precisa vencer para valer.</li>
+    </ul>
+    <p>Entradas: PTCH recebe a altura, GATE marca cada nota, RST esquece tudo. Saídas: ROOT é a tônica, SCL a escala, CERT a certeza, MUD um pulso a cada troca de tom.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o SIGNAL-IN no SCOPE, a saída PIT do SCOPE em PTCH e a saída ONS em GATE. Ligue ROOT e SCL nas entradas de tônica e escala do QUANTIZER.</li>
+      <li>Ligue o ON do SIGNAL-IN e cante uma melodia em ré menor: o visor mostra Dm e o patch passa a tocar nesse tom.</li>
+      <li>Ligue MUD na entrada FRASE do MIXER, com o palco no modo gesto: cada troca de tom muda o palco.</li>
+      <li>Sem microfone: um MARKOV num QUANTIZER, o QUANTIZER no KEY e o KEY num segundo QUANTIZER. A segunda voz segue o tom que a primeira parece ter.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-ACCENT">
+    <h3>ACCENT</h3>
+    <figure class="painel"><img src="assets/modulos/ACCENT.webp" alt="Painel do módulo ACCENT" width="114" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O ACCENT dá fraseado a uma linha. Um intérprete não acentua só com volume: a nota acentuada é mais forte, mais brilhante e mais curta, e ele acentua por várias razões. O ACCENT junta essas causas, cada uma com o seu peso, numa ênfase de 0 a 1, e entrega essa ênfase em várias saídas ao mesmo tempo: nível, brilho, duração, varredura.</p>
+    <h4>Como pensar nele</h4>
+    <p>São seis causas de acento: o tempo forte (METR), o tamanho do salto (SALTO), a nota mais aguda da frase recente (APICE), o acento que vem de fora (EXT), a nota depois de uma nota longa (AGOG) e o acento de fora num tempo fraco (SINC). Três controles moldam o conjunto: HER deixa uma cauda na nota seguinte, SUPR impede que tudo vire acento, ROT faz o tempo forte migrar devagar. PROF é quanto disso chega às saídas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>METR</b>: o peso do tempo forte de cada ciclo.</li>
+      <li><b>SALTO</b>: o peso do tamanho do intervalo desde a nota anterior.</li>
+      <li><b>APICE</b>: o peso da nota mais aguda das últimas oito.</li>
+      <li><b>EXT</b>: o peso do acento que chega pela entrada ACC.</li>
+      <li><b>AGOG</b>: o peso da nota que vem depois de uma nota longa.</li>
+      <li><b>SINC</b>: o peso de um acento de fora num tempo fraco.</li>
+      <li><b>CICLO</b>: de quantas notas é o ciclo métrico, de 2 a 16.</li>
+      <li><b>ROT</b>: a velocidade com que o tempo forte muda de lugar.</li>
+      <li><b>HER</b>: a cauda que um acento deixa na nota seguinte.</li>
+      <li><b>SUPR</b>: depois de um acento forte, o seguinte custa mais.</li>
+      <li><b>PROF</b>: a profundidade com que a ênfase chega às saídas.</li>
+    </ul>
+    <p>Entradas: GATE marca cada nota, PTCH recebe a altura, ACC o acento de fora, RST recomeça o ciclo. Saídas: ENF é a ênfase, VCA o nível, FC o brilho para um filtro, DEC a duração para um envelope, SWP uma varredura que sobe com acentos seguidos, GT um gate só nas notas acentuadas, NIV a ênfase em quatro degraus (0, um terço, dois terços, 1).</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Toque uma linha de SEQUENCE por um QUANTIZER num OSC. Ligue a altura e o gate do QUANTIZER em PTCH e GATE.</li>
+      <li>Ligue a saída VCA no CV1 do VCA da voz: a linha passa a respirar como uma frase.</li>
+      <li>Passe o OSC por um LADDER e ligue SWP no FC dele: os acentos seguidos sobem a varredura, como num baixo ácido.</li>
+      <li>Ponha CICLO em 5 e ROT em 0,5: o tempo forte muda de lugar e as notas continuam as mesmas.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-BLEFE">
+    <h3>BLEFE</h3>
+    <figure class="painel"><img src="assets/modulos/BLEFE.webp" alt="Painel do módulo BLEFE" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O BLEFE é um jogo de confiança feito de sinais. Cada gatilho vira um sinal, que soa sempre igual, seja verdade ou blefe. Uma janela depois, a verdade se confirma e o blefe não. A cada resolução, a confiança anda: sobe com verdades, cai com blefes. Quando a confiança construída despenca, é traição, e a resposta se recusa até o perdão.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um número aleatório não tem intenção; um blefe tem. O módulo não sorteia notas, ele cria uma relação entre vozes: uma voz que responde enquanto confia, hesita quando desconfia e se cala depois de traída. VERD é a taxa de verdade, MEM a velocidade com que a confiança muda, LIM o ponto da traição. A entrada RST é o perdão. SEED fixa o jogo: a mesma semente dá as mesmas verdades e mentiras.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>VERD</b>: a taxa de verdade, de 0 a 1.</li>
+      <li><b>JAN</b>: a janela entre o sinal e a confirmação, de 0,05 a 4 s.</li>
+      <li><b>MEM</b>: a velocidade com que a confiança anda.</li>
+      <li><b>LIM</b>: abaixo deste nível, a confiança construída vira traição.</li>
+      <li><b>SEED</b>: a semente do jogo.</li>
+    </ul>
+    <p>Entradas: IN recebe os gatilhos, RST perdoa e recomeça. Saídas: SIG é o sinal, sempre igual; VERD entrega a verdade escondida na hora, para quem quiser trapacear; CONF pulsa quando a verdade se confirma; CNF é o nível de confiança; RESP é a resposta, que se cala depois da traição; TRAI pulsa no instante da traição.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o CLOCK em IN, SIG no gate de um ENVELOPE e CONF num DRUM: o sinal e a confirmação soam como dois sons.</li>
+      <li>Ligue RESP no CV1 do VCA de outra voz: ela responde enquanto confia.</li>
+      <li>Comece com VERD em 0,9 e depois gire para 0,2. A voz que responde cresce, hesita e se cala.</li>
+      <li>Ligue o EOS de um SEQUENCE em RST: a cada frase, a relação recomeça.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-FRONTEIRA">
+    <h3>FRONTEIRA</h3>
+    <figure class="painel"><img src="assets/modulos/FRONTEIRA.webp" alt="Painel do módulo FRONTEIRA" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>A FRONTEIRA escuta uma melodia e marca onde começa uma ideia nova. Ouvimos uma fronteira onde algo muda: um salto depois de graus conjuntos, uma nota longa depois de curtas, uma pausa. O módulo mede essas três mudanças nota a nota e pulsa quando a força delas passa do limiar.</p>
+    <h4>Como pensar nele</h4>
+    <p>É o modelo de Cambouropoulos, a partir das regras de agrupamento de Lerdahl e Jackendoff. Para saber se uma nota é fronteira, ele precisa ouvir a seguinte, então o pulso chega uma nota depois. Um silêncio longo fecha a frase na hora. O PHRASE gera um motivo; a FRONTEIRA escuta.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>LIM</b>: o limiar de força acima do qual uma mudança vira fronteira.</li>
+      <li><b>MEM</b>: quantas notas ele usa como referência do que é normal.</li>
+      <li><b>MIN</b>: o mínimo de notas entre duas fronteiras.</li>
+      <li><b>SIL</b>: quanto silêncio fecha a frase, de 0,3 a 4 s.</li>
+    </ul>
+    <p>Entradas: PTCH recebe a altura, GATE marca cada nota. Saídas: FRONT pulsa no começo de cada célula, FORCA é a força da última fronteira, NOTAS quantas notas teve a célula, FIM pulsa quando o silêncio fecha a frase.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o SIGNAL-IN no SCOPE, a saída PIT do SCOPE em PTCH e a saída ONS em GATE. Ligue o ON do SIGNAL-IN.</li>
+      <li>Ligue FRONT na entrada FRASE do MIXER, com o palco no modo gesto: cada ideia nova de quem toca muda o palco.</li>
+      <li>Ligue FIM no RST de um SEQUENCE: quando quem toca para, o acompanhamento recomeça com a próxima frase.</li>
+      <li>Ligue NOTAS na duração de um ENVELOPE: frases longas pedem notas mais longas.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-COMPARADOR">
+    <h3>COMPARADOR</h3>
+    <figure class="painel"><img src="assets/modulos/COMPARADOR.webp" alt="Painel do módulo COMPARADOR" width="65" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O COMPARADOR mistura dois sinais com polaridade e decide quando a mistura passa de um limiar. Os knobs A e B têm o zero no centro: para a direita a entrada soma, para a esquerda entra invertida. A saída COMP é um gate que fica alto enquanto a mistura está acima do limiar.</p>
+    <h4>Como pensar nele</h4>
+    <p>É uma balança. Com A à direita e B à esquerda, a mistura é a diferença entre os dois sinais; com o mesmo sinal nos dois, ela se anula. A decisão vem depois: o gate abre quando a balança pende para um lado. A histerese impede que ele tremule quando o sinal tem ruído perto do limiar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>A, B</b>: o quanto cada entrada entra, de −1 (invertida) a 1.</li>
+      <li><b>OFS</b>: desloca a mistura toda para cima ou para baixo.</li>
+      <li><b>LIM</b>: o limiar da decisão.</li>
+      <li><b>HIST</b>: a histerese, uma folga em torno do limiar.</li>
+    </ul>
+    <p>Entradas: A e B recebem os sinais, LIM move o limiar por CV. Saídas: MIX é a mistura, INV a mistura de cabeça para baixo, COMP o gate da decisão, CRUZ um pulso a cada mudança de lado.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue dois FUNCTION lentos, em velocidades diferentes, em A e B. Ponha A à direita e B à esquerda.</li>
+      <li>Ligue COMP no gate de um ENVELOPE e CRUZ num DRUM: dois movimentos lentos que se cruzam viram ritmo.</li>
+      <li>Ligue o mesmo sinal em A e B com A em 1 e B em −1: a mistura some.</li>
+      <li>Ligue o LVL de um SCOPE em A e ponha LIM no meio: quando quem toca passa de um volume, outra voz entra.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-INTERPRET">
+    <h3>INTERPRET</h3>
+    <figure class="painel"><img src="assets/modulos/INTERPRET.webp" alt="Painel do módulo INTERPRET" width="98" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O INTERPRET toca as notas que chegam como um intérprete tocaria. Ele não inventa notas: recebe a altura e o gate de qualquer sequenciador e devolve a nota tocada, com glide pelo intervalo, um pequeno excesso nos saltos, vibrato que cresce na nota longa, articulação pelo contexto, fôlego e brilho.</p>
+    <h4>Como pensar nele</h4>
+    <p>A partitura diz a nota; o intérprete diz como. O módulo olha para as notas recentes: marca o salto, sustenta o ápice da frase, encurta duas notas rápidas, liga o resto. O fôlego se gasta ao longo da frase e volta numa pausa. Três eixos de caráter (ENERG, SUAV, BRILHO) dão a personalidade, e DERIVA a faz mudar devagar. Com EXPR em 0, a nota sai crua.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>EXPR</b>: o quanto de interpretação; em 0, a nota crua.</li>
+      <li><b>GLIDE</b>: o tempo de deslizar entre notas, até 0,3 s.</li>
+      <li><b>VIB</b>: a profundidade do vibrato nas notas longas.</li>
+      <li><b>ENERG</b>: o caráter enérgico, que marca os saltos.</li>
+      <li><b>SUAV</b>: o caráter suave, que liga as notas.</li>
+      <li><b>BRILHO</b>: o caráter brilhante, que abre o timbre no ápice.</li>
+      <li><b>DERIVA</b>: o quanto o caráter muda com o tempo.</li>
+    </ul>
+    <p>Entradas: PTCH recebe a altura, GATE o gate de cada nota, CAR move o caráter por CV. Saídas: PTCH é a altura tocada, AMP a dinâmica, BRT o brilho, FRASE a posição na frase, GT o gate articulado.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a altura e o gate de um QUANTIZER em PTCH e GATE. Ligue a saída PTCH no 1V/O de um OSC e GT no envelope da voz.</li>
+      <li>Ponha EXPR em 0 e depois em 0,8: compare a nota crua com a tocada.</li>
+      <li>Ligue AMP no CV1 do VCA da voz e BRT no corte do filtro: a linha ganha dinâmica e cor.</li>
+      <li>Suba VIB e GLIDE numa linha lenta: ela passa a cantar.</li>
+    </ol>
+  </article>
   <article class="modulo" id="mod-PHRASE">
     <h3>PHRASE</h3>
     <figure class="painel"><img src="assets/modulos/PHRASE.webp" alt="Painel do módulo PHRASE" width="237" height="300" loading="lazy" /></figure>
@@ -1256,7 +1816,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-ROUTE">
-  <h2>ROUTE <small>4 módulos</small></h2>
+  <h2>ROUTE <small>6 módulos</small></h2>
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="Painel do módulo SWITCH" width="142" height="300" loading="lazy" /></figure>
@@ -1271,6 +1831,8 @@
       <li><b>DEMUX</b>: desligado, quatro entradas para uma saída; ligado, uma entrada para quatro saídas.</li>
       <li><b>GLID</b>: uma transição gradual entre as posições, em que as duas fontes se misturam por um instante. Em zero, o corte é seco.</li>
       <li><b>SLEW</b>: suaviza a troca para evitar estalos. Convém deixar sempre um pouco.</li>
+      <li><b>FANT</b>: o scanner fantasma. A chave lembra os últimos endereços, e a saída FANT lê o lugar onde ela esteve, como um rastro.</li>
+      <li><b>ATRAS</b>: quantos passos atrás o fantasma lê, de 1 a 3.</li>
     </ul>
     <p>Entradas: A, B, C e D, as fontes; CLK, o pulso que avança; RST, para voltar à primeira posição; ADR, para escolher a posição com um sinal. Saídas: OA, OB, OC e OD; STP, a posição atual como sinal de controle.</p>
     <h4>Experimente</h4>
@@ -1295,6 +1857,7 @@
       <li><b>RING</b>: em vez de somar as entradas numa saída, multiplica, o que produz timbres metálicos com sinais de áudio.</li>
       <li><b>SAT</b>: uma saturação que segura o volume quando você realimenta a matriz.</li>
       <li><b>DRIFT</b>: faz as 16 células passearem devagar.</li>
+      <li><b>HIST</b>: rotas com história. Cada cruzamento guarda o desgaste do que passou por ele: o caminho usado se alarga e o abandonado se estreita. A matriz lembra por onde o som andou.</li>
     </ul>
     <p>Entradas: IN1 a IN4. Saídas: OUT1 a OUT4.</p>
     <h4>Experimente</h4>
@@ -1351,9 +1914,60 @@
       <li>Ligue Y' na entrada FC de um FILTER no caminho do som: o filtro acompanha o movimento.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-VIA">
+    <h3>VIA</h3>
+    <figure class="painel"><img src="assets/modulos/VIA.webp" alt="Painel do módulo VIA" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>A VIA é o caminho do sinal tratado como matéria. São sete portas por onde o som pode passar: resistor, diodo, capacitor, pulso, transistor, refluxo e alto-falante. As abertas se combinam pela média. Cada uma deixa no som a marca de um componente.</p>
+    <h4>Como pensar nele</h4>
+    <p>Num circuito, o fio nunca é neutro: o diodo corta, o capacitor guarda e solta, o alto-falante tem corpo e satura. A VIA põe esses comportamentos entre dois módulos quaisquer, num cabo de áudio ou de controle. As seis primeiras portas vêm do Antitotem; o FALANTE é um corpo ressonante afinado em CORPO. Sem nenhuma porta aberta, o caminho fica em silêncio.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RES</b>: o resistor: o sinal, atenuado.</li>
+      <li><b>DIODO</b>: retifica; só o lado de cima da onda passa, com direção.</li>
+      <li><b>CAP</b>: o capacitor, que guarda e solta devagar.</li>
+      <li><b>PULSO</b>: só a borda; o sinal vira um limiar, quase um degrau.</li>
+      <li><b>TRANS</b>: a curva assimétrica do transistor, junto do capacitor.</li>
+      <li><b>REFLX</b>: o refluxo, a diferença entre o sinal e a memória do capacitor: uma corrente que volta alterada.</li>
+      <li><b>FALANTE</b>: o corpo de um alto-falante, que ressoa e satura.</li>
+      <li><b>MEM</b>: o tempo do capacitor, de 1 ms a 2 s.</li>
+      <li><b>CORPO</b>: a ressonância do alto-falante, de 40 a 400 Hz.</li>
+      <li><b>NIVEL</b>: o nível de saída.</li>
+    </ul>
+    <p>Entradas: IN recebe o sinal, MEM move o tempo do capacitor. Saídas: OUT é o sinal transformado, CAP o estado do capacitor como CV.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Passe uma voz pela VIA só com RES aberto: o som passa igual.</li>
+      <li>Abra FALANTE e gire CORPO: a voz ganha o corpo de uma caixa pequena ou grande.</li>
+      <li>Feche tudo e abra só DIODO e CAP: um timbre roído, com memória.</li>
+      <li>Ligue um LFO em IN e use a saída CAP para mover um filtro: a VIA também trata sinais de controle.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-RELATE">
+    <h3>RELATE</h3>
+    <figure class="painel"><img src="assets/modulos/RELATE.webp" alt="Painel do módulo RELATE" width="65" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O RELATE recebe duas vozes e as devolve transformadas pela relação entre elas. Um seguidor de envelope mede quando cada uma soa, e um verbo decide o que essa relação faz.</p>
+    <h4>Como pensar nele</h4>
+    <p>Num grupo, os músicos não tocam sozinhos: um responde, outro cede, um terceiro contamina. O RELATE põe essa escuta entre duas vozes do patch. São cinco verbos. Sombra: B soa onde A soou, um tempo depois. Hoqueto: uma cede quando a outra soa. Contágio: o envelope lento de cada uma contamina a outra, e as duas passam a respirar juntas. Atrito: onde as duas soam juntas, a mistura ganha o produto delas, que se repara devagar quando o encontro passa. Anel: a mistura é o produto puro das duas.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>VERBO</b>: a relação, de 0 a 4 (sombra, hoqueto, contágio, atrito, anel).</li>
+      <li><b>INT</b>: a intensidade da relação.</li>
+      <li><b>TEMPO</b>: o atraso da sombra e a demora das outras relações.</li>
+    </ul>
+    <p>Entradas: A e B recebem as duas vozes. Saídas: OA e OB são as vozes transformadas, MIX a soma delas, ENC o encontro, de 0 a 1.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a voz principal em A e a contravoz em B, e OA e OB em dois canais do MIXER.</li>
+      <li>Com VERBO em hoqueto, ouça as vozes passarem a se revezar.</li>
+      <li>Troque para sombra e suba TEMPO: a segunda voz vira o eco rítmico da primeira.</li>
+      <li>Ligue ENC no MIX de um SPACE: quando as duas se encontram, o espaço se abre.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-SPACE">
-  <h2>SPACE <small>7 módulos</small></h2>
+  <h2>SPACE <small>11 módulos</small></h2>
   <article class="modulo" id="mod-SPACE">
     <h3>SPACE</h3>
     <figure class="painel"><img src="assets/modulos/SPACE.webp" alt="Painel do módulo SPACE" width="142" height="300" loading="lazy" /></figure>
@@ -1534,6 +2148,102 @@
       <li>Grave uma frase como no SAMPLER: a voz em IN e a saída DIV de um LOGIC, com DIV em 16, em REC. Ligue OUT no MIXER e LOOP.</li>
       <li>Ligue a saída BI de um FUNCTION a uns 2 Hz em SCR e suba GRAB até o meio. O disco vai e volta, num scratch.</li>
       <li>Retire o cabo de SCR. Ligue a saída GATE de um DECISION com BIAS baixo em BRK. De vez em quando, o disco freia e volta a girar.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SPRING">
+    <h3>SPRING</h3>
+    <figure class="painel"><img src="assets/modulos/SPRING.webp" alt="Painel do módulo SPRING" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O SPRING é um reverb de mola. Num amplificador, a mola de verdade leva o som de uma ponta à outra, e cada ida e volta chega com os graves atrasados em relação aos agudos: é o "boing". O módulo imita isso com um laço de atraso e filtros que espalham as frequências no tempo.</p>
+    <h4>Como pensar nele</h4>
+    <p>É menos um espaço e mais um objeto: um tanque de metal que soa por conta própria. TENS é o comprimento da mola, DRIP quanto "boing" ela tem, DAMP o brilho, DECAY quanto dura. A entrada KICK sacode o tanque, como quem bate no amplificador.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>DECAY</b>: quanto a cauda dura.</li>
+      <li><b>TENS</b>: a tensão da mola; muda a altura do "boing".</li>
+      <li><b>DAMP</b>: tira brilho da cauda.</li>
+      <li><b>DRIP</b>: quanto da dispersão característica da mola aparece.</li>
+      <li><b>MIX</b>: a proporção entre o som original e o da mola.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, KICK sacode o tanque, TENS move a tensão por CV. Saídas: OUT é a mistura, WET só a mola.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Passe uma voz pelo SPRING com MIX em 0,4, DRIP alto e DAMP baixo: o som de surf.</li>
+      <li>Ligue um CLOCK lento em KICK: o tanque estala sozinho.</li>
+      <li>Ligue um LFO lento em TENS: o eco desafina e geme.</li>
+      <li>Mande WET para um canal próprio do MIXER: a mola vira instrumento.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PRISM">
+    <h3>PRISM</h3>
+    <figure class="painel"><img src="assets/modulos/PRISM.webp" alt="Painel do módulo PRISM" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O PRISM separa o som em cores, como um prisma separa a luz. São seis faixas, do grave ao agudo, cada uma atrasada pelo seu próprio índice e posta num lugar do estéreo. Um golpe vira um arco-íris que escorre no tempo.</p>
+    <h4>Como pensar nele</h4>
+    <p>No vidro, cada cor anda numa velocidade. Aqui DISP é a espessura do vidro e CURVE o sentido: positiva, os agudos chegam depois, como na luz; negativa, os graves chegam depois, o que o vidro não faz. FDBK devolve cada cor ao prisma, e os ecos se separam mais a cada volta.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>DISP</b>: o atraso máximo entre as cores, até 400 ms.</li>
+      <li><b>CURVE</b>: o sentido e a forma da dispersão, de −1 a 1.</li>
+      <li><b>SPRD</b>: o quanto as cores se espalham no estéreo.</li>
+      <li><b>FDBK</b>: quanto de cada cor volta ao prisma.</li>
+      <li><b>MIX</b>: a proporção entre o som original e o disperso.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, DISP move a dispersão por CV. Saídas: OUT é a mistura, WET só o som disperso.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Passe um DRUM pelo PRISM com CURVE em 1, DISP em 200 ms e SPRD no máximo: cada batida escorre do grave ao agudo, de um lado ao outro.</li>
+      <li>Ponha CURVE em −1 e compare.</li>
+      <li>Suba FDBK para 0,7, com DISP em 80 ms e MIX em 0,6: ecos coloridos.</li>
+      <li>Ligue um LFO lento em DISP: o arco-íris respira.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-APOCRIFO">
+    <h3>APOCRIFO</h3>
+    <figure class="painel"><img src="assets/modulos/APOCRIFO.webp" alt="Painel do módulo APOCRIFO" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O APOCRIFO traz o passado distante para dentro do presente, como uma ruptura. O LOOPER repete o agora; o APÓCRIFO cita o que soou pelo menos IDADE segundos atrás. Ele guarda a entrada, nunca a própria saída: o apócrifo não cita a si mesmo.</p>
+    <h4>Como pensar nele</h4>
+    <p>São três modos de citar. Corroída: o trecho volta ao contrário e roído, com o presente abaixado por baixo, como uma memória corrompida. Corte: um corte de montagem, o trecho volta limpo uma vez e as emendas caem no cruzamento de zero, como a lâmina do editor de fita. Parêntese: o agora gagueja por um instante enquanto o patch segue por baixo, e volta exatamente onde o patch já está. A citação vem por um gatilho em CIT ou sozinha, pela CHANCE.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>MODO</b>: corroída (0), corte (1) ou parêntese (2).</li>
+      <li><b>IDADE</b>: de quão longe vem a citação, de 5 a 55 s.</li>
+      <li><b>DUR</b>: quanto dura o trecho citado.</li>
+      <li><b>CHANCE</b>: a frequência das citações espontâneas; em 0, só por gatilho.</li>
+      <li><b>PROF</b>: a profundidade da citação sobre o presente.</li>
+      <li><b>SEED</b>: a semente que escolhe os trechos.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, CIT dispara uma citação. Saídas: OUT é o som com as citações, ATIVO um gate enquanto a citação soa, IDADE de quão longe ela veio.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída do MIXER em IN e OUT no MASTER.</li>
+      <li>Ponha CHANCE em 0,3, MODO em corroída e IDADE em 30: de vez em quando, a peça de meio minuto atrás rasga o meio.</li>
+      <li>Troque para o modo corte e ligue o COL do COHERENCE em CIT: quando a linha fica previsível demais, a peça corta para o passado.</li>
+      <li>Ligue a saída IDADE no corte de um FILTER: quanto mais antiga a citação, mais escura.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-CUTUP">
+    <h3>CUTUP</h3>
+    <figure class="painel"><img src="assets/modulos/CUTUP.webp" alt="Painel do módulo CUTUP" width="81" height="206" loading="lazy" /></figure>
+    <h4>O que é</h4>
+    <p>O CUTUP recorta o próprio som no andamento do patch. Ele guarda os últimos quatro segundos e, quando chamado, faz um gesto de montagem sobre os últimos tempos do relógio: gagueira, rajada embaralhada, repetição microscópica ou silêncio.</p>
+    <h4>Como pensar nele</h4>
+    <p>É a técnica de recorte de William Burroughs e da colagem de fita, posta no barramento. Os gestos vêm por gate, cada um na sua entrada, ou sozinhos com CHANCE. Cada fragmento tem bordas suaves de 3 ms, e o gesto inteiro também, para o corte não estalar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>CHANCE</b>: a frequência dos gestos espontâneos; em 0, só por gate.</li>
+      <li><b>MICRO</b>: quantas repetições tem o gesto microscópico, de 2 a 8.</li>
+      <li><b>MIX</b>: a proporção entre o som original e o recortado.</li>
+      <li><b>SEED</b>: a semente que escolhe gestos e fatias.</li>
+    </ul>
+    <p>Entradas: IN recebe o som, CLK o relógio do patch, STUT dispara a gagueira, BURST a rajada de fatias embaralhadas, MICRO a repetição microscópica, GAP um tempo de silêncio. Saídas: OUT é o som recortado, ATIVO um gate enquanto um gesto soa.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue a saída do MIXER em IN, OUT no MASTER e o CLOCK em CLK.</li>
+      <li>Ponha CHANCE em 0,15: de vez em quando, o patch se recorta no tempo certo.</li>
+      <li>Ligue a saída euclidiana do CLOCK em STUT: a gagueira cai nos tempos do ritmo.</li>
+      <li>Ligue o EOS de um SEQUENCE em GAP: cada frase termina com um silêncio cortado.</li>
     </ol>
   </article>
 </section>

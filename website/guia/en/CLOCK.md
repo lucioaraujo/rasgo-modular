@@ -16,7 +16,9 @@ Instead of programming beat by beat, you describe the rhythm with two numbers. L
 - ACC-A, ACC-B: accents fall on steps that are multiples of these numbers. With 4 and 3, for instance, the accents form a three-against-four pattern.
 - AND: decides whether an accent needs both numbers at once or just one of them.
 - FEEL: how many parts each beat is divided into: two, three (triplets), five, seven, nine, eleven, or a division drawn at random on each step.
+- PHAS: Steve Reich's phasing. The FASE output is a second clock slightly faster, up to 3 %, that drifts away from the main one and comes back into line.
 Inputs: EXT, to follow outside pulses; RST, to go back to the start; BPM, to modulate the tempo. Outputs: CLK, EUC and ACC.
+The MET output gives the metric strength of the current step: 1 on the first step of the cycle, less on weak beats.
 
 ## Experimente
 1. Connect EUC to the GATE input of a DRUM, and the DRUM's OUT to a MIXER input.

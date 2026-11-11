@@ -1,5 +1,44 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.8 — preparação (11 nov. 2026)
+
+Pedido do autor (11/11): "preciso desse instrumento publicado ainda hoje",
+"em sua plena forma", "com documentação atualizada, tutoriais, páginas web,
+tudo certinho".
+
+Feito e verificado localmente:
+
+- versão 0.1.8 no `CMakeLists.txt`; build Linux completo e **116/116 testes
+  CTest** com os executáveis recém-compilados;
+- correção do rack antes da seed (`21a426b`): abrir um patch encolhia o rack
+  e as seeds seguintes compunham só com ele;
+- guias do site para os **88 módulos nos quatro idiomas**. São 28 verbetes
+  novos e 15 atualizados com as funções novas. `website/checar_guia.py`:
+  0 problemas e 0 suspeitas em pt/en/fr/es;
+- 28 imagens novas de painel, exportadas sem áudio (`RASGO_EXPORTAR_PATCH`,
+  HOME isolado);
+- páginas regeneradas: `modulos.json` do binário, `gerar_modulos.py` (88
+  módulos em 8 famílias), `estado.py --depois 0.1.8` e `seo.py`;
+  10/10 testes Python do site;
+- README (4 idiomas), INSTALL e CHANGELOG na v0.1.8.
+
+`website/verificar.py` acusa 49 avisos, todos do mesmo tipo: a v0.1.8 ainda
+não é pública. Eles devem zerar depois da release; rodar de novo para
+conferir.
+
+Portões que faltam, nesta ordem:
+
+1. **Escuta do autor no build da v0.1.8** (`./run`): seeds de volta ao rack
+   inteiro; manuseio do rack (knob sem arrastar o módulo, roda do mouse,
+   DESFAZ).
+2. **Decisão do autor de publicar** (push é decisão, não reflexo).
+3. Enviar a tag `v0.1.8` primeiro: a matriz da CI gera os seis pacotes e a
+   release. Só com os seis anexos publicados, enviar `main`, que dispara o
+   deploy de Pages. Nessa ordem, o site nunca aponta para downloads que ainda
+   não existem.
+4. Conferir os seis links HTTP, as páginas públicas e `verificar.py` com zero
+   avisos de versão.
+
 ## Release v0.1.7 — 18 out. 2026
 
 A [release v0.1.7](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7)

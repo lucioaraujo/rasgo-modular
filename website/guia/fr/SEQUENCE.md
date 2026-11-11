@@ -6,13 +6,17 @@ TURING fait naître la phrase du hasard ; SEQUENCE part d'une phrase que vous d�
 
 ## Controles
 - LEN : combien des huit pas entrent dans la phrase.
-- MODE : l'ordre de lecture : en avant, en arrière, aller-retour, au hasard, ou en errant pas à pas.
+- MODE : l'ordre de lecture : en avant, en arrière, aller-retour, au hasard, en errant pas à pas, ou le curseur, un corps qui avance dans les pas, poussé par l'horloge et attiré ou repoussé par une cible.
 - RATE : l'horloge interne, utilisée quand rien n'arrive sur CLK.
 - GATE : combien de temps chaque note reste active dans son pas. Court, c'est détaché ; long, lié.
 - GLIDE : fait glisser la hauteur d'une note à la suivante.
 - RANGE : combien d'octaves couvrent les huit valeurs, jusqu'à deux.
 - P1 à P8 : la hauteur de chaque pas.
 - G1 à G8 : active ou rend muet chaque pas.
+- INERC : en mode curseur, combien le curseur garde sa vitesse d'une impulsion à l'autre.
+- FORCA : en mode curseur, la force vers le pas ALVO : positive, elle attire, et le curseur s'attarde près de lui ; négative, elle repousse.
+- ALVO : le pas qui attire ou repousse le curseur.
+- FADIG : la fatigue. Chaque pas qui joue se fatigue et, trop fatigué, se tait cette fois : la répétition s'use. Valable dans tous les modes.
 Entrées : CLK, l'impulsion qui fait avancer ; RST, pour revenir au premier pas. Sorties : PTCH, la hauteur ; GATE, l'impulsion de la note ; EOS, une impulsion à chaque fin de phrase.
 
 ## Experimente

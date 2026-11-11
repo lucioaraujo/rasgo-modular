@@ -1,36 +1,19 @@
 # Rasgo Modular
 
-A v0.1.7 acrescenta LISTEN (escuta em
-três bandas, família OUT) e PHRASE (motivo por estímulos, DECISION), com
-controles explicados em quatro idiomas. Arraste-os da paleta para usar;
-o rack criado por seed conserva sua formação anterior. Patch de demonstração
-dos dois módulos: [escuta_frase.rmp](examples/escuta_frase.rmp).
-Esse exemplo serve para escutar LISTEN e PHRASE. Não serve para comparar as
-vistas RACK: seus 10 módulos visíveis chegam à saída, portanto TODOS e SAÍDA
-mostram os mesmos 10. Para testar a diferença entre as vistas, use um patch
-com pelo menos um módulo desconectado; o teste isolado faz 3 → 2 → 3 módulos.
-O exemplo `painel_tutoriais.rmp` também não serve para comparar essas vistas
-(11/11); ele existe para observar os painéis e controles.
-Antes de solicitar novos testes ao autor, o desenvolvimento confere o app,
-o exemplo e o resultado esperado; a [regra operacional](TAREFAS.md#portão-antes-de-pedir-teste-ao-autor--17102026)
-está nas tarefas. Escuta subjetiva só entra depois desse preparo técnico.
-Guias: [LISTEN](guia/61_listen.md) e [PHRASE](guia/62_phrase.md).
-Ao acrescentar um módulo, ele entra junto de sua família, em ordem alfabética
-(MIXER e MASTER ao final de OUT). A inserção não rearranja os módulos que você
-já posicionou. Os dois novos continuam opcionais, fora do rack semeado inicial.
-Os downloads da v0.1.7 incluem esses dois módulos.
-No app JUCE, o LEARN tem rolagem própria, textos mais claros e
-leituras BASE/DSP com a unidade do parâmetro. F1 fixa a explicação para
-leitura com setas/PgUp/PgDn; Esc devolve o teclado ao rack. Detalhes e
-limites em [Ajuda enquanto você toca](guia/CABEAMENTO.md#ajuda-enquanto-você-toca-017).
-O ENVELOPE usa quatro sliders verticais para ATK/DEC/SUS/REL, e o
-FILTER destaca CUT com um knob maior. Parâmetros, patches e comportamento
-da VARIA são preservados. As fontes locais do website já incluem guias
-completos e imagens reais dos dois módulos novos em PT/EN/FR/ES.
-O cabeçalho também tem ajuda em quatro idiomas. F6 permite percorrer os
-comandos por teclado; F1 fixa a explicação. F2 ou Aa abre a leitura do
-LEARN em 12/14/16 pixels lógicos e texto branco opcional, com preferência salva
-fora do patch. O ajuste é da caixa de leitura, não de todas as fontes do app.
+A **v0.1.8** (11 nov. 2026) leva o instrumento de 60 a **88 módulos**. Entre
+os novos: o filtro em escada LADDER, o fraseado do ACCENT, o jogo de
+confiança do BLEFE, as citações do APOCRIFO, o polímetro do POLYGON, os
+círculos do EPICYCLE, a relação entre vozes do RELATE, o intérprete do
+INTERPRET, os ímãs do MAGNET e os planetas do ORBIT. Quinze módulos ganharam
+funções, todas desligadas por padrão: o OSC (PD, UNI, SUBD), o QUANTIZER
+(crivo e afinações históricas), o HARMONY (neo-Riemann), o VCA (SAT), o
+ENVELOPE (LOOP, EOC) e outros. A seed passou a compor com regras novas:
+a garantia de limite, o gene Heisenberg e o grave em escada. O manuseio do
+rack também mudou: o módulo só se move pela faixa do nome, a roda do mouse
+gira os knobs e o DESFAZ devolve o módulo ao lugar. Detalhes no
+[CHANGELOG](CHANGELOG.md); guias de cada módulo em [`guia/`](guia/00_indice.md)
+e no [site](https://lucioaraujo.github.io/rasgo-modular/modulos.html), nos
+quatro idiomas.
 
 Localização atual (2026-10-11): `RASGO/PROJETOS_AUTORAIS/RASGO_MODULAR/`.
 O caminho antigo na raiz é um alias de compatibilidade, não outra fonte.
@@ -45,7 +28,7 @@ clonagem independente. Publicação continua uma decisão separada.
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.7 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7) ·
+**Download:** [v0.1.8 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -65,7 +48,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version:** v0.1.7 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.8 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -74,7 +57,7 @@ A modular synthesizer is an instrument made of separate modules, each with one
 job: one makes sound, another filters it, another keeps time, another makes
 decisions. You connect outputs to inputs with cables, and the sound comes out
 of those connections. Rasgo Modular does this on the computer screen, with
-**60 modules** in eight families (SOURCE, TRANSFORM, MODULATE, TIME, DECISION,
+**88 modules** in eight families (SOURCE, TRANSFORM, MODULATE, TIME, DECISION,
 ROUTE, SPACE, OUT).
 
 It is a standalone program: it opens, sounds and records, with no other music
@@ -108,7 +91,7 @@ undoes the last action, one cable at a time.
 
 To learn as you play, hover over any module, control or jack: the LEARN box
 explains it in English, Portuguese, French or Spanish. The
-[module guide](https://lucioaraujo.github.io/rasgo-modular/modulos-en.html) explains all 60 modules for beginners, with an
+[module guide](https://lucioaraujo.github.io/rasgo-modular/modulos-en.html) explains all 88 modules for beginners, with an
 exercise for each one.
 
 The REC button records a 24-bit `.wav` plus a `.score.txt` that logs the
@@ -117,7 +100,7 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.7 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7) —
+[**v0.1.8 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
 Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
 macOS `.dmg`, all built and packaged by continuous integration.
 
@@ -162,7 +145,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versão:** v0.1.7 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.8 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que é
@@ -170,7 +153,7 @@ e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 Um sintetizador modular é um instrumento feito de módulos independentes, cada
 um com uma função: um gera som, outro filtra, outro marca o tempo, outro toma
 decisões. Você liga saídas a entradas com cabos, e o som nasce dessas
-ligações. O Rasgo Modular faz isso na tela do computador, com **60 módulos**
+ligações. O Rasgo Modular faz isso na tela do computador, com **88 módulos**
 em oito famílias (SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE,
 OUT).
 
@@ -206,7 +189,7 @@ cabo por cabo.
 
 Para aprender enquanto toca, passe o mouse sobre qualquer módulo, controle ou
 entrada: a caixa LEARN explica em português, inglês, francês ou espanhol. O
-[guia dos módulos](https://lucioaraujo.github.io/rasgo-modular/modulos.html) explica os 60 módulos para quem está começando,
+[guia dos módulos](https://lucioaraujo.github.io/rasgo-modular/modulos.html) explica os 88 módulos para quem está começando,
 com um exercício para cada um.
 
 O botão REC grava um `.wav` de 24 bits e um `.score.txt` que anota o patch no
@@ -215,7 +198,7 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.7**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7) —
+[**Release v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
 Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 `.dmg` — todos construídos e empacotados pela integração contínua.
 
@@ -260,7 +243,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version :** v0.1.7 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.8 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -269,7 +252,7 @@ Un synthétiseur modulaire est un instrument fait de modules indépendants,
 chacun avec une fonction : l'un produit du son, un autre le filtre, un autre
 bat la mesure, un autre prend des décisions. Vous reliez des sorties à des
 entrées avec des câbles, et le son naît de ces liaisons. Rasgo Modular fait
-cela sur l'écran de l'ordinateur, avec **60 modules** en huit familles
+cela sur l'écran de l'ordinateur, avec **88 modules** en huit familles
 (SOURCE, TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT).
 
 C'est un programme autonome : il s'ouvre, sonne et enregistre, sans autre
@@ -307,7 +290,7 @@ vous appartient. `Ctrl+Z` annule la dernière action, câble par câble.
 
 Pour apprendre en jouant, survolez n'importe quel module, réglage ou prise :
 la boîte LEARN l'explique en français, portugais, anglais ou espagnol. Le
-[guide des modules](https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html) explique les 60 modules pour qui débute, avec un
+[guide des modules](https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html) explique les 88 modules pour qui débute, avec un
 exercice pour chacun.
 
 Le bouton REC enregistre un `.wav` en 24 bits et un `.score.txt` qui note le
@@ -316,7 +299,7 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.7**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7) —
+[**Version v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
@@ -362,7 +345,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versión:** v0.1.7 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.8 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -371,7 +354,7 @@ Un sintetizador modular es un instrumento hecho de módulos independientes,
 cada uno con una función: uno genera sonido, otro lo filtra, otro marca el
 tiempo, otro toma decisiones. Usted conecta salidas con entradas mediante
 cables, y el sonido nace de esas conexiones. Rasgo Modular hace esto en la
-pantalla del ordenador, con **60 módulos** en ocho familias (SOURCE,
+pantalla del ordenador, con **88 módulos** en ocho familias (SOURCE,
 TRANSFORM, MODULATE, TIME, DECISION, ROUTE, SPACE, OUT).
 
 Es un programa independiente: abre, suena y graba, sin otro software de
@@ -406,7 +389,7 @@ deshace la última acción, cable por cable.
 
 Para aprender mientras toca, pase el ratón sobre cualquier módulo, control o
 conector: la caja LEARN lo explica en español, portugués, inglés o francés. La
-[guía de los módulos](https://lucioaraujo.github.io/rasgo-modular/modulos-es.html) explica los 60 módulos para quien empieza, con
+[guía de los módulos](https://lucioaraujo.github.io/rasgo-modular/modulos-es.html) explica los 88 módulos para quien empieza, con
 un ejercicio para cada uno.
 
 El botón REC graba un `.wav` de 24 bits y un `.score.txt` que anota el patch
@@ -415,7 +398,7 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.7**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.7) —
+[**Versión v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 

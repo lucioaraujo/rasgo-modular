@@ -11,6 +11,7 @@ La grille : chaque cellule porte deux chiffres, l'entrée puis la sortie. La cel
 - RING : au lieu d'additionner les entrées sur une sortie, les multiplie, ce qui donne des timbres métalliques avec des signaux audio.
 - SAT : une saturation qui tient le niveau quand vous réinjectez la matrice sur elle-même.
 - DRIFT : fait se promener lentement les 16 cellules.
+- HIST : des routes avec une histoire. Chaque croisement garde l'usure de ce qui l'a traversé : le chemin utilisé s'élargit, l'abandonné se rétrécit. La matrice se souvient d'où le son est passé.
 Entrées : IN1 à IN4. Sorties : OUT1 à OUT4.
 
 ## Experimente

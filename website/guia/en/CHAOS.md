@@ -9,7 +9,9 @@ Other modules draw random values, like TURING and DECISION, or wander slowly, li
 - DRIVE: the force pushing the ball between the valleys. Higher means bigger, more frequent jumps.
 - DAMP: the friction. High, the ball settles in a valley and nearly stops; low, it swings widely and jumps from side to side.
 - FRZ: freezes the movement at its current value.
+- MODO: the attractor. Double well (as before), Rössler, which with DRIVE follows the period-doubling route to chaos, or Aizawa, a sphere pierced by a tube.
 Inputs: RSD, a pulse that gives a fresh push; RTM, to modulate the speed. Output: OUT.
+The Y and Z outputs give the attractor's other coordinates.
 
 ## Experimente
 1. Build a voice: the SAW of an OSC into the IN input of a FILTER, the FILTER's LO into the MIXER.

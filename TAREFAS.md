@@ -1,6 +1,6 @@
 # RASGO Modular — tarefas e continuidade
 
-Atualizado: 2026-10-18.
+Atualizado: 2026-11-11.
 Estado publicado: consultar o README e os registros datados ao final deste arquivo.
 Os marcos iniciais abaixo são históricos, não o estado atual da publicação.
 
@@ -10,6 +10,22 @@ transversais e reutilização continuam no inventário global; um dossiê por
 módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
+
+## ▶ Ponto de retomada — 11/11/2026 (noite): preparação da v0.1.8
+
+- Pronto e verificado localmente: ver `PUBLICACAO.md`, "Release v0.1.8 —
+  preparação". O que falta é a escuta do autor no build 0.1.8, o OK dele, a
+  tag (CI e release), depois `main` (Pages) e a conferência pública.
+- Em espera, fora da v0.1.8, até a escuta do autor: os papéis dos módulos
+  novos na seed e a poda do processador sem entrada. Patch em
+  `.local-build/em_espera/2026-11-11_seed_papeis_novos.patch`; ver
+  CHANGELOG.
+- Pedido maior do autor, a fazer depois da publicação, proposta antes do
+  código: aprofundar a composição das seeds (ritmo, melodia, harmonia,
+  trajetórias, eventos, variação; física, matemática, acústica), com algoritmos
+  mais elaborados sobre a gama atual de módulos.
+- Pendente: displays próprios de EPICYCLE, POLYGON, ORBIT e MAGNET (hoje os
+  visores mostram um traço genérico); fase didática.
 
 ## ▶ 11/11/2026 (madrugada): correções técnicas e auditoria dos módulos
 
