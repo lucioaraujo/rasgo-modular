@@ -13,6 +13,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 
 ## ▶ 11/11/2026 (madrugada): correções técnicas e auditoria dos módulos
 
+- [x] **Push** (11/11, autorizado pelo autor depois das etapas): 88 commits,
+  `4ce898f..39fd01a` em `lucioaraujo/rasgo-modular` (main). Sem áudio nem
+  material privado; nenhuma CI disparada (o build multiplataforma roda em
+  tag de versão ou à mão). Validação: suíte local, 98/98.
+
 - [x] Correções técnicas aprovadas ("ok pra todas"), cada uma com teste e
   commit: denormais no núcleo (55e6808), STRING afinada (173c96e), loudness
   em 10 ms e sem log10 no áudio (d9a5966), Lagrange em SPRING/PRISM
