@@ -45,6 +45,15 @@ endif()
 project(RasgoModularPrototype VERSION 0.1.8 LANGUAGES C CXX)
 set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}")
 
+# MSVC: /bigobj em todos os alvos. O catálogo (LEARN nos 4 idiomas, 88
+# módulos) estoura o limite padrão de seções COFF (C1128) em qualquer alvo
+# que o inclua inteiro — na v0.1.7 foi o teste reativo; na v0.1.8 (CI de
+# 11/11/2026) `test_learn_catalog` e `tool_learn_coverage`. Remendar alvo a
+# alvo só adiava a próxima falha. Só muda o formato do objeto no Windows.
+if(MSVC)
+    add_compile_options(/bigobj)
+endif()
+
 include(CTest)
 
 # `M_PI` NÃO é padrão C++. Ele vem do POSIX, e o GCC e o Clang o expõem
