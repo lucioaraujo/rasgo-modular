@@ -139,6 +139,7 @@ struct Rack {
     std::size_t sink = 0;
     std::vector<std::size_t> shown;       // ordem de exibição no rack
     std::map<std::string, std::size_t> byType;
+    std::vector<std::string> factoryTypes;   // ordem do rack de fábrica (build)
 
     // Telemetria dos `Display`. `scopes` é escrito pelo THREAD DE ÁUDIO
     // sob `gmx`; `scopeSnap` é a cópia que a UI desenha, tirada sem
@@ -547,6 +548,8 @@ struct Rack {
             }
         }
         sink = graph.add(std::make_unique<Out>());
+        factoryTypes.clear();
+        for (std::size_t i = 0; i < sink; ++i) factoryTypes.push_back(graph.node(i).type());
 
         // voz mínima ligada — o instrumento SOA ao abrir (identidade do
         // Rasgo Modular: não existe folha em branco silenciosa)
@@ -685,6 +688,31 @@ struct Rack {
         blockFrames = block;
         const rasgo::panel::SeedModuleFactory fabrica =
             [](const std::string& t) { return rasgo::panel::makeModule(t); };
+        // RACK DE FÁBRICA ANTES DA SEED (11/11/2026). Abrir um patch (.rmp)
+        // troca o rack inteiro pelos módulos daquele patch; o SEED seguinte
+        // compunha só com eles. Achado do autor depois de abrir um patch de
+        // prova de 13 módulos: as seeds ficaram pequenas, sempre LADDER/
+        // ACCENT/VCA, "mais didático e menos musical", com módulos sobrando
+        // sem cabo. A mesma seed tem de dar o mesmo patch (test_seed_
+        // identity): se o rack não começa pelo rack de fábrica, na ordem de
+        // fábrica, ele é refeito. O patch anterior continua no DESFAZ.
+        {
+            bool factory = !factoryTypes.empty() && graph.nodeCount() > factoryTypes.size();
+            for (std::size_t i = 0; factory && i < factoryTypes.size(); ++i)
+                factory = graph.node(i).type() == factoryTypes[i];
+            factory = factory && graph.node(factoryTypes.size()).type() == "OUT";
+            if (!factory) {
+                graph = rasgo::modular::SignalGraph{};
+                byType.clear();
+                shown.clear();
+                scopes.clear();
+                scopeSnap.clear();
+                cableSnap.clear();
+                invalidatePanels();
+                build();
+                allocScopes();
+            }
+        }
         try {
             rasgo::panel::seedPatch(graph, s, 0, fabrica);
         } catch (const std::exception& e) {
@@ -4902,6 +4930,7 @@ public:
             rack_.curSeed = seed_;
             rack_.applySeed(seed_, sampleRate_, blockSize_);
             rack_.populateMotion();
+            view_->resetForPatch();   // ver a nota em onSeedTyped
             view_->refresh();
             syncHeader();
         };
@@ -5041,6 +5070,13 @@ public:
             rack_.curSeed = v;
             rack_.applySeed(v, sampleRate_, blockSize_);
             rack_.populateMotion();
+            // Seed nova = patch novo: a lista "à vista por exceção" (módulo
+            // recém-adicionado ou recém-desplugado, borda tracejada) é do
+            // patch anterior. Sem limpar, um VCA/LADDER solto da edição
+            // anterior continuava na vista SAÍDA sem cabo nenhum — relato do
+            // autor, 11/11/2026: "não era pra aparecer módulos descabeados
+            // no seed".
+            view_->resetForPatch();
             view_->refresh();
             syncHeader();
             grabKeyboardFocus();   // devolve o teclado aos atalhos
@@ -5061,6 +5097,7 @@ public:
             rack_.curSeed = s;
             rack_.populateMotion();
             syncSignalIn();
+            view_->resetForPatch();   // ver a nota em onSeedTyped
             view_->refresh();
             syncHeader();
             grabKeyboardFocus();
