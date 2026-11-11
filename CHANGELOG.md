@@ -9,6 +9,15 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote da escuta do gesto** (11 nov., "pode avançar"; estudo da família §4.9).
+  - **Módulo novo: TAP (#78).** O andamento batido: a mediana a partir de 3
+    batidas, a contagem irregular é recusada, a 1ª batida é o "um", e o
+    relógio segue sozinho. Família TIME.
+  - **Módulo novo: FRONTEIRA (#79).** A fronteira de célula melódica por
+    LBDM (Cambouropoulos), ao vivo, com uma nota de atraso; o silêncio fecha
+    a frase (FIM). Família DECISION.
+  - Os dois entram no rack da seed (**as seeds mudam**).
+
 - **Lote do rasgo** (11 nov., "pode avançar nos módulos restantes"; estudo da
   família §4.8.3).
   - **Módulo novo: BLEFE (#76).** O jogo do sinal: verdade ou blefe soam

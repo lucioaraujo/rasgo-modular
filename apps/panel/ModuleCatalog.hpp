@@ -78,6 +78,8 @@
 #include "dsp/Accent.hpp"
 #include "dsp/Blefe.hpp"
 #include "dsp/Apocrifo.hpp"
+#include "dsp/Tap.hpp"
+#include "dsp/Fronteira.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -123,6 +125,8 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "ACCENT")     return std::make_unique<Accent>();
     if (t == "BLEFE")      return std::make_unique<Blefe>();
     if (t == "APOCRIFO")   return std::make_unique<Apocrifo>();
+    if (t == "TAP")        return std::make_unique<Tap>();
+    if (t == "FRONTEIRA")  return std::make_unique<Fronteira>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "MOUSSE")     return std::make_unique<Mousse>();
@@ -220,8 +224,8 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM"}},
-        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "PHRASE"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
         {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},

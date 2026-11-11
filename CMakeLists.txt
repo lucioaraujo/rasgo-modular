@@ -592,6 +592,16 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_apocrifo_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_apocrifo_tests COMMAND rasgo_modular_apocrifo_tests)
 
+    add_executable(rasgo_modular_tap_tests tests/test_tap.cpp)
+    target_include_directories(rasgo_modular_tap_tests PRIVATE src)
+    target_compile_options(rasgo_modular_tap_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_tap_tests COMMAND rasgo_modular_tap_tests)
+
+    add_executable(rasgo_modular_fronteira_tests tests/test_fronteira.cpp)
+    target_include_directories(rasgo_modular_fronteira_tests PRIVATE src)
+    target_compile_options(rasgo_modular_fronteira_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_fronteira_tests COMMAND rasgo_modular_fronteira_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})

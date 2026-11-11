@@ -858,6 +858,28 @@ inline const LearnTable& learnTable() {
             {"out:active", {"Alto enquanto uma citação toca.", "", ""}},
             {"out:age", {"De quão longe veio a última citação (idade/60 s).", "", ""}},
         }},
+        {"TAP", {
+            {"beats", {"O compasso: de quantos em quantos tempos volta o UM (1–16).", "", ""}},
+            {"spread", {"Quão irregular a contagem pode ser (o maior desvio relativo à mediana). Acima disto, o TAP não inventa um andamento.", "", ""}},
+            {"in:tap", {"Cada gatilho é uma batida. Três ou mais seguidas definem o andamento; a primeira é o “um”.", "", ""}},
+            {"in:reset", {"Esquece o andamento e a contagem.", "", ""}},
+            {"out:clock", {"Um pulso a cada tempo, no andamento batido — ligue no EXT do CLOCK.", "", ""}},
+            {"out:one", {"Um pulso no tempo forte (o “um”), a cada COMP tempos.", "", ""}},
+            {"out:bpm", {"O andamento como CV (bpm/300).", "", ""}},
+            {"out:locked", {"Alto quando há andamento.", "", ""}},
+        }},
+        {"FRONTEIRA", {
+            {"threshold", {"A força mínima para uma fronteira (0,05–0,9): baixo = células curtas e muitas.", "", ""}},
+            {"memory", {"Em quantas notas a referência (os máximos recentes) desbota.", "", ""}},
+            {"min_notes", {"O tamanho mínimo de uma célula, em notas.", "", ""}},
+            {"silence", {"Silêncio que fecha a frase na hora (0,3–4 s): um pulso em FIM.", "", ""}},
+            {"in:pitch", {"A altura de quem toca (1 V/oct): SCOPE.PIT serve.", "", ""}},
+            {"in:gate", {"Cada nota (SCOPE.ONS serve); o fim do gate mede a pausa.", "", ""}},
+            {"out:boundary", {"Um pulso quando começa uma célula nova — uma nota depois (para saber se uma nota é fronteira é preciso ouvir a seguinte).", "", ""}},
+            {"out:strength", {"A força de fronteira da última nota (0–1).", "", ""}},
+            {"out:notes", {"O tamanho da última célula fechada (notas/16).", "", ""}},
+            {"out:end", {"Um pulso quando o silêncio fecha a frase.", "", ""}},
+        }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
             {"stability", {"Quantas notas seguidas um tom novo precisa vencer para valer (1–16): evita tremular entre tons vizinhos.", "", ""}},
@@ -3097,6 +3119,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "O patch cita o próprio passado — guarda até 60 s do que passa e, por gatilho ou chance, devolve um trecho de longe: corroído e ao contrário, num corte de montagem limpo, ou um parêntese que gagueja o agora.",
             "Conceitos do Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): o rasgo do tempo — a peça se interrompe com uma memória de si.",
             "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0,3, MODO CORROÍDA: de vez em quando, a peça de 30 s atrás rasga o presente."}},
+        {"TAP", {
+            "O andamento batido por quem toca — três ou mais batidas definem o andamento (a mediana), e o relógio segue sozinho; a primeira batida é o “um”.",
+            "Conceito do tap tempo do Maravi: o andamento definido pelo próprio músico; contagem irregular é recusada, em vez de inventar um andamento.",
+            "SIGNAL-IN → SCOPE (ONS) → TAP; CLK → EXT do CLOCK; UM → RST do SEQUENCE: o patch entra no seu pulso e no seu “um”."}},
+        {"FRONTEIRA", {
+            "Onde a ideia de quem toca começa — mede salto, intervalo entre ataques e pausa nota a nota e marca o começo de cada célula melódica; o silêncio fecha a frase.",
+            "LBDM de Cambouropoulos (2001), das regras de agrupamento de Lerdahl & Jackendoff; conceito do Maravi. Uma nota de atraso, dita.",
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → FRASE do MIXER (modo GESTO): cada ideia nova muda o palco."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
@@ -3467,6 +3497,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The patch quotes its own past — it keeps up to 60 s of what goes through and, by trigger or chance, gives back a distant passage: corroded and reversed, as a clean montage cut, or a parenthesis that stutters the now.",
             "Concepts of the Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): the tear of time — the piece interrupts itself with a memory of itself.",
             "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0.3, MODE CORRODED: now and then, the piece from 30 s ago tears the present."}},
+        {"TAP", {
+            "The tempo tapped by the player — three or more taps set the tempo (the median) and the clock carries on by itself; the first tap is the “one”.",
+            "Concept of the Maravi's tap tempo: tempo set by the musician; an irregular count is refused instead of inventing a tempo.",
+            "SIGNAL-IN → SCOPE (ONS) → TAP; CLK → CLOCK EXT; ONE → SEQUENCE RST: the patch joins your pulse and your “one”."}},
+        {"FRONTEIRA", {
+            "Where the player's idea begins — it measures leap, inter-onset interval and rest note by note and marks the start of each melodic cell; silence closes the phrase.",
+            "Cambouropoulos's LBDM (2001), from Lerdahl & Jackendoff's grouping rules; concept from the Maravi. One note of latency, stated.",
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → MIXER PHRASE input (GESTURE mode): each new idea changes the stage."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
@@ -3765,6 +3803,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le patch cite son propre passé — il garde jusqu’à 60 s de ce qui passe et, par déclenchement ou hasard, rend un passage lointain : corrodé et à l’envers, en coupe de montage nette, ou une parenthèse qui bégaie le présent.",
             "Concepts du Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch) : la déchirure du temps — la pièce s’interrompt avec un souvenir d’elle-même.",
             "MIXER (L+R) → APOCRIFO → MASTER ; CHANCE 0,3, MODE CORRODÉ : de temps en temps, la pièce d’il y a 30 s déchire le présent."}},
+        {"TAP", {
+            "Le tempo frappé par qui joue — trois frappes ou plus fixent le tempo (la médiane) et l’horloge continue seule ; la première frappe est le « un ».",
+            "Concept du tap tempo du Maravi : le tempo défini par le musicien ; un comptage irrégulier est refusé au lieu d’inventer un tempo.",
+            "SIGNAL-IN → SCOPE (ONS) → TAP ; CLK → EXT du CLOCK ; UM → RST du SEQUENCE : le patch entre dans votre pulsation et votre « un »."}},
+        {"FRONTEIRA", {
+            "Là où commence l’idée de qui joue — mesure saut, intervalle entre attaques et silence note à note, et marque le début de chaque cellule mélodique ; le silence ferme la phrase.",
+            "LBDM de Cambouropoulos (2001), d’après les règles de groupement de Lerdahl & Jackendoff ; concept du Maravi. Une note de latence, dite.",
+            "SIGNAL-IN → SCOPE : PIT → PTCH, ONS → GATE ; FRONT → FRASE du MIXER (mode GESTE) : chaque idée nouvelle change la scène."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
@@ -4063,6 +4109,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El patch cita su propio pasado — guarda hasta 60 s de lo que pasa y, por disparo o azar, devuelve un pasaje lejano: corroído y al revés, como un corte de montaje limpio, o un paréntesis que tartamudea el ahora.",
             "Conceptos del Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): el rasgón del tiempo — la pieza se interrumpe con un recuerdo de sí misma.",
             "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0,3, MODO CORROÍDO: de vez en cuando, la pieza de hace 30 s rasga el presente."}},
+        {"TAP", {
+            "El tempo golpeado por quien toca — tres golpes o más fijan el tempo (la mediana) y el reloj sigue solo; el primer golpe es el «uno».",
+            "Concepto del tap tempo del Maravi: el tempo definido por el músico; una cuenta irregular se rechaza en vez de inventar un tempo.",
+            "SIGNAL-IN → SCOPE (ONS) → TAP; CLK → EXT del CLOCK; UM → RST del SEQUENCE: el patch entra en su pulso y en su «uno»."}},
+        {"FRONTEIRA", {
+            "Dónde empieza la idea de quien toca — mide salto, intervalo entre ataques y pausa nota a nota y marca el comienzo de cada célula melódica; el silencio cierra la frase.",
+            "LBDM de Cambouropoulos (2001), de las reglas de agrupamiento de Lerdahl & Jackendoff; concepto del Maravi. Una nota de latencia, dicha.",
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → FRASE del MIXER (modo GESTO): cada idea nueva cambia el escenario."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",
