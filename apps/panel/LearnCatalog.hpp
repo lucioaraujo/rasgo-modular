@@ -449,6 +449,11 @@ inline const LearnTable& learnTable() {
             {"out:out", {"A forma de onda varrida.", "", ""}},
         }},
         {"ADDITIVE", {
+            {"tension", {"FIBRA: a tensão no feixe de parciais. Cada parcial carrega na proporção do quanto soa; quando passa do seu limiar, RASGA — estala e cala — e a carga vai às vizinhas (avalanches). O fundamental nunca rasga. 0 = o ADDITIVE de sempre.", "", ""}},
+            {"in:tension", {"CV somada à TENS — um envelope ou um LFO lento aqui é pressão que se acumula.", "", ""}},
+            {"in:reset", {"Tece um feixe novo: todas as fibras inteiras, outros limiares.", "", ""}},
+            {"out:tear", {"Um pulso a cada fibra que rasga (numa avalanche, um pulso).", "", ""}},
+            {"out:intact", {"A fração do feixe ainda inteira (1 = nenhuma cicatriz; perto de 0 = só o fundamental).", "", ""}},
             {"freq", {
                 "Frequência base. 1 V/oct pela entrada 1V/O.", "", ""}},
             {"fine", {"Afinação fina em cents (±100).", "", ""}},
@@ -824,6 +829,34 @@ inline const LearnTable& learnTable() {
             {"out:sweep", {"O empilhamento da 303: cada nota sobe a carga pela sua ênfase e ela vaza devagar — acentos seguidos sobem, um sozinho não. Ligue no FC.", "", ""}},
             {"out:gate", {"O gate, só nas notas acentuadas (ênfase ≥ 0,5): para disparar um segundo som nos acentos.", "", ""}},
             {"out:level", {"A ênfase em degraus: 0, fraco, médio, forte (0, ⅓, ⅔, 1).", "", ""}},
+        }},
+        {"BLEFE", {
+            {"truthfulness", {"A taxa de verdade: a chance de cada sinal ser verdade (confirmado depois da janela) e não blefe.", "", ""}},
+            {"window", {"A janela de expectativa: quanto tempo depois do sinal a verdade se confirma (0,05–4 s).", "", ""}},
+            {"memory", {"Quão depressa a confiança anda a cada resolução (média móvel): alto = esquece rápido.", "", ""}},
+            {"threshold", {"Onde a confiança precisa cair, depois de ter sido construída, para ser traição.", "", ""}},
+            {"seed", {"Semente do jogo: a mesma seed, as mesmas verdades e mentiras.", "", ""}},
+            {"in:in", {"Cada gatilho é um sinal (o CLOCK, um ARP, uma nota).", "", ""}},
+            {"in:reset", {"O perdão: a confiança volta ao neutro e a recusa acaba.", "", ""}},
+            {"out:signal", {"O sinal — sempre o mesmo pulso, seja verdade ou blefe: ninguém distingue pelo som.", "", ""}},
+            {"out:truth", {"A verdade escondida, no instante do sinal — para quem quiser trapacear.", "", ""}},
+            {"out:confirm", {"A confirmação: um pulso quando a janela fecha e o sinal era verdade.", "", ""}},
+            {"out:trust", {"A confiança (0–1): sobe com verdades, cai com blefes.", "", ""}},
+            {"out:response", {"A resposta: um pulso na resolução com altura = confiança. Depois da traição, muda — a voz se recusa.", "", ""}},
+            {"out:betrayal", {"Um pulso no instante da traição (só depois de a confiança ter passado de 0,65).", "", ""}},
+        }},
+        {"APOCRIFO", {
+            {"mode", {"0 CORROÍDA: o passado volta ao contrário e roído, o presente se abaixa. 1 CORTE: o passado volta limpo, emendas no zero (corte de montagem). 2 PARÊNTESE: o agora gagueja enquanto o patch segue.", "", ""}},
+            {"min_age", {"De quão longe, no mínimo, vem a citação (5–55 s; até 60 s de memória).", "", ""}},
+            {"length", {"Quanto dura a citação (0,1–3 s). No PARÊNTESE, o trecho que gagueja é ¼ disto.", "", ""}},
+            {"chance", {"Citações sozinhas: 0 = só por gatilho; 1 = uma a cada ~10 s, em média.", "", ""}},
+            {"depth", {"Quanto o presente se abaixa sob a citação (CORROÍDA, PARÊNTESE).", "", ""}},
+            {"seed", {"Semente: de onde vêm as citações e quando caem (com CHANCE).", "", ""}},
+            {"in:in", {"O áudio que o APÓCRIFO escuta e lembra (a memória guarda a entrada, nunca a própria saída).", "", ""}},
+            {"in:trigger", {"Cita agora (se já houver passado suficiente).", "", ""}},
+            {"out:out", {"O áudio, com as citações.", "", ""}},
+            {"out:active", {"Alto enquanto uma citação toca.", "", ""}},
+            {"out:age", {"De quão longe veio a última citação (idade/60 s).", "", ""}},
         }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
@@ -3056,6 +3089,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "O campo de acento — várias causas (métrica, salto, ápice, acento de fora, agógico, síncope) somadas numa ênfase só, entregue em várias saídas ao mesmo tempo: volume, brilho, articulação e o empilhamento da 303.",
             "O acento como gesto, não como volume (Lerdahl & Jackendoff; Drake & Palmer). Herança e rotação do Antitotem; um campo para vários destinos, do Aquorbium; a supressão evita que tudo seja acento.",
             "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE e PTCH → ACCENT; VCA → CV do VCA, SWP → FC do LADDER, DEC → TIME do ENVELOPE: a linha ganha fraseado e o baixo ácido ganha o acento que sobe."}},
+        {"BLEFE", {
+            "O jogo do sinal — cada gatilho vira um sinal que soa sempre igual, verdade ou blefe; a verdade se confirma depois de uma janela, o blefe não. A confiança anda, e a traição (depois de construída) faz a resposta se recusar.",
+            "Conceito do BluffSignal do Rasgo Synth Studio: blefe é informação incompleta + expectativa + risco — um número aleatório não tem intenção, o blefe tem intenção percebida. RST é o perdão.",
+            "CLOCK → BLEFE (IN); SIG → GATE de um ENVELOPE (o sinal); CONF → um segundo som (a confirmação); RESP → CV de um VCA de outra voz: ela responde enquanto confia e se cala depois da traição."}},
+        {"APOCRIFO", {
+            "O patch cita o próprio passado — guarda até 60 s do que passa e, por gatilho ou chance, devolve um trecho de longe: corroído e ao contrário, num corte de montagem limpo, ou um parêntese que gagueja o agora.",
+            "Conceitos do Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): o rasgo do tempo — a peça se interrompe com uma memória de si.",
+            "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0,3, MODO CORROÍDA: de vez em quando, a peça de 30 s atrás rasga o presente."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
@@ -3418,6 +3459,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The accent field — several causes (metre, leap, apex, external accent, agogic, syncopation) summed into one emphasis, delivered to several outputs at once: volume, brightness, articulation and the 303 stacking.",
             "Accent as a gesture, not a volume (Lerdahl & Jackendoff; Drake & Palmer). Inheritance and rotation from the Antitotem; one field for many destinations, from the Aquorbium; suppression keeps everything from being an accent.",
             "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE and PTCH → ACCENT; VCA → the VCA's CV, SWP → LADDER FC, DEC → ENVELOPE TIME: the line gains phrasing and the acid bass gains the rising accent."}},
+        {"BLEFE", {
+            "The game of the signal — each trigger becomes a signal that always sounds the same, truth or bluff; the truth is confirmed after a window, the bluff is not. Trust moves, and betrayal (once trust was built) makes the response refuse.",
+            "Concept of the Rasgo Synth Studio's BluffSignal: a bluff is incomplete information + expectation + risk — a random number has no intention, a bluff has perceived intention. RST is forgiveness.",
+            "CLOCK → BLEFE (IN); SIG → an ENVELOPE GATE (the signal); CONF → a second sound (the confirmation); RESP → the CV of another voice's VCA: it answers while it trusts and falls silent after the betrayal."}},
+        {"APOCRIFO", {
+            "The patch quotes its own past — it keeps up to 60 s of what goes through and, by trigger or chance, gives back a distant passage: corroded and reversed, as a clean montage cut, or a parenthesis that stutters the now.",
+            "Concepts of the Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): the tear of time — the piece interrupts itself with a memory of itself.",
+            "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0.3, MODE CORRODED: now and then, the piece from 30 s ago tears the present."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
@@ -3708,6 +3757,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le champ d’accent — plusieurs causes (mètre, saut, apex, accent externe, agogique, syncope) sommées en une seule emphase, livrée à plusieurs sorties à la fois : volume, brillance, articulation et l’empilement de la 303.",
             "L’accent comme geste, non comme volume (Lerdahl & Jackendoff ; Drake & Palmer). Héritage et rotation de l’Antitotem ; un champ pour plusieurs destinations, de l’Aquorbium ; la suppression évite que tout soit accent.",
             "SEQUENCE → QUANTIZER → OSC → LADDER → VCA ; GATE et PTCH → ACCENT ; VCA → CV du VCA, SWP → FC du LADDER, DEC → TIME de l’ENVELOPE : la ligne gagne un phrasé et la basse acide l’accent qui monte."}},
+        {"BLEFE", {
+            "Le jeu du signal — chaque déclenchement devient un signal qui sonne toujours pareil, vérité ou bluff ; la vérité se confirme après une fenêtre, le bluff non. La confiance bouge, et la trahison (une fois la confiance construite) fait que la réponse se refuse.",
+            "Concept du BluffSignal du Rasgo Synth Studio : un bluff, c’est information incomplète + attente + risque — un nombre aléatoire n’a pas d’intention, le bluff a une intention perçue. RST est le pardon.",
+            "CLOCK → BLEFE (IN) ; SIG → GATE d’une ENVELOPE (le signal) ; CONF → un second son (la confirmation) ; RESP → la CV du VCA d’une autre voix : elle répond tant qu’elle a confiance et se tait après la trahison."}},
+        {"APOCRIFO", {
+            "Le patch cite son propre passé — il garde jusqu’à 60 s de ce qui passe et, par déclenchement ou hasard, rend un passage lointain : corrodé et à l’envers, en coupe de montage nette, ou une parenthèse qui bégaie le présent.",
+            "Concepts du Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch) : la déchirure du temps — la pièce s’interrompt avec un souvenir d’elle-même.",
+            "MIXER (L+R) → APOCRIFO → MASTER ; CHANCE 0,3, MODE CORRODÉ : de temps en temps, la pièce d’il y a 30 s déchire le présent."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
@@ -3998,6 +4055,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El campo de acento — varias causas (métrica, salto, ápice, acento externo, agógico, síncopa) sumadas en una sola énfasis, entregada a varias salidas a la vez: volumen, brillo, articulación y el apilamiento de la 303.",
             "El acento como gesto, no como volumen (Lerdahl & Jackendoff; Drake & Palmer). Herencia y rotación del Antitotem; un campo para varios destinos, del Aquorbium; la supresión evita que todo sea acento.",
             "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE y PTCH → ACCENT; VCA → CV del VCA, SWP → FC del LADDER, DEC → TIME del ENVELOPE: la línea gana fraseo y el bajo ácido el acento que sube."}},
+        {"BLEFE", {
+            "El juego de la señal — cada disparo se vuelve una señal que suena siempre igual, verdad o farol; la verdad se confirma tras una ventana, el farol no. La confianza se mueve, y la traición (una vez construida la confianza) hace que la respuesta se niegue.",
+            "Concepto del BluffSignal del Rasgo Synth Studio: un farol es información incompleta + expectativa + riesgo — un número aleatorio no tiene intención, el farol tiene intención percibida. RST es el perdón.",
+            "CLOCK → BLEFE (IN); SIG → GATE de un ENVELOPE (la señal); CONF → un segundo sonido (la confirmación); RESP → la CV del VCA de otra voz: responde mientras confía y calla después de la traición."}},
+        {"APOCRIFO", {
+            "El patch cita su propio pasado — guarda hasta 60 s de lo que pasa y, por disparo o azar, devuelve un pasaje lejano: corroído y al revés, como un corte de montaje limpio, o un paréntesis que tartamudea el ahora.",
+            "Conceptos del Rasgo Synth Studio (ApocryphalTear, MontageEditCut, ParenthesisGlitch): el rasgón del tiempo — la pieza se interrumpe con un recuerdo de sí misma.",
+            "MIXER (L+R) → APOCRIFO → MASTER; CHANCE 0,3, MODO CORROÍDO: de vez en cuando, la pieza de hace 30 s rasga el presente."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",

@@ -1097,6 +1097,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 || nm == "pd" || nm == "unison" || nm == "sub_div"
                 // lote da harmonia (11/11/2026): escolhas de estrutura
                 || nm == "tuning" || nm.rfind("sieve_", 0) == 0 || nm == "nr_cycle"
+                // FIBRA do ADDITIVE: a tensão rasga para sempre — escolha
+                // de quem toca (o "tension" do SPRING continua no sorteio)
+                || (nm == "tension" && node.type() == "ADDITIVE")
                 // GAIN do DYNAMICS: nível, como os outros ganhos
                 || nm == "makeup")
                 continue;

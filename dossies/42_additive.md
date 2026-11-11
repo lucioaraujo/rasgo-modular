@@ -215,3 +215,31 @@ Knobs `FREQ`/`FINE`/`TILT`/`COMB` (linha 1), `ODD`/`STR`/`FM`/`DRIFT`
 Cadeias canônicas: `SEQUENCE → QUANTIZER → ADDITIVE → VCA`;
 `ENVELOPE.env → ADDITIVE.tilt` (brilho segue a nota);
 `FUNCTION/LFO → ADDITIVE.stretch` (o timbre metaliza e volta).
+
+## 9. FIBRA, o rasgo da matéria (11/11/2026, estudo da família §4.8.3, aprovado)
+
+Conceito do `RasgoFracture` do Rasgo Synth Studio (mesmo autor; conceito,
+não código).
+- **O feixe:** os 64 parciais são fibras de um feixe (Fiber Bundle Model:
+  Pierce 1926; Daniels 1945). Cada uma tem um limiar de Weibull (k = 2,5,
+  λ = 1), amostrado pela inversão da CDF.
+- **A carga:** **TENS** (knob + CV) acumula carga por bloco, na proporção
+  da amplitude de cada parcial (até 0,5 por segundo no mais forte).
+- **O rasgo:** passado o limiar, a fibra rasga. Estala por 40 ms (ruído na
+  amplitude, com envoltória que cai) e cala.
+- **A propagação:** a carga que ela segurava vai às **vizinhas** inteiras
+  (local load sharing, Harlow & Phoenix 1978), com **avalanches**
+  recursivas.
+- **A cicatriz:** o fundamental nunca rasga, e a cicatriz fica até o
+  **RST**, que tece um feixe novo com outros limiares.
+- **Saídas:** RSG (pulso a cada ruptura) e INT (a fração inteira).
+- **Compatibilidade:** TENS = 0 e sem cabo é o ADDITIVE de antes. O TENS
+  do ADDITIVE fica fora do sorteio da seed e do VARIA (rasga para sempre);
+  o `tension` do SPRING continua como era.
+- **Medido** (TILT 0,5), número de fibras rasgadas:
+  - TENS 1: 7 aos 8 s, 11 aos 20 s, 13 aos 40 s;
+  - TENS 0,5: 4 aos 12 s, 11 aos 40 s;
+  - TENS 0,2: as primeiras aos 32 s.
+- **Teste** (`testFiberTearing`), com TILT 0,8 e TENS 1 por 20 s: 63
+  rasgadas e o fundamental vivo; avalanche máxima de 16; a cicatriz fica;
+  o RST refaz.

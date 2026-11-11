@@ -189,6 +189,8 @@ Estado: **✓** pronto · **·** a fazer.
 | 73 | `KEY` | [`73_key.md`](73_key.md) | local, após 0.1.7 |
 | 74 | `LADDER` | [`74_ladder.md`](74_ladder.md) | local, após 0.1.7 |
 | 75 | `ACCENT` | [`75_accent.md`](75_accent.md) | local, após 0.1.7 |
+| 76 | `BLEFE` | [`76_blefe.md`](76_blefe.md) | local, após 0.1.7 |
+| 77 | `APOCRIFO` | [`77_apocrifo.md`](77_apocrifo.md) | local, após 0.1.7 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |
