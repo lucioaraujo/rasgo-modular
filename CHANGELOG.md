@@ -9,6 +9,12 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Registro das seeds abertas** (11 nov., pedido do autor). Cada seed
+  aberta vira uma linha em `~/.config/rasgo-modular/seeds.log` (Linux): data
+  e hora, número, vozes do conjunto, módulos e cabos ligados, modo do PALCO
+  e as cópias em uso — para voltar a uma seed que soou bem
+  (`./run <número>`). Guarda a metade mais nova acima de ~1 MB.
+
 - **Módulo novo: COHERENCE (COERÊNCIA)** (11 nov., decisão do autor). A
   ordem que se rompe: escuta uma linha de alturas, mede quanto ela está
   previsível (1 − entropia de Shannon das últimas notas) e, quando fica
