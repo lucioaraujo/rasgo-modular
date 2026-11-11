@@ -75,6 +75,7 @@
 #include "dsp/Coherence.hpp"
 #include "dsp/Key.hpp"
 #include "dsp/Ladder.hpp"
+#include "dsp/Accent.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -117,6 +118,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "MARKOV")     return std::make_unique<Markov>();
     if (t == "COHERENCE")  return std::make_unique<Coherence>();
     if (t == "KEY")        return std::make_unique<Key>();
+    if (t == "ACCENT")     return std::make_unique<Accent>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "MOUSSE")     return std::make_unique<Mousse>();
@@ -215,7 +217,7 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "PHRASE"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
         {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},

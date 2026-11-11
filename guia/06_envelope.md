@@ -78,6 +78,10 @@ e não precisa que o `ENVELOPE` também controle volume de nada.
 - **`ENV`** (controle) — o contorno **em si**, como CV. **Plugue em:**
   `FILTER.cutoff` (o filtro abre com a nota — o gesto mais clássico),
   `SHAPE.fold`, `ADDITIVE.tilt`, `OPERATOR.index`, qualquer `_mod`.
+- **`EOC`** (controle, gatilho) — um pulso de 10 ms no **fim** de cada
+  envelope (ou de cada ciclo, com LOOP). **Plugue em:** o `GATE` de outro
+  `ENVELOPE` (envelopes encadeados: um termina, o outro começa), o `CLK`
+  de um `SEQUENCE` (o ciclo do envelope vira o relógio), o `RST` de algo.
 
 ## Os controles, um a um
 
@@ -108,6 +112,12 @@ importa).
 
 **TRIG** (mode, chave) — ASR (segura no gate) ↔ AD/trigger (completa o
 contorno inteiro sempre).
+
+**LOOP** (loop, chave) — o envelope recomeça sozinho ao terminar: um ciclo
+A·D·R que toca **sem gate** (um gate no `GATE` reinicia a fase). Em LOOP o
+SUS não segura: vira o nível em que o DEC termina e o REL começa. Com tempos
+curtos é um LFO de forma moldável (pela CURVE); com tempos longos, uma
+respiração. O período é ATK + DEC + REL (e o `TIME` o estica ou encurta).
 
 ## Como cabear
 

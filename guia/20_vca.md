@@ -82,6 +82,12 @@ exponencial (volume de áudio percebido).
 **DRIFT** (0–1) — oscilação lenta e correlacionada nos dois ganhos
 (±~3%) — "o VCA respira".
 
+**SAT** (saturation, 0–1) — a cor do par diferencial de um OTA, nos dois
+canais. Satura a **entrada** antes do ganho, então o caráter não depende do
+volume: um baixo baixinho e um alto têm a mesma "gordura". Em 0, o VCA é o
+de sempre (limpo). A saturação usa antialiasing por antiderivada (como o
+`SHAPE`), sem latência perceptível.
+
 ## Como cabear
 
 **Envelope de amplitude (a cadeia mínima):**

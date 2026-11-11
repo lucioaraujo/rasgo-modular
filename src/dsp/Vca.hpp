@@ -25,6 +25,15 @@
 // Modulação por PORTA de verdade: `cv` atenuvertida SOMA ao knob `level`
 // -> o knob fica vivo (ao contrário de `connectToParameter`). Desvio
 // Rasgo: `drift` — os dois ganhos ganham uma oscilação lenta seeded.
+//
+// SAT (11/11/2026, fila aprovada; `PESQUISA_cardinal_baixo_e_osciladores`
+// §8.4): a COR do par diferencial de um OTA — satura a ENTRADA antes do
+// ganho (y = g·tanh(d·x)/d), então o caráter não depende do volume, como
+// num VCA de transistor de verdade. d = 1 + 5·SAT; em SAT = 0 o VCA é
+// exatamente o de antes (nenhum patch muda). Antialiasing por antiderivada
+// de 1ª ordem (Parker, Zavalishin & Le Bivic, DAFx 2016; o mesmo do SHAPE):
+// a média de tanh entre duas amostras, pela diferença de log cosh — sem
+// oversampling, meia amostra de atraso só quando SAT > 0.
 
 namespace rasgo::modular {
 
@@ -45,7 +54,8 @@ public:
                {"level2", 0.0f, 1.0f, 0.0f, ""},
                {"cv2_amount", -1.0f, 1.0f, 1.0f, ""},
                {"response2", 0.0f, 1.0f, 0.0f, ""},
-               {"drift", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"drift", 0.0f, 1.0f, 0.0f, ""},
+               {"saturation", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "VCA"; }
 
@@ -66,6 +76,7 @@ public:
             p.add(Widget::Kind::Jack, ("O" + n), "out:out" + n, x, 116.0f);
         }
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 8.0f, 74.0f);
+        p.add(Widget::Kind::Knob, "SAT", "saturation", 32.0f, 74.0f);
         p.add(Widget::Kind::Jack, "SUM", "out:sum", 20.0f, 116.0f);
         return p;
     }
@@ -77,6 +88,7 @@ public:
         driftState_ = 0.0f;
         driftCounter_ = 0;
         rng_ = 0x853C49E6748FEA9BULL;
+        adaaPrev_[0] = adaaPrev_[1] = 0.0f;
         smoothCoef_ =
             1.0f - std::exp(-1.0f / std::max(1.0f, 0.0015f * sampleRate));
         driftInterval_ =
@@ -97,6 +109,8 @@ public:
         const float resp[2] = {parameterValue("response1"),
                                parameterValue("response2")};
         const float drift = parameterValue("drift");
+        const float sat = clampf(parameterValue("saturation"), 0.0f, 1.0f);
+        const float satDrive = 1.0f + 5.0f * sat;
         const float driftStep = 0.0004f * drift * drift;
 
         const AudioBlock* in[2] = {inputs[0], inputs[2]};
@@ -120,7 +134,10 @@ public:
                     resp[k] <= 0.0f ? g : std::pow(g, 1.0f + 3.0f * resp[k]);
                 const float gFinal = gShaped * driftMul;
                 gSmooth_[k] += (gFinal - gSmooth_[k]) * smoothCoef_;
-                const float x = in[k] != nullptr ? in[k]->at(0, frame) : 0.0f;
+                float x = in[k] != nullptr ? in[k]->at(0, frame) : 0.0f;
+                if (!std::isfinite(x)) x = 0.0f;
+                if (sat > 0.0f) x = otaSat(k, x, satDrive);
+                else adaaPrev_[k] = 0.0f;
                 y[k] = softSat(x * gSmooth_[k]);
             }
             const float s = softSat(y[0] + y[1]);
@@ -143,6 +160,22 @@ private:
         if (x < -0.9f) return -0.9f + 0.1f * std::tanh((x + 0.9f) * 8.0f);
         return x;
     }
+    // log cosh(u), estável para |u| grande
+    static double logCosh(const double u) noexcept {
+        const double a = std::fabs(u);
+        return a + std::log1p(std::exp(-2.0 * a)) - 0.69314718055994531;
+    }
+    // tanh(d·x)/d com ADAA de 1ª ordem (u = d·x)
+    float otaSat(const int k, const float x, const float d) noexcept {
+        const double u1 = static_cast<double>(x) * d;
+        const double u0 = static_cast<double>(adaaPrev_[k]) * d;
+        adaaPrev_[k] = x;
+        const double du = u1 - u0;
+        const double y = std::fabs(du) > 1.0e-5
+            ? (logCosh(u1) - logCosh(u0)) / du
+            : std::tanh(0.5 * (u0 + u1));
+        return static_cast<float>(y / d);
+    }
     float noise() noexcept {
         rng_ ^= rng_ >> 12; rng_ ^= rng_ << 25; rng_ ^= rng_ >> 27;
         const std::uint64_t x = rng_ * 0x2545F4914F6CDD1DULL;
@@ -151,6 +184,7 @@ private:
     }
 
     float gSmooth_[2] = {0.0f, 0.0f};
+    float adaaPrev_[2] = {0.0f, 0.0f};
     float driftState_ = 0.0f;
     float smoothCoef_ = 0.05f;
     std::uint32_t driftCounter_ = 0;

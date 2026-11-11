@@ -1,7 +1,7 @@
 # 75 — ACCENT (ACENTO): o campo de acento
 
-Data: 11/11/2026. Estado: **proposta, aguarda o autor**. Só o dossiê, sem
-código. Origem:
+Data: 11/11/2026. Estado: **em implementação** (proposta aprovada pelo
+autor: "sim", "tudo certo"; ver "Decisões do autor" no fim). Origem:
 - o item aprovado na fila ("aprovo todas… sequencia normal");
 - `ESTUDO_familia_rasgo_para_o_modular.md` §4.5, nuance 13 ("o acento é
   multidimensional");
@@ -144,18 +144,37 @@ código. Origem:
 ÁPICE, EXT); CICLO, HERANÇA, SUPR e PROF no meio; 4 entradas e 6 saídas
 embaixo.
 
-## Perguntas ao autor
+## Decisões do autor (11/11/2026)
 
-1. **Causas.** Métrica, salto, ápice e externa. Ficaram de fora o
-   **agógico** (a nota longa como acento, que pede saber a duração antes da
-   nota acabar: só dá para acentuar a **seguinte**) e a **síncope**. Entram
-   agora ou depois?
-2. **Hierarquia em níveis** (0–3, nomeados): a proposta é contínua. Quer
-   também uma saída em níveis (degraus) para patches que pedem
-   "forte/médio/fraco"?
-3. **Rotação** do Antitotem (qual tempo é o forte migra devagar): entra
-   como knob ROT ou fica para o VARIA mexer no CICLO?
-4. **Nome**: ACCENT no painel e ACENTO nos textos, como no TOM e no KEY?
+1. **Agógico e síncope entram agora.**
+   - AGÓG: quando a nota anterior durou mais de 1,5 × a média móvel das
+     durações, a nota atual é acentuada; o acento cheio vem com 3 × a
+     média. Só dá para acentuar a seguinte.
+   - SÍNC: o acento de fora (ACC) pesa mais num tempo fraco do ciclo
+     (ext · (1 − peso métrico)).
+2. **Saída em níveis:** NÍV, em degraus 0 / ⅓ / ⅔ / 1 (limites 0,25, 0,5 e
+   0,75).
+3. **Rotação como knob ROT:** o tempo forte anda uma posição a cada
+   1 + 15·(1 − ROT) ciclos (ROT 0 = parado).
+4. **Nome:** ACCENT no painel, ACENTO nos textos.
+
+## Implementação (11/11/2026)
+
+- **Combinação das causas:** um "ou" probabilístico, 1 − Π(1 − wᵢ·cᵢ).
+  Causas coincidentes se reforçam e a ênfase nunca passa de 1.
+- **HERANÇA:** a cauda entra pelo mesmo "ou"; a cauda = max(½·cauda,
+  ênfase crua), então não se realimenta.
+- **SUPR:** multiplica por 1 − SUPR·max(0, ênf anterior − 0,3)/0,7.
+- **SWP:** cada nota sobe 0,6·ênf do que falta até 1, numa carga que vaza
+  com τ 0,25 s. Medido: sozinho 0,60; três acentos a cada 60 ms: 0,60 →
+  0,79 → 0,85. Sobe aos poucos, como na 303 (a 1ª versão saturava no 2º
+  acento e foi corrigida).
+- **ACC:** o pico dos últimos 3 ms, porque o acento do CLOCK ou do TRIGSEQ
+  pode chegar uma amostra antes ou depois do gate.
+- **Painel:** 14 HP; visor com a ÊNF no tempo; 11 knobs em três fileiras;
+  4 entradas, 7 saídas em duas fileiras.
+- **Teste:** `test_accent` (hierarquia métrica, salto, ápice, externo,
+  síncope, agógico, herança, supressão, saídas, empilhamento, rotação).
 
 ## Na seed
 

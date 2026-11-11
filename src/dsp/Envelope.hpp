@@ -2,6 +2,7 @@
 
 #include "core/SignalGraph.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 // ============================================================================
@@ -24,6 +25,15 @@
 //
 // Curva contínua: `curve` = 0 convexa (ataque "mole"), 0,5 linear, 1
 // côncava (ataque "estalado"/exponencial). Determinístico (sem RNG).
+//
+// LOOP e EOC (11/11/2026, fila aprovada; auditoria dos módulos): com LOOP
+// ligado, o envelope recomeça sozinho ao terminar — vira um ciclo AD que
+// toca sem gate (o "cycle" do Maths); um gate reinicia a fase (sincronia).
+// Em LOOP o SUS não segura (o ciclo pararia): vira o nível em que o DEC
+// termina e o REL começa — um ciclo A·D·R. EOC: um pulso de 10 ms
+// no FIM de cada envelope (ou de cada ciclo) — o "fim de ciclo" do
+// Contour 1 — para encadear envelopes ou contar ciclos. A saída é nova
+// (índice 2): patches antigos não mudam.
 
 namespace rasgo::modular {
 
@@ -35,7 +45,8 @@ public:
                {"gate", PortKind::Control, "gate"},
                {"time_mod", PortKind::Control, "v/oct"}},
               {{"out", PortKind::Audio, ""},
-               {"env", PortKind::Control, ""}},
+               {"env", PortKind::Control, ""},
+               {"eoc", PortKind::Control, "trig"}},
               {{"attack", 0.001f, 10.0f, 0.01f, "s"},
                {"decay", 0.001f, 10.0f, 0.3f, "s"},
                {"sustain", 0.0f, 1.0f, 0.0f, ""},
@@ -43,7 +54,8 @@ public:
                {"curve", 0.0f, 1.0f, 0.6f, ""},
                {"mode", 0.0f, 1.0f, 0.0f, ""},  // 0 = gated (ASR), 1 = trigger (AD)
                {"vca_depth", 0.0f, 1.0f, 1.0f, ""},
-               {"level", 0.0f, 1.0f, 1.0f, ""}}) {}
+               {"level", 0.0f, 1.0f, 1.0f, ""},
+               {"loop", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "ENVELOPE"; }
 
@@ -62,11 +74,13 @@ public:
         p.add(Widget::Kind::Knob, "VCA", "vca_depth", 21.0f, 73.0f);
         p.add(Widget::Kind::Knob, "LVL", "level", 35.0f, 73.0f);
         p.add(Widget::Kind::Toggle, "TRIG", "mode", 49.0f, 75.0f, 12.0f);
+        p.add(Widget::Kind::Toggle, "LOOP", "loop", 49.0f, 86.0f, 12.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "GATE", "in:gate", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "TIME", "in:time_mod", 29.0f, 100.0f);
         p.add(Widget::Kind::Jack, "OUT", "out:out", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "ENV", "out:env", 17.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "EOC", "out:eoc", 29.0f, 116.0f);
         return p;
     }
 
@@ -77,12 +91,14 @@ public:
         env_ = 0.0f;
         segStart_ = 0.0f;
         prevGate_ = 0.0f;
+        eocLeft_ = 0;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
                  std::vector<AudioBlock>& outputs) noexcept override {
         AudioBlock& audioOut = outputs[0];
         AudioBlock& envOut = outputs[1];
+        AudioBlock* eocOut = outputs.size() > 2 ? &outputs[2] : nullptr;
         const std::size_t frames = audioOut.frames();
         const std::size_t channels = audioOut.channels();
 
@@ -94,6 +110,8 @@ public:
         const bool triggerMode = parameterValue("mode") >= 0.5f;
         const float depth = parameterValue("vca_depth");
         const float level = parameterValue("level");
+        const bool loop = parameterValue("loop") >= 0.5f;
+        const int eocLen = std::max(1, static_cast<int>(0.010f * sampleRate_));
 
         const AudioBlock* in = inputs[0];
         const AudioBlock* gate = inputs[1];
@@ -116,6 +134,13 @@ public:
                        && (stage_ == Stage::Attack || stage_ == Stage::Decay
                            || stage_ == Stage::Sustain)) {
                 stage_ = Stage::Release;
+                segPhase_ = 0.0f;
+                segStart_ = env_;
+            }
+
+            // LOOP: parado, recomeça sozinho (também na primeira vez, sem gate)
+            if (loop && stage_ == Stage::Idle) {
+                stage_ = Stage::Attack;
                 segPhase_ = 0.0f;
                 segStart_ = env_;
             }
@@ -143,7 +168,7 @@ public:
                 const float target = sustain;
                 if (segPhase_ >= 1.0f) {
                     env_ = target;
-                    if (!triggerMode && prevGate_ >= 0.5f && sustain > 0.0001f) {
+                    if (!triggerMode && !loop && prevGate_ >= 0.5f && sustain > 0.0001f) {
                         stage_ = Stage::Sustain;
                     } else {
                         stage_ = Stage::Release;
@@ -170,6 +195,7 @@ public:
                 if (segPhase_ >= 1.0f) {
                     env_ = 0.0f;
                     stage_ = Stage::Idle;
+                    eocLeft_ = eocLen;   // fim do envelope / do ciclo
                 } else {
                     env_ = segStart_ * (1.0f - shape(segPhase_, curve));
                 }
@@ -183,9 +209,12 @@ public:
             const float audio = x * gain;
             const float envValue = envUnit * level;
 
+            const float eoc = eocLeft_ > 0 ? 1.0f : 0.0f;
+            if (eocLeft_ > 0) --eocLeft_;
             for (std::size_t channel = 0; channel < channels; ++channel) {
                 audioOut.at(channel, frame) = audio;
                 envOut.at(channel, frame) = envValue;
+                if (eocOut) eocOut->at(channel, frame) = eoc;
             }
         }
     }
@@ -214,6 +243,7 @@ private:
     float env_ = 0.0f;
     float segStart_ = 0.0f;
     float prevGate_ = 0.0f;
+    int eocLeft_ = 0;
 };
 
 }  // namespace rasgo::modular

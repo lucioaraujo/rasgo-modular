@@ -259,7 +259,51 @@ void testPanel() {
 
 }  // namespace
 
+
+// LOOP: cicla sozinho, sem gate, com período A + D + R; EOC pulsa no fim
+// de cada ciclo; sem LOOP, EOC pulsa uma vez no fim do envelope
+void testLoopAndEoc() {
+    const float sr = 48000.0f;
+    const std::size_t bs = 240;
+    for (const bool loop : {true, false}) {
+        Envelope e;
+        e.setParameter("attack", 0.01f);
+        e.setParameter("decay", 0.05f);
+        e.setParameter("sustain", 0.0f);
+        e.setParameter("release", 0.04f);
+        e.setParameter("mode", 1.0f);
+        e.setParameter("loop", loop ? 1.0f : 0.0f);
+        e.prepare(sr, bs);
+        std::vector<AudioBlock> out(3, AudioBlock(sr, 1, bs));
+        AudioBlock gate(sr, 1, bs);
+        std::vector<const AudioBlock*> ins{nullptr, loop ? nullptr : &gate, nullptr};
+        int pulses = 0;
+        float prev = 0.0f;
+        std::vector<long> at;
+        for (int b = 0; b < 200; ++b) {   // 1 s
+            for (std::size_t i = 0; i < bs; ++i) gate.at(0, i) = (b == 0) ? 1.0f : 0.0f;
+            e.process(ins, out);
+            for (std::size_t i = 0; i < bs; ++i) {
+                const float v = out[2].at(0, i);
+                if (prev < 0.5f && v >= 0.5f) { ++pulses; at.push_back(long(b) * long(bs) + long(i)); }
+                prev = v;
+            }
+        }
+        if (loop) {
+            // período A + D + R = 0,1 s → ~10 ciclos em 1 s
+            check(pulses >= 9 && pulses <= 10, "LOOP: cicla sozinho, sem gate");
+            if (at.size() >= 3) {
+                const double period = double(at[2] - at[1]) / sr;
+                check(std::fabs(period - 0.1) < 0.002, "LOOP: período = A + D + R");
+            }
+        } else {
+            check(pulses == 1, "EOC: um pulso no fim do envelope");
+        }
+    }
+}
+
 int main() {
+    testLoopAndEoc();
     testADShape();
     testSustainHold();
     testVca();

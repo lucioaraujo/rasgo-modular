@@ -175,3 +175,46 @@ determinismo, drift) antes do patch. Cadeia melódica canônica:
 `SEQUENCE → QUANTIZER → OSC.pitch` · `OSC.saw → FILTER → ENVELOPE → MIXER`.
 Adicionado ao catálogo do painel (`apps/panel/ModuleCatalog.hpp`, família
 SOURCE).
+
+## 9. Proposta do lote do oscilador (11/11/2026, aguarda o autor)
+
+Da `PESQUISA_cardinal_baixo_e_osciladores.md` §8.3 (aprovada na fila):
+"modos que faltam e são baratos". São três acréscimos, e cada um em 0 deixa
+o OSC exatamente como hoje (nenhum patch muda). Ficam numa fileira nova de
+knobs (y 72), sem mexer no resto do painel.
+
+1. **PD** (phase distortion, 0–1), na saída **SIN**.
+   - A técnica de M. Ishibashi (patente Casio, 1984; conhecimento público,
+     sem imitar a marca): a fase é dobrada antes do seno. Ela corre rápido
+     até um ponto k e devagar depois, e o seno vira uma forma brilhante,
+     parecida com uma serra, sem filtro e sem somar osciladores.
+   - k = 0,5 − 0,49·PD. Num envelope no PD, é o "filtro" do CZ, que é uma
+     varredura de timbre.
+   - Antialiasing: o canto da fase é arredondado em proporção à frequência
+     (k nunca fica abaixo de 4 incrementos de fase), então nota aguda com
+     PD alto fica menos brilhante em vez de chiar.
+   - Pergunta: só no SIN (proposta) ou também no TRI?
+2. **UNI** (unísono, 0–1), na saída **SAW**.
+   - Sete serras desafinadas em torno da nota, com espalhamento não linear:
+     pouco no começo do knob, muito no fim. É a curva medida por A. Szabo
+     (2010) no supersaw, publicada.
+   - O ganho é compensado para o volume não subir com o UNI.
+   - Fases iniciais fixas e semeadas, então o som é determinístico.
+   - Em UNI 0, uma serra só, idêntica à atual.
+   - Pergunta: só na SAW (proposta) ou também no PLS?
+3. **SUBD** (subdivisão do SUB, 1/2 a 1/16, inteiro).
+   - O SUB passa a ser a nota dividida por qualquer inteiro de 2 a 16. É a
+     série sub-harmônica do Subharmonicon e de J. Schillinger (conceito),
+     que soa os graves "embaixo" de qualquer nota.
+   - Substitui a chave SUB2 no painel (SUB2 = SUBD 4). Patches antigos com
+     SUB2 ligado abrem com SUBD = 4, então nada muda.
+   - Pergunta: tudo bem a chave SUB2 sair do painel?
+
+**Medição prevista:**
+- os três em 0 são bit a bit iguais ao OSC atual;
+- PD 1 a 2 kHz com alias abaixo de −40 dB;
+- o UNI não muda o nível RMS em mais de 1 dB;
+- o SUBD afina em f/n exato.
+
+**Na seed:** depois da escuta (candidatos: UNI na textura e SUBD na voz de
+baixo).
