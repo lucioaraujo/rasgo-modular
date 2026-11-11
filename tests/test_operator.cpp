@@ -6,6 +6,8 @@
 #include "io/AsciiPanel.hpp"
 
 #include <cmath>
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <vector>
 
@@ -148,10 +150,17 @@ void testRatioInharmonic() {
     inh.setParameter("freq", 110.0f); inh.setParameter("algo", 0.0f);
     inh.setParameter("ratio_b", 4.0f);   // idx 4 -> razão 2,5
     inh.setParameter("index", 0.6f);
-    const auto rh = render(harm, 40);
-    const auto ri = render(inh, 40);
+    // janela longa (11/11/2026): com 40 blocos, 275 Hz ficava a ~3 bins dos
+    // harmônicos 220/330 e o "harmônico" media vazamento da janela (razão
+    // 4,35 contra o limite 4 — frágil). Com 160 blocos o vazamento cai e o
+    // teste mede o que diz medir.
+    const auto rh = render(harm, 160);
+    const auto ri = render(inh, 160);
     // razão 2,5: bandas laterais em f0 ± k·2,5·f0 -> energia em 2,5·f0
     EXPECT(magAt(ri, 2.5 * kF0) > 0.01);
+    if (std::getenv("OP_DBG"))
+        std::fprintf(stderr, "  2,5·f0: inarmônico %.5f, harmônico %.5f\n",
+                     static_cast<double>(magAt(ri, 2.5 * kF0)), static_cast<double>(magAt(rh, 2.5 * kF0)));
     EXPECT(magAt(ri, 2.5 * kF0) > 4.0 * magAt(rh, 2.5 * kF0));
 }
 

@@ -34,6 +34,7 @@
 #include "panel/LearnPresentation.hpp"
 #include "panel/HeaderHelp.hpp"
 #include "panel/ReadingPreferences.hpp"
+#include "panel/Instances.hpp"
 #include "panel/ModuleCatalog.hpp"
 #include "panel/MotionEngine.hpp"    // VARIA
 #include "panel/PatchGenetics.hpp"   // MUTA / EVOLUI / CRUZA
@@ -3067,7 +3068,15 @@ private:
             // `{}` explícito pra `chrome`: ela nasce vazia de propósito
             // (é rasterizada no 1º `paintModule`), e deixar implícito
             // fazia o compilador avisar com razão
-            mods_.push_back({id, p.hp, {x, y, w, modH_}, p, {}});
+            // instâncias (11/11/2026): com mais de uma cópia do mesmo tipo,
+            // o título da CÓPIA do painel ganha o número ("OSC 2") — o
+            // módulo em si não muda (ver `panel/Instances.hpp`)
+            Panel shownPanel = p;
+            const int inst = rasgo::panel::instanceNumber(rack_.graph, rack_.shown, id);
+            if (inst > 0 && !shownPanel.widgets.empty()
+                && shownPanel.widgets.front().kind == Widget::Kind::Label)
+                shownPanel.widgets.front().label += " " + std::to_string(inst);
+            mods_.push_back({id, p.hp, {x, y, w, modH_}, shownPanel, {}});
             x += w + mmpx(kGapMM);
         }
         contentH_ = y + modH_ + kPadPx;
@@ -5549,6 +5558,22 @@ private:
     }
 
     void addModule(const std::string& type) {
+        // instâncias (11/11/2026): o que é do rack inteiro não duplica, e os
+        // demais vão até `kMaxInstances` cópias (ver `panel/Instances.hpp`)
+        {
+            rasgo::panel::AddRefusal why;
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                why = rasgo::panel::canAddInstance(rack_.graph, rack_.shown, type);
+            }
+            if (why != rasgo::panel::AddRefusal::none) {
+                palette_.setNotice(u8(type + rasgo::panel::tr(
+                    why == rasgo::panel::AddRefusal::singleton
+                        ? rasgo::panel::strings::instanceSingle
+                        : rasgo::panel::strings::instanceMax, lang_)));
+                return;
+            }
+        }
         rack_.pushUndo();
         std::size_t newId = static_cast<std::size_t>(-1);
         {

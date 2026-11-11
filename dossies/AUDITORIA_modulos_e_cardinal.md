@@ -247,3 +247,16 @@ própria forma de onda, não estalo. Ficaram, e foram corrigidos, com teste
 | SWIRL `type` | 0,36 | 0,02 | o efeito passa pelo seco; a linha segue gravada no phaser (achado novo) |
 | MEMORY `freeze` | 0,28 | 0,01 | costura do buffer ao congelar e ao descongelar |
 | MIXER `mute` | 0,35 | 0,01 | rampa de ~30 ms |
+
+## 6. Feito em 11/11/2026 — instâncias (passos 1 e 2) e OPERATOR
+
+- **Instâncias, passo 1 (app)**: `apps/panel/Instances.hpp` — únicos
+  (MIXER, MASTER, CLOCK, SIGNAL-IN, NOTE-OUT, LISTEN), até 4 cópias dos
+  demais, número da cópia no título ("OSC 2"), contagem só sobre o que está
+  no rack (remover esconde o nó, não apaga). Aviso da paleta nas 4 línguas.
+  `test_instances` (inclui salvar/abrir um patch com duas cópias).
+- **Passo 2 (partitura/VARIA)**: conferido no código — a partitura já
+  escreve `modulo <id> <tipo>` e o VARIA trabalha por nó; nada a mudar.
+- **Passo 3 (seed)**: a desenhar com o autor — a seed passar a abrir
+  cópias muda a composição de toda seed.
+- **OPERATOR**: sobreamostragem 4× (dossiê 44).

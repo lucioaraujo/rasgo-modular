@@ -88,6 +88,17 @@ inline const L4 cableNotAudible {
     "Câblé — mais ce chemin n’atteint pas encore le son. Continuez à câbler jusqu’au MASTER pour l’entendre.",
     "Conectado — pero este camino aún no llega al sonido. Siga cableando hasta el MASTER para oírlo."};
 inline const L4 hdrRec     {"REC",     "REC",      "REC",      "REC"};
+// instâncias (11/11/2026): o nome do módulo vem antes do texto
+inline const L4 instanceSingle {
+    " is unique in the rack.",
+    " é único no rack.",
+    " est unique dans le rack.",
+    " es único en el rack."};
+inline const L4 instanceMax {
+    ": at most 4 copies.",
+    ": no máximo 4 cópias.",
+    " : 4 copies au maximum.",
+    ": como máximo 4 copias."};
 inline const L4 hdrSeed    {"SEED",    "SEED",     "SEED",     "SEED"};
 
 // ---- cabeçalho: ABRE — como o app abre (StartupPolicy.hpp) -------------

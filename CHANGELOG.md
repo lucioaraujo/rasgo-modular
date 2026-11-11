@@ -39,6 +39,17 @@ pronto.
   passa pelo seco e a linha de atraso continua viva no phaser. MEMORY:
   costura do buffer ao congelar e ao descongelar. MIXER: MUTE com rampa de
   ~30 ms. Saltos de 0,35–0,63 caíram para 0,01–0,03 (`test_declick`).
+- **Instâncias: o mesmo módulo mais de uma vez** (11 nov., decisão do
+  autor). Arraste da paleta um segundo OSC, ENVELOPE, FILTER… — até 4
+  cópias; os do rack inteiro (MIXER, MASTER, CLOCK, SIGNAL-IN, NOTE-OUT,
+  LISTEN) seguem únicos, com aviso na paleta (4 línguas). Com mais de uma
+  cópia, o título mostra o número ("OSC 2"). Patches com cópias salvam e
+  abrem; a partitura e o VARIA já eram por módulo. A seed ainda usa uma
+  cópia de cada (próximo passo). `apps/panel/Instances.hpp`, `test_instances`.
+- **OPERATOR com sobreamostragem 4×** (11 nov., decisão do autor): com INDEX
+  alto a FM dobrava bandas laterais acima de Nyquist (aliasing de −1 a +10 dB
+  medido); agora 10–25 dB mais limpo na faixa de uso. A FM forte soa "metal
+  limpo" em vez de "metal sujo". Dossiê 44.
 - **Volume da seed medido em 8 s** (decisão do autor; era 4 s): patches que
   crescem depois do começo deixam de ficar altos. Cada clique em SEED leva
   ~770 ms (era ~390).

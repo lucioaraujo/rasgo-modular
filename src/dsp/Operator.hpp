@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SignalGraph.hpp"
+#include "dsp/Oversampler.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -83,6 +84,8 @@ public:
         for (int i = 0; i < 4; ++i) { ph_[i] = 0.0f; dph_[i] = 0.0f; }
         a1_ = 0.0f;
         a2_ = 0.0f;
+        dec1_.reset();
+        dec2_.reset();
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -132,29 +135,41 @@ public:
             const float idx = clamp01(idxKnob + (idxIn ? idxIn->at(0, f) : 0.0f));
             const float depth = idx * idx * 6.0f;
 
-            for (int i = 0; i < 4; ++i) {
-                ph_[i] += f0 * ratio[i] * (1.0f + det[i]) * dt_;
-                ph_[i] -= std::floor(ph_[i]);
-            }
-
-            const float A = lut(ph_[0] + fb * 0.5f * (a1_ + a2_));
-            const float B = lut(ph_[1] + depth * (alg.aToB ? A : 0.0f));
-            const float C = lut(ph_[2] + depth * ((alg.aToC ? A : 0.0f)
-                                                  + (alg.bToC ? B : 0.0f)));
-            const float D = lut(ph_[3] + depth * ((alg.aToD ? A : 0.0f)
-                                                  + (alg.bToD ? B : 0.0f)
-                                                  + (alg.cToD ? C : 0.0f)));
-            a2_ = a1_;
-            a1_ = A;
-
-            float sum = 0.0f;
-            if (alg.carrier[0]) sum += A;
-            if (alg.carrier[1]) sum += B;
-            if (alg.carrier[2]) sum += C;
-            if (alg.carrier[3]) sum += D;
+            // (11/11/2026, decisão do autor) SOBREAMOSTRAGEM 4×: os quatro
+            // operadores rodam 4 vezes por amostra, com ¼ do passo de fase,
+            // e dois decimadores de meia-banda trazem de volta. Com índice
+            // alto os algoritmos em cadeia espalham bandas laterais além
+            // de Nyquist, que voltavam rebatidas (aliasing): medido +10 dB
+            // a 2 kHz com INDEX 0,5, −1 dB já a 110 Hz (auditoria dos
+            // módulos). O timbre da FM forte fica "metal limpo".
+            const float dtSub = 0.25f * dt_;
+            auto sub = [&]() -> float {
+                for (int i = 0; i < 4; ++i) {
+                    ph_[i] += f0 * ratio[i] * (1.0f + det[i]) * dtSub;
+                    ph_[i] -= std::floor(ph_[i]);
+                }
+                const float A = lut(ph_[0] + fb * 0.5f * (a1_ + a2_));
+                const float B = lut(ph_[1] + depth * (alg.aToB ? A : 0.0f));
+                const float C = lut(ph_[2] + depth * ((alg.aToC ? A : 0.0f)
+                                                      + (alg.bToC ? B : 0.0f)));
+                const float D = lut(ph_[3] + depth * ((alg.aToD ? A : 0.0f)
+                                                      + (alg.bToD ? B : 0.0f)
+                                                      + (alg.cToD ? C : 0.0f)));
+                a2_ = a1_;
+                a1_ = A;
+                float sum = 0.0f;
+                if (alg.carrier[0]) sum += A;
+                if (alg.carrier[1]) sum += B;
+                if (alg.carrier[2]) sum += C;
+                if (alg.carrier[3]) sum += D;
+                return sum * carScale;
+            };
+            const float s0 = sub(), s1 = sub(), s2 = sub(), s3 = sub();
+            const float mid0 = dec1_.push(s0, s1);
+            const float mid1 = dec1_.push(s2, s3);
             // soma ÷ nº de portadoras → |·| ≤ 1 (senóides); softclip é só a
             // rede de segurança pro feedback e pra portadoras em fase.
-            const float y = softclip(sum * carScale);
+            const float y = softclip(dec2_.push(mid0, mid1));
 
             for (std::size_t c = 0; c < channels; ++c) out.at(c, f) = y;
         }
@@ -220,6 +235,7 @@ private:
     float ph_[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     float dph_[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     float a1_ = 0.0f, a2_ = 0.0f;
+    HalfbandDecimator dec1_{}, dec2_{};   // 4× → 2× → 1×
 };
 
 }  // namespace rasgo::modular
