@@ -178,3 +178,44 @@ parâmetros, 12 escalas (`Quantizer::scales()`). `panel()` próprio
 Testado isolado (snap, root, S&H, glide, determinismo) antes do patch.
 É o módulo que fecha o caminho "acaso → música": `TURING`/`DECISION` →
 `QUANTIZER` → `STRING`/`MATTER`/`FUNCTION`, com `CLOCK` no `trigger`.
+
+## 9. Proposta do lote da harmonia: crivos e afinações (11/11/2026, aguarda o autor)
+
+Da auditoria (`AUDITORIA_modulos_e_cardinal.md`: "peneiras de Xenakis,
+afinações (justa, pitagórica, EDO)", aprovado) e do estudo da família §1
+(SIEVE: Batruc e Studio têm o conceito).
+
+1. **CRIVO** (a escala nº 12, depois de "Octave").
+   - As alturas permitidas são uma **união de duas classes de resíduo**
+     sobre a linha dos semitons: n ≡ R1 (mod M1) **ou** n ≡ R2 (mod M2), com
+     M1 e M2 de 2 a 13. É a peneira de I. Xenakis (*Formalized Music*,
+     1963–71).
+   - Quando M não divide 12, a escala **não se repete na oitava**: com 3 ∪
+     5, o desenho só volta depois de 15 semitons. É uma escala que o
+     QUANTIZER hoje não faz.
+   - Os módulos e os resíduos ficam **visíveis** como knobs (M1, R1, M2, R2):
+     o crivo do Batruc diz que um "preset Xenakis" sem módulos e resíduos
+     não explica o processo.
+   - O visor mostra os pontos do crivo.
+   - Pergunta: união só, ou também uma chave de interseção (∩)?
+2. **AFIN** (afinação, 6 posições). A nota escolhida pela escala é
+   reafinada:
+   - **12-EDO** (o de hoje, o padrão);
+   - **Justa** (razões de 5-limite: 16/15, 9/8, 6/5, 5/4…);
+   - **Pitagórica** (quintas 3/2 puras);
+   - **Mesotônica** de ¼ de coma.
+
+   Essas três medem **a partir da tônica (ROOT)**. Com o HARMONY ou o TOM
+   mudando a tônica, a afinação justa **acompanha a modulação**: uma
+   afinação adaptativa, que um teclado fixo não faz. E há ainda:
+   - **19-EDO** e **31-EDO**, que trocam a própria grade. A escala escolhida
+     é mapeada para os passos mais próximos da nova divisão (a terça de
+     31-EDO é quase justa).
+
+   A saída PTCH já é em V/oct, então a reafinação chega a qualquer voz.
+   - Pergunta: arquivos Scala (.scl) ficam de fora por ora? (pedem leitura de
+     arquivo e um seletor). Recomendação: fora, por enquanto.
+
+**Painel:** passa de 10 para 14 HP (AFIN e os quatro knobs do crivo numa
+fileira nova). Patches antigos abrem iguais: tudo novo vem em 12-EDO e o
+crivo só entra com SCALE = 12.

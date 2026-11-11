@@ -155,6 +155,7 @@ public:
                     || w.bind.rfind("out:", 0) == 0
                     || w.bind == "listen"    // ON do SIGNAL-IN: só à mão
                     || w.bind == "pit_keep" || w.bind == "pit_oct" // SCOPE: escolha de quem toca
+                    || w.bind == "sub_div" // OSC: o divisor muda a nota do grave aos saltos
                     || (t == "PHRASE" && w.bind == "seed")) // motif identity
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;

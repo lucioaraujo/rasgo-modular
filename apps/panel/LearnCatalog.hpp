@@ -668,6 +668,10 @@ inline const LearnTable& learnTable() {
                 "semitom no máximo).",
                 "", "drift=0 é determinístico; suba aos poucos pra um "
                 "vibrato natural bem lento."}},
+            {"pd", {"Phase distortion, só na saída SIN: a fase é dobrada antes do seno e ele ganha brilho, até uma forma parecida com uma serra — sem filtro. Um envelope aqui varre o timbre.", "", ""}},
+            {"unison", {"Unísono, só na saída SAW: sete serras desafinadas em torno da nota (como o supersaw). O volume não sobe. 0 = uma serra só.", "", ""}},
+            {"sub_div", {"A subdivisão do SUB: a nota dividida por 2 a 16 — a série sub-harmônica embaixo da nota. 2 = uma oitava abaixo, 4 = duas, 3 = uma oitava e uma quinta abaixo.", "", ""}},
+            {"in:sub_cv", {"CV no divisor do SUB: +1/15 V sobe um divisor (1 V = a faixa inteira). Um TURING ou SEQUENCE aqui faz o grave caminhar pela série sub-harmônica. A troca entra na volta do oscilador, sem estalo.", "", ""}},
             {"sub_2", {
                 "Sub-oscilador uma oitava (desligado) ou duas (ligado) "
                 "abaixo.", "", ""}},

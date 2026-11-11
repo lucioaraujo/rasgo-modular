@@ -367,7 +367,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         setP(voiceNode, "freq", voiceHz);
         setP(voiceNode, "pw", rng(0.25f, 0.75f));   // não vira trem de picos
         setP(voiceNode, "drift", rng(0.0f, 0.4f));
-        setP(voiceNode, "sub_2", chance(0.4f) ? 1.0f : 0.0f);
+        setP(voiceNode, "sub_div", chance(0.4f) ? 4.0f : 2.0f);   // = a antiga chave SUB2
         if (pIn(voiceNode, "pitch") >= 0)
             connectByName("QUANTIZER", "pitch", "OSC", "pitch");
     } else if (std::string(vc.mod) == "CHORD") {
@@ -1093,6 +1093,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 || nm == "fm_amount" || nm == "listen"
                 // depois da v0.1.7 — fora do sorteio (seeds antigas iguais)
                 || nm == "pit_keep" || nm == "pit_oct"
+                // lote do oscilador (11/11/2026): fora do sorteio genérico
+                || nm == "pd" || nm == "unison" || nm == "sub_div"
                 // GAIN do DYNAMICS: nível, como os outros ganhos
                 || nm == "makeup")
                 continue;

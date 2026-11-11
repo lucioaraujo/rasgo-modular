@@ -48,8 +48,8 @@ parte desse chiado sem amaciar o timbre.
 
 **O sub-oscilador** não é um segundo oscilador independente — é um
 circuito simples (um "flip-flop": alterna entre dois estados) que
-**conta ciclos** da fase principal e vira de +1 pra −1 a cada volta
-completa (ou a cada duas, com `SUB2`) — daí ele nunca desafina em
+**conta ciclos** da fase principal e divide a nota por um inteiro (de 2 a
+16, o knob `SUBD`) — daí ele nunca desafina em
 relação ao `OSC` principal, mesmo durante um hard sync (que reinicia a
 contagem junto).
 
@@ -91,6 +91,10 @@ FM forte — só o timbre fica mais metálico — enquanto FM de fase costuma
 - **`SYNC`** (controle, disparo) — hard sync. **Plugue aqui:** a saída de
   um oscilador ou de um `CLOCK`; cada borda de subida reinicia a fase do
   `OSC`. **Só funciona com a chave `SYNC` ligada.**
+- **`SUBD`** (controle) — CV no divisor do SUB: +1/15 V sobe um divisor
+  (1 V = a faixa inteira, de 1/2 a 1/16). **Plugue aqui:** um `TURING` ou
+  um `SEQUENCE` lento — o grave caminha pela série sub-harmônica embaixo
+  da mesma nota. A troca entra na volta do oscilador, sem estalo.
 
 ### Saídas
 
@@ -102,7 +106,8 @@ ou via `FILTER`/`ENVELOPE`):
 - **`SAW`** — dente-de-serra. A forma clássica do subtrativo — todos os
   harmônicos, brilhante.
 - **`PLS`** — pulso; a largura é o knob `PW`. Nasal, oco.
-- **`SUB`** — quadrada uma ou duas oitavas abaixo (chave `SUB2`).
+- **`SUB`** — quadrada na nota dividida por `SUBD` (2 = uma oitava abaixo,
+  3 = uma oitava e uma quinta, 4 = duas oitavas…).
   Some com uma das outras no `MIXER` pra encorpar o grave.
 
 ## Os controles, um a um
@@ -128,7 +133,18 @@ sem tocar na afinação — é o efeito clássico de PWM.
 **DRIFT** (0–1) — passeio lento na afinação (no máximo meio semitom). Em 0
 é determinístico; um toque tira o "morto" de um seno parado.
 
-**SUB2** (chave) — sub uma oitava abaixo (desligado) ou duas (ligado).
+**PD** (0–1) — phase distortion, só na saída `SIN`: a fase é dobrada
+antes do seno, e ele ganha brilho até uma forma parecida com uma serra, sem
+filtro. Um envelope aqui varre o timbre (a técnica de M. Ishibashi). Em
+nota aguda o PD alto fica mais suave, para não chiar.
+
+**UNI** (0–1) — unísono, só na saída `SAW`: sete serras desafinadas em
+torno da nota, como o supersaw. Pouco espalhamento no começo do knob, muito
+no fim; o volume não sobe. Em 0, uma serra só.
+
+**SUBD** (2–16) — o divisor do `SUB`: a série sub-harmônica embaixo da
+nota. Substitui a antiga chave SUB2 (SUB2 ligado = SUBD 4; patches antigos
+abrem assim). O VARIA não mexe nele.
 
 **SYNC** (chave) — liga a entrada `SYNC`. Um oscilador lento no `SYNC`
 "trava" a afinação do `OSC` na dele e transforma o `FREQ` num varredor

@@ -340,6 +340,129 @@ void testPanel() {
 
 }  // namespace
 
+
+// ---- lote do oscilador (PD, UNI, SUBD) ----
+double rmsOf(const std::vector<float>& v, std::size_t from) {
+    double a = 0; for (std::size_t i = from; i < v.size(); ++i) a += double(v[i]) * v[i];
+    return std::sqrt(a / double(v.size() - from));
+}
+double tone(const std::vector<float>& v, std::size_t from, double hz) {
+    double re = 0, im = 0;
+    for (std::size_t n = from; n < v.size(); ++n) {
+        const double ph = 6.283185307179586 * hz * double(n) / kSampleRate;
+        re += v[n] * std::cos(ph); im += v[n] * std::sin(ph);
+    }
+    return 2.0 * std::sqrt(re * re + im * im) / double(v.size() - from);
+}
+
+void testNewKnobsAreNoopAtZero() {
+    Oscillator a, b;
+    a.setParameter("freq", 220.0f);
+    b.setParameter("freq", 220.0f);
+    b.setParameter("pd", 0.0f);
+    b.setParameter("unison", 0.0f);
+    bool same = true;
+    for (int out = 0; out < 5; ++out) {
+        const auto x = render(a, out, 4096), y = render(b, out, 4096);
+        for (std::size_t i = 0; i < x.size(); ++i) if (x[i] != y[i]) same = false;
+    }
+    check(same, "PD 0, UNI 0, SUBD 2: o OSC de antes, bit a bit");
+}
+
+void testPhaseDistortion() {
+    Oscillator o;
+    o.setParameter("freq", 220.0f);
+    o.setParameter("pd", 0.0f);
+    const auto s0 = render(o, 0, 24000);
+    o.setParameter("pd", 0.8f);
+    const auto s1 = render(o, 0, 24000);
+    // brilho: energia do 3º ao 8º harmônico
+    double h0 = 0, h1 = 0;
+    for (int h = 2; h <= 8; ++h) { h0 += tone(s0, 4000, 220.0 * h); h1 += tone(s1, 4000, 220.0 * h); }
+    check(h1 > 0.3 && h0 < 0.01, "PD: o seno ganha harmônicos");
+    check(std::fabs(tone(s1, 4000, 220.0) ) > 0.2, "PD: a fundamental fica");
+    // alias com PD 1 a 2,1 kHz (48 kHz não é múltiplo: as dobras caem
+    // FORA dos harmônicos)
+    const double f0 = 2100.0;
+    o.setParameter("freq", float(f0));
+    o.setParameter("pd", 1.0f);
+    const auto s2 = render(o, 0, 24000);
+    double worst = 0;
+    for (int h = 12; h <= 40; ++h) {
+        if (h * f0 < kSampleRate / 2) continue;
+        double fa = std::fmod(f0 * h, double(kSampleRate));
+        if (fa > kSampleRate / 2) fa = kSampleRate - fa;
+        worst = std::max(worst, tone(s2, 4000, fa));
+    }
+    const double db = 20.0 * std::log10(worst / tone(s2, 4000, f0) + 1e-12);
+    std::cerr << "   PD 1 a 2,1 kHz: pior alias " << db << " dB\n";
+    check(db < -40.0, "PD: alias abaixo de −40 dB a 2,1 kHz");
+}
+
+void testUnison() {
+    Oscillator o;
+    o.setParameter("freq", 110.0f);
+    const auto s0 = render(o, 2, 48000);
+    const double r0 = rmsOf(s0, 4000);
+    for (const float u : {0.3f, 0.6f, 1.0f}) {
+        o.setParameter("unison", u);
+        const auto s = render(o, 2, 48000);
+        const double db = 20.0 * std::log10(rmsOf(s, 4000) / r0);
+        std::cerr << "   UNI " << u << ": RMS " << db << " dB\n";
+        check(std::fabs(db) < 1.5, "UNI: o nível não sobe nem cai");
+        bool finite = true; for (float v : s) if (!std::isfinite(v) || std::fabs(v) > 2.0f) finite = false;
+        check(finite, "UNI: finito");
+    }
+    // a afinação percebida (a fundamental) continua no lugar
+    o.setParameter("unison", 0.5f);
+    const auto s = render(o, 2, 48000);
+    check(tone(s, 4000, 110.0) > 0.3, "UNI: a nota continua 110 Hz");
+}
+
+void testSubDivision() {
+    for (const int n : {2, 3, 5, 7, 16}) {
+        Oscillator o;
+        o.setParameter("freq", 480.0f);
+        o.setParameter("sub_div", float(n));
+        const auto s = render(o, 4, 48000);
+        const double f = 480.0 / n;
+        // a fundamental do SUB em f/n domina as vizinhas
+        const double a = tone(s, 4000, f);
+        const double off = tone(s, 4000, f * 1.5);
+        check(a > 0.5 && a > 4.0 * off, "SUBD: o SUB soa em f/n");
+        (void)off;
+    }
+    // patch antigo: SUB2 ligado vira SUBD 4
+    Oscillator old;
+    old.setParameter("freq", 480.0f);
+    old.setParameter("sub_2", 1.0f);
+    const auto s = render(old, 4, 48000);
+    check(tone(s, 4000, 120.0) > 0.5, "SUB2 antigo = SUBD 4");
+    check(old.parameterValue("sub_div") == 4.0f && old.parameterValue("sub_2") == 0.0f,
+          "SUB2 migra para SUBD 4");
+}
+
+void testSubDivisionCv() {
+    Oscillator o;
+    o.setParameter("freq", 480.0f);
+    o.setParameter("sub_div", 2.0f);
+    o.prepare(kSampleRate, kBlock);
+    std::vector<AudioBlock> out(5, AudioBlock(kSampleRate, 1, kBlock));
+    AudioBlock cv(kSampleRate, 1, kBlock);
+    std::vector<const AudioBlock*> ins{nullptr, nullptr, nullptr, nullptr, &cv};
+    std::vector<float> s;
+    for (int b = 0; b < 375; ++b) {
+        for (std::size_t i = 0; i < kBlock; ++i) cv.at(0, i) = 1.0f / 15.0f;   // +1 → SUBD 3
+        o.process(ins, out);
+        for (std::size_t i = 0; i < kBlock; ++i) s.push_back(out[4].at(0, i));
+    }
+    check(tone(s, 4000, 160.0) > 0.5, "CV do SUBD: +1/15 V sobe um divisor (1/3)");
+    // a troca entra na volta do oscilador: sem salto no meio do ciclo
+    float maxStep = 0.0f;
+    for (std::size_t i = 1; i < s.size(); ++i) maxStep = std::max(maxStep, std::fabs(s[i] - s[i - 1]));
+    check(maxStep <= 2.2f, "SUBD: a forma continua uma quadrada limpa");
+}
+
 int main() {
     testPitchTracking();
     testWaveShapes();
@@ -354,6 +477,11 @@ int main() {
     testDeterminism();
     testInGraph();
     testPanel();
+    testNewKnobsAreNoopAtZero();
+    testPhaseDistortion();
+    testUnison();
+    testSubDivision();
+    testSubDivisionCv();
     if (g_failures == 0) std::cout << "test_oscillator: OK\n";
     return g_failures == 0 ? 0 : 1;
 }

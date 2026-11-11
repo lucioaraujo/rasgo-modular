@@ -9,6 +9,13 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote do oscilador** (11 nov., recomendações aprovadas pelo autor). OSC
+  ganha PD (phase distortion no SIN; pior alias −51 dB a 2,1 kHz), UNI
+  (sete serras na SAW, mistura pelas medidas de Szabo; o nível muda menos
+  de 1,5 dB) e SUBD (o SUB divide a nota por 2–16, travado na fase, com
+  entrada de CV). A chave SUB2 sai do painel (SUB2 ligado = SUBD 4). Os três
+  em 0 são bit a bit o OSC anterior; as seeds soam iguais.
+
 - **Lote do grave** (11 nov., pedido do autor: lotes com um build só).
   - **Módulo novo: ACCENT (ACENTO).** O campo de acento: seis causas
     (métrica com hierarquia, salto, ápice, externa, agógico, síncope)
