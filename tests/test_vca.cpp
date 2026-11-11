@@ -230,7 +230,56 @@ void testPanel() {
 
 }  // namespace
 
+
+// SAT: em 0 é o VCA de sempre; acima, satura a entrada (cor de OTA) sem
+// depender do volume, sem estourar e com alias baixo
+void testOtaSaturation() {
+    Vca v;
+    v.setParameter("level1", 1.0f);
+    v.setParameter("saturation", 0.0f);
+    near(dc(v, 0, {0.5f, 0, 0, 0, false, false, false}), 0.5, 1e-4);
+    v.setParameter("saturation", 1.0f);
+    const float d = 6.0f;
+    near(dc(v, 0, {0.5f, 0, 0, 0, false, false, false}), std::tanh(d * 0.5) / d, 2e-3);
+    // a forma (razão saída/entrada) é a mesma em LVL 1 e LVL 0,5
+    v.setParameter("level1", 0.5f);
+    const double half = dc(v, 0, {0.5f, 0, 0, 0, false, false, false});
+    near(half, 0.5 * std::tanh(d * 0.5) / d, 2e-3);
+    // seno agudo a 4,7 kHz, SAT 1: alias (dobra do 3º harmônico) baixo
+    v.setParameter("level1", 1.0f);
+    v.prepare(kSr, kB);
+    std::vector<AudioBlock> out(3, AudioBlock(kSr, 1, kB));
+    AudioBlock i1(kSr, 1, kB);
+    std::vector<const AudioBlock*> ins{&i1, nullptr, nullptr, nullptr};
+    std::vector<float> y;
+    for (int b = 0; b < 375; ++b) {
+        for (std::size_t k = 0; k < kB; ++k) {
+            const double n = double(b) * kB + double(k);
+            i1.at(0, k) = 0.9f * float(std::sin(2.0 * 3.14159265358979 * 4700.0 * n / kSr));
+        }
+        v.process(ins, out);
+        for (std::size_t k = 0; k < kB; ++k) y.push_back(out[0].at(0, k));
+    }
+    const auto amp = [&](double hz) {
+        double re = 0, im = 0;
+        for (std::size_t n = 8000; n < y.size(); ++n) {
+            const double ph = 2.0 * 3.14159265358979 * hz * double(n) / kSr;
+            re += y[n] * std::cos(ph); im += y[n] * std::sin(ph);
+        }
+        return std::sqrt(re * re + im * im);
+    };
+    // 7º (32,9 kHz → 15,1 kHz) e 9º (42,3 kHz → 5,7 kHz) dobrados
+    const double a7 = amp(48000.0 - 7.0 * 4700.0), a9 = amp(48000.0 - 9.0 * 4700.0);
+    const double alias = 20.0 * std::log10(std::max(a7, a9) / amp(4700.0));
+    std::cerr << "   SAT 1, seno 4,7 kHz: pior alias (7º/9º dobrados) " << alias << " dB\n";
+    check(alias < -30.0, "SAT: alias baixo com ADAA");
+    bool finite = true;
+    for (const float s : y) if (!std::isfinite(s) || std::fabs(s) > 1.0f) finite = false;
+    check(finite, "SAT: finito e limitado");
+}
+
 int main() {
+    testOtaSaturation();
     testLinearGain();
     testCvAttenuvert();
     testResponseCurve();

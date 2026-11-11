@@ -9,6 +9,21 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote do grave** (11 nov., pedido do autor: lotes com um build só).
+  - **Módulo novo: ACCENT (ACENTO).** O campo de acento: seis causas
+    (métrica com hierarquia, salto, ápice, externa, agógico, síncope)
+    combinadas por "ou" probabilístico numa ênfase de 0 a 1, com herança,
+    supressão e rotação. Sete saídas: ÊNF, VCA, FC, DEC, SWP (o
+    empilhamento da 303), GT e NÍV. Família DECISÃO; entra na seed (**as
+    seeds mudam**). Dossiê 75, `test_accent`.
+  - **VCA: SAT**, a cor do par diferencial de um OTA (satura a entrada
+    antes do ganho), com antialiasing por antiderivada. Medido no pior
+    caso: alias a −31 dB (−22 sem ADAA). Em 0, o VCA é o de antes.
+  - **ENVELOPE: LOOP e EOC.** LOOP faz o envelope ciclar sozinho (A·D·R,
+    sem gate; um gate reinicia a fase). EOC é um pulso no fim de cada
+    envelope ou ciclo. Desligado por padrão; a saída é nova; os patches não
+    mudam.
+
 - **Módulo novo: LADDER (ESCADA)** (11 nov., fila aprovada). O filtro do
   grave: escada de quatro polos com a ressonância como realimentação,
   discretizada sem atraso no laço (ZDF/TPT, Zavalishin), com saturação tanh

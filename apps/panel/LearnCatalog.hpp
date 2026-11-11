@@ -373,6 +373,8 @@ inline const LearnTable& learnTable() {
                 "", ""}},
         }},
         {"ENVELOPE", {
+            {"loop", {"LOOP ligado: o envelope recomeça sozinho ao terminar — um ciclo A·D·R que toca sem gate (um gate reinicia a fase). O SUS não segura: vira o nível entre o DEC e o REL.", "", ""}},
+            {"out:eoc", {"Um pulso no fim de cada envelope (ou de cada ciclo, com LOOP): para encadear envelopes, contar ciclos, disparar o próximo som.", "", ""}},
             {"attack", {
                 "Tempo de subida — quanto leva pra chegar ao pico depois "
                 "do gate.",
@@ -694,6 +696,7 @@ inline const LearnTable& learnTable() {
             {"out:sub", {"Sub-oscilador (uma ou duas oitavas abaixo).", "", ""}},
         }},
         {"VCA", {
+            {"saturation", {"A cor do par diferencial (OTA): satura a ENTRADA antes do ganho, então o caráter não depende do volume. 0 = o VCA limpo de sempre; 1 = bem saturado (com antialiasing).", "", ""}},
             {"level1", {
                 "Ganho manual do canal 1.",
                 "ganho = LVL1 + CV1_AMOUNT · cv1 — o knob continua vivo "
@@ -793,6 +796,30 @@ inline const LearnTable& learnTable() {
             {"in:res_mod", {"CV somada à RESO.", "", ""}},
             {"out:lp4", {"Passa-baixas de 24 dB/oct (os quatro degraus).", "", ""}},
             {"out:lp2", {"Passa-baixas de 12 dB/oct (a tomada do 2º degrau, com a mesma realimentação): mais brilho, mesma ressonância.", "", ""}},
+        }},
+        {"ACCENT", {
+            {"metric", {"Peso da causa MÉTRICA: o 1º tempo de cada ciclo de CICLO notas é forte; os outros pesam pela hierarquia (num ciclo de 8: o 5º ½, o 3º e o 7º ¼).", "", ""}},
+            {"leap", {"Peso do SALTO: quanto maior o intervalo desde a nota anterior, mais acento (uma oitava ou mais = inteiro).", "", ""}},
+            {"apex", {"Peso do ÁPICE: a nota mais aguda das últimas 8 é acentuada — o ponto alto da frase.", "", ""}},
+            {"external", {"Peso do acento de FORA (entrada ACC): o CLOCK, o TRIGSEQ, o PHRASE e o BOUNCE servem.", "", ""}},
+            {"agogic", {"Peso do acento AGÓGICO: quando a nota anterior durou bem mais que a média, esta é acentuada (o módulo só sabe a duração quando a nota acaba).", "", ""}},
+            {"synco", {"Peso da SÍNCOPE: um acento de fora que cai num tempo fraco do ciclo pesa mais.", "", ""}},
+            {"cycle", {"O tamanho do ciclo métrico, em notas (2–16).", "", ""}},
+            {"rotate", {"Rotação: o tempo forte migra uma posição a cada tantos ciclos (0 = parado; 1 = a cada ciclo). A métrica fica, a fase anda.", "", ""}},
+            {"inherit", {"Herança: parte do acento passa à nota seguinte e desbota pela metade a cada nota — uma cauda, não outro acento.", "", ""}},
+            {"suppress", {"Supressão: depois de um acento forte, o seguinte custa mais — evita que tudo fique acentuado.", "", ""}},
+            {"depth", {"Profundidade das saídas VCA, FC e DEC.", "", ""}},
+            {"in:gate", {"Cada borda de subida é uma nota.", "", ""}},
+            {"in:pitch", {"A altura da nota (1 V/oct), para o SALTO e o ÁPICE.", "", ""}},
+            {"in:accent", {"Acento de fora (0–1, contínuo ou gate).", "", ""}},
+            {"in:reset", {"Volta ao 1º tempo e apaga a cauda e a memória.", "", ""}},
+            {"out:emphasis", {"A ênfase da nota (0–1), segura até a próxima.", "", ""}},
+            {"out:vca", {"Ganho para um VCA: 1 no acento, até 0,6 sem acento (com PROF 1).", "", ""}},
+            {"out:cutoff", {"Brilho em V/oct (até +2 oitavas): ligue no FC de um LADDER ou FILTER.", "", ""}},
+            {"out:decay", {"Articulação em V/oct negativo: ligue no TIME de um ENVELOPE — o acento encurta a nota, como na 303.", "", ""}},
+            {"out:sweep", {"O empilhamento da 303: cada nota sobe a carga pela sua ênfase e ela vaza devagar — acentos seguidos sobem, um sozinho não. Ligue no FC.", "", ""}},
+            {"out:gate", {"O gate, só nas notas acentuadas (ênfase ≥ 0,5): para disparar um segundo som nos acentos.", "", ""}},
+            {"out:level", {"A ênfase em degraus: 0, fraco, médio, forte (0, ⅓, ⅔, 1).", "", ""}},
         }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
@@ -3011,6 +3038,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "O filtro do grave — uma escada de quatro polos (Moog) com a ressonância como realimentação; DIODO acopla os degraus até a escada de diodos (ácida). Saturação dentro do laço, a 2×.",
             "Discretização sem atraso no laço (Zavalishin). Desvios RASGO: o pico fica afinado no CUT em qualquer DIODO, RESO 1 é o limiar de cada escada, e COMP devolve o grave exatamente.",
             "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0,7, COMP 1: o baixo subtrativo que encorpa sem sumir. Com RESO 1 e uma nota no FC, a escada canta sozinha."}},
+        {"ACCENT", {
+            "O campo de acento — várias causas (métrica, salto, ápice, acento de fora, agógico, síncope) somadas numa ênfase só, entregue em várias saídas ao mesmo tempo: volume, brilho, articulação e o empilhamento da 303.",
+            "O acento como gesto, não como volume (Lerdahl & Jackendoff; Drake & Palmer). Herança e rotação do Antitotem; um campo para vários destinos, do Aquorbium; a supressão evita que tudo seja acento.",
+            "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE e PTCH → ACCENT; VCA → CV do VCA, SWP → FC do LADDER, DEC → TIME do ENVELOPE: a linha ganha fraseado e o baixo ácido ganha o acento que sobe."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
@@ -3369,6 +3400,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The bass filter — a four-pole ladder (Moog) with resonance as feedback; DIODE couples the rungs up to the diode ladder (acid). Saturation inside the loop, at 2×.",
             "Zero-delay-feedback discretisation (Zavalishin). RASGO deviations: the peak stays tuned to CUT at any DIODE, RESO 1 is each ladder's own threshold, and COMP gives the bass back exactly.",
             "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0.7, COMP 1: the subtractive bass that fattens without vanishing. With RESO 1 and a note on FC, the ladder sings on its own."}},
+        {"ACCENT", {
+            "The accent field — several causes (metre, leap, apex, external accent, agogic, syncopation) summed into one emphasis, delivered to several outputs at once: volume, brightness, articulation and the 303 stacking.",
+            "Accent as a gesture, not a volume (Lerdahl & Jackendoff; Drake & Palmer). Inheritance and rotation from the Antitotem; one field for many destinations, from the Aquorbium; suppression keeps everything from being an accent.",
+            "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE and PTCH → ACCENT; VCA → the VCA's CV, SWP → LADDER FC, DEC → ENVELOPE TIME: the line gains phrasing and the acid bass gains the rising accent."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
@@ -3655,6 +3690,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le filtre du grave — une échelle à quatre pôles (Moog) avec la résonance comme rétroaction ; DIODE couple les échelons jusqu’à l’échelle à diodes (acide). Saturation dans la boucle, à 2×.",
             "Discrétisation sans retard dans la boucle (Zavalishin). Écarts RASGO : le pic reste accordé sur CUT quel que soit DIODE, RESO 1 est le seuil propre à chaque échelle, et COMP rend le grave exactement.",
             "OSC (SAW) → LADDER → VCA ; ENVELOPE → FC ; RESO 0,7, COMP 1 : la basse soustractive qui s’épaissit sans disparaître. Avec RESO 1 et une note sur FC, l’échelle chante seule."}},
+        {"ACCENT", {
+            "Le champ d’accent — plusieurs causes (mètre, saut, apex, accent externe, agogique, syncope) sommées en une seule emphase, livrée à plusieurs sorties à la fois : volume, brillance, articulation et l’empilement de la 303.",
+            "L’accent comme geste, non comme volume (Lerdahl & Jackendoff ; Drake & Palmer). Héritage et rotation de l’Antitotem ; un champ pour plusieurs destinations, de l’Aquorbium ; la suppression évite que tout soit accent.",
+            "SEQUENCE → QUANTIZER → OSC → LADDER → VCA ; GATE et PTCH → ACCENT ; VCA → CV du VCA, SWP → FC du LADDER, DEC → TIME de l’ENVELOPE : la ligne gagne un phrasé et la basse acide l’accent qui monte."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
@@ -3941,6 +3980,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El filtro del grave — una escalera de cuatro polos (Moog) con la resonancia como realimentación; DIODO acopla los peldaños hasta la escalera de diodos (ácida). Saturación dentro del lazo, a 2×.",
             "Discretización sin retardo en el lazo (Zavalishin). Desvíos RASGO: el pico queda afinado en CUT con cualquier DIODO, RESO 1 es el umbral propio de cada escalera, y COMP devuelve el grave exactamente.",
             "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0,7, COMP 1: el bajo sustractivo que engorda sin desaparecer. Con RESO 1 y una nota en FC, la escalera canta sola."}},
+        {"ACCENT", {
+            "El campo de acento — varias causas (métrica, salto, ápice, acento externo, agógico, síncopa) sumadas en una sola énfasis, entregada a varias salidas a la vez: volumen, brillo, articulación y el apilamiento de la 303.",
+            "El acento como gesto, no como volumen (Lerdahl & Jackendoff; Drake & Palmer). Herencia y rotación del Antitotem; un campo para varios destinos, del Aquorbium; la supresión evita que todo sea acento.",
+            "SEQUENCE → QUANTIZER → OSC → LADDER → VCA; GATE y PTCH → ACCENT; VCA → CV del VCA, SWP → FC del LADDER, DEC → TIME del ENVELOPE: la línea gana fraseo y el bajo ácido el acento que sube."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",

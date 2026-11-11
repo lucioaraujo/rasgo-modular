@@ -577,6 +577,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_ladder_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_ladder_tests COMMAND rasgo_modular_ladder_tests)
 
+    add_executable(rasgo_modular_accent_tests tests/test_accent.cpp)
+    target_include_directories(rasgo_modular_accent_tests PRIVATE src)
+    target_compile_options(rasgo_modular_accent_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_accent_tests COMMAND rasgo_modular_accent_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})

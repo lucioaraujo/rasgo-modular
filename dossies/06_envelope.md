@@ -182,3 +182,20 @@ Testado isolado (forma, sustain, VCA, curva, time_mod) antes do patch.
 É o último módulo do marco 1 — com ele a **primeira peça longa** fica
 possível: `CLOCK` → `DECISION` → `ENVELOPE` articulando `FUNCTION` →
 `FILTER` → saída, tudo determinístico por seed e sem repetição.
+
+## 9. LOOP e EOC (11/11/2026, fila aprovada)
+
+Da auditoria dos módulos (`AUDITORIA_modulos_e_cardinal.md`: "ENVELOPE
+LOOP/EOA").
+- **LOOP** (chave, parâmetro `loop`): ao chegar ao fim (Idle), o envelope
+  recomeça sozinho, também sem nenhum gate. Um gate reinicia a fase. Em
+  LOOP o SUS não segura: vira o nível entre o DEC e o REL, e o ciclo é
+  A·D·R. Conceito do "cycle" do Make Noise Maths (comportamento, não
+  código).
+- **EOC** (saída nova, índice 2, `eoc`): um pulso de 10 ms no fim de cada
+  envelope ou ciclo. Conceito do fim de ciclo do Joranalogue Contour 1.
+- **Compatibilidade:** LOOP vem desligado e a saída é nova; patches e seeds
+  antigos soam igual.
+- **Teste** (`test_envelope`, `testLoopAndEoc`): sem gate, ~10 ciclos em 1 s
+  com A + D + R = 0,1 s; período medido = 0,1 s ± 2 ms; sem LOOP, um pulso
+  só.

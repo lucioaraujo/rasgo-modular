@@ -160,3 +160,21 @@ drift, independência) antes do patch. Cadeias canônicas:
 `OSC → VCA.in1` · `ENVELOPE.env → VCA.cv1` (voz com amplitude);
 `NOISE.smooth → VCA.cv2` (volume que deriva). Adicionado ao catálogo
 (`apps/panel/ModuleCatalog.hpp`, família TRANSFORM).
+
+## 9. SAT, a cor do OTA (11/11/2026, fila aprovada)
+
+Da `PESQUISA_cardinal_baixo_e_osciladores.md` §8.4 ("VCA com saturação
+suave, curva tanh, como o par diferencial").
+- **SAT** (`saturation`, 0–1, um knob para os dois canais): y =
+  g·tanh(d·x)/d, com d = 1 + 5·SAT. Satura a **entrada** antes do ganho,
+  como o par diferencial de um OTA, então o caráter não depende do volume.
+  A saturação de segurança perto do teto (±0,9) continua depois, como
+  antes.
+- **Antialiasing:** antiderivada de 1ª ordem (Parker, Zavalishin & Le Bivic,
+  DAFx 2016; o mesmo princípio do SHAPE), pela diferença de log cosh, com
+  meia amostra de atraso só quando SAT > 0.
+- **Medido** (`test_vca`, `testOtaSaturation`), pior caso (seno de 4,7 kHz,
+  0,9 de pico, SAT 1): alias das dobras do 7º e do 9º harmônico a −31 dB;
+  sem ADAA, −22 dB. Em material grave, muito menos.
+- **Compatibilidade:** SAT = 0 é exatamente o VCA anterior; nenhum patch
+  muda.
