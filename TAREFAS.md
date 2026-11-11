@@ -20,12 +20,11 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   latência na bateria (ca88a80), MATTER finito com FM de áudio (57ad708).
   95/95 testes; app recompilado em 11/11 00:00.
 - [x] Auditoria dos 69 módulos + Cardinal (`dossies/AUDITORIA_modulos_e_cardinal.md`).
-- [ ] **Decisão do autor**: instâncias (o mesmo módulo várias vezes) — §1
-  da auditoria recomenda instâncias com limite por família.
-- [ ] Próximo técnico (proposto): crossfade nas trocas discretas que estalam
-  (OPERATOR algo, SWIRL type, LOOPER reverse/hold, BOXCAR scan, FUNCTION
-  slope, MEMORY freeze) e rampa no MUTE do MIXER; depois medir o aliasing
-  dos 16 módulos não-lineares sem OS/ADAA.
+- [x] Instâncias, passos 1–2 (app; partitura/VARIA já por módulo). Falta
+  o passo 3: a seed abrir cópias — desenho a mostrar ao autor.
+- [x] Estalos nas trocas corrigidos (8b92226); aliasing medido — só o
+  OPERATOR pedia (sobreamostragem 4×, decisão do autor).
+
 - [x] Decisões do autor (11/11): **instâncias sim** (recomendação: com limite
   por família, ordem app → partitura/VARIA → seed); **estalos e aliasing**:
   seguir; **medição do volume da seed em 8 s** (770 ms por SEED, era 392);

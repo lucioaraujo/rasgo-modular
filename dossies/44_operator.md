@@ -200,3 +200,28 @@ do timbre/forma. Knobs `FREQ`/`FINE`/`ALGO`/`INDEX`/`FBK` (linha 1),
 Cadeias canônicas: `SEQUENCE → QUANTIZER → OPERATOR → VCA`;
 `ENVELOPE.env → OPERATOR.index` (ataque FM) + `ENVELOPE.env → VCA`;
 `LFO → OPERATOR.ratio_c` (timbre em movimento).
+
+## Sobreamostragem 4× (11/11/2026, decisão do autor)
+
+A auditoria dos módulos mediu aliasing forte com INDEX alto: o knob vira
+profundidade `idx² × 6` ciclos (≈ 9,4 rad em 0,5), e os algoritmos em cadeia
+multiplicam a largura do espectro — as bandas laterais passavam de Nyquist e
+voltavam rebatidas. Agora os quatro operadores rodam 4× por amostra (¼ do
+passo de fase) e dois decimadores meia-banda de 63 coeficientes
+(`HalfbandDecimator`, `Oversampler.hpp`) trazem de volta.
+
+Energia fora dos harmônicos (seno-portadora afinado, rácios 1/2/3, algo 0):
+
+| f0 | INDEX 0,3 antes → depois | INDEX 0,5 antes → depois |
+|---|---|---|
+| 110 Hz | −53,8 → −66,2 dB | −1,1 → −24,4 dB |
+| 440 Hz | −24,8 → −37,7 dB | +3,1 → −5,7 dB |
+| 1000 Hz | −46,7 → −37,6 dB | −24,0 → −20,0 dB |
+| 2003 Hz | −2,6 → −19,6 dB | +9,8 → +2,3 dB |
+
+Limite honesto: com INDEX perto de 1 a largura de banda passa até do rate
+4× (37 rad em cadeia) e o espectro continua dobrando — ali a FM forte é
+ruído por natureza. Em 1 kHz/0,3 o número ficou pior pela régua (a energia
+fora dos harmônicos é resto de vazamento da janela, −105 dB por pico, não
+aliasing). O timbre da FM forte fica "metal limpo". `test_operator`:
+`testRatioInharmonic` ganhou janela longa (o "harmônico" media vazamento).

@@ -2,7 +2,9 @@
 
 #include "core/SignalGraph.hpp"
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 
 // ============================================================================
@@ -85,6 +87,76 @@ private:
         std::size_t w = 0u;
     };
     std::array<Chan, AudioBlock::maxChannels> chans_{};
+};
+
+// ============================================================================
+// HalfbandDecimator — 2:1 para GERADORES sobreamostrados (11/11/2026)
+// ============================================================================
+//
+// O `Oversampler2x` acima serve a processadores (uma função aplicada a uma
+// entrada). Um gerador sobreamostrado — o OPERATOR rodando a 4× — produz
+// ele mesmo as amostras no rate alto; só precisa DECIMAR. Mesmo FIR
+// meia-banda (mesmos coeficientes); dois em cascata dão 4:1. Sem alocação.
+class HalfbandDecimator {
+public:
+    // 63 coeficientes (sinc meia-banda × janela de Kaiser β = 8): rejeição
+    // da ordem de 80 dB acima de ~0,28·fs — um GERADOR põe energia até o
+    // topo do rate alto, e o 13 taps de cima (feito para waveshaper, cuja
+    // entrada já é limitada em banda) deixava ela dobrar para dentro do
+    // áudio. Coeficientes calculados uma vez, fora do áudio.
+    static constexpr std::size_t kTaps = 63;
+    HalfbandDecimator() noexcept { reset(); }
+    void reset() noexcept { ring_.fill(0.0f); w_ = 0u; }
+    float push(const float s0, const float s1) noexcept {
+        ring_[w_ & kMask] = s0;
+        ++w_;
+        ring_[w_ & kMask] = s1;
+        ++w_;
+        const auto& h = coefs();
+        float acc = 0.0f;
+        // centro em (kTaps−1)/2 = 31; meia-banda: só ímpares do centro + centro
+        const std::size_t newest = w_ - 1u;
+        acc += h[31] * ring_[(newest - 31u) & kMask];
+        for (std::size_t k = 1; k <= 31; k += 2)
+            acc += h[31 - k] * (ring_[(newest - 31u + k) & kMask]
+                                + ring_[(newest - 31u - k) & kMask]);
+        return acc;
+    }
+    // atraso de grupo, em amostras do rate ALTO
+    static constexpr float latencyHighRate() noexcept { return 31.0f; }
+
+private:
+    static constexpr std::size_t kMask = 63u;
+    static double besselI0(const double x) noexcept {
+        double sum = 1.0, term = 1.0;
+        for (int k = 1; k < 40; ++k) {
+            term *= (x / (2.0 * k)) * (x / (2.0 * k));
+            sum += term;
+        }
+        return sum;
+    }
+    static const std::array<float, kTaps>& coefs() noexcept {
+        static const std::array<float, kTaps> h = [] {
+            std::array<float, kTaps> c{};
+            const double beta = 8.0, m = 31.0;
+            double dc = 0.0;
+            for (std::size_t i = 0; i < kTaps; ++i) {
+                const double n = static_cast<double>(i) - m;
+                const double sinc = n == 0.0 ? 0.5
+                    : std::sin(3.14159265358979 * 0.5 * n) / (3.14159265358979 * n);
+                const double r = n / m;
+                const double win = besselI0(beta * std::sqrt(std::max(0.0, 1.0 - r * r)))
+                                 / besselI0(beta);
+                c[i] = static_cast<float>(sinc * win);
+                dc += sinc * win;
+            }
+            for (auto& v : c) v = static_cast<float>(v / dc);   // ganho DC 1
+            return c;
+        }();
+        return h;
+    }
+    std::array<float, 64> ring_{};
+    std::size_t w_ = 0u;
 };
 
 }  // namespace rasgo::modular

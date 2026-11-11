@@ -567,6 +567,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_declick_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_declick_tests COMMAND rasgo_modular_declick_tests)
 
+    add_executable(rasgo_modular_instances_tests tests/test_instances.cpp)
+    target_include_directories(rasgo_modular_instances_tests PRIVATE src apps)
+    target_compile_options(rasgo_modular_instances_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_instances_tests COMMAND rasgo_modular_instances_tests)
+
     # FERRAMENTA de auditoria dos módulos — não é teste de regressão, e
     # por isso NÃO entra no ctest. Ela acusa 32 itens dos quais 13 já se
     # explicam como comportamento correto; um teste que falha sempre
