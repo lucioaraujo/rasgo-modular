@@ -42,6 +42,8 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -120,9 +122,29 @@ inline SeedIdentity seedIdentity(std::uint64_t seed) {
 
 // `forceEnsemble` (1..4) só para teste: força o tamanho do conjunto (a
 // régua de qualidade roda também com 4 vozes, o pior caso de soma).
+//
+// `makeCopy` (11/11/2026, instâncias — decisão do autor: "gostaria que já
+// abrissem seeds com os módulos repetidos"): fábrica de módulos. Com ela, a
+// seed garante um PAR FIXO de cópias no rack (uma segunda instância de
+// cada tipo de `kSeedCopyPool`, criada só se ainda não houver, sempre na
+// mesma ordem) e cada seed decide se USA a cópia. Rack novo e rack usado
+// ficam com a mesma estrutura — a mesma seed dá o mesmo patch. Sem fábrica
+// (painel X11, CRUZA), nada muda: uma instância de cada, como antes.
+using SeedModuleFactory =
+    std::function<std::unique_ptr<rasgo::modular::Signal>(const std::string&)>;
+inline const char* const kSeedCopyPool[] = {"OSC", "VCA", "ENVELOPE", "LPG", "STRING", "MATTER"};
+
 inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
-                      int forceEnsemble = 0) {
+                      int forceEnsemble = 0, const SeedModuleFactory& makeCopy = {}) {
     using namespace rasgo::modular;
+    if (makeCopy)
+        for (const char* t : kSeedCopyPool) {
+            int n = 0;
+            for (std::size_t i = 0; i < g.nodeCount(); ++i)
+                if (g.node(i).type() == t) ++n;
+            if (n == 1)
+                if (auto m = makeCopy(t)) g.add(std::move(m));
+        }
     SeedIdentity id = seedIdentity(seed);
     if (forceEnsemble >= 1 && forceEnsemble <= 4) id.ensemble = forceEnsemble;
     std::uint64_t rs = seed ? seed : 0x9E3779B97F4A7C15ULL;
@@ -159,6 +181,13 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     };
     auto setT = [&](const char* t, const char* p, float v) {
         if (hasT(t)) setP(firstT(t), p, v);
+    };
+    // a segunda instância de um tipo (a cópia do par), ou N se não há
+    auto copyOf = [&](const char* t) -> std::size_t {
+        bool seen = false;
+        for (std::size_t i = 0; i < N; ++i)
+            if (typ(i) == t) { if (seen) return i; seen = true; }
+        return N;
     };
 
     // ---- classificação de portas -----------------------------------
@@ -227,6 +256,15 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         if (so < 0 || di < 0) return false;
         return connect({firstT(st), static_cast<std::size_t>(so)},
                        {firstT(dt), static_cast<std::size_t>(di)});
+    };
+    // liga por NÓ (para as cópias, que `connectByName` não alcança)
+    auto connectIds = [&](std::size_t sn, const char* sp, std::size_t dn,
+                          const char* dp) -> bool {
+        if (sn >= N || dn >= N) return false;
+        const int so = pOut(sn, sp), di = pIn(dn, dp);
+        if (so < 0 || di < 0) return false;
+        return connect({sn, static_cast<std::size_t>(so)},
+                       {dn, static_cast<std::size_t>(di)});
     };
 
     // ---- rack de fábrica: a seed é a identidade do patch ---------
@@ -413,6 +451,39 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     // cadeia de processamento: 0-3 bus processors em série (por complexity)
     std::size_t bodyNode = voiceNode;
     const char* bodyOut = voiceOutNm;
+
+    // ---- PAR DE OSC (11/11/2026, instâncias) ---------------------------
+    // Às vezes a voz OSC ganha a cópia do OSC: levemente desafinada (a
+    // espessura do batimento) ou num intervalo (oitava, quinta) — somadas
+    // no VCA de cópia antes da cadeia. Por que vários VCOs: o autor
+    // perguntou em 10/11 ("porque muitos synth possuem vários vcos?").
+    bool rawPair = false;
+    if (makeCopy && std::string(vc.mod) == "OSC" && voiceHz > 0.0f
+        && chance(0.25f + 0.3f * id.complexity)) {
+        const std::size_t o2 = copyOf("OSC"), mx2 = copyOf("VCA");
+        if (o2 < N && mx2 < N) {
+            float factor;
+            if (chance(0.6f)) {                         // espessura
+                const float cents = rng(3.0f, 12.0f) * (chance(0.5f) ? 1.0f : -1.0f);
+                factor = std::exp2(cents / 1200.0f);
+            } else {                                    // intervalo
+                const float v[3] = {0.5f, 2.0f, 1.5f};
+                factor = v[rnd() % 3];
+            }
+            setP(o2, "freq", std::clamp(voiceHz * factor, 20.0f, 700.0f));
+            setP(o2, "pw", rng(0.25f, 0.75f));
+            setP(o2, "drift", rng(0.0f, 0.3f));
+            setP(mx2, "level1", 0.6f);
+            setP(mx2, "level2", factor > 0.9f && factor < 1.1f ? 0.6f : 0.4f);
+            const bool ok = connectIds(firstT("QUANTIZER"), "pitch", o2, "pitch")
+                && connectIds(voiceNode, voiceOutNm, mx2, "in1")
+                && connectIds(o2, voiceOutNm, mx2, "in2");
+            if (ok) {
+                bodyNode = mx2; bodyOut = "sum"; rawPair = true;
+                spine[o2] = 1; spine[mx2] = 1;
+            }
+        }
+    }
     // DYNAMICS desde 9/11 (decisão do autor; as seeds anteriores mudaram);
     // SPRING e PRISM também em 9/11 — processadores de áudio só entram no
     // patch pela cadeia; o passeio quase nunca os alcança (2,7 % das seeds).
@@ -514,9 +585,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     // serra crua vão direto pro MIXER — o "hiper agudo" que se repetia.
     {
         const std::string vt = typ(voiceNode);
-        const bool brightRaw = bodyNode == voiceNode
+        const bool brightRaw = rawPair || (bodyNode == voiceNode
             && (vt == "NOISE" || vt == "OSC" || vt == "SHAPE"
-                || vt == "FILTER");
+                || vt == "FILTER"));
         if (brightRaw && hasT("FILTER") && firstT("FILTER") != voiceNode) {
             const std::size_t flt = firstT("FILTER");
             const int ai = pIn(flt, "in");
@@ -529,6 +600,31 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 bodyNode = flt;
                 bodyOut = "all";
                 spine[flt] = 1;
+            }
+        }
+    }
+
+    // ---- ENVELOPE DO FILTRO (11/11/2026, instâncias) -------------------
+    // Quando o FILTER está na cadeia da voz, às vezes a cópia do ENVELOPE o
+    // abre e fecha a cada nota — o contorno de filtro separado do de
+    // volume, a gramática do baixo (pesquisa do grave, 10/11).
+    if (makeCopy && hasT("FILTER") && firstT("FILTER") != voiceNode
+        && spine[firstT("FILTER")] && chance(0.3f + 0.3f * id.complexity)) {
+        const std::size_t e2 = copyOf("ENVELOPE"), flt = firstT("FILTER");
+        if (e2 < N) {
+            setP(e2, "mode", 1.0f);
+            setP(e2, "attack", rng(0.002f, 0.02f));
+            setP(e2, "decay", rng(0.08f, 0.6f));
+            setP(e2, "sustain", 0.0f);
+            setP(e2, "release", rng(0.05f, 0.3f));
+            setP(e2, "level", 1.0f);
+            if (connectIds(firstT("CLOCK"), "euclid", e2, "gate")
+                && connectIds(e2, "env", flt, "cutoff_mod")) {
+                // 1–2 oitavas de abertura (ganho do cabo) a partir de um
+                // corte mais baixo: o envelope é quem abre
+                g.cable(g.cableCount() - 1).setGain(rng(1.0f, 2.0f));
+                setP(flt, "cutoff", rng(150.0f, 700.0f));
+                spine[e2] = 1;
             }
         }
     }
@@ -648,22 +744,35 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         // quem canta: STRING/MATTER (golpe próprio, corpo e decaimento)
         // ou um oscilador → LPG (o LPG é o envelope e o filtro)
         struct SG { const char* mod; const char* pitchIn; const char* trigIn; bool lpg; };
-        const SG opts[6] = {{"STRING", "freq_mod", "pluck", false},
+        // (11/11/2026, instâncias) a contravoz também pode cantar num OSC só
+        // dela, e usa a CÓPIA de STRING/MATTER/LPG/OSC quando a voz já
+        // ocupa a primeira instância — "a contravoz também é importante"
+        const SG opts[7] = {{"STRING", "freq_mod", "pluck", false},
                             {"MATTER", "freq_mod", "strike", false},
                             {"PULSAR", "pitch", nullptr, true},
                             {"WAVETABLE", "pitch", nullptr, true},
                             {"ADDITIVE", "pitch", nullptr, true},
-                            {"OPERATOR", "pitch", nullptr, true}};
+                            {"OPERATOR", "pitch", nullptr, true},
+                            {"OSC", "pitch", nullptr, true}};
+        // o nó livre de um tipo: a primeira instância, ou a cópia
+        auto nodeFor = [&](const char* t) -> std::size_t {
+            if (hasT(t) && !spine[firstT(t)] && firstT(t) != voiceNode) return firstT(t);
+            const std::size_t c = makeCopy ? copyOf(t) : N;
+            return (c < N && !spine[c]) ? c : N;
+        };
         const SG* sg = nullptr;
-        for (int tries = 0; tries < 8 && !sg; ++tries) {
-            const SG& o = opts[rnd() % 6];
-            if (!freeNode(o.mod) || firstT(o.mod) == voiceNode) continue;
-            if (o.lpg && !freeNode("LPG")) continue;
-            sg = &o;
+        std::size_t sn = N, lpN = N;
+        for (int tries = 0; tries < 10 && !sg; ++tries) {
+            const SG& o = opts[rnd() % 7];
+            const std::size_t cand = nodeFor(o.mod);
+            if (cand >= N) continue;
+            const std::size_t lp = o.lpg ? nodeFor("LPG") : N;
+            if (o.lpg && lp >= N) continue;
+            sg = &o; sn = cand; lpN = lp;
         }
         const char* gen = useArp ? "ARP" : "MARKOV";
         if (sg && (arpOk || mkOk)) {
-            const std::size_t gn = firstT(gen), sn = firstT(sg->mod);
+            const std::size_t gn = firstT(gen);
             // relógio: CLOCK dividido pela LOGIC; a contravoz não passa
             // de ~4 notas/s (2,5 com 3–4 vozes)
             const float clockHz = id.bpm / 60.0f * static_cast<float>(id.mult);
@@ -699,7 +808,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
 
             std::size_t outNode = sn; const char* outNm = "out";
             setP(sn, "freq", singerHz);
-            bool sung = connectByName(gen, "pitch", sg->mod, sg->pitchIn);
+            bool sung = connectIds(gn, "pitch", sn, sg->pitchIn);
             if (!sg->lpg) {
                 if (std::string(sg->mod) == "STRING") {
                     setP(sn, "decay", rng(0.5f, 0.9f));
@@ -710,9 +819,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                     setP(sn, "damping", rng(0.25f, 0.65f));
                 }
                 setP(sn, "exciter", rng(0.4f, 0.85f));
-                sung = sung && connectByName(gen, "gate", sg->mod, sg->trigIn);
+                sung = sung && connectIds(gn, "gate", sn, sg->trigIn);
             } else {
-                const std::size_t lp = firstT("LPG");
+                const std::size_t lp = lpN;
                 setP(lp, "mode", rng(0.3f, 1.0f));
                 setP(lp, "response", rng(0.1f, 0.45f));
                 setP(lp, "resonance", rng(0.0f, 0.35f));
@@ -722,8 +831,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 if (m == "OPERATOR") setP(sn, "index", rng(0.05f, 0.4f));
                 if (m == "ADDITIVE") setP(sn, "tilt", rng(0.2f, 0.6f));
                 if (m == "WAVETABLE") setP(sn, "pos", rng(0.0f, 1.0f));
-                sung = sung && connectByName(sg->mod, "out", "LPG", "in")
-                            && connectByName(gen, "gate", "LPG", "strike");
+                const char* sOut = m == "OSC" ? (chance(0.5f) ? "saw" : "tri") : "out";
+                sung = sung && connectIds(sn, sOut, lp, "in")
+                            && connectIds(gn, "gate", lp, "strike");
                 if (sung) { spine[lp] = 1; outNode = lp; }
             }
             if (sung && toChannel(outNode, outNm, 2, gain1 - rng(4.0f, 8.0f), 0.30f * side)) {
@@ -831,6 +941,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         for (; sc < 5; ++sc) { if (sr2 < sw[sc]) break; sr2 -= sw[sc]; }
         const Port sp = src[sc][rnd() % src[sc].size()];
         if (sp.node == d.node) continue;
+        // uma cópia (2ª instância) só entra no passeio se a seed já a pôs
+        // num papel — senão o rack ganharia cópias por acaso (11/11/2026)
+        if (copyOf(typ(sp.node).c_str()) == sp.node && !spine[sp.node]) continue;
         connect(sp, d);
     }
 
@@ -856,6 +969,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             for (const Port& p : src[sc]) {
                 if (layered) break;
                 if (p.node == bodyNode || !isProcessedBus(p.node)) continue;
+                if (copyOf(typ(p.node).c_str()) == p.node) continue;   // cópia: não
                 if (reaches(p.node, sink)) continue;      // já chega à saída
                 if (toChannel(p.node, g.node(p.node).outputDescriptor(p.port).name.c_str(),
                               3, tex, -0.45f * side))

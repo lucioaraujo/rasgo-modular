@@ -44,8 +44,18 @@ pronto.
   cópias; os do rack inteiro (MIXER, MASTER, CLOCK, SIGNAL-IN, NOTE-OUT,
   LISTEN) seguem únicos, com aviso na paleta (4 línguas). Com mais de uma
   cópia, o título mostra o número ("OSC 2"). Patches com cópias salvam e
-  abrem; a partitura e o VARIA já eram por módulo. A seed ainda usa uma
-  cópia de cada (próximo passo). `apps/panel/Instances.hpp`, `test_instances`.
+  abrem; a partitura e o VARIA já eram por módulo. `apps/panel/Instances.hpp`,
+  `test_instances`.
+- **A seed abre cópias** (11 nov., pedido do autor: "gostaria que já
+  abrissem seeds com os módulos repetidos"; "a contravoz também é
+  importante"). Três papéis: **par de OSC** na voz (desafinado, para
+  espessura, ou em oitava/quinta; somado num VCA de cópia), **envelope do
+  filtro** (um 2º ENVELOPE abre o FILTER a cada nota, 1–2 oitavas) e a
+  **contravoz** com módulos próprios (um OSC só dela pelo LPG, e as cópias
+  de STRING/MATTER/LPG quando a voz ocupa a primeira). Em 1000 seeds, 36 %
+  usam alguma cópia; o rack mostra só as cópias em uso. A mesma seed dá o
+  mesmo patch em rack novo e usado (par fixo de cópias). **Todas as seeds
+  mudam.**
 - **OPERATOR com sobreamostragem 4×** (11 nov., decisão do autor): com INDEX
   alto a FM dobrava bandas laterais acima de Nyquist (aliasing de −1 a +10 dB
   medido); agora 10–25 dB mais limpo na faixa de uso. A FM forte soa "metal

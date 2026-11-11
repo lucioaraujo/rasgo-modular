@@ -124,10 +124,14 @@ inline constexpr double kSeedProbeSeconds = 8.0;
 // Medir num rack separado não tem esse problema por construção: o grafo
 // do músico não é tocado, nem para ler. Custa montar um rack a mais —
 // barato, e uma vez por seed.
+// `forceEnsemble`: o mesmo do `seedPatch` (só testes) — o rack de prova
+// tem de compor EXATAMENTE o patch que vai ser corrigido (11/11/2026: com
+// 4 vozes forçadas o teste media a seed normal e corrigia a forçada).
 inline float seedGainCorrection(const std::uint64_t seed,
                                 const float sampleRate,
                                 const std::size_t blockFrames,
-                                const double seconds = kSeedProbeSeconds) {
+                                const double seconds = kSeedProbeSeconds,
+                                const int forceEnsemble = 0) {
     using namespace rasgo::modular;
 
     SignalGraph prova;
@@ -138,7 +142,12 @@ inline float seedGainCorrection(const std::uint64_t seed,
     // processar. Usa a MESMA guarda de saída do instrumento, senão a
     // medição veria um sinal que o músico nunca ouviria.
     const std::size_t sink = prova.add(std::make_unique<SinkOut>());
-    try { seedPatch(prova, seed); } catch (...) { return 0.0f; }
+    // a mesma fábrica do app: o rack de prova ganha as mesmas cópias
+    // (instâncias, 11/11/2026), senão mediria outro patch
+    try {
+        seedPatch(prova, seed, forceEnsemble,
+                  [](const std::string& t) { return makeModule(t); });
+    } catch (...) { return 0.0f; }
     prova.prepare(sampleRate, 2, blockFrames);
     prova.setActiveOutput(sink);
 
@@ -199,8 +208,10 @@ inline float balanceSeedLevel(rasgo::modular::SignalGraph& graph,
                               const std::uint64_t seed,
                               const float sampleRate,
                               const std::size_t blockFrames,
-                              const double seconds = kSeedProbeSeconds) {
-    float resta = seedGainCorrection(seed, sampleRate, blockFrames, seconds);
+                              const double seconds = kSeedProbeSeconds,
+                              const int forceEnsemble = 0) {
+    float resta = seedGainCorrection(seed, sampleRate, blockFrames, seconds,
+                                     forceEnsemble);
     if (resta == 0.0f) return 0.0f;
     const float pedido = resta;
 

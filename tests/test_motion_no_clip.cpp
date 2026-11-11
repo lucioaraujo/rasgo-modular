@@ -99,7 +99,10 @@ Probe run(std::uint64_t seed, double seconds, float masterGainDb,
     graph.connect(at("MASTER"), 0, sink, 0);
     graph.connect(at("ENVELOPE"), 1, at("FILTER"), 1, true);
 
-    try { rasgo::panel::seedPatch(graph, seed); } catch (...) {}
+    try {
+        rasgo::panel::seedPatch(graph, seed, 0,
+                                [](const std::string& t) { return rasgo::panel::makeModule(t); });
+    } catch (...) {}
 
     // o músico sobe o MASTER na mão (o seed o deixa em −24 dB)
     for (std::size_t n = 0; n < graph.nodeCount(); ++n)

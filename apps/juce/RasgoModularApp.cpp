@@ -568,17 +568,52 @@ struct Rack {
     // `blockFrames`: preparar com um valor e deixar o membro com outro
     // faria o próximo `reprepare()` (todo connect/disconnect passa por
     // ele) reconfigurar o grafo com uma taxa diferente da do dispositivo.
+    // Instâncias da seed (11/11/2026): depois de semear, o rack mostra as
+    // CÓPIAS (2ª instância de um tipo) que a seed cabeou e esconde as que
+    // ficaram sem cabo — o rack é "um de cada + as cópias em uso". Chamado
+    // com `gmx` tomado.
+    void syncSeedCopies() {
+        const std::size_t n = graph.nodeCount();
+        std::vector<char> wired(n, 0);
+        for (std::size_t i = 0; i < graph.cableCount(); ++i) {
+            const auto& c = graph.cable(i);
+            if (c.source().node < n) wired[c.source().node] = 1;
+            if (c.target().node < n) wired[c.target().node] = 1;
+        }
+        for (std::size_t id = 0; id < n; ++id) {
+            if (id == sink) continue;
+            const std::string t = graph.node(id).type();
+            bool earlier = false;
+            for (std::size_t j = 0; j < id && !earlier; ++j)
+                earlier = graph.node(j).type() == t;
+            if (!earlier) continue;                     // a 1ª instância fica
+            const bool isShown = std::find(shown.begin(), shown.end(), id) != shown.end();
+            if (wired[id] && !isShown) {
+                const auto at = rasgo::panel::moduleInsertionIndex(
+                    shown, t, [this](std::size_t i) { return graph.node(i).type(); });
+                shown.insert(shown.begin() + static_cast<std::ptrdiff_t>(at), id);
+                scopes[id];
+            } else if (!wired[id] && isShown) {
+                shown.erase(std::remove(shown.begin(), shown.end(), id), shown.end());
+                scopes.erase(id);
+            }
+        }
+    }
+
     void applySeed(std::uint64_t s, double sr, std::size_t block) {
         std::lock_guard<std::mutex> lk(gmx);
         sampleRate = static_cast<float>(sr);
         blockFrames = block;
+        const rasgo::panel::SeedModuleFactory fabrica =
+            [](const std::string& t) { return rasgo::panel::makeModule(t); };
         try {
-            rasgo::panel::seedPatch(graph, s);
+            rasgo::panel::seedPatch(graph, s, 0, fabrica);
         } catch (const std::exception& e) {
             std::fprintf(stderr, "[seed %llu] %s — voltando ao seed 1\n",
                          static_cast<unsigned long long>(s), e.what());
-            rasgo::panel::seedPatch(graph, 1);
+            rasgo::panel::seedPatch(graph, 1, 0, fabrica);
         }
+        syncSeedCopies();
         invalidatePanels();
         reprepare();
         graph.setActiveOutput(sink);
