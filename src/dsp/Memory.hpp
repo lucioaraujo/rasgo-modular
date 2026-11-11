@@ -2,6 +2,7 @@
 
 #include "core/SignalGraph.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -80,6 +81,8 @@ public:
         writePos_ = 0;
         grainClock_ = 0.0f;
         lastOut_ = 0.0f;
+        prevFrozen_ = false;
+        fadeInLeft_ = 0;
         rngState_ = 0x27D4EB2F165667C5ULL;
         for (auto& g : grains_)
             g = Grain{};
@@ -113,8 +116,31 @@ public:
                 || (freezeGate && freezeGate->at(0, frame) >= 0.5f);
             const float dry = in ? in->at(0, frame) : 0.0f;
 
+            // (11/11/2026) ao CONGELAR, costura o buffer: os últimos ~5 ms
+            // escritos se fundem com o conteúdo antigo logo à frente da
+            // cabeça, que os grãos passam a ler em volta. Sem isto, todo
+            // grão que cruzava a emenda estalava (auditoria dos módulos).
+            if (frozen && !prevFrozen_) spliceSeam();
+            // ao DESCONGELAR, a gravação recomeça e o buffer ganha outra
+            // emenda (o som de antes do HOLD encosta no de agora): o fim do
+            // que havia desce em ~5 ms e o novo sobe em ~5 ms
+            if (!frozen && prevFrozen_) {
+                const std::size_t n = std::min<std::size_t>(
+                    bufLen_ / 4, static_cast<std::size_t>(0.005f * sampleRate_) + 1);
+                for (std::size_t k = 0; k < n; ++k) {
+                    const float g = static_cast<float>(k + 1) / static_cast<float>(n);
+                    buffer_[(writePos_ + bufLen_ - 1 - k) % bufLen_] *= g;
+                }
+                fadeInLen_ = static_cast<int>(n);
+                fadeInLeft_ = fadeInLen_;
+            }
+            prevFrozen_ = frozen;
             if (!frozen) {
                 float w = dry + feedback * lastOut_;
+                if (fadeInLeft_ > 0) {
+                    w *= 1.0f - static_cast<float>(fadeInLeft_) / static_cast<float>(fadeInLen_);
+                    --fadeInLeft_;
+                }
                 w = w > 1.5f ? 1.5f : (w < -1.5f ? -1.5f : w);
                 buffer_[writePos_] = w;
                 writePos_ = (writePos_ + 1) % bufLen_;
@@ -207,6 +233,22 @@ private:
     std::vector<float> buffer_;
     std::size_t bufLen_ = 1;
     std::size_t writePos_ = 0;
+    bool prevFrozen_ = false;
+    int fadeInLen_ = 1, fadeInLeft_ = 0;
+    // funde os N últimos escritos com os N seguintes (o conteúdo antigo),
+    // em cosseno: o laço do buffer congelado não tem degrau na emenda
+    void spliceSeam() noexcept {
+        const std::size_t n = std::min<std::size_t>(
+            bufLen_ / 4, static_cast<std::size_t>(0.005f * sampleRate_) + 1);
+        for (std::size_t k = 0; k < n; ++k) {
+            const float t = (static_cast<float>(k) + 0.5f) / static_cast<float>(n);
+            const float g = 0.5f - 0.5f * std::cos(3.14159265f * t);   // 0 → 1
+            const std::size_t past = (writePos_ + bufLen_ - n + k) % bufLen_;
+            const std::size_t ahead = (writePos_ + k) % bufLen_;
+            // o fim do que foi escrito desliza para o começo do antigo
+            buffer_[past] = buffer_[past] * (1.0f - g) + buffer_[ahead] * g;
+        }
+    }
     float grainClock_ = 0.0f;
     float lastOut_ = 0.0f;
     std::uint64_t rngState_ = 0x27D4EB2F165667C5ULL;

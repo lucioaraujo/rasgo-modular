@@ -33,6 +33,15 @@ pronto.
   (7) **MATTER**: com FM de áudio na altura, a saída ia a NaN/Inf; os modos
   passaram à forma de rotação (re-afinar não muda a energia). Achado da
   auditoria dos módulos (`dossies/AUDITORIA_modulos_e_cardinal.md`).
+- **Sem estalo nas trocas** (11 nov., aprovado pelo autor). LOOPER: HOLD e
+  REV com crossfade de 5 ms; o laço congelado sem estalo na emenda de cada
+  volta; ao soltar o HOLD, a fita ganha emenda suave. SWIRL: troca de TYPE
+  passa pelo seco e a linha de atraso continua viva no phaser. MEMORY:
+  costura do buffer ao congelar e ao descongelar. MIXER: MUTE com rampa de
+  ~30 ms. Saltos de 0,35–0,63 caíram para 0,01–0,03 (`test_declick`).
+- **Volume da seed medido em 8 s** (decisão do autor; era 4 s): patches que
+  crescem depois do começo deixam de ficar altos. Cada clique em SEED leva
+  ~770 ms (era ~390).
 
 - **MIXER: o PALCO e o móbile** (10 nov., pedido e aprovado pelo autor;
   **todas as seeds mudam**). Pan que não é centro nem sorteio: modos

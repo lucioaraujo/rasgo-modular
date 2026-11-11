@@ -102,7 +102,12 @@ inline constexpr float kSeedMaxCutDb  =  9.0f;
 // `gain` do MASTER já tem. Some com a espera, mas troca uma pausa
 // previsível por um som que muda de nível depois de começar — e isso
 // precisa ser ouvido antes de ser adotado.
-inline constexpr double kSeedProbeSeconds = 4.0;
+//
+// (11/11/2026) Decisão do autor: **8 s**. Patches que crescem depois dos 4 s
+// ficavam acima do alvo (a limitação de 9/11). Remedido com a proteção de
+// denormais no núcleo: 392 ms por SEED com 4 s, **770 ms com 8 s** (12
+// seeds, 48 kHz). Se o clique ficar lento no uso, é esta constante.
+inline constexpr double kSeedProbeSeconds = 8.0;
 
 // Mede um seed e devolve a correção de ganho, em dB.
 //
