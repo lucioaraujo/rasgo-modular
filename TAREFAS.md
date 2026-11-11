@@ -108,6 +108,28 @@ família, no estudo do Cardinal e no diagnóstico abaixo.
   que nasce do timbre: `SpectralConsonance` do Studio, os corpos do
   Aquorbium; fontes GENDYN, Rungler, VOSIM, Walsh). Tudo pela régua de
   qualidade e com leveza (poucos genes, não um sistema pesado de regras).
+- **A ordem da música** (autor, 11/11): "quiálteras, ornamentos,
+  staccatos; faltam também questões importantes da ordem da música — teoria
+  musical, interpretação, regência, arranjos, composição, execução". Já existe
+  em parte:
+  - FEEL do CLOCK (divisão em dois ou três);
+  - INTERPRET (marcato, tenuto, staccato, legato, glide, vibrato, fôlego);
+  - ACCENT (fraseado por causas);
+  - HARMONY (movimentos, neo-Riemann).
+
+  Quase nada disso entra como espinha das seeds. A propor:
+  - quiálteras e métricas mistas na seed;
+  - ornamentos (apojatura, mordente, trinado, glissando, os gamakas e meends
+    do Trioio);
+  - articulação como gene;
+  - arranjo (quem toca quando: entradas, saídas, dobramentos, tutti/solo);
+  - forma e regência (andamento como gesto, dinâmica de seção, condução
+    entre as vozes);
+  - execução (o INTERPRET por voz).
+- **Andamento como gesto:** o VARIA trata BPM e MULT como estruturais
+  (±1,2 % da faixa ≈ ±3 BPM, τ 8 s), por desenho de 09/2026. Propor
+  accelerando e ritardando reais e o tempo seguindo a forma
+  (`GenerativeArc` do Rasgo Synth), não só mais amplitude.
 - **Duplicar SEQUENCE na seed** (e talvez TURING, ARP, CELL): melodias que
   defasam (5 × 8 passos), sequenciador de sequenciador (TRSP/tônica),
   melodia + baixo, pergunta e resposta. Hoje só OSC, VCA, ENVELOPE, LPG,
