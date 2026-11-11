@@ -9,6 +9,15 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Módulo novo: COHERENCE (COERÊNCIA)** (11 nov., decisão do autor). A
+  ordem que se rompe: escuta uma linha de alturas, mede quanto ela está
+  previsível (1 − entropia de Shannon das últimas notas) e, quando fica
+  ordenada demais por PACIÊNCIA notas seguidas, rompe — um pulso em
+  COLAPSO, a janela esquece a metade mais antiga e vem a cicatriz. Saídas
+  ORDEM, PRESSÃO, COLAPSO, SURPRESA; visor com o histograma das 12 notas,
+  a ordem e a pressão. Família DECISÃO; entra no rack da seed (**as seeds
+  mudam**). Dossiê 72, `test_coherence`.
+
 - **Correções técnicas** (10 nov., aprovadas pelo autor). (1) **Denormais**:
   o grafo processa com FTZ/DAZ ligados (e restaura ao sair) — caudas no
   silêncio não viram números lentos; a régua de qualidade caiu de 53,3 s

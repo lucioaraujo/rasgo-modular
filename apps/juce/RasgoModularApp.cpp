@@ -471,6 +471,17 @@ struct Rack {
                 const auto* depth = graph.lastOutput(id, 0);
                 if (depth && depth->frames() > 0)
                     it->second.pushLanes(depth->at(0, depth->frames() - 1), 0.0f, 0.0f, 0.0f);
+            } else if (graph.node(id).type() == "COHERENCE") {
+                // ordem, pressão e o colapso (máximo do bloco), um por bloco
+                const auto* ord = graph.lastOutput(id, 0);
+                const auto* pres = graph.lastOutput(id, 1);
+                const auto* col = graph.lastOutput(id, 2);
+                if (ord && pres && col && ord->frames() > 0) {
+                    float c = 0.0f;
+                    for (std::size_t i = 0; i < col->frames(); ++i) c = std::max(c, col->at(0, i));
+                    const std::size_t last = ord->frames() - 1;
+                    it->second.pushLanes(ord->at(0, last), pres->at(0, last), c, 0.0f);
+                }
             } else if (graph.node(id).type() == "MIXER") {
                 // PALCO: o lugar de cada canal, um registro por bloco (o
                 // rastro mostra o trajeto dos últimos segundos)
@@ -3946,6 +3957,47 @@ private:
                 }
                 g.setColour(T.accent);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
+                dlabel.clear();
+            } else if (mtype == "COHERENCE") {
+                // As 12 classes de altura da janela (barras), a ORDEM (linha
+                // clara) e a PRESSÃO (linha de destaque) rolando no tempo; um
+                // clarão vertical em cada COLAPSO.
+                const std::size_t nL = rasgo::ui::kLaneLen;
+                const auto* co = dynamic_cast<const rasgo::modular::Coherence*>(&node);
+                const float x0 = static_cast<float>(wx + 2), ww = static_cast<float>(dw - 4);
+                const float hTop = static_cast<float>(wy + 2);
+                const float hBot = static_cast<float>(wy) + static_cast<float>(dh) * 0.48f;
+                if (co) {
+                    const auto h = co->histogram();
+                    int mx = 1;
+                    for (const int v : h) mx = std::max(mx, v);
+                    const float bw = ww / 12.0f;
+                    g.setColour(T.accent.withAlpha(0.75f));
+                    for (int k = 0; k < 12; ++k) {
+                        const float bh = (hBot - hTop) * static_cast<float>(h[static_cast<std::size_t>(k)])
+                                       / static_cast<float>(mx);
+                        g.fillRect(x0 + bw * static_cast<float>(k) + 1.0f, hBot - bh,
+                                   std::max(1.0f, bw - 2.0f), bh);
+                    }
+                }
+                const float lTop = static_cast<float>(wy) + static_cast<float>(dh) * 0.55f;
+                const float lBot = static_cast<float>(wy + dh - 3);
+                auto lx = [&](std::size_t k) { return x0 + ww * static_cast<float>(k) / static_cast<float>(nL - 1); };
+                auto ly = [&](float v) { return lBot - (lBot - lTop) * juce::jlimit(0.0f, 1.0f, v); };
+                for (std::size_t k = 0; k < nL; ++k)
+                    if (sc.lane(2, k) > 0.5f) {
+                        g.setColour(T.warning.withAlpha(0.8f));
+                        g.drawVerticalLine(static_cast<int>(lx(k)), lTop, lBot);
+                    }
+                for (int lane = 0; lane < 2; ++lane) {
+                    juce::Path path;
+                    for (std::size_t k = 0; k < nL; ++k) {
+                        const float px = lx(k), py = ly(sc.lane(static_cast<std::size_t>(lane), k));
+                        if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
+                    }
+                    g.setColour(lane == 0 ? T.textPrimary : T.accent);
+                    g.strokePath(path, juce::PathStrokeType(lane == 0 ? 1.2f : 1.6f));
+                }
                 dlabel.clear();
             } else if (mtype == "MIXER") {
                 // PALCO: o tempo desce; cada canal deixa o rastro do seu

@@ -22,7 +22,15 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Auditoria dos 69 módulos + Cardinal (`dossies/AUDITORIA_modulos_e_cardinal.md`).
 - [x] Instâncias, passos 1–3 (app; partitura/VARIA já por módulo; a seed
   abre cópias: par de OSC, envelope do filtro, contravoz — 36 % das seeds).
-- [ ] Escuta do autor: seeds com cópias (OSC 2, ENVELOPE 2, contravoz).
+- [x] Autor escutou as seeds com cópias (11/11): "os seeds abertos funcionaram bem".
+- [x] COHERENCE (COERÊNCIA), módulo #72 — dossiê, testes, textos nas 4
+  línguas, visor. Escuta do autor junto do uso; papel dedicado na seed
+  (COL → reset do sequenciador / FRASE do PALCO) depois da escuta.
+- [ ] Papéis de cópia ainda fora da seed (11/11, a propor um por vez):
+  kit de DRUM (intertravamento), 2 QUANTIZER (politonalidade), 2 SEQUENCE
+  (phasing), 2 FILTER (série/paralelo), 2 FUNCTION (polimetria na
+  modulação), 2 SPACE/HALL (espaço por voz), 2 ARP/MARKOV (3 vozes),
+  ENVELOPE por voz. Prioridade sugerida: DRUM, QUANTIZER, SEQUENCE.
 - [ ] (quando o autor quiser) liberar um 2º MIXER à mão, como submix:
   conferido em 11/11 que é seguro (MASTER segue único; a seed e o
   equilíbrio usam o primeiro MIXER); é tirar "MIXER" de `isSingletonType`.
