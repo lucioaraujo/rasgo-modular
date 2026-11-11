@@ -1,6 +1,6 @@
 # 74 — LADDER (ESCADA): o filtro do grave
 
-Data: 11/11/2026. Estado: **em implementação** (fila aprovada pelo autor:
+Data: 11/11/2026. Estado: **escutado pelo autor** (11/11: "escutei o ladder, muito bom", com o patch `examples/teste_ladder_acento.rmp`); antes: **em implementação** (fila aprovada pelo autor:
 "aprovo todas… sequencia normal"; "avance"). Origem:
 `PESQUISA_cardinal_baixo_e_osciladores.md` §3 e §8.1 ("a maior lacuna do
 Modular no grave é o ladder") e `AUDITORIA_modulos_e_cardinal.md` (FILTER:

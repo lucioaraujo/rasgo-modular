@@ -1,0 +1,35 @@
+rasgo-modular-patch 1
+node 0 CLOCK bpm=118 mult=4 length=16 fill=5 accent_a=4 accent_b=3 swing=0.1
+node 1 SEQUENCE length=8 gate_len=0.55 range=1 p1=0 g1=1 p2=0 g2=1 p3=1 g3=1 p4=0.25 g4=1 p5=0 g5=1 p6=0.5833 g6=1 p7=0.25 g7=1 p8=0.8333 g8=1
+node 2 QUANTIZER scale=2 root=9 range=1 hysteresis=0
+node 3 OSC freq=55 drift=0
+node 4 LADDER cutoff=160 resonance=0.62 drive=0.4 comp=1 diode=0.7
+node 5 ENVELOPE attack=0.002 decay=0.3 sustain=0.6 release=0.06 curve=0.6 mode=0 vca_depth=1 level=1
+node 6 ENVELOPE attack=0.002 decay=0.22 sustain=0 release=0.05 curve=0.6 mode=1 vca_depth=0 level=1
+node 7 CONTROL scale1=2 scale2=0.35
+node 8 ACCENT metric=0.7 leap=0.5 apex=0.6 external=0.6 agogic=0 synco=0.5 cycle=4 rotate=0 inherit=0.4 suppress=0.3 depth=0.8
+node 9 VCA level1=0 cv1_amount=1
+node 10 MIXER gain1=4 mute2=1 mute3=1 mute4=1
+node 11 MASTER gain=-6 mute=0 limit=1
+node 12 OUT
+cable 0:0 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 2:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 2:2 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 3:0 gain=1 conductance=1 feedback=0 state=intact
+cable 3:2 -> 4:0 gain=1 conductance=1 feedback=0 state=intact
+cable 4:0 -> 5:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 5:1 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 6:1 gain=1 conductance=1 feedback=0 state=intact
+cable 6:1 -> 7:0 gain=1 conductance=1 feedback=0 state=intact
+cable 7:0 -> 4:1 gain=1 conductance=1 feedback=0 state=intact
+cable 8:4 -> 7:1 gain=1 conductance=1 feedback=0 state=intact
+cable 7:1 -> 4:2 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 8:0 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 8:1 gain=1 conductance=1 feedback=0 state=intact
+cable 0:2 -> 8:2 gain=1 conductance=1 feedback=0 state=intact
+cable 8:3 -> 6:2 gain=1 conductance=1 feedback=0 state=intact
+cable 5:0 -> 9:0 gain=1 conductance=1 feedback=0 state=intact
+cable 8:1 -> 9:1 gain=1 conductance=1 feedback=0 state=intact
+cable 9:0 -> 10:0 gain=1 conductance=1 feedback=0 state=intact
+cable 10:0 -> 11:0 gain=1 conductance=1 feedback=0 state=intact
+cable 11:0 -> 12:0 gain=1 conductance=1 feedback=0 state=intact

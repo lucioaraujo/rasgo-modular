@@ -1,0 +1,29 @@
+rasgo-modular-patch 1
+node 0 CLOCK bpm=96 mult=2 length=8 fill=3
+node 1 SEQUENCE length=8 gate_len=0.5 range=1 p1=0 g1=1 p2=0.1667 g2=1 p3=0.25 g3=1 p4=0.4167 g4=1 p5=0.5833 g5=1 p6=0.4167 g6=0 p7=0.25 g7=1 p8=0.1667 g8=1
+node 2 QUANTIZER scale=3 root=2 range=1 hysteresis=0
+node 3 OSC freq=110 drift=0.1
+node 4 ENVELOPE attack=0.005 decay=0.35 sustain=0.3 release=0.2 mode=0
+node 5 BLEFE truthfulness=0.85 window=0.25 memory=0.25 threshold=0.35
+node 6 DRUM tone=180 decay=0.2 snap=0.4
+node 7 STRING freq=220 decay=0.8 damping=0.4
+node 8 MIXER gain1=0 gain2=-3 gain3=-10 pan2=0.35 pan3=-0.35 mute4=1
+node 9 APOCRIFO mode=0 min_age=15 length=1.2 chance=0.5 depth=0.82
+node 10 MASTER gain=-6 mute=0 limit=1
+node 11 OUT
+cable 0:0 -> 1:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:0 -> 2:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 2:2 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 3:0 gain=1 conductance=1 feedback=0 state=intact
+cable 3:1 -> 4:0 gain=1 conductance=1 feedback=0 state=intact
+cable 1:1 -> 4:1 gain=1 conductance=1 feedback=0 state=intact
+cable 4:0 -> 8:0 gain=1 conductance=1 feedback=0 state=intact
+cable 0:1 -> 5:0 gain=1 conductance=1 feedback=0 state=intact
+cable 5:0 -> 6:0 gain=1 conductance=1 feedback=0 state=intact
+cable 5:4 -> 7:1 gain=1 conductance=1 feedback=0 state=intact
+cable 2:0 -> 7:2 gain=1 conductance=1 feedback=0 state=intact
+cable 7:0 -> 8:1 gain=1 conductance=1 feedback=0 state=intact
+cable 6:0 -> 8:2 gain=1 conductance=1 feedback=0 state=intact
+cable 8:0 -> 9:0 gain=1 conductance=1 feedback=0 state=intact
+cable 9:0 -> 10:0 gain=1 conductance=1 feedback=0 state=intact
+cable 10:0 -> 11:0 gain=1 conductance=1 feedback=0 state=intact
