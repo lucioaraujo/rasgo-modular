@@ -278,7 +278,43 @@ void testPanel() {
 
 }  // namespace
 
+
+// CAPT / RESID / ELAST (11/11/2026)
+static std::vector<float> driftField(float elastic, float residue, bool capture) {
+    Drift dr;
+    dr.setParameter("rate", 1.0f); dr.setParameter("depth", 1.0f);
+    dr.setParameter("momentum", 0.7f); dr.setParameter("anchor", capture ? 1.0f : 0.0f);
+    dr.setParameter("elastic", elastic); dr.setParameter("residue", residue);
+    dr.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(6, AudioBlock(48000.0f, 1, 256));
+    AudioBlock cap(48000.0f, 1, 256);
+    std::vector<const AudioBlock*> ins{nullptr, nullptr, capture ? &cap : nullptr};
+    std::vector<float> fld;
+    for (int b = 0; b < int(120.0f * 48000.0f / 256.0f); ++b) {
+        for (std::size_t i = 0; i < 256; ++i) cap.at(0, i) = (b == 400 && i < 64) ? 1.0f : 0.0f;
+        dr.process(ins, out);
+        fld.push_back(out[4].at(0, 255));
+    }
+    return fld;
+}
+static void testDriftExtras() {
+    const auto mola = driftField(0.0f, 0.0f, false), plast = driftField(2.0f, 0.0f, false);
+    double mMean = 0, pMean = 0;
+    for (const float v : mola) mMean += std::fabs(v);
+    for (const float v : plast) pMean += std::fabs(v);
+    mMean /= double(mola.size()); pMean /= double(plast.size());
+    std::cerr << "   |campo| médio: MOLA " << mMean << ", PLÁSTICO " << pMean << "\n";
+    check(pMean > mMean, "PLÁSTICO: sem volta, o campo vai mais longe do repouso");
+    const auto withCap = driftField(0.0f, 0.0f, true);
+    bool fin = true; for (const float v : withCap) if (!std::isfinite(v) || std::fabs(v) > 1.0f) fin = false;
+    check(fin, "CAPT: o marco fixado mantém o campo limitado");
+    const auto a = driftField(0.0f, 0.0f, true), b = driftField(0.0f, 1.0f, true);
+    double diff = 0; for (std::size_t i = 0; i < a.size(); ++i) diff += std::fabs(a[i] - b[i]);
+    check(diff / double(a.size()) > 0.01, "RESID: a volta ao marco não é idêntica");
+}
+
 int main() {
+    testDriftExtras();
     testSlowMovement();
     testDepthZero();
     testRateAffectsEvents();

@@ -199,3 +199,11 @@ com mistura cruzada; `LFO`+`ENV` → entradas, `out → *_mod`. Adicionado
 ao catálogo do painel (`apps/panel/ModuleCatalog.hpp`) — não há família
 ROUTE no catálogo; entra em SEQUENCE junto do `SWITCH`
 (roteamento), ou em MIX. Escolhido **MIX** (é mixer N×M).
+
+## HIST, rotas com história (11/11/2026)
+
+Da auditoria e do Método §4.0 ("rotas que se alargam com o uso").
+- **O desgaste:** cada cruzamento guarda o desgaste da energia que passou (sobe em ~8 s e esquece em ~60 s).
+- **O efeito:** o caminho usado alarga até 1,2×; o abandonado estreita até 0,3×.
+- **HIST 0:** a matriz de sempre.
+- **Teste:** depois de 30 s de uso, o desgaste passa de 0,6; o caminho alarga; após 2 minutos sem uso, a matriz esquece.

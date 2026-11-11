@@ -26,6 +26,12 @@
 //   - multiplexador CD4051 (teoria: 1 de N linhas ligada à comum);
 //   - `mode` de leitura do `SEQUENCE` do Rasgo (forward/pingpong/random).
 
+// SCANNER FANTASMA (11/11/2026; estudo da família §4.5: "o SWITCH lendo ao
+// mesmo tempo o endereço presente e um residual atrasado"; "avance em todos
+// eles"): o SWITCH lembra os últimos endereços. FANT (saída) lê a entrada do
+// endereço de ATRAS passos antes (1–3) — o lugar onde o scanner esteve. FANT
+// (knob) mistura esse resíduo no OA: o presente carrega um pouco do passado,
+// como um scanner que deixa rastro. FANT 0: o OA de sempre.
 namespace rasgo::modular {
 
 class Switch final : public Signal {
@@ -43,25 +49,30 @@ public:
                {"step", PortKind::Control, ""},
                {"out_b", PortKind::Audio, ""},
                {"out_c", PortKind::Audio, ""},
-               {"out_d", PortKind::Audio, ""}},
+               {"out_d", PortKind::Audio, ""},
+               {"ghost_out", PortKind::Audio, ""}},
               {{"steps", 2.0f, 4.0f, 4.0f, ""},
                {"mode", 0.0f, 3.0f, 0.0f, ""},
                {"dir", 0.0f, 1.0f, 0.0f, ""},
                {"glide", 0.0f, 1.0f, 0.0f, ""},
-               {"slew", 0.0f, 1.0f, 0.1f, ""}}) {}
+               {"slew", 0.0f, 1.0f, 0.1f, ""},
+               {"ghost", 0.0f, 1.0f, 0.0f, ""},
+               {"ghost_lag", 1.0f, 3.0f, 1.0f, ""}}) {}
 
     std::string type() const override { return "SWITCH"; }
 
     Panel panel() const override {
         Panel p;
-        p.hp = 12;
+        p.hp = 14;   // 12 → 14 HP em 11/11/2026: FANT e ATRAS
         p.add(Widget::Kind::Label, "SWITCH", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pos", "", 2.5f, 6.0f, 56.0f);
+        p.add(Widget::Kind::Display, "pos", "", 2.5f, 6.0f, 66.1f);
         p.add(Widget::Kind::Knob, "STEP", "steps", 8.0f, 28.0f);
         p.add(Widget::Kind::Knob, "MODE", "mode", 28.0f, 28.0f);
         p.add(Widget::Kind::Knob, "GLID", "glide", 8.0f, 46.0f);
         p.add(Widget::Kind::Knob, "SLEW", "slew", 28.0f, 46.0f);
         p.add(Widget::Kind::Toggle, "DEMUX", "dir", 46.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "ATRAS", "ghost_lag", 46.0f, 46.0f);
+        p.add(Widget::Kind::Knob, "FANT", "ghost", 60.0f, 46.0f);
         p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 66.0f);
         p.add(Widget::Kind::Jack, "B", "in:b", 19.0f, 66.0f);
         p.add(Widget::Kind::Jack, "C", "in:c", 31.0f, 66.0f);
@@ -74,6 +85,7 @@ public:
         p.add(Widget::Kind::Jack, "OC", "out:out_c", 31.0f, 110.0f);
         p.add(Widget::Kind::Jack, "OD", "out:out_d", 43.0f, 110.0f);
         p.add(Widget::Kind::Jack, "STP", "out:step", 55.0f, 110.0f);
+        p.add(Widget::Kind::Jack, "FANT", "out:ghost_out", 55.0f, 86.0f);
         return p;
     }
 
@@ -100,6 +112,8 @@ public:
             static_cast<int>(std::lround(parameterValue("steps"))), 2, 4);
         const int mode = clampi(
             static_cast<int>(std::lround(parameterValue("mode"))), 0, 3);
+        const float ghost = clamp01(parameterValue("ghost"));
+        const int lag = clampi(static_cast<int>(std::lround(parameterValue("ghost_lag"))), 1, 3);
         const bool demux = parameterValue("dir") >= 0.5f;
         const float glide = clamp01(parameterValue("glide"));
         const float slew = clamp01(parameterValue("slew"));
@@ -150,6 +164,11 @@ public:
                 prevClock_ = hi;
             }
 
+            if (pos_ != histPos_[0]) {   // o scanner andou: guarda o rastro
+                histPos_[3] = histPos_[2]; histPos_[2] = histPos_[1];
+                histPos_[1] = histPos_[0]; histPos_[0] = pos_;
+            }
+            const int ghostPos = clampi(histPos_[lag], 0, steps - 1);
             if (demux) {
                 // 1→N: `a` vai pro passo atual; as outras deslizam pra 0
                 const float src = in[0] != nullptr ? in[0]->at(0, f) : 0.0f;
@@ -164,7 +183,10 @@ public:
                     in[prevPos_] != nullptr ? in[prevPos_]->at(0, f) : 0.0f;
                 const float mix =
                     xfade_ > 0.0f ? sel + (prv - sel) * xfade_ : sel;
-                out_[0] += (mix - out_[0]) * slewCoef;
+                const float gsrc = in[ghostPos] != nullptr ? in[ghostPos]->at(0, f) : 0.0f;
+                ghostOut_ += (gsrc - ghostOut_) * slewCoef;
+                const float withGhost = ghost > 0.0f ? mix * (1.0f - 0.5f * ghost) + gsrc * 0.5f * ghost : mix;
+                out_[0] += (withGhost - out_[0]) * slewCoef;
                 for (int k = 1; k < 4; ++k) out_[k] += (0.0f - out_[k]) * slewCoef;
             }
             xfade_ -= xfDecay;
@@ -178,6 +200,7 @@ public:
                 outputs[2].at(c, f) = out_[1];
                 outputs[3].at(c, f) = out_[2];
                 outputs[4].at(c, f) = out_[3];
+                if (outputs.size() > 5) outputs[5].at(c, f) = ghostOut_;
             }
         }
     }
@@ -219,6 +242,8 @@ private:
 
     float sr_ = 48000.0f;
     float dt_ = 1.0f / 48000.0f;
+    int histPos_[4] = {0, 0, 0, 0};   // o rastro do scanner (0 = agora)
+    float ghostOut_ = 0.0f;
     int pos_ = 0;
     int prevPos_ = 0;
     int ppDir_ = 1;

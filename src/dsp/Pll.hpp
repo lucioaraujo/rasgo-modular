@@ -65,6 +65,14 @@
 // Determinístico sem referência (RNG nenhum). Sem alocação em
 // `process()`.
 
+// QUASE-ENCONTRO (11/11/2026; estudo da família §4.5: "o evento quando as
+// frequências se aproximam ou se afastam, sem corrigir a afinação"; "avance em
+// todos eles"): o PLL mede o BATIMENTO entre a sua fase e a esperada (a
+// velocidade do erro de fase, suavizada em ~0,15 s). ENC pulsa quando o
+// batimento fica mais lento que PERTO (Hz) — as frequências se encontram;
+// SEP pulsa quando ele volta a passar de 2 × PERTO — elas se afastam. BAT é o
+// batimento como CV (1 = juntas, 0 = 10 Hz ou mais). Com LOCK em 0 é
+// observação pura: nada corrige a afinação.
 namespace rasgo::modular {
 
 class Pll final : public Signal {
@@ -76,7 +84,10 @@ public:
                {"ref", PortKind::Audio, ""}},
               {{"out", PortKind::Audio, ""},
                {"ring", PortKind::Audio, ""},
-               {"lock", PortKind::Control, ""}},
+               {"lock", PortKind::Control, ""},
+               {"meet", PortKind::Control, "trig"},
+               {"part", PortKind::Control, "trig"},
+               {"beat", PortKind::Control, ""}},
               {{"freq", 8.0f, 8000.0f, 220.0f, "Hz"},
                {"fine", -100.0f, 100.0f, 0.0f, "cent"},
                {"shape", 0.0f, 3.0f, 1.0f, ""},
@@ -84,7 +95,8 @@ public:
                {"lock_gain", 0.0f, 1.0f, 0.35f, ""},
                {"fm_amount", 0.0f, 1.0f, 0.0f, ""},
                {"feedback_amount", 0.0f, 1.0f, 0.0f, ""},
-               {"feedback_type", 0.0f, 5.0f, 0.0f, ""}}) {}
+               {"feedback_type", 0.0f, 5.0f, 0.0f, ""},
+               {"near_hz", 0.1f, 10.0f, 1.0f, "Hz"}}) {}
 
     std::string type() const override { return "PLL"; }
 
@@ -108,6 +120,10 @@ public:
         p.add(Widget::Kind::Jack, "OUT", "out:out", 41.0f, 96.0f);
         p.add(Widget::Kind::Jack, "RING", "out:ring", 53.0f, 96.0f);
         p.add(Widget::Kind::Jack, "LOCK", "out:lock", 65.0f, 96.0f);
+        p.add(Widget::Kind::Knob, "PERTO", "near_hz", 52.0f, 52.0f);
+        p.add(Widget::Kind::Jack, "ENC", "out:meet", 41.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "SEP", "out:part", 53.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "BAT", "out:beat", 65.0f, 114.0f);
         return p;
     }
 
@@ -123,6 +139,12 @@ public:
         AudioBlock& out = outputs[0];
         AudioBlock& ring = outputs[1];
         AudioBlock& lock = outputs[2];
+        AudioBlock* meetOut = outputs.size() > 3 ? &outputs[3] : nullptr;
+        AudioBlock* partOut = outputs.size() > 4 ? &outputs[4] : nullptr;
+        AudioBlock* beatOut = outputs.size() > 5 ? &outputs[5] : nullptr;
+        const float nearHz = clampf(parameterValue("near_hz"), 0.1f, 10.0f);
+        const float beatCoef = 1.0f - std::exp(-1.0f / (0.15f * sampleRate_));
+        const int pulseLen = std::max(1, static_cast<int>(0.005f * sampleRate_));
         const std::size_t frames = out.frames();
         const std::size_t channels = out.channels();
 
@@ -169,6 +191,13 @@ public:
                 // efetiva se afastava da referência em vez de travar).
                 float phaseError = static_cast<float>(phase_) - expected;
                 phaseError -= std::round(phaseError);  // [-0,5, 0,5)
+                // o batimento: quanto o erro de fase anda por amostra
+                float dErr = phaseError - prevErr_;
+                dErr -= std::round(dErr);
+                prevErr_ = phaseError;
+                beatHz_ += (std::fabs(dErr) * sampleRate_ - beatHz_) * beatCoef;
+                if (!near_ && beatHz_ < nearHz) { near_ = true; meetLeft_ = pulseLen; }
+                else if (near_ && beatHz_ > 2.0f * nearHz) { near_ = false; partLeft_ = pulseLen; }
                 correction = clampf(phaseError * lockGain * 3.0f, -0.9f, 0.9f);
                 lockAmount = clampf(1.0f - std::fabs(phaseError) * 2.0f, 0.0f, 1.0f);
             }
@@ -196,7 +225,13 @@ public:
                 out.at(c, frame) = wave;
                 ring.at(c, frame) = ringV;
                 lock.at(c, frame) = lockAmount;
+                if (meetOut) meetOut->at(c, frame) = meetLeft_ > 0 ? 1.0f : 0.0f;
+                if (partOut) partOut->at(c, frame) = partLeft_ > 0 ? 1.0f : 0.0f;
+                if (beatOut) beatOut->at(c, frame) = hasRef
+                    ? clampf(1.0f - beatHz_ / 10.0f, 0.0f, 1.0f) : 0.0f;
             }
+            if (meetLeft_ > 0) --meetLeft_;
+            if (partLeft_ > 0) --partLeft_;
 
             phase_ += dp;
             phase_ -= std::floor(phase_);
@@ -260,6 +295,10 @@ private:
     double phase_ = 0.0;
     float prevOut_ = 0.0f;
     float capacitor_ = 0.0f;
+    // quase-encontro
+    float prevErr_ = 0.0f, beatHz_ = 100.0f;
+    bool near_ = false;
+    int meetLeft_ = 0, partLeft_ = 0;
 };
 
 }  // namespace rasgo::modular

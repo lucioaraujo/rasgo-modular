@@ -54,3 +54,14 @@ aleatório ainda — só via paleta); painel compila, não testado
 visualmente.
 
 **Não commitado.**
+
+## MODO: RÖSSLER e AIZAWA (11/11/2026)
+
+Da auditoria ("mais atratores como modos").
+- **Os modos:**
+  - **RÖSSLER:** a = 0,1 + 0,2·DAMP, b = 0,2, c = 3 + 5·DRIVE. O DRIVE anda pela rota de duplicação de período.
+  - **AIZAWA:** ε = 0,1 + 0,4·DRIVE.
+- **A integração:** RK2 em 4 subpassos; RATE dá cerca de uma volta por segundo em 1.
+- **Saídas novas:** Y e Z.
+- **MODO 0:** o poço de sempre.
+- **Teste:** limitados e vivos nas três dimensões; com DRIVE 0, 1 máximo distinto; com DRIVE 0,54 (c ≈ 5,7), 8 máximos (o caos).

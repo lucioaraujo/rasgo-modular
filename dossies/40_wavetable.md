@@ -177,3 +177,11 @@ Cadeias canônicas: `SEQUENCE → QUANTIZER → WAVETABLE → FILTER`;
 `ENVELOPE.env → WAVETABLE.pos` (a forma abre com a nota);
 `AUDIO-IN → WAVETABLE.capture`, `CLOCK → WAVETABLE.grab` (tabela viva
 que se renova no compasso).
+
+## DEF e MODO (11/11/2026)
+
+Da auditoria ("modos de deformação da tabela").
+- **DOBRA:** sin(π/2·(1+3·DEF)·y).
+- **RASGO:** a cada ciclo, a leitura salta até ±¼ de ciclo × DEF, com a troca nos primeiros 3 % do ciclo.
+- **DEF 0:** bit a bit igual ao de antes.
+- **Teste:** com RASGO, a diferença ciclo a ciclo vai de 0,003 para 0,14, e o maior salto fica em 0,21 (0,20 sem deformação).

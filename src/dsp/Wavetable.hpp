@@ -32,6 +32,15 @@
 // band-limited (aliasing em afinação alta = caráter aceito).
 //
 // `prepare()` aloca ~1 MB e gera as tabelas; `process()` não aloca.
+//
+// DEF + MODO (11/11/2026, auditoria: "modos de deformação da tabela (dobra,
+// espelho, 'rasgo' da tabela)"; "avance em todos eles"):
+//   0 DOBRA — a forma lida é dobrada sobre si: sin(π/2·(1 + 3·DEF)·y);
+//   1 RASGO — a cada ciclo a leitura salta para outro ponto da tabela
+//             (desvio de até ±¼ de ciclo × DEF, semeado); a troca se faz nos
+//             primeiros 3 % do ciclo (transição), sem estalo. O mesmo
+//             princípio do TEAR do SHAPE, na tabela.
+// DEF 0: o WAVETABLE de sempre.
 
 namespace rasgo::modular {
 
@@ -55,7 +64,9 @@ public:
                {"pos", 0.0f, 1.0f, 0.0f, ""},
                {"warp", 0.0f, 1.0f, 0.0f, ""},
                {"fm_amount", 0.0f, 1.0f, 0.0f, ""},
-               {"drift", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"drift", 0.0f, 1.0f, 0.0f, ""},
+               {"deform", 0.0f, 1.0f, 0.0f, ""},
+               {"deform_mode", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "WAVETABLE"; }
 
@@ -70,6 +81,8 @@ public:
         p.add(Widget::Kind::Knob, "WARP", "warp", 52.0f, 30.0f);
         p.add(Widget::Kind::Knob, "FM", "fm_amount", 7.0f, 54.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 22.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "DEF", "deform", 37.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "MODO", "deform_mode", 52.0f, 54.0f);
         p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 8.0f, 94.0f);
         p.add(Widget::Kind::Jack, "POS", "in:pos", 22.0f, 94.0f);
         p.add(Widget::Kind::Jack, "FM", "in:fm", 36.0f, 94.0f);
@@ -110,6 +123,8 @@ public:
         const float warp = clamp01(parameterValue("warp"));
         const float fmAmt = clamp01(parameterValue("fm_amount"));
         const float drift = clamp01(parameterValue("drift"));
+        const float deform = clamp01(parameterValue("deform"));
+        const bool tearMode = parameterValue("deform_mode") >= 0.5f;
         const float nyq = 0.5f / dt_;
 
         const AudioBlock* pitchIn = inputs[0];
@@ -151,7 +166,12 @@ public:
             f0 = clampf(f0, 0.01f, nyq * 0.9f);
 
             phase_ += f0 * dt_;
+            const bool wrapped = phase_ >= 1.0f;
             phase_ -= std::floor(phase_);
+            if (wrapped && deform > 0.0f && tearMode) {
+                prevShift_ = shift_;
+                shift_ = deform * 0.25f * noiseTear();
+            }
             const float wp = warpPhase(phase_, warp);
 
             // ---- mip: harmônica máxima do mip · f0 < Nyquist ----
@@ -170,9 +190,27 @@ public:
             if (s0 > maxSlot - 1) s0 = maxSlot - 1;
             const float sf = slot - static_cast<float>(s0);
 
-            const float a = readFrame(s0, mip, wp);
-            const float b = readFrame(s0 + 1, mip, wp);
-            const float y = a + (b - a) * sf;
+            auto readAt = [&](const float ph) noexcept {
+                const float a = readFrame(s0, mip, ph);
+                const float b = readFrame(s0 + 1, mip, ph);
+                return a + (b - a) * sf;
+            };
+            float y;
+            if (deform > 0.0f && tearMode) {
+                auto wrap01 = [](const float v) { return v - std::floor(v); };
+                const float yNew = readAt(wrap01(wp + shift_));
+                if (phase_ < 0.03f) {
+                    const float yOld = readAt(wrap01(wp + prevShift_));
+                    const float r = phase_ / 0.03f;
+                    y = yOld + (yNew - yOld) * r;
+                } else {
+                    y = yNew;
+                }
+            } else {
+                y = readAt(wp);
+                if (deform > 0.0f)
+                    y = std::sin(1.5707963f * (1.0f + 3.0f * deform) * y);
+            }
 
             for (std::size_t c = 0; c < channels; ++c) out.at(c, f) = y;
         }
@@ -183,6 +221,14 @@ private:
         return v < lo ? lo : (v > hi ? hi : v);
     }
     static float clamp01(const float v) noexcept { return clampf(v, 0.0f, 1.0f); }
+
+    float noiseTear() noexcept {
+        tearRng_ ^= tearRng_ >> 12; tearRng_ ^= tearRng_ << 25; tearRng_ ^= tearRng_ >> 27;
+        return static_cast<float>(static_cast<std::int32_t>((tearRng_ * 0x2545F4914F6CDD1DULL) >> 32))
+             / 2147483648.0f;
+    }
+    float shift_ = 0.0f, prevShift_ = 0.0f;
+    std::uint64_t tearRng_ = 0xA0761D6478BD642FULL;
 
     // xorshift* → [−1,1)
     float noise() noexcept {

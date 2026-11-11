@@ -19,6 +19,26 @@ pronto.
     passagem por zero.
   - Tudo novo vem desligado ou em saídas novas.
 
+- **Lote final da fila** (11 nov., "avance em todos eles").
+  - **Sete módulos novos**, que entram no rack da seed (**as seeds
+    mudam**):
+    - EPICYCLE (#81), círculos de Fourier;
+    - POLYGON (#82), polímetro como figura;
+    - VIA (#83), as portas do Antitotem para qualquer cabo, mais o
+      alto-falante;
+    - RELATE (#84), os atos entre duas vozes;
+    - CUT-UP (#85), o recorte do Navalha ao vivo;
+    - BUDGET (#86), o orçamento de eventos;
+    - INTERPRET (#87), o intérprete com CHARACTER.
+  - **Sete melhorias** (tudo novo vem desligado):
+    - CHAOS: RÖSSLER e AIZAWA, com Y e Z;
+    - WAVETABLE: DOBRA e RASGO da tabela;
+    - MATRIX: HIST, rotas com história;
+    - DRIFT: CAPT, RESID e ELAST;
+    - PLL: o quase-encontro (ENC, SEP, BAT);
+    - SWITCH: o scanner fantasma;
+    - SEQUENCE: CURSOR e FADIGA.
+
 - **Lote da seed e do manuseio** (11 nov., aprovado pelo autor).
   - **REGRAS da seed.**
     - Garantia de limite: cinco papéis de ruptura (citação, ruptura da

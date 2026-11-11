@@ -159,3 +159,13 @@ RANGE + jacks). Testado isolado (as cinco leituras, gate, eos, glide,
 determinismo) antes do patch. Numa peça: `CLOCK → SEQUENCE`,
 `pitch → QUANTIZER → STRING`, `eos → HARMONY.advance` — uma frase escrita
 que a leitura e a harmonia fazem evoluir.
+
+## CURSOR e FADIGA (11/11/2026)
+
+Do estudo da família §4.5b (aprovados).
+- **MODE 5, CURSOR:** um corpo que anda pelos passos. FORÇA muda a velocidade perto de ALVO: freia, quando atrator; acelera, quando repelente. INÉRCIA guarda a velocidade.
+  - A 1ª versão somava uma força e travava o cursor a 1,2 passo do ALVO; agora ele se demora, mas sai.
+- **FADIGA:** cada passo que toca se cansa (+0,25, ×0,9 por pulso) e, cansado demais, cala nessa vez.
+- **Teste:**
+  - o ALVO recebe 48 visitas com o atrator, 20 no modo adiante e 14 com o repelente;
+  - em 2 passos e 40 pulsos, a FADIGA dá 16 pausas.

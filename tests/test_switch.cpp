@@ -306,7 +306,31 @@ void testPanel() {
 
 }  // namespace
 
+
+// SCANNER FANTASMA (11/11/2026): FANT lê o endereço de ATRAS passos antes
+static void testGhost() {
+    Switch s;
+    s.setParameter("steps", 4.0f); s.setParameter("slew", 0.0f); s.setParameter("ghost_lag", 1.0f);
+    s.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(6, AudioBlock(48000.0f, 1, 256));
+    AudioBlock a(48000.0f, 1, 256), b(48000.0f, 1, 256), c(48000.0f, 1, 256), d(48000.0f, 1, 256), clk(48000.0f, 1, 256);
+    for (std::size_t i = 0; i < 256; ++i) { a.at(0, i) = 0.1f; b.at(0, i) = 0.2f; c.at(0, i) = 0.3f; d.at(0, i) = 0.4f; }
+    std::vector<const AudioBlock*> ins{&a, &b, &c, &d, &clk, nullptr, nullptr};
+    float lastOut = 0, lastGhost = 0;
+    for (int step = 0; step < 3; ++step) {        // três avanços: A → B → C → D
+        for (int blk = 0; blk < 40; ++blk) {
+            for (std::size_t i = 0; i < 256; ++i) clk.at(0, i) = (blk == 0 && i < 32) ? 1.0f : 0.0f;
+            s.process(ins, out);
+        }
+        lastOut = out[0].at(0, 255); lastGhost = out[5].at(0, 255);
+    }
+    std::cerr << "   FANT: OA " << lastOut << ", FANT " << lastGhost << "\n";
+    check(std::fabs(lastOut - 0.4f) < 0.02f && std::fabs(lastGhost - 0.3f) < 0.02f,
+          "FANT: o presente em D, o fantasma no passo de antes (C)");
+}
+
 int main() {
+    testGhost();
     testForwardCycles();
     testPingpong();
     testRandom();

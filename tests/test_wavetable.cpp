@@ -233,7 +233,43 @@ void testPanel() {
 
 }  // namespace
 
+
+// DEF (11/11/2026): 0 = o de antes; DOBRA traz harmônicos; RASGO muda a
+// forma ciclo a ciclo sem estalo
+static std::vector<float> wtRender(float deform, float mode) {
+    Wavetable w;
+    w.setParameter("freq", 220.0f); w.setParameter("pos", 0.5f);
+    w.setParameter("deform", deform); w.setParameter("deform_mode", mode);
+    w.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(1, AudioBlock(48000.0f, 1, 256));
+    std::vector<const AudioBlock*> ins{nullptr, nullptr, nullptr, nullptr, nullptr};
+    std::vector<float> y;
+    for (int b = 0; b < 200; ++b) { w.process(ins, out); for (std::size_t i = 0; i < 256; ++i) y.push_back(out[0].at(0, i)); }
+    return y;
+}
+static void testDeform() {
+    const auto a = wtRender(0.0f, 0.0f), b = wtRender(0.0f, 1.0f);
+    bool same = a.size() == b.size();
+    for (std::size_t i = 0; same && i < a.size(); ++i) same = a[i] == b[i];
+    check(same, "DEF 0: o WAVETABLE de antes");
+    const auto fold = wtRender(0.8f, 0.0f);
+    double dfold = 0; for (std::size_t i = 0; i < a.size(); ++i) dfold += std::fabs(fold[i] - a[i]);
+    check(dfold / double(a.size()) > 0.05, "DOBRA: a forma muda");
+    const auto tear = wtRender(1.0f, 1.0f);
+    const std::size_t per = 218;
+    double dc = 0, d0 = 0; float jump = 0, jump0 = 0;
+    for (std::size_t i = 1; i + per < tear.size(); ++i) {
+        dc += std::fabs(tear[i + per] - tear[i]); d0 += std::fabs(a[i + per] - a[i]);
+        jump = std::max(jump, std::fabs(tear[i] - tear[i - 1])); jump0 = std::max(jump0, std::fabs(a[i] - a[i - 1]));
+    }
+    std::cerr << "   RASGO: ciclo a ciclo " << dc / double(tear.size()) << " (DEF 0: " << d0 / double(a.size())
+              << "), maior salto " << jump << " (DEF 0: " << jump0 << ")\n";
+    check(dc > 5.0 * d0 + 1e-3, "RASGO: cada ciclo lê outro ponto da tabela");
+    check(jump < 2.0f * jump0 + 0.05f, "RASGO: a troca não estala");
+}
+
 int main() {
+    testDeform();
     testSineAtPos1();
     testSawAtPos0();
     testRecipeFrames();

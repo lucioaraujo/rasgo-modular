@@ -73,3 +73,11 @@ limitadas e finitas; `RING` fica em 0 sem `REF`; determinismo; grafo
 em seed aleatório ainda). Painel compila, não testado visualmente.
 
 **Não commitado.**
+
+## Quase-encontro (11/11/2026)
+
+Do estudo da família §4.5.
+- **A medida:** o PLL mede o batimento, a velocidade do erro de fase suavizada em 0,15 s.
+- **As saídas:** ENC quando o batimento cai abaixo de PERTO; SEP quando passa de 2 × PERTO; BAT como CV.
+- **Sem correção:** com LOCK em 0, é observação pura.
+- **Teste:** uma referência que desliza de 214 a 226 Hz, passando por 220, dá um ENC e um SEP.

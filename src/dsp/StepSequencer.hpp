@@ -28,6 +28,19 @@
 //
 // Determinístico: xorshift64* semeado em prepare() (modos random/brown).
 // Avança por `clock` externo OU relógio interno em `rate`.
+//
+// CURSOR e FADIGA (11/11/2026; estudo da família §4.5b, aprovados: "um modo de
+// cursor físico (inércia, atrator, repelente) e a fadiga por passo"; "avance
+// em todos eles"). Conceitos do Antitotem (mesmo autor), não código.
+//   - MODE 5 CURSOR: a leitura é um corpo que anda pelos passos — a cada
+//     pulso, um empurrão para a frente + a força de FORÇA na direção de ALVO
+//     (positiva = atrator: o cursor se demora perto do alvo; negativa =
+//     repelente: foge dele); INÉRCIA guarda a velocidade de um pulso a outro
+//     (0 = cada pulso decide sozinho; 1 = embalado). O passo tocado é onde o
+//     corpo está.
+//   - FADIGA (0–1): cada passo que toca se cansa (+0,25, descansando ×0,9 a
+//     cada pulso); cansado demais, ele cala nessa vez — a repetição gasta.
+//     Em qualquer modo. FADIGA 0: o de sempre.
 
 namespace rasgo::modular {
 
@@ -42,11 +55,15 @@ public:
                {"gate", PortKind::Control, "gate"},
                {"eos", PortKind::Control, "gate"}},
               {{"length", 1.0f, 8.0f, 8.0f, ""},
-               {"mode", 0.0f, 4.0f, 0.0f, ""},
+               {"mode", 0.0f, 5.0f, 0.0f, ""},
                {"rate", 0.01f, 40.0f, 4.0f, "Hz"},
                {"gate_len", 0.05f, 0.95f, 0.5f, ""},
                {"glide", 0.0f, 1.0f, 0.0f, ""},
                {"range", 0.0f, 2.0f, 1.0f, "oct"},
+               {"inertia", 0.0f, 1.0f, 0.5f, ""},
+               {"attract", -1.0f, 1.0f, 0.0f, ""},
+               {"target", 1.0f, 8.0f, 1.0f, ""},
+               {"fatigue", 0.0f, 1.0f, 0.0f, ""},
                {"p1", -1.0f, 1.0f, 0.0f, ""}, {"g1", 0.0f, 1.0f, 1.0f, ""},
                {"p2", -1.0f, 1.0f, 0.25f, ""}, {"g2", 0.0f, 1.0f, 1.0f, ""},
                {"p3", -1.0f, 1.0f, 0.5f, ""}, {"g3", 0.0f, 1.0f, 0.0f, ""},
@@ -78,6 +95,10 @@ public:
         p.add(Widget::Kind::Knob, "GATE", "gate_len", 56.0f, 80.0f);
         p.add(Widget::Kind::Knob, "GLIDE", "glide", 72.0f, 80.0f);
         p.add(Widget::Kind::Knob, "RANGE", "range", 88.0f, 80.0f);
+        p.add(Widget::Kind::Knob, "INERC", "inertia", 40.0f, 98.0f);
+        p.add(Widget::Kind::Knob, "FORCA", "attract", 56.0f, 98.0f);
+        p.add(Widget::Kind::Knob, "ALVO", "target", 72.0f, 98.0f);
+        p.add(Widget::Kind::Knob, "FADIG", "fatigue", 88.0f, 98.0f);
         p.add(Widget::Kind::Jack, "CLK", "in:clock", 5.0f, 104.0f);
         p.add(Widget::Kind::Jack, "RST", "in:reset", 17.0f, 104.0f);
         p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 5.0f, 117.0f);
@@ -88,6 +109,8 @@ public:
 
     void prepare(const float sampleRate, const std::size_t blockSize) override {
         Signal::prepare(sampleRate, blockSize);
+        x_ = 0.0f; v_ = 0.0f; restNow_ = false;
+        for (auto& fa : fatigue_) fa = 0.0f;
         phase_ = 0.0;
         idx_ = 0;
         dir_ = 1;
@@ -112,7 +135,11 @@ public:
         const int length = clampi(
             static_cast<int>(std::lround(parameterValue("length"))), 1, 8);
         const int mode = clampi(
-            static_cast<int>(std::lround(parameterValue("mode"))), 0, 4);
+            static_cast<int>(std::lround(parameterValue("mode"))), 0, 5);
+        inertia_ = std::fmin(1.0f, std::fmax(0.0f, parameterValue("inertia")));
+        attract_ = std::fmin(1.0f, std::fmax(-1.0f, parameterValue("attract")));
+        target_ = static_cast<float>(clampi(static_cast<int>(std::lround(parameterValue("target"))), 1, 8) - 1);
+        fatigueK_ = std::fmin(1.0f, std::fmax(0.0f, parameterValue("fatigue")));
         const float rate = parameterValue("rate");
         const float gateLen = parameterValue("gate_len");
         const float glide = parameterValue("glide");
@@ -172,7 +199,14 @@ public:
             else
                 pitch_ += (target - pitch_) * glideCoeff;
 
-            const bool stepGateOn = parameterValue(gateParam(idx_)) >= 0.5f;
+            if (stepped && fatigueK_ > 0.0f) {
+                for (auto& fa : fatigue_) fa *= 0.9f;
+                restNow_ = fatigue_[static_cast<std::size_t>(idx_)] * fatigueK_ > 0.5f;
+                if (!restNow_) fatigue_[static_cast<std::size_t>(idx_)] += 0.25f;
+            } else if (fatigueK_ <= 0.0f) {
+                restNow_ = false;
+            }
+            const bool stepGateOn = parameterValue(gateParam(idx_)) >= 0.5f && !restNow_;
             float gate = 0.0f;
             if (stepGateOn) {
                 if (externalClock) {
@@ -245,6 +279,21 @@ private:
             idx_ = static_cast<int>(uniform01() * static_cast<float>(length))
                 % length;
             break;
+        case 5: {  // CURSOR: um corpo com inércia que se demora ou foge
+            float dx = target_ - x_;            // o caminho mais curto no ciclo
+            const float L = static_cast<float>(length);
+            dx -= L * std::round(dx / L);
+            // perto do ALVO, o atrator freia (até 0,2 passo por pulso: demora-se,
+            // mas sai) e o repelente acelera (até 1,8: passa por cima)
+            const float near = std::exp(-0.5f * dx * dx);
+            const float want = 1.0f - 0.8f * attract_ * near;
+            v_ = v_ * inertia_ + want * (1.0f - inertia_);
+            v_ = std::fmin(2.0f, std::fmax(0.1f, v_));
+            x_ += v_;
+            x_ -= L * std::floor(x_ / L);
+            idx_ = static_cast<int>(x_) % length;
+            break;
+        }
         case 4:  // brownian
         default: {
             const float r = uniform01();
@@ -255,6 +304,10 @@ private:
         }
     }
 
+    float x_ = 0.0f, v_ = 0.0f;          // CURSOR
+    float inertia_ = 0.5f, attract_ = 0.0f, target_ = 0.0f, fatigueK_ = 0.0f;
+    float fatigue_[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    bool restNow_ = false;
     double phase_ = 0.0;
     int idx_ = 0;
     int dir_ = 1;
