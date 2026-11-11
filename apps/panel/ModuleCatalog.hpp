@@ -88,6 +88,9 @@
 #include "dsp/CutUp.hpp"
 #include "dsp/Budget.hpp"
 #include "dsp/Interpret.hpp"
+#include "dsp/Supply.hpp"
+#include "dsp/Magnet.hpp"
+#include "dsp/Orbit.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -143,6 +146,9 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "CUTUP")      return std::make_unique<CutUp>();
     if (t == "BUDGET")     return std::make_unique<Budget>();
     if (t == "INTERPRET")  return std::make_unique<Interpret>();
+    if (t == "SUPPLY")     return std::make_unique<Supply>();
+    if (t == "MAGNET")     return std::make_unique<Magnet>();
+    if (t == "ORBIT")      return std::make_unique<Orbit>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "MOUSSE")     return std::make_unique<Mousse>();
@@ -239,7 +245,7 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "INTERPRET", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE"}},

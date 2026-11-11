@@ -19,6 +19,15 @@ pronto.
     passagem por zero.
   - Tudo novo vem desligado ou em saídas novas.
 
+- **Módulos novos: MAGNET (#89) e ORBIT (#90)** (11 nov., decisão do autor:
+  "magnet e orbit entram"; rascunhos de 9/11 lidos por inteiro). MAGNET é a
+  grade de ímãs de Ising, com a transição de fase audível; ORBIT são planetas
+  em gravidade (leapfrog, a energia não deriva), com conjunção e periélio.
+  Família MODULATE; entram na seed.
+- **Módulo novo: SUPPLY (#88)** (11 nov., decisão do autor: "módulo com
+  cabos"). A alimentação variável: a carga faz o trilho ceder; as derivas
+  desencontram as vozes com o trilho baixo; FALHA marca o apagão. Família
+  MODULATE; entra na seed.
 - **Lote final da fila** (11 nov., "avance em todos eles").
   - **Sete módulos novos**, que entram no rack da seed (**as seeds
     mudam**):
