@@ -20,8 +20,9 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   latência na bateria (ca88a80), MATTER finito com FM de áudio (57ad708).
   95/95 testes; app recompilado em 11/11 00:00.
 - [x] Auditoria dos 69 módulos + Cardinal (`dossies/AUDITORIA_modulos_e_cardinal.md`).
-- [x] Instâncias, passos 1–2 (app; partitura/VARIA já por módulo). Falta
-  o passo 3: a seed abrir cópias — desenho a mostrar ao autor.
+- [x] Instâncias, passos 1–3 (app; partitura/VARIA já por módulo; a seed
+  abre cópias: par de OSC, envelope do filtro, contravoz — 36 % das seeds).
+- [ ] Escuta do autor: seeds com cópias (OSC 2, ENVELOPE 2, contravoz).
 - [x] Estalos nas trocas corrigidos (8b92226); aliasing medido — só o
   OPERATOR pedia (sobreamostragem 4×, decisão do autor).
 

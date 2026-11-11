@@ -50,6 +50,34 @@ SignalGraph rack() {
 
 std::uint64_t seedN(int i) { return static_cast<std::uint64_t>(i) * 0x9E3779B97F4A7C15ULL; }
 
+// 1b. o mesmo, COM as cópias (instâncias, 11/11/2026): o par fixo de cópias
+// nasce na primeira seed e é reusado — rack usado e rack novo iguais
+void testCliquesSeguidosComCopias() {
+    const rasgo::panel::SeedModuleFactory f =
+        [](const std::string& t) { return rasgo::panel::makeModule(t); };
+    SignalGraph usado = rack();
+    int diferentes = 0, comCopia = 0;
+    for (int i = 1; i <= 30; ++i) {
+        rasgo::panel::seedPatch(usado, seedN(i), 0, f);
+        SignalGraph novo = rack();
+        rasgo::panel::seedPatch(novo, seedN(i), 0, f);
+        if (novo.serialize() != usado.serialize()) ++diferentes;
+        // a seed usou alguma cópia? (um cabo tocando a 2ª instância de um tipo)
+        for (std::size_t c = 0; c < novo.cableCount(); ++c)
+            for (const std::size_t n : {novo.cable(c).source().node, novo.cable(c).target().node}) {
+                bool earlier = false;
+                for (std::size_t j = 0; j < n; ++j)
+                    if (novo.node(j).type() == novo.node(n).type()) earlier = true;
+                if (earlier) { ++comCopia; goto proxima; }
+            }
+        proxima:;
+    }
+    if (diferentes) std::printf("  %d de 30 seeds diferentes num rack usado (com cópias)\n", diferentes);
+    check(diferentes == 0, "com cópias: a mesma seed dá o mesmo patch depois de outras seeds");
+    std::printf("  seeds que usaram cópias: %d de 30\n", comCopia);
+    check(comCopia > 0, "a possibilidade existe: alguma seed usa uma cópia");
+}
+
 // 1. cliques seguidos: cada seed igual à mesma seed num rack novo
 void testCliquesSeguidos() {
     SignalGraph usado = rack();
@@ -155,6 +183,7 @@ void testTodoModuloNaSeed() {
 
 int main() {
     testCliquesSeguidos();
+    testCliquesSeguidosComCopias();
     testDepoisDoMusico();
     testVolumeNaoCarrega();
     testEscolhasDoMusico();

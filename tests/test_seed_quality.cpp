@@ -83,10 +83,11 @@ Medida medir(const std::uint64_t seed, const int forcar = 0) {
     SignalGraph g;
     montar(g);
     const auto sink = g.add(std::make_unique<rasgo::panel::SinkOut>());
-    rasgo::panel::seedPatch(g, seed, forcar);
+    rasgo::panel::seedPatch(g, seed, forcar,
+                            [](const std::string& t) { return rasgo::panel::makeModule(t); });
     g.prepare(kSr, 2, kB);
     g.setActiveOutput(sink);
-    rasgo::panel::balanceSeedLevel(g, seed, kSr, kB);
+    rasgo::panel::balanceSeedLevel(g, seed, kSr, kB, rasgo::panel::kSeedProbeSeconds, forcar);
 
     Master* ms = nullptr;
     for (std::size_t i = 0; i < g.nodeCount(); ++i)
@@ -133,7 +134,8 @@ int main() {
         montar(g);
         g.add(std::make_unique<rasgo::panel::SinkOut>());
         for (int k = 1; k <= 1000; ++k) {
-            rasgo::panel::seedPatch(g, static_cast<std::uint64_t>(k) * 0x2545F4914F6CDD1DULL);
+            rasgo::panel::seedPatch(g, static_cast<std::uint64_t>(k) * 0x2545F4914F6CDD1DULL, 0,
+                                    [](const std::string& t) { return rasgo::panel::makeModule(t); });
             bool cru = false;
             const int c = std::min(4, canaisDoMixer(g, cru));
             ++hist[c];

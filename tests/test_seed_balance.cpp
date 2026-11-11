@@ -45,7 +45,10 @@ Patch montar(std::uint64_t seed) {
         for (const char* t : grp.types)
             if (auto n = rasgo::panel::makeModule(t)) p.g.add(std::move(n));
     p.sink = p.g.add(std::make_unique<rasgo::panel::SinkOut>());
-    rasgo::panel::seedPatch(p.g, seed);
+    // com a fábrica, como o app: o rack de prova do equilíbrio tem as
+    // cópias (instâncias, 11/11/2026) — o patch medido e o tocado são iguais
+    rasgo::panel::seedPatch(p.g, seed, 0,
+                            [](const std::string& t) { return rasgo::panel::makeModule(t); });
     p.g.prepare(kSr, 2, kB);
     p.g.setActiveOutput(p.sink);
     return p;
