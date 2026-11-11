@@ -1,6 +1,6 @@
 # Proposta — REGRAS da seed: garantia de limite e gene Heisenberg
 
-Data: 11/11/2026. Estado: **proposta, aguarda o autor**. Origem: estudo da
+Data: 11/11/2026. Estado: **aprovada** ("ok para as 3 perguntas": os cinco papéis e as chances; 19/31-EDO no Heisenberg; a garantia vale para toda seed, cada papel só onde cabe). Implementação no lote da seed. Origem: estudo da
 família §4.8.3, item 5 (aprovado como direção: "gosto de todos"). Prior art:
 `PieceRenderer.hpp` do Rasgo Synth Studio, "Garantia de limite" e "Fase 71 —
 Heisenberg" (mesmo autor; conceito, não código). As duas mexem em **como
@@ -69,3 +69,26 @@ mesmo patch) continua garantida.
 2. O Heisenberg pode usar 19/31-EDO como "afinação vaga", ou só o DRIFT?
 3. A garantia vale para **toda** seed, ou só para as de 2 vozes ou mais (a
    de 1 voz é mais íntima, e a ruptura poderia sobrar)?
+
+## Implementação (11/11/2026)
+
+`apps/panel/PatchSeed.hpp`:
+- **Correntes próprias.** Os papéis usam as correntes 30–53 e o Heisenberg
+  as 17–19. A escolha da escada e do acento usa as 20–28. Nada que vem
+  antes no patch muda por causa delas.
+- **Quando cada papel cabe:**
+  - CITAÇÃO: há MIXER, MASTER e APÓCRIFO.
+  - ORDEM: o sequenciador que alimenta o QUANTIZER tem RST livre.
+  - MODULAÇÃO: o HARMONY ainda não está cabeado.
+  - CONFIANÇA: há contravoz.
+  - RASGO: o ADDITIVE é voz ou contravoz.
+- **Como cada papel se cabeia:**
+  - CITAÇÃO: o APÓCRIFO entra entre o MIXER e o MASTER; se a ligação
+    falhar, o MIXER volta direto ao MASTER, e a seed nunca fica sem som.
+  - CONFIANÇA: o BLEFE entra entre o gate do gerador da contravoz e o
+    gatilho dela. A janela é de 0,05–0,15 s, e é a resposta que chega um
+    pouco depois, dita.
+  - MODULAÇÃO: o HARMONY mantém a escala da seed (S-LO = S-HI = a escala
+    sorteada) e move a tônica.
+- **Registro:** o seeds.log ganha `limite …`, `heisenberg …` e, quando
+  há, `LADDER`/`ACCENT`.
