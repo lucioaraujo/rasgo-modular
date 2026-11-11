@@ -17,7 +17,8 @@ refazer a tag e publicar").
   0.1.8; as quatro de módulos, 88 verbetes.
 - `seo.py` passou a declarar a versão pública 0.1.8. `verificar.py`: "site
   conferido: sem problemas"; 10/10 testes Python do site.
-- Escuta do autor no build 0.1.8 em Linux: "aprovado". Windows e macOS ficam
+- Escuta do autor no build 0.1.8 em Linux: "aprovado". Pacote publicado instalado
+  pelo autor no Linux (Mint 22), 11–12/11: "ok, funcionou no linux". Windows e macOS ficam
   com a matriz da CI; não foram abertos em máquinas reais nesta versão.
 
 ## Release v0.1.8 — preparação (11 nov. 2026)
