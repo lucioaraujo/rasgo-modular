@@ -782,11 +782,23 @@ inline const LearnTable& learnTable() {
             {"out:collapse", {"Um pulso quando a ordem rompe — para resetar um sequenciador, chutar um pêndulo, abrir um filtro.", "", ""}},
             {"out:surprise", {"Quão rara era a nota que acabou de soar, na janela antes dela (0 = a mais comum, 1 = nunca ouvida).", "", ""}},
         }},
+        {"LADDER", {
+            {"cutoff", {"A frequência de corte (20 Hz–20 kHz). O pico da ressonância fica exatamente aqui, em qualquer DIODO.", "", ""}},
+            {"resonance", {"A realimentação da escada: o pico no corte cresce e, perto de 1, a escada auto-oscila numa senoide afinada no CUT. RESO 1 é o limiar calculado para cada DIODO.", "", ""}},
+            {"drive", {"Empurra a entrada contra a saturação do laço (até ≈ +18 dB): o som comprime e encorpa; o nível de saída é compensado.", "", ""}},
+            {"comp", {"Compensação do grave: quando a ressonância sobe, a escada perde o grave. Em 1 o ganho no grave volta a 1 com qualquer RESO; em 0, o grave afunda como na escada original.", "", ""}},
+            {"diode", {"O acoplamento entre os degraus: 0 = transistor (degraus isolados, redondo); 1 = diodo (cada degrau carrega o vizinho, ácido); no meio, escadas que não existem em circuito.", "", ""}},
+            {"in:in", {"O áudio a filtrar.", "", ""}},
+            {"in:cutoff_mod", {"CV no corte, 1 V/oct: um envelope aqui faz o baixo subtrativo; uma nota aqui afina a auto-oscilação.", "", ""}},
+            {"in:res_mod", {"CV somada à RESO.", "", ""}},
+            {"out:lp4", {"Passa-baixas de 24 dB/oct (os quatro degraus).", "", ""}},
+            {"out:lp2", {"Passa-baixas de 12 dB/oct (a tomada do 2º degrau, com a mesma realimentação): mais brilho, mesma ressonância.", "", ""}},
+        }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
             {"stability", {"Quantas notas seguidas um tom novo precisa vencer para valer (1–16): evita tremular entre tons vizinhos.", "", ""}},
-            {"in:pitch", {"A linha de quem toca, em 1 V/oct (só a classe de altura conta). SIGNAL-IN → SCOPE.PITCH serve.", "", ""}},
-            {"in:gate", {"Cada gate aqui é uma nota (SCOPE.ONSET serve). Sem cabo, conta uma nota quando a classe muda.", "", ""}},
+            {"in:pitch", {"A linha de quem toca, em 1 V/oct (só a classe de altura conta). SIGNAL-IN → SCOPE.PIT serve.", "", ""}},
+            {"in:gate", {"Cada gate aqui é uma nota (SCOPE.ONS serve). Sem cabo, conta uma nota quando a classe muda.", "", ""}},
             {"in:reset", {"Esquece o que ouviu e volta a não ter tom.", "", ""}},
             {"out:root", {"A tônica, no formato do QUANTIZER: ligue em ROOT. É também a tônica em 1 V/oct.", "", ""}},
             {"out:scale", {"Maior ou menor, no formato do QUANTIZER: ligue em SCL (Maior ou menor natural).", "", ""}},
@@ -2995,10 +3007,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "A ordem que se rompe — escuta uma linha de alturas, mede quanto ela está previsível (entropia de Shannon das últimas notas) e, quando fica ordenada demais por tempo demais, rompe: um pulso em COLAPSO.",
             "Inverte a ideia de que a ruptura vem do caos: a ordem extrema também rompe. Shannon (1948), a expectativa de Huron; conceito do Rasgo Synth Studio. A ruptura deixa cicatriz: a janela esquece a metade mais antiga e a pressão descansa.",
             "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST do SEQUENCE (a linha que se repete demais se refaz); PRES → CUTOFF de um FILTER: a tensão se ouve crescer."}},
+        {"LADDER", {
+            "O filtro do grave — uma escada de quatro polos (Moog) com a ressonância como realimentação; DIODO acopla os degraus até a escada de diodos (ácida). Saturação dentro do laço, a 2×.",
+            "Discretização sem atraso no laço (Zavalishin). Desvios RASGO: o pico fica afinado no CUT em qualquer DIODO, RESO 1 é o limiar de cada escada, e COMP devolve o grave exatamente.",
+            "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0,7, COMP 1: o baixo subtrativo que encorpa sem sumir. Com RESO 1 e uma nota no FC, a escada canta sozinha."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
-            "SIGNAL-IN → SCOPE: PITCH → PTCH, ONSET → GATE; KEY: ROOT → ROOT e SCL → SCL do QUANTIZER — o patch passa a tocar no tom de quem canta."}},
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; KEY: ROOT → ROOT e SCL → SCL do QUANTIZER — o patch passa a tocar no tom de quem canta."}},
         {"BOUNCE", {
             "Bolas que quicam — até 3 bolas caem sob gravidade e perdem energia a cada quique: gates que aceleram sozinhos, acento que cai e a altura de cada bola como CV.",
             "Queda livre e colisão parcialmente elástica (física de livro-texto). Desvios Rasgo: WIND (cada quique varia, semeado) e AUTO (as bolas paradas são relançadas — toca para sempre).",
@@ -3349,10 +3365,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Order that breaks — it listens to a line of pitches, measures how predictable it is (Shannon entropy of the last notes) and, when it stays too ordered for too long, it breaks: a pulse at COLLAPSE.",
             "It inverts the idea that rupture comes from chaos: extreme order breaks too. Shannon (1948), Huron's expectation; concept from the Rasgo Synth Studio. The break leaves a scar: the window forgets its older half and the pressure rests.",
             "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST of SEQUENCE (a line that repeats too much remakes itself); PRES → CUTOFF of a FILTER: you hear the tension grow."}},
+        {"LADDER", {
+            "The bass filter — a four-pole ladder (Moog) with resonance as feedback; DIODE couples the rungs up to the diode ladder (acid). Saturation inside the loop, at 2×.",
+            "Zero-delay-feedback discretisation (Zavalishin). RASGO deviations: the peak stays tuned to CUT at any DIODE, RESO 1 is each ladder's own threshold, and COMP gives the bass back exactly.",
+            "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0.7, COMP 1: the subtractive bass that fattens without vanishing. With RESO 1 and a note on FC, the ladder sings on its own."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
-            "SIGNAL-IN → SCOPE: PITCH → PTCH, ONSET → GATE; KEY: ROOT → ROOT and SCL → SCL of the QUANTIZER — the patch plays in the key of whoever sings."}},
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; KEY: ROOT → ROOT and SCL → SCL of the QUANTIZER — the patch plays in the key of whoever sings."}},
         {"BOUNCE", {
             "Bouncing balls — up to 3 balls fall under gravity and lose energy at every bounce: gates that speed up by themselves, an accent that falls and each ball's height as CV.",
             "Free fall and partially elastic collision (textbook physics). Rasgo deviations: WIND (each bounce varies, seeded) and AUTO (stopped balls are dropped again — it plays forever).",
@@ -3631,10 +3651,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "L’ordre qui se rompt — écoute une ligne de hauteurs, mesure à quel point elle est prévisible (entropie de Shannon des dernières notes) et, quand elle reste trop ordonnée trop longtemps, elle rompt : une impulsion en COLLAPSE.",
             "Renverse l’idée que la rupture vient du chaos : l’ordre extrême rompt aussi. Shannon (1948), l’attente selon Huron ; concept du Rasgo Synth Studio. La rupture laisse une cicatrice : la fenêtre oublie sa moitié la plus ancienne et la pression se repose.",
             "QUANTIZER.PTCH/GATE → COHERENCE ; COL → RST du SEQUENCE (une ligne qui se répète trop se refait) ; PRES → CUTOFF d’un FILTER : on entend la tension monter."}},
+        {"LADDER", {
+            "Le filtre du grave — une échelle à quatre pôles (Moog) avec la résonance comme rétroaction ; DIODE couple les échelons jusqu’à l’échelle à diodes (acide). Saturation dans la boucle, à 2×.",
+            "Discrétisation sans retard dans la boucle (Zavalishin). Écarts RASGO : le pic reste accordé sur CUT quel que soit DIODE, RESO 1 est le seuil propre à chaque échelle, et COMP rend le grave exactement.",
+            "OSC (SAW) → LADDER → VCA ; ENVELOPE → FC ; RESO 0,7, COMP 1 : la basse soustractive qui s’épaissit sans disparaître. Avec RESO 1 et une note sur FC, l’échelle chante seule."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
-            "SIGNAL-IN → SCOPE : PITCH → PTCH, ONSET → GATE ; KEY : ROOT → ROOT et SCL → SCL du QUANTIZER — le patch joue dans la tonalité de qui chante."}},
+            "SIGNAL-IN → SCOPE : PIT → PTCH, ONS → GATE ; KEY : ROOT → ROOT et SCL → SCL du QUANTIZER — le patch joue dans la tonalité de qui chante."}},
         {"BOUNCE", {
             "Balles qui rebondissent — jusqu’à 3 balles tombent sous la gravité et perdent de l’énergie à chaque rebond : des gates qui accélèrent d’eux-mêmes, un accent qui baisse et la hauteur de chaque balle en CV.",
             "Chute libre et collision partiellement élastique (physique de manuel). Écarts Rasgo : WIND (chaque rebond varie, semé) et AUTO (les balles arrêtées sont relâchées — il joue pour toujours).",
@@ -3913,10 +3937,14 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El orden que se rompe — escucha una línea de alturas, mide cuán previsible es (entropía de Shannon de las últimas notas) y, cuando queda demasiado ordenada por demasiado tiempo, se rompe: un pulso en COLLAPSE.",
             "Invierte la idea de que la ruptura viene del caos: el orden extremo también rompe. Shannon (1948), la expectativa de Huron; concepto del Rasgo Synth Studio. La ruptura deja cicatriz: la ventana olvida su mitad más antigua y la presión descansa.",
             "QUANTIZER.PTCH/GATE → COHERENCE; COL → RST del SEQUENCE (una línea que se repite demasiado se rehace); PRES → CUTOFF de un FILTER: se oye crecer la tensión."}},
+        {"LADDER", {
+            "El filtro del grave — una escalera de cuatro polos (Moog) con la resonancia como realimentación; DIODO acopla los peldaños hasta la escalera de diodos (ácida). Saturación dentro del lazo, a 2×.",
+            "Discretización sin retardo en el lazo (Zavalishin). Desvíos RASGO: el pico queda afinado en CUT con cualquier DIODO, RESO 1 es el umbral propio de cada escalera, y COMP devuelve el grave exactamente.",
+            "OSC (SAW) → LADDER → VCA; ENVELOPE → FC; RESO 0,7, COMP 1: el bajo sustractivo que engorda sin desaparecer. Con RESO 1 y una nota en FC, la escalera canta sola."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",
-            "SIGNAL-IN → SCOPE: PITCH → PTCH, ONSET → GATE; KEY: ROOT → ROOT y SCL → SCL del QUANTIZER — el patch toca en la tonalidad de quien canta."}},
+            "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; KEY: ROOT → ROOT y SCL → SCL del QUANTIZER — el patch toca en la tonalidad de quien canta."}},
         {"BOUNCE", {
             "Pelotas que rebotan — hasta 3 pelotas caen por la gravedad y pierden energía en cada rebote: gates que se aceleran solos, un acento que cae y la altura de cada pelota como CV.",
             "Caída libre y choque parcialmente elástico (física de manual). Desvíos Rasgo: WIND (cada rebote varía, sembrado) y AUTO (las pelotas detenidas se lanzan de nuevo — toca para siempre).",

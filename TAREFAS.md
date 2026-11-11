@@ -34,6 +34,7 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   línguas, visor. Escuta do autor junto do uso; papel dedicado na seed
   (COL → reset do sequenciador / FRASE do PALCO) depois da escuta.
 - [x] KEY (TOM), módulo #73 — dossiê, testes, textos nas 4 línguas, visor.
+- [x] LADDER (ESCADA), módulo #74 — dossiê, testes, textos nas 4 línguas; aguarda a escuta do autor (vaga dedicada na seed depois dela).
 - [ ] Papéis de cópia ainda fora da seed (11/11, a propor um por vez):
   kit de DRUM (intertravamento), 2 QUANTIZER (politonalidade), 2 SEQUENCE
   (phasing), 2 FILTER (série/paralelo), 2 FUNCTION (polimetria na
