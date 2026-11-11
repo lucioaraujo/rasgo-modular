@@ -4006,6 +4006,35 @@ private:
                 g.setColour(T.accent);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel.clear();
+            } else if (mtype == "KEY") {
+                // O histograma das 12 classes (ponderado por duração), a
+                // tônica em destaque e a certeza numa barra embaixo; o nome
+                // do tom (letra; "m" = menor) no rótulo do visor.
+                const auto* ky = dynamic_cast<const rasgo::modular::Key*>(&node);
+                if (ky) {
+                    const auto h = ky->histogram();
+                    float mx = 1.0e-6f;
+                    for (const float v : h) mx = std::max(mx, v);
+                    const float x0 = static_cast<float>(wx + 2), ww = static_cast<float>(dw - 4);
+                    const float top = static_cast<float>(wy + 2);
+                    const float bot = static_cast<float>(wy + dh) - 7.0f;
+                    const float bw = ww / 12.0f;
+                    const int t = ky->tonic();
+                    for (int k = 0; k < 12; ++k) {
+                        const float bh = (bot - top) * h[static_cast<std::size_t>(k)] / mx;
+                        g.setColour(k == t ? T.accent : T.textSecondary.withAlpha(0.6f));
+                        g.fillRect(x0 + bw * static_cast<float>(k) + 1.0f, bot - bh,
+                                   std::max(1.0f, bw - 2.0f), bh);
+                    }
+                    g.setColour(T.accent.withAlpha(0.8f));
+                    g.fillRect(x0, bot + 2.0f, ww * ky->certainty(), 2.0f);
+                    static const char* kNames[12] = {"C", "C#", "D", "Eb", "E", "F",
+                                                     "F#", "G", "Ab", "A", "Bb", "B"};
+                    dlabel = t >= 0 ? juce::String(kNames[t]) + (ky->minor() ? "m" : "")
+                                    : juce::String("—");
+                } else {
+                    dlabel.clear();
+                }
             } else if (mtype == "COHERENCE") {
                 // As 12 classes de altura da janela (barras), a ORDEM (linha
                 // clara) e a PRESSÃO (linha de destaque) rolando no tempo; um
