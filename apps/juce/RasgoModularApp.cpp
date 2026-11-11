@@ -611,6 +611,53 @@ struct Rack {
         }
     }
 
+    // REGISTRO DAS SEEDS ABERTAS (11/11/2026, pedido do autor: "faça o
+    // registro das seeds abertas"). Uma linha por seed em
+    // `<dados do app>/seeds.log`: data e hora, número, vozes do conjunto,
+    // cópias em uso, módulos e cabos ligados, modo do PALCO — para voltar a
+    // uma seed que soou bem. Só acrescenta; acima de ~1 MB guarda a metade
+    // mais nova. Chamado no fim de `applySeed` (thread da interface).
+    void logSeedOpened(const std::uint64_t s) {
+        const std::size_t n = graph.nodeCount();
+        std::vector<char> wired(n, 0);
+        for (std::size_t i = 0; i < graph.cableCount(); ++i) {
+            const auto& c = graph.cable(i);
+            if (c.source().node < n) wired[c.source().node] = 1;
+            if (c.target().node < n) wired[c.target().node] = 1;
+        }
+        int modules = 0;
+        std::string copies, stage = "MANUAL";
+        for (std::size_t id = 0; id < n; ++id) {
+            if (id == sink || !wired[id]) continue;
+            ++modules;
+            const std::string t = graph.node(id).type();
+            bool earlier = false;
+            for (std::size_t j = 0; j < id && !earlier; ++j)
+                earlier = graph.node(j).type() == t;
+            if (earlier) copies += (copies.empty() ? "" : ", ") + t + " 2";
+            if (t == "MIXER") {
+                static const char* kModes[5] = {"MANUAL", "RODA", "CANONE", "GESTO", "PENDULO"};
+                const int md = std::clamp(static_cast<int>(std::lround(
+                    graph.node(id).parameterValue("stage"))), 0, 4);
+                stage = kModes[md];
+            }
+        }
+        const auto id = rasgo::panel::seedIdentity(s);
+        const juce::String line = juce::Time::getCurrentTime().formatted("%Y-%m-%d %H:%M:%S")
+            + "  seed " + juce::String(static_cast<juce::uint64>(s))
+            + "  vozes " + juce::String(id.ensemble)
+            + "  modulos " + juce::String(modules)
+            + "  cabos " + juce::String(static_cast<int>(graph.cableCount()))
+            + "  palco " + juce::String(stage)
+            + "  copias " + u8(copies.empty() ? std::string("-") : copies) + "\n";
+        const juce::File f = applicationDataDir().getChildFile("seeds.log");
+        if (f.getSize() > 1024 * 1024) {
+            const juce::String all = f.loadFileAsString();
+            f.replaceWithText(all.substring(all.length() / 2));
+        }
+        f.appendText(line, false, false, "\n");
+    }
+
     void applySeed(std::uint64_t s, double sr, std::size_t block) {
         std::lock_guard<std::mutex> lk(gmx);
         sampleRate = static_cast<float>(sr);
@@ -639,6 +686,7 @@ struct Rack {
         // ao vivo (ver a explicação longa em `SeedBalance.hpp`), e é
         // determinística: o mesmo seed dá o mesmo ganho.
         rasgo::panel::balanceSeedLevel(graph, s, sampleRate, blockFrames);
+        logSeedOpened(s);
 
         // Seed trocada DURANTE a tomada: o nome do arquivo fica com a
         // primeira (decisão do autor, 10/11/2026); a partitura registra a

@@ -23,6 +23,8 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Instâncias, passos 1–3 (app; partitura/VARIA já por módulo; a seed
   abre cópias: par de OSC, envelope do filtro, contravoz — 36 % das seeds).
 - [x] Autor escutou as seeds com cópias (11/11): "os seeds abertos funcionaram bem".
+- [x] Registro das seeds abertas em `~/.config/rasgo-modular/seeds.log`
+  (pedido do autor, 11/11); testado com HOME isolado.
 - [x] COHERENCE (COERÊNCIA), módulo #72 — dossiê, testes, textos nas 4
   línguas, visor. Escuta do autor junto do uso; papel dedicado na seed
   (COL → reset do sequenciador / FRASE do PALCO) depois da escuta.
