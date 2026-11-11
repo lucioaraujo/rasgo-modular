@@ -36,10 +36,16 @@ inline void registrarLotesTraduzidos() {
     // ---- familia DECISION (72 verbetes) ----
     {
         LearnTable& t = learnTableEnMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over. The 13th, SIEVE, is drawn by the M1/R1/M2/R2 knobs.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tonic of the scale (0=C ... 11=B). With a cable on the ROOT input, the cable takes over.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"How many octaves the input CV covers before quantising.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Portamento time between one quantised note and the next.", "", ""};
+        t["QUANTIZER"]["tuning"] = LearnEntry{"Tuning: 12-EDO (the usual temperament) · Just (pure 5-limit ratios) · Pythagorean (pure fifths) · ¼-comma meantone — these three measured from the tonic, so they follow HARMONY and KEY — · 19-EDO · 31-EDO (another grid of notes).", "", ""};
+        t["QUANTIZER"]["sieve_m1"] = LearnEntry{"SIEVE: the 1st modulus (2–13). Notes n ≡ R1 (mod M1), counted from the tonic, are allowed. With a modulus that does not divide 12 the scale does not repeat at the octave.", "", ""};
+        t["QUANTIZER"]["sieve_r1"] = LearnEntry{"SIEVE: the 1st residue — where the 1st sieve starts.", "", ""};
+        t["QUANTIZER"]["sieve_m2"] = LearnEntry{"SIEVE: the 2nd modulus (2–13).", "", ""};
+        t["QUANTIZER"]["sieve_r2"] = LearnEntry{"SIEVE: the 2nd residue.", "", ""};
+        t["QUANTIZER"]["sieve_and"] = LearnEntry{"SIEVE: off = union (notes of one OR the other sieve); on = intersection (only those of both — rare scales). An empty intersection falls back to the union.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Dead zone before changing degree — avoids flickering between two neighbouring degrees with unstable CV.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"Continuous CV to quantise.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"1 V/oct CV that adds before quantising — transposes the whole scale.", "", ""};
@@ -49,11 +55,13 @@ inline void registrarLotesTraduzidos() {
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"Quantised CV, in 1 V/oct — ready to feed OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Short pulse (~5 ms) every time the note really changes.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"The same note, normalised to ±1 instead of octaves — useful as a control CV.", "", ""};
-        t["HARMONY"]["movement"] = LearnEntry{"Harmonic movement technique: Coltrane / tritone substitution+ii-V / chromatic mediant / modal interchange / modal jazz / backdoor ii-V.", "Each technique has its own root-interval pattern — Coltrane is always +4 st (a cycle of 3), backdoor always +2 st, modal jazz almost always standing still.", "Compare MOVE=Coltrane (moves fast, cyclic) with MOVE=modal jazz (stands still, takes a rare step)."};
+        t["HARMONY"]["movement"] = LearnEntry{"Harmonic movement technique: Coltrane / tritone substitution+ii-V / chromatic mediant / modal interchange / modal jazz / backdoor ii-V / NEO-RIEMANN (P, L, R: each step moves a single note of the triad).", "Each technique has its own root-interval pattern — Coltrane is always +4 st (a cycle of 3), backdoor always +2 st, modal jazz almost always standing still.", "Compare MOVE=Coltrane (moves fast, cyclic) with MOVE=modal jazz (stands still, takes a rare step)."};
         t["HARMONY"]["rate"] = LearnEntry{"Internal clock, used only if ADV is free.", "", ""};
         t["HARMONY"]["root_start"] = LearnEntry{"Root note at reset/start (0=C ... 11=B).", "", ""};
         t["HARMONY"]["scale_lo"] = LearnEntry{"Lowest scale index that can be drawn on a change.", "", ""};
         t["HARMONY"]["scale_hi"] = LearnEntry{"Highest scale index that can be drawn on a change.", "", ""};
+        t["HARMONY"]["nr_cycle"] = LearnEntry{"NEO-RIEMANN only: the path through the triads — 0 free walk (never undoes the step), 1 hexatonic (P L…: closes in 6), 2 octatonic (P R…: closes in 8), 3 LR (the walking fifths).", "", ""};
+        t["HARMONY"]["out:op"] = LearnEntry{"Which transformation happened at the last NEO-RIEMANN advance: P = ⅓, L = ⅔, R = 1. For the patch to react to each kind of motion.", "", ""};
         t["HARMONY"]["hold"] = LearnEntry{"Probability of SKIPPING a scheduled change, keeping the current tonal centre.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — moves on to the next tonal centre on the rising edge; present, it replaces RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Back to the initial ROOT/scale.", "", ""};
@@ -111,10 +119,16 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableFrMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande. La 13e, le CRIBLE, est dessinée par les boutons M1/R1/M2/R2.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tonique de la gamme (0=C ... 11=B). Avec un câble sur l’entrée ROOT, c’est le câble qui commande.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Combien d’octaves couvre la CV d’entrée avant la quantification.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Temps de portamento entre une note quantifiée et la suivante.", "", ""};
+        t["QUANTIZER"]["tuning"] = LearnEntry{"Accord : 12-EDO (le tempérament habituel) · Juste (rapports purs de limite 5) · Pythagoricien (quintes pures) · Mésotonique ¼ de comma — ces trois mesurés depuis la tonique, donc ils suivent HARMONY et KEY — · 19-EDO · 31-EDO (une autre grille de notes).", "", ""};
+        t["QUANTIZER"]["sieve_m1"] = LearnEntry{"CRIBLE : le 1er module (2–13). Les notes n ≡ R1 (mod M1), comptées depuis la tonique, sont permises. Avec un module qui ne divise pas 12, la gamme ne se répète pas à l’octave.", "", ""};
+        t["QUANTIZER"]["sieve_r1"] = LearnEntry{"CRIBLE : le 1er résidu — là où commence le 1er crible.", "", ""};
+        t["QUANTIZER"]["sieve_m2"] = LearnEntry{"CRIBLE : le 2e module (2–13).", "", ""};
+        t["QUANTIZER"]["sieve_r2"] = LearnEntry{"CRIBLE : le 2e résidu.", "", ""};
+        t["QUANTIZER"]["sieve_and"] = LearnEntry{"CRIBLE : éteint = union (les notes de l’un OU de l’autre crible) ; allumé = intersection (seulement celles des deux — gammes rares). Une intersection vide revient à l’union.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Zone morte avant de changer de degré — évite le papillotement entre deux degrés voisins avec une CV instable.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"CV continue à quantifier.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"CV 1 V/oct qui s’ajoute avant la quantification — transpose la gamme entière.", "", ""};
@@ -124,11 +138,13 @@ inline void registrarLotesTraduzidos() {
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"CV quantifiée, en 1 V/oct — prête à alimenter OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Brève impulsion (~5 ms) chaque fois que la note change vraiment.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"La même note, normalisée à ±1 au lieu des octaves — utile comme CV de contrôle.", "", ""};
-        t["HARMONY"]["movement"] = LearnEntry{"Technique de mouvement harmonique : Coltrane / substitution tritonique+ii-V / médiante chromatique / échange modal / jazz modal / ii-V backdoor.", "Chaque technique a son propre motif d’intervalle de fondamentale — Coltrane fait toujours +4 demi-tons (un cycle de 3), le backdoor toujours +2, le jazz modal reste presque toujours immobile.", "Comparez MOVE=Coltrane (avance vite, cyclique) et MOVE=jazz modal (reste immobile, fait un pas rare)."};
+        t["HARMONY"]["movement"] = LearnEntry{"Technique de mouvement harmonique : Coltrane / substitution tritonique+ii-V / médiante chromatique / échange modal / jazz modal / ii-V backdoor / NÉO-RIEMANN (P, L, R : chaque pas déplace une seule note de l’accord).", "Chaque technique a son propre motif d’intervalle de fondamentale — Coltrane fait toujours +4 demi-tons (un cycle de 3), le backdoor toujours +2, le jazz modal reste presque toujours immobile.", "Comparez MOVE=Coltrane (avance vite, cyclique) et MOVE=jazz modal (reste immobile, fait un pas rare)."};
         t["HARMONY"]["rate"] = LearnEntry{"Horloge interne, utilisée seulement si ADV est libre.", "", ""};
         t["HARMONY"]["root_start"] = LearnEntry{"Note fondamentale au reset/démarrage (0=C ... 11=B).", "", ""};
         t["HARMONY"]["scale_lo"] = LearnEntry{"Plus petit indice de gamme tirable lors des changements.", "", ""};
         t["HARMONY"]["scale_hi"] = LearnEntry{"Plus grand indice de gamme tirable lors des changements.", "", ""};
+        t["HARMONY"]["nr_cycle"] = LearnEntry{"NÉO-RIEMANN seulement : le chemin entre les accords — 0 promenade libre (ne défait jamais le pas), 1 hexatonique (P L… : se ferme en 6), 2 octatonique (P R… : se ferme en 8), 3 LR (les quintes qui marchent).", "", ""};
+        t["HARMONY"]["out:op"] = LearnEntry{"Quelle transformation a eu lieu au dernier avancement NÉO-RIEMANN : P = ⅓, L = ⅔, R = 1. Pour que le patch réagisse à chaque type de mouvement.", "", ""};
         t["HARMONY"]["hold"] = LearnEntry{"Probabilité de SAUTER un changement prévu, en gardant le centre tonal actuel.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — passe au centre tonal suivant sur le front montant ; présent, il remplace RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Retour au ROOT/gamme de départ.", "", ""};
@@ -186,10 +202,16 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableEsMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable. La 13.ª, la CRIBA, se dibuja con los knobs M1/R1/M2/R2.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tónica de la escala (0=C ... 11=B). Con un cable en la entrada ROOT, manda el cable.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Cuántas octavas cubre la CV de entrada antes de cuantizar.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Tiempo de portamento entre una nota cuantizada y la siguiente.", "", ""};
+        t["QUANTIZER"]["tuning"] = LearnEntry{"Afinación: 12-EDO (el temperamento de siempre) · Justa (razones puras de límite 5) · Pitagórica (quintas puras) · Mesotónica ¼ de coma — estas tres medidas desde la tónica, así siguen a HARMONY y KEY — · 19-EDO · 31-EDO (otra rejilla de notas).", "", ""};
+        t["QUANTIZER"]["sieve_m1"] = LearnEntry{"CRIBA: el 1.er módulo (2–13). Entran las notas n ≡ R1 (mod M1), contadas desde la tónica. Con un módulo que no divide 12, la escala no se repite en la octava.", "", ""};
+        t["QUANTIZER"]["sieve_r1"] = LearnEntry{"CRIBA: el 1.er residuo — donde empieza la 1.ª criba.", "", ""};
+        t["QUANTIZER"]["sieve_m2"] = LearnEntry{"CRIBA: el 2.º módulo (2–13).", "", ""};
+        t["QUANTIZER"]["sieve_r2"] = LearnEntry{"CRIBA: el 2.º residuo.", "", ""};
+        t["QUANTIZER"]["sieve_and"] = LearnEntry{"CRIBA: apagado = unión (las notas de una U otra criba); encendido = intersección (solo las de ambas — escalas raras). Una intersección vacía vuelve a la unión.", "", ""};
         t["QUANTIZER"]["hysteresis"] = LearnEntry{"Zona muerta antes de cambiar de grado — evita el temblor entre dos grados vecinos con CV inestable.", "", ""};
         t["QUANTIZER"]["in:cv"] = LearnEntry{"CV continua a cuantizar.", "", ""};
         t["QUANTIZER"]["in:transpose"] = LearnEntry{"CV 1 V/oct que se suma antes de cuantizar — transpone la escala entera.", "", ""};
@@ -199,11 +221,13 @@ inline void registrarLotesTraduzidos() {
         t["QUANTIZER"]["out:pitch"] = LearnEntry{"CV cuantizada, en 1 V/oct — lista para alimentar OSC.pitch.", "", ""};
         t["QUANTIZER"]["out:gate"] = LearnEntry{"Pulso corto (~5 ms) cada vez que la nota cambia de verdad.", "", ""};
         t["QUANTIZER"]["out:semitone"] = LearnEntry{"La misma nota, normalizada a ±1 en vez de octavas — útil como CV de control.", "", ""};
-        t["HARMONY"]["movement"] = LearnEntry{"Técnica de movimiento armónico: Coltrane / sustitución tritonal+ii-V / mediante cromática / intercambio modal / jazz modal / ii-V backdoor.", "Cada técnica tiene su propio patrón de intervalo de fundamental — Coltrane siempre +4 semitonos (un ciclo de 3), el backdoor siempre +2, el jazz modal casi siempre quieto.", "Compare MOVE=Coltrane (avanza rápido, cíclico) con MOVE=jazz modal (se queda quieto, da un paso raro)."};
+        t["HARMONY"]["movement"] = LearnEntry{"Técnica de movimiento armónico: Coltrane / sustitución tritonal+ii-V / mediante cromática / intercambio modal / jazz modal / ii-V backdoor / NEO-RIEMANN (P, L, R: cada paso mueve una sola nota de la tríada).", "Cada técnica tiene su propio patrón de intervalo de fundamental — Coltrane siempre +4 semitonos (un ciclo de 3), el backdoor siempre +2, el jazz modal casi siempre quieto.", "Compare MOVE=Coltrane (avanza rápido, cíclico) con MOVE=jazz modal (se queda quieto, da un paso raro)."};
         t["HARMONY"]["rate"] = LearnEntry{"Reloj interno, usado sólo si ADV está libre.", "", ""};
         t["HARMONY"]["root_start"] = LearnEntry{"Nota fundamental en el reset/inicio (0=C ... 11=B).", "", ""};
         t["HARMONY"]["scale_lo"] = LearnEntry{"Menor índice de escala sorteable en los cambios.", "", ""};
         t["HARMONY"]["scale_hi"] = LearnEntry{"Mayor índice de escala sorteable en los cambios.", "", ""};
+        t["HARMONY"]["nr_cycle"] = LearnEntry{"Solo en NEO-RIEMANN: el camino por las tríadas — 0 paseo libre (nunca deshace el paso), 1 hexatónico (P L…: se cierra en 6), 2 octatónico (P R…: se cierra en 8), 3 LR (las quintas que caminan).", "", ""};
+        t["HARMONY"]["out:op"] = LearnEntry{"Qué transformación ocurrió en el último avance NEO-RIEMANN: P = ⅓, L = ⅔, R = 1. Para que el patch reaccione a cada tipo de movimiento.", "", ""};
         t["HARMONY"]["hold"] = LearnEntry{"Probabilidad de SALTARSE un cambio previsto, manteniendo el centro tonal actual.", "", ""};
         t["HARMONY"]["in:advance"] = LearnEntry{"Trigger — avanza al siguiente centro tonal en el flanco de subida; si está presente, sustituye a RATE.", "", ""};
         t["HARMONY"]["in:reset"] = LearnEntry{"Vuelve al ROOT/escala inicial.", "", ""};

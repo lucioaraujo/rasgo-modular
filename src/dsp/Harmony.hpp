@@ -36,6 +36,14 @@
 //
 // Determinístico: xorshift64* semeado em prepare(). Avança por trigger
 // externo OU por relógio interno em `rate`.
+//
+// Movimento 6, NEO-RIEMANN (11/11/2026, lote da harmonia, aprovado): a
+// tríade (tônica + Maior/menor) sofre P (paralela), R (relativa) ou L
+// (Leittonwechsel) — cada uma move UMA nota por 1–2 semitons (H. Riemann;
+// R. Cohn, 1998; D. Lewin). CICLO: 0 passeio livre pelo Tonnetz (nunca
+// desfaz o passo anterior), 1 hexatônico (P L P L…), 2 octatônico (P R P
+// R…), 3 LR (as quintas que caminham). Escala só Maior (1) e menor natural
+// (2). Saída OP: qual transformação (P = ⅓, L = ⅔, R = 1).
 
 namespace rasgo::modular {
 
@@ -47,13 +55,15 @@ public:
                {"reset", PortKind::Control, "trig"}},
               {{"root", PortKind::Audio, ""},     // semitom/12, pra QUANTIZER.root (depth 12)
                {"scale", PortKind::Audio, ""},    // índice/11,   pra QUANTIZER.scale (depth 11)
-               {"change", PortKind::Control, "gate"}},
-              {{"movement", 0.0f, 5.0f, 4.0f, ""},   // 4 = jazz modal (default calmo)
+               {"change", PortKind::Control, "gate"},
+               {"op", PortKind::Control, ""}},
+              {{"movement", 0.0f, 6.0f, 4.0f, ""},   // 4 = jazz modal (default calmo); 6 = neo-Riemann
                {"rate", 0.005f, 2.0f, 0.06f, "Hz"},
                {"root_start", 0.0f, 11.0f, 2.0f, "st"},
                {"scale_lo", 1.0f, 10.0f, 1.0f, ""},   // menor índice de escala sorteável
                {"scale_hi", 1.0f, 10.0f, 6.0f, ""},   // maior índice de escala sorteável
-               {"hold", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"hold", 0.0f, 1.0f, 0.0f, ""},
+               {"nr_cycle", 0.0f, 3.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "HARMONY"; }
 
@@ -71,11 +81,13 @@ public:
         p.add(Widget::Kind::Knob, "S-LO", "scale_lo", 6.0f, 54.0f);
         p.add(Widget::Kind::Knob, "S-HI", "scale_hi", 22.0f, 54.0f);
         p.add(Widget::Kind::Knob, "HOLD", "hold", 38.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "CICLO", "nr_cycle", 6.0f, 76.0f);
         p.add(Widget::Kind::Jack, "ADV", "in:advance", 8.0f, 100.0f);
         p.add(Widget::Kind::Jack, "RST", "in:reset", 20.0f, 100.0f);
         p.add(Widget::Kind::Jack, "ROOT", "out:root", 8.0f, 118.0f);
         p.add(Widget::Kind::Jack, "SCALE", "out:scale", 22.0f, 118.0f);
         p.add(Widget::Kind::Jack, "CHG", "out:change", 36.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "OP", "out:op", 36.0f, 100.0f);
         return p;
     }
 
@@ -90,6 +102,9 @@ public:
         scale_ = clampi(static_cast<int>(std::lround(parameterValue("scale_lo"))),
                         1, 10);
         coltraneStep_ = 0;
+        nrLast_ = -1;
+        nrStep_ = 0;
+        op_ = 0.0f;
         changeCountdown_ = 0;
         gateSamples_ = static_cast<int>(0.02f * sampleRate);
     }
@@ -101,9 +116,12 @@ public:
         AudioBlock& changeOut = outputs[2];
         const std::size_t frames = rootOut.frames();
         const std::size_t channels = rootOut.channels();
+        AudioBlock* opOut = outputs.size() > 3 ? &outputs[3] : nullptr;
 
         const int movement = clampi(
-            static_cast<int>(std::lround(parameterValue("movement"))), 0, 5);
+            static_cast<int>(std::lround(parameterValue("movement"))), 0, 6);
+        const int nrCycle = clampi(
+            static_cast<int>(std::lround(parameterValue("nr_cycle"))), 0, 3);
         const float rate = parameterValue("rate");
         const int scLo = clampi(
             static_cast<int>(std::lround(parameterValue("scale_lo"))), 1, 10);
@@ -125,6 +143,8 @@ public:
                     if (root_ < 0) root_ += 12;
                     scale_ = scLo;
                     coltraneStep_ = 0;
+                    nrLast_ = -1;
+                    nrStep_ = 0;
                 }
                 prevReset_ = r;
             }
@@ -146,7 +166,8 @@ public:
             if (step && !(hold > 0.0f && uniform01() < hold)) {
                 const int oldRoot = root_;
                 const int oldScale = scale_;
-                advanceKeyCenter(movement, scLo, scHi);
+                if (movement == 6) neoRiemann(nrCycle);
+                else advanceKeyCenter(movement, scLo, scHi);
                 if (root_ != oldRoot || scale_ != oldScale)
                     changeCountdown_ = gateSamples_;
             }
@@ -163,6 +184,7 @@ public:
                 rootOut.at(channel, frame) = rootN;
                 scaleOut.at(channel, frame) = scaleN;
                 changeOut.at(channel, frame) = chg;
+                if (opOut) opOut->at(channel, frame) = op_;
             }
         }
     }
@@ -228,6 +250,40 @@ private:
             break;
         }
     }
+
+    // P / L / R sobre (root_, Maior = 1 | menor = 2)
+    void neoRiemann(const int cycle) noexcept {
+        if (scale_ != 1 && scale_ != 2) scale_ = 1;
+        int op;   // 0 P · 1 L · 2 R
+        switch (cycle) {
+        case 1: op = (nrStep_ % 2 == 0) ? 0 : 1; break;   // hexatônico
+        case 2: op = (nrStep_ % 2 == 0) ? 0 : 2; break;   // octatônico
+        case 3: op = (nrStep_ % 2 == 0) ? 1 : 2; break;   // LR
+        default:
+            // passeio livre: nunca repete o último (cada uma é involução)
+            if (nrLast_ < 0) {
+                op = static_cast<int>(uniform01() * 3.0f) % 3;
+            } else {
+                op = static_cast<int>(uniform01() * 2.0f) % 2;
+                if (op >= nrLast_) ++op;
+            }
+            break;
+        }
+        ++nrStep_;
+        nrLast_ = op;
+        const bool major = scale_ == 1;
+        switch (op) {
+        case 0: break;                              // P: mesma tônica
+        case 1: moveRoot(major ? 4 : -4); break;    // L: Dó → mi; mi → Dó
+        default: moveRoot(major ? -3 : 3); break;   // R: Dó → lá; lá → Dó
+        }
+        scale_ = major ? 2 : 1;                     // as três trocam o modo
+        op_ = static_cast<float>(op + 1) / 3.0f;
+    }
+
+    int nrLast_ = -1;
+    int nrStep_ = 0;
+    float op_ = 0.0f;
 
     double phase_ = 0.0;
     float prevAdvance_ = 0.0f;

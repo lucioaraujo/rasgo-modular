@@ -1591,10 +1591,13 @@ inline const LearnTable& learnTable() {
                 "Saída bipolar (−1..1) — boa pra CV de pitch/FM.", "", ""}},
         }},
         {"HARMONY", {
+            {"nr_cycle", {"Só no movimento NEO-RIEMANN: o caminho pelas tríades — 0 passeio livre (nunca desfaz o passo), 1 hexatônico (P L…: fecha em 6), 2 octatônico (P R…: fecha em 8), 3 LR (as quintas que caminham).", "", ""}},
+            {"out:op", {"Qual transformação aconteceu no último avanço do NEO-RIEMANN: P = ⅓, L = ⅔, R = 1. Para o patch reagir a cada tipo de movimento.", "", ""}},
             {"movement", {
                 "Técnica de movimento harmônico: Coltrane / substituição "
                 "tritônica+ii-V / mediante cromática / intercâmbio modal / "
-                "jazz modal / backdoor ii-V.",
+                "jazz modal / backdoor ii-V / NEO-RIEMANN (P, L, R: cada "
+                "passo move uma só nota da tríade).",
                 "Cada técnica tem seu próprio padrão de intervalo de raiz "
                 "— Coltrane sempre +4 st (ciclo de 3), backdoor sempre +2 "
                 "st, jazz modal quase sempre parado.",
@@ -2086,8 +2089,15 @@ inline const LearnTable& learnTable() {
         {"QUANTIZER", {
             {"scale", {
                 "Escala musical (12 tabelas curadas — cromática, maior, "
-                "modos, pentatônicas, tons inteiros, oitava). Com cabo "
-                "na entrada SCL, quem manda é o cabo.", "", ""}},
+                "modos, pentatônicas, tons inteiros, oitava — e a 13ª, o "
+                "CRIVO, desenhado pelos knobs M1/R1/M2/R2). Com cabo "
+                "na entrada SCL, quem manda é o cabo (até a 12ª).", "", ""}},
+            {"tuning", {"A afinação: 12-EDO (o temperamento de sempre) · Justa (razões puras de 5-limite) · Pitagórica (quintas puras) · Mesotônica ¼ de coma — as três medidas a partir da tônica, então acompanham o HARMONY e o TOM — · 19-EDO · 31-EDO (outra grade de notas).", "", ""}},
+            {"sieve_m1", {"CRIVO: o 1º módulo (2–13). Entram as notas n ≡ R1 (mod M1), contadas da tônica. Com um módulo que não divide 12, a escala não se repete na oitava.", "", ""}},
+            {"sieve_r1", {"CRIVO: o 1º resíduo — onde a 1ª peneira começa.", "", ""}},
+            {"sieve_m2", {"CRIVO: o 2º módulo (2–13).", "", ""}},
+            {"sieve_r2", {"CRIVO: o 2º resíduo.", "", ""}},
+            {"sieve_and", {"CRIVO: desligado = união (as notas de uma OU da outra peneira); ligado = interseção (só as das duas — escalas raras). Interseção vazia volta à união.", "", ""}},
             {"root", {"Tônica da escala (0=C ... 11=B). Com cabo na "
                       "entrada ROOT, quem manda é o cabo.", "", ""}},
             {"range", {

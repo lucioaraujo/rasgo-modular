@@ -27,6 +27,18 @@
 //   - glide exponencial (theremin, `RASGO_SYNTH/dsp/ThereminVoice.hpp`).
 //
 // Determinístico (sem RNG).
+//
+// Lote da harmonia (11/11/2026, aprovado; dossiê §9):
+//   - CRIVO = escala nº 12: as alturas são n ≡ R1 (mod M1) ∪ (ou ∩) n ≡ R2
+//     (mod M2) sobre a linha dos semitons a partir da tônica — a peneira de
+//     I. Xenakis (*Formalized Music*). Com M que não divide 12 a escala não
+//     se repete na oitava. Os módulos e os resíduos ficam à vista (knobs).
+//     Interseção vazia → cai na união (nunca fica mudo).
+//   - AFIN: 12-EDO (o de antes) · Justa (5-limite) · Pitagórica · Mesotônica
+//     ¼ de coma — as três medidas A PARTIR DA TÔNICA (com o HARMONY ou o TOM
+//     mudando a tônica, a afinação acompanha: adaptativa) · 19-EDO · 31-EDO
+//     (a grade muda: cada semitom vai ao passo mais próximo da divisão).
+//     Aplicada na saída, depois da escolha da nota e antes do glide.
 
 namespace rasgo::modular {
 
@@ -71,25 +83,81 @@ public:
               {{"pitch", PortKind::Audio, "v/oct"},
                {"gate", PortKind::Control, "gate"},
                {"semitone", PortKind::Audio, ""}},
-              {{"scale", 0.0f, 11.0f, 1.0f, ""},
+              {{"scale", 0.0f, 12.0f, 1.0f, ""},
                {"root", 0.0f, 11.0f, 0.0f, "st"},
                {"range", 1.0f, 6.0f, 2.0f, "oct"},
                {"glide", 0.0f, 1.0f, 0.0f, ""},
-               {"hysteresis", 0.0f, 1.0f, 0.3f, ""}}) {}
+               {"hysteresis", 0.0f, 1.0f, 0.3f, ""},
+               {"tuning", 0.0f, 5.0f, 0.0f, ""},
+               {"sieve_m1", 2.0f, 13.0f, 3.0f, ""},
+               {"sieve_r1", 0.0f, 12.0f, 0.0f, ""},
+               {"sieve_m2", 2.0f, 13.0f, 4.0f, ""},
+               {"sieve_r2", 0.0f, 12.0f, 1.0f, ""},
+               {"sieve_and", 0.0f, 1.0f, 0.0f, ""}}) {}
+
+    static constexpr int kSieveIndex = 12;   // SCALE = 12 → o CRIVO
+
+    // o crivo: n (semitons desde a tônica) pertence?
+    struct Sieve { int m1, r1, m2, r2; bool both; };
+    static bool inSieve(const int n, const Sieve& s) noexcept {
+        const bool a = ((n - s.r1) % s.m1 + s.m1) % s.m1 == 0;
+        const bool b = ((n - s.r2) % s.m2 + s.m2) % s.m2 == 0;
+        return s.both ? (a && b) : (a || b);
+    }
+    static bool sieveEmpty(const Sieve& s) noexcept {
+        for (int n = 0; n < s.m1 * s.m2; ++n) if (inSieve(n, s)) return false;
+        return true;
+    }
+
+    // desvio (em semitons) da afinação `tuning` para um semitom `s` que está
+    // `rel` semitons acima da tônica (rel = s − tônica)
+    static float tuningOffset(const int tuning, const int s, const int rel) noexcept {
+        // cents de cada grau desde a tônica, menos o 12-EDO (de tabelas
+        // públicas: 5-limite justo; pitagórica por quintas; mesotônica ¼ coma)
+        static constexpr float kJust[12] = {0.0f, 11.73f, 3.91f, 15.64f, -13.69f, -1.96f,
+                                            -9.78f, 1.96f, 13.69f, -15.64f, 17.60f, -11.73f};
+        static constexpr float kPyth[12] = {0.0f, -9.78f, 3.91f, -5.87f, 7.82f, -1.96f,
+                                            11.73f, 1.96f, -7.82f, 5.87f, -3.91f, 9.78f};
+        // mesotônica: bemóis em 2ª m, 3ª m, 6ª m, 7ª m (as das escalas
+        // menores e modais) e o trítono como 4ª aumentada
+        static constexpr float kMean[12] = {0.0f, 17.11f, -6.84f, 10.26f, -13.69f, 3.42f,
+                                            -20.53f, -3.42f, 13.69f, -10.26f, 6.84f, -17.11f};
+        const int deg = ((rel % 12) + 12) % 12;
+        switch (tuning) {
+        case 1: return kJust[deg] / 100.0f;
+        case 2: return kPyth[deg] / 100.0f;
+        case 3: return kMean[deg] / 100.0f;
+        case 4:
+        case 5: {
+            const float n = tuning == 4 ? 19.0f : 31.0f;
+            // a grade nova ancorada na TÔNICA (rel), não no Dó
+            (void)s;
+            const float rf = static_cast<float>(rel);
+            return std::round(rf * n / 12.0f) * 12.0f / n - rf;
+        }
+        default: return 0.0f;
+        }
+    }
 
     std::string type() const override { return "QUANTIZER"; }
 
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
-        p.hp = 10;
+        p.hp = 14;
         p.add(Widget::Kind::Label, "QUANTIZER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scale", "", 2.5f, 6.0f, 45.8f);
+        p.add(Widget::Kind::Display, "scale", "", 2.5f, 6.0f, 66.1f);
         p.add(Widget::Kind::Knob, "SCALE", "scale", 8.0f, 30.0f);
         p.add(Widget::Kind::Knob, "ROOT", "root", 23.0f, 30.0f);
         p.add(Widget::Kind::Knob, "RANGE", "range", 38.0f, 30.0f);
         p.add(Widget::Kind::Knob, "GLIDE", "glide", 8.0f, 54.0f);
         p.add(Widget::Kind::Knob, "HYST", "hysteresis", 23.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "AFIN", "tuning", 38.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "M1", "sieve_m1", 55.0f, 30.0f);
+        p.add(Widget::Kind::Knob, "R1", "sieve_r1", 55.0f, 46.0f);
+        p.add(Widget::Kind::Knob, "M2", "sieve_m2", 55.0f, 62.0f);
+        p.add(Widget::Kind::Knob, "R2", "sieve_r2", 55.0f, 78.0f);
+        p.add(Widget::Kind::Toggle, "AND", "sieve_and", 45.0f, 80.0f, 8.0f);
         p.add(Widget::Kind::Jack, "CV", "in:cv", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "TRSP", "in:transpose", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 29.0f, 100.0f);
@@ -122,16 +190,27 @@ public:
         // bloco (o HARMONY troca de centro em segundos, não em amostras)
         const AudioBlock* rootCv = inputs.size() > 3 ? inputs[3] : nullptr;
         const AudioBlock* scaleCv = inputs.size() > 4 ? inputs[4] : nullptr;
+        // a CV de escala (formato do HARMONY/TOM, índice/11) chega a 0–11; o
+        // CRIVO (12) é só pelo knob
         const int scaleIdx = scaleCv
             ? clampi(static_cast<int>(std::lround(scaleCv->at(0, 0) * 11.0f)), 0, 11)
-            : clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, 11);
+            : clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, kSieveIndex);
+        const bool useSieve = scaleIdx == kSieveIndex;
+        Sieve sv{
+            clampi(static_cast<int>(std::lround(parameterValue("sieve_m1"))), 2, 13),
+            clampi(static_cast<int>(std::lround(parameterValue("sieve_r1"))), 0, 12),
+            clampi(static_cast<int>(std::lround(parameterValue("sieve_m2"))), 2, 13),
+            clampi(static_cast<int>(std::lround(parameterValue("sieve_r2"))), 0, 12),
+            parameterValue("sieve_and") >= 0.5f};
+        if (useSieve && sv.both && sieveEmpty(sv)) sv.both = false;   // nunca mudo
+        const int tuning = clampi(static_cast<int>(std::lround(parameterValue("tuning"))), 0, 5);
         const int root = rootCv
             ? ((static_cast<int>(std::lround(rootCv->at(0, 0) * 12.0f)) % 12) + 12) % 12
             : clampi(static_cast<int>(std::lround(parameterValue("root"))), 0, 11);
         const float range = parameterValue("range");
         const float glide = parameterValue("glide");
         const float hysteresis = parameterValue("hysteresis");
-        const ScaleDef& sc = scales()[static_cast<std::size_t>(scaleIdx)];
+        const ScaleDef& sc = scales()[static_cast<std::size_t>(useSieve ? 0 : scaleIdx)];
 
         const AudioBlock* cv = inputs[0];
         const AudioBlock* transpose = inputs[1];
@@ -159,7 +238,8 @@ public:
             }
 
             if (update) {
-                const float snapped = snap(wantSemi, sc, root);
+                const float snapped = useSieve ? snapSieve(wantSemi, sv, root)
+                                               : snap(wantSemi, sc, root);
                 if (!initialized_) {
                     gateCountdown_ = gateSamples;
                     heldSemi_ = snapped;
@@ -214,10 +294,12 @@ public:
             }
 
             // glide até o alvo
+            const int heldInt = static_cast<int>(std::lround(heldSemi_));
+            const float target = heldSemi_ + tuningOffset(tuning, heldInt, heldInt - root);
             if (glideCoeff >= 1.0f)
-                glideSemi_ = heldSemi_;
+                glideSemi_ = target;
             else
-                glideSemi_ += (heldSemi_ - glideSemi_) * glideCoeff;
+                glideSemi_ += (target - glideSemi_) * glideCoeff;
 
             float gate = 0.0f;
             if (gateCountdown_ > 0) {
@@ -257,6 +339,17 @@ private:
             }
         }
         return best;
+    }
+
+    // o semitom do crivo (a partir da tônica) mais próximo de `semi`
+    static float snapSieve(const float semi, const Sieve& s, const int root) noexcept {
+        const int c = static_cast<int>(std::lround(semi));
+        for (int d = 0; d <= 40; ++d) {
+            // empate: o de baixo primeiro (determinístico)
+            for (const int cand : {c - d, c + d})
+                if (inSieve(cand - root, s)) return static_cast<float>(cand);
+        }
+        return static_cast<float>(root);
     }
 
     float heldSemi_ = 0.0f;

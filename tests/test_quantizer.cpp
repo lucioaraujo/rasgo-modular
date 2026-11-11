@@ -428,7 +428,90 @@ void testHarmonyMoveOQuantizer() {
     std::cout << '\n';
 }
 
+
+// ---- lote da harmonia: CRIVO e AFIN ----
+std::vector<int> sieveSet(Quantizer& q) {
+    // varre 0..3 oitavas em passos finos; coleta os semitons de saída
+    std::vector<float> cvs;
+    for (int i = 0; i <= 360; ++i) cvs.push_back(float(i) / 360.0f);
+    const auto p = quantizeRamp(q, cvs);
+    std::vector<int> s;
+    for (const float v : p) {
+        const int n = int(std::lround(v * 12.0f));
+        if (s.empty() || s.back() != n) s.push_back(n);
+    }
+    return s;
+}
+
+void testSieve() {
+    Quantizer q;
+    q.setParameter("scale", 12.0f);
+    q.setParameter("root", 0.0f);
+    q.setParameter("range", 3.0f);
+    q.setParameter("hysteresis", 0.0f);
+    q.setParameter("sieve_m1", 3.0f); q.setParameter("sieve_r1", 0.0f);
+    q.setParameter("sieve_m2", 5.0f); q.setParameter("sieve_r2", 0.0f);
+    const auto u = sieveSet(q);
+    bool ok = !u.empty();
+    for (const int n : u) if (n % 3 != 0 && n % 5 != 0) ok = false;
+    check(ok, "CRIVO 3 ∪ 5: só múltiplos de 3 ou de 5");
+    // não se repete na oitava: 15 está, 12+? (27 não está, 24 está)
+    bool has9 = false, has21 = false;
+    for (const int n : u) { if (n == 9) has9 = true; if (n == 21) has21 = true; }
+    check(has9 && has21, "CRIVO 3 ∪ 5: 9 e 21 (3·3, 3·7)");
+    bool has10 = false, has22 = false;
+    for (const int n : u) { if (n == 10) has10 = true; if (n == 22) has22 = true; }
+    check(has10 && !has22, "CRIVO 3 ∪ 5: não se repete na oitava (10 está, 22 não)");
+    // interseção 2 ∩ 3 = múltiplos de 6
+    q.setParameter("sieve_m1", 2.0f); q.setParameter("sieve_m2", 3.0f);
+    q.setParameter("sieve_and", 1.0f);
+    const auto i = sieveSet(q);
+    ok = !i.empty();
+    for (const int n : i) if (n % 6 != 0) ok = false;
+    check(ok, "CRIVO 2 ∩ 3: só múltiplos de 6");
+    // interseção vazia (par ∩ ímpar) cai na união: nunca mudo
+    q.setParameter("sieve_r2", 1.0f); q.setParameter("sieve_m2", 2.0f);
+    const auto e = sieveSet(q);
+    check(e.size() > 10, "CRIVO: interseção vazia vira união");
+}
+
+float settle(Quantizer& q, const float cv) {
+    return quantizeRamp(q, {cv})[0];
+}
+
+void testTunings() {
+    Quantizer q;
+    q.setParameter("scale", 1.0f);   // Maior
+    q.setParameter("range", 1.0f);
+    q.setParameter("hysteresis", 0.0f);
+    q.setParameter("root", 0.0f);
+    const float cvE = 4.0f / 12.0f;   // a terça
+    q.setParameter("tuning", 0.0f);
+    check(std::fabs(settle(q, cvE) * 1200.0f - 400.0f) < 0.1f, "12-EDO: terça = 400 cents");
+    q.setParameter("tuning", 1.0f);
+    check(std::fabs(settle(q, cvE) * 1200.0f - 386.31f) < 0.1f, "Justa: terça 5/4 = 386,3 cents");
+    q.setParameter("tuning", 2.0f);
+    check(std::fabs(settle(q, cvE) * 1200.0f - 407.82f) < 0.1f, "Pitagórica: terça 81/64");
+    // a afinação mede a partir da tônica: com ROOT = Ré, a terça Fá♯ é justa
+    q.setParameter("tuning", 1.0f);
+    q.setParameter("root", 2.0f);
+    const float fs = settle(q, 6.0f / 12.0f) * 1200.0f;
+    check(std::fabs(fs - (200.0f + 386.31f)) < 0.1f, "Justa acompanha a tônica");
+    // 19-EDO: cada nota cai num passo de 1200/19
+    q.setParameter("root", 0.0f);
+    q.setParameter("tuning", 4.0f);
+    bool on = true;
+    for (int k = 0; k < 12; ++k) {
+        const float c = settle(q, float(k) / 12.0f) * 1200.0f;
+        const float steps = c / (1200.0f / 19.0f);
+        if (std::fabs(steps - std::round(steps)) > 1e-3f) on = false;
+    }
+    check(on, "19-EDO: a grade é de 19 passos");
+}
+
 int main() {
+    testSieve();
+    testTunings();
     testSnapsToScale();
     testRootShifts();
     testSampleHold();

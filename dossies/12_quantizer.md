@@ -179,7 +179,7 @@ Testado isolado (snap, root, S&H, glide, determinismo) antes do patch.
 É o módulo que fecha o caminho "acaso → música": `TURING`/`DECISION` →
 `QUANTIZER` → `STRING`/`MATTER`/`FUNCTION`, com `CLOCK` no `trigger`.
 
-## 9. Proposta do lote da harmonia: crivos e afinações (11/11/2026, aguarda o autor)
+## 9. Proposta do lote da harmonia: crivos e afinações (11/11/2026, implementado; decisões abaixo)
 
 Da auditoria (`AUDITORIA_modulos_e_cardinal.md`: "peneiras de Xenakis,
 afinações (justa, pitagórica, EDO)", aprovado) e do estudo da família §1
@@ -219,3 +219,28 @@ afinações (justa, pitagórica, EDO)", aprovado) e do estudo da família §1
 **Painel:** passa de 10 para 14 HP (AFIN e os quatro knobs do crivo numa
 fileira nova). Patches antigos abrem iguais: tudo novo vem em 12-EDO e o
 crivo só entra com SCALE = 12.
+
+**Decisões e implementação (11/11/2026).** O autor, com "avance", seguiu as
+recomendações: crivo com **união e interseção** (chave AND) e arquivos
+**Scala fora** por ora.
+- **Crivo:** a escala nº 12 (`kSieveIndex`), só pelo knob; a CV de escala
+  continua 0–11. A busca vai à nota do crivo mais próxima (empate: a de
+  baixo), em até ±40 semitons. Uma interseção vazia vira união.
+- **Afinação:** aplicada à nota segurada, antes do glide.
+  - Tabelas em cents relativas ao 12-EDO, por grau a partir da tônica:
+    Justa (16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8);
+    Pitagórica (cadeia de quintas, trítono 729/512); Mesotônica ¼ de coma
+    com bemóis na 2ª, 3ª, 6ª e 7ª menores (a 1ª versão tinha a 6ª menor como
+    sol♯, 27 cents baixa nas escalas menores; corrigido antes do commit).
+  - 19-EDO e 31-EDO são ancorados na **tônica**.
+- **Painel:** 14 HP; AFIN na fileira do meio; M1, R1, M2, R2 numa coluna à
+  direita; chave AND.
+- **Seed:** afinação e crivo fora do sorteio, da mutação e do VARIA; as
+  seeds soam iguais.
+- **Teste** (`test_quantizer`, `testSieve`, `testTunings`):
+  - 3 ∪ 5 só dá múltiplos de 3 ou 5 e não se repete na oitava;
+  - 2 ∩ 3 dá múltiplos de 6;
+  - a interseção vazia volta à união;
+  - terça justa 386,31 cents, pitagórica 407,82;
+  - a afinação justa acompanha ROOT = Ré;
+  - 19-EDO cai na grade.

@@ -174,7 +174,7 @@ técnicas, reset, clock, determinismo) antes do patch. Numa peça:
 `QUANTIZER`; `HARMONY.change` → `TURING.reset` — a peça modula e cada
 tom novo traz uma frase nova.
 
-## 9. Proposta do lote da harmonia: neo-Riemann (11/11/2026, aguarda o autor)
+## 9. Proposta do lote da harmonia: neo-Riemann (11/11/2026, implementado; decisões abaixo)
 
 Da auditoria ("HARMONY: lacuna neo-Riemann P/L/R", aprovado).
 
@@ -202,3 +202,16 @@ Da auditoria ("HARMONY: lacuna neo-Riemann P/L/R", aprovado).
   transformação ocorreu (P, L ou R em três níveis), para o patch reagir a
   cada uma? Recomendação: sim, é barata.
 - **Compatibilidade:** os movimentos 0–5 ficam iguais.
+
+**Decisões e implementação (11/11/2026).** Saída **OP** incluída
+(recomendação seguida com "avance").
+- **Movimento 6** (`movement` passa a ir até 6); os movimentos 0–5 não
+  mudaram.
+- **Passeio livre:** o primeiro passo é sorteado entre P, L e R; os
+  seguintes, entre as duas transformações diferentes da anterior.
+- **Ciclos:** alternância fixa.
+- **Teste** (`testNeoRiemann`):
+  - só Maior e menor natural;
+  - cada passo guarda duas notas da tríade anterior (parcimônia);
+  - o hexatônico fecha em 6 passos e o octatônico em 8.
+- **Seed:** CICLO fora do sorteio, da mutação e do VARIA.
