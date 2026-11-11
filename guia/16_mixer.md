@@ -50,6 +50,14 @@ passando pelo centro sem esse "buraco" de volume.
   a saída de áudio de qualquer voz ou processador — `ENVELOPE.out`,
   `FILTER.all`, `DRUM.out`, `SPACE.out`, `SWIRL.l`/`r`…
 
+### Entradas (controle)
+
+- **`P1`**–**`P4`** — CV de pan (−1..+1) de cada canal, somada ao lugar em
+  qualquer modo. **Plugue aqui:** um `PENDULUM` (x1/x2), um LFO lento.
+- **`FRASE`** — no modo GESTO, cada gatilho aqui move um canal. **Plugue
+  aqui:** o EOS de um `ARP`/`SEQUENCE`, o COL do `COHERENCE`, o MUD do
+  `KEY`.
+
 ### Saída
 
 - **`L+R`** (out) (áudio) — a soma estéreo dos 4 canais. **Plugue em:**
@@ -68,6 +76,35 @@ constante).
 **OUT** (out_gain, −24 a +12 dB) — o nível do barramento de saída,
 depois da soma.
 
+## O PALCO: pans que andam com intenção
+
+A coluna da direita é o **PALCO**: um jeito de o pan não ficar parado no
+centro, mas também não andar ao acaso.
+
+**MODO**:
+- **MANUAL** — o PAN é o lugar, e nada se move sozinho.
+- **RODA** — os canais giram em torno das suas casas, defasados por
+  igual.
+- **CÂNONE** — um trajeto lento, que cada canal repete atrasado e
+  espelhado.
+- **GESTO** — a cada gatilho em FRASE (ou a cada tanto), um canal desliza
+  para um lugar novo, escolhido para reequilibrar.
+- **PÊNDULO** — só as entradas P1–P4 movem (ligue um `PENDULUM`).
+
+Fora do MANUAL, o knob PAN de cada canal é a **casa** (o centro do
+movimento). **VELOC** dá o período (de 60 s a 6 s) e **ABERT** dá a
+amplitude.
+
+**O contrapeso, um móbile.** Fora do MANUAL, cada canal pesa o som que
+está tocando (a parte aguda; o grave mora no centro). Como numa alavanca, o
+mais pesado anda menos. Quando o palco pende para um lado, quem corrige é
+o leve, e o palco balança e assenta (cerca de 2,5 s). É uma regra de
+composição inspirada nos móbiles de Calder, não uma simulação física.
+
+O visor embaixo mostra o palco. O tempo desce, cada canal deixa o rastro
+do lugar, o ponto cresce com o peso, e o traço embaixo é o centro de
+gravidade.
+
 ## Como cabear
 
 **Um patch de várias vozes:**
@@ -85,9 +122,11 @@ MIXER (L+R) → MASTER (IN)        (já vem feito no seed)
   canal próprio — você mixa seco e molhado como faixas separadas.
 - **Sub-mix:** um `VCA4.mix` ou um segundo `MIXER` alimentando um canal
   deste — libera canais quando o patch cresce.
-- **Automação de balanço:** os pans e níveis do `MIXER` ficam **de fora
-  da mão caótica** (`VARIA`) — são seus. Mas você pode cabear um LFO num
-  `pan` via `connectToParameter` se quiser movimento.
+- **Movimento:** o PALCO (acima) faz os pans andarem. Para um movimento
+  seu, cabeie um LFO numa entrada P1–P4. A mão caótica (`VARIA`) só mexe
+  em VELOC e ABERT; os níveis, os pans e o MODO são seus.
+- **A frase move o palco:** no modo GESTO, ligue em FRASE o fim de frase de
+  quem toca (o EOS do `ARP`, o COL do `COHERENCE`, o MUD do `KEY`).
 - **Mute rítmico:** o painel não modula `mute` por cabo; use um `VCA` no
   caminho do canal com um gate se quiser "cortar" no compasso.
 
@@ -96,5 +135,7 @@ MIXER (L+R) → MASTER (IN)        (já vem feito no seed)
 Faz o papel de um mixer de performance (WMD/SSF, Intellijel, Happy
 Nerding) — 4 canais, pan, mute. A lei de pan é de potência constante
 (fato público). O par é o `MASTER` (#17) — o estágio final; e o `VCA4`
-(#59) é um mixer de brinde. Os pans nascem sempre no centro em todo seed
-(decisão do autor).
+(#59) é um mixer de brinde. Nenhum mixer do Cardinal pesa o estéreo pelo
+som: lá, todo pan é uma posição dada. Na seed, com 2 ou mais vozes, o palco
+abre nas casas (voz no centro, contravoz, textura e eco a cada lado) e
+escolhe um modo; com 1 voz, fica em MANUAL no centro.

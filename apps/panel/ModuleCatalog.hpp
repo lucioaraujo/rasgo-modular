@@ -74,6 +74,7 @@
 #include "dsp/Markov.hpp"
 #include "dsp/Coherence.hpp"
 #include "dsp/Key.hpp"
+#include "dsp/Ladder.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -104,6 +105,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "CHORD")      return std::make_unique<Chord>();
     if (t == "FUNCTION")   return std::make_unique<FunctionGenerator>();
     if (t == "FILTER")     return std::make_unique<Filter>();
+    if (t == "LADDER")     return std::make_unique<Ladder>();
     if (t == "FORMANT")    return std::make_unique<Formant>();
     if (t == "RESONATOR")  return std::make_unique<Resonator>();
     if (t == "GLIDE")      return std::make_unique<Glide>();
@@ -210,7 +212,7 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
 inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
-        {"TRANSFORM", {"FILTER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
+        {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "PHRASE"}},

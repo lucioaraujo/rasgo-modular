@@ -9,6 +9,18 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Módulo novo: LADDER (ESCADA)** (11 nov., fila aprovada). O filtro do
+  grave: escada de quatro polos com a ressonância como realimentação,
+  discretizada sem atraso no laço (ZDF/TPT, Zavalishin), com saturação tanh
+  no nó de entrada e o laço a 2×. DIODO acopla os degraus de forma contínua
+  (0 = transistor, 1 = diodo). Desvios RASGO: o pico fica afinado no CUT
+  em qualquer DIODO (erro < 2 cents na auto-oscilação); RESO 1 é o limiar
+  calculado para cada acoplamento; COMP devolve o grave exatamente (ganho
+  em DC 1). Saídas LP4 e LP2. Medido: alias ≤ −56 dB com DRIVE 1 num seno
+  de 4,7 kHz. Limitação: com DRIVE alto, a auto-oscilação fica mais baixa
+  (o nível de saída é compensado pelo ganho do DRIVE). Família TRANSFORM;
+  entra na seed (**as seeds mudam**). Dossiê 74, `test_ladder`.
+
 - **Módulo novo: KEY (TOM)** (11 nov., fila aprovada). O tom de quem toca:
   estima tônica e modo (maior/menor) de uma linha de alturas pelos perfis
   de Krumhansl e Kessler, com as notas longas pesando mais (como no
