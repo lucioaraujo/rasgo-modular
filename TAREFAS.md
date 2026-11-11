@@ -34,7 +34,7 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   línguas, visor. Escuta do autor junto do uso; papel dedicado na seed
   (COL → reset do sequenciador / FRASE do PALCO) depois da escuta.
 - [x] KEY (TOM), módulo #73 — dossiê, testes, textos nas 4 línguas, visor.
-- [x] LADDER (ESCADA), módulo #74 — dossiê, testes, textos nas 4 línguas; aguarda a escuta do autor (vaga dedicada na seed depois dela).
+- [x] LADDER (ESCADA), módulo #74 — dossiê, testes, textos nas 4 línguas; **escutado pelo autor em 11/11 ("muito bom")**. Próximo: o papel na seed (proposta).
 - [x] Lote do grave (11/11): ACCENT #75, VCA SAT, ENVELOPE LOOP/EOC — aguarda a escuta do autor. Lotes pequenos, um build por lote (pedido do autor).
 - [x] Lote do oscilador (11/11): OSC PD / UNI / SUBD + CV do SUBD — aguarda a escuta junto com o lote do grave.
 - [x] Lote da harmonia (11/11): QUANTIZER crivo + afinações, HARMONY neo-Riemann + OP — aguarda a escuta (com os lotes do grave e do oscilador).
