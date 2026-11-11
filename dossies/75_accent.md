@@ -178,5 +178,13 @@ embaixo.
 
 ## Na seed
 
+**Papel desde 11/11/2026**, junto com o LADDER. Em ~40 % das seeds com
+escada (corrente 22), o ACCENT escuta o gate e a altura da voz:
+- DEC → TIME do envelope, com ganho 0,5;
+- SWP → Q da escada, com ganho 0,2;
+- FC → FC da escada, com ganho 0,6, se o FC estiver livre.
+
+Texto anterior:
+
 Depois da escuta. Candidato natural: a voz de baixo com o LADDER, com o
 ACCENT ligado ao FC, ao VCA e ao DEC.

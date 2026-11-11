@@ -40,6 +40,7 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Lote da harmonia (11/11): QUANTIZER crivo + afinações, HARMONY neo-Riemann + OP — aguarda a escuta (com os lotes do grave e do oscilador).
 - [x] Lote do rasgo (11/11): BLEFE #76, APÓCRIFO #77, FIBRA no ADDITIVE — aguarda a escuta.
 - [x] Lote da escuta do gesto (11/11): TAP #78, FRONTEIRA #79 — aguarda a escuta.
+- [ ] Lote da seed e do manuseio (11/11): regras da seed, LADDER/ACCENT na voz grave, roda do mouse, pega pela faixa do nome, [x] ao soltar, DESFAZ no lugar — escrito em cópia; entra com o build depois da escuta do autor.
 - [ ] Papéis de cópia ainda fora da seed (11/11, a propor um por vez):
   kit de DRUM (intertravamento), 2 QUANTIZER (politonalidade), 2 SEQUENCE
   (phasing), 2 FILTER (série/paralelo), 2 FUNCTION (polimetria na

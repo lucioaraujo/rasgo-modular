@@ -9,6 +9,25 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote da seed e do manuseio** (11 nov., aprovado pelo autor).
+  - **REGRAS da seed.**
+    - Garantia de limite: cinco papéis de ruptura (citação, ruptura da
+      ordem, modulação, confiança, rasgo da matéria). Se nenhum sai, a seed
+      força um.
+    - Gene Heisenberg (25 % das seeds): ritmo e afinação com precisões
+      inversas, com 19/31-EDO ou Justa.
+    - **As seeds mudam.**
+  - **LADDER e ACCENT na voz grave** (~40 % e ~40 % disso).
+  - **seeds.log:** registra o limite, o Heisenberg, o LADDER e o ACCENT.
+  - **Manuseio do rack.**
+    - O módulo só se move pela faixa do nome.
+    - Um clique que erra o knob por até 4 mm pega o knob.
+    - A roda do mouse ajusta knobs e sliders (2 % por clique, Shift 0,5 %,
+      seletores um passo).
+    - O [x] só remove ao soltar o botão.
+    - O DESFAZ de um módulo arrastado ou removido devolve-o ao lugar de
+      antes do arrasto. Antes, a fotografia era tirada já na posição nova.
+
 - **Lote da escuta do gesto** (11 nov., "pode avançar"; estudo da família §4.9).
   - **Módulo novo: TAP (#78).** O andamento batido: a mediana a partir de 3
     batidas, a contagem irregular é recusada, a 1ª batida é o "um", e o

@@ -112,6 +112,22 @@ lacuna, sem ladder).
 
 ## Na seed
 
+**Papel desde 11/11/2026** (autor: "de acordo"). Quando a voz é OSC abaixo
+de ~110 Hz, em ~40 % dessas seeds (corrente 20), a escada entra no lugar do
+FILTER, na cadeia ou na rede de segurança.
+- **Os sorteios:** o ramo da escada consome os mesmos sorteios do FILTER,
+  então as seeds sem escada não mudam.
+- **Os parâmetros:**
+  - CUT 120–900 Hz;
+  - RESO 0,25–0,8;
+  - DIODO e DRIVE de correntes próprias;
+  - COMP sempre 1.
+- **Junto com a escada:** o envelope de filtro de cópia abre a escada
+  quando ela está na voz. Em ~40 % das seeds com escada entra o ACCENT
+  (ver 75).
+
+Texto anterior:
+
 Entra no rack da seed pela regra de 9/11 (todo módulo novo entra no rack).
 Uma vaga dedicada na cadeia (por exemplo, como alternativa ao FILTER na voz
 de baixo) fica para depois da escuta do autor.
