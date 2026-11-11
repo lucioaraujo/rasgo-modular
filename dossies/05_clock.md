@@ -195,3 +195,23 @@ FILL/ROT numa fileira, SWING/DRIFT/GATE/ACC A/ACC B noutra, toggle AND +
 jacks). Testado isolado (contagem de bordas, densidade, divisores,
 deriva) antes do patch. Entra na primeira peça longa como a fonte de
 tempo: `CLOCK` → `trigger` do `DECISION` e dos envelopes (módulo 6).
+
+## 9. FASE e MET (11/11/2026, fila aprovada)
+
+Do estudo da família, sobre o Rasgo Synth Studio e o Batruc: "phasing
+(Reich); força métrica 2-ádica" (conceito, não código).
+- **FASE** (saída) e **PHAS** (knob): um segundo relógio até 3 % mais
+  rápido que o CLK.
+  - É o *Piano Phase* de S. Reich (1967): os dois começam juntos, se
+    afastam e voltam a coincidir.
+  - PHAS 0 = colado ao CLK. O RST realinha os dois.
+  - Também funciona com relógio externo: FASE = o período externo × (1 +
+    3 %·PHAS).
+- **MET** (saída): a força métrica do passo atual — 1 no 1º passo do
+  ciclo de LEN, senão mdc(passo, LEN)/LEN. É a mesma hierarquia do ACCENT.
+- **Compatibilidade:** as saídas são novas (índices 3 e 4) e PHAS vem em
+  0; nada muda nos patches.
+- **Teste** (`testPhasingAndMetric`):
+  - PHAS 0: FASE = CLK (40/40 em 10 s);
+  - PHAS 1: 42 contra 40;
+  - MET dá 1 no tempo forte e ½ no meio do ciclo.

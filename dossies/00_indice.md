@@ -108,6 +108,7 @@ propriedade do cabo, não um módulo do catálogo.
 | 77 | [`77_apocrifo.md`](77_apocrifo.md) | `APOCRIFO` (cita o próprio passado: corroída, corte de montagem no zero, parêntese) | SPACE | implementação local, 2026-11-11 |
 | 78 | [`78_tap.md`](78_tap.md) | `TAP` (o andamento batido: mediana, recusa a contagem irregular, a 1ª batida é o "um") | TIME | implementação local, 2026-11-11 |
 | 79 | [`79_fronteira.md`](79_fronteira.md) | `FRONTEIRA` (fronteira de célula por LBDM, ao vivo, uma nota de atraso; FIM no silêncio) | DECISION | implementação local, 2026-11-11 |
+| 80 | [`80_comparador.md`](80_comparador.md) | `COMPARADOR` (mixer polarizador + comparador com histerese: MIX, INV, COMP, CRUZ) | DECISION | implementação local, 2026-11-11 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

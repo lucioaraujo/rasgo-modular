@@ -86,6 +86,14 @@ subdivisão fixa e **sorteia** um fator de tempo diferente a cada passo
 - **`ACC`** — o acento (AND/OR de `ACC-A` e `ACC-B`). **Plugue em:**
   `DRUM.ACC`, `VCA.cv`, qualquer `_mod` — dá peso a certos passos.
 
+- **`FASE`** — um segundo relógio, um pouco mais rápido que o CLK (até
+  3 %, no knob **PHAS**). Os dois começam juntos, se afastam e voltam a
+  coincidir: o *Piano Phase* de Steve Reich. **Plugue em:** um segundo
+  `SEQUENCE` que toca a mesma linha. Ouça as duas se desencontrarem.
+- **`MET`** (CV, não gate) — a força métrica do passo: 1 no primeiro tempo
+  do ciclo, ½ no meio, ¼ nos quartos… **Plugue em:** o nível de um `VCA`
+  ou o FC de um filtro, para o tempo forte pesar mais.
+
 ## Os controles, um a um
 
 **BPM** (20–300) — o andamento.
@@ -116,6 +124,9 @@ de B; desligado: A **ou** B (polirritmia de graça).
 
 **FEEL** (0–6) — o agrupamento: reto / tercina / quintina / septina /
 nonina / undecina / glitch.
+
+**PHAS** (phasing, 0–1) — o quanto a saída FASE corre na frente do CLK
+(de 0 a 3 %). Em 0, as duas andam coladas.
 
 ## Como cabear
 

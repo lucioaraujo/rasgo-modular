@@ -177,3 +177,18 @@ canônicas: `OSC.sine → SHAPE → FILTER`; `OSC → SHAPE` + `OSC2 →
 SHAPE.mod` (ring-mod); `ENVELOPE.env → SHAPE.fold_mod` (dobras
 dinâmicas). Adicionado ao catálogo do painel
 (`apps/panel/ModuleCatalog.hpp`, família TRANSFORM).
+
+## 9. TEAR, a dobra que rasga (11/11/2026, fila aprovada)
+
+Do estudo da família: o `FractureFolder` do Rasgo Synth Studio (mesmo autor;
+conceito, não código).
+- **O que é:** uma dobra comum reflete sempre no mesmo ponto. Com TEAR > 0,
+  o ponto de reflexão muda **a cada ciclo** da entrada (fator de 1 ±
+  0,7·TEAR no drive). O sorteio cai na **passagem por zero**, onde a dobra
+  vale 0: a troca não estala e o ADAA segue consistente.
+- **Diferença para o Studio:** lá o sorteio é por amostra, o que na prática
+  é ruído; aqui é por ciclo, que é o que o conceito descreve ("a cada
+  cruzamento").
+- **TEAR 0:** a dobra de antes, bit a bit.
+- **Teste** (`testTear`): com TEAR 1, a diferença ciclo a ciclo vai de 0,012
+  para 0,44; o maior salto fica em 0,17, contra 0,11 sem TEAR.

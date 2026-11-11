@@ -880,6 +880,20 @@ inline const LearnTable& learnTable() {
             {"out:notes", {"O tamanho da última célula fechada (notas/16).", "", ""}},
             {"out:end", {"Um pulso quando o silêncio fecha a frase.", "", ""}},
         }},
+        {"COMPARADOR", {
+            {"pol_a", {"Quanto de A entra no MIX, com o zero no centro: à direita soma, à esquerda entra invertido.", "", ""}},
+            {"pol_b", {"Quanto de B entra no MIX, com o zero no centro (padrão: invertido — o MIX é a diferença A − B).", "", ""}},
+            {"offset", {"Um deslocamento somado ao MIX.", "", ""}},
+            {"threshold", {"O limiar do COMP: o gate fica alto enquanto o MIX está acima dele.", "", ""}},
+            {"hysteresis", {"A histerese: o COMP sobe acima de LIM + HIST/2 e desce abaixo de LIM − HIST/2 — não tremula com ruído.", "", ""}},
+            {"in:a", {"O sinal A (áudio ou CV).", "", ""}},
+            {"in:b", {"O sinal B (áudio ou CV).", "", ""}},
+            {"in:threshold_cv", {"CV somada ao LIM: o limiar pode andar.", "", ""}},
+            {"out:mix", {"A·A + B·B + OFS: somar, opor ou anular.", "", ""}},
+            {"out:inv", {"O MIX invertido.", "", ""}},
+            {"out:comp", {"A decisão: alto enquanto o MIX está acima do limiar.", "", ""}},
+            {"out:cross", {"Um pulso a cada mudança do COMP (subida e descida).", "", ""}},
+        }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
             {"stability", {"Quantas notas seguidas um tom novo precisa vencer para valer (1–16): evita tremular entre tons vizinhos.", "", ""}},
@@ -1019,6 +1033,9 @@ inline const LearnTable& learnTable() {
                         "", ""}},
         }},
         {"CLOCK", {
+            {"phasing", {"O quanto a saída FASE corre na frente do CLK (0 a 3 %): a defasagem de Steve Reich. Em 0, as duas andam coladas.", "", ""}},
+            {"out:phased", {"Um segundo relógio um pouco mais rápido que o CLK: começam juntos, se afastam e voltam a coincidir.", "", ""}},
+            {"out:metric", {"A força métrica do passo (CV): 1 no tempo forte, ½ no meio do ciclo, ¼ nos quartos…", "", ""}},
             {"bpm", {
                 "Andamento em batidas por minuto.", "", ""}},
             {"mult", {
@@ -2378,6 +2395,7 @@ inline const LearnTable& learnTable() {
                          "elas é o processo.", "", ""}},
         }},
         {"SHAPE", {
+            {"tear", {"A dobra que rasga: o ponto de reflexão muda a cada ciclo da onda (na passagem por zero, então não estala). 0 = a dobra de sempre.", "", ""}},
             {"ring", {"Mistura IN com IN×MOD (ring-mod de 4 quadrantes).",
                      "", ""}},
             {"fold", {
@@ -3127,6 +3145,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "Onde a ideia de quem toca começa — mede salto, intervalo entre ataques e pausa nota a nota e marca o começo de cada célula melódica; o silêncio fecha a frase.",
             "LBDM de Cambouropoulos (2001), das regras de agrupamento de Lerdahl & Jackendoff; conceito do Maravi. Uma nota de atraso, dita.",
             "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → FRASE do MIXER (modo GESTO): cada ideia nova muda o palco."}},
+        {"COMPARADOR", {
+            "O limiar como acontecimento — mistura dois sinais com o zero no centro (somar, opor, anular) e transforma a relação entre eles num gate com histerese.",
+            "Princípios do mixer polarizador (phono) e do mixer-comparador (R. Brewster), lidos no acervo do Antitotem: o comparador converte uma relação contínua em evento.",
+            "Dois FUNCTION lentos em A e B; COMP → GATE de um ENVELOPE; CRUZ → DRUM: dois LFOs que se cruzam viram ritmo."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
@@ -3505,6 +3527,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "Where the player's idea begins — it measures leap, inter-onset interval and rest note by note and marks the start of each melodic cell; silence closes the phrase.",
             "Cambouropoulos's LBDM (2001), from Lerdahl & Jackendoff's grouping rules; concept from the Maravi. One note of latency, stated.",
             "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → MIXER PHRASE input (GESTURE mode): each new idea changes the stage."}},
+        {"COMPARADOR", {
+            "The threshold as an event — it mixes two signals with zero in the centre (add, oppose, cancel) and turns their relation into a gate with hysteresis.",
+            "Principles of the polarising mixer (phono) and the mixer-comparator (R. Brewster), read in the Antitotem's archive: the comparator turns a continuous relation into an event.",
+            "Two slow FUNCTIONs into A and B; COMP → an ENVELOPE GATE; CRUZ → DRUM: two LFOs crossing become a rhythm."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
@@ -3811,6 +3837,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Là où commence l’idée de qui joue — mesure saut, intervalle entre attaques et silence note à note, et marque le début de chaque cellule mélodique ; le silence ferme la phrase.",
             "LBDM de Cambouropoulos (2001), d’après les règles de groupement de Lerdahl & Jackendoff ; concept du Maravi. Une note de latence, dite.",
             "SIGNAL-IN → SCOPE : PIT → PTCH, ONS → GATE ; FRONT → FRASE du MIXER (mode GESTE) : chaque idée nouvelle change la scène."}},
+        {"COMPARADOR", {
+            "Le seuil comme événement — mélange deux signaux avec le zéro au centre (additionner, opposer, annuler) et transforme leur relation en un gate avec hystérésis.",
+            "Principes du mélangeur polarisant (phono) et du mélangeur-comparateur (R. Brewster), lus dans les archives de l’Antitotem : le comparateur transforme une relation continue en événement.",
+            "Deux FUNCTION lents sur A et B ; COMP → GATE d’une ENVELOPE ; CRUZ → DRUM : deux LFO qui se croisent deviennent un rythme."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
@@ -4117,6 +4147,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "Dónde empieza la idea de quien toca — mide salto, intervalo entre ataques y pausa nota a nota y marca el comienzo de cada célula melódica; el silencio cierra la frase.",
             "LBDM de Cambouropoulos (2001), de las reglas de agrupamiento de Lerdahl & Jackendoff; concepto del Maravi. Una nota de latencia, dicha.",
             "SIGNAL-IN → SCOPE: PIT → PTCH, ONS → GATE; FRONT → FRASE del MIXER (modo GESTO): cada idea nueva cambia el escenario."}},
+        {"COMPARADOR", {
+            "El umbral como acontecimiento — mezcla dos señales con el cero en el centro (sumar, oponer, anular) y convierte la relación entre ellas en un gate con histéresis.",
+            "Principios del mezclador polarizador (phono) y del mezclador-comparador (R. Brewster), leídos en el archivo del Antitotem: el comparador convierte una relación continua en evento.",
+            "Dos FUNCTION lentos en A y B; COMP → GATE de un ENVELOPE; CRUZ → DRUM: dos LFO que se cruzan se vuelven ritmo."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",

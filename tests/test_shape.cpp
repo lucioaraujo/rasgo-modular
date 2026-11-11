@@ -255,7 +255,41 @@ void testPanel() {
 
 }  // namespace
 
+
+// TEAR (11/11/2026): 0 = a dobra de antes; > 0 = cada ciclo diferente,
+// sem estalo na troca (ela cai na passagem por zero)
+void testTear() {
+    Shape a, b;
+    for (Shape* s : {&a, &b}) { s->setParameter("fold", 0.6f); s->setParameter("sat", 0.0f); }
+    b.setParameter("tear", 0.0f);
+    const auto x0 = run(a, 200, 220.0f), x1 = run(b, 200, 220.0f);
+    bool same = x0.size() == x1.size();
+    for (std::size_t k = 0; same && k < x0.size(); ++k) same = x0[k] == x1[k];
+    check(same, "TEAR 0: a dobra de antes, bit a bit");
+    Shape c;
+    c.setParameter("fold", 0.6f); c.setParameter("sat", 0.0f); c.setParameter("tear", 1.0f);
+    const auto y = run(c, 200, 220.0f);
+    // ciclo a ciclo (período ≈ 218 amostras a 220 Hz): a forma muda
+    const std::size_t per = static_cast<std::size_t>(kSr / 220.0f + 0.5f);
+    double diffT = 0.0, diff0 = 0.0;
+    for (std::size_t k = 0; k + per < y.size(); ++k) {
+        diffT += std::fabs(y[k + per] - y[k]);
+        diff0 += std::fabs(x0[k + per] - x0[k]);
+    }
+    std::cerr << "   TEAR: diferença ciclo a ciclo " << diffT / double(y.size())
+              << " (sem TEAR " << diff0 / double(y.size()) << ")\n";
+    check(diffT > 5.0 * diff0 + 1e-3, "TEAR 1: cada ciclo é diferente");
+    float jumpT = 0.0f, jump0 = 0.0f;
+    for (std::size_t k = 1; k < y.size(); ++k) {
+        jumpT = std::max(jumpT, std::fabs(y[k] - y[k - 1]));
+        jump0 = std::max(jump0, std::fabs(x0[k] - x0[k - 1]));
+    }
+    std::cerr << "   TEAR: maior salto " << jumpT << " (sem TEAR " << jump0 << ")\n";
+    check(jumpT < 1.6f * jump0 + 0.05f, "TEAR: sem estalo (o salto fica na ordem da dobra)");
+}
+
 int main() {
+    testTear();
     testRingMod();
     testFoldAddsHarmonics();
     testSymmetryEvenHarmonic();

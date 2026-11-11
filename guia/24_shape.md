@@ -88,6 +88,11 @@ seco (corta e reentra do outro lado — dente de serra brutal).
 
 **DRIFT** (0–1) — passeio lento e correlacionado na quantidade de dobra.
 
+**TEAR** (0–1) — a dobra que rasga. Em 0, a dobra reflete sempre no mesmo
+ponto. Acima, o ponto de reflexão muda a cada ciclo da onda: a forma fica um
+pouco diferente a cada ciclo, áspera e viva. A troca cai na passagem por
+zero, por isso não estala.
+
 ## Como cabear
 
 **Enriquecer um seno:**

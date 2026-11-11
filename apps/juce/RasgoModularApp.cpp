@@ -642,6 +642,24 @@ struct Rack {
                 stage = kModes[md];
             }
         }
+        // as REGRAS da seed (11/11/2026): o papel de limite, o Heisenberg,
+        // e a escada/acento na voz grave — lidos do patch que soa
+        std::string limits, extras;
+        for (std::size_t i = 0; i < n; ++i) {
+            if (i == sink || !wired[i]) continue;
+            const std::string t = graph.node(i).type();
+            auto add = [&](std::string& dst, const char* what) {
+                if (dst.find(what) == std::string::npos) dst += (dst.empty() ? "" : ",") + std::string(what);
+            };
+            if (t == "APOCRIFO") add(limits, "CITACAO");
+            if (t == "COHERENCE") add(limits, "ORDEM");
+            if (t == "BLEFE") add(limits, "CONFIANCA");
+            if (t == "HARMONY") add(limits, "MODULACAO");
+            if (t == "ADDITIVE" && graph.node(i).parameterValue("tension") > 0.0f) add(limits, "RASGO");
+            if (t == "LADDER") add(extras, "LADDER");
+            if (t == "ACCENT") add(extras, "ACCENT");
+        }
+        const float hb = rasgo::panel::seedHeisenberg(s);
         const auto id = rasgo::panel::seedIdentity(s);
         const juce::String line = juce::Time::getCurrentTime().formatted("%Y-%m-%d %H:%M:%S")
             + "  seed " + juce::String(static_cast<juce::uint64>(s))
@@ -649,7 +667,10 @@ struct Rack {
             + "  modulos " + juce::String(modules)
             + "  cabos " + juce::String(static_cast<int>(graph.cableCount()))
             + "  palco " + juce::String(stage)
-            + "  copias " + u8(copies.empty() ? std::string("-") : copies) + "\n";
+            + "  copias " + u8(copies.empty() ? std::string("-") : copies)
+            + "  limite " + u8(limits.empty() ? std::string("-") : limits)
+            + "  heisenberg " + (hb < 0.0f ? juce::String("-") : juce::String(hb, 2))
+            + (extras.empty() ? juce::String() : "  " + u8(extras)) + "\n";
         const juce::File f = applicationDataDir().getChildFile("seeds.log");
         if (f.getSize() > 1024 * 1024) {
             const juce::String all = f.loadFileAsString();
@@ -2464,10 +2485,13 @@ public:
 
         for (const auto& m : mods_) {
             if (!m.bounds.contains(e.getPosition())) continue;
-            // [x] de remover
-            if (juce::Rectangle<int>(m.bounds.getRight() - 15, m.bounds.getY() + 2,
-                                     13, 13).contains(e.getPosition())) {
-                if (onRemoveModule) onRemoveModule(m.id);
+            // [x] de remover — só ao SOLTAR sobre ele, sem arrastar (11/11/2026,
+            // autor: "às vezes chega até a remover o módulo"). Antes removia
+            // no instante do clique: um clique que escorregava perto do canto
+            // tirava o módulo.
+            if (removeBox(m).contains(e.getPosition())) {
+                pendingRemove_ = static_cast<int>(m.id);
+                downAt_ = e.getPosition();
                 return;
             }
             Signal& node = rack_.graph.node(m.id);
@@ -2548,6 +2572,21 @@ public:
                 pendingInspect_ = ci;
                 return;
             }
+            // PEGA GENEROSA (11/11/2026, autor: "quando quero alterar o valor
+            // do knob com o mouse o módulo se desloca de lugar"): um clique
+            // que errou o knob por pouco (até ~4 mm) vai para o knob ou
+            // slider mais próximo, em vez de pegar o módulo.
+            if (const Widget* nw = nearestControl(m, e.getPosition(), 4.0f)) {
+                const ParameterDescriptor* d = paramDesc(node, nw->bind);
+                drag_ = {true, m.id, nw->bind,
+                         rack_.graph.parameterUserValue(m.id, nw->bind),
+                         d ? d->minimum : 0.0f, d ? d->maximum : 1.0f,
+                         e.getPosition().y};
+                return;
+            }
+            // O MÓDULO SÓ SE MOVE PELA FAIXA DO NOME (o topo, onde está o
+            // nome) — arrastar no resto do painel não o desloca mais.
+            if (!titleStrip(m).contains(e.getPosition())) return;
             mdrag_ = {true, m.id, false};
             juce::Desktop::getInstance().beginDragAutoRepeat(40);
             return;
@@ -2696,11 +2735,20 @@ public:
                 pendingInspect_ = -1;
             return;
         }
+        if (pendingRemove_ >= 0) {   // escorregou do [x]: não remove
+            if (e.getPosition().getDistanceFrom(downAt_) > kDragSlopPx)
+                pendingRemove_ = -1;
+            return;
+        }
         if (mdrag_.active) {
             if (!mdrag_.moved) {          // ainda é clique: zona morta
                 if (e.getPosition().getDistanceFrom(downAt_) <= kDragSlopPx)
                     return;
                 mdrag_.moved = true;
+                // a fotografia do DESFAZ é tirada ANTES de o módulo sair do
+                // lugar: desfazer devolve-o à posição de antes do arrasto
+                // (antes, a remoção na paleta fotografava já na posição nova)
+                rack_.pushUndo();
             }
             autoScrollAtEdge(e);
             mouse_ = e.getPosition();
@@ -2766,6 +2814,19 @@ public:
             pendingInspect_ = -1;
             return;
         }
+        if (pendingRemove_ >= 0) {
+            const int pr = pendingRemove_;
+            pendingRemove_ = -1;
+            for (const auto& m : mods_)
+                if (static_cast<int>(m.id) == pr && removeBox(m).contains(e.getPosition())
+                    && e.getPosition().getDistanceFrom(downAt_) <= kDragSlopPx
+                    && onRemoveModule) {
+                    onRemoveModule(m.id, true);
+                    break;
+                }
+            repaint();
+            return;
+        }
         if (mdrag_.active) {
             const std::size_t id = mdrag_.id;
             const bool moved = mdrag_.moved;
@@ -2774,7 +2835,7 @@ public:
             // arrasto de verdade, nunca num clique parado
             if (moved && overPalette && overPalette(e.getScreenPosition())
                 && onRemoveModule)
-                onRemoveModule(id);
+                onRemoveModule(id, false);   // o DESFAZ já foi empilhado no arrasto
             repaint();
             return;
         }
@@ -2978,6 +3039,7 @@ private:
     // (ver `mouseDown`) — antes disso o gesto ainda é um clique.
     struct ModDrag { bool active = false; std::size_t id = 0; bool moved = false; };
     static constexpr int kDragSlopPx = 6;
+    int pendingRemove_ = -1;   // o [x] apertado, à espera de soltar
     struct CableHit { std::size_t cable; int x0, y0, x1, y1; };
     enum class InspAct { RelNone, RelRing, RelFold, RelDiff,
                          Amount, Conductance, Gain, Companion, Rupture, Remove };
@@ -3030,6 +3092,81 @@ private:
         const ui::RectMM r = ui::footprintMM(w);
         return {m.bounds.getX() + mmpx(r.x), m.bounds.getY() + mmpx(r.y),
                 mmpx(r.w), mmpx(r.h)};
+    }
+    // o [x] de remover, no canto de cima à direita
+    static juce::Rectangle<int> removeBox(const ModBox& m) {
+        return {m.bounds.getRight() - 15, m.bounds.getY() + 2, 13, 13};
+    }
+    // a faixa do nome (o topo do módulo, acima dos controles): a única
+    // pega para mover o módulo (11/11/2026)
+    juce::Rectangle<int> titleStrip(const ModBox& m) const {
+        return m.bounds.withHeight(mmpx(6.0f)).withTrimmedRight(17);
+    }
+    // o knob ou slider sob o ponto, ou o mais próximo a até `tolMM` mm
+    const Widget* nearestControl(const ModBox& m, const juce::Point<int> p,
+                                 const float tolMM) {
+        const Widget* best = nullptr;
+        int bestD = mmpx(tolMM) + 1;
+        const bool matrix = rack_.graph.node(m.id).type() == "MATRIX";
+        for (const auto& w : m.panel.widgets) {
+            if (w.kind != Widget::Kind::Knob && w.kind != Widget::Kind::Slider) continue;
+            if (matrix && ui::isMatrixCellBind(w.bind)) continue;
+            const auto r = widgetBounds(m, w);
+            const int dx = std::max({r.getX() - p.x, 0, p.x - r.getRight()});
+            const int dy = std::max({r.getY() - p.y, 0, p.y - r.getBottom()});
+            const int d = std::max(dx, dy);
+            if (d < bestD) { bestD = d; best = &w; }
+        }
+        return best;
+    }
+
+    // RODA DO MOUSE sobre um knob ou slider (11/11/2026, aprovado): ~2 % da
+    // faixa por clique da roda (Shift: ~0,5 %); faixas exponenciais
+    // (frequência) andam em escala exponencial, como no arrasto; seletores
+    // (faixa inteira de 2 a 16 valores) andam um passo. Fora de um
+    // controle, a roda faz o que fazia (rola o rack).
+    void mouseWheelMove(const juce::MouseEvent& e,
+                        const juce::MouseWheelDetails& wd) override {
+        if (wd.deltaY == 0.0f || !wheelOnControl(e, wd))
+            juce::Component::mouseWheelMove(e, wd);
+    }
+    bool wheelOnControl(const juce::MouseEvent& e, const juce::MouseWheelDetails& wd) {
+        for (const auto& m : mods_) {
+            if (!m.bounds.contains(e.getPosition())) continue;
+            const Widget* w = nearestControl(m, e.getPosition(), 2.0f);
+            if (!w) return false;
+            Signal& node = rack_.graph.node(m.id);
+            const ParameterDescriptor* d = paramDesc(node, w->bind);
+            if (!d) return false;
+            const float lo = d->minimum, hi = d->maximum;
+            const float dir = wd.deltaY > 0.0f ? 1.0f : -1.0f;
+            const float from = rack_.graph.parameterUserValue(m.id, w->bind);
+            const bool discrete = hi - lo >= 2.0f && hi - lo <= 16.0f
+                && std::floor(lo) == lo && std::floor(hi) == hi;
+            const float step = e.mods.isShiftDown() ? 0.005f : 0.02f;
+            float v;
+            if (discrete) {
+                v = std::round(from) + dir;
+            } else if (lo > 0.0f && hi / lo > 30.0f) {
+                const float k = std::log(hi / lo);
+                const float tt = juce::jlimit(0.0f, 1.0f,
+                    std::log(std::max(from, lo) / lo) / k + dir * step);
+                v = lo * std::exp(k * tt);
+            } else {
+                v = from + dir * step * (hi - lo);
+            }
+            v = juce::jlimit(lo, hi, v);
+            if (v != from) {
+                {
+                    std::lock_guard<std::mutex> lk(rack_.gmx);
+                    rack_.graph.setParameterBase(m.id, w->bind, v);
+                }
+                if (onParamGesture) onParamGesture(m.id, w->bind, from, v);
+                repaint();
+            }
+            return true;
+        }
+        return false;
     }
 
     // quebra o rack em linhas, como o `relayout()` do painel X11.
@@ -3343,7 +3480,7 @@ public:
     // MainComponent. `spawn*` desenha o fantasma do módulo que vem da
     // paleta enquanto ele ainda não foi solto.
     std::function<bool(juce::Point<int>)> overPalette;   // pos. de TELA
-    std::function<void(std::size_t)> onRemoveModule;
+    std::function<void(std::size_t, bool)> onRemoveModule;   // (id, empilhar o DESFAZ?)
     // clicar no rack devolve o teclado aos atalhos (a caixa de seed é um
     // TextEditor e retém o foco enquanto ninguém o tira dela)
     std::function<void()> onFocusWanted;
@@ -4947,7 +5084,7 @@ public:
         view_->overPalette = [this](juce::Point<int> screenPos) {
             return palette_.getScreenBounds().contains(screenPos);
         };
-        view_->onRemoveModule = [this](std::size_t id) { removeModule(id); };
+        view_->onRemoveModule = [this](std::size_t id, bool push) { removeModule(id, push); };
         view_->onFocusWanted = [this] { grabKeyboardFocus(); };
         view_->onNotice = [this](const std::string& t) {
             palette_.setNotice(u8(t));
@@ -5699,8 +5836,8 @@ private:
     // encostam nele; o nó fica órfão no grafo (silencioso, sem custo de
     // DSP, porque `setActiveOutput` poda o que não chega à saída). Mesma
     // semântica do painel X11 — remover da vista não é apagar do patch.
-    void removeModule(std::size_t id) {
-        rack_.pushUndo();
+    void removeModule(std::size_t id, const bool pushUndo = true) {
+        if (pushUndo) rack_.pushUndo();
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             for (std::size_t i = rack_.graph.cableCount(); i-- > 0;) {

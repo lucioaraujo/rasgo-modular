@@ -2,6 +2,7 @@
 
 #include "core/SignalGraph.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 
@@ -43,6 +44,17 @@
 // (não precisa acertar o número exato de ouvido). `glitch` é o único
 // modo qualitativamente novo: cada passo sorteia um fator de tempo
 // (~0,7–1,4×) — o clock deixa de ser um trem de pulsos regular.
+//
+// FASE e MET (11/11/2026; estudo da família: "phasing (Reich); força
+// métrica 2-ádica" do Rasgo Synth Studio e do Batruc — conceito, não
+// código):
+//   - FASE: um segundo relógio um pouco mais rápido (até +3 % com PHAS
+//     em 1) — o "Piano Phase" de S. Reich (1967): os dois começam juntos,
+//     se afastam e voltam a coincidir. PHAS 0 = colado ao CLK. O RST
+//     realinha os dois.
+//   - MET: a força métrica do passo atual (CV): 1 no primeiro passo do
+//     ciclo de LEN, senão mdc(passo, LEN)/LEN — num ciclo de 16, o 9º pesa
+//     ½, o 5º e o 13º ¼… (a hierarquia que o ACCENT também usa).
 
 namespace rasgo::modular {
 
@@ -55,7 +67,9 @@ public:
                {"bpm_mod", PortKind::Control, ""}},
               {{"clock", PortKind::Control, "gate"},
                {"euclid", PortKind::Control, "gate"},
-               {"accent", PortKind::Control, "gate"}},
+               {"accent", PortKind::Control, "gate"},
+               {"phased", PortKind::Control, "gate"},
+               {"metric", PortKind::Control, ""}},
               {{"bpm", 20.0f, 300.0f, 120.0f, "BPM"},
                {"mult", 0.25f, 8.0f, 2.0f, "x"},
                {"length", 1.0f, 32.0f, 8.0f, ""},
@@ -67,7 +81,8 @@ public:
                {"accent_a", 1.0f, 16.0f, 4.0f, ""},
                {"accent_b", 1.0f, 16.0f, 3.0f, ""},
                {"accent_mode", 0.0f, 1.0f, 0.0f, ""},
-               {"feel", 0.0f, 6.0f, 0.0f, ""}}) {}
+               {"feel", 0.0f, 6.0f, 0.0f, ""},
+               {"phasing", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "CLOCK"; }
 
@@ -90,12 +105,15 @@ public:
         p.add(Widget::Kind::Knob, "ACC-B", "accent_b", 67.0f, 52.0f);
         p.add(Widget::Kind::Toggle, "AND", "accent_mode", 7.0f, 76.0f);
         p.add(Widget::Kind::Knob, "FEEL", "feel", 22.0f, 76.0f);
+        p.add(Widget::Kind::Knob, "PHAS", "phasing", 37.0f, 76.0f);
         p.add(Widget::Kind::Jack, "EXT", "in:ext_clock", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "RST", "in:reset", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "BPM", "in:bpm_mod", 29.0f, 100.0f);
         p.add(Widget::Kind::Jack, "CLK", "out:clock", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "EUC", "out:euclid", 17.0f, 116.0f);
         p.add(Widget::Kind::Jack, "ACC", "out:accent", 29.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "FASE", "out:phased", 41.0f, 116.0f);
+        p.add(Widget::Kind::Jack, "MET", "out:metric", 53.0f, 116.0f);
         return p;
     }
 
@@ -115,6 +133,7 @@ public:
             static_cast<std::uint32_t>(std::max(1.0f, sampleRate / 20.0f));
         rngState_ = 0xD1B54A32D192ED03ULL;
         glitchFactor_ = 1.0f;
+        phase2_ = 0.0;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -122,6 +141,10 @@ public:
         AudioBlock& clockOut = outputs[0];
         AudioBlock& euclidOut = outputs[1];
         AudioBlock& accentOut = outputs[2];
+        AudioBlock* phasedOut = outputs.size() > 3 ? &outputs[3] : nullptr;
+        AudioBlock* metricOut = outputs.size() > 4 ? &outputs[4] : nullptr;
+        const double phasing = 1.0 + 0.03 * std::clamp(
+            static_cast<double>(parameterValue("phasing")), 0.0, 1.0);
         const std::size_t frames = clockOut.frames();
         const std::size_t channels = clockOut.channels();
 
@@ -168,6 +191,7 @@ public:
                 if (prevReset_ < 0.5f && r >= 0.5f) {
                     stepCounter_ = 0;
                     phase_ = 0.0;
+                    phase2_ = 0.0;
                     extSamples_ = 0.0f;
                 }
                 prevReset_ = r;
@@ -185,6 +209,7 @@ public:
                     stepped = true;
                 }
                 prevExt_ = e;
+                phase2_ += phasing / static_cast<double>(std::max(1.0f, extPeriod_));
                 extSamples_ += 1.0f;
                 phaseInStep_ = clampf(extSamples_ / extPeriod_, 0.0f, 0.99999f);
             } else {
@@ -195,6 +220,8 @@ public:
                 const float stepHz = effBpm / 60.0f * mult * tupletRatio
                     * (1.0f + driftState_) * glitchMul;
                 phase_ += static_cast<double>(std::max(0.0001f, stepHz))
+                    / sampleRate_;
+                phase2_ += phasing * static_cast<double>(std::max(0.0001f, stepHz))
                     / sampleRate_;
                 if (phase_ >= 1.0) {
                     phase_ -= 1.0;
@@ -219,15 +246,25 @@ public:
             const float eu = (euOnset && win) ? 1.0f : 0.0f;
             const float ac = (acOnset && win) ? 1.0f : 0.0f;
 
+            phase2_ -= std::floor(phase2_);
+            const float ph2 = (phase2_ < static_cast<double>(gateLen)) ? 1.0f : 0.0f;
+            const float met = i == 0 ? 1.0f
+                : static_cast<float>(gcdi(i, length)) / static_cast<float>(length);
             for (std::size_t channel = 0; channel < channels; ++channel) {
                 clockOut.at(channel, frame) = clk;
                 euclidOut.at(channel, frame) = eu;
                 accentOut.at(channel, frame) = ac;
+                if (phasedOut) phasedOut->at(channel, frame) = ph2;
+                if (metricOut) metricOut->at(channel, frame) = met;
             }
         }
     }
 
 private:
+    static int gcdi(int a, int b) noexcept {
+        while (b != 0) { const int r = a % b; a = b; b = r; }
+        return a < 0 ? -a : a;
+    }
     static int clampi(const int v, const int lo, const int hi) noexcept {
         return v < lo ? lo : (v > hi ? hi : v);
     }
@@ -276,6 +313,7 @@ private:
     }
 
     double phase_ = 0.0;
+    double phase2_ = 0.0;   // FASE: o segundo relógio
     int stepCounter_ = 0;
     float phaseInStep_ = 0.0f;
 
