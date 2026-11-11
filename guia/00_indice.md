@@ -193,6 +193,7 @@ Estado: **✓** pronto · **·** a fazer.
 | 77 | `APOCRIFO` | [`77_apocrifo.md`](77_apocrifo.md) | local, após 0.1.7 |
 | 78 | `TAP` | [`78_tap.md`](78_tap.md) | local, após 0.1.7 |
 | 79 | `FRONTEIRA` | [`79_fronteira.md`](79_fronteira.md) | local, após 0.1.7 |
+| 80 | `COMPARADOR` | [`80_comparador.md`](80_comparador.md) | local, após 0.1.7 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

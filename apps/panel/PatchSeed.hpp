@@ -134,6 +134,12 @@ using SeedModuleFactory =
     std::function<std::unique_ptr<rasgo::modular::Signal>(const std::string&)>;
 inline const char* const kSeedCopyPool[] = {"OSC", "VCA", "ENVELOPE", "LPG", "STRING", "MATTER"};
 
+// Gene Heisenberg (11/11/2026): −1 = não entra; senão o equilíbrio b ∈ [0,1).
+inline float seedHeisenberg(std::uint64_t seed) {
+    const std::uint64_t s = seed ? seed : 0x9E3779B97F4A7C15ULL;
+    return seedUnit(s, 17) < 0.25f ? seedUnit(s, 18) : -1.0f;
+}
+
 inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                       int forceEnsemble = 0, const SeedModuleFactory& makeCopy = {}) {
     using namespace rasgo::modular;
@@ -442,6 +448,23 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             firstT("FILTER"), "cutoff", fcDepth, fcBase, true); } catch (...) {}
     }
 
+    // ---- LADDER na voz grave (11/11/2026, autor: "de acordo") ---------
+    // Voz OSC abaixo de ~110 Hz: em ~40 % dessas seeds a escada entra no
+    // lugar do FILTER (na cadeia ou na rede de segurança). A decisão vem de
+    // uma corrente própria (20) e o ramo da escada consome os MESMOS
+    // sorteios do FILTER — as seeds sem escada não mudam por causa disto.
+    const std::uint64_t seedS = seed ? seed : 0x9E3779B97F4A7C15ULL;
+    const bool bassLadder = std::string(vc.mod) == "OSC" && voiceHz > 0.0f
+        && voiceHz < 110.0f && hasT("LADDER") && seedUnit(seedS, 20) < 0.4f;
+    std::size_t ladderNode = N;
+    auto setLadder = [&](std::size_t ln, float cut01, float res01) {
+        setP(ln, "cutoff", 120.0f + 1300.0f * cut01);
+        setP(ln, "resonance", 0.25f + 0.55f * res01);
+        setP(ln, "diode", seedUnit(seedS, 21));
+        setP(ln, "drive", 0.1f + 0.4f * seedUnit(seedS, 23));
+        setP(ln, "comp", 1.0f);   // o grave nunca some
+    };
+
     // a VOZ é sacrossanta: o passeio não mexe nas entradas dela (senão
     // FM/sync/mod aleatório emudece o timbre). Sobram 79 outras entradas.
     spine[voiceNode] = 1;
@@ -494,14 +517,26 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     for (int pi = 0; pi < nProc; ++pi) {
         const char* pr = procs[rnd() % 8];
         if (!hasT(pr) || firstT(pr) == bodyNode) continue;
-        const int ai = pIn(firstT(pr), "in");
+        const bool asLadder = bassLadder && ladderNode >= N && std::string(pr) == "FILTER";
+        const std::size_t prNode = asLadder ? firstT("LADDER") : firstT(pr);
+        const int ai = pIn(prNode, "in");
         const int so = pOut(bodyNode, bodyOut);
         if (ai < 0 || so < 0) continue;
         if (!connect({bodyNode, static_cast<std::size_t>(so)},
-                     {firstT(pr), static_cast<std::size_t>(ai)})) continue;
-        bodyNode = firstT(pr);
+                     {prNode, static_cast<std::size_t>(ai)})) continue;
+        bodyNode = prNode;
         spine[bodyNode] = 1;
-        if (std::string(pr) == "FILTER") {
+        if (asLadder) {
+            // os mesmos 4–5 sorteios do FILTER, levados à faixa da escada
+            const float cut = (rng(150.0f, 6000.0f) - 150.0f) / 5850.0f;
+            const float res = (rng(0.05f, 0.85f) - 0.05f) / 0.8f;
+            (void)rng(0.0f, 0.5f);
+            (void)(chance(0.3f) ? rng(0.1f, 0.6f) : 0.0f);
+            const char* o = pickS5("all", "all", "low", "center", "high");
+            setLadder(bodyNode, cut * 0.6f, res);
+            bodyOut = std::string(o) == "high" ? "lp2" : "lp4";
+            ladderNode = bodyNode;
+        } else if (std::string(pr) == "FILTER") {
             setP(bodyNode, "cutoff", rng(150.0f, 6000.0f));
             setP(bodyNode, "resonance", rng(0.05f, 0.85f));
             setP(bodyNode, "spread", rng(0.0f, 0.5f));
@@ -589,16 +624,25 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             && (vt == "NOISE" || vt == "OSC" || vt == "SHAPE"
                 || vt == "FILTER"));
         if (brightRaw && hasT("FILTER") && firstT("FILTER") != voiceNode) {
-            const std::size_t flt = firstT("FILTER");
+            const bool asLadder = bassLadder && ladderNode >= N;
+            const std::size_t flt = asLadder ? firstT("LADDER") : firstT("FILTER");
             const int ai = pIn(flt, "in");
             const int so = pOut(bodyNode, bodyOut);
             if (ai >= 0 && so >= 0
                 && connect({bodyNode, static_cast<std::size_t>(so)},
                            {flt, static_cast<std::size_t>(ai)})) {
-                setP(flt, "cutoff", rng(400.0f, 3200.0f));
-                setP(flt, "resonance", rng(0.05f, 0.4f));
+                if (asLadder) {
+                    const float cut = (rng(400.0f, 3200.0f) - 400.0f) / 2800.0f;
+                    const float res = (rng(0.05f, 0.4f) - 0.05f) / 0.35f;
+                    setLadder(flt, 0.03f + 0.5f * cut, 0.2f + 0.8f * res);
+                    bodyOut = "lp4";
+                    ladderNode = flt;
+                } else {
+                    setP(flt, "cutoff", rng(400.0f, 3200.0f));
+                    setP(flt, "resonance", rng(0.05f, 0.4f));
+                    bodyOut = "all";
+                }
                 bodyNode = flt;
-                bodyOut = "all";
                 spine[flt] = 1;
             }
         }
@@ -608,9 +652,12 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     // Quando o FILTER está na cadeia da voz, às vezes a cópia do ENVELOPE o
     // abre e fecha a cada nota — o contorno de filtro separado do de
     // volume, a gramática do baixo (pesquisa do grave, 10/11).
-    if (makeCopy && hasT("FILTER") && firstT("FILTER") != voiceNode
-        && spine[firstT("FILTER")] && chance(0.3f + 0.3f * id.complexity)) {
-        const std::size_t e2 = copyOf("ENVELOPE"), flt = firstT("FILTER");
+    // (11/11/2026) com a escada na voz, o envelope abre a escada
+    if (makeCopy && (ladderNode < N || (hasT("FILTER") && firstT("FILTER") != voiceNode))
+        && spine[ladderNode < N ? ladderNode : firstT("FILTER")]
+        && chance(0.3f + 0.3f * id.complexity)) {
+        const std::size_t e2 = copyOf("ENVELOPE"),
+                          flt = ladderNode < N ? ladderNode : firstT("FILTER");
         if (e2 < N) {
             setP(e2, "mode", 1.0f);
             setP(e2, "attack", rng(0.002f, 0.02f));
@@ -647,6 +694,37 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                        {e, static_cast<std::size_t>(ai)})) {
             connectByName("CLOCK", "euclid", "ENVELOPE", "gate");
             bodyNode = e; bodyOut = "out"; spine[e] = 1;
+        }
+    }
+
+    // ---- ACCENT com a escada (11/11/2026, autor: "de acordo") ----------
+    // Em ~40 % das seeds com escada: o acento escuta a linha (o gate da voz
+    // e a altura) e mexe em três coisas ao mesmo tempo — DEC encurta o
+    // envelope, SWP empilha a ressonância, FC abre a escada (se o FC
+    // estiver livre). Ganhos de cabo contidos. Corrente própria (22, 24…).
+    if (ladderNode < N && hasT("ACCENT") && !spine[firstT("ACCENT")]
+        && seedUnit(seedS, 22) < 0.4f) {
+        const std::size_t ac = firstT("ACCENT");
+        setP(ac, "metric", 0.5f + 0.3f * seedUnit(seedS, 24));
+        setP(ac, "leap", 0.3f + 0.3f * seedUnit(seedS, 25));
+        setP(ac, "apex", 0.3f + 0.4f * seedUnit(seedS, 26));
+        setP(ac, "external", 0.0f);
+        setP(ac, "agogic", 0.2f);
+        setP(ac, "synco", 0.0f);
+        setP(ac, "cycle", seedUnit(seedS, 27) < 0.5f ? 4.0f : 8.0f);
+        setP(ac, "inherit", 0.3f);
+        setP(ac, "suppress", 0.3f);
+        setP(ac, "depth", 0.5f + 0.3f * seedUnit(seedS, 28));
+        if (connectIds(firstT("CLOCK"), "euclid", ac, "gate")) {
+            connectIds(firstT("QUANTIZER"), "pitch", ac, "pitch");
+            spine[ac] = 1;
+            const std::size_t env = firstT("ENVELOPE");
+            if (hasT("ENVELOPE") && spine[env] && connectIds(ac, "decay", env, "time_mod"))
+                g.cable(g.cableCount() - 1).setGain(0.5f);
+            if (connectIds(ac, "sweep", ladderNode, "res_mod"))
+                g.cable(g.cableCount() - 1).setGain(0.2f);
+            if (connectIds(ac, "cutoff", ladderNode, "cutoff_mod"))
+                g.cable(g.cableCount() - 1).setGain(0.6f);
         }
     }
 
@@ -721,6 +799,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     };
     auto freeNode = [&](const char* t) { return hasT(t) && !spine[firstT(t)]; };
     int voices = 1;
+    // a contravoz, para as regras de limite (o BLEFE se põe no gatilho dela)
+    std::size_t cvGenNode = N, cvTrigNode = N;
+    const char* cvTrigIn = nullptr;
 
     // ---- ch2 CONTRAVOZ: segunda linha com altura própria -----------
     // As notas vêm da voz: ARP (raiz = a nota da voz → acorde em torno da
@@ -839,6 +920,9 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             if (sung && toChannel(outNode, outNm, 2, gain1 - rng(4.0f, 8.0f), 0.30f * side)) {
                 spine[sn] = 1;
                 ++voices;
+                cvGenNode = gn;
+                cvTrigNode = sg->lpg ? lpN : sn;
+                cvTrigIn = sg->lpg ? "strike" : sg->trigIn;
             }
         }
     }
@@ -1047,6 +1131,133 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                                      tp.depth * (0.3f + id.motion), tp.off, true);
             } catch (...) {}
         }
+    }
+
+    // ================ REGRAS da seed (11/11/2026, autor: "ok para as 3
+    // perguntas"; `dossies/PROPOSTA_regras_da_seed.md`) ================
+    // GARANTIA DE LIMITE: cinco papéis de ruptura, cada um com chance baixa
+    // e independente; se nenhum sair, a seed força um entre os que cabem
+    // (conceito do Rasgo Synth Studio: "a rede de segurança decide QUE algo
+    // aconteça, nunca QUAL"). Correntes próprias (30…) — nada antes muda.
+    {
+        auto u = [&](int k) { return seedUnit(seedS, static_cast<std::uint64_t>(30 + k)); };
+        auto freeIn = [&](std::size_t n, const char* nm) {
+            const int pi = pIn(n, nm);
+            if (pi < 0) return;
+            for (std::size_t i = g.cableCount(); i-- > 0;)
+                if (g.cable(i).target().node == n
+                    && g.cable(i).target().port == static_cast<std::size_t>(pi)) {
+                    g.disconnect(n, static_cast<std::size_t>(pi));
+                    break;
+                }
+            inUsed[n][static_cast<std::size_t>(pi)] = 0;
+        };
+        // quem cabe neste patch
+        const bool canCite = hasT("APOCRIFO") && hasT("MIXER") && hasT("MASTER");
+        std::size_t seqSrc = N;
+        if (hasT("QUANTIZER")) {
+            const int qcv = pIn(firstT("QUANTIZER"), "cv");
+            for (std::size_t i = 0; i < g.cableCount(); ++i)
+                if (g.cable(i).target().node == firstT("QUANTIZER")
+                    && static_cast<int>(g.cable(i).target().port) == qcv)
+                    seqSrc = g.cable(i).source().node;
+        }
+        const bool canOrder = hasT("COHERENCE") && seqSrc < N && pIn(seqSrc, "reset") >= 0
+            && !inUsed[seqSrc][static_cast<std::size_t>(pIn(seqSrc, "reset"))];
+        bool harmonyWired = false;
+        if (hasT("HARMONY"))
+            for (std::size_t i = 0; i < g.cableCount(); ++i)
+                if (g.cable(i).source().node == firstT("HARMONY")) harmonyWired = true;
+        const bool canModulate = hasT("HARMONY") && hasT("QUANTIZER") && !harmonyWired;
+        const bool canTrust = hasT("BLEFE") && cvGenNode < N && cvTrigNode < N && cvTrigIn;
+        std::size_t addNode = N;
+        if (hasT("ADDITIVE") && spine[firstT("ADDITIVE")]) addNode = firstT("ADDITIVE");
+        const bool canTear = addNode < N;
+
+        bool roles[5] = {canCite && u(0) < 0.15f, canOrder && u(1) < 0.15f,
+                         canModulate && u(2) < 0.15f, canTrust && u(3) < 0.10f,
+                         canTear && u(4) < 0.10f};
+        if (!roles[0] && !roles[1] && !roles[2] && !roles[3] && !roles[4]) {
+            const bool can[5] = {canCite, canOrder, canModulate, canTrust, canTear};
+            int nCan = 0;
+            for (const bool c : can) nCan += c ? 1 : 0;
+            if (nCan > 0) {
+                int k = static_cast<int>(u(5) * static_cast<float>(nCan)) % nCan;
+                for (int r = 0; r < 5; ++r)
+                    if (can[r] && k-- == 0) { roles[r] = true; break; }
+            }
+        }
+        if (roles[0]) {   // CITAÇÃO: o APÓCRIFO no barramento
+            const std::size_t ap = firstT("APOCRIFO"), ms = firstT("MASTER");
+            freeIn(ms, "in");
+            setP(ap, "mode", static_cast<float>(static_cast<int>(u(6) * 3.0f) % 3));
+            setP(ap, "min_age", 20.0f + 20.0f * u(7));
+            setP(ap, "length", 0.4f + 1.2f * u(8));
+            setP(ap, "chance", 0.15f + 0.25f * u(9));
+            setP(ap, "depth", 0.7f);
+            setP(ap, "seed", std::floor(999.0f * u(10)));
+            if (connectIds(firstT("MIXER"), "out", ap, "in") && connectIds(ap, "out", ms, "in"))
+                spine[ap] = 1;
+            else
+                connectIds(firstT("MIXER"), "out", ms, "in");   // nunca sem som
+        }
+        if (roles[1]) {   // RUPTURA DA ORDEM: a linha que se repete se refaz
+            const std::size_t co = firstT("COHERENCE");
+            setP(co, "window", 8.0f + 8.0f * u(11));
+            setP(co, "threshold", 0.55f + 0.2f * u(12));
+            setP(co, "patience", 4.0f + 6.0f * u(13));
+            setP(co, "scar", 4.0f + 4.0f * u(14));
+            if (connectIds(firstT("QUANTIZER"), "pitch", co, "pitch")
+                && connectIds(firstT("QUANTIZER"), "gate", co, "gate")
+                && connectIds(co, "collapse", seqSrc, "reset"))
+                spine[co] = 1;
+        }
+        if (roles[2]) {   // MODULAÇÃO: o HARMONY sai do quase parado
+            const std::size_t hm = firstT("HARMONY");
+            static constexpr float kMoves[5] = {0.0f, 1.0f, 2.0f, 5.0f, 6.0f};
+            const float mv = kMoves[static_cast<int>(u(15) * 5.0f) % 5];
+            setP(hm, "movement", mv);
+            setP(hm, "rate", 0.02f + 0.05f * u(16));
+            setP(hm, "root_start", static_cast<float>(id.root));
+            setP(hm, "scale_lo", static_cast<float>(id.scale));
+            setP(hm, "scale_hi", static_cast<float>(id.scale));
+            setP(hm, "nr_cycle", static_cast<float>(static_cast<int>(u(17) * 4.0f) % 4));
+            setP(hm, "hold", 0.0f);
+            connectIds(hm, "root", firstT("QUANTIZER"), "root_cv");
+            connectIds(hm, "scale", firstT("QUANTIZER"), "scale_cv");
+        }
+        if (roles[3]) {   // CONFIANÇA: a contravoz responde enquanto confia
+            const std::size_t bl = firstT("BLEFE");
+            setP(bl, "truthfulness", 0.55f + 0.3f * u(18));
+            setP(bl, "window", 0.05f + 0.1f * u(19));
+            setP(bl, "memory", 0.1f + 0.2f * u(20));
+            setP(bl, "threshold", 0.3f + 0.1f * u(21));
+            setP(bl, "seed", std::floor(999.0f * u(22)));
+            freeIn(cvTrigNode, cvTrigIn);
+            if (connectIds(cvGenNode, "gate", bl, "in")
+                && connectIds(bl, "response", cvTrigNode, cvTrigIn))
+                spine[bl] = 1;
+            else
+                connectIds(cvGenNode, "gate", cvTrigNode, cvTrigIn);   // como era
+        }
+        if (roles[4])     // RASGO DA MATÉRIA: o timbre se esvazia devagar
+            setP(addNode, "tension", 0.08f + 0.17f * u(23));
+    }
+    // GENE HEISENBERG (Studio, Fase 71): em ~25 % das seeds, um equilíbrio b
+    // troca precisão de ritmo por precisão de afinação. b ≈ 0: grade rígida,
+    // afinação vaga (DRIFT, glide, às vezes 19/31-EDO); b ≈ 1: afinação presa
+    // (Justa), ritmo fraturado (DRIFT e SWING do CLOCK).
+    if (const float hb = seedHeisenberg(seed); hb >= 0.0f) {
+        if (std::string(vc.mod) == "OSC") setP(voiceNode, "drift", 0.6f * (1.0f - hb));
+        setT("QUANTIZER", "glide", 0.15f * (1.0f - hb));
+        if (hb < 0.3f && seedUnit(seedS, 19) < 0.5f)
+            setT("QUANTIZER", "tuning", seedUnit(seedS, 19) < 0.25f ? 4.0f : 5.0f);
+        else if (hb > 0.7f)
+            setT("QUANTIZER", "tuning", 1.0f);
+        else
+            setT("QUANTIZER", "tuning", 0.0f);
+        setT("CLOCK", "drift", 0.5f * hb);
+        setT("CLOCK", "swing", 0.35f * hb);
     }
 
     // ================ poda: nenhum cabo sem função sonora =========

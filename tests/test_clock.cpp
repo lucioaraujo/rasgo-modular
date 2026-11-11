@@ -331,7 +331,39 @@ void testPanel() {
 
 }  // namespace
 
+
+// FASE e MET (11/11/2026)
+void testPhasingAndMetric() {
+    for (const float ph : {0.0f, 1.0f}) {
+        EuclidClock c;
+        c.setParameter("bpm", 120.0f); c.setParameter("mult", 2.0f);
+        c.setParameter("length", 16.0f); c.setParameter("phasing", ph);
+        c.prepare(kSampleRate, kBlock);
+        std::vector<AudioBlock> out(5, AudioBlock(kSampleRate, 1, kBlock));
+        std::vector<const AudioBlock*> ins{nullptr, nullptr, nullptr};
+        int clk = 0, fase = 0; float pc = 0, pf = 0;
+        float metAt0 = -1, metAt8 = -1; int step = -1;
+        for (int b = 0; b < int(10.0f * kSampleRate / kBlock); ++b) {
+            c.process(ins, out);
+            for (std::size_t i = 0; i < kBlock; ++i) {
+                if (pc < 0.5f && out[0].at(0, i) >= 0.5f) {
+                    ++clk; ++step;
+                    if (step % 16 == 0) metAt0 = out[4].at(0, i);
+                    if (step % 16 == 8) metAt8 = out[4].at(0, i);
+                }
+                if (pf < 0.5f && out[3].at(0, i) >= 0.5f) ++fase;
+                pc = out[0].at(0, i); pf = out[3].at(0, i);
+            }
+        }
+        std::cerr << "   PHAS " << ph << ": CLK " << clk << ", FASE " << fase << "\n";
+        if (ph == 0.0f) check(fase == clk, "PHAS 0: FASE colada ao CLK");
+        else check(fase > clk && fase <= clk * 1.04 + 1, "PHAS 1: FASE ~3 % mais rápida (Reich)");
+        check(metAt0 == 1.0f && std::fabs(metAt8 - 0.5f) < 1e-6f, "MET: 1 no tempo forte, ½ no meio do ciclo");
+    }
+}
+
 int main() {
+    testPhasingAndMetric();
     testInternalTempo();
     testFeelTuplet();
     testFeelGlitchIsIrregular();

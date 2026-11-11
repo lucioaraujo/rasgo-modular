@@ -9,6 +9,16 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote do tempo e da decisão** (11 nov., "pode avançar").
+  - **Módulo novo: COMPARADOR (#80)**, mixer polarizador e comparador com
+    histerese (MIX, INV, COMP, CRUZ). Família DECISÃO; entra na seed (**as
+    seeds mudam**).
+  - **CLOCK:** a saída FASE (o *phasing* de Reich, até 3 %, knob PHAS) e a
+    saída MET (a força métrica do passo).
+  - **SHAPE:** TEAR, a dobra cujo ponto de reflexão muda a cada ciclo, na
+    passagem por zero.
+  - Tudo novo vem desligado ou em saídas novas.
+
 - **Lote da seed e do manuseio** (11 nov., aprovado pelo autor).
   - **REGRAS da seed.**
     - Garantia de limite: cinco papéis de ruptura (citação, ruptura da

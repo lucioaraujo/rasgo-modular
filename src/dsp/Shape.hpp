@@ -29,6 +29,16 @@
 // com integral contínua; Parker/Esqueda/Välimäki 2016) mata o alias
 // entre fs/2 e fs antes da decimação, o oversampling cuida do resto.
 // Atraso de grupo ~2,5 amostras. Ver dossiê §6.
+//
+// TEAR (11/11/2026; estudo da família: o `FractureFolder` do Rasgo Synth
+// Studio, mesmo autor — conceito, não código): a dobra que RASGA. Uma dobra
+// comum reflete sempre no mesmo ponto; com TEAR > 0 o ponto de reflexão
+// muda a cada CICLO da entrada — sorteado na passagem por zero, onde a
+// dobra vale exatamente 0, então a troca não estala e o ADAA continua
+// consistente. A forma deixa de ser periódica: um pouco diferente a cada
+// ciclo, de propósito. (No Studio o sorteio é por amostra; aqui, por
+// ciclo — é o que o conceito descreve, "a cada cruzamento", e é limpo.)
+// TEAR = 0: a dobra de antes, sem sorteio nenhum.
 
 namespace rasgo::modular {
 
@@ -46,7 +56,8 @@ public:
                {"wrap", 0.0f, 1.0f, 0.0f, ""},
                {"sat", 0.0f, 1.0f, 0.15f, ""},
                {"level", 0.0f, 1.0f, 0.8f, ""},
-               {"drift", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"drift", 0.0f, 1.0f, 0.0f, ""},
+               {"tear", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "SHAPE"; }
 
@@ -62,6 +73,7 @@ public:
         p.add(Widget::Kind::Knob, "SAT", "sat", 8.0f, 68.0f);
         p.add(Widget::Kind::Knob, "LVL", "level", 28.0f, 68.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 8.0f, 84.0f);
+        p.add(Widget::Kind::Knob, "TEAR", "tear", 28.0f, 84.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 110.0f);
         p.add(Widget::Kind::Jack, "MOD", "in:mod", 18.0f, 110.0f);
         p.add(Widget::Kind::Jack, "FCV", "in:fold_mod", 30.0f, 110.0f);
@@ -75,6 +87,9 @@ public:
         driftTgt_ = 0.0f;
         uPrev_ = 0.0f;
         os_.reset();
+        tearMul_ = 1.0f;
+        prevX_ = 0.0f;
+        tearRng_ = 0x9E3779B97F4A7C15ULL;
         driftCounter_ = 0;
         driftInterval_ = static_cast<std::uint32_t>(
             std::max(1.0f, std::max(1.0f, sampleRate) / 8.0f));
@@ -99,6 +114,7 @@ public:
         const float satT = clamp01(parameterValue("sat"));
         const float levelT = clamp01(parameterValue("level"));
         const float drift = clamp01(parameterValue("drift"));
+        const float tear = clamp01(parameterValue("tear"));
 
         if (!ctlPrimed_) {
             sRing_ = ringT; sFold_ = foldT; sSym_ = symT;
@@ -133,9 +149,21 @@ public:
             }
             x += sym * 0.5f;
 
+            // TEAR: um ponto de reflexão novo a cada ciclo, na passagem
+            // por zero (lá a dobra vale 0: trocar não estala)
+            if (tear > 0.0f) {
+                if ((prevX_ < 0.0f) != (x < 0.0f) && x >= 0.0f) {
+                    tearRng_ ^= tearRng_ >> 12; tearRng_ ^= tearRng_ << 25; tearRng_ ^= tearRng_ >> 27;
+                    const float r = static_cast<float>((tearRng_ * 0x2545F4914F6CDD1DULL) >> 40) / 16777216.0f;
+                    tearMul_ = 1.0f + tear * 0.7f * (2.0f * r - 1.0f);
+                }
+            } else {
+                tearMul_ = 1.0f;
+            }
+            prevX_ = x;
             const float foldCv = fcv != nullptr ? fcv->at(0, f) : 0.0f;
             const float foldAmt = clamp01(sFold_ + foldCv);
-            const float drive = 1.0f + foldAmt * 6.0f * (1.0f + driftCur_);
+            const float drive = 1.0f + foldAmt * 6.0f * (1.0f + driftCur_) * tearMul_;
 
             // núcleo sem memória (dobra ⊕ wrap com ADAA de 1ª ordem, depois
             // sat/tanh), rodado a 2× pelo oversampler. `drive` é constante
@@ -194,6 +222,8 @@ private:
     float driftCur_ = 0.0f;
     float driftTgt_ = 0.0f;
     float uPrev_ = 0.0f;   // ADAA: entrada driveada da sub-amostra anterior
+    float tearMul_ = 1.0f, prevX_ = 0.0f;   // TEAR: o fator do ciclo atual
+    std::uint64_t tearRng_ = 0x9E3779B97F4A7C15ULL;
     std::uint32_t driftCounter_ = 0;
     std::uint32_t driftInterval_ = 6000;
     std::uint64_t rng_ = 0x100000001B3ULL;
