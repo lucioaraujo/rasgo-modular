@@ -9,6 +9,14 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Módulo novo: KEY (TOM)** (11 nov., fila aprovada). O tom de quem toca:
+  estima tônica e modo (maior/menor) de uma linha de alturas pelos perfis
+  de Krumhansl e Kessler, com as notas longas pesando mais (como no
+  Maravi); histerese (ESTAB) para não tremular; CERTEZA diz quando é
+  ambíguo. ROOT e SCL saem no formato do QUANTIZER: SIGNAL-IN → SCOPE →
+  KEY → QUANTIZER e o patch toca no tom de quem canta. Família DECISÃO;
+  entra na seed (**as seeds mudam**). Dossiê 73, `test_key`.
+
 - **Registro das seeds abertas** (11 nov., pedido do autor). Cada seed
   aberta vira uma linha em `~/.config/rasgo-modular/seeds.log` (Linux): data
   e hora, número, vozes do conjunto, módulos e cabos ligados, modo do PALCO

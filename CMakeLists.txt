@@ -567,6 +567,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_declick_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_declick_tests COMMAND rasgo_modular_declick_tests)
 
+    add_executable(rasgo_modular_key_tests tests/test_key.cpp)
+    target_include_directories(rasgo_modular_key_tests PRIVATE src)
+    target_compile_options(rasgo_modular_key_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_key_tests COMMAND rasgo_modular_key_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})
