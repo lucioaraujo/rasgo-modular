@@ -9,6 +9,28 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Correção: a seed volta a compor com o rack inteiro** (11 nov., relato
+  do autor: "os seeds mudaram, não estão mais tão interessantes", "mais
+  didático e menos musical", módulos sem cabo na tela).
+  - Causa: abrir um patch (.rmp) troca o rack pelos módulos daquele patch.
+    Depois de abrir o patch de prova `teste_ladder_acento` (13 módulos), cada
+    SEED passou a compor só com eles. Desde as 18:00, as seeds saíram com
+    7–10 módulos (antes, 6–47), sempre LADDER/ACCENT/VCA, e a mesma seed dava
+    outro patch. O código das seeds não mudou; o rack é que tinha encolhido.
+  - Agora: SEED, seed digitada e REPOR refazem o rack de fábrica, na ordem de
+    fábrica, quando ele não está completo. O patch anterior continua no
+    DESFAZ.
+  - A lista "à vista por exceção" da vista SAÍDA (módulo recém-adicionado ou
+    recém-desplugado, com borda tracejada) é limpa a cada seed. Antes, um
+    módulo solto do patch anterior seguia na tela sem cabo.
+  - Seeds iguais ao commit anterior; nenhuma regra de composição mudou.
+  - Em espera, sem entrar neste build: os papéis dos módulos novos na seed
+    (INTÉRPRETE, RELAÇÃO, POLÍMETRO, ÍMÃS, EPICICLO, CORPO, RECORTE) e a
+    poda do processador sem entrada. Medição: o FILTER sem entrada no ch3 já
+    existe nas seeds aprovadas (93 de 400 em fef0803), por isso fica para a
+    escuta do autor. O patch está em
+    `.local-build/em_espera/2026-11-11_seed_papeis_novos.patch` (local).
+
 - **Lote do tempo e da decisão** (11 nov., "pode avançar").
   - **Módulo novo: COMPARADOR (#80)**, mixer polarizador e comparador com
     histerese (MIX, INV, COMP, CRUZ). Família DECISÃO; entra na seed (**as
