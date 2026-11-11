@@ -48,6 +48,25 @@
 // autônomo) ficou de fora: o `OSC` já tem `drift` fazendo
 // exatamente esse papel — duplicar seria redundante, não uma
 // contribuição nova.
+//
+// Lote do oscilador (11/11/2026, recomendações aprovadas pelo autor;
+// dossiê §9). Três acréscimos; cada um em 0 deixa o OSC como antes:
+//   - PD (phase distortion, só no SIN): a fase é dobrada antes do seno —
+//     corre até 0,5 em k = 0,5 − 0,49·PD e devagar depois (técnica de
+//     M. Ishibashi, conhecimento público). k nunca fica abaixo de 8
+//     incrementos de fase: nota aguda com PD alto perde brilho em vez de
+//     chiar.
+//   - UNI (unísono, só na SAW): 7 serras desafinadas; os desvios relativos
+//     e as curvas de mistura são as MEDIDAS publicadas por A. Szabo
+//     ("How to Emulate the Super Saw", 2010) — números, não código; a
+//     curva de espalhamento é nossa (0,15·x + 0,85·x³, suave no começo). Fases
+//     iniciais fixas; ganho normalizado pela potência (o RMS não sobe).
+//   - SUBD (1/2…1/16) + entrada SUBD (CV, 1 V = a faixa inteira): o SUB é a
+//     nota dividida por um inteiro — um DIVISOR de verdade, travado na fase
+//     do oscilador (conta as voltas, como um flip-flop), então não deriva e
+//     a troca do divisor entra na próxima volta, sem estalo. Série
+//     sub-harmônica (Schillinger; o Subharmonicon) — conceito. A chave SUB2
+//     saiu do painel: `sub_2` ligado (patches antigos) vira SUBD 4.
 
 namespace rasgo::modular {
 
@@ -58,7 +77,8 @@ public:
               {{"pitch", PortKind::Control, "v/oct"},
                {"fm", PortKind::Audio, ""},
                {"pwm", PortKind::Control, ""},
-               {"sync", PortKind::Control, "trig"}},
+               {"sync", PortKind::Control, "trig"},
+               {"sub_cv", PortKind::Control, ""}},
               {{"sine", PortKind::Audio, ""},
                {"tri", PortKind::Audio, ""},
                {"saw", PortKind::Audio, ""},
@@ -71,7 +91,10 @@ public:
                {"drift", 0.0f, 1.0f, 0.0f, ""},
                {"sub_2", 0.0f, 1.0f, 0.0f, ""},
                {"sync_enable", 0.0f, 1.0f, 0.0f, ""},
-               {"prox", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"prox", 0.0f, 1.0f, 0.0f, ""},
+               {"pd", 0.0f, 1.0f, 0.0f, ""},
+               {"unison", 0.0f, 1.0f, 0.0f, ""},
+               {"sub_div", 2.0f, 16.0f, 2.0f, ""}}) {}
 
     std::string type() const override { return "OSC"; }
 
@@ -86,13 +109,16 @@ public:
         p.add(Widget::Kind::Knob, "PW", "pw", 35.0f, 30.0f);
         p.add(Widget::Kind::Knob, "FM", "fm_amount", 49.0f, 30.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 7.0f, 52.0f);
-        p.add(Widget::Kind::Toggle, "SUB2", "sub_2", 21.0f, 54.0f);
         p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 35.0f, 54.0f);
         p.add(Widget::Kind::Knob, "PROX", "prox", 49.0f, 52.0f);
+        p.add(Widget::Kind::Knob, "PD", "pd", 7.0f, 72.0f);
+        p.add(Widget::Kind::Knob, "UNI", "unison", 21.0f, 72.0f);
+        p.add(Widget::Kind::Knob, "SUBD", "sub_div", 35.0f, 72.0f);
         p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 5.0f, 96.0f);
         p.add(Widget::Kind::Jack, "FM", "in:fm", 17.0f, 96.0f);
         p.add(Widget::Kind::Jack, "PWM", "in:pwm", 29.0f, 96.0f);
         p.add(Widget::Kind::Jack, "SYNC", "in:sync", 41.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "SUBD", "in:sub_cv", 53.0f, 96.0f);
         p.add(Widget::Kind::Jack, "SIN", "out:sine", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "TRI", "out:tri", 17.0f, 116.0f);
         p.add(Widget::Kind::Jack, "SAW", "out:saw", 29.0f, 116.0f);
@@ -115,6 +141,9 @@ public:
             static_cast<std::uint32_t>(std::max(1.0f, sampleRate / 40.0f));
         paramCoeff_ = std::exp(-1.0f / (0.005f * std::max(1.0f, sampleRate)));
         sineLP_ = triLP_ = sawLP_ = pulseLP_ = subLP_ = 0.0f;
+        subCount_ = 0;
+        subDiv_ = 2;
+        for (std::size_t v = 0; v < kUni; ++v) uniPhase_[v] = kUniStart[v];
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -133,11 +162,23 @@ public:
         const float fmAmount = parameterValue("fm_amount");
         const float drift = parameterValue("drift");
         const float prox = parameterValue("prox");
-        const bool sub2 = parameterValue("sub_2") >= 0.5f;
+        // patches de antes: a chave SUB2 ligada vira SUBD 4 (uma vez)
+        if (parameterValue("sub_2") >= 0.5f) {
+            setParameter("sub_div", 4.0f);
+            setParameter("sub_2", 0.0f);
+        }
+        const float pdAmt = clampf(parameterValue("pd"), 0.0f, 1.0f);
+        const float uni = clampf(parameterValue("unison"), 0.0f, 1.0f);
+        const float subDivParam = parameterValue("sub_div");
+        const AudioBlock* subCv = inputs.size() > 4 ? inputs[4] : nullptr;
+        // UNI: espalhamento e mistura (curvas de Szabo para a mistura)
+        const float spread = 0.15f * uni + 0.85f * uni * uni * uni;
+        const float mixC = -0.55366f * uni + 0.99785f;
+        const float mixS = -0.73764f * uni * uni + 1.2841f * uni + 0.044372f;
+        const float uniNorm = 1.0f / std::sqrt(mixC * mixC + 6.0f * mixS * mixS);
         const bool syncEnabled = parameterValue("sync_enable") >= 0.5f;
         const float driftStep = 0.0006f * drift * drift;
         const float fineRatio = std::exp2(fineParam / 1200.0f);
-        const float subMult = sub2 ? 0.25f : 0.5f;
         const double nyq = 0.45 * sampleRate_;
 
         const AudioBlock* pitchMod = inputs[0];
@@ -175,6 +216,8 @@ public:
                 if (prevSync_ < 0.5f && trig >= 0.5f) {
                     phase_ = 0.0;
                     subPhase_ = 0.0;
+                    subCount_ = 0;
+                    for (std::size_t v = 0; v < kUni; ++v) uniPhase_[v] = kUniStart[v];
                 }
                 prevSync_ = trig;
             }
@@ -187,19 +230,41 @@ public:
             const float sp = static_cast<float>(subPhase_);
 
             // --- formas ---
-            const float sine =
-                std::sin(6.28318530717958648f * p);
+            float sine;
+            if (pdAmt <= 0.0f) {
+                sine = std::sin(6.28318530717958648f * p);
+            } else {
+                const float kMin = std::min(0.5f, 8.0f * static_cast<float>(adt));
+                const float k = std::max(kMin, 0.5f - 0.49f * pdAmt);
+                const float w = p < k ? 0.5f * p / k
+                                      : 0.5f + 0.5f * (p - k) / (1.0f - k);
+                sine = std::sin(6.28318530717958648f * w);
+            }
             const float tri = (p < 0.5f) ? (4.0f * p - 1.0f) : (3.0f - 4.0f * p);
 
             float saw = 2.0f * p - 1.0f;
             saw -= static_cast<float>(polyBlep(phase_, adt));
+            if (uni > 0.0f) {
+                float sides = 0.0f;
+                for (std::size_t v = 0; v < kUni; ++v) {
+                    if (v == kUniCentre) continue;
+                    const double ratio = 1.0 + static_cast<double>(kUniOffset[v] * spread);
+                    const double vdt = adt * ratio;
+                    float s = 2.0f * static_cast<float>(uniPhase_[v]) - 1.0f;
+                    s -= static_cast<float>(polyBlep(uniPhase_[v], vdt));
+                    sides += s;
+                    uniPhase_[v] += dp * ratio;
+                    uniPhase_[v] -= std::floor(uniPhase_[v]);
+                }
+                saw = (mixC * saw + mixS * sides) * uniNorm;
+            }
 
             float pulse = (p < pw) ? 1.0f : -1.0f;
             pulse += static_cast<float>(polyBlep(phase_, adt));
             pulse -= static_cast<float>(
                 polyBlep(wrap01(phase_ + 1.0 - static_cast<double>(pw)), adt));
 
-            const double sdt = adt * static_cast<double>(subMult);
+            const double sdt = adt / static_cast<double>(subDiv_);
             float sub = (sp < 0.5f) ? 1.0f : -1.0f;
             sub += static_cast<float>(polyBlep(subPhase_, sdt));
             sub -= static_cast<float>(polyBlep(wrap01(subPhase_ + 0.5), sdt));
@@ -228,9 +293,20 @@ public:
             }
 
             phase_ += dp;
-            phase_ -= std::floor(phase_);          // wrap [0,1), qualquer sinal
-            subPhase_ += dp * static_cast<double>(subMult);
-            subPhase_ -= std::floor(subPhase_);
+            // SUB: divisor travado na fase — conta as voltas do oscilador
+            // (para a frente e, na FM through-zero, para trás)
+            const double wraps = std::floor(phase_);
+            phase_ -= wraps;                       // wrap [0,1), qualquer sinal
+            if (wraps != 0.0) {
+                subCount_ += static_cast<int>(wraps);
+                // o divisor só muda na volta: sem estalo
+                float dv = subDivParam;
+                if (subCv != nullptr) dv += 15.0f * subCv->at(0, frame);
+                subDiv_ = static_cast<int>(std::lround(clampf(dv, 2.0f, 16.0f)));
+                subCount_ = ((subCount_ % subDiv_) + subDiv_) % subDiv_;
+            }
+            subPhase_ = (static_cast<double>(subCount_) + phase_)
+                      / static_cast<double>(subDiv_);
         }
     }
 
@@ -266,6 +342,15 @@ private:
         return static_cast<float>(static_cast<std::int32_t>(x >> 32))
             / 2147483648.0f;
     }
+
+    // UNI: 7 vozes; desvios relativos medidos por Szabo (2010)
+    static constexpr std::size_t kUni = 7, kUniCentre = 3;
+    static constexpr float kUniOffset[kUni] = {-0.11002313f, -0.06288439f, -0.01952356f, 0.0f,
+                                               0.01991221f, 0.06216538f, 0.10745242f};
+    static constexpr double kUniStart[kUni] = {0.13, 0.71, 0.42, 0.0, 0.88, 0.27, 0.56};
+    double uniPhase_[kUni] = {0.13, 0.71, 0.42, 0.0, 0.88, 0.27, 0.56};
+    int subCount_ = 0;
+    int subDiv_ = 2;
 
     double phase_ = 0.0;
     double subPhase_ = 0.0;

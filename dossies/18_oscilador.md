@@ -176,7 +176,27 @@ determinismo, drift) antes do patch. Cadeia melódica canônica:
 Adicionado ao catálogo do painel (`apps/panel/ModuleCatalog.hpp`, família
 SOURCE).
 
-## 9. Proposta do lote do oscilador (11/11/2026, aguarda o autor)
+## 9. Lote do oscilador (11/11/2026, aprovado: "siga com suas recomendações, inclua a CV do SUBD")
+
+**Decisões:** PD só no SIN; UNI só na SAW; a chave SUB2 sai do painel; entra
+uma entrada de CV para o SUBD (1 V = a faixa inteira, +1/15 V por
+divisor).
+
+**Implementado e medido** (`test_oscillator`):
+- PD 0, UNI 0 e SUBD 2 são bit a bit iguais ao OSC anterior.
+- PD 0,8 a 220 Hz dá harmônicos; pior alias com PD 1 a 2,1 kHz: −51 dB.
+  O canto da fase foi limitado a 8 incrementos de fase; com 4, dava −37 dB.
+- UNI 0,3/0,6/1: RMS −1,2/+0,6/+0,2 dB.
+- SUBD 2/3/5/7/16 afinam em f/n. O SUB virou um **divisor travado na fase**
+  (conta as voltas do oscilador, também para trás na FM through-zero); a
+  troca do divisor entra na volta seguinte.
+- `sub_2` ligado migra para SUBD 4 ao tocar. A seed sorteia `sub_div`
+  com o mesmo sorteio da antiga chave, então as seeds soam iguais.
+- PD, UNI e SUBD ficam fora do sorteio genérico da seed. O SUBD fica fora
+  do VARIA e da mutação (mudaria a nota do grave aos saltos); PD e UNI
+  entram no VARIA.
+
+### Proposta original
 
 Da `PESQUISA_cardinal_baixo_e_osciladores.md` §8.3 (aprovada na fila):
 "modos que faltam e são baratos". São três acréscimos, e cada um em 0 deixa

@@ -173,3 +173,32 @@ técnicas, reset, clock, determinismo) antes do patch. Numa peça:
 `CLOCK` (divisão longa) → `HARMONY.advance`; `HARMONY.root/scale` →
 `QUANTIZER`; `HARMONY.change` → `TURING.reset` — a peça modula e cada
 tom novo traz uma frase nova.
+
+## 9. Proposta do lote da harmonia: neo-Riemann (11/11/2026, aguarda o autor)
+
+Da auditoria ("HARMONY: lacuna neo-Riemann P/L/R", aprovado).
+
+- **Movimento nº 6, NEO-RIEMANN.** A cada avanço, a tríade atual (tônica +
+  maior/menor) sofre uma das três transformações de H. Riemann, na leitura
+  de R. Cohn (1998) e D. Lewin:
+  - **P** (paralela): Dó maior ↔ Dó menor;
+  - **R** (relativa): Dó maior ↔ Lá menor;
+  - **L** (*Leittonwechsel*): Dó maior ↔ Mi menor.
+
+  Cada uma move **uma só nota** da tríade por um ou dois semitons. É a
+  condução de vozes mais econômica que existe, e é por isso que essas
+  progressões (Wagner, Liszt, trilhas de cinema) soam como deslizar, não
+  como saltar.
+- **O caminho:** um passeio semeado pelo **Tonnetz** (a rede de tríades),
+  que **nunca desfaz** o passo anterior (P depois de P voltaria ao mesmo
+  acorde).
+- **Ciclos:** um knob **CICLO** escolhe entre:
+  - passeio livre;
+  - ciclo **hexatônico** (P, L, P, L…: seis acordes que fecham o círculo);
+  - ciclo **octatônico** (P, R, P, R…);
+  - **LR** (as quintas que caminham, o ciclo de Beethoven, de Cohn).
+- **Saídas:** as mesmas (ROOT, SCALE no formato do QUANTIZER: Maior ou
+  menor natural; CHG). Pergunta: uma saída a mais, **OP**, que diz qual
+  transformação ocorreu (P, L ou R em três níveis), para o patch reagir a
+  cada uma? Recomendação: sim, é barata.
+- **Compatibilidade:** os movimentos 0–5 ficam iguais.
