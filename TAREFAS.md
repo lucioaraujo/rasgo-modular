@@ -23,6 +23,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] Instâncias, passos 1–3 (app; partitura/VARIA já por módulo; a seed
   abre cópias: par de OSC, envelope do filtro, contravoz — 36 % das seeds).
 - [ ] Escuta do autor: seeds com cópias (OSC 2, ENVELOPE 2, contravoz).
+- [ ] (quando o autor quiser) liberar um 2º MIXER à mão, como submix:
+  conferido em 11/11 que é seguro (MASTER segue único; a seed e o
+  equilíbrio usam o primeiro MIXER); é tirar "MIXER" de `isSingletonType`.
+  Autor: "não precisa no momento".
 - [x] Estalos nas trocas corrigidos (8b92226); aliasing medido — só o
   OPERATOR pedia (sobreamostragem 4×, decisão do autor).
 
