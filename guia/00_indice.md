@@ -201,6 +201,9 @@ Estado: **✓** pronto · **·** a fazer.
 | 85 | `CUTUP` | [`85_cutup.md`](85_cutup.md) | local, após 0.1.7 |
 | 86 | `BUDGET` | [`86_budget.md`](86_budget.md) | local, após 0.1.7 |
 | 87 | `INTERPRET` | [`87_interpret.md`](87_interpret.md) | local, após 0.1.7 |
+| 88 | `SUPPLY` | [`88_supply.md`](88_supply.md) | local, após 0.1.7 |
+| 89 | `MAGNET` | [`89_magnet.md`](89_magnet.md) | local, após 0.1.7 |
+| 90 | `ORBIT` | [`90_orbit.md`](90_orbit.md) | local, após 0.1.7 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

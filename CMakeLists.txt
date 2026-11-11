@@ -642,6 +642,21 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_interpret_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_interpret_tests COMMAND rasgo_modular_interpret_tests)
 
+    add_executable(rasgo_modular_supply_tests tests/test_supply.cpp)
+    target_include_directories(rasgo_modular_supply_tests PRIVATE src)
+    target_compile_options(rasgo_modular_supply_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_supply_tests COMMAND rasgo_modular_supply_tests)
+
+    add_executable(rasgo_modular_magnet_tests tests/test_magnet.cpp)
+    target_include_directories(rasgo_modular_magnet_tests PRIVATE src)
+    target_compile_options(rasgo_modular_magnet_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_magnet_tests COMMAND rasgo_modular_magnet_tests)
+
+    add_executable(rasgo_modular_orbit_tests tests/test_orbit.cpp)
+    target_include_directories(rasgo_modular_orbit_tests PRIVATE src)
+    target_compile_options(rasgo_modular_orbit_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_orbit_tests COMMAND rasgo_modular_orbit_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})
