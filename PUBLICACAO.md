@@ -26,6 +26,19 @@ Feito e verificado localmente:
 não é pública. Eles devem zerar depois da release; rodar de novo para
 conferir.
 
+Primeira tentativa da tag (11/11):
+- A execução `43098402083`, disparada pelo push da tag, ficou 41 min na fila
+  sem criar nenhum job, com o Actions operacional. O GitHub recusou cancelar
+  e reexecutar. Disparo manual sobre a tag: execução `43104135401`.
+- Resultado: Linux (.deb) e macOS (.dmg) passaram. O Windows falhou com
+  MSVC C1128 ("compile with /bigobj") em `test_learn_catalog` e
+  `tool_learn_coverage`; o catálogo cresceu com os textos dos 28 módulos.
+- Release e teste de abertura Linux foram pulados, como o portão manda:
+  **nada foi publicado**.
+- Correção: `/bigobj` em todos os alvos MSVC (`CMakeLists.txt`); Linux não
+  muda. A tag `v0.1.8` foi refeita sobre o commit corrigido, já que nenhuma
+  release existia.
+
 Portões que faltam, nesta ordem:
 
 1. **Escuta do autor no build da v0.1.8** (`./run`): seeds de volta ao rack
