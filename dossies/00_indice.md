@@ -109,6 +109,13 @@ propriedade do cabo, não um módulo do catálogo.
 | 78 | [`78_tap.md`](78_tap.md) | `TAP` (o andamento batido: mediana, recusa a contagem irregular, a 1ª batida é o "um") | TIME | implementação local, 2026-11-11 |
 | 79 | [`79_fronteira.md`](79_fronteira.md) | `FRONTEIRA` (fronteira de célula por LBDM, ao vivo, uma nota de atraso; FIM no silêncio) | DECISION | implementação local, 2026-11-11 |
 | 80 | [`80_comparador.md`](80_comparador.md) | `COMPARADOR` (mixer polarizador + comparador com histerese: MIX, INV, COMP, CRUZ) | DECISION | implementação local, 2026-11-11 |
+| 81 | [`81_epicycle.md`](81_epicycle.md) | `EPICYCLE` (círculos dentro de círculos: série de Fourier desenhada, Fibonacci em raios ou velocidades) | MODULATE | implementação local, 2026-11-11 |
+| 82 | [`82_polygon.md`](82_polygon.md) | `POLYGON` (polígonos inscritos num ciclo: polímetro como figura, COINC, EOS) | TIME | implementação local, 2026-11-11 |
+| 83 | [`83_via.md`](83_via.md) | `VIA` (o cabo com matéria: as 6 portas do Antitotem + FALANTE, para qualquer cabo) | ROUTE | implementação local, 2026-11-11 |
+| 84 | [`84_relate.md`](84_relate.md) | `RELATE` (os atos entre duas vozes: sombra, hoqueto, contágio, atrito, anel) | ROUTE | implementação local, 2026-11-11 |
+| 85 | [`85_cutup.md`](85_cutup.md) | `CUTUP` (o recorte do Navalha ao vivo: STUT, BURST, MICRO, GAP) | SPACE | implementação local, 2026-11-11 |
+| 86 | [`86_budget.md`](86_budget.md) | `BUDGET` (orçamento de eventos: competição ou cooperação entre 4 vozes) | TIME | implementação local, 2026-11-11 |
+| 87 | [`87_interpret.md`](87_interpret.md) | `INTERPRET` (o intérprete das notas que chegam, com CHARACTER) | DECISION | implementação local, 2026-11-11 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

@@ -81,6 +81,13 @@
 #include "dsp/Tap.hpp"
 #include "dsp/Fronteira.hpp"
 #include "dsp/Comparador.hpp"
+#include "dsp/Epicycle.hpp"
+#include "dsp/Polygon.hpp"
+#include "dsp/Via.hpp"
+#include "dsp/Relate.hpp"
+#include "dsp/CutUp.hpp"
+#include "dsp/Budget.hpp"
+#include "dsp/Interpret.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -129,6 +136,13 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "TAP")        return std::make_unique<Tap>();
     if (t == "FRONTEIRA")  return std::make_unique<Fronteira>();
     if (t == "COMPARADOR") return std::make_unique<Comparador>();
+    if (t == "EPICYCLE")   return std::make_unique<Epicycle>();
+    if (t == "POLYGON")    return std::make_unique<Polygon>();
+    if (t == "VIA")        return std::make_unique<Via>();
+    if (t == "RELATE")     return std::make_unique<Relate>();
+    if (t == "CUTUP")      return std::make_unique<CutUp>();
+    if (t == "BUDGET")     return std::make_unique<Budget>();
+    if (t == "INTERPRET")  return std::make_unique<Interpret>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "MOUSSE")     return std::make_unique<Mousse>();
@@ -225,11 +239,11 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM"}},
-        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "PHRASE"}},
-        {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR"}},
-        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "INTERPRET", "PHRASE"}},
+        {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE"}},
+        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO", "CUTUP"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},
     };
     return c;

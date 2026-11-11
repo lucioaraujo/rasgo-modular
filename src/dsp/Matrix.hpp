@@ -26,6 +26,14 @@
 //   - camada MATRIZ do `SignalGraph` do Rasgo (`matrixCell`, marco 2).
 //
 // Determinístico: o `drift` é soma de senos, sem RNG.
+//
+// HIST — rotas com história (11/11/2026; auditoria: "rotas que se alargam
+// com o uso", do Método RASGO §4.0; "avance em todos eles"). Cada cruzamento
+// guarda o DESGASTE do que passou por ele (a energia média |entrada·ganho|):
+// sobe em ~8 s de uso e esquece em ~60 s de desuso. Com HIST > 0, o caminho
+// usado ALARGA (até 1,2×) e o abandonado ESTREITA (até 0,3×) — a matriz
+// lembra por onde o som andou, e os knobs viram intenção, não valor exato.
+// HIST 0: a matriz de sempre.
 
 namespace rasgo::modular {
 
@@ -67,6 +75,7 @@ public:
         p.add(Widget::Kind::Knob, "RING", "ring", 90.0f, 58.0f);
         p.add(Widget::Kind::Knob, "SAT", "sat", 90.0f, 74.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 90.0f, 90.0f);
+        p.add(Widget::Kind::Knob, "HIST", "history", 90.0f, 106.0f);
         return p;
     }
 
@@ -78,7 +87,14 @@ public:
         driftPhase_ = 0.0f;
         for (auto& row : dw_)
             for (auto& c : row) c = 0.0f;
+        for (auto& row : wear_)
+            for (auto& c : row) c = 0.0f;
+        const float blockSec = static_cast<float>(blockSize) / sr_;
+        wearUp_ = 1.0f - std::exp(-blockSec / 8.0f);
+        wearDown_ = 1.0f - std::exp(-blockSec / 60.0f);
     }
+
+    float wear(const int j, const int k) const noexcept { return wear_[j][k]; }
 
     void process(const std::vector<const AudioBlock*>& inputs,
                  std::vector<AudioBlock>& outputs) noexcept override {
@@ -104,11 +120,14 @@ public:
                 dw_[j][k] = drift * 0.12f
                     * std::sin(driftPhase_ * (1.0f + 0.3f * j) + 1.7f * k);
 
+        const float hist = clamp01(parameterValue("history"));
         float geff[4][4], invn[4];
         for (int k = 0; k < 4; ++k) {
             float wsum = 0.0f;
             for (int j = 0; j < 4; ++j) {
                 geff[j][k] = clampf(g[j][k] + dw_[j][k], -1.5f, 1.5f);
+                if (hist > 0.0f)
+                    geff[j][k] *= (1.0f - hist) + hist * (0.3f + 0.9f * wear_[j][k]);
                 const float a = geff[j][k] < 0.0f ? -geff[j][k] : geff[j][k];
                 wsum += a;
             }
@@ -117,6 +136,22 @@ public:
         }
 
         const AudioBlock* in[4] = {inputs[0], inputs[1], inputs[2], inputs[3]};
+        // o desgaste: a energia média do bloco por cruzamento (normalizada
+        // por 0,3, um nível de sinal típico), subindo e esquecendo devagar
+        if (hist > 0.0f) {
+            float e[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+            for (int j = 0; j < 4; ++j)
+                if (in[j] != nullptr) {
+                    for (std::size_t f = 0; f < frames; ++f) e[j] += std::fabs(in[j]->at(0, f));
+                    e[j] /= static_cast<float>(std::max<std::size_t>(1, frames));
+                }
+            for (int j = 0; j < 4; ++j)
+                for (int k = 0; k < 4; ++k) {
+                    const float use = std::min(1.0f, e[j] * std::fabs(g[j][k]) / 0.3f);
+                    float& w = wear_[j][k];
+                    w += (use - w) * (use > w ? wearUp_ : wearDown_);
+                }
+        }
 
         for (std::size_t f = 0; f < frames; ++f) {
             float xin[4];
@@ -181,6 +216,7 @@ private:
         v.push_back({"ring", 0.0f, 1.0f, 0.0f, ""});
         v.push_back({"sat", 0.0f, 1.0f, 0.0f, ""});
         v.push_back({"drift", 0.0f, 1.0f, 0.0f, ""});
+        v.push_back({"history", 0.0f, 1.0f, 0.0f, ""});
         return v;
     }
 
@@ -193,6 +229,8 @@ private:
     float driftInc_ = 0.0f;
     float driftPhase_ = 0.0f;
     float dw_[4][4] = {};
+    float wear_[4][4] = {};
+    float wearUp_ = 0.0f, wearDown_ = 0.0f;
 };
 
 }  // namespace rasgo::modular

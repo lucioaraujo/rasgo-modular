@@ -179,3 +179,11 @@ vazamento, determinismo) antes do patch. Cadeias canônicas:
 `DRIFT.a → SWITCH.addr` (roteamento que deriva). Adicionado ao catálogo
 do painel (`apps/panel/ModuleCatalog.hpp`, família — não há ROUTE no
 catálogo; entra em SEQUENCE junto do `TURING`/`SEQUENCE`).
+
+## Scanner fantasma (11/11/2026)
+
+Do estudo da família §4.5.
+- **FANT** (saída): lê o endereço de ATRAS passos antes (1–3).
+- **FANT** (knob): mistura esse resíduo no OA.
+- **FANT 0:** o de sempre.
+- **Teste:** no D, o FANT mostra o C.

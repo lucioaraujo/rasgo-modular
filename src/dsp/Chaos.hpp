@@ -33,6 +33,21 @@
 // separadamente, mais largos, pra dar fôlego à dinâmica sem escapar pra
 // um valor perigoso). Determinístico (RNG semeado). Sem alocação em
 // `process()`.
+//
+// MODO (11/11/2026, auditoria: "mais atratores como modos (Rössler,
+// Aizawa)"; "avance em todos eles"):
+//   0 POÇO    — o campo de poço duplo de sempre (nada muda);
+//   1 RÖSSLER — O. Rössler (1976): ẋ = −y − z, ẏ = x + a·y, ż = b + z(x − c),
+//               a = 0,1 + 0,2·DAMP, b = 0,2, c = 3 + 5·DRIVE — o DRIVE anda
+//               pela rota de DUPLICAÇÃO DE PERÍODO: c baixo, um ciclo; mais
+//               alto, dois, quatro… até o caos (c ≈ 5,7, o clássico);
+//   2 AIZAWA  — o atrator de Aizawa (esfera com um tubo no eixo), com
+//               ε = 0,1 + 0,4·DRIVE e o amortecimento em DAMP.
+// Os dois são EDOs de 3 dimensões, integradas por RK2 em 4 subpassos; RATE
+// escala o tempo do atrator (≈ uma volta por segundo em RATE 1). Saídas
+// novas Y e Z (índices 1 e 2) — as outras dimensões do mesmo atrator; no
+// POÇO, Y é a velocidade e Z fica em 0. Um atrator que diverge volta ao
+// começo (nunca NaN).
 
 namespace rasgo::modular {
 
@@ -42,11 +57,14 @@ public:
         : Signal(
               {{"reseed", PortKind::Control, "trig"},
                {"rate_mod", PortKind::Control, ""}},
-              {{"out", PortKind::Audio, ""}},
+              {{"out", PortKind::Audio, ""},
+               {"y", PortKind::Audio, ""},
+               {"z", PortKind::Audio, ""}},
               {{"rate", 0.02f, 400.0f, 4.0f, "Hz"},
                {"drive", 0.0f, 1.0f, 0.6f, ""},
                {"damping", 0.05f, 1.0f, 0.3f, ""},
-               {"freeze", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"freeze", 0.0f, 1.0f, 0.0f, ""},
+               {"model", 0.0f, 2.0f, 0.0f, ""}}) {}
 
     std::string type() const override { return "CHAOS"; }
 
@@ -65,6 +83,9 @@ public:
         p.add(Widget::Kind::Jack, "RSD", "in:reseed", 7.0f, 98.0f);
         p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 18.0f, 98.0f);
         p.add(Widget::Kind::Jack, "OUT", "out:out", 29.0f, 98.0f);
+        p.add(Widget::Kind::Knob, "MODO", "model", 13.0f, 72.0f);
+        p.add(Widget::Kind::Jack, "Y", "out:y", 7.0f, 114.0f);
+        p.add(Widget::Kind::Jack, "Z", "out:z", 18.0f, 114.0f);
         return p;
     }
 
@@ -74,6 +95,7 @@ public:
         rngState_ = 0x9E3779B97F4A7C15ULL;
         prevReseed_ = 0.0f;
         kickCounter_ = 0;
+        lastModel_ = -1;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -89,6 +111,11 @@ public:
 
         const AudioBlock* reseedIn = inputs[0];
         const AudioBlock* rateModIn = inputs[1];
+        AudioBlock* yOut = outputs.size() > 1 ? &outputs[1] : nullptr;
+        AudioBlock* zOut = outputs.size() > 2 ? &outputs[2] : nullptr;
+        const int model = static_cast<int>(std::lround(
+            clampf(parameterValue("model"), 0.0f, 2.0f)));
+        if (model != lastModel_) { resetAttractor(model); lastModel_ = model; }
 
         for (std::size_t frame = 0; frame < frames; ++frame) {
             if (reseedIn != nullptr) {
@@ -97,6 +124,22 @@ public:
                 prevReseed_ = r;
             }
 
+            if (!freeze && model != 0) {
+                const float rate = clampf(
+                    rateBase + (rateModIn ? rateModIn->at(0, frame) : 0.0f),
+                    0.02f, 400.0f);
+                stepAttractor(model, rate, drive, damping);
+            }
+            if (model != 0) {
+                float nx, ny, nz;
+                normalized(model, nx, ny, nz);
+                for (std::size_t c = 0; c < channels; ++c) {
+                    out.at(c, frame) = nx;
+                    if (yOut) yOut->at(c, frame) = ny;
+                    if (zOut) zOut->at(c, frame) = nz;
+                }
+                continue;
+            }
             if (!freeze) {
                 const float rate = clampf(
                     rateBase + (rateModIn ? rateModIn->at(0, frame) : 0.0f),
@@ -120,8 +163,12 @@ public:
             }
 
             const float v = clampf(x_, -1.0f, 1.0f);
-            for (std::size_t c = 0; c < channels; ++c)
+            const float vy = clampf(y_ / 3.5f, -1.0f, 1.0f);
+            for (std::size_t c = 0; c < channels; ++c) {
                 out.at(c, frame) = v;
+                if (yOut) yOut->at(c, frame) = vy;
+                if (zOut) zOut->at(c, frame) = 0.0f;
+            }
         }
     }
 
@@ -146,6 +193,56 @@ private:
         y_ = clampf(whiteNoise() * 3.5f, -3.5f, 3.5f);
         kickCounter_ = 0;
     }
+
+    // ---- atratores de 3 dimensões (RÖSSLER, AIZAWA) ------------------
+    void resetAttractor(const int model) noexcept {
+        if (model == 1) { ax_ = 1.0; ay_ = 1.0; az_ = 0.0; }
+        else { ax_ = 0.1; ay_ = 0.0; az_ = 0.0; }
+    }
+    void deriv(const int model, const double x, const double y, const double z,
+               const double drive, const double damp,
+               double& dx, double& dy, double& dz) const noexcept {
+        if (model == 1) {
+            const double a = 0.1 + 0.2 * damp, b = 0.2, c = 3.0 + 5.0 * drive;
+            dx = -y - z; dy = x + a * y; dz = b + z * (x - c);
+        } else {
+            const double a = 0.95, b = 0.7, c = 0.6, d = 3.5, e = 0.1 + 0.4 * drive, f = 0.1;
+            const double damping = 1.0 + 0.5 * (damp - 0.3);
+            dx = (z - b) * x - d * y;
+            dy = d * x + (z - b) * y;
+            dz = c + a * z - z * z * z / 3.0 - (x * x + y * y) * (1.0 + e * z) + f * z * x * x * x;
+            dx *= damping; dy *= damping;
+        }
+    }
+    void stepAttractor(const int model, const float rate, const float drive,
+                       const float damp) noexcept {
+        // ≈ uma volta por segundo em RATE 1 (Rössler: período ≈ 6; Aizawa ≈ 3)
+        const double scale = model == 1 ? 6.0 : 3.0;
+        const double h = std::min(0.05, static_cast<double>(rate) * scale / sampleRate_ / 4.0);
+        for (int s = 0; s < 4; ++s) {
+            double k1x, k1y, k1z, k2x, k2y, k2z;
+            deriv(model, ax_, ay_, az_, drive, damp, k1x, k1y, k1z);
+            deriv(model, ax_ + 0.5 * h * k1x, ay_ + 0.5 * h * k1y, az_ + 0.5 * h * k1z,
+                  drive, damp, k2x, k2y, k2z);
+            ax_ += h * k2x; ay_ += h * k2y; az_ += h * k2z;
+        }
+        if (!std::isfinite(ax_) || !std::isfinite(ay_) || !std::isfinite(az_)
+            || std::fabs(ax_) > 100.0 || std::fabs(ay_) > 100.0 || std::fabs(az_) > 100.0)
+            resetAttractor(model);
+    }
+    void normalized(const int model, float& nx, float& ny, float& nz) const noexcept {
+        if (model == 1) {
+            nx = clampf(static_cast<float>(ax_ / 12.0), -1.0f, 1.0f);
+            ny = clampf(static_cast<float>(ay_ / 12.0), -1.0f, 1.0f);
+            nz = clampf(static_cast<float>(az_ / 12.0 - 1.0), -1.0f, 1.0f);
+        } else {
+            nx = clampf(static_cast<float>(ax_ / 1.6), -1.0f, 1.0f);
+            ny = clampf(static_cast<float>(ay_ / 1.6), -1.0f, 1.0f);
+            nz = clampf(static_cast<float>(az_ - 0.6), -1.0f, 1.0f);
+        }
+    }
+    double ax_ = 1.0, ay_ = 1.0, az_ = 0.0;
+    int lastModel_ = -1;
 
     float x_ = 0.15f, y_ = 0.0f;
     std::uint32_t kickCounter_ = 0;

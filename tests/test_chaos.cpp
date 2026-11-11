@@ -162,7 +162,61 @@ void testPanel() {
 
 }  // namespace
 
+
+// MODO RÖSSLER / AIZAWA (11/11/2026): limitados, vivos, três dimensões; o
+// DRIVE do Rössler anda pela duplicação de período
+static int rosslerPeriodicity(float drive) {
+    Chaos c;
+    c.setParameter("model", 1.0f); c.setParameter("rate", 5.0f); c.setParameter("drive", drive);
+    c.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(3, AudioBlock(48000.0f, 1, 256));
+    std::vector<const AudioBlock*> ins{nullptr, nullptr};
+    std::vector<float> peaks;
+    float p2 = 0, p1 = 0;
+    for (int b = 0; b < 2000; ++b) {
+        c.process(ins, out);
+        for (std::size_t i = 0; i < 256; ++i) {
+            const float v = out[0].at(0, i);
+            if (b > 600 && p1 > p2 && p1 > v) peaks.push_back(p1);
+            p2 = p1; p1 = v;
+        }
+    }
+    // quantos máximos distintos (tolerância 2 %) — 1 = um ciclo, 2 = dois…
+    std::vector<float> distinct;
+    for (const float pk : peaks) {
+        bool seen = false;
+        for (const float d : distinct) if (std::fabs(d - pk) < 0.02f) seen = true;
+        if (!seen) distinct.push_back(pk);
+    }
+    return static_cast<int>(distinct.size());
+}
+static void testAttractorModels() {
+    for (const float model : {1.0f, 2.0f}) {
+        Chaos c;
+        c.setParameter("model", model); c.setParameter("rate", 3.0f);
+        c.prepare(48000.0f, 256);
+        std::vector<AudioBlock> out(3, AudioBlock(48000.0f, 1, 256));
+        std::vector<const AudioBlock*> ins{nullptr, nullptr};
+        float lo = 1e9f, hi = -1e9f, zlo = 1e9f, zhi = -1e9f;
+        bool fin = true;
+        for (int b = 0; b < 1500; ++b) {
+            c.process(ins, out);
+            for (std::size_t i = 0; i < 256; ++i) {
+                const float x = out[0].at(0, i), z = out[2].at(0, i);
+                if (!std::isfinite(x) || std::fabs(x) > 1.0f) fin = false;
+                if (b > 300) { lo = std::min(lo, x); hi = std::max(hi, x); zlo = std::min(zlo, z); zhi = std::max(zhi, z); }
+            }
+        }
+        check(fin, "atrator: finito e limitado");
+        check(hi - lo > 0.3f && zhi - zlo > 0.05f, "atrator: vivo nas três dimensões");
+    }
+    const int p1 = rosslerPeriodicity(0.0f), pc = rosslerPeriodicity(0.54f);
+    std::cerr << "   RÖSSLER: máximos distintos com DRIVE 0 " << p1 << ", DRIVE 0,54 " << pc << "\n";
+    check(p1 <= 2 && pc > p1, "RÖSSLER: o DRIVE anda do ciclo simples ao caos");
+}
+
 int main() {
+    testAttractorModels();
     testBoundedAndFinite();
     testCrossesBothWells();
     testFreezeHoldsExactly();

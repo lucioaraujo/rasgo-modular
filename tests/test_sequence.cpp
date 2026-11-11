@@ -8,6 +8,7 @@
 #include "io/AsciiPanel.hpp"
 
 #include <cmath>
+#include <string>
 #include <iostream>
 #include <vector>
 
@@ -242,7 +243,50 @@ void testPanel() {
 
 }  // namespace
 
+
+// CURSOR e FADIGA (11/11/2026)
+static std::vector<int> visits(float mode, float attract, float fatigue, int len, int clocks, int* rests) {
+    StepSequencer s;
+    s.setParameter("mode", mode); s.setParameter("length", float(len));
+    s.setParameter("attract", attract); s.setParameter("target", 5.0f);
+    s.setParameter("inertia", 0.3f); s.setParameter("fatigue", fatigue);
+    for (int k = 1; k <= 8; ++k) { s.setParameter(("p" + std::to_string(k)).c_str(), float(k) / 10.0f);
+                                   s.setParameter(("g" + std::to_string(k)).c_str(), 1.0f); }
+    s.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(3, AudioBlock(48000.0f, 1, 256));
+    AudioBlock clk(48000.0f, 1, 256);
+    std::vector<const AudioBlock*> ins{&clk, nullptr};
+    std::vector<int> v(8, 0);
+    int rest = 0;
+    for (int c = 0; c < clocks; ++c) {
+        bool gated = false;
+        for (int blk = 0; blk < 20; ++blk) {
+            for (std::size_t i = 0; i < 256; ++i) clk.at(0, i) = (blk == 0 && i < 32) ? 1.0f : 0.0f;
+            s.process(ins, out);
+            if (out[1].at(0, 128) >= 0.5f) gated = true;
+            if (blk == 2) { const int idx = int(std::lround(out[0].at(0, 128) * 10.0f)) - 1; if (idx >= 0 && idx < 8) ++v[std::size_t(idx)]; }
+        }
+        if (!gated) ++rest;
+    }
+    if (rests) *rests = rest;
+    return v;
+}
+static void testCursorAndFatigue() {
+    const auto fwd = visits(0.0f, 0.0f, 0.0f, 8, 160, nullptr);
+    const auto att = visits(5.0f, 1.0f, 0.0f, 8, 160, nullptr);
+    const auto rep = visits(5.0f, -1.0f, 0.0f, 8, 160, nullptr);
+    std::cerr << "   visitas ao passo 5 (ALVO): adiante " << fwd[4] << ", atrator " << att[4]
+              << ", repelente " << rep[4] << "\n";
+    check(att[4] > fwd[4] && rep[4] < fwd[4], "CURSOR: o atrator demora-se no ALVO, o repelente foge dele");
+    int r0 = 0, r1 = 0;
+    visits(0.0f, 0.0f, 0.0f, 2, 40, &r0);
+    visits(0.0f, 0.0f, 1.0f, 2, 40, &r1);
+    std::cerr << "   FADIGA (2 passos, 40 pulsos): pausas sem " << r0 << ", com " << r1 << "\n";
+    check(r0 == 0 && r1 > 4, "FADIGA: o passo repetido demais cala às vezes");
+}
+
 int main() {
+    testCursorAndFatigue();
     testForward();
     testBackward();
     testPingpong();

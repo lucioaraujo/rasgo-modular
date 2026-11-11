@@ -411,6 +411,8 @@ inline const LearnTable& learnTable() {
                 "parâmetro (ex.: FILTER.cutoff).", "", ""}},
         }},
         {"WAVETABLE", {
+            {"deform", {"O quanto a tabela é deformada (0 = a de sempre).", "", ""}},
+            {"deform_mode", {"DOBRA (a forma dobrada sobre si) ou RASGO (a cada ciclo, a leitura salta para outro ponto da tabela, sem estalo).", "", ""}},
             {"freq", {
                 "Frequência base. 1 V/oct pela entrada 1V/O.", "", ""}},
             {"fine", {"Afinação fina em cents (±100).", "", ""}},
@@ -894,6 +896,115 @@ inline const LearnTable& learnTable() {
             {"out:comp", {"A decisão: alto enquanto o MIX está acima do limiar.", "", ""}},
             {"out:cross", {"Um pulso a cada mudança do COMP (subida e descida).", "", ""}},
         }},
+        {"EPICYCLE", {
+            {"rate", {"A velocidade do primeiro círculo (0,01 Hz a 2 kHz): lento é gesto e ritmo; no áudio, a figura vira timbre.", "", ""}},
+            {"circles", {"Quantos círculos (1–8), cada um girando na borda do anterior.", "", ""}},
+            {"mode", {"As velocidades e os raios: QUADRADA (ímpares, 1/k) · SERRA (1, 2, 3…, 1/k) · FIB-RAIO (raios 1/Fₙ) · FIB-VELOC (velocidades Fₙ). Escolhas diferentes, nomeadas.", "", ""}},
+            {"detune", {"Desafina as velocidades por números irracionais: com DESV > 0 a figura nunca fecha.", "", ""}},
+            {"phase", {"A fase de partida de todos os círculos.", "", ""}},
+            {"in:pitch", {"1 V/oct na velocidade: para tocar a figura como uma nota.", "", ""}},
+            {"in:reset", {"Volta todos os círculos ao começo.", "", ""}},
+            {"out:x", {"A coordenada X da figura (−1..1).", "", ""}},
+            {"out:y", {"A coordenada Y da figura (−1..1).", "", ""}},
+            {"out:radius", {"A distância do centro (0..1): pulsa quando os círculos se somam e se anulam.", "", ""}},
+            {"out:angle", {"O ângulo da figura (0..1).", "", ""}},
+            {"out:gate", {"Um pulso cada vez que Y cruza o zero subindo: o ritmo do desenho.", "", ""}},
+        }},
+        {"POLYGON", {
+            {"n1", {"Os vértices do polígono 1 (0 = desligado, até 16): N pulsos igualmente espaçados por ciclo.", "", ""}},
+            {"phi1", {"Gira o polígono 1 (até um lado): os mesmos vértices, deslocados.", "", ""}},
+            {"out:g1", {"Os vértices do polígono 1.", "", ""}},
+            {"n2", {"Os vértices do polígono 2 (0 = desligado, até 16): N pulsos igualmente espaçados por ciclo.", "", ""}},
+            {"phi2", {"Gira o polígono 2 (até um lado): os mesmos vértices, deslocados.", "", ""}},
+            {"out:g2", {"Os vértices do polígono 2.", "", ""}},
+            {"n3", {"Os vértices do polígono 3 (0 = desligado, até 16): N pulsos igualmente espaçados por ciclo.", "", ""}},
+            {"phi3", {"Gira o polígono 3 (até um lado): os mesmos vértices, deslocados.", "", ""}},
+            {"out:g3", {"Os vértices do polígono 3.", "", ""}},
+            {"n4", {"Os vértices do polígono 4 (0 = desligado, até 16): N pulsos igualmente espaçados por ciclo.", "", ""}},
+            {"phi4", {"Gira o polígono 4 (até um lado): os mesmos vértices, deslocados.", "", ""}},
+            {"out:g4", {"Os vértices do polígono 4.", "", ""}},
+            {"cycle", {"A duração do ciclo comum, em segundos (sem cabo em CLK).", "", ""}},
+            {"steps", {"Com cabo em CLK: o ciclo dura PASSOS pulsos do relógio.", "", ""}},
+            {"in:clock", {"O relógio: o ciclo passa a durar PASSOS pulsos.", "", ""}},
+            {"in:reset", {"Volta ao começo do ciclo.", "", ""}},
+            {"out:coinc", {"Um pulso quando dois ou mais vértices caem juntos.", "", ""}},
+            {"out:eos", {"Um pulso no fim de cada ciclo, quando todos realinham.", "", ""}},
+            {"out:phase", {"A posição no ciclo (0..1).", "", ""}},
+        }},
+        {"VIA", {
+            {"res", {"Porta RES: o sinal passa (o resistor).", "", ""}},
+            {"diode", {"Porta DIODO: o sinal retificado (|x|·2 − 1) — a frequência dobra.", "", ""}},
+            {"capacitor", {"Porta CAP: o estado do capacitor — o caminho lembra e solta devagar (MEM).", "", ""}},
+            {"pulse", {"Porta PULSO: só a borda — o sinal virado limiar.", "", ""}},
+            {"transistor", {"Porta TRANS: um tanh assimétrico com o capacitor (o transistor).", "", ""}},
+            {"reflux", {"Porta REFLUXO: o sinal menos a memória do capacitor — uma corrente que volta alterada.", "", ""}},
+            {"speaker", {"Porta FALANTE: um corpo que ressoa em CORPO e satura — o cone que bate no limite.", "", ""}},
+            {"memory", {"O tempo de carga do capacitor (1 ms – 2 s).", "", ""}},
+            {"body", {"A frequência do corpo do FALANTE (40–400 Hz).", "", ""}},
+            {"level", {"O nível de saída.", "", ""}},
+            {"in:in", {"O que passa pela VIA (qualquer cabo: áudio ou CV).", "", ""}},
+            {"in:memory_cv", {"CV no tempo do capacitor (+1 = 16× mais lento).", "", ""}},
+            {"out:out", {"A média das portas abertas (o retorno composto).", "", ""}},
+            {"out:cap", {"O estado do capacitor, como CV.", "", ""}},
+        }},
+        {"RELATE", {
+            {"verb", {"O ato entre as duas vozes: SOMBRA · HOQUETO · CONTÁGIO · ATRITO · ANEL.", "", ""}},
+            {"intensity", {"O quanto a relação age.", "", ""}},
+            {"time", {"O tempo da relação: o atraso da SOMBRA, a lentidão do CONTÁGIO, o reparo do ATRITO.", "", ""}},
+            {"in:a", {"A voz A.", "", ""}},
+            {"in:b", {"A voz B.", "", ""}},
+            {"out:out_a", {"A voz A, transformada pela relação.", "", ""}},
+            {"out:out_b", {"A voz B, transformada pela relação.", "", ""}},
+            {"out:mix", {"As duas juntas, mais o atrito ou o anel.", "", ""}},
+            {"out:meeting", {"O encontro: quanto as duas soam ao mesmo tempo (0–1).", "", ""}},
+        }},
+        {"CUTUP", {
+            {"chance", {"Gestos sozinhos: a chance, a cada pulso do relógio, de um gesto sorteado.", "", ""}},
+            {"micro_n", {"Quantas vezes o MICRO repete o começo do tempo (2–8).", "", ""}},
+            {"mix", {"O quanto o gesto substitui o presente.", "", ""}},
+            {"seed", {"Semente: a ordem do BURST e os gestos sozinhos.", "", ""}},
+            {"in:in", {"O som que o CUT-UP recorta (os últimos 4 s).", "", ""}},
+            {"in:clock", {"O relógio: dá o tamanho do tempo (sem cabo, 120 BPM).", "", ""}},
+            {"in:stutter", {"STUT: o último tempo, 4 vezes (14–160 ms).", "", ""}},
+            {"in:burst", {"BURST: fatias dos últimos 8 tempos, embaralhadas como um saco (18–72 ms).", "", ""}},
+            {"in:micro", {"MICRO: o começo do último tempo, repetido MICRO vezes.", "", ""}},
+            {"in:gap", {"GAP: um tempo de silêncio, com bordas de 3 ms.", "", ""}},
+            {"out:out", {"O som, com os recortes.", "", ""}},
+            {"out:active", {"Alto enquanto um gesto toca.", "", ""}},
+        }},
+        {"BUDGET", {
+            {"in:g1", {"Os gates da voz 1.", "", ""}},
+            {"out:o1", {"Os gates da voz 1 que couberam no orçamento.", "", ""}},
+            {"in:g2", {"Os gates da voz 2.", "", ""}},
+            {"out:o2", {"Os gates da voz 2 que couberam no orçamento.", "", ""}},
+            {"in:g3", {"Os gates da voz 3.", "", ""}},
+            {"out:o3", {"Os gates da voz 3 que couberam no orçamento.", "", ""}},
+            {"in:g4", {"Os gates da voz 4.", "", ""}},
+            {"out:o4", {"Os gates da voz 4 que couberam no orçamento.", "", ""}},
+            {"ceiling", {"Quantos eventos por ciclo, para todas as vozes juntas (1–32).", "", ""}},
+            {"mode", {"Desligado = COMPETE (quem chega primeiro leva); ligado = COOPERA (cada voz tem a sua parte; quem falou muito cede).", "", ""}},
+            {"cycle", {"A duração do ciclo sem cabo em CLK, em segundos.", "", ""}},
+            {"in:clock", {"Cada pulso abre um ciclo novo (o orçamento se renova).", "", ""}},
+            {"out:balance", {"O que resta do orçamento (0–1).", "", ""}},
+            {"out:spent", {"Um pulso quando o orçamento acaba.", "", ""}},
+        }},
+        {"INTERPRET", {
+            {"expression", {"O quanto o intérprete age (0 = a nota crua).", "", ""}},
+            {"glide", {"A base do glide (mais longo nos saltos e com SUAVIDADE).", "", ""}},
+            {"vibrato", {"O vibrato das notas longas: começa depois de 0,25 s e cresce.", "", ""}},
+            {"energy", {"Eixo ENERGIA do caráter: mais marcato, vibrato maior, overshoot maior.", "", ""}},
+            {"softness", {"Eixo SUAVIDADE: glides longos, mais legato, ataques mais macios.", "", ""}},
+            {"brightness", {"Eixo BRILHO: soma ao BRT.", "", ""}},
+            {"drift", {"O quanto os três eixos derivam sozinhos, devagar (um clima que dura várias frases).", "", ""}},
+            {"in:pitch", {"As notas que chegam (1 V/oct), de qualquer sequenciador.", "", ""}},
+            {"in:gate", {"Os gates das notas.", "", ""}},
+            {"in:character", {"CV somada à ENERGIA.", "", ""}},
+            {"out:pitch", {"A altura tocada: glide, overshoot nos saltos, vibrato progressivo.", "", ""}},
+            {"out:amp", {"A articulação (legato, staccato, marcato, tenuto, pelo contexto) e o fôlego.", "", ""}},
+            {"out:bright", {"O brilho: registro, ápice e o eixo BRILHO.", "", ""}},
+            {"out:phrase", {"O estado da frase: calma 0 · subida ⅓ · clímax ⅔ · repouso 1.", "", ""}},
+            {"out:gate", {"O gate articulado (o staccato encurta).", "", ""}},
+        }},
         {"KEY", {
             {"memory", {"Quanto tempo o TOM lembra (2–60 s): curto segue modulações depressa; longo fica firme no tom.", "", ""}},
             {"stability", {"Quantas notas seguidas um tom novo precisa vencer para valer (1–16): evita tremular entre tons vizinhos.", "", ""}},
@@ -1144,6 +1255,9 @@ inline const LearnTable& learnTable() {
                 "degrau do S&H (que só troca no pulso).", "", ""}},
         }},
         {"DRIFT", {
+            {"residue", {"A volta ao marco nunca é idêntica: desloca o campo e vira um bit, nesta medida.", "", ""}},
+            {"elastic", {"Como o campo volta ao repouso: MOLA (o de sempre) · BORRACHA (livre no centro, forte nas bordas) · PLÁSTICO (sem volta: o repouso anda).", "", ""}},
+            {"in:capture", {"Guarda AGORA o marco: a paisagem a que a deriva volta (com ANCHR).", "", ""}},
             {"rate", {
                 "Ritmo do passeio do campo compartilhado — escala de "
                 "MINUTOS, não de áudio.", "", ""}},
@@ -1463,6 +1577,9 @@ inline const LearnTable& learnTable() {
             {"out:cc", {"O valor do CC nº CC# (0–1), segurado.", "", ""}},
         }},
         {"CHAOS", {
+            {"model", {"O atrator: POÇO (o de sempre) · RÖSSLER (o DRIVE anda pela duplicação de período até o caos) · AIZAWA.", "", ""}},
+            {"out:y", {"A segunda dimensão do atrator (no POÇO, a velocidade).", "", ""}},
+            {"out:z", {"A terceira dimensão do atrator (no POÇO, 0).", "", ""}},
             {"rate", {
                 "Velocidade da dinâmica — de CV bem lenta (0,02 Hz) a "
                 "textura de áudio (400 Hz).", "", ""}},
@@ -1769,6 +1886,7 @@ inline const LearnTable& learnTable() {
                 "oeste.", "", ""}},
         }},
         {"MATRIX", {
+            {"history", {"Rotas com história: o caminho usado alarga (até 1,2×), o abandonado estreita (até 0,3×); a matriz esquece em ~1 minuto de desuso.", "", ""}},
             {"g11", {"Ganho de IN1 → OUT1 (diagonal — padrão 1, "
                     "passa-direto).",
                     "Cada célula é um atenuversor (−1..1); negativo "
@@ -2108,6 +2226,10 @@ inline const LearnTable& learnTable() {
                 "aplicados.", "", ""}},
         }},
         {"PLL", {
+            {"near_hz", {"O batimento abaixo do qual as frequências contam como encontradas (Hz).", "", ""}},
+            {"out:meet", {"Um pulso quando as frequências se encontram (o batimento fica lento) — mesmo sem LOCK.", "", ""}},
+            {"out:part", {"Um pulso quando elas se afastam de novo.", "", ""}},
+            {"out:beat", {"O batimento como CV: 1 = juntas, 0 = 10 Hz ou mais.", "", ""}},
             {"freq", {
                 "Frequência livre — usada quando REF não está conectado, "
                 "e como ponto de partida quando está.", "", ""}},
@@ -2708,6 +2830,10 @@ inline const LearnTable& learnTable() {
                       "imagem abrir.", "", ""}},
         }},
         {"SEQUENCE", {
+            {"inertia", {"CURSOR: o quanto a velocidade do cursor se guarda de um pulso a outro.", "", ""}},
+            {"attract", {"CURSOR: perto do ALVO, positivo freia (o cursor se demora), negativo acelera (passa por cima).", "", ""}},
+            {"target", {"CURSOR: o passo que atrai ou repele.", "", ""}},
+            {"fatigue", {"Fadiga por passo: o passo que toca se cansa e, cansado demais, cala nessa vez. 0 = o de sempre.", "", ""}},
             {"length", {"Quantos dos 8 passos entram no padrão.", "", ""}},
             {"mode", {
                 "Direção de leitura: pra frente / pra trás / ping-pong / "
@@ -2784,6 +2910,9 @@ inline const LearnTable& learnTable() {
                        "MIX.", "", ""}},
         }},
         {"SWITCH", {
+            {"ghost", {"O scanner fantasma: mistura no OA o que estava no endereço de antes.", "", ""}},
+            {"ghost_lag", {"Quantos passos atrás o fantasma lê (1–3).", "", ""}},
+            {"out:ghost_out", {"A entrada do endereço de ATRAS passos antes: o rastro do scanner.", "", ""}},
             {"steps", {"Quantas posições a chave usa (2-4).", "", ""}},
             {"mode", {
                 "Ordem de avanço: pra frente / ping-pong / aleatório (sem "
@@ -3149,6 +3278,34 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "O limiar como acontecimento — mistura dois sinais com o zero no centro (somar, opor, anular) e transforma a relação entre eles num gate com histerese.",
             "Princípios do mixer polarizador (phono) e do mixer-comparador (R. Brewster), lidos no acervo do Antitotem: o comparador converte uma relação contínua em evento.",
             "Dois FUNCTION lentos em A e B; COMP → GATE de um ENVELOPE; CRUZ → DRUM: dois LFOs que se cruzam viram ritmo."}},
+        {"EPICYCLE", {
+            "Círculos dentro de círculos — uma série de Fourier desenhada: com poucos círculos e devagar, gesto e ritmo (X, Y, raio, ângulo); com muitos e no áudio, timbre.",
+            "Do Batruc (epiciclos de Fourier). Fibonacci nos raios ou nas velocidades são escolhas diferentes, nomeadas — o crivo do Batruc.",
+            "EPICYCLE (X) → FC de um FILTER, (Y) → PAN de um canal do MIXER, (GT) → um ENVELOPE: o desenho move timbre, lugar e ritmo."}},
+        {"POLYGON", {
+            "Polígonos inscritos num ciclo — até 4 camadas de N vértices, giradas por fase: o polímetro como figura, com coincidências e o realinhamento.",
+            "A geometria rítmica do Batruc como módulo: três contra dois, cinco contra quatro — e o gate de quando caem juntos.",
+            "POLYGON N1 3, N2 2: G1 → DRUM, G2 → outro DRUM, COINC → o acento; EOS → RST de um SEQUENCE."}},
+        {"VIA", {
+            "O cabo com matéria — sete portas (resistor, diodo, capacitor, pulso, transistor, refluxo, alto-falante) para qualquer cabo; as abertas fazem a média.",
+            "As PORTAS do Antitotem (código do autor), levadas a qualquer cabo do patch — o próximo passo que o próprio autor deixou escrito.",
+            "LFO → VIA (CAP + REFLUXO) → FC de um FILTER: a modulação ganha memória e volta alterada."}},
+        {"RELATE", {
+            "Os atos entre duas vozes — sombra, hoqueto, contágio, atrito e anel: as vozes saem transformadas pela relação entre elas.",
+            "Conceitos do Asterismus e do Antitotem: tocar junto não é tocar em uníssono. ENC diz quanto as duas se encontram.",
+            "Duas vozes → RELATE (HOQUETO) → MIXER: uma cede quando a outra soa."}},
+        {"CUTUP", {
+            "O recorte do Navalha no som ao vivo — STUT, BURST, MICRO e GAP sobre os últimos tempos do relógio, com bordas que não estalam.",
+            "Os números do FragmentGesture do Navalha 2 (Glerm Soares / Lúcio Araújo): 4 repetições entre 14 e 160 ms, 8 fatias por saco embaralhado entre 18 e 72 ms.",
+            "MIXER → CUT-UP → MASTER; CLOCK → CLK; CHANCE 0,2: de vez em quando o som gagueja ou se embaralha no tempo."}},
+        {"BUDGET", {
+            "O orçamento de eventos — quatro vozes dividem um teto de eventos por ciclo: competem (quem chega primeiro leva) ou cooperam (quem falou muito cede).",
+            "A ecologia do Aquorbium vista pelo lado do tempo.",
+            "Os gates de três vozes → BUDGET (TETO 6, COOPERA) → os ENVELOPE delas: a textura nunca passa de 6 notas por ciclo."}},
+        {"INTERPRET", {
+            "O intérprete — recebe as notas de qualquer sequenciador e devolve a nota TOCADA: glide, overshoot, vibrato progressivo, articulação pelo contexto, fôlego e brilho; com três eixos de caráter.",
+            "Do MelodicInterpreter do Antitotem (código do autor) — lá o intérprete gera as notas; aqui ele interpreta as que chegam.",
+            "SEQUENCE → QUANTIZER → INTERPRET (PTCH, GATE); PTCH → OSC; AMP → VCA; BRT → FC de um FILTER: a linha passa a ser tocada."}},
         {"KEY", {
             "O tom de quem toca — escuta uma linha de alturas e estima a tonalidade (tônica, maior ou menor) pelos perfis de Krumhansl e Kessler, com as notas longas pesando mais.",
             "Krumhansl e Kessler (1982); a ponderação por duração vem do Maravi. Causal, ao vivo: o tom só muda quando outro vence por ESTAB notas seguidas, e a CERTEZA diz quando o tom é ambíguo.",
@@ -3531,6 +3688,34 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The threshold as an event — it mixes two signals with zero in the centre (add, oppose, cancel) and turns their relation into a gate with hysteresis.",
             "Principles of the polarising mixer (phono) and the mixer-comparator (R. Brewster), read in the Antitotem's archive: the comparator turns a continuous relation into an event.",
             "Two slow FUNCTIONs into A and B; COMP → an ENVELOPE GATE; CRUZ → DRUM: two LFOs crossing become a rhythm."}},
+        {"EPICYCLE", {
+            "Circles within circles — a drawn Fourier series: few circles and slow, gesture and rhythm (X, Y, radius, angle); many and at audio rate, timbre.",
+            "From the Batruc (Fourier epicycles). Fibonacci in the radii or in the speeds are different, named choices — the Batruc's rule.",
+            "EPICYCLE (X) → a FILTER's FC, (Y) → a MIXER channel's PAN, (GT) → an ENVELOPE: the drawing moves timbre, place and rhythm."}},
+        {"POLYGON", {
+            "Polygons inscribed in a cycle — up to 4 layers of N vertices, rotated by phase: polymeter as a figure, with coincidences and realignment.",
+            "The Batruc's rhythmic geometry as a module: three against two, five against four — and the gate of when they land together.",
+            "POLYGON N1 3, N2 2: G1 → DRUM, G2 → another DRUM, COINC → the accent; EOS → a SEQUENCE's RST."}},
+        {"VIA", {
+            "The cable with matter — seven gates (resistor, diode, capacitor, pulse, transistor, reflux, speaker) for any cable; the open ones are averaged.",
+            "The Antitotem's GATES (the author's code), taken to any cable of the patch — the next step the author himself wrote down.",
+            "LFO → VIA (CAP + REFLUX) → a FILTER's FC: the modulation gains memory and returns altered."}},
+        {"RELATE", {
+            "The acts between two voices — shadow, hocket, contagion, friction and ring: the voices come out transformed by their relation.",
+            "Concepts from the Asterismus and the Antitotem: playing together is not playing in unison. ENC says how much the two meet.",
+            "Two voices → RELATE (HOCKET) → MIXER: one yields when the other sounds."}},
+        {"CUTUP", {
+            "The Navalha's cutting on the live sound — STUT, BURST, MICRO and GAP over the last clock beats, with click-free edges.",
+            "The numbers of the Navalha 2's FragmentGesture (Glerm Soares / Lúcio Araújo): 4 repeats between 14 and 160 ms, 8 slices from a shuffled bag between 18 and 72 ms.",
+            "MIXER → CUT-UP → MASTER; CLOCK → CLK; CHANCE 0.2: now and then the sound stutters or shuffles in time."}},
+        {"BUDGET", {
+            "The event budget — four voices share a ceiling of events per cycle: they compete (first come takes it) or cooperate (whoever spoke a lot yields).",
+            "The Aquorbium's ecology seen from the side of time.",
+            "Three voices' gates → BUDGET (CEILING 6, COOPERATE) → their ENVELOPEs: the texture never exceeds 6 notes per cycle."}},
+        {"INTERPRET", {
+            "The interpreter — it takes notes from any sequencer and returns the PLAYED note: glide, overshoot, progressive vibrato, articulation from context, breath and brightness; with three character axes.",
+            "From the Antitotem's MelodicInterpreter (the author's code) — there the interpreter generates the notes; here it interprets the incoming ones.",
+            "SEQUENCE → QUANTIZER → INTERPRET (PTCH, GATE); PTCH → OSC; AMP → VCA; BRT → a FILTER's FC: the line starts being played."}},
         {"KEY", {
             "The key of whoever plays — it listens to a line of pitches and estimates the key (tonic, major or minor) with the Krumhansl–Kessler profiles, long notes weighing more.",
             "Krumhansl and Kessler (1982); the duration weighting comes from the Maravi. Causal, live: the key only changes when another one wins for STAB notes in a row, and CERT says when the key is ambiguous.",
@@ -3841,6 +4026,34 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le seuil comme événement — mélange deux signaux avec le zéro au centre (additionner, opposer, annuler) et transforme leur relation en un gate avec hystérésis.",
             "Principes du mélangeur polarisant (phono) et du mélangeur-comparateur (R. Brewster), lus dans les archives de l’Antitotem : le comparateur transforme une relation continue en événement.",
             "Deux FUNCTION lents sur A et B ; COMP → GATE d’une ENVELOPE ; CRUZ → DRUM : deux LFO qui se croisent deviennent un rythme."}},
+        {"EPICYCLE", {
+            "Des cercles dans des cercles — une série de Fourier dessinée : peu de cercles et lent, geste et rythme (X, Y, rayon, angle) ; beaucoup et à vitesse audio, timbre.",
+            "Du Batruc (épicycles de Fourier). Fibonacci dans les rayons ou dans les vitesses sont des choix différents, nommés — la règle du Batruc.",
+            "EPICYCLE (X) → FC d’un FILTER, (Y) → PAN d’un canal du MIXER, (GT) → une ENVELOPE : le dessin bouge timbre, place et rythme."}},
+        {"POLYGON", {
+            "Des polygones inscrits dans un cycle — jusqu’à 4 couches de N sommets, tournées par phase : la polymétrie comme figure, avec coïncidences et réalignement.",
+            "La géométrie rythmique du Batruc en module : trois contre deux, cinq contre quatre — et le gate de quand ils tombent ensemble.",
+            "POLYGON N1 3, N2 2 : G1 → DRUM, G2 → un autre DRUM, COINC → l’accent ; EOS → RST d’un SEQUENCE."}},
+        {"VIA", {
+            "Le câble avec matière — sept portes (résistance, diode, condensateur, impulsion, transistor, reflux, haut-parleur) pour n’importe quel câble ; les ouvertes font la moyenne.",
+            "Les PORTES de l’Antitotem (code de l’auteur), portées à n’importe quel câble du patch — l’étape suivante que l’auteur avait lui-même notée.",
+            "LFO → VIA (CAP + REFLUX) → FC d’un FILTER : la modulation gagne une mémoire et revient altérée."}},
+        {"RELATE", {
+            "Les actes entre deux voix — ombre, hoquet, contagion, frottement et anneau : les voix ressortent transformées par leur relation.",
+            "Concepts de l’Asterismus et de l’Antitotem : jouer ensemble n’est pas jouer à l’unisson. ENC dit combien les deux se rencontrent.",
+            "Deux voix → RELATE (HOQUET) → MIXER : l’une cède quand l’autre sonne."}},
+        {"CUTUP", {
+            "La découpe du Navalha sur le son en direct — STUT, BURST, MICRO et GAP sur les derniers temps de l’horloge, avec des bords sans clic.",
+            "Les chiffres du FragmentGesture du Navalha 2 (Glerm Soares / Lúcio Araújo) : 4 répétitions entre 14 et 160 ms, 8 tranches tirées d’un sac mélangé entre 18 et 72 ms.",
+            "MIXER → CUT-UP → MASTER ; CLOCK → CLK ; CHANCE 0,2 : de temps en temps le son bégaie ou se mélange en mesure."}},
+        {"BUDGET", {
+            "Le budget d’événements — quatre voix se partagent un plafond d’événements par cycle : elles rivalisent (premier arrivé, premier servi) ou coopèrent (qui a beaucoup parlé cède).",
+            "L’écologie de l’Aquorbium vue du côté du temps.",
+            "Les gates de trois voix → BUDGET (PLAFOND 6, COOPÈRE) → leurs ENVELOPE : la texture ne dépasse jamais 6 notes par cycle."}},
+        {"INTERPRET", {
+            "L’interprète — il reçoit les notes de n’importe quel séquenceur et rend la note JOUÉE : glissando, dépassement, vibrato progressif, articulation selon le contexte, souffle et brillance ; avec trois axes de caractère.",
+            "Du MelodicInterpreter de l’Antitotem (code de l’auteur) — là-bas l’interprète génère les notes ; ici il interprète celles qui arrivent.",
+            "SEQUENCE → QUANTIZER → INTERPRET (PTCH, GATE) ; PTCH → OSC ; AMP → VCA ; BRT → FC d’un FILTER : la ligne se met à être jouée."}},
         {"KEY", {
             "La tonalité de qui joue — écoute une ligne de hauteurs et estime la tonalité (tonique, majeur ou mineur) avec les profils de Krumhansl et Kessler, les notes longues pesant davantage.",
             "Krumhansl et Kessler (1982) ; la pondération par la durée vient du Maravi. Causal, en direct : la tonalité ne change que quand une autre gagne pendant STAB notes d’affilée, et CERT dit quand elle est ambiguë.",
@@ -4151,6 +4364,34 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El umbral como acontecimiento — mezcla dos señales con el cero en el centro (sumar, oponer, anular) y convierte la relación entre ellas en un gate con histéresis.",
             "Principios del mezclador polarizador (phono) y del mezclador-comparador (R. Brewster), leídos en el archivo del Antitotem: el comparador convierte una relación continua en evento.",
             "Dos FUNCTION lentos en A y B; COMP → GATE de un ENVELOPE; CRUZ → DRUM: dos LFO que se cruzan se vuelven ritmo."}},
+        {"EPICYCLE", {
+            "Círculos dentro de círculos — una serie de Fourier dibujada: pocos círculos y lento, gesto y ritmo (X, Y, radio, ángulo); muchos y a velocidad de audio, timbre.",
+            "Del Batruc (epiciclos de Fourier). Fibonacci en los radios o en las velocidades son elecciones distintas, nombradas — el criterio del Batruc.",
+            "EPICYCLE (X) → FC de un FILTER, (Y) → PAN de un canal del MIXER, (GT) → un ENVELOPE: el dibujo mueve timbre, lugar y ritmo."}},
+        {"POLYGON", {
+            "Polígonos inscritos en un ciclo — hasta 4 capas de N vértices, giradas por fase: el polímetro como figura, con coincidencias y realineación.",
+            "La geometría rítmica del Batruc como módulo: tres contra dos, cinco contra cuatro — y el gate de cuando caen juntos.",
+            "POLYGON N1 3, N2 2: G1 → DRUM, G2 → otro DRUM, COINC → el acento; EOS → RST de un SEQUENCE."}},
+        {"VIA", {
+            "El cable con materia — siete puertas (resistencia, diodo, condensador, pulso, transistor, reflujo, altavoz) para cualquier cable; las abiertas hacen la media.",
+            "Las PUERTAS del Antitotem (código del autor), llevadas a cualquier cable del patch — el siguiente paso que el propio autor dejó escrito.",
+            "LFO → VIA (CAP + REFLUJO) → FC de un FILTER: la modulación gana memoria y vuelve alterada."}},
+        {"RELATE", {
+            "Los actos entre dos voces — sombra, hoqueto, contagio, fricción y anillo: las voces salen transformadas por su relación.",
+            "Conceptos del Asterismus y del Antitotem: tocar juntos no es tocar al unísono. ENC dice cuánto se encuentran las dos.",
+            "Dos voces → RELATE (HOQUETO) → MIXER: una cede cuando la otra suena."}},
+        {"CUTUP", {
+            "El recorte del Navalha sobre el sonido en vivo — STUT, BURST, MICRO y GAP sobre los últimos tiempos del reloj, con bordes sin clic.",
+            "Los números del FragmentGesture del Navalha 2 (Glerm Soares / Lúcio Araújo): 4 repeticiones entre 14 y 160 ms, 8 rodajas de una bolsa barajada entre 18 y 72 ms.",
+            "MIXER → CUT-UP → MASTER; CLOCK → CLK; CHANCE 0,2: de vez en cuando el sonido tartamudea o se baraja a tiempo."}},
+        {"BUDGET", {
+            "El presupuesto de eventos — cuatro voces se reparten un techo de eventos por ciclo: compiten (quien llega primero se lo lleva) o cooperan (quien habló mucho cede).",
+            "La ecología del Aquorbium vista desde el lado del tiempo.",
+            "Los gates de tres voces → BUDGET (TECHO 6, COOPERA) → sus ENVELOPE: la textura nunca pasa de 6 notas por ciclo."}},
+        {"INTERPRET", {
+            "El intérprete — recibe las notas de cualquier secuenciador y devuelve la nota TOCADA: glide, overshoot, vibrato progresivo, articulación por el contexto, aliento y brillo; con tres ejes de carácter.",
+            "Del MelodicInterpreter del Antitotem (código del autor) — allí el intérprete genera las notas; aquí interpreta las que llegan.",
+            "SEQUENCE → QUANTIZER → INTERPRET (PTCH, GATE); PTCH → OSC; AMP → VCA; BRT → FC de un FILTER: la línea pasa a ser tocada."}},
         {"KEY", {
             "La tonalidad de quien toca — escucha una línea de alturas y estima la tonalidad (tónica, mayor o menor) con los perfiles de Krumhansl y Kessler, con las notas largas pesando más.",
             "Krumhansl y Kessler (1982); la ponderación por duración viene del Maravi. Causal, en vivo: la tonalidad solo cambia cuando otra gana durante STAB notas seguidas, y CERT dice cuándo es ambigua.",

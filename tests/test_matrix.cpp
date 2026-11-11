@@ -267,7 +267,27 @@ void testPanel() {
 
 }  // namespace
 
+
+// HIST (11/11/2026): o caminho usado alarga, o abandonado estreita
+static void testHistory() {
+    Matrix m;
+    m.setParameter("history", 1.0f);
+    m.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(4, AudioBlock(48000.0f, 1, 256));
+    AudioBlock a(48000.0f, 1, 256);
+    for (std::size_t i = 0; i < 256; ++i) a.at(0, i) = 0.5f * std::sin(0.05f * float(i));
+    std::vector<const AudioBlock*> ins{&a, nullptr, nullptr, nullptr};
+    for (int b = 0; b < int(30.0f * 48000.0f / 256.0f); ++b) m.process(ins, out);   // 30 s pela 1→1
+    check(m.wear(0, 0) > 0.6f && m.wear(1, 1) < 0.01f, "HIST: o cruzamento usado guarda o desgaste");
+    float pk = 0.0f; for (std::size_t i = 0; i < 256; ++i) pk = std::max(pk, std::fabs(out[0].at(0, i)));
+    check(pk > 0.5f, "HIST: o caminho usado alarga (passa de 1×)");
+    std::vector<const AudioBlock*> silent{nullptr, nullptr, nullptr, nullptr};
+    for (int b = 0; b < int(120.0f * 48000.0f / 256.0f); ++b) m.process(silent, out);   // 2 min sem uso
+    check(m.wear(0, 0) < 0.2f, "HIST: sem uso, a matriz esquece");
+}
+
 int main() {
+    testHistory();
     testIdentity();
     testSingleCell();
     testNegative();

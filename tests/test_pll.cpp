@@ -187,7 +187,38 @@ void testPanel() {
 
 }  // namespace
 
+
+// QUASE-ENCONTRO (11/11/2026): uma referência que passa perto da frequência
+// do PLL (sem LOCK) dá um ENC na aproximação e um SEP no afastamento
+static void testNearMeeting() {
+    Pll p;
+    p.setParameter("freq", 220.0f); p.setParameter("lock_gain", 0.0f); p.setParameter("near_hz", 1.0f);
+    p.prepare(48000.0f, 256);
+    std::vector<AudioBlock> out(6, AudioBlock(48000.0f, 1, 256));
+    AudioBlock ref(48000.0f, 1, 256);
+    std::vector<const AudioBlock*> ins{nullptr, nullptr, &ref};
+    double ph = 0.0; int meets = 0, parts = 0; float pm = 0, pp = 0;
+    const int blocks = int(12.0f * 48000.0f / 256.0f);
+    for (int b = 0; b < blocks; ++b) {
+        // a referência desliza de 214 a 226 Hz em 12 s: passa por 220
+        const double hz = 214.0 + 12.0 * double(b) / double(blocks);
+        for (std::size_t i = 0; i < 256; ++i) {
+            ph += hz / 48000.0; ph -= std::floor(ph);
+            ref.at(0, i) = float(2.0 * ph - 1.0);
+        }
+        p.process(ins, out);
+        for (std::size_t i = 0; i < 256; ++i) {
+            if (pm < 0.5f && out[3].at(0, i) >= 0.5f) ++meets;
+            if (pp < 0.5f && out[4].at(0, i) >= 0.5f) ++parts;
+            pm = out[3].at(0, i); pp = out[4].at(0, i);
+        }
+    }
+    std::cerr << "   quase-encontro: ENC " << meets << ", SEP " << parts << "\n";
+    check(meets == 1 && parts == 1, "ENC na aproximação, SEP no afastamento (sem LOCK)");
+}
+
 int main() {
+    testNearMeeting();
     testFreeRunningWithoutRef();
     testLocksToReference();
     testRatioLocksToMultiple();

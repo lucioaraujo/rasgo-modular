@@ -202,3 +202,12 @@ Cadeias canônicas: `DRIFT.a → connectToParameter(FILTER.cutoff)` ·
 2–4 saídas em parâmetros estruturais por caráter — todo patch de seed
 passa a **evoluir sozinho**. Adicionado ao catálogo do painel
 (`apps/panel/ModuleCatalog.hpp`, família DECISION — junto do `DECISION`).
+
+## CAPT, RESID e ELAST (11/11/2026)
+
+Do estudo da família §4.5 (aprovados).
+- **CAPT** (entrada): guarda o marco agora.
+- **RESID:** a volta ao marco nunca é idêntica.
+- **ELAST:** MOLA (o de sempre), BORRACHA (∝ distância³) ou PLÁSTICO (o repouso anda).
+- **Os padrões:** com os padrões, o de antes.
+- **Teste:** o PLÁSTICO vai mais longe (|campo| médio 0,62 contra 0,33 na MOLA); o CAPT mantém o campo limitado; o RESID muda a volta.

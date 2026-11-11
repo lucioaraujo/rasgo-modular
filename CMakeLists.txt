@@ -607,6 +607,41 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_comparador_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_comparador_tests COMMAND rasgo_modular_comparador_tests)
 
+    add_executable(rasgo_modular_epicycle_tests tests/test_epicycle.cpp)
+    target_include_directories(rasgo_modular_epicycle_tests PRIVATE src)
+    target_compile_options(rasgo_modular_epicycle_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_epicycle_tests COMMAND rasgo_modular_epicycle_tests)
+
+    add_executable(rasgo_modular_polygon_tests tests/test_polygon.cpp)
+    target_include_directories(rasgo_modular_polygon_tests PRIVATE src)
+    target_compile_options(rasgo_modular_polygon_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_polygon_tests COMMAND rasgo_modular_polygon_tests)
+
+    add_executable(rasgo_modular_via_tests tests/test_via.cpp)
+    target_include_directories(rasgo_modular_via_tests PRIVATE src)
+    target_compile_options(rasgo_modular_via_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_via_tests COMMAND rasgo_modular_via_tests)
+
+    add_executable(rasgo_modular_relate_tests tests/test_relate.cpp)
+    target_include_directories(rasgo_modular_relate_tests PRIVATE src)
+    target_compile_options(rasgo_modular_relate_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_relate_tests COMMAND rasgo_modular_relate_tests)
+
+    add_executable(rasgo_modular_cutup_tests tests/test_cutup.cpp)
+    target_include_directories(rasgo_modular_cutup_tests PRIVATE src)
+    target_compile_options(rasgo_modular_cutup_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_cutup_tests COMMAND rasgo_modular_cutup_tests)
+
+    add_executable(rasgo_modular_budget_tests tests/test_budget.cpp)
+    target_include_directories(rasgo_modular_budget_tests PRIVATE src)
+    target_compile_options(rasgo_modular_budget_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_budget_tests COMMAND rasgo_modular_budget_tests)
+
+    add_executable(rasgo_modular_interpret_tests tests/test_interpret.cpp)
+    target_include_directories(rasgo_modular_interpret_tests PRIVATE src)
+    target_compile_options(rasgo_modular_interpret_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_interpret_tests COMMAND rasgo_modular_interpret_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})
