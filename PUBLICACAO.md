@@ -1,5 +1,25 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.8 — 11 nov. 2026 (publicada)
+
+A [release v0.1.8](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8)
+foi criada pela execução `43108367304`, sobre a tag `v0.1.8` em `e7bf877`
+(a tag refeita com a correção `/bigobj`, autorizada pelo autor: "pode
+refazer a tag e publicar").
+
+- Todos os jobs com sucesso: pacotes Linux, Windows e macOS; abertura Linux
+  em Debian 12, Ubuntu 24.04, Fedora e Arch; publicação.
+- Seis anexos públicos, todos com HTTP 200: `.deb` (7,7 MB), AppImage
+  (7,4 MB), `.tar.gz` (6,9 MB), `.exe` (4,7 MB), `.zip` (6,1 MB), `.dmg`
+  (13,6 MB).
+- `main` enviada depois da release (`39fd01a..e7bf877`). Deploy de Pages
+  `43111123053` com sucesso. As quatro páginas principais públicas mostram
+  0.1.8; as quatro de módulos, 88 verbetes.
+- `seo.py` passou a declarar a versão pública 0.1.8. `verificar.py`: "site
+  conferido: sem problemas"; 10/10 testes Python do site.
+- Escuta do autor no build 0.1.8 em Linux: "aprovado". Windows e macOS ficam
+  com a matriz da CI; não foram abertos em máquinas reais nesta versão.
+
 ## Release v0.1.8 — preparação (11 nov. 2026)
 
 Pedido do autor (11/11): "preciso desse instrumento publicado ainda hoje",
