@@ -205,7 +205,45 @@ void testPanel() {
 
 }  // namespace
 
+
+// NEO-RIEMANN: cada passo move uma nota da tríade; ciclos fecham
+static int triadPcs(int root, bool major, int k) {   // k-ésima nota da tríade
+    const int third = major ? 4 : 3;
+    const int iv[3] = {0, third, 7};
+    return (root + iv[k]) % 12;
+}
+static int commonTones(int r1, bool m1, int r2, bool m2) {
+    int c = 0;
+    for (int a = 0; a < 3; ++a) for (int b = 0; b < 3; ++b)
+        if (triadPcs(r1, m1, a) == triadPcs(r2, m2, b)) ++c;
+    return c;
+}
+void testNeoRiemann() {
+    for (const float cyc : {0.0f, 1.0f, 2.0f, 3.0f}) {
+        Harmony h;
+        h.setParameter("movement", 6.0f);
+        h.setParameter("nr_cycle", cyc);
+        h.setParameter("root_start", 0.0f);
+        h.setParameter("scale_lo", 1.0f);
+        const auto s = stepN(h, 24);
+        bool parsimonious = true, onlyMajMin = true;
+        int pr = 0, ps = 1;
+        for (std::size_t i = 0; i < s.root.size(); ++i) {
+            if (s.scale[i] != 1 && s.scale[i] != 2) onlyMajMin = false;
+            if (commonTones(pr, ps == 1, s.root[i], s.scale[i] == 1) != 2) parsimonious = false;
+            pr = s.root[i]; ps = s.scale[i];
+        }
+        check(onlyMajMin, "NEO-RIEMANN: só Maior e menor natural");
+        check(parsimonious, "NEO-RIEMANN: cada passo guarda duas notas da tríade");
+        if (cyc == 1.0f)   // hexatônico: volta ao início em 6 passos
+            check(s.root[5] == 0 && s.scale[5] == 1, "hexatônico fecha em 6");
+        if (cyc == 2.0f)   // octatônico: fecha em 8
+            check(s.root[7] == 0 && s.scale[7] == 1, "octatônico fecha em 8");
+    }
+}
+
 int main() {
+    testNeoRiemann();
     testColtrane();
     testBackdoor();
     testModalInterchangeRootFixed();

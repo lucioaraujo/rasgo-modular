@@ -101,6 +101,25 @@ escala sorteável nas trocas.
 **HOLD** (0–1) — a probabilidade de pular uma troca agendada,
 mantendo o centro tonal.
 
+**O movimento NEO-RIEMANN** (MOVE na 7ª posição) — a cada avanço, a
+tríade (tônica, maior ou menor) muda por uma das três transformações de
+Riemann:
+- **P** (paralela): Dó maior ↔ Dó menor;
+- **R** (relativa): Dó maior ↔ Lá menor;
+- **L** (*Leittonwechsel*): Dó maior ↔ Mi menor.
+
+Cada uma move **uma só nota** por um ou dois semitons, então a harmonia
+desliza em vez de saltar, como em Wagner, em Liszt e nas trilhas de cinema.
+**CICLO** escolhe o caminho:
+- 0: passeio livre, que nunca desfaz o passo;
+- 1: hexatônico (P L P L…), seis acordes que fecham o círculo;
+- 2: octatônico (P R…), que fecha em oito;
+- 3: LR, as quintas que caminham.
+
+A saída **OP** diz qual transformação aconteceu (P = ⅓, L = ⅔, R = 1).
+Ligue-a num `SWITCH` ou num `VCA` para que cada tipo de movimento mude o
+timbre de um jeito.
+
 ## Como cabear
 
 **Harmonia que se move sob a melodia:**

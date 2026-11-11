@@ -89,6 +89,23 @@ quantizar.
 **HYST** (hysteresis, 0–1) — a zona-morta antes de trocar de grau —
 evita tremular com CV instável.
 
+**AFIN** (tuning, 6 posições) — a afinação das notas escolhidas:
+12-EDO (o temperamento de sempre) · Justa (terças e quintas puras, de
+5-limite) · Pitagórica (quintas puras) · Mesotônica ¼ de coma (terças
+puras). Estas três são medidas **a partir da tônica**: se o `HARMONY` ou o
+`KEY` mudam a tônica, a afinação muda junto, uma afinação justa que segue a
+modulação. As duas últimas, 19-EDO e 31-EDO, trocam a própria grade (a
+terça de 31-EDO é quase pura).
+
+**O CRIVO** (SCALE na 13ª posição) — as notas permitidas são desenhadas
+por duas **peneiras** de Xenakis: entram as notas que estão a um múltiplo de
+**M1** semitons do resíduo **R1**, ou (com **AND**: e) a um múltiplo de
+**M2** do resíduo **R2**, contadas a partir da tônica. Com M1 = 3 e M2 = 4,
+a união dá uma escala de 8 notas por oitava. Com um módulo que não divide 12
+(5, 7, 11, 13), a escala **não se repete na oitava**: o desenho só volta
+muito depois, e cada oitava tem notas diferentes. A interseção (AND) dá
+escalas raras e esparsas; se for vazia, volta à união.
+
 ## Como cabear
 
 **A melodia generativa (o uso central):**

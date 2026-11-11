@@ -1095,6 +1095,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 || nm == "pit_keep" || nm == "pit_oct"
                 // lote do oscilador (11/11/2026): fora do sorteio genérico
                 || nm == "pd" || nm == "unison" || nm == "sub_div"
+                // lote da harmonia (11/11/2026): escolhas de estrutura
+                || nm == "tuning" || nm.rfind("sieve_", 0) == 0 || nm == "nr_cycle"
                 // GAIN do DYNAMICS: nível, como os outros ganhos
                 || nm == "makeup")
                 continue;

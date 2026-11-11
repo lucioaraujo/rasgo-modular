@@ -156,6 +156,8 @@ public:
                     || w.bind == "listen"    // ON do SIGNAL-IN: só à mão
                     || w.bind == "pit_keep" || w.bind == "pit_oct" // SCOPE: escolha de quem toca
                     || w.bind == "sub_div" // OSC: o divisor muda a nota do grave aos saltos
+                    || w.bind == "tuning" || w.bind.rfind("sieve_", 0) == 0
+                    || w.bind == "nr_cycle" // afinação, crivo, ciclo: estrutura, do músico
                     || (t == "PHRASE" && w.bind == "seed")) // motif identity
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;

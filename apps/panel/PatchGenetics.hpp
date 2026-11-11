@@ -69,7 +69,7 @@ namespace rasgo::panel {
 // emudecem fácil. Mesma lista do passe genérico do `PatchSeed.hpp`.
 inline bool isMutationBlocked(const std::string& id) noexcept {
     static const std::unordered_set<std::string> blocked = {
-        "bpm", "mult", "length", "scale", "root", "mode", "sub_2", "sub_div",
+        "bpm", "mult", "length", "scale", "root", "mode", "sub_2", "sub_div", "tuning", "sieve_m1", "sieve_r1", "sieve_m2", "sieve_r2", "sieve_and", "nr_cycle",
         "sync_enable", "dc_block", "limit", "voices", "freeze", "mono",
         "gain", "output", "out_gain", "fm_amount",
         // ON do SIGNAL-IN: abrir microfone/MIDI é gesto de quem toca

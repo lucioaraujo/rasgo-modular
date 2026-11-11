@@ -37,6 +37,7 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - [x] LADDER (ESCADA), módulo #74 — dossiê, testes, textos nas 4 línguas; aguarda a escuta do autor (vaga dedicada na seed depois dela).
 - [x] Lote do grave (11/11): ACCENT #75, VCA SAT, ENVELOPE LOOP/EOC — aguarda a escuta do autor. Lotes pequenos, um build por lote (pedido do autor).
 - [x] Lote do oscilador (11/11): OSC PD / UNI / SUBD + CV do SUBD — aguarda a escuta junto com o lote do grave.
+- [x] Lote da harmonia (11/11): QUANTIZER crivo + afinações, HARMONY neo-Riemann + OP — aguarda a escuta (com os lotes do grave e do oscilador).
 - [ ] Papéis de cópia ainda fora da seed (11/11, a propor um por vez):
   kit de DRUM (intertravamento), 2 QUANTIZER (politonalidade), 2 SEQUENCE
   (phasing), 2 FILTER (série/paralelo), 2 FUNCTION (polimetria na

@@ -9,6 +9,17 @@ pronto.
 
 ## Em desenvolvimento (depois da v0.1.7)
 
+- **Lote da harmonia** (11 nov., recomendações seguidas com "avance").
+  - **QUANTIZER: CRIVO**, peneiras de Xenakis com união ou interseção de
+    duas classes de resíduo, à vista nos knobs. A escala pode não se repetir
+    na oitava.
+  - **QUANTIZER: AFIN.** Justa, Pitagórica e Mesotônica medidas a partir da
+    tônica (seguem o HARMONY e o TOM), mais 19-EDO e 31-EDO. O painel passa
+    a 14 HP.
+  - **HARMONY: movimento NEO-RIEMANN** (P, L, R), com CICLO (livre,
+    hexatônico, octatônico, LR) e saída OP.
+  - Tudo novo vem desligado; as seeds soam iguais.
+
 - **Lote do oscilador** (11 nov., recomendações aprovadas pelo autor). OSC
   ganha PD (phase distortion no SIN; pior alias −51 dB a 2,1 kHz), UNI
   (sete serras na SAW, mistura pelas medidas de Szabo; o nível muda menos
