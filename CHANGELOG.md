@@ -7,6 +7,28 @@ pronto.
 
 ---
 
+## Não publicado
+
+- **Receptor do Maestruc** (o regente da família RASGO, protocolo
+  `maestruc.link/1`, OSC só na máquina local): com `./run --maestruc`
+  (`RASGO_MAESTRUC=1`), o Maestruc troca a seed com o app aberto (o mesmo
+  caminho de digitar no campo SEED, com desfazer), põe em repouso e tira
+  dele (o botão de repouso: cala o MASTER, o patch segue) e lê o estado.
+  Desligado por padrão: sem a opção, nada muda. Andamento comum responde
+  "capacidade ausente" (cada CLOCK do patch tem o seu). Cópia de
+  `MAESTRUC/receptor/MaestrucLink.h`; módulo `juce_osc` no app.
+- **Ponte de som para o Maestruc** (Windows, macOS e Linux, sem driver de
+  áudio virtual): com `--maestruc`, a mistura do MASTER vai ao Maestruc por um
+  arquivo de memória compartilhada que só o usuário lê; enquanto o Maestruc
+  lê, o Modular cala a própria saída (o som não sai em dobro) e, se o
+  Maestruc fecha ou para, volta a tocar sozinho em cerca de meio segundo.
+  Gravações do app iguais. Pontes deixadas por um instrumento fechado à força
+  são apagadas na abertura seguinte. Cópia de `MAESTRUC/receptor/PonteDeSom.h`.
+- **Senha da sessão:** os comandos do Maestruc só valem com a senha que ele
+  grava num arquivo só do usuário.
+
+---
+
 ## v0.1.8 — 2026-11-11
 
 **Resumo.** De 60 a 88 módulos. Novos: LADDER, ACCENT, BLEFE, APOCRIFO,

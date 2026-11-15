@@ -43,6 +43,7 @@ target_include_directories(RasgoModularApp PRIVATE
 target_link_libraries(RasgoModularApp PRIVATE
     rasgo_modular_core
     juce::juce_audio_utils
+    juce::juce_osc   # receptor do Maestruc (MaestrucLink.h), 15/11/2026
     juce::juce_recommended_config_flags)
 
 # Política de aviso: a DO PROJETO (`-Wall -Wextra`, igual ao alvo do painel

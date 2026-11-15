@@ -19,6 +19,7 @@
 // é uma transliteração daquele desenho, não um segundo desenho.
 
 #include <juce_audio_utils/juce_audio_utils.h>
+#include "MaestrucLink.h"   // regente da família (maestruc.link/1)
 
 #include "panel/assets/rasgo_logo_gray.h"
 
@@ -5324,6 +5325,8 @@ public:
                     rasgo::panel::strings::startNoteSafe, lang_)));
         }
         arranque::marca("seed aplicado");
+        if (std::getenv("RASGO_MAESTRUC") != nullptr)
+            enableMaestrucLink();
         view_->refresh();
         syncHeader();
         syncSignalIn();
@@ -5418,6 +5421,8 @@ public:
     }
 
     ~MainComponent() override {
+        maestrucPortao_.fecharEsperar();   // o áudio deixa de usar a ponte do Maestruc
+        maestrucLink_.reset();   // antes de tudo: nenhum comando chega a meio desmonte
         stopTimer();
         for (auto* in : midiIns_) in->stop();
         midiIns_.clear();
@@ -5469,6 +5474,12 @@ public:
         inFifo_.reserve(std::max<std::size_t>(
             static_cast<std::size_t>(std::max(1, samplesPerBlockExpected)) * 8,
             blockSize_ * 16));
+        // Ponte do Maestruc: reabre na taxa nova pelo fio de mensagens (até
+        // lá, o Modular toca nas próprias caixas).
+        maestrucPortao_.fecharEsperar();
+        juce::MessageManager::callAsync([safe = juce::Component::SafePointer<MainComponent>(this)] {
+            if (safe != nullptr) safe->openMaestrucBridge();
+        });
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& info) override {
@@ -5515,6 +5526,13 @@ public:
             }
             carryUsed_ += static_cast<std::size_t>(n);
             done += n;
+        }
+        // Maestruc: a mistura vai pela ponte; enquanto ele lê, o Modular cala
+        // a própria saída (o som não sai em dobro). Sem trava nem alocação.
+        {
+            const float* const bridge[2] { L, R != nullptr ? R : L };
+            if (maestrucPortao_.escrever(bridge, 2, info.numSamples))
+                info.clearActiveBufferRegion();
         }
     }
 
@@ -6775,6 +6793,45 @@ private:
     bool chooserOpen_ = false;
     std::string learnKey_;
     std::chrono::steady_clock::time_point learnSince_{};
+
+    // Maestruc (maestruc.link/1, 15/11/2026): o regente da família pode trocar
+    // a seed com o app aberto (o mesmo caminho de digitar no campo SEED, com
+    // desfazer), pôr em repouso e tirar dele (o botão de repouso: cala o
+    // MASTER, o patch segue) e saber o estado. Desligado por padrão; liga com
+    // `./run --maestruc` (RASGO_MAESTRUC=1).
+    void enableMaestrucLink() {
+        if (maestrucLink_ != nullptr) return;
+        maestrucLink_ = std::make_unique<rasgo::maestruc::Link>(
+            "Rasgo Modular", JUCE_APPLICATION_VERSION_STRING);
+        auto& h = maestrucLink_->handlers;
+        h.seed = [this](const juce::String& text) {
+            const auto t = text.trim();
+            if (t.isEmpty() || !t.containsOnly("0123456789") || t.length() > 19) return;   // inválida: ignorada
+            const auto v = std::strtoull(t.toRawUTF8(), nullptr, 10);
+            if (v == 0 || !header_.onSeedTyped) return;
+            header_.onSeedTyped(static_cast<std::uint64_t>(v));
+        };
+        h.play = [this](juce::int64) { if (standby_ && header_.onStandby) header_.onStandby(); };
+        h.stop = [this] { if (!standby_ && header_.onStandby) header_.onStandby(); };
+        h.state = [this](bool& playing, juce::String& seed, float& bpm) {
+            playing = !standby_;
+            seed = juce::String(static_cast<juce::uint64>(seed_));
+            bpm = 0.0f;   // cada CLOCK do patch tem o seu
+        };
+        if (!maestrucLink_->start()) { maestrucLink_.reset(); return; }
+        openMaestrucBridge();
+    }
+    // Fio de mensagens. A ponte leva a mistura do MASTER (um par estéreo) na
+    // taxa da placa. O mixer pelo Maestruc fica para depois: o MIXER do
+    // Modular é um módulo do patch, e como mostrá-lo é decisão do autor.
+    void openMaestrucBridge() {
+        maestrucPortao_.fecharEsperar();
+        if (maestrucLink_ == nullptr || sampleRate_ <= 0.0) return;
+        if (maestrucLink_->openSoundBridge(1, sampleRate_, {"mix"}))
+            maestrucPortao_.abrir(maestrucLink_.get());
+    }
+    rasgo::maestruc::PortaoDeSom maestrucPortao_;
+    std::unique_ptr<rasgo::maestruc::Link> maestrucLink_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
