@@ -24,6 +24,9 @@ pronto.
   Maestruc fecha ou para, volta a tocar sozinho em cerca de meio segundo.
   Gravações do app iguais. Pontes deixadas por um instrumento fechado à força
   são apagadas na abertura seguinte. Cópia de `MAESTRUC/receptor/PonteDeSom.h`.
+- **Mixer pelo Maestruc:** os módulos MIXER do patch (CH1–CH4 com ganho e
+  MUTE, e o OUT) e o MASTER (ganho e mudo), pelo mesmo caminho dos knobs do
+  painel; o que se muda à mão no patch volta ao Maestruc.
 - **Senha da sessão:** os comandos do Maestruc só valem com a senha que ele
   grava num arquivo só do usuário.
 

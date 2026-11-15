@@ -3,7 +3,7 @@
 //
 // Cópia no Rasgo Modular: 15/11/2026, do monorepo privado
 // rasgo-instruments (RASGO/PROJETOS_AUTORAIS/MAESTRUC/receptor), SHA-256 da
-// origem c903da8ba03f…; ponte de som, mixer e senha. Ao atualizar, copiar de lá e anotar.
+// origem 7cc9164840db…; ponte de som, mixer e senha. Ao atualizar, copiar de lá e anotar.
 //
 // Receptor de referência do protocolo maestruc.link/1 (PROTOCOLO_MAESTRUC_LINK.md)
 // para apps JUCE. Fonte: RASGO/PROJETOS_AUTORAIS/MAESTRUC/receptor/MaestrucLink.h
@@ -84,12 +84,17 @@ inline std::string lerSenha()
 }
 
 // Um canal do mixer de dentro do instrumento (índice -1 = o master dele).
+// `objects`: os controles que o canal tem de verdade no instrumento, entre
+// "nivel", "mudo", "solo" e "pan" (separados por vírgula); o Maestruc mostra só
+// esses. `minDb`/`maxDb`: a faixa do fader do instrumento. 16/11/2026.
 struct MixerChannel
 {
     int index = 0;
     juce::String name;
     float levelDb = 0.0f;
     bool mute = false, solo = false;
+    juce::String objects { "nivel,mudo,solo" };
+    float minDb = -90.0f, maxDb = 12.0f;
 };
 
 struct Handlers
@@ -438,7 +443,8 @@ private:
         for (auto& c : ch)
         {
             if (n >= 64) break;   // um limite: a lista não inunda o Maestruc
-            out ("mixer/canal", port_, c.index, c.name.substring (0, 48), c.levelDb, c.mute ? 1 : 0, c.solo ? 1 : 0);
+            out ("mixer/canal", port_, c.index, c.name.substring (0, 48), c.levelDb, c.mute ? 1 : 0, c.solo ? 1 : 0,
+                 c.objects.substring (0, 48), c.minDb, c.maxDb);
             ++n;
         }
         out ("mixer/fim", port_, n);

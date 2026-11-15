@@ -5683,6 +5683,22 @@ private:
     // congela à espera do áudio (`redraw()` do painel X11 faz igual).
     void timerCallback() override {
         if (!primeiroQuadro_) { primeiroQuadro_ = true; arranque::marca("primeiro quadro"); }
+        if (maestrucLink_ != nullptr && ++maestrucMixerTick_ >= 6) {
+            // o mixer do patch mudou à mão (knob, patch novo): o Maestruc fica sabendo
+            maestrucMixerTick_ = 0;
+            std::vector<rasgo::maestruc::MixerChannel> agora;
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                maestrucMixerList(agora);
+            }
+            std::vector<float> resumo;
+            for (const auto& c : agora) {
+                resumo.push_back(static_cast<float>(c.index));
+                resumo.push_back(c.levelDb);
+                resumo.push_back(c.mute ? 1.0f : 0.0f);
+            }
+            if (resumo != maestrucMixerSeen_) { maestrucMixerSeen_ = std::move(resumo); maestrucLink_->mixerChanged(); }
+        }
         if (++signalInTick_ >= 15) { signalInTick_ = 0; syncSignalIn(); }
         // O TECLADO só chega aqui se este componente tiver o foco. O único
         // filho focável é a caixa de seed (um TextEditor), e o JUCE dá o
@@ -6818,18 +6834,88 @@ private:
             seed = juce::String(static_cast<juce::uint64>(seed_));
             bpm = 0.0f;   // cada CLOCK do patch tem o seu
         };
+        // Mixer pelo Maestruc (16/11/2026; o autor: "os mesmos objetos dos
+        // mixers de cada instrumento"): os módulos MIXER do patch (CH1–CH4:
+        // ganho −60…+12 dB e MUTE; OUT: ganho −24…+12 dB) e o MASTER (ganho e
+        // mudo), pelo mesmo caminho dos knobs do painel. Índice = nó × 8 + k
+        // (k 0–3 = CH1–CH4, 4 = OUT); o MASTER do patch é o −1.
+        h.mixerList = [this](std::vector<rasgo::maestruc::MixerChannel>& channels) {
+            std::lock_guard<std::mutex> lk(rack_.gmx);
+            maestrucMixerList(channels);
+        };
+        h.mixerSet = [this](int index, const juce::String& what, float value) {
+            std::size_t node = 0;
+            std::string bind;
+            float lo = 0.0f, hi = 1.0f;
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                if (!maestrucMixerBind(index, what, node, bind, lo, hi)) return false;
+                const float v = what == "nivel" ? juce::jlimit(lo, hi, value) : (value > 0.5f ? 1.0f : 0.0f);
+                rack_.graph.setParameterBase(node, bind, v);
+            }
+            if (view_) view_->repaint();
+            return true;
+        };
         if (!maestrucLink_->start()) { maestrucLink_.reset(); return; }
         openMaestrucBridge();
     }
+    // Sob `gmx`: os canais do mixer do patch, na ordem do rack.
+    void maestrucMixerList(std::vector<rasgo::maestruc::MixerChannel>& channels) {
+        int mixers = 0;
+        for (const std::size_t id : rack_.shown) {
+            if (id >= rack_.graph.nodeCount()) continue;
+            const std::string type = rack_.graph.node(id).type();
+            const auto value = [&](const std::string& bind) { return rack_.graph.parameterUserValue(id, bind); };
+            if (type == "MIXER") {
+                ++mixers;
+                const juce::String prefixo = mixers > 1 ? "MIXER " + juce::String(mixers) + " " : juce::String();
+                for (int k = 1; k <= 4; ++k) {
+                    const std::string n = std::to_string(k);
+                    channels.push_back({static_cast<int>(id * 8) + k - 1, prefixo + "CH" + juce::String(k),
+                                        value("gain" + n), value("mute" + n) >= 0.5f, false, "nivel,mudo", -60.0f, 12.0f});
+                }
+                channels.push_back({static_cast<int>(id * 8) + 4, prefixo + "OUT", value("out_gain"), false, false,
+                                    "nivel", -24.0f, 12.0f});
+            } else if (type == "MASTER") {
+                channels.push_back({-1, "MASTER", value("gain"), value("mute") >= 0.5f, false, "nivel,mudo", -60.0f, 12.0f});
+            }
+        }
+    }
+    // Sob `gmx`: de um índice do Maestruc ao nó e ao parâmetro do patch.
+    bool maestrucMixerBind(int index, const juce::String& what, std::size_t& node, std::string& bind,
+                           float& lo, float& hi) {
+        if (what != "nivel" && what != "mudo") return false;   // o MIXER não tem SOLO
+        if (index == -1) {
+            for (const std::size_t id : rack_.shown)
+                if (id < rack_.graph.nodeCount() && rack_.graph.node(id).type() == "MASTER") {
+                    node = id; bind = what == "nivel" ? "gain" : "mute"; lo = -60.0f; hi = 12.0f;
+                    return true;
+                }
+            return false;
+        }
+        if (index < 0) return false;
+        const auto id = static_cast<std::size_t>(index / 8);
+        const int k = index % 8;
+        if (k > 4 || std::find(rack_.shown.begin(), rack_.shown.end(), id) == rack_.shown.end()
+            || id >= rack_.graph.nodeCount() || rack_.graph.node(id).type() != "MIXER") return false;
+        if (k == 4) {
+            if (what != "nivel") return false;
+            node = id; bind = "out_gain"; lo = -24.0f; hi = 12.0f;
+            return true;
+        }
+        node = id; bind = (what == "nivel" ? "gain" : "mute") + std::to_string(k + 1); lo = -60.0f; hi = 12.0f;
+        return true;
+    }
     // Fio de mensagens. A ponte leva a mistura do MASTER (um par estéreo) na
-    // taxa da placa. O mixer pelo Maestruc fica para depois: o MIXER do
-    // Modular é um módulo do patch, e como mostrá-lo é decisão do autor.
+    // taxa da placa.
     void openMaestrucBridge() {
         maestrucPortao_.fecharEsperar();
         if (maestrucLink_ == nullptr || sampleRate_ <= 0.0) return;
         if (maestrucLink_->openSoundBridge(1, sampleRate_, {"mix"}))
             maestrucPortao_.abrir(maestrucLink_.get());
     }
+    int maestrucMixerTick_ = 0;
+    std::vector<float> maestrucMixerSeen_;
     rasgo::maestruc::PortaoDeSom maestrucPortao_;
     std::unique_ptr<rasgo::maestruc::Link> maestrucLink_;
 
