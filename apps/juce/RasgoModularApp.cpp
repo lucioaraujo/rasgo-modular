@@ -29,6 +29,7 @@
 #include "dsp/NoteOut.hpp"        // notas concluídas -> SYSTEM SCORE
 #include "dsp/SignalIn.hpp"       // entrada de áudio/MIDI (módulo adaptador)
 #include "io/WavWriter.hpp"       // REC: o mesmo .wav do painel X11
+#include "juce/StreamingVersion.h" // REC: a versão de entrega (16/11/2026)
 #include "panel/ScoreRecorder.hpp"  // SYSTEM SCORE da tomada
 #include "panel/SinkOut.hpp"      // sink + guarda de segurança
 #include "panel/LearnCatalog.hpp"
@@ -6592,6 +6593,20 @@ private:
         if (!takePre.empty())
             write(out.getSiblingFile(out.getFileNameWithoutExtension()
                                      + ".pre-safety.wav"), takePre);
+        // versão de entrega a -14 LUFS (16/11/2026, saida-ref 1.1), da tomada
+        // pós-safety (o que se ouviu), num fio próprio: a tela não espera
+        if (!take.empty()) {
+            const juce::File postFile = rack_.recTap == Rack::RecTap::post
+                ? out : out.getSiblingFile(out.getFileNameWithoutExtension() + ".post-safety.wav");
+            const juce::File streamingFile =
+                out.getSiblingFile(out.getFileNameWithoutExtension() + ".streaming.wav");
+            streamingPool_.addJob([copy = take, rate = sampleRate_,
+                                   wav = streamingFile.getFullPathName().toStdString(),
+                                   txt = streamingFile.withFileExtension("txt").getFullPathName().toStdString(),
+                                   name = postFile.getFileName().toStdString()] {
+                rasgo::modular::writeStreamingVersion(copy, rate, wav, txt, name);
+            });
+        }
         // o .score.txt vai ao lado, com o MESMO nome — é o par do áudio
         const juce::File scoreFile =
             out.getSiblingFile(out.getFileNameWithoutExtension() + ".score.txt");
@@ -6801,6 +6816,9 @@ private:
     std::vector<float> inFifo_;           // entrada intercalada L/R
     juce::OwnedArray<juce::MidiInput> midiIns_;
     int recCount_ = 0;
+    // a versão de entrega da última tomada (16/11/2026); o destrutor espera
+    juce::ThreadPool streamingPool_ { juce::ThreadPoolOptions {}
+        .withThreadName("Rasgo Modular streaming master").withNumberOfThreads(1) };
     bool recWasOn_ = false;
     std::unique_ptr<juce::FileChooser> chooser_;
     int signalInTick_ = 0;   // syncSignalIn a cada 15 quadros (~0,5 s)

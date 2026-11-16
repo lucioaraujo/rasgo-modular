@@ -27,6 +27,11 @@ else()
 endif()
 
 target_sources(RasgoModularApp PRIVATE RasgoModularApp.cpp)
+# saida-ref 1.1 (16/11/2026): o master de entrega da gravação
+target_sources(RasgoModularApp PRIVATE
+    ../../src/saida/DeliveryMaster.cpp ../../src/saida/OutputStage.cpp
+    ../../src/saida/LoudnessMeter.cpp ../../src/saida/TruePeakDetector.cpp
+    ../../src/saida/TakeAnalysis.cpp)
 
 # A marca NÃO precisa de BinaryData: vem do mesmo cabeçalho C já commitado
 # que o painel X11 usa (`apps/panel/assets/rasgo_logo_gray.h`, mapa de
