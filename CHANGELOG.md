@@ -7,7 +7,7 @@ pronto.
 
 ---
 
-## Não publicado
+## v0.1.9 — 2026-11-16
 
 - **Receptor do Maestruc** (o regente da família RASGO, protocolo
   `maestruc.link/1`, OSC só na máquina local): com `./run --maestruc`

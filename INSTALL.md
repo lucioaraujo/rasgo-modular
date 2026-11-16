@@ -1,15 +1,15 @@
 # Rasgo Modular — instalação / installation
 
-> **Estado (11 nov. 2026):** a versão atual é a **v0.1.8**, com pacotes
+> **Estado (16 nov. 2026):** a versão atual é a **v0.1.9**, com pacotes
 > para Linux, Windows e macOS na
-> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8)
-> (antes: v0.1.7 em 18 out., v0.1.5 em 7 out., v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
+> [página da release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.9)
+> (antes: v0.1.8 em 11 nov., v0.1.7 em 18 out., v0.1.5 em 7 out., v0.1.4 em 6 out., v0.1.3 em 4 out., v0.1.2 em 3 out., v0.1.1 em 2 out., v0.1.0 em
 > 29 set. 2026). Este documento descreve também como
 > construir e rodar a partir do código.
 >
 > **Para instalar, comece por ["Instalar, passo a passo"](#instalar-passo-a-passo)**:
 > lá estão os avisos do Windows e do macOS e o que fazer em cada um.
-> *English:* the current version is v0.1.8. Start with
+> *English:* the current version is v0.1.9. Start with
 > ["Installing, step by step"](#installing-step-by-step).
 
 ---
