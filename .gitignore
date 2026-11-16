@@ -20,3 +20,7 @@
 *.wav
 *.score.txt
 !guia/**/*.md
+
+# caches do Python (geração do site)
+__pycache__/
+*.pyc
