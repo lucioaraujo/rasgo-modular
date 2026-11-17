@@ -7,6 +7,16 @@ pronto.
 
 ---
 
+## Não publicado
+
+- **Versão de entrega a −14 LUFS** (saida-ref 1.1, a saída técnica comum
+  da família): ao lado de cada gravação, `.streaming.wav` (−14 LUFS, true
+  peak ≤ −1 dBTP, PCM 24, sem dither como a tomada (ver `WavWriter.hpp`)) e um `.txt` com as medidas, feitos
+  offline num fio próprio. O som ao vivo e a gravação crua não mudam. Guarda
+  de dinâmica: o limitador nunca tira mais de 6 dB; uma gravação dinâmica
+  demais fica abaixo de −14 e o `.txt` diz por quê.
+  Feita da tomada pós-safety, que o REC já tem na memória.
+
 ## v0.1.9 — 2026-11-16
 
 - **Receptor do Maestruc** (o regente da família RASGO, protocolo
