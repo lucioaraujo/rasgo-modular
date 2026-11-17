@@ -22,7 +22,10 @@
 //   1. guarda de finitude  — NaN/Inf viram 0 (contados);
 //   2. bloqueio de DC      — passa-alta de 1 polo (~5 Hz);
 //   3. guarda ULTRASSÔNICA — passa-baixa Butterworth de 2 polos em ~21 kHz.
-//      Musicalmente transparente (−0,1 dB a 8 kHz, ~−1 dB a 15 kHz), tira
+//      Musicalmente transparente (medido a 48 kHz: 0,00 dB a 8 kHz,
+//      −0,03 dB a 15 kHz, −12,5 dB a 22,5 kHz; o "~−1 dB a 15 kHz" que
+//      estava aqui é o Butterworth analógico, e a transformação bilinear
+//      comprime a curva perto de Nyquist — saida-ref, 16/11/2026), tira
 //      só a energia perto de Nyquist (ruído violeta/`bit` sustentados,
 //      hash de aliasing) — o "ice-pick" que dá pressão física sem ser
 //      nota. Sempre ligada: é como o bloqueio de DC, nunca é escolha
