@@ -1,5 +1,5 @@
-// Rasgo Modular — cópia de RASGO/REFERENCIAS/SAIDA_TECNICA/src/DeliveryMaster.h (saida-ref 1.1,
-// 16/11/2026, sha256 824844bd9d857146…), namespace rasgo::modular::saida. Proveniência na referência.
+// Rasgo Modular — cópia de RASGO/REFERENCIAS/SAIDA_TECNICA/src/DeliveryMaster.h (saida-ref 1.2,
+// 17/11/2026, sha256 13f78b43fc779c77…), namespace rasgo::modular::saida. Proveniência na referência.
 // Copyright (C) 2026 Lúcio de Araújo
 
 #pragma once
@@ -51,7 +51,7 @@ public:
         float inputTruePeakDb = -240.0f;
         float gainDb = 0.0f;
         float outputLufs = -70.0f;
-        float outputTruePeakDb = -240.0f;
+        float outputTruePeakDb = -240.0f;  // 1.2: checked at 16x (offline), not the live 4x
         float limiterReductionDb = 0.0f;  // the most the limiter took from a peak
         bool reachedTarget = false;
         bool silent = false;              // nothing to master: written as it came

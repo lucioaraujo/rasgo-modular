@@ -1,5 +1,5 @@
-// Rasgo Modular — cópia de RASGO/REFERENCIAS/SAIDA_TECNICA/src/DeliveryMaster.cpp (saida-ref 1.1,
-// 16/11/2026, sha256 3f2230c4ae1cde7f…), namespace rasgo::modular::saida. Proveniência na referência.
+// Rasgo Modular — cópia de RASGO/REFERENCIAS/SAIDA_TECNICA/src/DeliveryMaster.cpp (saida-ref 1.2,
+// 17/11/2026, sha256 6649e7bb99339a0b…), namespace rasgo::modular::saida. Proveniência na referência.
 // Copyright (C) 2026 Lúcio de Araújo
 
 #include "saida/DeliveryMaster.h"
@@ -8,16 +8,117 @@
 #include "saida/TakeAnalysis.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <vector>
 
 namespace rasgo::modular::saida
 {
 namespace
 {
+// saida-ref 1.2 (17/11/2026): the offline check of the delivered file's true
+// peak. The live 4x detector (48 taps per phase) is flat to 20 kHz, but a 4x
+// grid misses up to 0.7 dB between its points for content near Nyquist, and
+// takes do carry it (a Batruc take: -24 dB of its energy between 20.5 and
+// 22.05 kHz; delivered at "-1.00 dBTP", it read -0.51 at 32x). Offline, the
+// cost does not matter: 16x, 128 taps per phase, Kaiser (beta 12), flat to
+// 21 kHz at 44.1 kHz; it agreed with a 32x reference to 0.01 dB on that take.
+// Only the points next to a sample within 6 dB of the ceiling are
+// interpolated (an intersample peak is not 6 dB over both its neighbours in
+// any real take); the rest of the take costs nothing.
+class PreciseTruePeak final
+{
+public:
+    static constexpr std::size_t factor = 16;
+    static constexpr std::size_t taps = 128;
+
+    PreciseTruePeak()
+    {
+        constexpr double pi = 3.14159265358979323846;
+        constexpr double beta = 12.0;
+        auto i0 = [](double x) {
+            double sum = 1.0, term = 1.0;
+            for (int k = 1; k < 80 && term > sum * 1.0e-17; ++k)
+            {
+                term *= x * x * 0.25 / (static_cast<double>(k) * static_cast<double>(k));
+                sum += term;
+            }
+            return sum;
+        };
+        constexpr auto total = factor * taps;
+        constexpr auto half = static_cast<double>(total) * 0.5;
+        std::vector<double> prototype((factor - 1) * taps, 0.0);
+        for (std::size_t phase = 1; phase < factor; ++phase)
+        {
+            double sum = 0.0;
+            for (std::size_t t = 0; t < taps; ++t)
+            {
+                const auto position = static_cast<double>(t * factor + phase) - half;
+                const auto ratio = position / half;
+                const auto x = position / static_cast<double>(factor);
+                const auto s = std::sin(pi * x) / (pi * x);  // never 0: phase > 0
+                const auto value = s * i0(beta * std::sqrt(std::max(0.0, 1.0 - ratio * ratio))) / i0(beta);
+                prototype[(phase - 1) * taps + t] = value;
+                sum += value;
+            }
+            for (std::size_t t = 0; t < taps; ++t)
+                prototype[(phase - 1) * taps + t] /= sum;
+        }
+        coefficients.assign(prototype.begin(), prototype.end());
+    }
+
+    void reset(float gateLinear) noexcept
+    {
+        gate = gateLinear;
+        peak = 0.0;
+        for (auto& h : history) h.fill(0.0f);
+        at = 0;
+    }
+
+    void push(float left, float right) noexcept
+    {
+        history[0][at] = history[0][at + taps] = left;
+        history[1][at] = history[1][at + taps] = right;
+        at = (at + 1) % taps;
+        for (std::size_t ch = 0; ch < 2; ++ch)
+        {
+            const float* w = history[ch].data() + at;  // oldest first
+            // the two samples around the interpolated points
+            const auto a = std::abs(w[taps / 2 - 1]), b = std::abs(w[taps / 2]);
+            peak = std::max(peak, static_cast<double>(std::max(a, b)));
+            if (std::max(a, b) < gate) continue;
+            for (std::size_t phase = 0; phase + 1 < factor; ++phase)
+            {
+                // eight partial sums in float (vectorised; error ~1e-7)
+                const float* h = coefficients.data() + phase * taps;
+                std::array<float, 8> partial {};
+                for (std::size_t t = 0; t < taps; t += 8)
+                    for (std::size_t lane = 0; lane < 8; ++lane)
+                        partial[lane] += h[t + lane] * w[t + lane];
+                const auto y = ((partial[0] + partial[1]) + (partial[2] + partial[3]))
+                    + ((partial[4] + partial[5]) + (partial[6] + partial[7]));
+                peak = std::max(peak, static_cast<double>(std::abs(y)));
+            }
+        }
+    }
+
+    [[nodiscard]] float db() const noexcept
+    {
+        return peak > 1.0e-12 ? static_cast<float>(20.0 * std::log10(peak)) : -240.0f;
+    }
+
+private:
+    std::vector<float> coefficients;
+    std::array<std::array<float, 2 * taps>, 2> history {};
+    std::size_t at = 0;
+    float gate = 0.0f;
+    double peak = 0.0;
+};
+
 struct Pass
 {
     float lufs = -70.0f;
-    float truePeakDb = -240.0f;
+    float truePeakDb = -240.0f;  // the precise (16x) true peak of the output
     float reductionDb = 0.0f;
     bool ok = true;
 };
@@ -43,7 +144,7 @@ bool measure(DeliveryMaster::Source& source, double rate, std::size_t block, Tak
 // gain, then the limiter, latency compensated (the output lines up with the
 // input); measured, and written when there is a sink
 Pass render(DeliveryMaster::Source& source, double rate, std::size_t block, float gainDb, float ceilingDbtp,
-            DeliveryMaster::Sink* sink)
+            float checkCeilingDbtp, PreciseTruePeak& precise, DeliveryMaster::Sink* sink)
 {
     Pass result;
     if (!source.rewind()) { result.ok = false; return result; }
@@ -53,6 +154,7 @@ Pass render(DeliveryMaster::Source& source, double rate, std::size_t block, floa
     stage.reset();
     TakeAnalysis analysis;
     analysis.prepare(rate);
+    precise.reset(std::pow(10.0f, (checkCeilingDbtp - 6.0f) / 20.0f));
     const auto gain = std::pow(10.0f, gainDb / 20.0f);
     const auto latency = static_cast<std::size_t>(stage.latencySamples());
     std::vector<float> inL(block), inR(block), outL(block), outR(block);
@@ -60,7 +162,10 @@ Pass render(DeliveryMaster::Source& source, double rate, std::size_t block, floa
     bool ended = false;
     auto flush = [&]() {
         for (std::size_t i = 0; i < pending; ++i)
+        {
             analysis.push(outL[i], outR[i]);
+            precise.push(outL[i], outR[i]);
+        }
         if (sink != nullptr && pending > 0 && !sink->write(outL.data(), outR.data(), pending))
             result.ok = false;
         pending = 0;
@@ -93,9 +198,11 @@ Pass render(DeliveryMaster::Source& source, double rate, std::size_t block, floa
         }
     }
     flush();
+    for (std::size_t i = 0; i < PreciseTruePeak::taps; ++i)  // the last samples through the check
+        precise.push(0.0f, 0.0f);
     const auto measured = analysis.result();
     result.lufs = measured.integratedLufs;
-    result.truePeakDb = measured.truePeakDb;
+    result.truePeakDb = std::max(measured.truePeakDb, precise.db());
     return result;
 }
 
@@ -140,40 +247,51 @@ DeliveryMaster::Report DeliveryMaster::process(Source& source, double sampleRate
     // peaks at most `maxReduction` over the ceiling
     gain = std::min(gain, ceiling + maxReduction - input.truePeakDb);
 
-    // find the gain by measuring only (nothing written)
+    // find the gain by measuring only (nothing written). The limiter's own
+    // ceiling starts at the target and is lowered by what the precise check
+    // finds over it (1.2), at most 3 dB.
+    PreciseTruePeak precise;
+    auto limiterCeiling = ceiling;
     Pass best;
-    float bestGain = gain;
+    float bestGain = gain, bestCeiling = ceiling;
     bool haveBest = false;
-    for (int pass = 0; pass < std::max(1, settings.passes); ++pass)
+    for (int pass = 0; pass < std::max(1, settings.passes) + 2; ++pass)
     {
-        const auto result = render(source, rate, block, gain, ceiling, nullptr);
+        const auto result = render(source, rate, block, gain, limiterCeiling, ceiling, precise, nullptr);
         if (!result.ok) { report.failed = true; return report; }
         const bool withinGuard = result.reductionDb <= maxReduction + 0.25f;
-        if (!haveBest || (withinGuard && result.lufs > best.lufs))
+        const bool underCeiling = result.truePeakDb <= ceiling + 0.02f;
+        if (!haveBest || (withinGuard && underCeiling && result.lufs > best.lufs)
+            || (underCeiling && best.truePeakDb > ceiling + 0.02f))
         {
             best = result;
             bestGain = gain;
+            bestCeiling = limiterCeiling;
             haveBest = true;
         }
+        const auto over = result.truePeakDb - ceiling;
+        if (over > 0.02f)
+            limiterCeiling = std::max(ceiling - 3.0f, limiterCeiling - over - 0.02f);
         const auto missing = settings.targetLufs - result.lufs;
-        if (std::abs(missing) <= 0.2f)
+        if (std::abs(missing) <= 0.2f && over <= 0.02f)
             break;
         auto next = std::clamp(gain + missing, -settings.maxGainDb, settings.maxGainDb);
         next = std::min(next, ceiling + maxReduction + 1.0f - input.truePeakDb);
         if (!withinGuard)
             next = gain - (result.reductionDb - maxReduction);
-        if (std::abs(next - gain) < 0.05f)
+        if (std::abs(next - gain) < 0.05f && over <= 0.02f)
             break;
         gain = next;
     }
-    // the one pass that writes, with the chosen gain
-    const auto written = render(source, rate, block, bestGain, ceiling, &sink);
+    // the one pass that writes, with the chosen gain and limiter ceiling
+    const auto written = render(source, rate, block, bestGain, bestCeiling, ceiling, precise, &sink);
     report.failed = !written.ok;
     report.gainDb = bestGain;
     report.outputLufs = written.lufs;
     report.outputTruePeakDb = written.truePeakDb;
     report.limiterReductionDb = written.reductionDb;
-    report.reachedTarget = std::abs(settings.targetLufs - written.lufs) <= 0.5f;
+    report.reachedTarget = std::abs(settings.targetLufs - written.lufs) <= 0.5f
+        && written.truePeakDb <= ceiling + 0.05f;
     (void) best;
     return report;
 }
