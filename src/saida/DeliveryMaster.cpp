@@ -1,5 +1,5 @@
 // Rasgo Modular — cópia de RASGO/REFERENCIAS/SAIDA_TECNICA/src/DeliveryMaster.cpp (saida-ref 1.2,
-// 17/11/2026, sha256 6649e7bb99339a0b…), namespace rasgo::modular::saida. Proveniência na referência.
+// 17/11/2026, sha256 ad96886d905d4c05…), namespace rasgo::modular::saida. Proveniência na referência.
 // Copyright (C) 2026 Lúcio de Araújo
 
 #include "saida/DeliveryMaster.h"
@@ -252,17 +252,26 @@ DeliveryMaster::Report DeliveryMaster::process(Source& source, double sampleRate
     // finds over it (1.2), at most 3 dB.
     PreciseTruePeak precise;
     auto limiterCeiling = ceiling;
+    // a gain once found over the guard is never tried again (no oscillation
+    // between a gain over the guard and one under it)
+    auto gainOverGuard = settings.maxGainDb + 1.0f;
     Pass best;
     float bestGain = gain, bestCeiling = ceiling;
     bool haveBest = false;
+    // ranking: within the guard and under the ceiling first, then the
+    // loudest; a pass that fails either only wins over another that fails
+    auto valid = [&](const Pass& p) {
+        return p.reductionDb <= maxReduction + 0.25f && p.truePeakDb <= ceiling + 0.02f;
+    };
     for (int pass = 0; pass < std::max(1, settings.passes) + 2; ++pass)
     {
         const auto result = render(source, rate, block, gain, limiterCeiling, ceiling, precise, nullptr);
         if (!result.ok) { report.failed = true; return report; }
         const bool withinGuard = result.reductionDb <= maxReduction + 0.25f;
-        const bool underCeiling = result.truePeakDb <= ceiling + 0.02f;
-        if (!haveBest || (withinGuard && underCeiling && result.lufs > best.lufs)
-            || (underCeiling && best.truePeakDb > ceiling + 0.02f))
+        const bool better = !haveBest
+            || (valid(result) && (!valid(best) || result.lufs > best.lufs))
+            || (!valid(result) && !valid(best) && result.reductionDb < best.reductionDb);
+        if (better)
         {
             best = result;
             bestGain = gain;
@@ -272,13 +281,19 @@ DeliveryMaster::Report DeliveryMaster::process(Source& source, double sampleRate
         const auto over = result.truePeakDb - ceiling;
         if (over > 0.02f)
             limiterCeiling = std::max(ceiling - 3.0f, limiterCeiling - over - 0.02f);
+        if (!withinGuard)
+            gainOverGuard = std::min(gainOverGuard, gain);
         const auto missing = settings.targetLufs - result.lufs;
-        if (std::abs(missing) <= 0.2f && over <= 0.02f)
+        if (std::abs(missing) <= 0.2f && over <= 0.02f && withinGuard)
             break;
         auto next = std::clamp(gain + missing, -settings.maxGainDb, settings.maxGainDb);
-        next = std::min(next, ceiling + maxReduction + 1.0f - input.truePeakDb);
+        next = std::min(next, limiterCeiling + maxReduction + 1.0f - input.truePeakDb);
         if (!withinGuard)
             next = gain - (result.reductionDb - maxReduction);
+        if (withinGuard)  // between a gain inside the guard and one over it: halve the gap
+            next = std::min(next, 0.5f * (gain + gainOverGuard));
+        if (withinGuard && over <= 0.02f && gainOverGuard - gain < 0.1f)
+            break;  // as loud as the guard allows
         if (std::abs(next - gain) < 0.05f && over <= 0.02f)
             break;
         gain = next;
