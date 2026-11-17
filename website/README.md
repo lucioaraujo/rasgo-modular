@@ -62,7 +62,7 @@ regressões do website são verificações distintas. Para regenerar:
 ```sh
 ../build/rasgo_modular_learn_coverage --despejar-modulos > modulos.json
 python3 gerar_modulos.py
-python3 estado.py --depois 0.1.9
+python3 estado.py --depois 0.1.11
 python3 seo.py
 python3 verificar.py
 python3 -B -m unittest discover -s . -p 'test_*.py'
