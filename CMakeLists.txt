@@ -42,7 +42,7 @@ if (APPLE)
 endif()
 
 # `C` além de `CXX`: o JUCE compila fontes C nos seus módulos.
-project(RasgoModularPrototype VERSION 0.1.10 LANGUAGES C CXX)
+project(RasgoModularPrototype VERSION 0.1.11 LANGUAGES C CXX)
 set(RASGO_MODULAR_VERSION_LABEL "${PROJECT_VERSION}")
 
 # MSVC: /bigobj em todos os alvos. O catálogo (LEARN nos 4 idiomas, 88

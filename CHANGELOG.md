@@ -7,7 +7,13 @@ pronto.
 
 ---
 
-## Não publicado
+## v0.1.11 — 2026-11-17
+
+- **Fechar o app logo depois do REC não corta mais a versão de entrega**:
+  o `.streaming.wav` termina antes de o app sair. Antes, o pool de fios só
+  esperava 5 s e depois o matava à força.
+
+## v0.1.10 — 2026-11-17
 
 - **Versão de entrega a −14 LUFS** (saida-ref 1.1, a saída técnica comum
   da família): ao lado de cada gravação, `.streaming.wav` (−14 LUFS, true

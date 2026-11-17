@@ -5428,6 +5428,11 @@ public:
         for (auto* in : midiIns_) in->stop();
         midiIns_.clear();
         shutdownAudio();
+        // A versão de entrega em curso (ou na fila) termina antes de sair
+        // (17/11/2026): o destrutor do juce::ThreadPool só espera 5 s e depois
+        // mata o fio à força; removeAllJobs descarta o que ainda está na fila.
+        while (streamingPool_.getNumJobs() > 0)
+            juce::Thread::sleep(20);
         if (panelExport_) return;
         // continua daqui na próxima sessão (ABRE · ÚLTIMA, ou `RASGO_RESUME=1`)
         savePatch(dataDir().getChildFile("session.rmp"));
