@@ -54,7 +54,7 @@ inline void writeStreamingVersion(const std::vector<float>& interleaved, const d
     if (report.failed || sink.out.empty()) return;
     if (!writeWav24(wavPath, sink.out, static_cast<std::uint32_t>(sampleRate), 2)) return;
     std::ofstream text(textPath);
-    text << "Rasgo Modular - versao de entrega (streaming), saida-ref 1.1\n"
+    text << "Rasgo Modular - versao de entrega (streaming), saida-ref 1.2\n"
          << "tomada: " << takeName << " (post-safety)\n"
          << "alvo: -14 LUFS, true peak <= -1 dBTP; limitador no maximo 6 dB (guarda de dinamica)\n"
          << "entrada: " << report.inputLufs << " LUFS, " << report.inputTruePeakDb << " dBTP\n"
