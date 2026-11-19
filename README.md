@@ -1,6 +1,12 @@
 # Rasgo Modular
 
-A **v0.1.8** (11 nov. 2026) leva o instrumento de 60 a **88 módulos**. Entre
+A **v0.1.11** (17 nov. 2026) é a atual. A 0.1.9 e a 0.1.10 ligam o Modular
+ao [Maestruc](https://lucioaraujo.github.io/maestruc/), o regente da família
+(seed, repouso, mixer e ponte de som), e gravam ao lado de cada tomada a
+versão de entrega para streaming (−14 LUFS, true peak até −1 dBTP); a 0.1.11
+garante essa versão mesmo quando o app fecha logo depois do REC.
+
+A **v0.1.8** (11 nov. 2026) levou o instrumento de 60 a **88 módulos**. Entre
 os novos: o filtro em escada LADDER, o fraseado do ACCENT, o jogo de
 confiança do BLEFE, as citações do APOCRIFO, o polímetro do POLYGON, os
 círculos do EPICYCLE, a relação entre vozes do RELATE, o intérprete do
@@ -28,7 +34,7 @@ clonagem independente. Publicação continua uma decisão separada.
 ![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.8 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) ·
+**Download:** [v0.1.11 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -48,7 +54,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version:** v0.1.8 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.11 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### What it is
@@ -100,7 +106,7 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.8 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
+[**v0.1.11 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11) —
 Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
 macOS `.dmg`, all built and packaged by continuous integration.
 
@@ -145,7 +151,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versão:** v0.1.8 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.11 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### O que é
@@ -198,7 +204,7 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
+[**Release v0.1.11**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11) —
 Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 `.dmg` — todos construídos e empacotados pela integração contínua.
 
@@ -243,7 +249,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version :** v0.1.8 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.11 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Ce que c'est
@@ -299,7 +305,7 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
+[**Version v0.1.11**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
@@ -345,7 +351,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versión:** v0.1.8 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.11 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
 
 ### Qué es
@@ -398,7 +404,7 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.8**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8) —
+[**Versión v0.1.11**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
 
