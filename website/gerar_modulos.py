@@ -359,10 +359,10 @@ def pagina(codigo, dados, familias, marca):
     L.append("    <span>MODULAR</span>")
     L.append("  </a>")
     L.append('  <div class="header-nav">')
-    L.append('    <nav class="page-nav" aria-label="%s">' % e(t["secoes_label"]))
-    L.append('      <a href="%s">%s</a>' % (PAGINA_PRINCIPAL[codigo], e(t["nav_conceito"])))
-    L.append('      <a href="%s" aria-current="page">%s</a>' % (t["arquivo"], e(t["nav_modulos"])))
-    L.append("    </nav>")
+    # o menu de páginas comum (Conceito · Tutorial · Módulos · Instalação ·
+    # Baixar), de paginas_extra.py (nivelamento dos sites, 19/11/2026)
+    from paginas_extra import menu
+    L.append("    " + menu(codigo, "modulos"))
     L.append('    <nav class="lang-switch" aria-label="%s">' % e(t["idioma_label"]))
     for c in ("pt", "en", "fr", "es"):
         atual = ' aria-current="true"' if c == codigo else ""

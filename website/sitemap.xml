@@ -65,4 +65,68 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/modulos-es.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/modulos.html"/>
   </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/tutorial.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/tutorial-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/tutorial-fr.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/tutorial-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/tutorial-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/tutorial.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/instalacao.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+  </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
+  </url>
 </urlset>

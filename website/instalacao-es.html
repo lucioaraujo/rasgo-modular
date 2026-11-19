@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Instalación — Rasgo Modular</title>
+<meta name="description" content="Instalar Rasgo Modular en Windows, macOS y Linux, paso a paso, con los avisos de seguridad, los requisitos y dónde quedan los datos." />
+<link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
+<link rel="stylesheet" href="styles.css" />
+<script src="assets/contact.js" defer></script>
+<!-- SEO:INICIO — gerado por seo.py; editar lá, não aqui -->
+<link rel="canonical" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html">
+<link rel="alternate" hreflang="pt-BR" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html">
+<link rel="alternate" hreflang="en" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-en.html">
+<link rel="alternate" hreflang="fr" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-fr.html">
+<link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html">
+<link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rasgo Modular">
+<meta property="og:title" content="Instalación — Rasgo Modular">
+<meta property="og:description" content="Instalar Rasgo Modular en Windows, macOS y Linux, paso a paso, con los avisos de seguridad, los requisitos y dónde quedan los datos.">
+<meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html">
+<meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rasgo Modular en ejecución: un rack de tres filas de módulos cruzado por unos setenta cables naranjas y azules.">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="pt_BR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Rasgo Modular",
+  "description": "Instalar Rasgo Modular en Windows, macOS y Linux, paso a paso, con los avisos de seguridad, los requisitos y dónde quedan los datos.",
+  "url": "https://lucioaraujo.github.io/rasgo-modular/",
+  "inLanguage": "es",
+  "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
+  "applicationCategory": "MultimediaApplication",
+  "applicationSubCategory": "Modular synthesizer",
+  "operatingSystem": "Linux, Windows, macOS",
+  "softwareVersion": "0.1.11",
+  "downloadUrl": "https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.11",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  },
+  "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+  "isAccessibleForFree": true,
+  "author": {
+    "@type": "Person",
+    "name": "Lúcio Araújo"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "RASGO",
+    "url": "https://rasgoinstruments.arquiviagem.net/"
+  },
+  "sameAs": [
+    "https://github.com/lucioaraujo/rasgo-modular"
+  ]
+}
+</script>
+<script>(function(){var K='rasgo-lingua',M={pt:'index.html',en:'en.html',fr:'fr.html',es:'es.html'};function g(){try{return localStorage.getItem(K)}catch(e){return null}}function s(v){try{localStorage.setItem(K,v)}catch(e){}}var l=(document.documentElement.lang||'').slice(0,2).toLowerCase(),p=location.pathname,base=location.origin+p.replace(/[^/]*$/,''),r=document.referrer||'';if(/\/(index\.html)?$/.test(p)&&l==='pt'&&r.indexOf(base)!==0&&!/[?&]lang=pt/.test(location.search)&&!/bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent)){var c=g();if(!c){var L=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];c='en';for(var i=0;i<L.length;i++){var x=String(L[i]).slice(0,2).toLowerCase();if(M[x]){c=x;break}}}if(c!=='pt'&&M[c]){location.replace(M[c]+location.hash);return}}if(M[l])s(l);})();</script>
+<!-- SEO:FIM -->
+</head>
+<body>
+<div class="rasgo-strip"><a href="https://rasgoinstruments.arquiviagem.net/">RASGO — familia de instrumentos e investigación sonora</a></div>
+<a class="skip-link" href="#conteudo">Saltar al contenido</a>
+
+<div class="site-header">
+  <a class="brand" href="#top" aria-label="Rasgo Modular">
+<svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="6.63 12.62 258.74 30.75" role="img" aria-label="RASGO">
+  <path fill="currentColor" d="M 8.0120798,40.29824 C 7.252945,38.879784 6.6318348,33.822641 6.6318348,29.060145 c 0,-12.794058 0.1058025,-12.84956 24.4952382,-12.84956 21.305108,0 23.504762,0.5615 23.504762,6 0,5.270564 -2.382823,6 -19.6,6 -16.4,0 -16.4,0 -16.4,5.733334 0,8.456585 -7.191687,12.759725 -10.6197552,6.354321 z M 59.932167,39.457119 c -2.019723,-5.312274 -1.575796,-16.926571 0.775273,-20.283192 2.732511,-3.901206 41.38639,-4.644203 45.16249,-0.868103 4.465,4.464996 2.37351,22.782804 -2.74806,24.068236 -4.507357,1.131273 -6.948629,-1.479657 -7.418446,-7.933987 -0.404923,-5.562821 -0.404923,-5.562821 -12.071589,-5.948065 -7.427558,-0.245264 -11.666667,0.118093 -11.666667,1 0,0.808165 3.47158,1.393749 8.333333,1.405661 10.934075,0.02679 14.911842,3.249251 11.614974,9.409506 -2.44559,4.569626 -30.201236,3.831888 -31.981308,-0.850056 z m 51.985153,0.664056 c -3.7693,-7.042995 0.91607,-9.243923 19.67859,-9.243923 18.03411,0 21.83006,-2.210131 5.03593,-2.932099 -9.33334,-0.401234 -9.33334,-0.401234 -9.73629,-6.650398 -0.50041,-7.760671 3.00717,-10.742235 8.44545,-7.178932 2.1369,1.400149 6.2919,2.094762 12.53034,2.094762 11.15111,0 12.09383,1.039334 12.09383,13.333334 0,13.713936 0.70412,13.333333 -24.66667,13.333333 -20.77845,0 -21.98211,-0.141881 -23.38118,-2.756077 z m 53.67874,1.186966 c -2.00722,-2.007228 -2.19509,-18.885312 -0.25065,-22.518544 1.66447,-3.110065 27.39221,-3.93989 30.35309,-0.979012 5.55622,5.556218 0.58824,10.4 -10.66666,10.4 -5.15556,0 -9.06667,0.575164 -9.06667,1.333334 0,3.356278 23.56097,1.535309 25.87739,-2 4.81344,-7.346239 10.46766,-3.013046 9.8627,7.558432 -0.40676,7.108234 -0.40676,7.108234 -22.44253,7.472457 -16.01251,0.264667 -22.48157,-0.08156 -23.66667,-1.266667 z m 51.74935,-1.009901 c -2.15009,-4.017484 -1.69952,-17.705129 0.69536,-21.124313 2.73252,-3.901206 41.3864,-4.644203 45.16249,-0.868103 2.59203,2.592028 2.97787,20.488804 0.49524,22.971428 -3.04696,3.046963 -44.66892,2.167876 -46.35309,-0.979012 z m 35.28643,-10.754321 c -1.08719,-1.759108 -23.33334,-1.759108 -23.33334,0 0,0.790766 4.91512,1.333333 12.0787,1.333333 7.71293,0 11.78084,-0.481924 11.25464,-1.333333 z"/>
+</svg>
+    <span>MODULAR</span>
+  </a>
+  <div class="header-nav">
+    <nav class="page-nav" aria-label="Secciones">
+      <a href="es.html">Concepto</a>
+      <a href="tutorial-es.html">Tutorial</a>
+      <a href="modulos-es.html">Módulos</a>
+      <a href="instalacao-es.html" aria-current="page">Instalación</a>
+      <a href="es.html#baixar">Descargar</a>
+    </nav>
+    <nav class="lang-switch" aria-label="Idioma">
+      <a href="instalacao.html">PT</a>
+      <a href="instalacao-en.html">EN</a>
+      <a href="instalacao-fr.html">FR</a>
+      <a href="instalacao-es.html" aria-current="true">ES</a>
+    </nav>
+  </div>
+</div>
+
+<main id="conteudo">
+<section class="hero" id="top">
+  <h1>Instalación</h1>
+  <p class="lead">Cómo instalar Rasgo Modular en Windows, macOS y Linux, qué pide del ordenador y dónde guarda las cosas.</p>
+</section>
+
+<section class="section">
+  <h2>Antes de empezar</h2>
+  <p>Los paquetes están en <strong>Descargar</strong>, en la página de inicio, y en la página de releases de GitHub. Los avisos de seguridad de Windows y macOS son esperables y aparecen solo la primera vez.</p>
+</section>
+
+<section class="section section-dark">
+  <h2>Windows</h2>
+  <ol class="tut-list">
+    <li>Descarga <code>rasgo-modular-&lt;versión&gt;-windows-x64.exe</code> y ábrelo.</li>
+    <li>Windows muestra <strong>"Windows protegió su PC"</strong>: haz clic en <strong>"Más información"</strong> y luego en <strong>"Ejecutar de todas formas"</strong>.</li>
+    <li>Si Windows pide permiso de administrador, haz clic en <strong>"Sí"</strong>.</li>
+    <li>Haz clic en <strong>"Siguiente"</strong> hasta el final. Rasgo Modular queda en el menú Inicio y en el escritorio; cada versión nueva reemplaza a la anterior.</li>
+  </ol>
+  <p><strong>Sin instalar:</strong> descomprime el <code>.zip</code> y abre <code>Rasgo Modular.exe</code>. Si no abre, pulsa Win + R, escribe <code>%APPDATA%\rasgo-modular</code> y envía el <code>arranque.log</code> en una issue de GitHub: su última línea dice dónde se detuvo el arranque.</p>
+</section>
+
+<section class="section">
+  <h2>macOS</h2>
+  <ol class="tut-list">
+    <li>Descarga <code>rasgo-modular-&lt;versión&gt;-macos-universal.dmg</code>. Sirve para Mac Intel y Apple Silicon.</li>
+    <li>Abre el <code>.dmg</code> y arrastra Rasgo Modular a <strong>Aplicaciones</strong>.</li>
+    <li>Abre la app. La primera vez, macOS la bloquea, porque tiene firma ad hoc, sin el Developer ID de pago de Apple. Haz clic en <strong>"OK"</strong>.</li>
+    <li>Autoriza la app una vez: en <strong>Ajustes del Sistema → Privacidad y seguridad</strong>, haz clic en <strong>"Abrir igualmente"</strong> y confirma. En macOS 14 o anterior: clic derecho en la app en el Finder → <strong>Abrir → Abrir</strong>.</li>
+    <li>Al encender el botón <strong>ON</strong> del módulo SIGNAL-IN, macOS pide el micrófono: autorízalo si quieres tocar con entrada de audio.</li>
+  </ol>
+  <p>Si el botón no aparece, usa la Terminal. El comando quita la marca de cuarentena que macOS pone a todo archivo descargado:</p>
+  <pre class="tut-code"><code>xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"</code></pre>
+</section>
+
+<section class="section section-dark">
+  <h2>Linux</h2>
+  <ul class="tut-list">
+    <li><strong>Ubuntu, Debian y Mint:</strong> doble clic en el <code>.deb</code>, o <code>sudo apt install ./rasgo-modular-&lt;versión&gt;-linux-x86_64.deb</code>.</li>
+    <li><strong>Otras distribuciones, AppImage:</strong> hazlo ejecutable (Propiedades → permitir ejecutar, o <code>chmod +x</code>) y ábrelo.</li>
+    <li><strong>Otras distribuciones, <code>.tar.gz</code>:</strong> descomprímelo y ejecuta <code>./install.sh</code>, que instala para tu usuario, sin root.</li>
+  </ul>
+</section>
+
+<section class="section">
+  <h2>Requisitos</h2>
+  <table class="ref">
+    <tr><th scope="row"><strong>Windows</strong></th><td>Windows 10 (1607 o posterior) u 11, 64 bits</td></tr>
+    <tr><th scope="row"><strong>macOS</strong></th><td>10.15 o posterior, Intel y Apple Silicon</td></tr>
+    <tr><th scope="row"><strong>Linux</strong></th><td>x86-64 con glibc 2.35 o más reciente; probado al abrir en Debian 12, Ubuntu 24.04, Fedora y Arch</td></tr>
+    <tr><th scope="row"><strong>Procesador</strong></th><td>64 bits, dos núcleos o más; medido en un Intel Core i5-6500: la app usa de un tercio a la mitad de un núcleo</td></tr>
+    <tr><th scope="row"><strong>Memoria y disco</strong></th><td>unos 55 MB en uso y 20 MB en el disco</td></tr>
+    <tr><th scope="row"><strong>Pantalla</strong></th><td>1280 × 760 o mayor</td></tr>
+    <tr><th scope="row"><strong>Audio</strong></th><td>cualquier salida del sistema; micrófono y teclado MIDI son opcionales (módulo SIGNAL-IN)</td></tr>
+  </table>
+</section>
+
+<section class="section section-dark">
+  <h2>Dónde quedan las cosas</h2>
+  <ul class="tut-list">
+    <li><strong>Estado y preferencias:</strong> <code>~/.config/rasgo-modular/</code> en Linux (sesión, patches, idioma); en macOS y Windows, la carpeta de datos de aplicación del sistema.</li>
+    <li><strong>Grabaciones:</strong> <code>~/Music/RasgoModular/</code>, el <code>.wav</code> y la partitura de la toma, con la versión de entrega para streaming al lado.</li>
+  </ul>
+</section>
+
+<section class="section">
+  <h2>Si no sale sonido</h2>
+  <p>Rasgo Modular suena al abrir. Sin sonido, revisa la salida de audio del sistema, el botón ESPERA (que silencia el máster) y el <code>gain</code> del módulo MASTER. Para otra cosa, escribe a <strong>rasgo.instruments@gmail.com</strong> con tu sistema, la versión y lo que apareció.</p>
+</section>
+</main>
+
+<footer>
+  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Código bajo GNU AGPL-3.0-or-later.</p>
+  <p>Los nombres de controles y conexiones citados aquí se verifican contra el código del instrumento.</p>
+</footer>
+<dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">
+  <button class="dialog-close" type="button" data-contact-close aria-label="Cerrar ventana de contacto">&times;</button>
+  <h2 id="contact-title">CONTACTO</h2>
+  <p>Copie la dirección de correo:</p>
+  <code data-contact-address></code>
+  <button class="button button-primary" type="button" data-contact-copy>Copiar correo</button>
+  <p class="contact-feedback" data-contact-feedback data-copied="Correo copiado." data-fallback="Seleccione y copie la dirección de arriba." aria-live="polite"></p>
+</dialog>
+</body>
+</html>

@@ -286,6 +286,18 @@ footer p { max-width: 46rem; }
    (5,5:1), ambos acima de AA. */
 footer .contato { margin-top: 1.1rem; }
 
+/* Tutorial e Instalação (nivelamento dos sites da família, 19/11/2026) */
+.tut-toc { max-width: 760px; padding-left: 1.4rem; color: var(--muted); columns: 2 18rem; column-gap: 2rem; }
+.tut-toc li { margin: .3rem 0; break-inside: avoid; }
+.tut-toc a { color: var(--ink); text-decoration: none; }
+.tut-toc a:hover { color: var(--accent); }
+.tut-list { max-width: 720px; color: var(--muted); padding-left: 1.3rem; }
+.tut-list li { margin: .35rem 0; }
+.tut-code { max-width: 760px; padding: .8rem 1rem; overflow-x: auto; background: var(--recessed); border: 1px solid var(--line); }
+table.ref { border-collapse: collapse; max-width: 900px; width: 100%; margin: 1rem 0; font-size: .92rem; }
+table.ref th, table.ref td { text-align: left; vertical-align: top; padding: .6rem .8rem; border-bottom: 1px solid var(--line); color: var(--muted); }
+table.ref th { color: var(--ink); font-weight: 400; width: 30%; }
+
 @media (max-width: 40rem) {
   .site-header { top: 1.8rem; }
   .header-nav { width: 100%; justify-content: space-between; }
