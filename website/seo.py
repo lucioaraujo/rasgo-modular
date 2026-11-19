@@ -89,6 +89,13 @@ import sys
 AQUI = pathlib.Path(__file__).parent
 INICIO = "<!-- SEO:INICIO — gerado por seo.py; editar lá, não aqui -->"
 FIM = "<!-- SEO:FIM -->"
+
+# Língua de abertura (autor, 19/11/2026: "detectar a língua do navegador").
+# Na raiz em português, quem chega de fora vai para a língua do navegador
+# (pt, en, fr, es; qualquer outra vai para en) ou para a última escolhida
+# (guardada ao abrir uma página). Navegação interna, ?lang=pt e robôs de
+# busca ficam na página pedida. Mesmo código em todos os sites da família.
+LINGUA = "<script>(function(){var K='rasgo-lingua',M={pt:'index.html',en:'en.html',fr:'fr.html',es:'es.html'};function g(){try{return localStorage.getItem(K)}catch(e){return null}}function s(v){try{localStorage.setItem(K,v)}catch(e){}}var l=(document.documentElement.lang||'').slice(0,2).toLowerCase(),p=location.pathname,base=location.origin+p.replace(/[^/]*$/,''),r=document.referrer||'';if(/\/(index\.html)?$/.test(p)&&l==='pt'&&r.indexOf(base)!==0&&!/[?&]lang=pt/.test(location.search)&&!/bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent)){var c=g();if(!c){var L=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];c='en';for(var i=0;i<L.length;i++){var x=String(L[i]).slice(0,2).toLowerCase();if(M[x]){c=x;break}}}if(c!=='pt'&&M[c]){location.replace(M[c]+location.hash);return}}if(M[l])s(l);})();</script>"
 BLOCO = re.compile(r"[ \t]*<!-- SEO:INICIO.*?<!-- SEO:FIM -->\n", re.S)
 OG_LOCALE = {"pt": "pt_BR", "pt-BR": "pt_BR", "en": "en_US", "fr": "fr_FR", "es": "es_ES"}
 
@@ -145,6 +152,7 @@ def bloco(pagina, grupo, titulo, descricao):
     if SITE.get("bing_verificacao") and pagina["url"] == "":
         L.append('<meta name="msvalidate.01" content="%s">' % a(SITE["bing_verificacao"]))
     L.append(json_ld(dados_estruturados(pagina, descricao)))
+    L.append(LINGUA)
     L.append(FIM)
     return L
 
