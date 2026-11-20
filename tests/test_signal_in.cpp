@@ -5,6 +5,7 @@
 // segurança entre threads (essa vem do `std::atomic` acquire/release).
 
 #include "dsp/SignalIn.hpp"
+#include "dsp/EuclidClock.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -267,6 +268,146 @@ void testDesligadoNaoDeixaEntrar() {
     check(out[3].at(0, 63) > 0.5f, "ligado: nota nova abre o gate");
 }
 
+// ==== MIDI CLOCK (20/11/2026) ====
+// Simula a placa: os clocks "chegam" no seu instante verdadeiro e só são
+// entregues no começo do PERÍODO da placa seguinte (como no app: o MIDI vai
+// para o anel e o áudio o entrega a cada callback, que roda vários
+// sub-blocos de 256 de uma vez).
+struct ClockRun {
+    std::vector<long> edges;     // bordas de subida do CLK (amostra)
+    std::vector<long> rstEdges;
+    float lastRun = 0.0f;
+};
+
+ClockRun runClock(SignalIn& s, double bpmA, double bpmB, double changeAt,
+                  long total, int devPeriod, bool start = true, long stopAt = -1,
+                  bool stamps = true) {
+    const int blk = 256;
+    std::vector<AudioBlock> out(9, AudioBlock(kSr, 2, blk));
+    ClockRun r;
+    double next = 0.0;              // instante verdadeiro do próximo clock
+    bool started = false;
+    float prevClk = 0.0f, prevRst = 0.0f;
+    for (long base = 0; base < total; base += blk) {
+        if (base % devPeriod == 0) {            // começo de um período da placa
+            if (start && !started) { s.pushMidi(0xFA, 0, 0); started = true; }
+            if (stopAt >= 0 && base >= stopAt) s.pushMidi(0xFC, 0, 0);
+            while (next < static_cast<double>(base)) {
+                // com carimbo: o instante verdadeiro (como o app calcula do
+                // timestamp do JUCE); sem carimbo: o começo do bloco
+                s.pushMidi(0xF8, 0, 0,
+                           stamps ? static_cast<float>(next - static_cast<double>(base)) : 0.0f);
+                const double bpm = next < changeAt ? bpmA : bpmB;
+                next += kSr * 60.0 / (bpm * 24.0);
+            }
+        }
+        s.process({}, out);
+        for (int f = 0; f < blk; ++f) {
+            const float c = out[6].at(0, static_cast<std::size_t>(f));
+            const float q = out[8].at(0, static_cast<std::size_t>(f));
+            if (prevClk < 0.5f && c >= 0.5f) r.edges.push_back(base + f);
+            if (prevRst < 0.5f && q >= 0.5f) r.rstEdges.push_back(base + f);
+            prevClk = c; prevRst = q;
+        }
+        r.lastRun = out[7].at(0, blk - 1);
+    }
+    return r;
+}
+
+double worstDev(const ClockRun& r, double expect, long after) {
+    double w = 0.0;
+    for (std::size_t i = 1; i < r.edges.size(); ++i)
+        if (r.edges[i - 1] > after)
+            w = std::max(w, std::abs(static_cast<double>(r.edges[i] - r.edges[i - 1]) - expect));
+    return w;
+}
+
+void testMidiClockSteady() {
+    // com carimbo de tempo: períodos de placa de 256 e de 1024 amostras;
+    // sem carimbo (o tempo é o começo do bloco), o de 256
+    struct Caso { int dev; bool stamps; double tol; };
+    for (const Caso k : {Caso{256, true, 8.0}, Caso{1024, true, 8.0}, Caso{256, false, 12.0}}) {
+        const int dev = k.dev;
+        SignalIn s; s.setParameter("listen", 1.0f); s.prepare(kSr, 256);
+        const ClockRun r = runClock(s, 120.0, 120.0, 1e18, static_cast<long>(kSr * 6), dev,
+                                    true, -1, k.stamps);
+        // colcheia a 120 BPM = 12000 amostras
+        check(r.edges.size() >= 20, "MIDI clock: pulsos de colcheia");
+        const double w = worstDev(r, 12000.0, static_cast<long>(kSr * 2));
+        if (w > k.tol) std::cerr << "  periodo " << dev << ": desvio " << w << '\n';
+        check(w <= k.tol, "MIDI clock: intervalos estáveis (tremor da placa filtrado)");
+        check(r.lastRun > 0.5f, "MIDI clock: RUN alto tocando");
+        check(r.rstEdges.size() == 1, "MIDI clock: um RST no START");
+        check(!r.edges.empty() && !r.rstEdges.empty()
+              && r.rstEdges[0] == r.edges[0] + 1, "MIDI clock: RST uma amostra depois do 1º pulso");
+        check(std::abs(s.midiBpm() - 120.0f) < 0.5f, "MIDI clock: andamento medido");
+    }
+}
+
+void testMidiClockTempoChange() {
+    SignalIn s; s.setParameter("listen", 1.0f); s.prepare(kSr, 256);
+    const ClockRun r = runClock(s, 120.0, 140.0, kSr * 3.0, static_cast<long>(kSr * 9), 512);
+    const double expect = kSr * 60.0 / 140.0 / 2.0;     // colcheia a 140
+    const double w = worstDev(r, expect, static_cast<long>(kSr * 5));
+    if (w > 4.0) std::cerr << "  mudança: desvio " << w << '\n';
+    check(w <= 4.0, "MIDI clock: segue a mudança de andamento");
+}
+
+void testMidiClockStopAndDiv() {
+    SignalIn s; s.setParameter("listen", 1.0f); s.setParameter("clk_div", 2.0f);
+    s.prepare(kSr, 256);
+    const long stopAt = static_cast<long>(kSr * 3);
+    const ClockRun r = runClock(s, 120.0, 120.0, 1e18, static_cast<long>(kSr * 5), 256, true, stopAt);
+    check(!r.edges.empty() && r.edges.back() < stopAt + 2000, "MIDI clock: STOP para os pulsos");
+    check(r.lastRun < 0.5f, "MIDI clock: RUN baixo depois do STOP");
+    const double w = worstDev(r, 6000.0, static_cast<long>(kSr * 1));   // semicolcheia
+    if (w > 4.0) std::cerr << "  DIV: desvio " << w << '\n';
+    check(w <= 4.0, "MIDI clock: DIV semicolcheia");
+}
+
+void testMidiClockOffAndSilent() {
+    SignalIn s; s.prepare(kSr, 256);                       // ON desligado
+    const ClockRun r = runClock(s, 120.0, 120.0, 1e18, static_cast<long>(kSr * 2), 256);
+    check(r.edges.empty() && r.rstEdges.empty(), "MIDI clock: desligado não deixa entrar");
+    SignalIn q; q.setParameter("listen", 1.0f); q.prepare(kSr, 256);
+    std::vector<AudioBlock> out(9, AudioBlock(kSr, 2, 256));
+    bool quiet = true;
+    for (int b = 0; b < 100; ++b) {
+        q.process({}, out);
+        for (int k = 6; k < 9; ++k) if (out[static_cast<std::size_t>(k)].at(0, 100) != 0.0f) quiet = false;
+    }
+    check(quiet, "MIDI clock: sem clock, CLK/RUN/RST em zero");
+}
+
+// CLK → EXT e RST → RST do CLOCK: o "um" do patch no "um" da DAW
+void testMidiClockDrivesClock() {
+    SignalIn s; s.setParameter("listen", 1.0f); s.prepare(kSr, 256);
+    EuclidClock c; c.prepare(kSr, 256);
+    std::vector<AudioBlock> so(9, AudioBlock(kSr, 2, 256));
+    std::vector<AudioBlock> co(5, AudioBlock(kSr, 2, 256));
+    double next = 0.0; bool started = false;
+    float prevClk = 0.0f; int downbeats = 0, edges = 0; bool firstIsOne = false;
+    for (long base = 0; base < static_cast<long>(kSr * 4); base += 256) {
+        if (!started) { s.pushMidi(0xFA, 0, 0); started = true; }
+        while (next < static_cast<double>(base)) { s.pushMidi(0xF8, 0, 0); next += 1000.0; }
+        s.process({}, so);
+        c.process({&so[6], &so[8], nullptr}, co);
+        for (std::size_t f = 0; f < 256; ++f) {
+            const float k = so[6].at(0, f);
+            if (prevClk < 0.5f && k >= 0.5f) {
+                ++edges;
+                // a métrica do CLOCK duas amostras depois da borda
+                const std::size_t g = std::min<std::size_t>(255, f + 2);
+                if (co[4].at(0, g) >= 0.999f) { ++downbeats; if (edges == 1) firstIsOne = true; }
+            }
+            prevClk = k;
+        }
+    }
+    check(edges > 10, "CLOCK seguiu o CLK do SIGNAL-IN");
+    check(firstIsOne, "o primeiro pulso depois do START é o passo 0 do CLOCK");
+    check(downbeats >= 1 && downbeats <= edges / 4 + 1, "só o passo 0 tem métrica 1");
+}
+
 int main() {
     testSilentWithoutFeed();
     testAudioRoundTrip();
@@ -281,6 +422,11 @@ int main() {
     testDeterminism();
     testType();
     testDesligadoNaoDeixaEntrar();
+    testMidiClockSteady();
+    testMidiClockTempoChange();
+    testMidiClockStopAndDiv();
+    testMidiClockOffAndSilent();
+    testMidiClockDrivesClock();
 
     if (g_failures == 0) {
         std::cout << "RASGO Modular SIGNAL-IN tests passed\n";

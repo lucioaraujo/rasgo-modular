@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — guide des modules</title>
-<meta name="description" content="Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
+<meta name="description" content="Les 101 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — guide des modules">
-<meta property="og:description" content="Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
+<meta property="og:description" content="Les 101 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
+  "description": "Les 101 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "fr",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,13 +99,13 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">100 modules · 8 familles</span>
+  <span class="status-pill">101 modules · 8 familles</span>
   <h1>Guide des modules</h1>
-  <p class="lead">Les 100 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
+  <p class="lead">Les 101 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
 </section>
 
 <nav class="familias" aria-label="Familles">
-  <a href="#fam-SOURCE">SOURCE <span>15</span></a>
+  <a href="#fam-SOURCE">SOURCE <span>16</span></a>
   <a href="#fam-TRANSFORM">TRANSFORM <span>18</span></a>
   <a href="#fam-MODULATE">MODULATE <span>16</span></a>
   <a href="#fam-TIME">TIME <span>14</span></a>
@@ -116,7 +116,7 @@
 </nav>
 
 <section class="section" id="fam-SOURCE">
-  <h2>SOURCE <small>15 modules</small></h2>
+  <h2>SOURCE <small>16 modules</small></h2>
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="Panneau du module OSC" width="142" height="300" loading="lazy" /></figure>
@@ -450,13 +450,15 @@
       <li><b>BEND</b> : de combien de demi-tons le pitch bend du clavier fait bouger la hauteur, de zéro à deux octaves.</li>
       <li><b>CC#</b> : quel contrôleur du clavier la sortie CC suit. Le numéro 1 est en général la molette de modulation.</li>
       <li><b>ON</b> : allume l'entrée extérieure. Éteint, ce qui est l'état de départ, rien n'entre dans le patch.</li>
+      <li><b>DIV</b> : la division de l'horloge MIDI sur la sortie CLK : noire, croche (la valeur de départ, accordée au MULT 2 du CLOCK), double croche ou les 24 impulsions par noire.</li>
     </ul>
-    <p>Sorties : L et R, l'audio entrant ; 1V/O, la hauteur de la touche jouée ; GATE, ouvert tant que la touche est enfoncée ; VEL, la force avec laquelle elle a été jouée ; CC, la valeur du contrôleur choisi.</p>
+    <p>Sorties : L et R, l'audio entrant ; 1V/O, la hauteur de la touche jouée ; GATE, ouvert tant que la touche est enfoncée ; VEL, la force avec laquelle elle a été jouée ; CC, la valeur du contrôleur choisi ; CLK, des impulsions au tempo de l'horloge MIDI qui vient d'un logiciel d'enregistrement ou d'une machine ; RUN, ouvert tant que ce logiciel joue ; RST, une impulsion sur le premier temps après le start.</p>
     <h4>À essayer</h4>
     <ol class="passos">
       <li>Avec un micro ou un instrument relié à l'ordinateur, branchez L sur une entrée du MIXER, allumez ON et réglez GAIN jusqu'à entendre le son.</li>
       <li>Faites passer ce son par un FILTER ou par SPACE avant le MIXER pour le transformer.</li>
       <li>Avec un clavier MIDI et ON allumé, branchez 1V/O sur l'entrée 1V/O d'un OSC, et GATE sur l'entrée GATE d'un ENVELOPE qui a le son de l'OSC sur son entrée IN. Le clavier joue maintenant le patch.</li>
+      <li>Dans un logiciel d'enregistrement, activez l'envoi de l'horloge MIDI vers Rasgo Modular. Branchez CLK sur l'entrée EXT du CLOCK et RST sur l'entrée RST du CLOCK, puis lancez la lecture : le patch avance à son tempo et commence sur le même temps.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-GENDYN">
@@ -506,6 +508,27 @@
       <li>Branchez PWM sur un FILTER et un VCA avec les deux fréquences en audio : le son rauque du Benjolin.</li>
       <li>Montez LOOP jusqu’au bout : le motif se fige. Baissez un peu : il commence à changer.</li>
       <li>Montez MODA et MODB : le motif trébuche jusqu’au chaos.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-POLY-IN">
+    <h3>POLY-IN</h3>
+    <h4>Ce que c’est</h4>
+    <p>POLY-IN répartit les notes d'un clavier MIDI ou d'une piste de la DAW sur jusqu'à quatre voix. Chaque voix a sa hauteur, son gate et sa vélocité, et chacune peut jouer son propre oscillateur.</p>
+    <h4>Comment l’aborder</h4>
+    <p>SIGNAL-IN donne une seule voix ; POLY-IN donne un accord. Le rack accepte jusqu'à quatre copies de chaque module : avec quatre OSC et quatre ENVELOPE, chaque voix de POLY-IN joue une paire, et le clavier joue maintenant des accords dans le patch. Le module démarre éteint et ne demande jamais le micro : il n'ouvre que le MIDI.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>VOZES</b> : combien de voix reçoivent des notes, d'une à quatre.</li>
+      <li><b>MODE</b> : comment les notes se répartissent. *Rota* passe chaque note à la voix libre suivante ; *Mesma* rend la note répétée à la voix où elle a joué ; *Altura* met les voix dans l'ordre, et la voix 1 tient toujours la note la plus grave. Sans voix libre, la nouvelle note prend la voix la plus ancienne.</li>
+      <li><b>BEND</b> : de combien de demi-tons le pitch bend fait bouger toutes les voix.</li>
+      <li><b>ON</b> : allume l'entrée MIDI.</li>
+    </ul>
+    <p>Sorties : P1 à P4, la hauteur de chaque voix ; G1 à G4, le gate de chaque voix, ouvert tant que la touche ou la pédale tient la note ; V1 à V4, la force de chaque note.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Allumez ON. Branchez P1 sur l'entrée 1V/O d'un OSC et G1 sur l'entrée GATE d'un ENVELOPE qui reçoit le son de cet OSC.</li>
+      <li>Ajoutez un autre OSC et un autre ENVELOPE et branchez-y P2 et G2. Jouez deux notes ensemble : chacune sonne sur sa paire.</li>
+      <li>Avec quatre paires et MODE sur *Altura*, la voix 1 est toujours la basse de l'accord : donnez-lui un filtre plus fermé ou plus de niveau sur le MIXER.</li>
     </ol>
   </article>
 </section>
@@ -2656,7 +2679,7 @@
 </main>
 
 <footer>
-  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Code sous GNU AGPL-3.0-or-later.</p>
+  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Code sous GNU AGPL-3.0-or-later. Les modules DSP aussi sous GPL-3.0-or-later.</p>
   <p>Les noms de réglages et de prises cités ici sont vérifiés d’après le code de l’instrument.</p>
 </footer>
 <dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">

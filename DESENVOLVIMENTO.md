@@ -266,6 +266,47 @@ testes em Ardour, Reaper e Infinite, (5) CLAP, (6) AU quando houver Mac.
 Prioridade antes disso: o standalone estável e testado nos três sistemas
 (um plugin que cai derruba o DAW de quem usa).
 
+**Estado em 20/11/2026 (pedido do autor: "vamos fazer tudo isso"; que o
+Modular "continue funcionando como standalone e multiplataforma, e com a
+família rasgo, mas que também se torne mais versátil e útil para outros
+usuários"):**
+
+- etapa 1, a trava tela↔áudio — **os parâmetros saíram do lock**: valor e
+  base de modulação são `RtFloat` (`src/core/RtFloat.hpp`, atômico
+  relaxado); o arrasto e a roda dos knobs e o passo do VARIA não tomam mais
+  o `gmx`; a estrutura do grafo (módulos, cabos, seed, patch) continua sob
+  ele, porque só a interface a muda e é rara. Teste `test_rt_params` (duas
+  threads; também com ThreadSanitizer). Falta medir no app os blocos
+  perdidos (SOBRE / `RASGO_DIAG=1`) com o VARIA ligado, antes × depois;
+- etapa 3, **VST3 e LV2 experimentais**: alvo `RasgoModularPlugin`
+  (`apps/juce/CMakeLists.txt`, opção `RASGO_MODULAR_BUILD_PLUGIN`,
+  DESLIGADA por padrão — app, pacotes e CI iguais). O plugin é o mesmo
+  MainComponent sem placa (`RASGO_PLUGIN`, `apps/juce/RasgoModularPlugin.inc`):
+  o processador é dono do patch, o editor só o mostra; MIDI da DAW no
+  SIGNAL-IN com o instante exato; o transporte da DAW vira MIDI clock
+  sintético (START/STOP/CONTINUE/song position, 24 por semínima), e o CLK,
+  RUN e RST do SIGNAL-IN seguem o play; o patch é salvo no projeto. O SDK
+  do VST3 que vem no JUCE 9.0.3 está sob **MIT** (conferido no
+  `VST3_SDK/LICENSE.txt`). **Conferido no Linux (20/11)** com o hospedeiro
+  de teste próprio, sem janela (`tools/plugin_check.cpp`, alvo
+  `RasgoModularPluginCheck`): VST3 e LV2 carregam, soam ao ser inseridos
+  (≈ −28 dBFS RMS, pico abaixo de −12 dBFS em 20 s), recebem MIDI, e o
+  estado salvo reabre noutra instância (VST3 byte a byte; LV2 com a mesma
+  estrutura, porque lá os timers da interface rodam numa thread própria do
+  plugin e o VARIA pode mover um knob no meio) — 30 de 30 execuções. Dois
+  defeitos achados e corrigidos pelo teste: o LV2 declara a entrada estéreo
+  fixa (lá ela nasce ligada) e, no LV2, criar, carregar e destruir o patch
+  precisam acontecer na thread de mensagens do JUCE (`onMessageThread`).
+  Falta: `pluginval` e o teste em Ardour, Reaper e Infinite (o autor); o
+  transporte → MIDI clock só é testado do lado do SIGNAL-IN (a conferir
+  numa DAW); NOTE-OUT para o MIDI da DAW; Windows e macOS na CI só quando o
+  autor decidir publicar. Construir:
+  `cmake -B .local-build/plugin -DRASGO_MODULAR_BUILD_PLUGIN=ON …` e
+  `cmake --build .local-build/plugin --target RasgoModularPlugin_VST3
+  RasgoModularPlugin_LV2 RasgoModularPluginCheck`;
+- relógio de fora no aplicativo também: SIGNAL-IN com MIDI clock (dossiê 49
+  §8) e a receita "Com outros programas" (INSTALL e página de Instalação).
+
 **Módulos para VCV Rack / Cardinal — possibilidade futura.** Viável: o DSP
 é C++ sem framework; faltariam uma casca `rack::Module` por módulo (com
 ponte de blocos de 256 para amostra a amostra), painéis SVG gerados das
@@ -275,7 +316,9 @@ VARIA, MUDA, LEARN — é a ideia do instrumento que fica de fora. Licença:
 a loja do VCV aceita GPL; o **Cardinal exige GPLv3-ou-posterior** (não
 aceita GPLv3-only, e a AGPL imporia condições extras ao binário dele).
 Os módulos teriam de ser oferecidos **também** sob GPLv3+ — decisão do
-autor, que pode fazê-lo sem mudar a licença do instrumento. O Cardinal
+autor, que pode fazê-lo sem mudar a licença do instrumento. **Decidido em 20/11/2026:**
+`src/dsp/` e `src/core/` passam a ser oferecidos também sob GPL-3.0-or-later
+([`LICENSING.md`](LICENSING.md)); o port ainda não começou. O Cardinal
 também pede dependências mínimas e nenhum acesso à internet, o que o
 Rasgo já cumpre. README do Cardinal traduzido na conversa de 4 out.
 

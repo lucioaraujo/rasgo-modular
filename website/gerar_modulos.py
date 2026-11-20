@@ -53,7 +53,7 @@ IDIOMAS = {
         "indice": "Famílias",
         "n_modulos": "%d módulos",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
-                    "Código sob GNU AGPL-3.0-or-later.",
+                    "Código sob GNU AGPL-3.0-or-later. Os módulos de DSP também sob GPL-3.0-or-later.",
         "rodape_2": "Os nomes de controles e portas citados aqui são conferidos contra "
                     "o código do instrumento.",
         "contato_h": "Contato",
@@ -91,7 +91,7 @@ IDIOMAS = {
         "indice": "Families",
         "n_modulos": "%d modules",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
-                    "Code under GNU AGPL-3.0-or-later.",
+                    "Code under GNU AGPL-3.0-or-later. The DSP modules also under GPL-3.0-or-later.",
         "rodape_2": "The control and port names quoted here are checked against the "
                     "instrument's code.",
         "contato_h": "Contact",
@@ -130,7 +130,7 @@ IDIOMAS = {
         "indice": "Familles",
         "n_modulos": "%d modules",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
-                    "Code sous GNU AGPL-3.0-or-later.",
+                    "Code sous GNU AGPL-3.0-or-later. Les modules DSP aussi sous GPL-3.0-or-later.",
         "rodape_2": "Les noms de réglages et de prises cités ici sont vérifiés d’après "
                     "le code de l’instrument.",
         "contato_h": "Contact",
@@ -168,7 +168,7 @@ IDIOMAS = {
         "indice": "Familias",
         "n_modulos": "%d módulos",
         "rodape_1": "<strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. "
-                    "Código bajo GNU AGPL-3.0-or-later.",
+                    "Código bajo GNU AGPL-3.0-or-later. Los módulos de DSP también bajo GPL-3.0-or-later.",
         "rodape_2": "Los nombres de controles y conexiones citados aquí se verifican "
                     "contra el código del instrumento.",
         "contato_h": "Contacto",

@@ -14,6 +14,35 @@ os módulos novos da v0.1.8 ganharam papéis na seed. Os 12 novos entram no
 rack da seed, então **as seeds mudam**. Nada disto foi publicado: espera a
 escuta do autor.
 
+- **SIGNAL-IN segue o MIDI clock** (20/11, pedido do autor: "para que
+  funcione com outros softwares"). Saídas novas CLK (na divisão DIV), RUN e
+  RST: CLK no EXT do CLOCK e RST no RST do CLOCK, e o patch segue o
+  andamento e o "um" de uma DAW ou máquina. Os pulsos saem pelo carimbo de
+  tempo de cada mensagem e um filtro DLL (o do JACK), sem o tremor dos
+  blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
+  mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
+  6 para 8 HP. Patches e seeds antigos iguais.
+- **Licença dupla dos módulos** (20/11, decisão do autor): `src/dsp/` e
+  `src/core/` são oferecidos também sob **GPL-3.0-or-later**, para o VCV Rack
+  e o Cardinal; o instrumento continua AGPL-3.0-or-later. `LICENSING.md` (pt,
+  en) explica o que vale para cada parte, por que é seguro e o que muda;
+  `LICENSE.GPL-3.0` traz o texto. README (4 línguas), créditos e rodapé do
+  site (4 línguas) dizem o mesmo.
+- **Maestruc** (20/11): o Modular passa a seguir o **andamento comum** (o BPM
+  do CLOCK, como o knob) e a dizê-lo no estado; manda a **carga** do áudio e
+  os blocos perdidos (`load`), e **acontecimentos** da saída (`ataque`, e
+  `silencio` depois de 2 s quieto); o **orçamento** (`budget`) só desenha a
+  tela com menos quadros (30, 15, 8) — o som e o VARIA não mudam.
+- **POLY-IN** (#103, SOURCE; 20/11, pedido do autor: "as polifonias";
+  "ok"): o MIDI de um teclado ou de uma DAW repartido em até 4 vozes
+  (altura, gate, velocidade), em ROTA, MESMA ou ALTURA, com roubo da mais
+  antiga, pedal e bend. Com as cópias de OSC e ENVELOPE, o patch toca
+  acordes. Só MIDI: não pede o microfone. No rack da seed, mas a seed não o
+  cabeia; como todo módulo novo, **as seeds mudam**.
+- **Página de Instalação e INSTALL.md: "Com outros programas"** (4 línguas
+  no site, pt/en no INSTALL): áudio por PipeWire/JACK, BlackHole ou
+  VB-Cable; notas; o andamento da DAW pelo MIDI clock; portas MIDI entre
+  programas.
 - **Doze módulos novos** (aprovados pelo autor em 9/11, "aprovo todos";
   criados em 20/11, "crie todos os módulos novos pendentes"). Cada um tem DSP,
   teste próprio, LEARN nos 4 idiomas, dossiê, guia e página no site:

@@ -134,7 +134,8 @@ public:
             // VELOC e ABERT do PALCO, e só fora do MANUAL — quanto o palco
             // respira, não onde as vozes estão nem quanto soam. GAIN, PAN,
             // MUTE, OUT e MODO continuam do músico e da seed.
-            if (t == "MASTER" || t == "SIGNAL-IN" || t == "LISTEN") continue;
+            // POLY-IN (20/11/2026): como o SIGNAL-IN, é o aparelho de quem toca
+            if (t == "MASTER" || t == "SIGNAL-IN" || t == "POLY-IN" || t == "LISTEN") continue;
             const bool mixer = t == "MIXER";
             if (mixer) {
                 bool hasStage = false;

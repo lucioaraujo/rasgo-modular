@@ -179,3 +179,39 @@ Cadeias canônicas: `SIGNAL-IN.pitch → OSC.1V/O`,
 `SIGNAL-IN.gate → ENVELOPE.gate`, `SIGNAL-IN.cc → FILTER.cutoff`;
 `SIGNAL-IN.out → FILTER/SHAPE/SAMPLER` (o áudio de entrada, como o
 `AUDIO-IN`).
+
+## 8. MIDI clock (20/11/2026)
+
+Pedido do autor: "para que funcione com outros softwares e tecnologias".
+O SIGNAL-IN segue o relógio MIDI de uma DAW ou máquina. Painel de 6 → 8 HP:
+knob `DIV` e jacks `CLK`, `RUN`, `RST` numa terceira coluna (a conferir
+pelo autor no app).
+
+- **Mensagens:** clock (0xF8), start (0xFA), continue (0xFB), stop (0xFC),
+  song position (0xF2). Antes, o app descartava toda mensagem de 1 byte.
+- **CLK:** pulso na divisão `DIV` (semínima, colcheia — o padrão, que casa
+  com o MULT 2 do CLOCK —, semicolcheia, 24 por semínima), gate de meia
+  divisão. **RUN:** gate enquanto toca (uma fonte só de clock, sem
+  transporte, também conta). **RST:** 5 ms no primeiro clock depois do
+  START, **uma amostra depois** do pulso: o CLOCK zera o passo depois da
+  borda, e o "um" cai no passo 0 (reset e borda na mesma amostra davam o
+  passo 1). `test_signal_in` confere com um CLOCK real.
+- **Tempo:** o app marca cada mensagem com o carimbo do JUCE
+  (`MidiMessage::getTimeStamp`) e converte para amostras relativas ao
+  bloco (início do callback + o que já saiu nele). Um DLL de 2ª ordem
+  (Fons Adriaensen, "Using a DLL to filter time", 2005; o filtro de tempo
+  do JACK — conceito) dá o instante limpo de cada clock e o período; a
+  banda começa em 2 Hz e estreita até 0,25 Hz, e reabre quando o erro
+  passa do ruído (mudança de andamento). O pulso sai no instante limpo
+  mais o atraso de entrega medido (≈ o período da placa), que fica
+  estável. Medido no teste: desvio ≤ 8 amostras (0,17 ms) com período de
+  placa de 256 e de 1024; sem carimbo, ≤ 12 amostras com 256.
+- **App:** o MIDI vai a um anel próprio (mutex só entre entradas MIDI) e o
+  áudio o entrega aos SIGNAL-IN no começo do bloco, sob o `gmx`. Antes,
+  um `try_lock` descartava o evento quando a interface estava com o grafo
+  — tolerável para um CC, não para o clock.
+- **Compatibilidade:** saídas e o parâmetro `clk_div` no fim das listas;
+  `clk_div` fora da seed, do VARIA e do MUDA, como o `listen`. Sem clock
+  chegando, as saídas novas ficam em zero e nada muda.
+- **Painel X11** (`apps/panel/`, bancada antiga): não recebe o anel nem os
+  carimbos; o SIGNAL-IN funciona lá sem clock com tempo fino.

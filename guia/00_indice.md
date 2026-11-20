@@ -216,6 +216,7 @@ Estado: **✓** pronto · **·** a fazer.
 | 100 | `SEASON` | [`100_season.md`](100_season.md) | local, após 0.1.11 |
 | 101 | `GENDYN` | [`101_gendyn.md`](101_gendyn.md) | local, após 0.1.11 |
 | 102 | `RUNGLER` | [`102_rungler.md`](102_rungler.md) | local, após 0.1.11 |
+| 103 | `POLY-IN` | [`103_poly_in.md`](103_poly_in.md) | local, após 0.1.11 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

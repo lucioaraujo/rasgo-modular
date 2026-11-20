@@ -74,6 +74,8 @@ inline bool isMutationBlocked(const std::string& id) noexcept {
         "gain", "output", "out_gain", "fm_amount",
         // ON do SIGNAL-IN: abrir microfone/MIDI é gesto de quem toca
         "listen",
+        // DIV do MIDI clock do SIGNAL-IN (20/11/2026)
+        "clk_div",
         // ganhos de nível — mutar isto joga o barramento pra fora e o
         // MASTER limita demais / distorce (o "clipe" reportado 2026-09-05)
         "gain1", "gain2", "gain3", "gain4", "level1", "level2",

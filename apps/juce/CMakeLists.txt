@@ -107,3 +107,73 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     install(TARGETS RasgoModularApp BUNDLE DESTINATION .)
 endif()
+
+# ---- PLUGIN (experimental, 20/11/2026) --------------------------------
+# O mesmo instrumento como VST3 e LV2 (o SDK do VST3 que vem no JUCE 9.0.3
+# está sob MIT, Steinberg 2025; o LV2 é ISC). DESLIGADO por padrão: o
+# aplicativo, os pacotes e a CI não mudam. Ligar com
+#   cmake -B build -DRASGO_MODULAR_BUILD_PLUGIN=ON
+# Instrumento (IS_SYNTH) com MIDI de entrada e entrada estéreo opcional
+# (o SIGNAL-IN recebe o som da faixa). Sem o logotipo "VST" (acordo de
+# marca da Steinberg, ainda não pedido). Plano: DESENVOLVIMENTO.md.
+option(RASGO_MODULAR_BUILD_PLUGIN "Build the experimental VST3/LV2 plugin" OFF)
+if (RASGO_MODULAR_BUILD_PLUGIN)
+    set(RASGO_MODULAR_PLUGIN_FORMATS VST3)
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND RASGO_MODULAR_PLUGIN_FORMATS LV2)
+    endif()
+    juce_add_plugin(RasgoModularPlugin
+        PRODUCT_NAME "Rasgo Modular"
+        COMPANY_NAME "RASGO"
+        BUNDLE_ID "org.rasgo.modular.plugin"
+        PLUGIN_MANUFACTURER_CODE Rsgo
+        PLUGIN_CODE RsMd
+        FORMATS ${RASGO_MODULAR_PLUGIN_FORMATS}
+        IS_SYNTH TRUE
+        NEEDS_MIDI_INPUT TRUE
+        NEEDS_MIDI_OUTPUT FALSE
+        EDITOR_WANTS_KEYBOARD_FOCUS TRUE
+        COPY_PLUGIN_AFTER_BUILD FALSE
+        VST3_CATEGORIES Instrument Synth Generator
+        LV2URI "https://lucioaraujo.github.io/rasgo-modular/plugin"
+        VERSION "${PROJECT_VERSION}")
+    target_sources(RasgoModularPlugin PRIVATE RasgoModularApp.cpp
+        ../../src/saida/DeliveryMaster.cpp ../../src/saida/OutputStage.cpp
+        ../../src/saida/LoudnessMeter.cpp ../../src/saida/TruePeakDetector.cpp
+        ../../src/saida/TakeAnalysis.cpp)
+    target_include_directories(RasgoModularPlugin PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../apps")
+    target_link_libraries(RasgoModularPlugin PRIVATE
+        rasgo_modular_core
+        juce::juce_audio_utils
+        juce::juce_audio_plugin_client
+        juce::juce_osc
+        juce::juce_recommended_config_flags)
+    target_compile_definitions(RasgoModularPlugin PUBLIC
+        RASGO_PLUGIN=1
+        RASGO_MODULAR_BUILD="${RASGO_BUILD_STAMP}"
+        JUCE_APPLICATION_NAME_STRING="Rasgo Modular"
+        JUCE_APPLICATION_VERSION_STRING="${RASGO_MODULAR_VERSION_LABEL}"
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_USE_XINPUT=0
+        JUCE_VST3_CAN_REPLACE_VST2=0)
+    if (MSVC)
+        target_compile_options(RasgoModularPlugin PRIVATE /utf-8 /bigobj)
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(RasgoModularPlugin PRIVATE -Wall -Wextra
+            -finput-charset=UTF-8 -fexec-charset=UTF-8)
+    endif()
+endif()
+
+# Hospedeiro de teste do plugin, sem janela (tools/plugin_check.cpp).
+if (RASGO_MODULAR_BUILD_PLUGIN)
+    juce_add_console_app(RasgoModularPluginCheck PRODUCT_NAME "rasgo_modular_plugin_check")
+    target_sources(RasgoModularPluginCheck PRIVATE ../../tools/plugin_check.cpp)
+    target_compile_definitions(RasgoModularPluginCheck PRIVATE
+        JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_LV2=1 JUCE_MODAL_LOOPS_PERMITTED=1
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
+    target_link_libraries(RasgoModularPluginCheck PRIVATE
+        juce::juce_audio_processors juce::juce_events
+        juce::juce_recommended_config_flags)
+endif()

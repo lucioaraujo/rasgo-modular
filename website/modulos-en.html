@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — module guide</title>
-<meta name="description" content="The 100 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
+<meta name="description" content="The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — module guide">
-<meta property="og:description" content="The 100 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
+<meta property="og:description" content="The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "The 100 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
+  "description": "The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "en",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,13 +99,13 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">100 modules · 8 families</span>
+  <span class="status-pill">101 modules · 8 families</span>
   <h1>Module guide</h1>
-  <p class="lead">The 100 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
+  <p class="lead">The 101 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
 </section>
 
 <nav class="familias" aria-label="Families">
-  <a href="#fam-SOURCE">SOURCE <span>15</span></a>
+  <a href="#fam-SOURCE">SOURCE <span>16</span></a>
   <a href="#fam-TRANSFORM">TRANSFORM <span>18</span></a>
   <a href="#fam-MODULATE">MODULATE <span>16</span></a>
   <a href="#fam-TIME">TIME <span>14</span></a>
@@ -116,7 +116,7 @@
 </nav>
 
 <section class="section" id="fam-SOURCE">
-  <h2>SOURCE <small>15 modules</small></h2>
+  <h2>SOURCE <small>16 modules</small></h2>
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="OSC module panel" width="142" height="300" loading="lazy" /></figure>
@@ -450,13 +450,15 @@
       <li><b>BEND</b>: how many semitones the keyboard's pitch bend moves the pitch, from zero to two octaves.</li>
       <li><b>CC#</b>: which keyboard controller the CC output follows. Number 1 is usually the mod wheel.</li>
       <li><b>ON</b>: turns the outside input on. Off, which is how the module starts, nothing comes into the patch.</li>
+      <li><b>DIV</b>: the MIDI clock division on the CLK output: quarter note, eighth note (the starting value, which matches the CLOCK's MULT 2), sixteenth note or the raw 24 pulses per quarter note.</li>
     </ul>
-    <p>Outputs: L and R, the incoming audio; 1V/O, the pitch of the key played; GATE, open while the key is held; VEL, how hard it was played; CC, the value of the chosen controller.</p>
+    <p>Outputs: L and R, the incoming audio; 1V/O, the pitch of the key played; GATE, open while the key is held; VEL, how hard it was played; CC, the value of the chosen controller; CLK, pulses at the tempo of the MIDI clock coming from a recording program or a machine; RUN, open while that program plays; RST, a pulse on the first beat after start.</p>
     <h4>Try this</h4>
     <ol class="passos">
       <li>With a microphone or instrument connected to the computer, connect L to a MIXER input, turn ON on, and adjust GAIN until you hear the sound.</li>
       <li>Run that sound through a FILTER or SPACE before the MIXER to transform it.</li>
       <li>With a MIDI keyboard and ON turned on, connect 1V/O to the 1V/O input of an OSC, and GATE to the GATE input of an ENVELOPE that has the OSC's sound on its IN input. The keyboard now plays the patch.</li>
+      <li>In a recording program, turn on MIDI clock output to Rasgo Modular. Connect CLK to the CLOCK's EXT input and RST to the CLOCK's RST input, and press play in the program: the patch moves at its tempo and starts on the same beat.</li>
     </ol>
   </article>
   <article class="modulo" id="mod-GENDYN">
@@ -506,6 +508,27 @@
       <li>Patch PWM into a FILTER and a VCA with both frequencies at audio rate: the Benjolin's raspy sound.</li>
       <li>Raise LOOP all the way: the pattern locks. Lower it a little: it starts to change.</li>
       <li>Raise MODA and MODB: the pattern stumbles into chaos.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-POLY-IN">
+    <h3>POLY-IN</h3>
+    <h4>What it is</h4>
+    <p>POLY-IN shares the notes of a MIDI keyboard or a DAW track out to up to four voices. Each voice has its own pitch, gate and velocity, and each can play its own oscillator.</p>
+    <h4>How to think about it</h4>
+    <p>SIGNAL-IN gives a single voice; POLY-IN gives a chord. The rack takes up to four copies of each module: with four OSCs and four ENVELOPEs, each POLY-IN voice plays one pair, and the keyboard now plays chords in the patch. The module starts off and never asks for the microphone: it only opens MIDI.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>VOZES</b>: how many voices receive notes, from one to four.</li>
+      <li><b>MODE</b>: how the notes are shared out. *Rota* moves each note to the next free voice; *Mesma* gives a repeated note back to the voice it played on; *Altura* puts the voices in order, and voice 1 always holds the lowest note. With no free voice, the new note takes the oldest voice.</li>
+      <li><b>BEND</b>: how many semitones the pitch bend moves every voice.</li>
+      <li><b>ON</b>: turns the MIDI input on.</li>
+    </ul>
+    <p>Outputs: P1 to P4, the pitch of each voice; G1 to G4, the gate of each voice, open while the key or the pedal holds the note; V1 to V4, how hard each note was played.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Turn ON on. Connect P1 to the 1V/O input of an OSC and G1 to the GATE input of an ENVELOPE that receives that OSC's sound.</li>
+      <li>Add another OSC and another ENVELOPE and connect P2 and G2 to them. Play two notes together: each one sounds on its own pair.</li>
+      <li>With four pairs and MODE on *Altura*, voice 1 is always the bass of the chord: give it a darker filter or more level on the MIXER.</li>
     </ol>
   </article>
 </section>
@@ -2656,7 +2679,7 @@
 </main>
 
 <footer>
-  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Code under GNU AGPL-3.0-or-later.</p>
+  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Code under GNU AGPL-3.0-or-later. The DSP modules also under GPL-3.0-or-later.</p>
   <p>The control and port names quoted here are checked against the instrument's code.</p>
 </footer>
 <dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">

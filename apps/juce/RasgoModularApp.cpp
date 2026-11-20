@@ -2828,10 +2828,10 @@ public:
             v = drag_.startVal + dy * (drag_.hi - drag_.lo);
         }
         v = juce::jlimit(drag_.lo, drag_.hi, v);
-        {
-            std::lock_guard<std::mutex> lk(rack_.gmx);
-            rack_.graph.setParameterBase(drag_.node, drag_.bind, v);
-        }
+        // sem o `gmx` (20/11/2026): só a interface muda a estrutura do
+        // grafo, e o valor e a base da modulação são `RtFloat` — o áudio
+        // não espera a mão do músico
+        rack_.graph.setParameterBase(drag_.node, drag_.bind, v);
         repaint();
     }
 
@@ -3187,10 +3187,7 @@ private:
             }
             v = juce::jlimit(lo, hi, v);
             if (v != from) {
-                {
-                    std::lock_guard<std::mutex> lk(rack_.gmx);
-                    rack_.graph.setParameterBase(m.id, w->bind, v);
-                }
+                rack_.graph.setParameterBase(m.id, w->bind, v);   // sem `gmx`: ver o arrasto
                 if (onParamGesture) onParamGesture(m.id, w->bind, from, v);
                 repaint();
             }
@@ -4930,7 +4927,35 @@ inline void aoCair(void*) {
 }  // namespace arranque
 
 // ---- áudio + janela ----------------------------------------------------
-class MainComponent : public juce::AudioAppComponent,
+// Base de áudio. No APLICATIVO, o `AudioAppComponent` abre a placa. No
+// PLUGIN (`RASGO_PLUGIN`, 20/11/2026), quem entrega o áudio é a DAW: a base
+// é só Component + AudioSource, `setAudioChannels`/`shutdownAudio` não
+// fazem nada e o `deviceManager` nunca abre dispositivo. O resto do
+// MainComponent é o mesmo nos dois.
+#if RASGO_PLUGIN
+class AppAudioBase : public juce::Component, public juce::AudioSource {
+public:
+    void setAudioChannels(int, int) {}
+    void shutdownAudio() {}
+    juce::AudioDeviceManager deviceManager;
+};
+#else
+using AppAudioBase = juce::AudioAppComponent;
+#endif
+
+#if RASGO_PLUGIN
+constexpr bool kPlugin = true;
+#else
+constexpr bool kPlugin = false;
+#endif
+
+// pedir para fechar: no plugin não há aplicativo (quem fecha é a DAW)
+inline void appQuit() {
+    if (auto* app = juce::JUCEApplicationBase::getInstance())
+        app->systemRequestedQuit();
+}
+
+class MainComponent : public AppAudioBase,
                       private juce::Timer,
                       private juce::MidiInputCallback {
 public:
@@ -5306,7 +5331,14 @@ public:
         // Desde 6 out. 2026 a abertura é uma PREFERÊNCIA (botão ABRE), com
         // o seed como padrão — retorno do fórum do VCV Rack. A regra está
         // em `panel/StartupPolicy.hpp`, testada sem JUCE.
-        {
+        if (kPlugin) {
+            // no plugin, o estado vive no projeto da DAW
+            // (`setStateInformation`); ao ser inserido, soa um seed novo
+            seed_ = nextRandomSeed();
+            rack_.curSeed = seed_;
+            rack_.applySeed(seed_, sampleRate_, blockSize_);
+            rack_.populateMotion();
+        } else {
             rasgo::panel::StartInputs in;
             in.envSeed = std::getenv("RASGO_SEED") != nullptr;
             in.envResume = std::getenv("RASGO_RESUME") != nullptr;
@@ -5420,7 +5452,7 @@ public:
                 const int n = view_->exportPanels(juce::File(dir), 2.0f);
                 std::fprintf(stderr, "[painéis] %d salvos em %s\n", n,
                              dir.toRawUTF8());
-                juce::JUCEApplication::getInstance()->systemRequestedQuit();
+                appQuit();
             });
         }
         // `RASGO_TUTORIAL=1` abre o tutorial ao iniciar — para medir e
@@ -5452,6 +5484,7 @@ public:
 
     ~MainComponent() override {
         maestrucPortao_.fecharEsperar();   // o áudio deixa de usar a ponte do Maestruc
+        maestrucAudio_.closeWait();        // e a carga e os acontecimentos
         maestrucLink_.reset();   // antes de tudo: nenhum comando chega a meio desmonte
         stopTimer();
         for (auto* in : midiIns_) in->stop();
@@ -5462,7 +5495,7 @@ public:
         // mata o fio à força; removeAllJobs descarta o que ainda está na fila.
         while (streamingPool_.getNumJobs() > 0)
             juce::Thread::sleep(20);
-        if (panelExport_) return;
+        if (panelExport_ || kPlugin) return;   // plugin: o estado está na DAW
         // continua daqui na próxima sessão (ABRE · ÚLTIMA, ou `RASGO_RESUME=1`)
         savePatch(dataDir().getChildFile("session.rmp"));
         // fechou normalmente: a próxima abertura não precisa ser a segura
@@ -5550,9 +5583,16 @@ public:
         auto* R = info.buffer->getNumChannels() > 1
             ? info.buffer->getWritePointer(1, info.startSample) : nullptr;
 
+        const auto loadT0 = juce::Time::getHighResolutionTicks();
         int done = 0;
+        if (signalIn_.load(std::memory_order_relaxed))
+            cbWall_ = hostTime_ >= 0.0 ? hostTime_
+                                       : juce::Time::getMillisecondCounterHiRes() * 0.001;
         while (done < info.numSamples) {
-            if (carryUsed_ >= blockSize_) renderBlock();
+            if (carryUsed_ >= blockSize_) {
+                blockWall_ = cbWall_ + static_cast<double>(done) / sampleRate_;
+                renderBlock();
+            }
             const int n = std::min<int>(info.numSamples - done,
                 static_cast<int>(blockSize_ - carryUsed_));
             for (int i = 0; i < n; ++i) {
@@ -5569,6 +5609,15 @@ public:
             if (maestrucPortao_.escrever(bridge, 2, info.numSamples))
                 info.clearActiveBufferRegion();
         }
+        // carga do callback (fração do tempo do bloco) e blocos perdidos
+        maestrucAudio_.use([&](rasgo::maestruc::Link& l) {
+            const double spent = juce::Time::highResolutionTicksToSeconds(
+                juce::Time::getHighResolutionTicks() - loadT0);
+            const double budget = info.numSamples / std::max(1.0, sampleRate_);
+            loadAvg_ += (static_cast<float>(spent / budget) - loadAvg_) * 0.05f;
+            l.setAudioLoad(loadAvg_, static_cast<int>(
+                rack_.starvedBlocks.load(std::memory_order_relaxed)));
+        });
     }
 
     void releaseResources() override {}
@@ -5659,14 +5708,44 @@ public:
         case S::zoomOut: header_.trigger(A::zoomOut); return true;
         case S::zoomReset: view_->nudgeZoom(0); layoutRack(); return true;
         case S::quit:
-            juce::JUCEApplication::getInstance()->systemRequestedQuit();
+            appQuit();
             return true;
         case S::none: return false;
         }
         return false;
     }
 
+    // ---- para o plugin (20/11/2026) -------------------------------------
+    // O patch como texto (o mesmo do `.rmp`), para o projeto da DAW.
+    std::string patchText() {
+        std::lock_guard<std::mutex> lk(rack_.gmx);
+        std::string text = rack_.graph.serialize();
+        if (rack_.curSeed)
+            text += "seed " + std::to_string(rack_.curSeed) + "\n";
+        text += "panel shown";
+        for (const auto id : rack_.shown) text += ' ' + std::to_string(id);
+        text += '\n';
+        return text;
+    }
+    // Abrir um patch vindo da DAW (fio de mensagens).
+    bool loadPatchText(const std::string& text) {
+        return applyPatchText(text, "DAW");
+    }
+    // O relógio do bloco em segundos, dado pela DAW (posição em amostras /
+    // taxa). Com ele, os carimbos do MIDI da DAW são exatos; sem ele (< 0),
+    // o relógio do sistema, como no aplicativo.
+    void setHostTime(const double seconds) noexcept { hostTime_ = seconds; }
+    // Um evento MIDI da DAW (notas, CC, e o clock sintético do transporte),
+    // no instante `seconds` do mesmo relógio de `setHostTime`.
+    void pushHostMidi(const std::uint8_t st, const std::uint8_t d1,
+                      const std::uint8_t d2, const double seconds) {
+        if (!signalIn_.load(std::memory_order_relaxed)) return;
+        pushMidiEvent(st, d1, d2, seconds);
+    }
+
 private:
+    double hostTime_ = -1.0;
+
     // DESFAZER. Cobre toda ação que muda o patch — inclusive CADA CABO
     // ligado ou cortado, que é o caso mais comum: o músico cabeia, o
     // resultado não é o esperado, e ele já não sabe ao certo qual ligação
@@ -5757,7 +5836,9 @@ private:
         //
         // As outras duas: não disputar com um diálogo modal nem com o
         // seletor de arquivo nativo do ABRIR, que é assíncrono.
-        if (juce::Process::isForegroundProcess()
+        // No plugin, a DAW é o processo da frente: reaver o foco a cada
+        // quadro roubaria o teclado dela. Lá o foco vem do clique.
+        if (!kPlugin && juce::Process::isForegroundProcess()
             && isShowing() && !chooserOpen_
             && juce::Component::getCurrentlyModalComponent() == nullptr
             && !hasKeyboardFocus(true) && !header_.seedBoxFocused())
@@ -5773,15 +5854,17 @@ private:
         }
 
         // VARIA: um passo de variação por quadro (dt = 1/30 s, a mesma
-        // cadência do painel X11). Sob o `gmx` porque `tick` escreve as
-        // bases de parâmetro que o thread de áudio lê no mesmo instante —
-        // sem o lock era uma corrida (leitura rasgada de float →
-        // coeficiente absurdo por um bloco = estalo). Não roda enquanto o
-        // músico está com a mão num controle: a máquina não disputa o
-        // knob com quem está mexendo nele.
+        // cadência do painel X11). Até 20/11/2026 rodava sob o `gmx`,
+        // porque `tick` escreve as bases de parâmetro que o áudio lê — e
+        // segurar o lock 30 vezes por segundo deixava o áudio sem bloco
+        // (os estalos com o VARIA ligado eram isso: xruns, não DSP). Agora
+        // as bases e os valores são `RtFloat` (atômicos, nunca rasgados) e
+        // a estrutura do grafo só muda nesta mesma thread; o passo roda
+        // sem lock. A partitura continua sob o `gmx` (o áudio também
+        // escreve nela). Não roda enquanto o músico está com a mão num
+        // controle: a máquina não disputa o knob com quem está mexendo.
         float vu = 0.0f;
         if (rack_.motionOn && !view_->interacting()) {
-            std::lock_guard<std::mutex> lk(rack_.gmx);
             if (++motionThrottle_ >= 30) {
                 motionThrottle_ = 0;
                 rack_.motion.refreshCables(rack_.graph);
@@ -5821,6 +5904,7 @@ private:
                     if (i >= variaLogged_.size()) { variaLogged_.push_back(v); ++i; return; }
                     const float last = variaLogged_[i];
                     if (std::fabs(v - last) > 0.02f * std::max(1e-4f, hi - lo)) {
+                        std::lock_guard<std::mutex> lk(rack_.gmx);
                         rack_.score.parameterChange(t, node, pid, last, v, /*byVaria=*/true);
                         variaLogged_[i] = v;
                     }
@@ -5843,9 +5927,13 @@ private:
 
         // sob o tutorial/SOBRE o rack fica coberto pelo véu: repintá-lo a
         // 30 fps só atrasava a rolagem e o FECHAR (o som segue normal)
+        const int every = maestrucBudget_ == 0 ? 1 : (maestrucBudget_ == 1 ? 2 : 4);
+        const bool drawNow = (++budgetFrame_ % every) == 0;
         if (!overlay_.isVisible()) {
-            view_->repaint();
-            header_.repaint();
+            if (drawNow) {
+                view_->repaint();
+                header_.repaint();
+            }
         } else if (overlay_.mode() == OverlayView::Mode::about) {
             overlay_.repaint();   // as leituras ao vivo do SOBRE (LUFS, blocos)
         }
@@ -6338,25 +6426,38 @@ private:
         // Windows, Audiofanzine 3 out. 2026). O timer reavalia a cada
         // meio segundo, então ligar ou cortar o cabo abre ou fecha a
         // entrada sem precisar de gancho em cada gesto.
-        bool present = false;
+        // O SIGNAL-IN abre o áudio de entrada e o MIDI; o POLY-IN (20/11/2026)
+        // só o MIDI — com ele sozinho, nenhum microfone é pedido.
+        bool audioIn = false, midiIn = false;
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
-            for (std::size_t i = 0; i < rack_.graph.nodeCount() && !present; ++i) {
-                if (rack_.graph.node(i).type() != "SIGNAL-IN") continue;
+            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i) {
+                const std::string ty = rack_.graph.node(i).type();
+                if (ty != "SIGNAL-IN" && ty != "POLY-IN") continue;
                 // e com o ON ligado (nasce desligado: v0.1.3)
                 if (rack_.graph.node(i).parameterValue("listen") < 0.5f) continue;
+                bool cabled = false;
                 for (std::size_t c = 0; c < rack_.graph.cableCount(); ++c)
-                    if (rack_.graph.cable(c).source().node == i) { present = true; break; }
+                    if (rack_.graph.cable(c).source().node == i) { cabled = true; break; }
+                if (!cabled) continue;
+                midiIn = true;
+                if (ty == "SIGNAL-IN") audioIn = true;
             }
         }
-        if (present == signalIn_.load()) return;
+        const bool present = midiIn;
+        if (present == signalIn_.load() && audioIn == audioIn_) return;
+        const bool midiChanged = present != signalIn_.load();
         signalIn_.store(present);
 
         // canais de entrada: trocar reabre o dispositivo, por isso só é
         // feito quando o estado de fato muda
-        setAudioChannels(present ? 2 : 0, 2);
+        if (audioIn != audioIn_) {
+            audioIn_ = audioIn;
+            setAudioChannels(audioIn ? 2 : 0, 2);
+        }
+        if (!midiChanged) return;
 
-        if (present) {
+        if (present && !kPlugin) {   // no plugin, o MIDI vem da DAW
             for (const auto& d : juce::MidiInput::getAvailableDevices()) {
                 if (auto in = juce::MidiInput::openDevice(d.identifier, this)) {
                     in->start();
@@ -6372,23 +6473,69 @@ private:
     }
 
     // Chamado pelo thread de MIDI do JUCE, não pelo de áudio nem pelo de
-    // interface. `pushMidi` é SPSC e não bloqueia, mas o grafo pode estar
-    // sendo editado — `try_lock` e descarta: perder um CC é melhor que
-    // travar a entrada MIDI (e o painel X11 faz igual).
+    // interface. Até 20/11/2026 tomava o `gmx` com `try_lock` e DESCARTAVA
+    // o evento se a interface estivesse com o grafo — tolerável para um
+    // CC, não para o MIDI clock (24 por semínima: cada um perdido atrasa o
+    // patch). Agora o evento vai para um anel próprio do app (`midiRing_`,
+    // com um mutex só entre as entradas MIDI) e o áudio o entrega aos
+    // SIGNAL-IN no começo de cada bloco, já sob o `gmx`. Nada se perde, e o
+    // áudio nunca espera: se uma entrada MIDI estiver escrevendo, o áudio
+    // deixa para o bloco seguinte. Mensagens de 1 byte (clock, start,
+    // continue, stop) agora passam; SysEx (0xF0) e os demais comuns de
+    // sistema, não.
     void handleIncomingMidiMessage(juce::MidiInput*,
                                    const juce::MidiMessage& msg) override {
         if (!signalIn_.load(std::memory_order_relaxed)) return;
         const auto* raw = msg.getRawData();
-        if (msg.getRawDataSize() < 2) return;
+        const int size = msg.getRawDataSize();
+        if (size < 1) return;
         const std::uint8_t st = raw[0];
-        const std::uint8_t d1 = raw[1];
-        const std::uint8_t d2 = msg.getRawDataSize() > 2 ? raw[2] : 0;
-        std::unique_lock<std::mutex> lk(rack_.gmx, std::try_to_lock);
-        if (!lk) return;
-        for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
-            if (auto* si = dynamic_cast<rasgo::modular::SignalIn*>(
-                    &rack_.graph.node(i)))
-                si->pushMidi(st, d1, d2);
+        if (st < 0x80) return;
+        if (st >= 0xF0 && st != 0xF2 && st < 0xF8) return;   // SysEx etc.
+        const std::uint8_t d1 = size > 1 ? raw[1] : 0;
+        const std::uint8_t d2 = size > 2 ? raw[2] : 0;
+        // carimbo: o JUCE marca a chegada em segundos do contador de
+        // milissegundos de alta resolução; sem carimbo, agora
+        double ts = msg.getTimeStamp();
+        if (!(ts > 0.0)) ts = juce::Time::getMillisecondCounterHiRes() * 0.001;
+        pushMidiEvent(st, d1, d2, ts);
+    }
+
+    void pushMidiEvent(const std::uint8_t st, const std::uint8_t d1,
+                       const std::uint8_t d2, const double ts) {
+        std::lock_guard<std::mutex> lk(midiMx_);
+        if (midiW_ - midiR_ >= midiRing_.size()) return;      // anel cheio
+        midiTs_[midiW_ % midiRing_.size()] = ts;
+        midiRing_[midiW_ % midiRing_.size()] =
+            (static_cast<std::uint32_t>(st) << 16)
+            | (static_cast<std::uint32_t>(d1) << 8) | d2;
+        ++midiW_;
+    }
+
+    // No áudio, sob o `gmx`: entrega o MIDI pendente aos SIGNAL-IN.
+    void deliverMidi() {
+        std::unique_lock<std::mutex> lk(midiMx_, std::try_to_lock);
+        if (!lk || midiR_ == midiW_) return;
+        while (midiR_ != midiW_) {
+            const std::uint32_t ev = midiRing_[midiR_ % midiRing_.size()];
+            // quando, em amostras, relativo ao começo deste bloco: o bloco
+            // começa a soar em `blockWall_` (início do callback + o que já
+            // saiu nele); o evento, em `midiTs_`
+            const float off = static_cast<float>(
+                (midiTs_[midiR_ % midiRing_.size()] - blockWall_) * sampleRate_);
+            ++midiR_;
+            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i) {
+                auto& nd = rack_.graph.node(i);
+                if (auto* si = dynamic_cast<rasgo::modular::SignalIn*>(&nd))
+                    si->pushMidi(static_cast<std::uint8_t>(ev >> 16),
+                                 static_cast<std::uint8_t>(ev >> 8),
+                                 static_cast<std::uint8_t>(ev), off);
+                else if (auto* pi = dynamic_cast<rasgo::modular::PolyIn*>(&nd))
+                    pi->pushMidi(static_cast<std::uint8_t>(ev >> 16),
+                                 static_cast<std::uint8_t>(ev >> 8),
+                                 static_cast<std::uint8_t>(ev));
+            }
+        }
     }
 
     // ABRIR um `.rmp`. Até 2026-09-15 o BANCO era um botão que só
@@ -6652,16 +6799,7 @@ private:
     }
 
     void savePatch(const juce::File& path) {
-        std::string text;
-        {
-            std::lock_guard<std::mutex> lk(rack_.gmx);
-            text = rack_.graph.serialize();
-            if (rack_.curSeed)
-                text += "seed " + std::to_string(rack_.curSeed) + "\n";
-            text += "panel shown";
-            for (const auto id : rack_.shown) text += ' ' + std::to_string(id);
-            text += '\n';
-        }
+        const std::string text = patchText();
         if (path.replaceWithText(u8(text)))
             std::fprintf(stderr, "[patch] salvo em %s\n",
                          path.getFullPathName().toRawUTF8());
@@ -6728,6 +6866,7 @@ private:
         }
         // entrega a fatia de entrada deste sub-bloco aos SIGNAL-IN antes
         // de processar — já estamos sob o `gmx`
+        if (signalIn_.load(std::memory_order_relaxed)) deliverMidi();
         if (inFifo_.size() >= blockSize_ * 2) {
             for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
                 if (auto* si = dynamic_cast<rasgo::modular::SignalIn*>(
@@ -6762,6 +6901,30 @@ private:
         rack_.outRms.store(static_cast<float>(
             std::sqrt(sum / static_cast<double>(blockSize_))),
             std::memory_order_relaxed);
+        // Maestruc: "ataque" quando a energia do bloco salta acima da média
+        // lenta (e passa de −50 dBFS), no máximo um a cada 80 ms; "silencio"
+        // uma vez, depois de 2 s abaixo de −60 dBFS. Sem Maestruc, nada.
+        {
+            const double e = sum / static_cast<double>(blockSize_);
+            const auto sr = static_cast<std::size_t>(std::max(1.0, sampleRate_));
+            maestrucAudio_.use([&](rasgo::maestruc::Link& l) {
+                if (onsetHold_ > 0) onsetHold_ = onsetHold_ > blockSize_ ? onsetHold_ - blockSize_ : 0;
+                if (onsetHold_ == 0 && e > 1e-5 && e > 4.0 * onsetSlow_) {
+                    l.pushEvent("ataque", static_cast<float>(std::sqrt(e)));
+                    onsetHold_ = sr * 8 / 100;
+                }
+                if (e < 1e-6) {
+                    quietFrames_ += blockSize_;
+                    if (!quietSent_ && quietFrames_ >= sr * 2) {
+                        l.pushEvent("silencio", static_cast<float>(quietFrames_) / static_cast<float>(sr));
+                        quietSent_ = true;
+                    }
+                } else {
+                    quietFrames_ = 0; quietSent_ = false;
+                }
+            });
+            onsetSlow_ = 0.95 * onsetSlow_ + 0.05 * e;
+        }
 
         // loudness do que de fato sai
         for (std::size_t i = 0; i < blockSize_; ++i)
@@ -6846,8 +7009,15 @@ private:
     bool rackOutputPref_ = false;
     rasgo::panel::ReadingPreferences reading_;
     rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
-    std::atomic<bool> signalIn_{false};   // há SIGNAL-IN no patch?
+    std::atomic<bool> signalIn_{false};   // há SIGNAL-IN/POLY-IN no patch?
+    bool audioIn_ = false;                // a entrada de áudio está aberta?
     std::vector<float> inFifo_;           // entrada intercalada L/R
+    // MIDI de fora → áudio (20/11/2026): ver `handleIncomingMidiMessage`
+    std::mutex midiMx_;
+    std::array<std::uint32_t, 2048> midiRing_{};
+    std::array<double, 2048> midiTs_{};
+    double cbWall_ = 0.0, blockWall_ = 0.0;   // relógio do callback (s)
+    std::size_t midiW_ = 0, midiR_ = 0;
     juce::OwnedArray<juce::MidiInput> midiIns_;
     int recCount_ = 0;
     // a versão de entrega da última tomada (16/11/2026); o destrutor espera
@@ -6870,8 +7040,22 @@ private:
     void enableMaestrucLink() {
         if (maestrucLink_ != nullptr) return;
         maestrucLink_ = std::make_unique<rasgo::maestruc::Link>(
-            "Rasgo Modular", JUCE_APPLICATION_VERSION_STRING);
+            "Rasgo Modular", JUCE_APPLICATION_VERSION_STRING,
+            juce::StringArray{}, juce::StringArray{"event", "load"});
         auto& h = maestrucLink_->handlers;
+        // Andamento comum (20/11/2026): o BPM do CLOCK do patch, pelo mesmo
+        // caminho do knob (como no Batruc e no Asterismus, que põem o
+        // andamento no próprio controle). Patch sem CLOCK: nada a fazer.
+        h.tempo = [this](const float bpm) {
+            if (!(bpm >= 20.0f && bpm <= 300.0f)) return;
+            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
+                if (rack_.graph.node(i).type() == "CLOCK")
+                    rack_.graph.setParameterBase(i, "bpm", bpm);
+            repaint();
+        };
+        // Orçamento (protocolo §5): só a TELA desenha menos (30 → 15 → 8
+        // quadros); o som, o VARIA e a composição seguem iguais.
+        h.budget = [this](const int level) { maestrucBudget_ = juce::jlimit(0, 2, level); };
         h.seed = [this](const juce::String& text) {
             const auto t = text.trim();
             if (t.isEmpty() || !t.containsOnly("0123456789") || t.length() > 19) return;   // inválida: ignorada
@@ -6884,7 +7068,12 @@ private:
         h.state = [this](bool& playing, juce::String& seed, float& bpm) {
             playing = !standby_;
             seed = juce::String(static_cast<juce::uint64>(seed_));
-            bpm = 0.0f;   // cada CLOCK do patch tem o seu
+            bpm = 0.0f;   // o do CLOCK do patch, se houver
+            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
+                if (rack_.graph.node(i).type() == "CLOCK") {
+                    bpm = rack_.graph.parameterUserValue(i, "bpm");
+                    break;
+                }
         };
         // Mixer pelo Maestruc (16/11/2026; o autor: "os mesmos objetos dos
         // mixers de cada instrumento"): os módulos MIXER do patch (CH1–CH4:
@@ -6909,6 +7098,7 @@ private:
             return true;
         };
         if (!maestrucLink_->start()) { maestrucLink_.reset(); return; }
+        maestrucAudio_.open(maestrucLink_.get());
         openMaestrucBridge();
     }
     // Sob `gmx`: os canais do mixer do patch, na ordem do rack.
@@ -6969,6 +7159,30 @@ private:
     int maestrucMixerTick_ = 0;
     std::vector<float> maestrucMixerSeen_;
     rasgo::maestruc::PortaoDeSom maestrucPortao_;
+    // Carga e acontecimentos para o Maestruc, do callback de áudio
+    // (20/11/2026). Mesmo desenho do portão da ponte: o áudio só usa o Link
+    // com o portão aberto, e fechar espera o bloco em curso sair.
+    struct MaestrucAudioGate {
+        std::atomic<rasgo::maestruc::Link*> link{nullptr};
+        std::atomic<int> busy{0};
+        void open(rasgo::maestruc::Link* l) noexcept { link.store(l); }
+        void closeWait() noexcept {
+            link.store(nullptr);
+            for (int i = 0; busy.load() != 0 && i < 100000; ++i) std::this_thread::yield();
+        }
+        template <class F> void use(F&& f) noexcept {
+            busy.fetch_add(1);
+            if (auto* l = link.load()) f(*l);
+            busy.fetch_sub(1);
+        }
+    } maestrucAudio_;
+    int maestrucBudget_ = 0;     // 0 normal, 1 econômico, 2 mínimo (só a tela)
+    int budgetFrame_ = 0;
+    // detecção de ataque e de silêncio na saída (callback de áudio)
+    double onsetSlow_ = 0.0;
+    std::size_t onsetHold_ = 0, quietFrames_ = 0;
+    bool quietSent_ = false;
+    float loadAvg_ = 0.0f;
     std::unique_ptr<rasgo::maestruc::Link> maestrucLink_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
@@ -6986,6 +7200,7 @@ static_assert(std::atomic<bool>::is_always_lock_free);
 extern "C" inline void aoSinal(int) { pedida.store(true); }
 } // namespace saida
 
+#if !RASGO_PLUGIN
 class RasgoModularApplication : public juce::JUCEApplication,
                                 private juce::Timer {
 public:
@@ -7077,7 +7292,12 @@ private:
 
     std::unique_ptr<Window> window_;
 };
+#endif  // !RASGO_PLUGIN
 
 } // namespace
 
+#if RASGO_PLUGIN
+#include "RasgoModularPlugin.inc"
+#else
 START_JUCE_APPLICATION(RasgoModularApplication)
+#endif

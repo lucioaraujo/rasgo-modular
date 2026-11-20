@@ -101,7 +101,11 @@ void testDepoisDoMusico() {
             const std::string id = p.descriptor.id;
             // escolhas do músico que a seed preserva (testadas à parte)
             if (usado.node(n).type() == "MASTER" && id == "mute") continue;
-            if (usado.node(n).type() == "SIGNAL-IN" && (id == "gain" || id == "listen")) continue;
+            // escolhas de quem toca que nenhuma seed sorteia; `clk_div` (o
+            // DIV do MIDI clock, 20/11/2026) é de quem liga a DAW
+            if (usado.node(n).type() == "SIGNAL-IN"
+                && (id == "gain" || id == "listen" || id == "clk_div")) continue;
+            if (usado.node(n).type() == "POLY-IN" && id == "listen") continue;
             usado.node(n).setParameter(id, p.descriptor.maximum);
         }
     for (std::size_t n = 0; n + 1 < usado.nodeCount(); ++n)

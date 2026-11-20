@@ -155,6 +155,18 @@
 </section>
 
 <section class="section section-dark">
+  <h2>Com outros programas</h2>
+  <p>O Rasgo Modular é um aplicativo próprio e conversa com DAWs, outros sintetizadores e máquinas pelo áudio e pelo MIDI do sistema. A porta de entrada é o módulo SIGNAL-IN: ligue o <strong>ON</strong> e cabeie uma saída dele. A partir daí ele recebe o som, as notas e o andamento; o NOTE-OUT manda as notas para fora.</p>
+  <ul class="tut-list">
+    <li><strong>Som de outro programa no Rasgo:</strong> no Linux, ligue a saída do programa à entrada do Rasgo Modular no PipeWire ou no JACK (qpwgraph, Helvum ou Carla); no macOS, use um dispositivo virtual como o BlackHole; no Windows, o VB-Cable. O som chega nas saídas L e R do SIGNAL-IN.</li>
+    <li><strong>Som do Rasgo numa DAW:</strong> o mesmo caminho ao contrário. A saída do Rasgo Modular vira a entrada de uma faixa da DAW (Ardour, Reaper, Bitwig, Live, Infinite e outras) para gravar ou processar.</li>
+    <li><strong>Notas:</strong> um teclado MIDI ou uma faixa MIDI da DAW chega no SIGNAL-IN (1V/O, GATE, VEL e CC). O NOTE-OUT manda as notas do patch para outro instrumento.</li>
+    <li><strong>O andamento da DAW (MIDI clock):</strong> na DAW, ligue o envio de MIDI clock para a porta que o Rasgo Modular escuta. Cabeie o <strong>CLK</strong> do SIGNAL-IN no <strong>EXT</strong> do CLOCK e o <strong>RST</strong> no <strong>RST</strong> do CLOCK: o patch segue o andamento e o "um" da DAW e para no STOP. O <strong>DIV</strong> escolhe a divisão; a colcheia, o padrão, casa com o MULT 2 do CLOCK. O <strong>RUN</strong> fica alto enquanto a DAW toca.</li>
+    <li><strong>Portas MIDI entre programas:</strong> no Linux, as portas aparecem no próprio sistema (ALSA); no macOS, use o driver IAC; no Windows, um cabo MIDI virtual como o loopMIDI. O Rasgo Modular escuta as entradas MIDI que existem quando o SIGNAL-IN é ligado: abra a DAW antes.</li>
+  </ul>
+</section>
+
+<section class="section">
   <h2>Onde ficam as coisas</h2>
   <ul class="tut-list">
     <li><strong>Estado e preferências:</strong> <code>~/.config/rasgo-modular/</code> no Linux (sessão, patches, idioma); no macOS e no Windows, a pasta de dados de aplicativo do sistema.</li>
@@ -162,14 +174,14 @@
   </ul>
 </section>
 
-<section class="section">
+<section class="section section-dark">
   <h2>Se não sair som</h2>
   <p>O Rasgo Modular soa ao abrir. Sem som, confira a saída de áudio do sistema, o botão ESPERA (que cala o master) e o <code>gain</code> do módulo MASTER. Para outra coisa, escreva para <strong>rasgo.instruments@gmail.com</strong> com o sistema, a versão e o que apareceu.</p>
 </section>
 </main>
 
 <footer>
-  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Código sob GNU AGPL-3.0-or-later.</p>
+  <p><strong>Rasgo Modular</strong> — Lúcio de Araújo, 2026. Código sob GNU AGPL-3.0-or-later. Os módulos de DSP também sob GPL-3.0-or-later.</p>
   <p>Os nomes de controles e portas citados aqui são conferidos contra o código do instrumento.</p>
 </footer>
 <dialog class="contact-dialog" data-contact-dialog aria-labelledby="contact-title">

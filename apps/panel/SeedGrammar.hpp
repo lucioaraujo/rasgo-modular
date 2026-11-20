@@ -103,6 +103,11 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
             // Saídas acrescentadas depois da v0.1.7 ficam fora do passeio,
             // pelo mesmo motivo das entradas abaixo.
             if (t == "SCOPE" && nm == "conf") continue;
+            // MIDI clock do SIGNAL-IN (20/11/2026): mudo sem clock de fora,
+            // e fora do sorteio para as seeds anteriores continuarem iguais
+            if (t == "SIGNAL-IN" && (nm == "clk" || nm == "run" || nm == "rst")) continue;
+            // POLY-IN (20/11/2026): mudo sem teclado; a seed não o cabeia
+            if (t == "POLY-IN") continue;
             int c = SEED_SRC_NONE;
             if (d.kind == PortKind::Audio) {
                 if (t == "NOISE" && (nm == "smooth" || nm == "sh")) c = SEED_SRC_RAND;

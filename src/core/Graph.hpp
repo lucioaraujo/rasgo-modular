@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/RtFloat.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -489,8 +491,13 @@ private:
 
 struct PortDescriptor {
     PortDescriptor() = default;
+    // Duas sobrecargas em vez de `streamDescriptor = std::nullopt`: o
+    // temporário vazio do argumento padrão, inlinado em cada módulo, dava
+    // um falso "may be used uninitialized" no GCC 13 com -O2 (20/11/2026).
+    PortDescriptor(std::string portName, const PortKind portKind, std::string portUnit)
+        : name(std::move(portName)), kind(portKind), unit(std::move(portUnit)) {}
     PortDescriptor(std::string portName, const PortKind portKind, std::string portUnit,
-                   std::optional<StreamDescriptor> streamDescriptor = std::nullopt)
+                   std::optional<StreamDescriptor> streamDescriptor)
         : name(std::move(portName)), kind(portKind), unit(std::move(portUnit)),
           stream(std::move(streamDescriptor)) {}
 
@@ -818,7 +825,7 @@ struct ParameterDescriptor {
 
 struct Parameter {
     ParameterDescriptor descriptor;
-    float value = 0.0f;
+    RtFloat value = 0.0f;
 };
 
 class Module {

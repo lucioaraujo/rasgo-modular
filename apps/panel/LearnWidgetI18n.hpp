@@ -1135,6 +1135,10 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["out:gate"] = LearnEntry{"High while some key is pressed (a 1 ms anti-click ramp).", "", ""};
         t["SIGNAL-IN"]["out:vel"] = LearnEntry{"Velocity of the last note (0–1), held.", "", ""};
         t["SIGNAL-IN"]["out:cc"] = LearnEntry{"The value of CC no. CC# (0–1), held.", "", ""};
+        t["SIGNAL-IN"]["clk_div"] = LearnEntry{"The MIDI clock division on the CLK output: quarter note, eighth note (the default, which matches the CLOCK's MULT 2), sixteenth note or the raw 24 pulses per quarter note.", "", ""};
+        t["SIGNAL-IN"]["out:clk"] = LearnEntry{"Pulses at the tempo of the incoming MIDI clock (from a DAW, another program or a machine), at the DIV division. Patch it into the CLOCK's EXT: the patch follows the outside tempo.", "The pulses come out clean, without the jitter of the audio blocks: a time filter (a DLL, like JACK's) places each one, with a small, constant delay.", ""};
+        t["SIGNAL-IN"]["out:run"] = LearnEntry{"High while the DAW plays (START or CONTINUE until STOP). A source that sends only clock, with no transport, also counts as playing.", "", ""};
+        t["SIGNAL-IN"]["out:rst"] = LearnEntry{"A pulse on the first beat after START. Patch it into the CLOCK's RST: the patch's “one” lands on the DAW's “one”.", "", ""};
     }
     {
         LearnTable& t = learnTableFrMutable();
@@ -1336,6 +1340,10 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["out:gate"] = LearnEntry{"Haut tant qu’une touche est enfoncée (une rampe anti-clic de 1 ms).", "", ""};
         t["SIGNAL-IN"]["out:vel"] = LearnEntry{"Vélocité de la dernière note (0–1), maintenue.", "", ""};
         t["SIGNAL-IN"]["out:cc"] = LearnEntry{"La valeur du CC nº CC# (0–1), maintenue.", "", ""};
+        t["SIGNAL-IN"]["clk_div"] = LearnEntry{"La division de l’horloge MIDI sur la sortie CLK : noire, croche (par défaut, accordée au MULT 2 du CLOCK), double croche ou les 24 impulsions par noire.", "", ""};
+        t["SIGNAL-IN"]["out:clk"] = LearnEntry{"Des impulsions au tempo de l’horloge MIDI qui arrive (d’une DAW, d’un autre logiciel ou d’une machine), à la division DIV. Branchez-la sur l’EXT du CLOCK : le patch suit le tempo extérieur.", "Les impulsions sortent propres, sans le tremblement des blocs audio : un filtre de temps (une DLL, comme celle de JACK) place chacune, avec un petit retard constant.", ""};
+        t["SIGNAL-IN"]["out:run"] = LearnEntry{"Haute tant que la DAW joue (START ou CONTINUE jusqu’au STOP). Une source qui n’envoie que l’horloge, sans transport, compte aussi comme en lecture.", "", ""};
+        t["SIGNAL-IN"]["out:rst"] = LearnEntry{"Une impulsion sur le premier temps après START. Branchez-la sur le RST du CLOCK : le « un » du patch tombe sur le « un » de la DAW.", "", ""};
     }
     {
         LearnTable& t = learnTableEsMutable();
@@ -1537,6 +1545,10 @@ inline void registrarLotesTraduzidos() {
         t["SIGNAL-IN"]["out:gate"] = LearnEntry{"Alto mientras alguna tecla está pulsada (rampa de 1 ms anticlic).", "", ""};
         t["SIGNAL-IN"]["out:vel"] = LearnEntry{"Velocity de la última nota (0–1), sostenida.", "", ""};
         t["SIGNAL-IN"]["out:cc"] = LearnEntry{"El valor del CC nº CC# (0–1), sostenido.", "", ""};
+        t["SIGNAL-IN"]["clk_div"] = LearnEntry{"La división del reloj MIDI en la salida CLK: negra, corchea (por defecto, que casa con el MULT 2 del CLOCK), semicorchea o los 24 pulsos por negra.", "", ""};
+        t["SIGNAL-IN"]["out:clk"] = LearnEntry{"Pulsos al tempo del reloj MIDI que llega (de una DAW, de otro programa o de una máquina), en la división DIV. Conéctela al EXT del CLOCK: el patch sigue el tempo de fuera.", "Los pulsos salen limpios, sin el temblor de los bloques de audio: un filtro de tiempo (un DLL, como el de JACK) coloca cada uno, con un retardo pequeño y constante.", ""};
+        t["SIGNAL-IN"]["out:run"] = LearnEntry{"Alto mientras la DAW toca (START o CONTINUE hasta STOP). Una fuente que solo manda reloj, sin transporte, también cuenta como tocando.", "", ""};
+        t["SIGNAL-IN"]["out:rst"] = LearnEntry{"Un pulso en el primer tiempo después del START. Conéctela al RST del CLOCK: el «uno» del patch cae en el «uno» de la DAW.", "", ""};
     }
     // ---- familia SPACE (89 verbetes) ----
     {
@@ -2658,6 +2670,22 @@ inline void registrarLotesTraduzidos() {
         t["RUNGLER"]["out:tri_b"] = LearnEntry{"B's triangle (audio).", "", ""};
         t["RUNGLER"]["out:pwm"] = LearnEntry{"The A > B comparator: the Benjolin's raspy sound.", "", ""};
         t["RUNGLER"]["out:rung"] = LearnEntry{"The rungler's 8 steps (0–1): a sequencer that thinks for itself.", "", ""};
+        t["POLY-IN"]["voices"] = LearnEntry{"How many voices receive notes, from 1 to 4. With 1, it is a monophonic keyboard that steals the previous note.", "", ""};
+        t["POLY-IN"]["mode"] = LearnEntry{"How the notes are shared out: ROTA (0) moves each note to the next free voice; MESMA (1) gives a repeated note back to the voice it played on; ALTURA (2) puts the voices in pitch order: voice 1 is always the lowest note. With no free voice, the note steals the oldest.", "", ""};
+        t["POLY-IN"]["bend"] = LearnEntry{"Pitch bend range in semitones (0–24), on every voice.", "", ""};
+        t["POLY-IN"]["listen"] = LearnEntry{"Turns the MIDI input on. It starts off: the app only opens MIDI with it on and an output patched. POLY-IN never asks for the microphone.", "", ""};
+        t["POLY-IN"]["out:p1"] = LearnEntry{"Pitch of voice 1 in 1 V/oct (note 60 = 0 V), with bend. Patch it into an OSC's 1V/O.", "", ""};
+        t["POLY-IN"]["out:g1"] = LearnEntry{"Gate of voice 1: open while the key (or the pedal) holds the note; it closes for 2 ms before a new note on the same voice, so the envelope fires again.", "", ""};
+        t["POLY-IN"]["out:v1"] = LearnEntry{"Velocity of voice 1's note (0–1).", "", ""};
+        t["POLY-IN"]["out:p2"] = LearnEntry{"Pitch of voice 2 in 1 V/oct (note 60 = 0 V), with bend. Patch it into an OSC's 1V/O.", "", ""};
+        t["POLY-IN"]["out:g2"] = LearnEntry{"Gate of voice 2: open while the key (or the pedal) holds the note; it closes for 2 ms before a new note on the same voice, so the envelope fires again.", "", ""};
+        t["POLY-IN"]["out:v2"] = LearnEntry{"Velocity of voice 2's note (0–1).", "", ""};
+        t["POLY-IN"]["out:p3"] = LearnEntry{"Pitch of voice 3 in 1 V/oct (note 60 = 0 V), with bend. Patch it into an OSC's 1V/O.", "", ""};
+        t["POLY-IN"]["out:g3"] = LearnEntry{"Gate of voice 3: open while the key (or the pedal) holds the note; it closes for 2 ms before a new note on the same voice, so the envelope fires again.", "", ""};
+        t["POLY-IN"]["out:v3"] = LearnEntry{"Velocity of voice 3's note (0–1).", "", ""};
+        t["POLY-IN"]["out:p4"] = LearnEntry{"Pitch of voice 4 in 1 V/oct (note 60 = 0 V), with bend. Patch it into an OSC's 1V/O.", "", ""};
+        t["POLY-IN"]["out:g4"] = LearnEntry{"Gate of voice 4: open while the key (or the pedal) holds the note; it closes for 2 ms before a new note on the same voice, so the envelope fires again.", "", ""};
+        t["POLY-IN"]["out:v4"] = LearnEntry{"Velocity of voice 4's note (0–1).", "", ""};
         t["MAGNET"]["temp"] = LearnEntry{"Temperature (0.1–6): low, the magnets align in large domains; high, noise wins; near 2.27 (critical), domains of every size — the edge of chaos.", "", ""};
         t["MAGNET"]["coupling"] = LearnEntry{"Coupling: positive, each magnet wants to copy its neighbours (ferromagnet); negative, to oppose them (a chessboard).", "", ""};
         t["MAGNET"]["field"] = LearnEntry{"An external magnet pushing the whole grid up or down.", "", ""};
@@ -3359,6 +3387,22 @@ inline void registrarLotesTraduzidos() {
         t["RUNGLER"]["out:tri_b"] = LearnEntry{"Le triangle de B (audio).", "", ""};
         t["RUNGLER"]["out:pwm"] = LearnEntry{"Le comparateur A > B : le son rauque du Benjolin.", "", ""};
         t["RUNGLER"]["out:rung"] = LearnEntry{"Les 8 marches du rungler (0–1) : un séquenceur qui pense tout seul.", "", ""};
+        t["POLY-IN"]["voices"] = LearnEntry{"Combien de voix reçoivent des notes, de 1 à 4. Avec 1, c’est un clavier monophonique qui vole la note précédente.", "", ""};
+        t["POLY-IN"]["mode"] = LearnEntry{"Comment les notes se répartissent : ROTA (0) passe chaque note à la voix libre suivante ; MESMA (1) rend la note répétée à la voix où elle a joué ; ALTURA (2) met les voix dans l’ordre des hauteurs : la voix 1 est toujours la note la plus grave. Sans voix libre, la note vole la plus ancienne.", "", ""};
+        t["POLY-IN"]["bend"] = LearnEntry{"Portée du pitch bend en demi-tons (0–24), sur toutes les voix.", "", ""};
+        t["POLY-IN"]["listen"] = LearnEntry{"Active l’entrée MIDI. Elle démarre éteinte : l’application n’ouvre le MIDI que si elle est allumée et qu’une sortie est câblée. POLY-IN ne demande jamais le micro.", "", ""};
+        t["POLY-IN"]["out:p1"] = LearnEntry{"Hauteur de la voix 1 en 1 V/oct (note 60 = 0 V), avec le bend. Branchez-la sur le 1V/O d’un OSC.", "", ""};
+        t["POLY-IN"]["out:g1"] = LearnEntry{"Gate de la voix 1 : ouvert tant que la touche (ou la pédale) tient la note ; il se ferme 2 ms avant une nouvelle note sur la même voix, pour que l’enveloppe redémarre.", "", ""};
+        t["POLY-IN"]["out:v1"] = LearnEntry{"Vélocité de la note de la voix 1 (0–1).", "", ""};
+        t["POLY-IN"]["out:p2"] = LearnEntry{"Hauteur de la voix 2 en 1 V/oct (note 60 = 0 V), avec le bend. Branchez-la sur le 1V/O d’un OSC.", "", ""};
+        t["POLY-IN"]["out:g2"] = LearnEntry{"Gate de la voix 2 : ouvert tant que la touche (ou la pédale) tient la note ; il se ferme 2 ms avant une nouvelle note sur la même voix, pour que l’enveloppe redémarre.", "", ""};
+        t["POLY-IN"]["out:v2"] = LearnEntry{"Vélocité de la note de la voix 2 (0–1).", "", ""};
+        t["POLY-IN"]["out:p3"] = LearnEntry{"Hauteur de la voix 3 en 1 V/oct (note 60 = 0 V), avec le bend. Branchez-la sur le 1V/O d’un OSC.", "", ""};
+        t["POLY-IN"]["out:g3"] = LearnEntry{"Gate de la voix 3 : ouvert tant que la touche (ou la pédale) tient la note ; il se ferme 2 ms avant une nouvelle note sur la même voix, pour que l’enveloppe redémarre.", "", ""};
+        t["POLY-IN"]["out:v3"] = LearnEntry{"Vélocité de la note de la voix 3 (0–1).", "", ""};
+        t["POLY-IN"]["out:p4"] = LearnEntry{"Hauteur de la voix 4 en 1 V/oct (note 60 = 0 V), avec le bend. Branchez-la sur le 1V/O d’un OSC.", "", ""};
+        t["POLY-IN"]["out:g4"] = LearnEntry{"Gate de la voix 4 : ouvert tant que la touche (ou la pédale) tient la note ; il se ferme 2 ms avant une nouvelle note sur la même voix, pour que l’enveloppe redémarre.", "", ""};
+        t["POLY-IN"]["out:v4"] = LearnEntry{"Vélocité de la note de la voix 4 (0–1).", "", ""};
         t["MAGNET"]["temp"] = LearnEntry{"La température (0,1–6) : basse, les aimants s’alignent en grands domaines ; haute, le bruit gagne ; près de 2,27 (critique), des domaines de toutes tailles — le bord du chaos.", "", ""};
         t["MAGNET"]["coupling"] = LearnEntry{"Le couplage : positif, chaque aimant veut imiter ses voisins (ferromagnétique) ; négatif, s’y opposer (un damier).", "", ""};
         t["MAGNET"]["field"] = LearnEntry{"Un aimant extérieur qui pousse toute la grille vers le haut ou le bas.", "", ""};
@@ -4060,6 +4104,22 @@ inline void registrarLotesTraduzidos() {
         t["RUNGLER"]["out:tri_b"] = LearnEntry{"El triángulo de B (audio).", "", ""};
         t["RUNGLER"]["out:pwm"] = LearnEntry{"El comparador A > B: el sonido ronco del Benjolin.", "", ""};
         t["RUNGLER"]["out:rung"] = LearnEntry{"Los 8 escalones del rungler (0–1): un secuenciador que piensa solo.", "", ""};
+        t["POLY-IN"]["voices"] = LearnEntry{"Cuántas voces reciben notas, de 1 a 4. Con 1, es un teclado monofónico que roba la nota anterior.", "", ""};
+        t["POLY-IN"]["mode"] = LearnEntry{"Cómo se reparten las notas: ROTA (0) pasa cada nota a la siguiente voz libre; MESMA (1) devuelve la nota repetida a la voz donde sonó; ALTURA (2) ordena las voces por altura: la voz 1 es siempre la nota más grave. Sin voz libre, la nota roba la más antigua.", "", ""};
+        t["POLY-IN"]["bend"] = LearnEntry{"Alcance del pitch bend en semitonos (0–24), en todas las voces.", "", ""};
+        t["POLY-IN"]["listen"] = LearnEntry{"Enciende la entrada MIDI. Empieza apagada: la aplicación solo abre el MIDI con ella encendida y alguna salida conectada. POLY-IN nunca pide el micrófono.", "", ""};
+        t["POLY-IN"]["out:p1"] = LearnEntry{"Altura de la voz 1 en 1 V/oct (nota 60 = 0 V), con el bend. Conéctela al 1V/O de un OSC.", "", ""};
+        t["POLY-IN"]["out:g1"] = LearnEntry{"Gate de la voz 1: abierto mientras la tecla (o el pedal) sostiene la nota; se cierra 2 ms antes de una nota nueva en la misma voz, para que la envolvente vuelva a disparar.", "", ""};
+        t["POLY-IN"]["out:v1"] = LearnEntry{"Velocidad de la nota de la voz 1 (0–1).", "", ""};
+        t["POLY-IN"]["out:p2"] = LearnEntry{"Altura de la voz 2 en 1 V/oct (nota 60 = 0 V), con el bend. Conéctela al 1V/O de un OSC.", "", ""};
+        t["POLY-IN"]["out:g2"] = LearnEntry{"Gate de la voz 2: abierto mientras la tecla (o el pedal) sostiene la nota; se cierra 2 ms antes de una nota nueva en la misma voz, para que la envolvente vuelva a disparar.", "", ""};
+        t["POLY-IN"]["out:v2"] = LearnEntry{"Velocidad de la nota de la voz 2 (0–1).", "", ""};
+        t["POLY-IN"]["out:p3"] = LearnEntry{"Altura de la voz 3 en 1 V/oct (nota 60 = 0 V), con el bend. Conéctela al 1V/O de un OSC.", "", ""};
+        t["POLY-IN"]["out:g3"] = LearnEntry{"Gate de la voz 3: abierto mientras la tecla (o el pedal) sostiene la nota; se cierra 2 ms antes de una nota nueva en la misma voz, para que la envolvente vuelva a disparar.", "", ""};
+        t["POLY-IN"]["out:v3"] = LearnEntry{"Velocidad de la nota de la voz 3 (0–1).", "", ""};
+        t["POLY-IN"]["out:p4"] = LearnEntry{"Altura de la voz 4 en 1 V/oct (nota 60 = 0 V), con el bend. Conéctela al 1V/O de un OSC.", "", ""};
+        t["POLY-IN"]["out:g4"] = LearnEntry{"Gate de la voz 4: abierto mientras la tecla (o el pedal) sostiene la nota; se cierra 2 ms antes de una nota nueva en la misma voz, para que la envolvente vuelva a disparar.", "", ""};
+        t["POLY-IN"]["out:v4"] = LearnEntry{"Velocidad de la nota de la voz 4 (0–1).", "", ""};
         t["MAGNET"]["temp"] = LearnEntry{"La temperatura (0,1–6): baja, los imanes se alinean en dominios grandes; alta, gana el ruido; cerca de 2,27 (la crítica), dominios de todos los tamaños — el borde del caos.", "", ""};
         t["MAGNET"]["coupling"] = LearnEntry{"El acoplamiento: positivo, cada imán quiere imitar a sus vecinos (ferromagneto); negativo, oponerse (un tablero de ajedrez).", "", ""};
         t["MAGNET"]["field"] = LearnEntry{"Un imán externo que empuja toda la rejilla hacia arriba o hacia abajo.", "", ""};

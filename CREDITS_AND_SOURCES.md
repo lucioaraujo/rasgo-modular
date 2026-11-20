@@ -14,6 +14,13 @@ original é um erro a corrigir, não uma versão alternativa.
 [`LICENSE`](LICENSE). A escolha é a licença habitual da família RASGO
 (decisão do autor, 1 set. 2026).
 
+**Os módulos de DSP** (`src/dsp/`, `src/core/`) são oferecidos **também**
+sob **GPL-3.0-or-later**, à escolha de quem os recebe, para o VCV Rack e o
+Cardinal (decisão do autor, 20/11/2026). O instrumento continua AGPL. O que
+vale para cada parte, por que isso é seguro (autoria conferida; o código do
+Navalha 2 de Glerm Soares já é GPL-3.0-or-later) e o que muda na prática:
+[`LICENSING.md`](LICENSING.md). Texto da GPL: [`LICENSE.GPL-3.0`](LICENSE.GPL-3.0).
+
 O front-end de produção usa o **JUCE sob AGPLv3** (tier livre), sem
 licença comercial. Como o código deste projeto já é AGPLv3-or-later, o
 encaixe é direto — detalhe e conferência em
@@ -73,6 +80,21 @@ Cardinal; implementação própria sob AGPL-3.0-or-later.
 
 Contratos em [65](dossies/65_cell.md), [66](dossies/66_markov.md),
 [67](dossies/67_bounce.md) e [68](dossies/68_spring.md).
+
+## POLY-IN (#103, 20/11/2026)
+
+- A alocação de vozes dos sintetizadores polifônicos (rodízio, a mesma
+  voz, ordem de altura, roubo da mais antiga) — prática pública; o MIDI-CV
+  polifônico do VCV Rack (GPL) lido como conceito, nenhum código.
+
+## SIGNAL-IN: MIDI clock (20/11/2026)
+
+- **Fons Adriaensen**, "Using a DLL to filter time" (Linux Audio
+  Conference, 2005): o filtro de tempo de 2ª ordem que o JACK usa. Conceito
+  público, implementação própria em `src/dsp/SignalIn.hpp` (banda variável
+  e atraso de entrega medido são do Rasgo).
+- **MIDI 1.0** (MIDI Association): mensagens de tempo real (clock, start,
+  continue, stop) e song position pointer.
 
 ## Módulos 91–102 — física, óptica, fita e a família (20/11/2026)
 

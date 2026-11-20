@@ -787,6 +787,17 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_signal_in_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_signal_in_tests COMMAND rasgo_modular_signal_in_tests)
 
+    add_executable(rasgo_modular_poly_in_tests tests/test_poly_in.cpp)
+    target_include_directories(rasgo_modular_poly_in_tests PRIVATE src)
+    target_compile_options(rasgo_modular_poly_in_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_poly_in_tests COMMAND rasgo_modular_poly_in_tests)
+
+    # parâmetros sem lock entre interface e áudio (20/11/2026)
+    add_executable(rasgo_modular_rt_params_tests tests/test_rt_params.cpp)
+    target_link_libraries(rasgo_modular_rt_params_tests PRIVATE rasgo_modular_core Threads::Threads)
+    target_compile_options(rasgo_modular_rt_params_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_rt_params_tests COMMAND rasgo_modular_rt_params_tests)
+
     # guarda de segurança do sink: precisa de `apps/` no include path
     # (o `SinkOut.hpp` é header de aplicação, framework-free)
     add_executable(rasgo_modular_sink_guard_tests tests/test_sink_guard.cpp)

@@ -11,6 +11,41 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ Ponto de retomada — 20/11/2026 (noite, depois): outros programas, MIDI clock, parâmetros sem lock, plugin
+
+- Feito localmente, sem commit: receita "Com outros programas" (INSTALL e
+  página de Instalação, 4 línguas); **MIDI clock no SIGNAL-IN** (CLK, RUN,
+  RST, DIV; painel 6 → 8 HP, a conferir no app); **parâmetros sem `gmx`**
+  (`RtFloat`; knobs e VARIA); **plugin VST3/LV2** experimental, desligado
+  por padrão. Detalhes em `DESENVOLVIMENTO.md` (VST3) e no dossiê 49 §8.
+- Conferido: suíte 130/130; 200 seeds idênticas ao commit 39794c8 antes do
+  POLY-IN (o MIDI clock não mexe nas seeds); `test_rt_params` limpo no
+  ThreadSanitizer; plugin VST3 e LV2 30/30 no hospedeiro de teste.
+- **POLY-IN (#103)** feito (aprovado pelo autor, 20/11: "ok"): MIDI em até 4
+  vozes; no rack da seed, sem cabos sorteados — **as seeds mudam** (como
+  com os 12 de antes, nada publicado).
+- Falta: a conferência do autor no app (painéis do SIGNAL-IN, 8 HP, e do
+  POLY-IN; os estalos do VARIA, SOBRE/`RASGO_DIAG=1`); as imagens de painel
+  do site (13 módulos + o SIGNAL-IN novo: abre janela, pedir antes);
+  `pluginval` e DAWs (Ardour, Reaper, Infinite); commit e push (decisão do
+  autor).
+- **Licença dupla decidida** (20/11, autor: "sim, pode oferecer módulos
+  também sob gpl3+, desde que isso não gere problema, organise bem"):
+  `LICENSING.md`. Próximo, se o autor quiser: o port para VCV/Cardinal.
+- **Maestruc 1–3** feitos no código (tempo, carga, acontecimentos; orçamento
+  só na tela) — app compilado; falta o ensaio com o Maestruc aberto.
+
+## ▶ Ponto de retomada — 20/11/2026 (noite): auditoria 2 e proposta FORM/TEMPO
+
+- Escritos, nada implementado (esperam a decisão do autor):
+  `dossies/PROPOSTA_forma_e_andamento.md` (FORM, a dinâmica da forma;
+  TEMPO, o andamento que respira) e `dossies/AUDITORIA_2_cem_modulos.md`
+  (incompletos, fusões, lacunas de síntese, pontos fracos, Maestruc,
+  plugin).
+- Próximo passo: o autor escolhe na ordem da auditoria §8 (técnico sem
+  estética primeiro: trava tela↔áudio, MULT → SUM, núcleo do VCA no VCA4,
+  Maestruc tempo/carga/eventos).
+
 ## ▶ Ponto de retomada — 20/11/2026: 12 módulos novos, papéis da seed e visor do KEY
 
 - **Feito (local, sem push):**

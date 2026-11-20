@@ -9,9 +9,11 @@ Con él, alguien de fuera puede tocar Rasgo Modular: la altura de la tecla va a 
 - BEND: cuántos semitonos mueve la altura la rueda de pitch bend del teclado, de cero a dos octavas.
 - CC#: qué controlador del teclado sigue la salida CC. El número 1 suele ser la rueda de modulación.
 - ON: enciende la entrada de fuera. Apagado, que es como empieza el módulo, no entra nada al patch.
-Salidas: L y R, el audio que entra; 1V/O, la altura de la tecla tocada; GATE, abierto mientras la tecla está pulsada; VEL, la fuerza con que se tocó; CC, el valor del controlador elegido.
+- DIV: la división del reloj MIDI en la salida CLK: negra, corchea (el valor de partida, que casa con el MULT 2 del CLOCK), semicorchea o los 24 pulsos por negra.
+Salidas: L y R, el audio que entra; 1V/O, la altura de la tecla tocada; GATE, abierto mientras la tecla está pulsada; VEL, la fuerza con que se tocó; CC, el valor del controlador elegido; CLK, pulsos al tempo del reloj MIDI que llega de un programa de grabación o de una máquina; RUN, abierto mientras ese programa toca; RST, un pulso en el primer tiempo después del start.
 
 ## Experimente
 1. Con un micrófono o instrumento conectado al ordenador, conecte L a una entrada del MIXER, encienda ON y ajuste GAIN hasta oír el sonido.
 2. Haga pasar ese sonido por un FILTER o por SPACE antes del MIXER para transformarlo.
 3. Con un teclado MIDI y ON encendido, conecte 1V/O a la entrada 1V/O de un OSC, y GATE a la entrada GATE de un ENVELOPE que tenga el sonido del OSC en su entrada IN. El teclado ahora toca el patch.
+4. En un programa de grabación, active el envío de reloj MIDI a Rasgo Modular. Conecte CLK a la entrada EXT del CLOCK y RST a la entrada RST del CLOCK, y pulse play en el programa: el patch avanza a su tempo y empieza en el mismo tiempo.

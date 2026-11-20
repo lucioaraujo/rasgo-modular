@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/RtFloat.hpp"
 #include "dsp/TruePeak.hpp"
 
 #include <cmath>
@@ -328,7 +329,9 @@ private:
     float dcR_ = 0.999f, atkCoef_ = 0.1f, relCoef_ = 0.001f;
     float dcXl_ = 0.0f, dcYl_ = 0.0f, dcXr_ = 0.0f, dcYr_ = 0.0f;
     float env_ = 0.0f, gain_ = 1.0f;
-    float grDb_ = 0.0f, outPeak_ = 0.0f, truePeak_ = 0.0f;
+    // grDb_ é lido pelo VARIA na interface, sem lock (20/11/2026)
+    RtFloat grDb_ = 0.0f;
+    float outPeak_ = 0.0f, truePeak_ = 0.0f;
     std::uint64_t nonFinite_ = 0;
     std::vector<float> dl_, dr_;
     std::size_t len_ = 2, w_ = 0;

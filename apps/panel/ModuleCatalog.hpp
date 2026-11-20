@@ -13,6 +13,7 @@
 #include "dsp/Additive.hpp"
 #include "dsp/Boxcar.hpp"
 #include "dsp/SignalIn.hpp"
+#include "dsp/PolyIn.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Control.hpp"
 #include "dsp/Crush.hpp"
@@ -126,6 +127,7 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "SPECTRA")    return std::make_unique<Spectra>();
     if (t == "SIGNAL-IN" || t == "AUDIO-IN")
         return std::make_unique<SignalIn>();   // AUDIO-IN = alias de migração
+    if (t == "POLY-IN")    return std::make_unique<PolyIn>();
     if (t == "CHAOS")      return std::make_unique<Chaos>();
     if (t == "PLL")        return std::make_unique<Pll>();
     if (t == "NOISE")      return std::make_unique<Noise>();
@@ -267,7 +269,7 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
 // anteriores passam a gerar outros patches, o que fica no CHANGELOG.
 inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN", "GENDYN", "RUNGLER"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN", "GENDYN", "RUNGLER", "POLY-IN"}},
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS", "ELASTIC", "TAPE"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT", "PRESSURE", "REFRACT", "PREDATOR"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET", "INTERFERENCE", "SWARM", "ECLIPSE", "SEASON"}},

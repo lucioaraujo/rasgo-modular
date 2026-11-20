@@ -1189,6 +1189,24 @@ inline const LearnTable& learnTable() {
             {"out:pwm", {"O comparador A > B: o som rouco do Benjolin.", "", ""}},
             {"out:rung", {"Os 8 degraus do rungler (0–1): um sequenciador que pensa sozinho.", "", ""}},
         }},
+        {"POLY-IN", {
+            {"voices", {"Quantas vozes recebem notas, de 1 a 4. Com 1, é um teclado monofônico que rouba a nota anterior.", "", ""}},
+            {"mode", {"Como as notas se repartem: ROTA (0) passa a cada nota para a próxima voz livre; MESMA (1) devolve a nota repetida à voz em que ela tocou; ALTURA (2) põe as vozes em ordem: a voz 1 é sempre a nota mais grave. Sem voz livre, a nota rouba a mais antiga.", "", ""}},
+            {"bend", {"Alcance do pitch bend em semitons (0–24), em todas as vozes.", "", ""}},
+            {"listen", {"Liga a entrada MIDI. Começa desligado: o app só abre o MIDI com ele ligado e alguma saída cabeada. O POLY-IN não pede microfone.", "", ""}},
+            {"out:p1", {"Altura da voz 1 em 1 V/oct (nota 60 = 0 V), com o bend. Ligue no 1V/O de um OSC.", "", ""}},
+            {"out:g1", {"Gate da voz 1: aberto enquanto a tecla (ou o pedal) segura a nota; fecha 2 ms antes de uma nota nova na mesma voz, para o envelope disparar de novo.", "", ""}},
+            {"out:v1", {"Velocidade da nota da voz 1 (0–1).", "", ""}},
+            {"out:p2", {"Altura da voz 2 em 1 V/oct (nota 60 = 0 V), com o bend. Ligue no 1V/O de um OSC.", "", ""}},
+            {"out:g2", {"Gate da voz 2: aberto enquanto a tecla (ou o pedal) segura a nota; fecha 2 ms antes de uma nota nova na mesma voz, para o envelope disparar de novo.", "", ""}},
+            {"out:v2", {"Velocidade da nota da voz 2 (0–1).", "", ""}},
+            {"out:p3", {"Altura da voz 3 em 1 V/oct (nota 60 = 0 V), com o bend. Ligue no 1V/O de um OSC.", "", ""}},
+            {"out:g3", {"Gate da voz 3: aberto enquanto a tecla (ou o pedal) segura a nota; fecha 2 ms antes de uma nota nova na mesma voz, para o envelope disparar de novo.", "", ""}},
+            {"out:v3", {"Velocidade da nota da voz 3 (0–1).", "", ""}},
+            {"out:p4", {"Altura da voz 4 em 1 V/oct (nota 60 = 0 V), com o bend. Ligue no 1V/O de um OSC.", "", ""}},
+            {"out:g4", {"Gate da voz 4: aberto enquanto a tecla (ou o pedal) segura a nota; fecha 2 ms antes de uma nota nova na mesma voz, para o envelope disparar de novo.", "", ""}},
+            {"out:v4", {"Velocidade da nota da voz 4 (0–1).", "", ""}},
+        }},
         {"MAGNET", {
             {"temp", {"A temperatura (0,1–6): baixa, os ímãs se alinham em domínios grandes; alta, o ruído vence; perto de 2,27 (a crítica), domínios de todos os tamanhos — a borda do caos.", "", ""}},
             {"coupling", {"O acoplamento: positivo, cada ímã quer imitar os vizinhos (ferromagneto); negativo, quer se opor (um tabuleiro de xadrez).", "", ""}},
@@ -1792,6 +1810,24 @@ inline const LearnTable& learnTable() {
             {"out:vel", {"Velocity da última nota (0–1), segurada.",
                         "", ""}},
             {"out:cc", {"O valor do CC nº CC# (0–1), segurado.", "", ""}},
+            {"clk_div", {
+                "A divisão do MIDI clock na saída CLK: semínima, colcheia "
+                "(o padrão, que casa com o MULT 2 do CLOCK), semicolcheia "
+                "ou os 24 pulsos por semínima.", "", ""}},
+            {"out:clk", {
+                "Pulsos no andamento do MIDI clock que chega (de uma DAW, "
+                "de outro programa ou de uma máquina), na divisão DIV. "
+                "Ligue no EXT do CLOCK: o patch segue o andamento de fora.",
+                "Os pulsos saem limpos, sem o tremor dos blocos de áudio: "
+                "um filtro de tempo (DLL, como o do JACK) acerta cada um, "
+                "com um atraso pequeno e constante.", ""}},
+            {"out:run", {
+                "Alto enquanto a DAW toca (START ou CONTINUE até o STOP). "
+                "Uma fonte que manda só clock, sem transporte, também "
+                "conta como tocando.", "", ""}},
+            {"out:rst", {
+                "Um pulso no primeiro tempo depois do START. Ligue no RST "
+                "do CLOCK: o “um” do patch cai no “um” da DAW.", "", ""}},
         }},
         {"CHAOS", {
             {"model", {"O atrator: POÇO (o de sempre) · RÖSSLER (o DRIVE anda pela duplicação de período até o caos) · AIZAWA.", "", ""}},
@@ -3400,7 +3436,8 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "um mapa 808 ↔ 909 ↔ acústico e ROLL.", "", ""}},
         {"SIGNAL-IN", {
             "Entrada do mundo — áudio ao vivo (ALSA) + MIDI num adaptador "
-            "só; voz monofônica last-note com saídas pitch/gate/vel/cc.",
+            "só; voz monofônica last-note com saídas pitch/gate/vel/cc, e o "
+            "MIDI clock (CLK/RUN/RST) para seguir uma DAW.",
             "É a contraparte de ENTRADA do NOTE-OUT. Sem nada ligado, "
             "silêncio determinístico.", ""}},
         {"FILTER", {
@@ -3575,6 +3612,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTable() {
             "O coração do Benjolin — dois osciladores e um registrador de 8 bits que se alimentam: os três últimos bits viram 8 degraus que modulam os dois osciladores; entre o padrão que se repete e o caos.",
             "Rob Hordijk (Benjolin, Blippoo Box); o Rasgo Synth Studio tem um Rungler (mesmo autor), refeito aqui no desenho de Hordijk (três bits, comparador, chave de laço). Conceito público, nenhum código de clone.",
             "RUNGLER FRQA 8, FRQB 230: RUNG → QUANTIZER → OSC (uma melodia que pensa sozinha); PWM → FILTER → VCA (o Benjolin); LOOP no máximo prende o padrão."}},
+        {"POLY-IN", {
+            "O MIDI polifônico em até 4 vozes — cada voz com altura, gate e velocidade; com 4 OSC e 4 ENVELOPE, o teclado ou a DAW toca acordes.",
+            "O SIGNAL-IN é uma voz só (e o áudio de fora); o POLY-IN reparte as notas: ROTA, MESMA ou ALTURA. Rouba a voz mais antiga, segura com o pedal.",
+            "ON ligado; P1 → OSC 1V/O e G1 → ENVELOPE GATE; o mesmo com cópias do OSC e do ENVELOPE para as vozes 2, 3 e 4."}},
         {"MAGNET", {
             "Uma grade de ímãs — o modelo de Ising: 8×8 ímãs que querem se alinhar e são agitados pela temperatura; perto da temperatura crítica, domínios de todos os tamanhos aparecem e somem.",
             "Ideia do autor (\"imãs\"); Ising (1925), Onsager (1944), Metropolis (1953). Conceito lido no CVfunk Magnets (MIT), nenhum código copiado. QUENCH esquenta tudo de uma vez.",
@@ -3890,7 +3931,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "",
             ""}},
         {"SIGNAL-IN", {
-            "The way in from the world — live audio (ALSA) + MIDI in a single adapter; monophonic last-note voice with pitch/gate/vel/cc outputs.",
+            "The way in from the world — live audio (ALSA) + MIDI in a single adapter; monophonic last-note voice with pitch/gate/vel/cc outputs, and MIDI clock (CLK/RUN/RST) to follow a DAW.",
             "It is the INPUT counterpart of NOTE-OUT. With nothing connected, deterministic silence.",
             ""}},
         {"FILTER", {
@@ -4045,6 +4086,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEn() {
             "The heart of the Benjolin — two oscillators and an 8-bit register feeding each other: the last three bits become 8 steps that modulate both oscillators; between a repeating pattern and chaos.",
             "Rob Hordijk (Benjolin, Blippoo Box); the Rasgo Synth Studio has a Rungler (same author), rebuilt here in Hordijk's design (three bits, comparator, loop switch). Public concept, no clone code.",
             "RUNGLER FRQA 8, FRQB 230: RUNG → QUANTIZER → OSC (a melody that thinks for itself); PWM → FILTER → VCA (the Benjolin); LOOP at maximum locks the pattern."}},
+        {"POLY-IN", {
+            "Polyphonic MIDI in up to 4 voices — each voice with pitch, gate and velocity; with 4 OSCs and 4 ENVELOPEs, the keyboard or the DAW plays chords.",
+            "SIGNAL-IN is a single voice (and the outside audio); POLY-IN shares the notes out: ROTA, MESMA or ALTURA. It steals the oldest voice and holds with the pedal.",
+            "ON on; P1 → OSC 1V/O and G1 → ENVELOPE GATE; the same with copies of the OSC and the ENVELOPE for voices 2, 3 and 4."}},
         {"MAGNET", {
             "A grid of magnets — the Ising model: 8×8 magnets that want to align and are stirred by temperature; near the critical temperature, domains of every size appear and vanish.",
             "The author's idea (\"magnets\"); Ising (1925), Onsager (1944), Metropolis (1953). Concept read in CVfunk Magnets (MIT), no code copied. QUENCH heats everything at once.",
@@ -4288,7 +4333,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "",
             ""}},
         {"SIGNAL-IN", {
-            "L’entrée du monde — audio en direct (ALSA) + MIDI dans un seul adaptateur ; voix monophonique last-note avec sorties pitch/gate/vel/cc.",
+            "L’entrée du monde — audio en direct (ALSA) + MIDI dans un seul adaptateur ; voix monophonique last-note avec sorties pitch/gate/vel/cc, et l’horloge MIDI (CLK/RUN/RST) pour suivre une DAW.",
             "C’est la contrepartie d’ENTRÉE de NOTE-OUT. Sans rien de branché, silence déterministe.",
             ""}},
         {"FILTER", {
@@ -4443,6 +4488,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableFr() {
             "Le cœur du Benjolin — deux oscillateurs et un registre de 8 bits qui se nourrissent : les trois derniers bits deviennent 8 marches qui modulent les deux oscillateurs ; entre le motif qui se répète et le chaos.",
             "Rob Hordijk (Benjolin, Blippoo Box) ; le Rasgo Synth Studio a un Rungler (même auteur), refait ici selon le dessin de Hordijk (trois bits, comparateur, interrupteur de boucle). Concept public, aucun code de clone.",
             "RUNGLER FRQA 8, FRQB 230 : RUNG → QUANTIZER → OSC (une mélodie qui pense toute seule) ; PWM → FILTER → VCA (le Benjolin) ; LOOP au maximum fige le motif."}},
+        {"POLY-IN", {
+            "Le MIDI polyphonique sur jusqu’à 4 voix — chaque voix avec hauteur, gate et vélocité ; avec 4 OSC et 4 ENVELOPE, le clavier ou la DAW joue des accords.",
+            "SIGNAL-IN est une seule voix (et l’audio extérieur) ; POLY-IN répartit les notes : ROTA, MESMA ou ALTURA. Il vole la voix la plus ancienne et tient avec la pédale.",
+            "ON allumé ; P1 → OSC 1V/O et G1 → ENVELOPE GATE ; de même avec des copies de l’OSC et de l’ENVELOPE pour les voix 2, 3 et 4."}},
         {"MAGNET", {
             "Une grille d’aimants — le modèle d’Ising : 8×8 aimants qui veulent s’aligner et que la température agite ; près de la température critique, des domaines de toutes tailles apparaissent et disparaissent.",
             "Idée de l’auteur (« aimants ») ; Ising (1925), Onsager (1944), Metropolis (1953). Concept lu dans CVfunk Magnets (MIT), aucun code copié. QUENCH chauffe tout d’un coup.",
@@ -4686,7 +4735,7 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "",
             ""}},
         {"SIGNAL-IN", {
-            "La entrada del mundo — audio en vivo (ALSA) + MIDI en un solo adaptador; voz monofónica last-note con salidas pitch/gate/vel/cc.",
+            "La entrada del mundo — audio en vivo (ALSA) + MIDI en un solo adaptador; voz monofónica last-note con salidas pitch/gate/vel/cc, y el reloj MIDI (CLK/RUN/RST) para seguir una DAW.",
             "Es la contraparte de ENTRADA de NOTE-OUT. Sin nada conectado, silencio determinista.",
             ""}},
         {"FILTER", {
@@ -4841,6 +4890,10 @@ inline const std::unordered_map<std::string, LearnEntry>& moduleLearnTableEs() {
             "El corazón del Benjolin — dos osciladores y un registro de 8 bits que se alimentan: los tres últimos bits se vuelven 8 escalones que modulan los dos osciladores; entre el patrón que se repite y el caos.",
             "Rob Hordijk (Benjolin, Blippoo Box); el Rasgo Synth Studio tiene un Rungler (mismo autor), rehecho aquí con el diseño de Hordijk (tres bits, comparador, llave de bucle). Concepto público, ningún código de clon.",
             "RUNGLER FRQA 8, FRQB 230: RUNG → QUANTIZER → OSC (una melodía que piensa sola); PWM → FILTER → VCA (el Benjolin); LOOP al máximo fija el patrón."}},
+        {"POLY-IN", {
+            "El MIDI polifónico en hasta 4 voces — cada voz con altura, gate y velocidad; con 4 OSC y 4 ENVELOPE, el teclado o la DAW toca acordes.",
+            "SIGNAL-IN es una sola voz (y el audio de fuera); POLY-IN reparte las notas: ROTA, MESMA o ALTURA. Roba la voz más antigua y sostiene con el pedal.",
+            "ON encendido; P1 → OSC 1V/O y G1 → ENVELOPE GATE; lo mismo con copias del OSC y del ENVELOPE para las voces 2, 3 y 4."}},
         {"MAGNET", {
             "Una rejilla de imanes — el modelo de Ising: 8×8 imanes que quieren alinearse y la temperatura agita; cerca de la temperatura crítica aparecen y desaparecen dominios de todos los tamaños.",
             "Idea del autor («imanes»); Ising (1925), Onsager (1944), Metropolis (1953). Concepto leído en CVfunk Magnets (MIT), ningún código copiado. QUENCH calienta todo de una vez.",

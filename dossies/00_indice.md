@@ -131,6 +131,7 @@ propriedade do cabo, não um módulo do catálogo.
 | 100 | [`100_season.md`](100_season.md) | `SEASON` (dia, noite e estação) | TIME | implementação local, 2026-11-20 |
 | 101 | [`101_gendyn.md`](101_gendyn.md) | `GENDYN` (a síntese estocástica de Xenakis) | SOURCE | implementação local, 2026-11-20 |
 | 102 | [`102_rungler.md`](102_rungler.md) | `RUNGLER` (o coração do Benjolin) | SOURCE | implementação local, 2026-11-20 |
+| 103 | [`103_poly_in.md`](103_poly_in.md) | `POLY-IN` (o MIDI polifônico em até 4 vozes) | SOURCE | implementação local, 2026-11-20 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

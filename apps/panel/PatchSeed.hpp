@@ -296,7 +296,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         for (const auto& pr : node.parameters()) {
             const std::string& pid = pr.descriptor.id;
             if (t == "MASTER" && pid == "mute") continue;
-            if (t == "SIGNAL-IN" && (pid == "gain" || pid == "listen")) continue;
+            if (t == "SIGNAL-IN" && (pid == "gain" || pid == "listen" || pid == "clk_div")) continue;
+            if (t == "POLY-IN" && pid == "listen") continue;
             if (pr.value != pr.descriptor.defaultValue)
                 setP(n, pid.c_str(), pr.descriptor.defaultValue);
         }
@@ -1479,6 +1480,8 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 || nm == "voices" || nm == "freeze" || nm == "mono"
                 || nm == "gain" || nm == "output" || nm == "out_gain"
                 || nm == "fm_amount" || nm == "listen"
+                // MIDI clock do SIGNAL-IN (20/11/2026): escolha de quem liga a DAW
+                || nm == "clk_div"
                 // depois da v0.1.7 — fora do sorteio (seeds antigas iguais)
                 || nm == "pit_keep" || nm == "pit_oct"
                 // lote do oscilador (11/11/2026): fora do sorteio genérico

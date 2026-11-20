@@ -431,8 +431,9 @@ struct ParameterLink {
     bool feedback = false;
     // valor de intenção do usuário (o knob), capturado no connect: a
     // modulação é ADITIVA sobre ele -> `param = base + offset + depth·fonte`.
-    // Um front-end atualiza via `SignalGraph::setParameterBase`.
-    float base = 0.0f;
+    // Um front-end atualiza via `SignalGraph::setParameterBase` — sem lock
+    // desde 20/11/2026, por isso `RtFloat`.
+    RtFloat base = 0.0f;
 };
 
 // ---------------------------------------------------------------------------
@@ -1131,7 +1132,7 @@ private:
         std::string parameterId;
         float depth = 1.0f;
         float offset = 0.0f;
-        float base = 0.0f;   // valor de intenção do usuário; modulação aditiva
+        RtFloat base = 0.0f;   // valor de intenção do usuário; modulação aditiva (sem lock)
     };
 
     // Resolve `qualities_` das contribuições, usando o bloco ANTERIOR.
