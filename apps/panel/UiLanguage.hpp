@@ -124,6 +124,12 @@ inline const L4 startNoteInit {
     "Este patch agora é o seu patch de abertura: na próxima vez, abre com ele. Para trocar, volte a MEU PATCH com o patch que quiser.",
     "Ce patch est maintenant votre patch d’ouverture : la prochaine fois, il s’ouvre dessus. Pour le changer, revenez à MON PATCH avec le patch voulu.",
     "Este patch es ahora su patch de apertura: la próxima vez abre con él. Para cambiarlo, vuelva a MI PATCH con el patch que quiera."};
+// no plugin (20/11/2026): quem abre o patch é o projeto da DAW
+inline const L4 startNotePlugin {
+    "In the plugin, the patch opens from the DAW project; the app's opening choice stays as it is.",
+    "No plugin, o patch abre pelo projeto da DAW; a escolha de abertura do app fica como está.",
+    "Dans le plugin, le patch s’ouvre depuis le projet de la DAW ; le choix d’ouverture de l’application reste tel quel.",
+    "En el plugin, el patch abre desde el proyecto de la DAW; la elección de apertura de la app queda como está."};
 inline const L4 startNoteLast {
     "Next time it opens with the session as it is when you close the app.",
     "Na próxima vez, abre com a sessão como estiver ao fechar o app.",

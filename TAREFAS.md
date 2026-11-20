@@ -11,6 +11,18 @@ módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
 
+## ▶ Ideia registrada — 21/11/2026: a linha de comando do Modular
+
+Autor: "sim" (depois de ver o comando `infinite` e o MCP do Infinite). A
+proposta antes do código: um comando `rasgo-modular` sem janela —
+`render --seed N --dur S saida.wav` (seed para WAV sem placa), `validate
+patch.rmp`, `panels <pasta>` (as imagens de painel do site sem abrir janela,
+o que hoje trava 13 imagens) e `info` (módulos e portas). O núcleo já roda
+sem interface; hoje isso existe em parte por variáveis (`RASGO_SEED`,
+`RASGO_EXPORTAR_PAINEIS`). Ordem sugerida ao autor: (1) terminar o plugin
+(silêncio no Infinite, queda da janela `BadWindow`); (2) esta linha de
+comando; (3) Maestruc ↔ Infinite por OSC (TAREFAS do Maestruc); (4) MCP.
+
 ## ▶ Ponto de retomada — 20/11/2026 (noite, depois): outros programas, MIDI clock, parâmetros sem lock, plugin
 
 - Feito localmente, sem commit: receita "Com outros programas" (INSTALL e

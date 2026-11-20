@@ -4909,7 +4909,12 @@ inline juce::File pasta() {
 inline void marca(const char* etapa) {
     static const juce::uint32 t0 = juce::Time::getMillisecondCounter();
     static bool primeira = true;
+    // o plugin tem o seu, para não apagar o diagnóstico do aplicativo
+#if RASGO_PLUGIN
+    auto f = pasta().getChildFile("arranque-plugin.log");
+#else
     auto f = pasta().getChildFile("arranque.log");
+#endif
     if (primeira) {
         primeira = false;
         f.replaceWithText(juce::String::fromUTF8(RASGO_MODULAR_BUILD) + "  "
@@ -4992,6 +4997,13 @@ public:
         };
         header_.onStartup = [this] {
             namespace S = rasgo::panel::strings;
+            // No plugin (20/11/2026, achado no Infinite): a abertura é a do
+            // projeto da DAW. Antes, o ABRE do plugin gravava a escolha e o
+            // init.rmp do APLICATIVO.
+            if (kPlugin) {
+                palette_.setNotice(u8(rasgo::panel::tr(S::startNotePlugin, lang_)));
+                return;
+            }
             startMode_ = rasgo::panel::nextStartMode(startMode_);
             const rasgo::panel::L4* note = &S::startNoteSeed;
             switch (startMode_) {
@@ -6406,6 +6418,7 @@ private:
             .replaceWithText(u8(rasgo::panel::langCode(lang_)));
     }
     void saveRackViewPref() const {
+        if (kPlugin) return;   // a vista do plugin não muda a do aplicativo
         dataDir().getChildFile("rack-view")
             .replaceWithText(view_->outputOnly() ? "output" : "all");
     }
