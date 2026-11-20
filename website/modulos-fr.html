@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — guide des modules</title>
-<meta name="description" content="Les 88 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
+<meta name="description" content="Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — guide des modules">
-<meta property="og:description" content="Les 88 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
+<meta property="og:description" content="Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-fr.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Les 88 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
+  "description": "Les 100 modules du Rasgo Modular expliqués pour qui débute : ce que chacun fait au son, ce que change chaque réglage, et un exercice à faire dans l’application.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "fr",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,24 +99,24 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">88 modules · 8 familles</span>
+  <span class="status-pill">100 modules · 8 familles</span>
   <h1>Guide des modules</h1>
-  <p class="lead">Les 88 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
+  <p class="lead">Les 100 modules du Rasgo Modular, famille par famille. Chaque notice raconte ce que le module fait au son, comment il se situe parmi ses voisins, ce que change chaque réglage, et se termine par quelques étapes à essayer dans l’application. Les exercices partent d’un patch où le MIXER est déjà relié au MASTER, comme dans toutes les graines. Dans l’instrument, la boîte LEARN affiche un résumé de chaque module et de chaque réglage quand vous les survolez avec la souris.</p>
 </section>
 
 <nav class="familias" aria-label="Familles">
-  <a href="#fam-SOURCE">SOURCE <span>13</span></a>
-  <a href="#fam-TRANSFORM">TRANSFORM <span>16</span></a>
-  <a href="#fam-MODULATE">MODULATE <span>13</span></a>
-  <a href="#fam-TIME">TIME <span>10</span></a>
+  <a href="#fam-SOURCE">SOURCE <span>15</span></a>
+  <a href="#fam-TRANSFORM">TRANSFORM <span>18</span></a>
+  <a href="#fam-MODULATE">MODULATE <span>16</span></a>
+  <a href="#fam-TIME">TIME <span>14</span></a>
   <a href="#fam-DECISION">DECISION <span>14</span></a>
   <a href="#fam-ROUTE">ROUTE <span>6</span></a>
-  <a href="#fam-SPACE">SPACE <span>11</span></a>
+  <a href="#fam-SPACE">SPACE <span>12</span></a>
   <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
 
 <section class="section" id="fam-SOURCE">
-  <h2>SOURCE <small>13 modules</small></h2>
+  <h2>SOURCE <small>15 modules</small></h2>
   <article class="modulo" id="mod-OSC">
     <h3>OSC</h3>
     <figure class="painel"><img src="assets/modulos/OSC.webp" alt="Panneau du module OSC" width="142" height="300" loading="lazy" /></figure>
@@ -459,9 +459,58 @@
       <li>Avec un clavier MIDI et ON allumé, branchez 1V/O sur l'entrée 1V/O d'un OSC, et GATE sur l'entrée GATE d'un ENVELOPE qui a le son de l'OSC sur son entrée IN. Le clavier joue maintenant le patch.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-GENDYN">
+    <h3>GENDYN</h3>
+    <h4>Ce que c’est</h4>
+    <p>GENDYN est une source sonore où l’onde est un polygone de quelques points. À chaque tour, chaque point change un peu de hauteur et de distance jusqu’au suivant, au hasard. L’onde ne se répète jamais, mais ne s’échappe jamais non plus : un son qui vit.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est la synthèse stochastique dynamique de Iannis Xenakis, celle de Gendy3, de 1991. Chaque point fait un pas au hasard, comme un ivrogne, et les bords le réfléchissent, pour qu’il ne s’y colle jamais. Avec BAND à 0, la hauteur est tenue et seul le dessin de l’onde respire : une note juste et vivante. Avec BAND à 1, la période erre aussi, et le son va jusqu’au bruit. DIST choisit le type de pas ; la distribution de Cauchy, la préférée de Xenakis, donne des sauts rares et grands.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>PTS</b> : combien de points compte le polygone.</li>
+      <li><b>FREQ</b> : la hauteur centrale.</li>
+      <li><b>BAND</b> : jusqu’où la hauteur peut s’échapper.</li>
+      <li><b>AMP</b> : le pas des amplitudes.</li>
+      <li><b>DUR</b> : le pas des durées.</li>
+      <li><b>DIST</b> : le type de pas.</li>
+      <li><b>LEVEL</b> : le niveau.</li>
+    </ul>
+    <p>Entrées : PTCH ajoute une hauteur en volts par octave, FRZ fige l’onde tant que le gate est haut, AMP s’ajoute au pas des amplitudes. Sortie : OUT est le son.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Mettez BAND à 0,1 et branchez OUT sur un FILTER et un VCA : une basse qui respire.</li>
+      <li>Montez BAND et AMP à 1 : la masse de bruit de Xenakis.</li>
+      <li>Branchez un gate lent sur FRZ : l’onde se fige et se dégèle.</li>
+      <li>Branchez une séquence sur PTCH avec BAND bas : une mélodie de timbres vivants.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-RUNGLER">
+    <h3>RUNGLER</h3>
+    <h4>Ce que c’est</h4>
+    <p>RUNGLER a deux oscillateurs et un registre de 8 bits. À chaque tour de l’oscillateur A, le registre avance d’une case et garde l’état de l’oscillateur B à cet instant. Les trois derniers bits deviennent une tension de 8 marches, qui sort sur RUNG et revient moduler les deux oscillateurs.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est le cœur du Benjolin, de Rob Hordijk. La boucle se ferme : avec peu de modulation, un motif qui se répète ; avec beaucoup, le circuit trébuche entre se verrouiller sur un rythme et devenir bruit. LOOP est l’interrupteur de Hordijk : au maximum, le bit qui sort de la fin revient au début et le motif de 8 pas se répète pour toujours ; entre les deux, un nouveau bit entre de temps en temps et le motif se transforme.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>FRQA</b> : la fréquence de l’oscillateur A, l’horloge.</li>
+      <li><b>FRQB</b> : la fréquence de l’oscillateur B.</li>
+      <li><b>LOOP</b> : l’interrupteur de boucle.</li>
+      <li><b>MODA</b> : combien le rungler module A.</li>
+      <li><b>MODB</b> : combien le rungler module B.</li>
+      <li><b>LEVEL</b> : le niveau.</li>
+    </ul>
+    <p>Entrées : PTA et PTB ajoutent des hauteurs en volts par octave, LOOP s’ajoute à l’interrupteur de boucle. Sorties : TRIA et TRIB sont les triangles, PWM le comparateur, RUNG les 8 marches.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Mettez FRQA à 8 Hz et branchez RUNG sur un QUANTIZER et un OSC : une mélodie qui pense toute seule.</li>
+      <li>Branchez PWM sur un FILTER et un VCA avec les deux fréquences en audio : le son rauque du Benjolin.</li>
+      <li>Montez LOOP jusqu’au bout : le motif se fige. Baissez un peu : il commence à changer.</li>
+      <li>Montez MODA et MODB : le motif trébuche jusqu’au chaos.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TRANSFORM">
-  <h2>TRANSFORM <small>16 modules</small></h2>
+  <h2>TRANSFORM <small>18 modules</small></h2>
   <article class="modulo" id="mod-FILTER">
     <h3>FILTER</h3>
     <figure class="painel"><img src="assets/modulos/FILTER.webp" alt="Panneau du module FILTER" width="118" height="300" loading="lazy" /></figure>
@@ -869,9 +918,57 @@
       <li>Branchez la sortie ENV dans le CUT d'un FILTER sur un autre son : le filtre s'ouvre avec la force de ce que le compresseur entend.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-ELASTIC">
+    <h3>ELASTIC</h3>
+    <h4>Ce que c’est</h4>
+    <p>ELASTIC est une chaîne de masses reliées par des ressorts, fixée aux deux bouts. Le son entrant pousse une masse près d’un bout, et toute la chaîne vibre. L et R écoutent deux points de la chaîne.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est une corde faite de perles. Les modes de vibration ne sont pas harmoniques : ils se resserrent de plus en plus dans l’aigu, ce qui donne le timbre d’un maillage élastique, entre le gong et le caoutchouc. STRCH durcit le ressort à mesure qu’il s’étire, comme un vrai élastique : avec un signal fort, les modes montent et le son se tord.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>N</b> : combien de masses la chaîne a.</li>
+      <li><b>TUNE</b> : l’accord du ressort.</li>
+      <li><b>DAMP</b> : la perte ; combien de temps le son dure.</li>
+      <li><b>STRCH</b> : le durcissement du ressort.</li>
+      <li><b>PICK</b> : le point d’écoute.</li>
+      <li><b>MIX</b> : le mélange avec le son entrant.</li>
+    </ul>
+    <p>Entrées : IN est le son qui fait vibrer, PLUK pince la chaîne, TUNE bouge l’accord en volts par octave. Sorties : L et R sont la chaîne écoutée en deux points en miroir.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez un CLOCK sur PLUK, sans rien sur IN : une basse d’élastique pincé.</li>
+      <li>Branchez un DRUM sur IN avec DAMP à 0,1 : chaque coup réveille un gong de caoutchouc.</li>
+      <li>Montez STRCH avec un son fort : les modes montent et le timbre se tord.</li>
+      <li>Bougez PICK lentement : le timbre va de l’aigu du bout au grave du milieu.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-TAPE">
+    <h3>TAPE</h3>
+    <h4>Ce que c’est</h4>
+    <p>TAPE est un magnétophone à bande. Le son entre, est enregistré sur la bande et revient avec sa couleur : des crêtes arrondies, un aigu plus sombre, une bosse dans le grave, une hauteur qui ondule et un souffle dessous.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Dans la musique sur bande de Pierre Schaeffer, Pierre Henry, Bebe et Louis Barron et Daphne Oram, la bande était l’instrument. Ici, c’est le milieu que le patch traverse. SPEED change tout le caractère : la bande lente est plus sombre et ondule davantage. WEAR use la bande : le niveau chute soudain et revient, et parfois la bande se froisse et la hauteur tremble.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>DRIVE</b> : la saturation.</li>
+      <li><b>SPEED</b> : la vitesse de la bande.</li>
+      <li><b>WOW</b> : le pleurage lent du moteur.</li>
+      <li><b>FLUT</b> : le scintillement rapide du cabestan.</li>
+      <li><b>HISS</b> : le souffle.</li>
+      <li><b>WEAR</b> : l’usure de la bande.</li>
+    </ul>
+    <p>Entrées : IN est le son, WEAR et DRV s’ajoutent à l’usure et à la saturation. Sorties : OUT est le son qui revient de la bande, DROP une impulsion à chaque panne.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez la sortie du MIXER sur IN et OUT sur le MASTER : tout le patch passe par la bande.</li>
+      <li>Mettez SPEED à 0 et WOW haut : la bande lente s’assombrit et ondule.</li>
+      <li>Montez WEAR lentement : les pannes commencent à apparaître.</li>
+      <li>Branchez DROP sur un SH : chaque panne tire une nouvelle note.</li>
+    </ol>
+  </article>
 </section>
 <section class="section" id="fam-MODULATE">
-  <h2>MODULATE <small>13 modules</small></h2>
+  <h2>MODULATE <small>16 modules</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="Panneau du module ENVELOPE" width="142" height="300" loading="lazy" /></figure>
@@ -1199,9 +1296,77 @@
       <li>Branchez DIST dans le MIX d'un SPACE : quand les planètes s'éloignent, l'espace s'ouvre.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-PRESSURE">
+    <h3>PRESSURE</h3>
+    <h4>Ce que c’est</h4>
+    <p>PRESSURE est une boîte de gaz. Les particules avancent en ligne droite et rebondissent sur les parois. La paroi de droite est un piston, et chaque choc sur elle donne un gate sur HIT. La force moyenne des chocs est la pression, qui sort sur PRES.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est la théorie cinétique des gaz, de Maxwell et Boltzmann. Plus de chaleur, les particules courent plus vite et frappent davantage. Moins de volume, elles frappent plus souvent, car la paroi est plus proche : la pression monte, comme dans la loi de Boyle. Avec ATTR positif, le gaz devient un gaz réel : les particules s’attirent et, fortes, se condensent en goutte, et la pression baisse.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>N</b> : combien de particules il y a dans la boîte.</li>
+      <li><b>TEMP</b> : la température, la vitesse moyenne.</li>
+      <li><b>VOL</b> : le volume ; la position du piston.</li>
+      <li><b>ATTR</b> : attraction (positif) ou répulsion (négatif) entre les particules.</li>
+      <li><b>GATE</b> : la durée de chaque gate.</li>
+    </ul>
+    <p>Entrées : HEAT donne un éclat de chaleur à toutes, VOL et TEMP bougent volume et température par CV. Sorties : HIT est le gate des chocs sur le piston, PRES la pression, TEMP la température mesurée, X et Y la position d’une particule.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez HIT sur un DRUM avec N à 3 : un rythme clairsemé et irrégulier. Montez N jusqu’à 20 : cela devient un grésillement de chocs.</li>
+      <li>Branchez un LFO lent sur VOL : quand le piston comprime, le rythme accélère et PRES monte.</li>
+      <li>Branchez X et Y sur le PAN et la coupure d’un FILTER : la particule dessine le timbre.</li>
+      <li>Montez ATTR lentement : le gaz se condense, les chocs se raréfient et la pression baisse.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-REFRACT">
+    <h3>REFRACT</h3>
+    <h4>Ce que c’est</h4>
+    <p>REFRACT est un rayon lumineux qui naît dans une couche de verre, en traverse trois autres et sort dans l’air. Dans chaque couche il dévie, et son angle dans chacune sort en CV sur A1 à A4.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est la loi de Snell : en passant d’un milieu à un autre, le rayon change de direction selon leurs indices. Passant d’un milieu dense à un milieu moins dense sous un angle trop rasant, il ne traverse pas : il se réfléchit entièrement. C’est la réflexion totale, l’éclat du diamant et le chemin de la lumière dans la fibre optique. Chaque fois que le rayon se met à se réfléchir, une impulsion sort sur TIR.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>N1, N2, N3, N4</b> : les indices des quatre couches.</li>
+      <li><b>RATE</b> : la vitesse du balayage de l’angle.</li>
+      <li><b>RANGE</b> : jusqu’où l’angle balaie.</li>
+      <li><b>SHIM</b> : le mirage, le tremblement des indices.</li>
+    </ul>
+    <p>Entrées : ANG donne l’angle par CV, à la place du balayage, IDX s’ajoute à tous les indices. Sorties : A1 à A4 sont les angles dans les couches, TIR l’impulsion de la réflexion totale, EXIT le déplacement latéral du rayon.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez TIR sur un DRUM : le balayage passe par l’angle critique deux fois par cycle, et le DRUM marque chaque passage.</li>
+      <li>Branchez A2 et A4 sur deux coupures de FILTER : le même rayon donne deux mouvements semblables et différents.</li>
+      <li>Montez SHIM avec RANGE près de l’angle critique : TIR devient un rythme de mirage.</li>
+      <li>Branchez un LFO sur IDX : le verre chauffe et refroidit, et le point de réflexion totale se déplace.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-PREDATOR">
+    <h3>PREDATOR</h3>
+    <h4>Ce que c’est</h4>
+    <p>PREDATOR est un petit écosystème : des proies qui croissent seules et des prédateurs qui croissent en mangeant. Les deux populations montent et descendent en cycle, le prédateur toujours un peu en retard, et sortent en CV sur PREY et PRED.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Ce sont les équations de Lotka et Volterra, des années 1920, la même physique que l’écosystème de l’Aquorbium. Quand les proies abondent, le prédateur croît ; quand les prédateurs abondent, la proie chute ; alors le prédateur a faim, et tout recommence. Les captures donnent des impulsions sur CTCH, et le pic de la proie, la fuite, donne une impulsion sur FLEE. CANON répète la ligne de la proie avec un retard qui rétrécit quand le prédateur s’approche : un canon qui se resserre jusqu’à la strette.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>PERIOD</b> : la durée d’un cycle.</li>
+      <li><b>SIZE</b> : la taille de l’orbite.</li>
+      <li><b>HUNT</b> : combien le prédateur chasse.</li>
+      <li><b>WILD</b> : le bruit de l’environnement.</li>
+      <li><b>DELAY</b> : le retard maximal du canon.</li>
+    </ul>
+    <p>Entrées : CTCH est une capture venue de l’extérieur, RATE bouge la vitesse en volts par octave. Sorties : PREY et PRED sont les populations, CTCH et FLEE les impulsions de la chasse et de la fuite, CANON le canon de la proie.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez PREY sur la coupure d’un FILTER et PRED sur le niveau d’un VCA : le timbre et la dynamique se chassent.</li>
+      <li>Branchez CTCH sur un DRUM avec HUNT haut : les captures deviennent des coups dans les moments d’abondance.</li>
+      <li>Branchez PREY et CANON sur les hauteurs de deux voix : la seconde imite la première de plus en plus près.</li>
+      <li>Montez WILD : les cycles cessent d’être pareils, comme dans un vrai écosystème.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
-  <h2>TIME <small>10 modules</small></h2>
+  <h2>TIME <small>14 modules</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="Panneau du module CLOCK" width="189" height="300" loading="lazy" /></figure>
@@ -1457,6 +1622,96 @@
       <li>Avec TETO à 6, écoutez les voix se disputer le cycle.</li>
       <li>Activez COOP : les deux se mettent à partager le budget.</li>
       <li>Branchez SALDO dans la coupure d'un FILTER : le son s'assombrit à mesure que le budget se dépense.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-INTERFERENCE">
+    <h3>INTERFERENCE</h3>
+    <h4>Ce que c’est</h4>
+    <p>INTERFERENCE est un écran éclairé par deux ou trois sources de lumière cohérente. Là où les ondes arrivent ensemble, la lumière s’ajoute et la frange est claire ; là où elles arrivent opposées, elle s’annule et la frange est sombre. Un point parcourt l’écran, et chaque frange claire donne une impulsion sur FRNG, chaque sombre sur DARK.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est l’expérience de Young, de 1801, la preuve que la lumière est une onde. Avec deux sources, les franges sont régulières, l’une après l’autre. Avec la troisième, les franges se groupent et s’effacent en cycles lents, le moiré, qui sort sur MOIRE. Lent, c’est du rythme ; avec SPEED haut, INT devient un son.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>SPEED</b> : combien de franges par seconde.</li>
+      <li><b>RATIO</b> : la différence de chemin de la troisième source.</li>
+      <li><b>THIRD</b> : la force de la troisième source.</li>
+      <li><b>THR</b> : le seuil des franges.</li>
+      <li><b>COHER</b> : la cohérence de la lumière, du laser à la lampe.</li>
+    </ul>
+    <p>Entrées : SPD bouge la vitesse en volts par octave, RATIO s’ajoute à RATIO, RST ramène au centre de l’écran. Sorties : INT est l’intensité, FRNG et DARK les impulsions des franges, MOIRE l’enveloppe lente.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez FRNG sur un DRUM avec THIRD à 0 : une impulsion régulière. Montez THIRD : les impulsions se groupent et disparaissent par cycles.</li>
+      <li>Branchez MOIRE sur le niveau d’un VCA : le son respire avec le moiré.</li>
+      <li>Baissez COHER : le motif net devient brume et le rythme se défait.</li>
+      <li>Mettez SPEED à 220 et branchez INT dans le MIXER : les franges deviennent timbre.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SWARM">
+    <h3>SWARM</h3>
+    <h4>Ce que c’est</h4>
+    <p>SWARM est un banc de six poissons, et chaque poisson est une horloge avec son propre tempo. Ils s’écoutent et se tirent les uns les autres. Quatre d’entre eux sortent sur G1 à G4, et la pulsation du banc entier sur ALL.</p>
+    <h4>Comment l’aborder</h4>
+    <p>C’est le modèle de Kuramoto, celui des grenouilles qui se synchronisent dans le chœur de phases de l’Aquorbium et des lucioles qui clignotent ensemble. Un seul réglage, COHES, va du dispersé au soudé : à 0, chaque poisson joue dans son temps, comme une hétérophonie ; à 1, tous sur la même pulsation, comme une homorythmie ; entre les deux, le banc se forme et se défait. SYNC mesure à quel point ils sont ensemble.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>RATE</b> : le tempo moyen.</li>
+      <li><b>SPRD</b> : combien les tempos naturels diffèrent.</li>
+      <li><b>COHES</b> : la cohésion du banc.</li>
+      <li><b>GATE</b> : la durée de chaque gate.</li>
+    </ul>
+    <p>Entrées : SCAR est la frayeur qui disperse le banc, LEAD un meneur externe que tous suivent, COH s’ajoute à COHES. Sorties : G1 à G4 sont les pulsations de quatre poissons, ALL celle du banc, SYNC la cohésion mesurée.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez G1 à G4 sur quatre DRUM avec COHES à 0 : quatre tempos dispersés. Montez COHES lentement et écoutez le banc se former.</li>
+      <li>Branchez un déclencheur rare sur SCAR : le banc se disperse et se regroupe.</li>
+      <li>Branchez un CLOCK sur LEAD : le banc se met à suivre le meneur.</li>
+      <li>Branchez SYNC sur le niveau d’un VCA : le son grandit quand le banc se resserre.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-ECLIPSE">
+    <h3>ECLIPSE</h3>
+    <h4>Ce que c’est</h4>
+    <p>ECLIPSE est la Lune avec ses deux mois. L’un est celui des phases, de nouvelle lune à nouvelle lune. L’autre est le retour aux nœuds, les deux points où l’orbite de la Lune croise le plan de la Terre. Il n’y a éclipse que quand les deux coïncident, et chaque éclipse donne un gate sur SUN ou sur MOON.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Les deux mois s’emboîtent presque, mais pas tout à fait. C’est pourquoi les éclipses viennent par saisons, à peu près tous les six mois, et la séquence entière ne revient qu’après 223 mois : le Saros, déjà connu des Babyloniens. C’est un polyrythme astronomique, rare et prévisible. Les nombres sont ceux du ciel de l’Asterismus. SYN et DRAC changent les mois et donnent d’autres ciels.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>SPEED</b> : combien de jours par seconde.</li>
+      <li><b>LIMIT</b> : la limite d’éclipse.</li>
+      <li><b>GATE</b> : la durée du gate.</li>
+      <li><b>SYN</b> : le mois des phases.</li>
+      <li><b>DRAC</b> : le mois des nœuds.</li>
+    </ul>
+    <p>Entrées : CLK fait de chaque impulsion un jour, RST revient au jour 0. Sorties : SUN et MOON sont les éclipses, NEW chaque nouvelle lune, NODE chaque passage par un nœud, ALIGN l’arrivée de la saison, PHASE la phase de la Lune.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez NEW sur un DRUM et SUN sur un accord : la pulsation du mois, et de temps en temps un événement rare.</li>
+      <li>Branchez ALIGN sur le niveau d’une voix : elle grandit à l’approche de la saison des éclipses.</li>
+      <li>Branchez PHASE sur la coupure d’un FILTER : un LFO d’un mois.</li>
+      <li>Rapprochez DRAC de SYN : les éclipses deviennent fréquentes ; éloignez-le : elles deviennent rarissimes.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SEASON">
+    <h3>SEASON</h3>
+    <h4>Ce que c’est</h4>
+    <p>SEASON est une horloge très lente : un jour avec lever et coucher du Soleil, une année à quatre saisons. La hauteur du Soleil sort sur SUN, le jour sur LIGHT, et le mode et le tempo de chaque saison sur SCL et TEMPO.</p>
+    <h4>Comment l’aborder</h4>
+    <p>La hauteur du Soleil vient de la vraie astronomie : elle dépend de l’heure, de l’époque de l’année et de la latitude du lieu. À l’équateur, le jour dure 12 h toute l’année. Loin de lui, les jours d’été sont longs et ceux d’hiver courts. Au-delà du cercle polaire, il y a le soleil de minuit et la nuit polaire. C’est l’horloge de l’Aquorbium, où jour, nuit et saison choisissent le mode et le tempo, et elle donne une forme longue au patch.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>DAY</b> : la durée d’un jour.</li>
+      <li><b>YEAR</b> : combien de jours compte l’année.</li>
+      <li><b>LAT</b> : la latitude du lieu.</li>
+      <li><b>HEMI</b> : l’hémisphère ; au sud, les saisons s’inversent.</li>
+    </ul>
+    <p>Entrées : RST revient à l’aube de l’équinoxe, SPD accélère le temps en volts par octave. Sorties : SUN est la hauteur du Soleil, LIGHT le gate du jour, DAWN et DUSK le lever et le coucher, YEAR la phase de l’année, SCL le mode de la saison, TEMPO le tempo.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez SCL sur le SCL d’un QUANTIZER : la mélodie change de mode à chaque saison.</li>
+      <li>Branchez SUN sur la coupure d’un FILTER : le timbre s’éclaircit le jour et s’assombrit la nuit.</li>
+      <li>Branchez DAWN sur un déclencheur qui réveille une voix et DUSK sur un qui la fait taire.</li>
+      <li>Mettez LAT à 70 : écoutez l’été sans nuit et l’hiver sans jour.</li>
     </ol>
   </article>
 </section>
@@ -1971,7 +2226,7 @@
   </article>
 </section>
 <section class="section" id="fam-SPACE">
-  <h2>SPACE <small>11 modules</small></h2>
+  <h2>SPACE <small>12 modules</small></h2>
   <article class="modulo" id="mod-SPACE">
     <h3>SPACE</h3>
     <figure class="painel"><img src="assets/modulos/SPACE.webp" alt="Panneau du module SPACE" width="142" height="300" loading="lazy" /></figure>
@@ -2248,6 +2503,28 @@
       <li>Mettez CHANCE à 0,15 : de temps en temps, le patch se découpe pile dans le temps.</li>
       <li>Branchez la sortie euclidienne du CLOCK dans STUT : le bégaiement tombe sur les temps du rythme.</li>
       <li>Branchez l'EOS d'un SEQUENCE dans GAP : chaque phrase finit sur un silence coupé.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-LENS">
+    <h3>LENS</h3>
+    <h4>Ce que c’est</h4>
+    <p>LENS est un objectif photo pour le son. Le spectre est divisé en huit bandes. La bande sur FOCUS reste nette ; les autres sortent de la mise au point : leur attaque s’étale dans le temps, comme une image floue.</p>
+    <h4>Comment l’aborder</h4>
+    <p>Pensez à la photo de portrait : le visage net et le fond flou. DEPTH est la profondeur de champ, l’ouverture du diaphragme : petite, seule la bande de la mise au point reste nette ; grande, presque tout l’est. BLUR dit combien la partie floue se brouille. Avec BLUR à 0, l’objectif ne change rien. Ce qui sort de la mise au point s’ouvre aussi dans la stéréo, comme le bokeh au fond de la photo.</p>
+    <h4>Commandes</h4>
+    <ul class="controles">
+      <li><b>FOCUS</b> : la fréquence mise au point.</li>
+      <li><b>BLUR</b> : combien la partie floue se brouille.</li>
+      <li><b>DEPTH</b> : la profondeur de champ.</li>
+      <li><b>MIX</b> : combien du flou entre.</li>
+    </ul>
+    <p>Entrées : IN est le son, FOC bouge la mise au point en volts par octave, BLUR s’ajoute à BLUR. Sorties : L et R, avec la partie floue ouverte dans la stéréo.</p>
+    <h4>À essayer</h4>
+    <ol class="passos">
+      <li>Branchez un DRUM sur IN, FOCUS à 2000 et DEPTH petit : le claquement reste net et le corps se brouille.</li>
+      <li>Mettez FOCUS dans le grave : maintenant le corps est net et la brillance devient brume.</li>
+      <li>Branchez un LFO lent sur FOC : l’objectif cherche la mise au point, comme un appareil photo.</li>
+      <li>Mettez une voix sur IN et montez DEPTH lentement : le flou recule jusqu’à disparaître.</li>
     </ol>
   </article>
 </section>

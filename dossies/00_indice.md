@@ -119,6 +119,18 @@ propriedade do cabo, não um módulo do catálogo.
 | 88 | [`88_supply.md`](88_supply.md) | `SUPPLY` (a alimentação variável com cabos: a carga faz o trilho ceder; derivas que desencontram as vozes; FALHA) | MODULATE | implementação local, 2026-11-11 |
 | 89 | [`89_magnet.md`](89_magnet.md) | `MAGNET` (grade de ímãs de Ising: temperatura, acoplamento, QUENCH) | MODULATE | implementação local, 2026-11-11 (rascunho de 9/11) |
 | 90 | [`90_orbit.md`](90_orbit.md) | `ORBIT` (planetas em gravidade, leapfrog; conjunção com tempo-luz, periélio) | MODULATE | implementação local, 2026-11-11 (rascunho de 9/11) |
+| 91 | [`91_pressure.md`](91_pressure.md) | `PRESSURE` (gás numa caixa) | MODULATE | implementação local, 2026-11-20 |
+| 92 | [`92_elastic.md`](92_elastic.md) | `ELASTIC` (massas e molas) | TRANSFORM | implementação local, 2026-11-20 |
+| 93 | [`93_refract.md`](93_refract.md) | `REFRACT` (um raio atravessando camadas) | MODULATE | implementação local, 2026-11-20 |
+| 94 | [`94_interference.md`](94_interference.md) | `INTERFERENCE` (franjas de interferência) | TIME | implementação local, 2026-11-20 |
+| 95 | [`95_lens.md`](95_lens.md) | `LENS` (foco e desfoque) | SPACE | implementação local, 2026-11-20 |
+| 96 | [`96_tape.md`](96_tape.md) | `TAPE` (a fita magnética) | TRANSFORM | implementação local, 2026-11-20 |
+| 97 | [`97_predator.md`](97_predator.md) | `PREDATOR` (predador e presa) | MODULATE | implementação local, 2026-11-20 |
+| 98 | [`98_swarm.md`](98_swarm.md) | `SWARM` (o cardume) | TIME | implementação local, 2026-11-20 |
+| 99 | [`99_eclipse.md`](99_eclipse.md) | `ECLIPSE` (dois ciclos que só às vezes se alinham) | TIME | implementação local, 2026-11-20 |
+| 100 | [`100_season.md`](100_season.md) | `SEASON` (dia, noite e estação) | TIME | implementação local, 2026-11-20 |
+| 101 | [`101_gendyn.md`](101_gendyn.md) | `GENDYN` (a síntese estocástica de Xenakis) | SOURCE | implementação local, 2026-11-20 |
+| 102 | [`102_rungler.md`](102_rungler.md) | `RUNGLER` (o coração do Benjolin) | SOURCE | implementação local, 2026-11-20 |
 | — | — | vocoder de 5 bandas = `mode` do `FORMANT` (#45), 2026-09-07 | — | **implementado** |
 
 Desde 17/10/2026, o catálogo tem 60 tipos instanciáveis: 58 do rack publicado

@@ -7,6 +7,45 @@ pronto.
 
 ---
 
+## Não publicado (desde a v0.1.11)
+
+**Resumo.** De 88 a 100 módulos, com 12 novos. O visor do KEY foi refeito, e
+os módulos novos da v0.1.8 ganharam papéis na seed. Os 12 novos entram no
+rack da seed, então **as seeds mudam**. Nada disto foi publicado: espera a
+escuta do autor.
+
+- **Doze módulos novos** (aprovados pelo autor em 9/11, "aprovo todos";
+  criados em 20/11, "crie todos os módulos novos pendentes"). Cada um tem DSP,
+  teste próprio, LEARN nos 4 idiomas, dossiê, guia e página no site:
+  - **PRESSURE** (#91, MODULATE): gás numa caixa. Os choques no pistão viram
+    gates, a pressão vira CV, e comprimir aquece o gás.
+  - **ELASTIC** (#92, TRANSFORM): massas e molas que o som faz vibrar.
+  - **REFRACT** (#93, MODULATE): um raio que atravessa quatro camadas (Snell),
+    com pulso na reflexão total.
+  - **INTERFERENCE** (#94, TIME): as franjas de Young, o moiré e a coerência
+    parcial.
+  - **LENS** (#95, SPACE): foco e desfoque do espectro, com profundidade de
+    campo. Com BLUR 0, é transparente.
+  - **TAPE** (#96, TRANSFORM): a fita magnética (saturação, cabeça, wow,
+    flutter, chiado). WEAR gasta a fita.
+  - **PREDATOR** (#97, MODULATE): Lotka–Volterra, do Aquorbium, com
+    capturas, fugas e um cânone que fecha em stretto.
+  - **SWARM** (#98, TIME): o cardume de Kuramoto, da heterofonia à
+    homorritmia.
+  - **ECLIPSE** (#99, TIME): os meses sinódico e dracônico do Asterismus. Dá
+    46 eclipses por Saros, e 98 % voltam.
+  - **SEASON** (#100, TIME): dia, noite e estação pela altura real do Sol,
+    com o modo e o andamento de cada estação.
+  - **GENDYN** (#101, SOURCE): a síntese estocástica de Xenakis, do Studio.
+  - **RUNGLER** (#102, SOURCE): o coração do Benjolin de Rob Hordijk.
+- **Seed: papéis dos módulos novos da v0.1.8** (decisão do autor, 11/11):
+  INTERPRET, RELATE, POLYGON, MAGNET, EPICYCLE, VIA e CUT-UP. Entram no
+  máximo dois por seed. A poda do processador sem entrada fica de fora, para
+  escuta separada.
+- **Visor do KEY** (decisão do autor, 11/11: "faça na próxima versão"):
+  - o nome do tom aparece grande, com a nota que soa agora ao lado ("Dm · A");
+  - a barra da nota atual ganha contorno, separada da tônica.
+
 ## v0.1.11 — 2026-11-17
 
 - **Fechar o app logo depois do REC não corta mais a versão de entrega**:

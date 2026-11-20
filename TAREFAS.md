@@ -1,6 +1,6 @@
 # RASGO Modular — tarefas e continuidade
 
-Atualizado: 2026-11-11.
+Atualizado: 2026-11-20.
 Estado publicado: consultar o README e os registros datados ao final deste arquivo.
 Os marcos iniciais abaixo são históricos, não o estado atual da publicação.
 
@@ -10,6 +10,30 @@ transversais e reutilização continuam no inventário global; um dossiê por
 módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
+
+## ▶ Ponto de retomada — 20/11/2026: 12 módulos novos, papéis da seed e visor do KEY
+
+- **Feito (local, sem push):**
+  - os papéis dos módulos novos na seed e o visor do KEY (commit `b6ee9b8`;
+    116/116 testes, régua de qualidade passando);
+  - os 12 módulos aprovados em 9/11: PRESSURE, ELASTIC, REFRACT,
+    INTERFERENCE, LENS, TAPE, PREDATOR, SWARM, ECLIPSE, SEASON, GENDYN e
+    RUNGLER (#91–#102). Cada um tem DSP, teste próprio, LEARN nos 4 idiomas,
+    dossiê, guia e página no site (`website/guia/<idioma>/`). Créditos em
+    `CREDITS_AND_SOURCES.md` e registro no CHANGELOG ("Não publicado").
+- **Falta:**
+  - a escuta do autor, um módulo por vez (as receitas do guia de cada um são
+    o roteiro);
+  - decidir os papéis dedicados na seed dos 12;
+  - os visores próprios, que passam pelo autor: hoje os 12 usam o traço
+    genérico, como MAGNET e ORBIT;
+  - a poda do processador sem entrada, para escuta separada.
+- **Fora desta leva:**
+  - as escalas do Trioio no QUANTIZER, aprovadas em 9/11. São aperfeiçoamento
+    de um módulo que já existe, não módulo novo: ficam para a próxima leva;
+  - WATER, BUBBLE, CLOUD e HABITAT (estudo da família, 10/11). Não estão
+    registradas como aprovadas: ficam como propostas a confirmar com o
+    autor.
 
 ## ▶ Ponto de retomada — 11/11/2026 (noite): preparação da v0.1.8
 

@@ -91,6 +91,18 @@
 #include "dsp/Supply.hpp"
 #include "dsp/Magnet.hpp"
 #include "dsp/Orbit.hpp"
+#include "dsp/Pressure.hpp"
+#include "dsp/Elastic.hpp"
+#include "dsp/Refract.hpp"
+#include "dsp/Interference.hpp"
+#include "dsp/Lens.hpp"
+#include "dsp/Tape.hpp"
+#include "dsp/Predator.hpp"
+#include "dsp/Swarm.hpp"
+#include "dsp/Eclipse.hpp"
+#include "dsp/Season.hpp"
+#include "dsp/Gendyn.hpp"
+#include "dsp/Rungler.hpp"
 #include "dsp/Mousse.hpp"
 #include "dsp/Pendulum.hpp"
 #include "dsp/Prism.hpp"
@@ -149,6 +161,18 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "SUPPLY")     return std::make_unique<Supply>();
     if (t == "MAGNET")     return std::make_unique<Magnet>();
     if (t == "ORBIT")      return std::make_unique<Orbit>();
+    if (t == "PRESSURE")    return std::make_unique<Pressure>();
+    if (t == "ELASTIC")     return std::make_unique<Elastic>();
+    if (t == "REFRACT")     return std::make_unique<Refract>();
+    if (t == "INTERFERENCE")  return std::make_unique<Interference>();
+    if (t == "LENS")        return std::make_unique<Lens>();
+    if (t == "TAPE")        return std::make_unique<Tape>();
+    if (t == "PREDATOR")    return std::make_unique<Predator>();
+    if (t == "SWARM")       return std::make_unique<Swarm>();
+    if (t == "ECLIPSE")     return std::make_unique<Eclipse>();
+    if (t == "SEASON")      return std::make_unique<Season>();
+    if (t == "GENDYN")      return std::make_unique<Gendyn>();
+    if (t == "RUNGLER")     return std::make_unique<Rungler>();
     if (t == "BOUNCE")     return std::make_unique<Bounce>();
     if (t == "SPRING")     return std::make_unique<Spring>();
     if (t == "MOUSSE")     return std::make_unique<Mousse>();
@@ -243,13 +267,13 @@ inline void sortFamilyForDisplay(std::vector<const char*>& types) {
 // anteriores passam a gerar outros patches, o que fica no CHANGELOG.
 inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
-        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN"}},
-        {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT"}},
-        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET"}},
+        {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN", "GENDYN", "RUNGLER"}},
+        {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS", "ELASTIC", "TAPE"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT", "PRESSURE", "REFRACT", "PREDATOR"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET", "INTERFERENCE", "SWARM", "ECLIPSE", "SEASON"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "INTERPRET", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE"}},
-        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO", "CUTUP"}},
+        {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO", "CUTUP", "LENS"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},
     };
     return c;

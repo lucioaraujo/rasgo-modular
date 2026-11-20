@@ -74,6 +74,40 @@ Cardinal; implementação própria sob AGPL-3.0-or-later.
 Contratos em [65](dossies/65_cell.md), [66](dossies/66_markov.md),
 [67](dossies/67_bounce.md) e [68](dossies/68_spring.md).
 
+## Módulos 91–102 — física, óptica, fita e a família (20/11/2026)
+
+Aprovados pelo autor em 9/11/2026 ("aprovo todos") e criados em 20/11/2026.
+Implementação sob AGPL-3.0-or-later; nenhum código de terceiros.
+
+- **PRESSURE** — teoria cinética dos gases (Maxwell, Boltzmann); conceito lido
+  no Sapphire Nucleus (GPL-3.0-or-later), sem cópia de código.
+- **ELASTIC** — corda discreta de massas e molas; conceito lido no Sapphire
+  Elastika (GPL-3.0-or-later), sem cópia de código.
+- **REFRACT**, **INTERFERENCE**, **LENS** — óptica pública (Ibn Sahl, Snell,
+  Descartes; Young, 1801; profundidade de campo), sem equivalente no Cardinal.
+  O LENS usa o SVF de V. Zavalishin e os passa-tudo de M. R. Schroeder (1962).
+- **TAPE** — a saturação vem do `TapeSaturator.hpp` do Rasgo Synth Studio
+  (mesmo autor, AGPL), adaptada; o ChowTape (GPL-3.0) foi lido como conceito,
+  sem cópia de código.
+- **PREDATOR** — Lotka (1925) e Volterra (1926); a integração em logaritmos e
+  a captura vêm do `PopulationCycles` do **Aquorbium** (mesmo autor, AGPL),
+  copiadas e adaptadas.
+- **SWARM** — Kuramoto (1975); o coro de fases do Aquorbium (`ChorusPhase`,
+  mesmo autor) e o cardume de T. Blackwell e P. Bentley (2002).
+- **ECLIPSE** — os meses sinódico e dracônico, o limite de eclipse e o Saros:
+  dados astronômicos públicos, com os valores e a validação do céu do **Rasgo
+  Synth Asterismus** (mesmo autor); nenhum código copiado.
+- **SEASON** — a fórmula pública da altura do Sol; a ideia do relógio de dia,
+  noite e estação vem do Aquorbium (mesmo autor).
+- **GENDYN** — síntese estocástica dinâmica de I. Xenakis (*Formalized Music*;
+  GENDY3, 1991); copiado e adaptado do `GendynOscillator.hpp` do Rasgo Synth
+  Studio (mesmo autor, AGPL).
+- **RUNGLER** — o Rungler de Rob Hordijk (Benjolin, Blippoo Box), pelos textos
+  públicos dele; o Rasgo Synth Studio tem uma versão (mesmo autor) que serviu
+  de ponto de partida. Nenhum código de clone.
+
+Contratos em `dossies/91_pressure.md` a `dossies/102_rungler.md`.
+
 ## Código de terceiros incorporado
 
 Só três, e nenhum no núcleo de DSP:

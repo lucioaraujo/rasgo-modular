@@ -666,6 +666,66 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_orbit_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_orbit_tests COMMAND rasgo_modular_orbit_tests)
 
+    add_executable(rasgo_modular_pressure_tests tests/test_pressure.cpp)
+    target_include_directories(rasgo_modular_pressure_tests PRIVATE src)
+    target_compile_options(rasgo_modular_pressure_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_pressure_tests COMMAND rasgo_modular_pressure_tests)
+
+    add_executable(rasgo_modular_elastic_tests tests/test_elastic.cpp)
+    target_include_directories(rasgo_modular_elastic_tests PRIVATE src)
+    target_compile_options(rasgo_modular_elastic_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_elastic_tests COMMAND rasgo_modular_elastic_tests)
+
+    add_executable(rasgo_modular_refract_tests tests/test_refract.cpp)
+    target_include_directories(rasgo_modular_refract_tests PRIVATE src)
+    target_compile_options(rasgo_modular_refract_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_refract_tests COMMAND rasgo_modular_refract_tests)
+
+    add_executable(rasgo_modular_interference_tests tests/test_interference.cpp)
+    target_include_directories(rasgo_modular_interference_tests PRIVATE src)
+    target_compile_options(rasgo_modular_interference_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_interference_tests COMMAND rasgo_modular_interference_tests)
+
+    add_executable(rasgo_modular_lens_tests tests/test_lens.cpp)
+    target_include_directories(rasgo_modular_lens_tests PRIVATE src)
+    target_compile_options(rasgo_modular_lens_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_lens_tests COMMAND rasgo_modular_lens_tests)
+
+    add_executable(rasgo_modular_tape_tests tests/test_tape.cpp)
+    target_include_directories(rasgo_modular_tape_tests PRIVATE src)
+    target_compile_options(rasgo_modular_tape_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_tape_tests COMMAND rasgo_modular_tape_tests)
+
+    add_executable(rasgo_modular_predator_tests tests/test_predator.cpp)
+    target_include_directories(rasgo_modular_predator_tests PRIVATE src)
+    target_compile_options(rasgo_modular_predator_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_predator_tests COMMAND rasgo_modular_predator_tests)
+
+    add_executable(rasgo_modular_swarm_tests tests/test_swarm.cpp)
+    target_include_directories(rasgo_modular_swarm_tests PRIVATE src)
+    target_compile_options(rasgo_modular_swarm_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_swarm_tests COMMAND rasgo_modular_swarm_tests)
+
+    add_executable(rasgo_modular_eclipse_tests tests/test_eclipse.cpp)
+    target_include_directories(rasgo_modular_eclipse_tests PRIVATE src)
+    target_compile_options(rasgo_modular_eclipse_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_eclipse_tests COMMAND rasgo_modular_eclipse_tests)
+
+    add_executable(rasgo_modular_season_tests tests/test_season.cpp)
+    target_include_directories(rasgo_modular_season_tests PRIVATE src)
+    target_compile_options(rasgo_modular_season_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_season_tests COMMAND rasgo_modular_season_tests)
+
+    add_executable(rasgo_modular_gendyn_tests tests/test_gendyn.cpp)
+    target_include_directories(rasgo_modular_gendyn_tests PRIVATE src)
+    target_compile_options(rasgo_modular_gendyn_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_gendyn_tests COMMAND rasgo_modular_gendyn_tests)
+
+    add_executable(rasgo_modular_rungler_tests tests/test_rungler.cpp)
+    target_include_directories(rasgo_modular_rungler_tests PRIVATE src)
+    target_compile_options(rasgo_modular_rungler_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_rungler_tests COMMAND rasgo_modular_rungler_tests)
+
     add_executable(rasgo_modular_coherence_tests tests/test_coherence.cpp)
     target_include_directories(rasgo_modular_coherence_tests PRIVATE src)
     target_compile_options(rasgo_modular_coherence_tests PRIVATE ${rasgo_modular_warnings})

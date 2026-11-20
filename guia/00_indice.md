@@ -204,6 +204,18 @@ Estado: **✓** pronto · **·** a fazer.
 | 88 | `SUPPLY` | [`88_supply.md`](88_supply.md) | local, após 0.1.7 |
 | 89 | `MAGNET` | [`89_magnet.md`](89_magnet.md) | local, após 0.1.7 |
 | 90 | `ORBIT` | [`90_orbit.md`](90_orbit.md) | local, após 0.1.7 |
+| 91 | `PRESSURE` | [`91_pressure.md`](91_pressure.md) | local, após 0.1.11 |
+| 92 | `ELASTIC` | [`92_elastic.md`](92_elastic.md) | local, após 0.1.11 |
+| 93 | `REFRACT` | [`93_refract.md`](93_refract.md) | local, após 0.1.11 |
+| 94 | `INTERFERENCE` | [`94_interference.md`](94_interference.md) | local, após 0.1.11 |
+| 95 | `LENS` | [`95_lens.md`](95_lens.md) | local, após 0.1.11 |
+| 96 | `TAPE` | [`96_tape.md`](96_tape.md) | local, após 0.1.11 |
+| 97 | `PREDATOR` | [`97_predator.md`](97_predator.md) | local, após 0.1.11 |
+| 98 | `SWARM` | [`98_swarm.md`](98_swarm.md) | local, após 0.1.11 |
+| 99 | `ECLIPSE` | [`99_eclipse.md`](99_eclipse.md) | local, após 0.1.11 |
+| 100 | `SEASON` | [`100_season.md`](100_season.md) | local, após 0.1.11 |
+| 101 | `GENDYN` | [`101_gendyn.md`](101_gendyn.md) | local, após 0.1.11 |
+| 102 | `RUNGLER` | [`102_rungler.md`](102_rungler.md) | local, após 0.1.11 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |
