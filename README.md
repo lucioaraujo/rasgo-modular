@@ -46,7 +46,9 @@ number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Version:** v0.1.11 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
-and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); the DSP modules
+(`src/dsp/`, `src/core/`) are also offered under GPL-3.0-or-later, for VCV Rack
+and Cardinal (see [`LICENSING.md`](LICENSING.md))
 
 ### What it is
 
@@ -143,7 +145,9 @@ número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Versão:** v0.1.11 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
-e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); os módulos de DSP
+(`src/dsp/`, `src/core/`) também são oferecidos sob GPL-3.0-or-later, para o VCV
+Rack e o Cardinal (ver [`LICENSING.md`](LICENSING.md))
 
 ### O que é
 
@@ -241,7 +245,9 @@ son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Version :** v0.1.11 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
-et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)) ; les modules DSP
+(`src/dsp/`, `src/core/`) sont aussi proposés sous GPL-3.0-or-later, pour VCV
+Rack et Cardinal (voir [`LICENSING.md`](LICENSING.md))
 
 ### Ce que c'est
 
@@ -343,7 +349,9 @@ número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
 **Versión:** v0.1.11 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
-y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md))
+y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); los módulos de DSP
+(`src/dsp/`, `src/core/`) también se ofrecen bajo GPL-3.0-or-later, para VCV
+Rack y Cardinal (ver [`LICENSING.md`](LICENSING.md))
 
 ### Qué es
 

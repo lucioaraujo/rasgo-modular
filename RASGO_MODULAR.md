@@ -790,6 +790,15 @@ version:
 
 ## 29. Proveniência e licença
 
+> **20/11/2026 — licença dupla dos módulos.** Decisão do autor ("sim, pode
+> oferecer módulos também sob gpl3+, desde que isso não gere problema"):
+> `src/dsp/` e `src/core/` são AGPL-3.0-or-later **ou** GPL-3.0-or-later, à
+> escolha de quem recebe; o resto do instrumento segue AGPL-3.0-or-later.
+> Conferido antes: autoria (todo o código é do autor; os trechos do Navalha 2
+> de Glerm Soares já são GPL-3.0-or-later), nenhuma dependência de JUCE ou de
+> `src/io`/`src/saida` nos módulos, leituras de outros projetos sem código.
+> Detalhe e consequências em [`LICENSING.md`](LICENSING.md).
+
 **Licença do projeto (decisão do autor, 2026-09-01):** **GNU AGPLv3 ou
 posterior** — "a mesma que temos usado", isto é, a licença habitual da
 família RASGO (MARAVI, ANTITOTEM, AQUORBIUM). Arquivo `LICENSE` na raiz
