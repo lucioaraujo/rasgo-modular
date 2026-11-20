@@ -1174,17 +1174,36 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         if (hasT("ADDITIVE") && spine[firstT("ADDITIVE")]) addNode = firstT("ADDITIVE");
         const bool canTear = addNode < N;
 
-        bool roles[5] = {canCite && u(0) < 0.15f, canOrder && u(1) < 0.15f,
+        // 6º papel (11/11/2026, "pode desenvolver os seeds incluindo os novos
+        // módulos"): RECORTE, o CUT-UP no barramento — alternativa à CITAÇÃO
+        // (as duas não se somam no mesmo barramento)
+        const bool canCut = hasT("CUTUP") && hasT("MIXER") && hasT("MASTER") && hasT("CLOCK");
+        bool roles[6] = {canCite && u(0) < 0.15f, canOrder && u(1) < 0.15f,
                          canModulate && u(2) < 0.15f, canTrust && u(3) < 0.10f,
-                         canTear && u(4) < 0.10f};
-        if (!roles[0] && !roles[1] && !roles[2] && !roles[3] && !roles[4]) {
-            const bool can[5] = {canCite, canOrder, canModulate, canTrust, canTear};
+                         canTear && u(4) < 0.10f, canCut && u(24) < 0.10f};
+        if (roles[0]) roles[5] = false;
+        if (!roles[0] && !roles[1] && !roles[2] && !roles[3] && !roles[4] && !roles[5]) {
+            const bool can[6] = {canCite, canOrder, canModulate, canTrust, canTear, canCut};
             int nCan = 0;
             for (const bool c : can) nCan += c ? 1 : 0;
             if (nCan > 0) {
                 int k = static_cast<int>(u(5) * static_cast<float>(nCan)) % nCan;
-                for (int r = 0; r < 5; ++r)
+                for (int r = 0; r < 6; ++r)
                     if (can[r] && k-- == 0) { roles[r] = true; break; }
+            }
+        }
+        if (roles[5]) {   // RECORTE: o CUT-UP no barramento, no relógio da seed
+            const std::size_t cu = firstT("CUTUP"), ms = firstT("MASTER");
+            freeIn(ms, "in");
+            setP(cu, "chance", 0.08f + 0.17f * u(25));
+            setP(cu, "micro_n", 2.0f + std::floor(5.0f * u(26)));
+            setP(cu, "mix", 0.85f);
+            setP(cu, "seed", std::floor(999.0f * u(27)));
+            if (connectIds(firstT("MIXER"), "out", cu, "in") && connectIds(cu, "out", ms, "in")) {
+                connectIds(firstT("CLOCK"), "clock", cu, "clock");
+                spine[cu] = 1;
+            } else {
+                connectIds(firstT("MIXER"), "out", ms, "in");   // nunca sem som
             }
         }
         if (roles[0]) {   // CITAÇÃO: o APÓCRIFO no barramento
@@ -1258,6 +1277,164 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             setT("QUANTIZER", "tuning", 0.0f);
         setT("CLOCK", "drift", 0.5f * hb);
         setT("CLOCK", "swing", 0.35f * hb);
+    }
+
+    // ================ PAPÉIS DOS MÓDULOS NOVOS (11/11/2026) ===========
+    // Pedido do autor: "pode desenvolver os seeds incluindo os novos módulos".
+    // No máximo DOIS papéis por seed (nada de densidade só por densidade),
+    // sorteados numa ordem semeada; cada um só onde cabe; correntes próprias
+    // (60…). TAP, FRONTEIRA e KEY ficam de fora: escutam quem toca ao vivo, e
+    // a seed não liga o microfone.
+    {
+        auto v = [&](int k) { return seedUnit(seedS, static_cast<std::uint64_t>(60 + k)); };
+        auto freeIn2 = [&](std::size_t n, const char* nm) {
+            const int pi = pIn(n, nm);
+            if (pi < 0) return;
+            for (std::size_t i = g.cableCount(); i-- > 0;)
+                if (g.cable(i).target().node == n
+                    && g.cable(i).target().port == static_cast<std::size_t>(pi)) {
+                    g.disconnect(n, static_cast<std::size_t>(pi));
+                    break;
+                }
+            inUsed[n][static_cast<std::size_t>(pi)] = 0;
+        };
+        // a fonte que hoje entra numa porta (nó, porta de saída), ou N
+        auto sourceOf = [&](std::size_t n, const char* nm, std::size_t& sp) -> std::size_t {
+            const int pi = pIn(n, nm);
+            if (pi < 0) return N;
+            for (std::size_t i = 0; i < g.cableCount(); ++i)
+                if (g.cable(i).target().node == n
+                    && g.cable(i).target().port == static_cast<std::size_t>(pi)) {
+                    sp = g.cable(i).source().port;
+                    return g.cable(i).source().node;
+                }
+            return N;
+        };
+        const bool hasContra = cvGenNode < N;
+        const bool oscVoice = std::string(vc.mod) == "OSC" && voiceHz > 0.0f;
+        const std::size_t fltNode = ladderNode < N ? ladderNode
+            : (hasT("FILTER") && spine[firstT("FILTER")] ? firstT("FILTER") : N);
+        auto freeFor = [&](const char* t) { return hasT(t) && !spine[firstT(t)]; };
+        // 0 INTÉRPRETE · 1 RELAÇÃO · 2 POLÍMETRO · 3 ÍMÃS · 4 EPICICLO · 5 CORPO
+        const bool can[6] = {
+            oscVoice && freeFor("INTERPRET") && hasT("QUANTIZER"),
+            hasContra && freeFor("RELATE") && hasT("MIXER"),
+            hasContra && freeFor("POLYGON"),
+            hasContra && freeFor("MAGNET"),
+            fltNode < N && freeFor("EPICYCLE") && pIn(fltNode, "cutoff_mod") >= 0
+                && !inUsed[fltNode][static_cast<std::size_t>(pIn(fltNode, "cutoff_mod"))],
+            hasContra && freeFor("VIA") && hasT("MIXER")};
+        const float chance[6] = {0.25f, 0.15f, 0.15f, 0.10f, 0.15f, 0.10f};
+        // ordem semeada (Fisher–Yates pela corrente 60)
+        int order[6] = {0, 1, 2, 3, 4, 5};
+        for (int i = 5; i > 0; --i) {
+            const int j = static_cast<int>(v(i) * static_cast<float>(i + 1)) % (i + 1);
+            std::swap(order[i], order[j]);
+        }
+        bool clockTaken = false, ch2Taken = false;
+        int picked = 0;
+        for (const int r : order) {
+            if (picked >= 2 || !can[r] || v(10 + r) >= chance[r]) continue;
+            if ((r == 2 || r == 3) && clockTaken) continue;   // um relógio só
+            if ((r == 1 || r == 5) && ch2Taken) continue;     // um caminho do ch2
+            bool done = false;
+            if (r == 0) {   // INTÉRPRETE: a linha da voz passa a ser tocada
+                const std::size_t in = firstT("INTERPRET"), q = firstT("QUANTIZER");
+                setP(in, "expression", 0.5f + 0.3f * v(20));
+                setP(in, "glide", 0.02f + 0.06f * v(21));
+                setP(in, "vibrato", 0.2f + 0.3f * v(22));
+                setP(in, "drift", 0.3f);
+                if (connectIds(q, "pitch", in, "pitch") && connectIds(firstT("CLOCK"), "euclid", in, "gate")) {
+                    // todo OSC que tocava a altura crua do QUANTIZER passa a tocar a interpretada
+                    for (std::size_t n = 0; n < N; ++n) {
+                        if (typ(n) != "OSC") continue;
+                        std::size_t sp = 0;
+                        if (sourceOf(n, "pitch", sp) == q) {
+                            freeIn2(n, "pitch");
+                            connectIds(in, "pitch", n, "pitch");
+                        }
+                    }
+                    spine[in] = 1;
+                    done = true;
+                }
+            } else if (r == 1 || r == 5) {   // RELAÇÃO / CORPO: o caminho do ch2
+                const std::size_t mx = firstT("MIXER");
+                std::size_t sp2 = 0, sp1 = 0;
+                const std::size_t s2 = sourceOf(mx, "ch2", sp2), s1 = sourceOf(mx, "ch1", sp1);
+                if (s2 < N && (r == 5 || s1 < N)) {
+                    if (r == 1) {
+                        const std::size_t re = firstT("RELATE");
+                        static constexpr float kVerbs[3] = {0.0f, 1.0f, 2.0f};   // SOMBRA, HOQUETO, CONTÁGIO
+                        setP(re, "verb", kVerbs[static_cast<int>(v(23) * 3.0f) % 3]);
+                        setP(re, "intensity", 0.5f + 0.3f * v(24));
+                        setP(re, "time", 0.1f + 0.3f * v(25));
+                        freeIn2(mx, "ch1"); freeIn2(mx, "ch2");
+                        const int ia = pIn(re, "a"), ib = pIn(re, "b");
+                        const bool ok = connect({s1, sp1}, {re, static_cast<std::size_t>(ia)})
+                                     && connect({s2, sp2}, {re, static_cast<std::size_t>(ib)})
+                                     && connectIds(re, "out_a", mx, "ch1")
+                                     && connectIds(re, "out_b", mx, "ch2");
+                        if (ok) { spine[re] = 1; done = true; }
+                        else {   // como era
+                            connect({s1, sp1}, {mx, static_cast<std::size_t>(pIn(mx, "ch1"))});
+                            connect({s2, sp2}, {mx, static_cast<std::size_t>(pIn(mx, "ch2"))});
+                        }
+                    } else {
+                        const std::size_t vi = firstT("VIA");
+                        for (const char* gp : {"diode", "capacitor", "pulse", "transistor", "reflux"})
+                            setP(vi, gp, 0.0f);
+                        setP(vi, "res", 1.0f);
+                        setP(vi, "speaker", 1.0f);
+                        setP(vi, "body", 60.0f + 160.0f * v(26));
+                        setP(vi, "level", 0.9f);
+                        freeIn2(mx, "ch2");
+                        const int ii = pIn(vi, "in");
+                        if (connect({s2, sp2}, {vi, static_cast<std::size_t>(ii)}) && connectIds(vi, "out", mx, "ch2")) {
+                            spine[vi] = 1; done = true;
+                        } else {
+                            connect({s2, sp2}, {mx, static_cast<std::size_t>(pIn(mx, "ch2"))});
+                        }
+                    }
+                    if (done) ch2Taken = true;
+                }
+            } else if (r == 2 || r == 3) {   // POLÍMETRO / ÍMÃS: o relógio da contravoz
+                const std::size_t gn = cvGenNode;
+                freeIn2(gn, "clock");
+                if (r == 2) {
+                    const std::size_t po = firstT("POLYGON");
+                    static constexpr float kN[3] = {3.0f, 5.0f, 7.0f};
+                    setP(po, "n1", kN[static_cast<int>(v(27) * 3.0f) % 3]);
+                    for (const char* z : {"n2", "n3", "n4"}) setP(po, z, 0.0f);
+                    setP(po, "steps", 8.0f);
+                    done = connectIds(firstT("CLOCK"), "clock", po, "clock") && connectIds(po, "g1", gn, "clock");
+                    if (done) spine[po] = 1;
+                } else {
+                    const std::size_t mg = firstT("MAGNET");
+                    const float clockHz = id.bpm / 60.0f * static_cast<float>(id.mult);
+                    setP(mg, "temp", 2.0f + 0.6f * v(28));
+                    setP(mg, "coupling", 1.0f);
+                    setP(mg, "sweep", 0.4f);
+                    setP(mg, "rate", std::clamp(clockHz * 0.5f, 0.5f, 6.0f));
+                    setP(mg, "gate_len", 0.4f);
+                    done = connectIds(mg, "gate", gn, "clock");
+                    if (done) spine[mg] = 1;
+                }
+                if (!done && hasT("LOGIC") && spine[firstT("LOGIC")])
+                    connectIds(firstT("LOGIC"), "div", gn, "clock");   // como era
+                if (done) clockTaken = true;
+            } else if (r == 4) {   // EPICICLO: um gesto lento no corte do filtro da voz
+                const std::size_t ep = firstT("EPICYCLE");
+                setP(ep, "rate", 0.03f + 0.12f * v(29));
+                setP(ep, "circles", 2.0f + std::floor(3.0f * v(30)));
+                setP(ep, "mode", std::floor(4.0f * v(31)));
+                setP(ep, "detune", 0.3f + 0.7f * v(32));
+                if (connectIds(ep, "x", fltNode, "cutoff_mod")) {
+                    g.cable(g.cableCount() - 1).setGain(0.5f);
+                    spine[ep] = 1; done = true;
+                }
+            }
+            if (done) ++picked;
+        }
     }
 
     // ================ poda: nenhum cabo sem função sonora =========

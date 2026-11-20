@@ -70,6 +70,7 @@ public:
     bool minor() const noexcept { return minor_; }
     float certainty() const noexcept { return certainty_; }
     std::array<float, 12> histogram() const noexcept { return hist_; }
+    int currentNote() const noexcept { return curPc_; }   // a classe que soa agora; −1 = nenhuma
 
     static int pitchClass(float v) noexcept {
         const int semis = static_cast<int>(std::lround(v * 12.0f));

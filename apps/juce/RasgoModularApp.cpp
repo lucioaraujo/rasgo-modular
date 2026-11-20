@@ -4174,34 +4174,63 @@ private:
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel.clear();
             } else if (mtype == "KEY") {
-                // O histograma das 12 classes (ponderado por duração), a
-                // tônica em destaque e a certeza numa barra embaixo; o nome
-                // do tom (letra; "m" = menor) no rótulo do visor.
+                // O NOME DO TOM grande no alto, com a nota que soa agora ao
+                // lado ("Dm · A"; autor, 11/11/2026: "ok, faça na próxima
+                // versão" — antes o nome ia em 9 px cinza por cima das barras
+                // e só a cor da tônica se lia). Embaixo, o histograma das 12
+                // classes (ponderado por duração): a tônica cheia em
+                // destaque, a nota atual com contorno, separada dela; a
+                // certeza numa barra fina no pé.
                 const auto* ky = dynamic_cast<const rasgo::modular::Key*>(&node);
                 if (ky) {
+                    static const char* kNames[12] = {"C", "C#", "D", "Eb", "E", "F",
+                                                     "F#", "G", "Ab", "A", "Bb", "B"};
                     const auto h = ky->histogram();
                     float mx = 1.0e-6f;
                     for (const float v : h) mx = std::max(mx, v);
+                    const int t = ky->tonic();
+                    const int now = ky->currentNote();
                     const float x0 = static_cast<float>(wx + 2), ww = static_cast<float>(dw - 4);
-                    const float top = static_cast<float>(wy + 2);
+                    const float textH = juce::jlimit(11.0f, 24.0f, static_cast<float>(dh) * 0.30f);
+                    // o nome do tom e a nota atual
+                    const juce::String tom = t >= 0 ? juce::String(kNames[t]) + (ky->minor() ? "m" : "")
+                                                    : juce::String(juce::CharPointer_UTF8("\xe2\x80\x94"));
+                    const juce::Font fTom(juce::FontOptions(textH, juce::Font::bold));
+                    const juce::Font fNota(juce::FontOptions(textH * 0.8f));
+                    const int ty = wy + 2;
+                    const int tomW = static_cast<int>(std::ceil(juce::GlyphArrangement::getStringWidth(fTom, tom)));
+                    g.setFont(fTom);
+                    g.setColour(t >= 0 ? T.accent : T.textSecondary);
+                    g.drawText(tom, wx + 4, ty, std::min(tomW + 2, dw - 6), static_cast<int>(textH) + 2,
+                               juce::Justification::centredLeft, false);
+                    if (now >= 0) {
+                        g.setFont(fNota);
+                        g.setColour(T.textPrimary);
+                        g.drawText(juce::String(juce::CharPointer_UTF8("\xc2\xb7 ")) + kNames[now],
+                                   wx + 4 + tomW + 6, ty, std::max(0, dw - tomW - 14),
+                                   static_cast<int>(textH) + 2, juce::Justification::centredLeft, true);
+                    }
+                    // o histograma
+                    const float top = static_cast<float>(ty) + textH + 6.0f;
                     const float bot = static_cast<float>(wy + dh) - 7.0f;
                     const float bw = ww / 12.0f;
-                    const int t = ky->tonic();
-                    for (int k = 0; k < 12; ++k) {
-                        const float bh = (bot - top) * h[static_cast<std::size_t>(k)] / mx;
-                        g.setColour(k == t ? T.accent : T.textSecondary.withAlpha(0.6f));
-                        g.fillRect(x0 + bw * static_cast<float>(k) + 1.0f, bot - bh,
-                                   std::max(1.0f, bw - 2.0f), bh);
+                    if (bot - top > 4.0f) {
+                        for (int k = 0; k < 12; ++k) {
+                            const float bx = x0 + bw * static_cast<float>(k) + 1.0f;
+                            const float bwk = std::max(1.0f, bw - 2.0f);
+                            const float bh = (bot - top) * h[static_cast<std::size_t>(k)] / mx;
+                            g.setColour(k == t ? T.accent : T.textSecondary.withAlpha(0.55f));
+                            g.fillRect(bx, bot - bh, bwk, bh);
+                            if (k == now) {   // a nota atual: contorno na altura toda
+                                g.setColour(T.textPrimary);
+                                g.drawRect(juce::Rectangle<float>(bx - 0.5f, top, bwk + 1.0f, bot - top), 1.2f);
+                            }
+                        }
                     }
                     g.setColour(T.accent.withAlpha(0.8f));
                     g.fillRect(x0, bot + 2.0f, ww * ky->certainty(), 2.0f);
-                    static const char* kNames[12] = {"C", "C#", "D", "Eb", "E", "F",
-                                                     "F#", "G", "Ab", "A", "Bb", "B"};
-                    dlabel = t >= 0 ? juce::String(kNames[t]) + (ky->minor() ? "m" : "")
-                                    : juce::String("—");
-                } else {
-                    dlabel.clear();
                 }
+                dlabel.clear();
             } else if (mtype == "COHERENCE") {
                 // As 12 classes de altura da janela (barras), a ORDEM (linha
                 // clara) e a PRESSÃO (linha de destaque) rolando no tempo; um
