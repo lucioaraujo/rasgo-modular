@@ -27,7 +27,14 @@ namespace {
 template <class F>
 void onMessageThread(F&& f) {
     auto* mm = juce::MessageManager::getInstance();
-    if (mm->isThisTheMessageThread()) { f(); return; }
+    // Quem já segura a trava da thread de mensagens roda aqui mesmo: a
+    // thread de mensagens está parada esperando essa trava, e pedir a ela
+    // seria esperar para sempre (achado no scanner VST3 do Ardour,
+    // 21/11/2026: o wrapper do JUCE destrói o processador com a trava).
+    if (mm->isThisTheMessageThread() || mm->currentThreadHasLockedMessageManager()) {
+        f();
+        return;
+    }
     mm->callFunctionOnMessageThread(
         [](void* p) -> void* { (*static_cast<std::remove_reference_t<F>*>(p))(); return nullptr; },
         &f);
@@ -36,13 +43,18 @@ void onMessageThread(F&& f) {
 class RasgoModularProcessor final : public juce::AudioProcessor {
 public:
     // A entrada estéreo é OPCIONAL no VST3 (instrumento; a DAW liga se
-    // quiser mandar som ao SIGNAL-IN). No LV2 as portas são fixas no .ttl e
-    // o cliente do JUCE copia a entrada declarada: lá ela nasce ligada.
+    // quiser mandar som ao SIGNAL-IN). No LV2 as portas são fixas no .ttl:
+    // com entrada declarada, o Ardour o lista como efeito e não como
+    // instrumento (21/11/2026), e uma entrada declarada mas desligada fazia o
+    // cliente do JUCE cair. Lá ele é só instrumento, sem entrada de áudio.
     static BusesProperties buses() {
         const bool lv2 = juce::PluginHostType::getPluginLoadedAs()
                          == juce::AudioProcessor::wrapperType_LV2;
+        if (lv2)
+            return BusesProperties()
+                .withOutput("Output", juce::AudioChannelSet::stereo(), true);
         return BusesProperties()
-            .withInput("Input", juce::AudioChannelSet::stereo(), lv2)
+            .withInput("Input", juce::AudioChannelSet::stereo(), false)
             .withOutput("Output", juce::AudioChannelSet::stereo(), true);
     }
     RasgoModularProcessor() : AudioProcessor(buses()) {
@@ -66,6 +78,7 @@ public:
     bool isBusesLayoutSupported(const BusesLayout& layout) const override {
         if (layout.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
             return false;
+        if (layout.inputBuses.isEmpty()) return true;   // LV2: sem entrada
         const auto in = layout.getMainInputChannelSet();
         return in.isDisabled() || in == juce::AudioChannelSet::stereo();
     }
