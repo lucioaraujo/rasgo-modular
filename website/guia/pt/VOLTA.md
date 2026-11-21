@@ -10,7 +10,9 @@ O TURING reescreve o próprio laço, e o que muda se perde. A VOLTA nunca reescr
 - MUT: quantos passos trocam pelo valor alternativo.
 - ERODE: quantos passos calam.
 - MEM: os passos protegidos, que não mudam nem calam.
-- RANGE, STEPS e OFST: a amplitude, a quantização e o deslocamento da CV.
+- RANGE: a amplitude da CV.
+- STEPS: em quantos degraus a CV é quantizada.
+- OFST: um deslocamento somado à CV.
 - SEED: a semente do laço e da ordem das mudanças.
 Entradas: CLK, o relógio; RST, volta ao primeiro passo; NEW, uma base nova; MUT e ERO, sinais somados aos knobs. Saídas: CV e CV2, as alturas; PULSE, os gates; POS, a posição no laço.
 

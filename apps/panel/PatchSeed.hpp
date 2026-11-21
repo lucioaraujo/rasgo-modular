@@ -1288,6 +1288,11 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
     // a seed não liga o microfone.
     {
         auto v = [&](int k) { return seedUnit(seedS, static_cast<std::uint64_t>(60 + k)); };
+        // TAMANHO da seed (21/11/2026, proposta dos papéis): camerístico (até
+        // 1 papel), médio (2) ou orquestral (3, e a forma: FORM e TEMPO)
+        const float sizeU = seedUnit(seedS, 95);
+        const int sizeClass = sizeU < 0.3f ? 0 : (sizeU < 0.8f ? 1 : 2);
+        const int maxRoles = sizeClass + 1;
         auto freeIn2 = [&](std::size_t n, const char* nm) {
             const int pi = pIn(n, nm);
             if (pi < 0) return;
@@ -1335,7 +1340,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
         bool clockTaken = false, ch2Taken = false;
         int picked = 0;
         for (const int r : order) {
-            if (picked >= 2 || !can[r] || v(10 + r) >= chance[r]) continue;
+            if (picked >= maxRoles || !can[r] || v(10 + r) >= chance[r]) continue;
             if ((r == 2 || r == 3) && clockTaken) continue;   // um relógio só
             if ((r == 1 || r == 5) && ch2Taken) continue;     // um caminho do ch2
             bool done = false;
@@ -1435,6 +1440,212 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 }
             }
             if (done) ++picked;
+        }
+
+        // ===== PAPÉIS DA LEVA DE 20–21/11 (21/11/2026) =====================
+        // `PROPOSTA_papeis_seed_modulos_novos.md`, "ok para suas
+        // recomendações". Os módulos novos ganham um papel cada, no mesmo
+        // molde dos de cima, depois deles e até o teto do TAMANHO da seed
+        // (camerístico 1 · médio 2 · orquestral 3). Corrente própria (120…).
+        // Cada papel só onde cabe; se um cabo falha, volta como era.
+        {
+            auto w = [&](int k) { return seedUnit(seedS, static_cast<std::uint64_t>(120 + k)); };
+            const std::size_t mx = hasT("MIXER") ? firstT("MIXER") : N;
+            const std::size_t ms = hasT("MASTER") ? firstT("MASTER") : N;
+            std::size_t seqSp = 0;   // a linha que entra no QUANTIZER
+            const std::size_t seqSrc = hasT("QUANTIZER") ? sourceOf(firstT("QUANTIZER"), "cv", seqSp) : N;
+            auto chanFree = [&](const char* ch) {
+                std::size_t sp = 0;
+                return mx < N && pIn(mx, ch) >= 0 && sourceOf(mx, ch, sp) == N;
+            };
+            const char* freeChan = chanFree("ch3") ? "ch3" : (chanFree("ch4") ? "ch4" : nullptr);
+            std::size_t msp = 0;
+            const bool busDirect = ms < N && mx < N && sourceOf(ms, "in", msp) == mx;
+            // o canal do MIXER que o DRUM toca (para o corpo e os gatilhos)
+            const char* drumCh = nullptr;
+            if (mx < N && hasT("DRUM"))
+                for (const char* ch : {"ch1", "ch2", "ch3", "ch4"}) {
+                    std::size_t sp = 0;
+                    if (sourceOf(mx, ch, sp) == firstT("DRUM")) { drumCh = ch; break; }
+                }
+            std::size_t gsp = 0;
+            const std::size_t drumGateSrc = hasT("DRUM") ? sourceOf(firstT("DRUM"), "gate", gsp) : N;
+            const int cutIn = fltNode < N ? pIn(fltNode, "cutoff_mod") : -1;
+            const bool cutFree = cutIn >= 0 && !inUsed[fltNode][static_cast<std::size_t>(cutIn)];
+            std::size_t cutSp = 0;
+            const std::size_t cutSrc = cutIn >= 0 ? sourceOf(fltNode, "cutoff_mod", cutSp) : N;
+            bool busTaken = !busDirect, drumGateTaken = false, cutTaken = !cutFree;
+            // 0 VOZ ESTOCÁSTICA · 1 CORAÇÃO · 2 CORPO ELÁSTICO · 3 LENTE · 4 FITA
+            // 5 GÁS · 6 RAIO · 7 FRANJAS · 8 ECOLOGIA · 9 CARDUME · 10 ECLIPSE
+            // 11 ESTAÇÃO · 12 VOLTA · 13 DUAS MÃOS
+            const bool can2[14] = {
+                freeChan != nullptr && freeFor("GENDYN") && voiceHz > 0.0f,
+                cutFree && freeFor("RUNGLER"),
+                drumCh != nullptr && freeFor("ELASTIC"),
+                busDirect && freeFor("LENS"),
+                busDirect && freeFor("TAPE"),
+                drumGateSrc < N && freeFor("PRESSURE"),
+                cutFree && freeFor("REFRACT"),
+                drumGateSrc < N && freeFor("INTERFERENCE"),
+                cutFree && freeFor("PREDATOR"),
+                hasContra && freeFor("SWARM"),
+                hasT("TRIGSEQ") && spine[firstT("TRIGSEQ")] && hasT("CLOCK") && freeFor("ECLIPSE"),
+                hasT("CLOCK") && hasT("QUANTIZER") && freeFor("SEASON"),
+                seqSrc < N && typ(seqSrc) == "TURING" && freeFor("VOLTA"),
+                cutSrc < N && hasT("DRIFT") && freeFor("SUM")};
+            const float chance2[14] = {0.12f, 0.12f, 0.10f, 0.08f, 0.12f, 0.10f, 0.08f,
+                                       0.08f, 0.08f, 0.08f, 0.06f, 0.06f, 0.10f, 0.10f};
+            int order2[14];
+            for (int i = 0; i < 14; ++i) order2[i] = i;
+            for (int i = 13; i > 0; --i) {
+                const int j = static_cast<int>(w(i) * static_cast<float>(i + 1)) % (i + 1);
+                std::swap(order2[i], order2[j]);
+            }
+            for (const int r : order2) {
+                if (picked >= maxRoles || !can2[r] || w(20 + r) >= chance2[r]) continue;
+                bool done = false;
+                switch (r) {
+                case 0: {   // VOZ ESTOCÁSTICA: GENDYN como a textura
+                    const std::size_t gd = firstT("GENDYN");
+                    setP(gd, "freq", std::clamp(voiceHz * 0.5f, 30.0f, 400.0f));
+                    setP(gd, "band", 0.1f + 0.2f * w(40));
+                    if (connectIds(gd, "out", mx, freeChan)) {
+                        const std::string gk = std::string("gain") + freeChan[2];
+                        setP(mx, gk.c_str(), -16.0f + 6.0f * w(41));
+                        spine[gd] = 1; done = true;
+                    }
+                    break; }
+                case 1: case 6: case 8: {   // CORAÇÃO / RAIO / ECOLOGIA no corte do filtro
+                    if (cutTaken) break;
+                    const char* t = r == 1 ? "RUNGLER" : (r == 6 ? "REFRACT" : "PREDATOR");
+                    const char* o = r == 1 ? "rung" : (r == 6 ? "a1" : "prey");
+                    const std::size_t n = firstT(t);
+                    if (connectIds(n, o, fltNode, "cutoff_mod")) {
+                        g.cable(g.cableCount() - 1).setGain(r == 1 ? 0.35f : 0.45f);
+                        spine[n] = 1; done = true; cutTaken = true;
+                    }
+                    break; }
+                case 2: {   // CORPO ELÁSTICO: o golpe do DRUM vira um corpo
+                    const std::size_t el = firstT("ELASTIC"), dr = firstT("DRUM");
+                    setP(el, "mix", 0.6f + 0.3f * w(42));
+                    freeIn2(mx, drumCh);
+                    if (connectIds(dr, "out", el, "in") && connectIds(el, "l", mx, drumCh)) {
+                        spine[el] = 1; done = true;
+                    } else {
+                        connectIds(dr, "out", mx, drumCh);   // como era
+                    }
+                    break; }
+                case 3: case 4: {   // LENTE / FITA no barramento
+                    if (busTaken) break;
+                    const char* t = r == 3 ? "LENS" : "TAPE";
+                    const std::size_t n = firstT(t);
+                    if (r == 4) { setP(n, "wear", 0.05f + 0.1f * w(43)); setP(n, "drive", 0.3f + 0.3f * w(44)); }
+                    else { setP(n, "depth", 0.2f + 0.3f * w(45)); }
+                    freeIn2(ms, "in");
+                    if (connectIds(mx, "out", n, "in") && connectIds(n, r == 3 ? "l" : "out", ms, "in")) {
+                        spine[n] = 1; done = true; busTaken = true;
+                    } else {
+                        connectIds(mx, "out", ms, "in");   // nunca sem som
+                    }
+                    break; }
+                case 5: case 7: {   // GÁS / FRANJAS: os golpes do DRUM
+                    if (drumGateTaken) break;
+                    const char* t = r == 5 ? "PRESSURE" : "INTERFERENCE";
+                    const std::size_t n = firstT(t), dr = firstT("DRUM");
+                    freeIn2(dr, "gate");
+                    if (connectIds(n, r == 5 ? "hit" : "fringe", dr, "gate")) {
+                        spine[n] = 1; done = true; drumGateTaken = true;
+                    } else {
+                        connect({drumGateSrc, gsp}, {dr, static_cast<std::size_t>(pIn(dr, "gate"))});
+                    }
+                    break; }
+                case 9: {   // CARDUME: o relógio da contravoz vem do cardume
+                    if (clockTaken) break;
+                    const std::size_t sw = firstT("SWARM");
+                    setP(sw, "cohesion", 0.3f + 0.6f * w(46));
+                    freeIn2(cvGenNode, "clock");
+                    if (connectIds(sw, "g1", cvGenNode, "clock")) {
+                        spine[sw] = 1; done = true; clockTaken = true;
+                    } else if (hasT("LOGIC") && spine[firstT("LOGIC")]) {
+                        connectIds(firstT("LOGIC"), "div", cvGenNode, "clock");   // como era
+                    }
+                    break; }
+                case 10: {  // ECLIPSE: o evento raro abre o fill da percussão
+                    const std::size_t ec = firstT("ECLIPSE"), ts = firstT("TRIGSEQ");
+                    if (connectIds(firstT("CLOCK"), "clock", ec, "clock")
+                        && connectIds(ec, "align", ts, "fill")) { spine[ec] = 1; done = true; }
+                    break; }
+                case 11: {  // ESTAÇÃO: o modo da estação no QUANTIZER, o andamento no CLOCK
+                    const std::size_t se = firstT("SEASON");
+                    const bool a = connectIds(se, "scale", firstT("QUANTIZER"), "scale_cv");
+                    const bool b = connectIds(se, "tempo", firstT("CLOCK"), "rate");
+                    if (b) g.cable(g.cableCount() - 1).setGain(0.25f);
+                    if (a || b) { spine[se] = 1; done = true; }
+                    break; }
+                case 12: {  // VOLTA no lugar do TURING na linha
+                    const std::size_t vo = firstT("VOLTA"), q = firstT("QUANTIZER");
+                    std::size_t csp = 0;
+                    const std::size_t clkSrc = sourceOf(seqSrc, "clock", csp);
+                    setP(vo, "mutate", 0.15f + 0.3f * w(48));
+                    setP(vo, "length", 6.0f + std::floor(8.0f * w(49)));
+                    setP(vo, "seed", std::floor(1.0f + 999.0f * w(50)));
+                    std::size_t qsp = 0;
+                    const std::size_t qSrc = sourceOf(q, "cv", qsp);
+                    freeIn2(q, "cv");
+                    bool ok = connectIds(vo, "cv", q, "cv");
+                    if (ok && clkSrc < N) ok = connect({clkSrc, csp}, {vo, static_cast<std::size_t>(pIn(vo, "clock"))});
+                    if (ok) { spine[vo] = 1; done = true; }
+                    else { freeIn2(q, "cv"); if (qSrc < N) connect({qSrc, qsp}, {q, static_cast<std::size_t>(pIn(q, "cv"))}); }
+                    break; }
+                case 13: {  // DUAS MÃOS: o que movia o corte + a DRIFT, somados
+                    const std::size_t su = firstT("SUM"), dr = firstT("DRIFT");
+                    setP(su, "amt2", 0.3f + 0.3f * w(51));
+                    freeIn2(fltNode, "cutoff_mod");
+                    const bool ok = connect({cutSrc, cutSp}, {su, static_cast<std::size_t>(pIn(su, "in1"))})
+                                 && connectIds(dr, "a", su, "in2")
+                                 && connectIds(su, "sum", fltNode, "cutoff_mod");
+                    if (ok) { spine[su] = 1; done = true; }
+                    else connect({cutSrc, cutSp}, {fltNode, static_cast<std::size_t>(cutIn)});   // como era
+                    break; }
+                default: break;
+                }
+                if (done) ++picked;
+            }
+
+            // ORQUESTRAL: a forma da peça — as vozes passam pelo FORM, o
+            // CLOCK pelo TEMPO (a decisão maior da proposta de forma)
+            if (sizeClass == 2 && mx < N && hasT("FORM") && hasT("TEMPO") && hasT("CLOCK")) {
+                const std::size_t fo = firstT("FORM"), te = firstT("TEMPO"), ck = firstT("CLOCK");
+                setP(fo, "grammar", std::floor(5.0f * w(60)));
+                setP(fo, "length", 3.0f + 4.0f * w(61));
+                setP(fo, "depth", 6.0f + 3.0f * w(62));
+                setP(fo, "gesture", 0.3f + 0.5f * w(63));
+                setP(fo, "seed", std::floor(1.0f + 999.0f * w(64)));
+                setP(te, "mode", w(65) < 0.5f ? 1.0f : 2.0f);
+                setP(te, "accel", 0.05f + 0.1f * w(66));
+                int layers = 0;
+                static const char* kCh[4] = {"ch1", "ch2", "ch3", "ch4"};
+                static const char* kIn[4] = {"in1", "in2", "in3", "in4"};
+                static const char* kOut[4] = {"out1", "out2", "out3", "out4"};
+                for (int k = 0; k < 4; ++k) {
+                    std::size_t sp = 0;
+                    const std::size_t s = sourceOf(mx, kCh[k], sp);
+                    if (s >= N) continue;
+                    freeIn2(mx, kCh[k]);
+                    if (connect({s, sp}, {fo, static_cast<std::size_t>(pIn(fo, kIn[k]))})
+                        && connectIds(fo, kOut[k], mx, kCh[k])) ++layers;
+                    else connect({s, sp}, {mx, static_cast<std::size_t>(pIn(mx, kCh[k]))});   // como era
+                }
+                if (layers > 0) {
+                    spine[fo] = 1;
+                    if (connectIds(te, "rate", ck, "rate")) {
+                        connectIds(fo, "tension", te, "tension");
+                        connectIds(fo, "section", te, "section");
+                        connectIds(fo, "end", te, "coda");
+                        spine[te] = 1;
+                    }
+                }
+            }
         }
     }
 

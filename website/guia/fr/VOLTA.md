@@ -10,7 +10,9 @@ TURING réécrit sa propre boucle, et ce qui change se perd. VOLTA ne réécrit 
 - MUT : combien de pas passent à leur valeur alternative.
 - ERODE : combien de pas se taisent.
 - MEM : les pas protégés, qui ne changent ni ne se taisent.
-- RANGE, STEPS et OFST : l'amplitude, la quantification et le décalage de la CV.
+- RANGE : l'amplitude de la CV.
+- STEPS : en combien de paliers la CV est quantifiée.
+- OFST : un décalage ajouté à la CV.
 - SEED : la graine de la boucle et de l'ordre des changements.
 Entrées : CLK, l'horloge ; RST, retour au premier pas ; NEW, une nouvelle base ; MUT et ERO, des signaux ajoutés aux boutons. Sorties : CV et CV2, les hauteurs ; PULSE, les gates ; POS, la position dans la boucle.
 

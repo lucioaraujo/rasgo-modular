@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — guia dos módulos</title>
-<meta name="description" content="Os 101 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app." />
+<meta name="description" content="Os 105 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — guia dos módulos">
-<meta property="og:description" content="Os 101 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.">
+<meta property="og:description" content="Os 105 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "Os 101 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.",
+  "description": "Os 105 módulos do Rasgo Modular explicados para quem está começando: o que cada um faz com o som, o que muda em cada controle e um exercício para fazer no app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "pt-BR",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,18 +99,18 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">101 módulos · 8 famílias</span>
+  <span class="status-pill">105 módulos · 8 famílias</span>
   <h1>Guia dos módulos</h1>
-  <p class="lead">Os 101 módulos do Rasgo Modular, família por família. Cada verbete conta o que o módulo faz com o som, como ele se relaciona com os vizinhos, o que muda em cada controle, e termina com alguns passos para você experimentar no app. Os exercícios partem de um patch em que o MIXER já está ligado ao MASTER, como em toda semente. Dentro do instrumento, a caixa LEARN mostra um resumo de cada módulo e de cada controle quando você passa o mouse sobre eles.</p>
+  <p class="lead">Os 105 módulos do Rasgo Modular, família por família. Cada verbete conta o que o módulo faz com o som, como ele se relaciona com os vizinhos, o que muda em cada controle, e termina com alguns passos para você experimentar no app. Os exercícios partem de um patch em que o MIXER já está ligado ao MASTER, como em toda semente. Dentro do instrumento, a caixa LEARN mostra um resumo de cada módulo e de cada controle quando você passa o mouse sobre eles.</p>
 </section>
 
 <nav class="familias" aria-label="Famílias">
   <a href="#fam-SOURCE">SOURCE <span>16</span></a>
   <a href="#fam-TRANSFORM">TRANSFORM <span>18</span></a>
-  <a href="#fam-MODULATE">MODULATE <span>16</span></a>
-  <a href="#fam-TIME">TIME <span>14</span></a>
+  <a href="#fam-MODULATE">MODULATE <span>17</span></a>
+  <a href="#fam-TIME">TIME <span>16</span></a>
   <a href="#fam-DECISION">DECISION <span>14</span></a>
-  <a href="#fam-ROUTE">ROUTE <span>6</span></a>
+  <a href="#fam-ROUTE">ROUTE <span>7</span></a>
   <a href="#fam-SPACE">SPACE <span>12</span></a>
   <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
@@ -991,7 +991,7 @@
   </article>
 </section>
 <section class="section" id="fam-MODULATE">
-  <h2>MODULATE <small>16 módulos</small></h2>
+  <h2>MODULATE <small>17 módulos</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="Painel do módulo ENVELOPE" width="142" height="300" loading="lazy" /></figure>
@@ -1387,9 +1387,34 @@
       <li>Suba WILD: os ciclos deixam de ser iguais, como num ecossistema real.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-FORM">
+    <h3>FORM</h3>
+    <h4>O que é</h4>
+    <p>O FORM dá forma à peça inteira. Quatro camadas de som entram, passam por um arco com introdução, subida, clímax, queda e coda, e saem com crescendo, diminuendo, um silêncio antes do clímax e o morendo do fim.</p>
+    <h4>Como pensar nele</h4>
+    <p>Uma forma só se ouve quando todas as camadas a seguem. Por isso o FORM é um mixer: o que passa por ele segue o arco. A tensão do arco também sai como sinal, para o filtro abrir no clímax e o TEMPO acelerar junto. O volume nunca passa do nível de entrada.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>GRAM</b>: a forma — arco, ondas, crescimento, calmaria entre agitações, ou kishō, em que a virada é um corte seco.</li>
+      <li><b>LEN</b>: a duração aproximada, de 1 a 20 minutos.</li>
+      <li><b>DEPTH</b>: o contraste entre o vale e o clímax, em dB.</li>
+      <li><b>GEST</b>: a chance dos gestos, como o silêncio antes do clímax.</li>
+      <li><b>MODE</b>: impor o arco, seguir a energia que chega em ENV, ou contrapor o arco.</li>
+      <li><b>SEG1 a SEG4</b>: quanto cada camada segue a forma. A camada 1 é a essencial; a 4, o enfeite.</li>
+      <li><b>LOOP</b>: depois da coda, uma peça nova começa.</li>
+      <li><b>SEED</b>: a mesma semente dá a mesma forma.</li>
+    </ul>
+    <p>Entradas: IN1 a IN4, as camadas; CLK, para as trocas caírem no pulso; NEXT, a próxima seção; RST, recomeçar; ENV, a energia a seguir. Saídas: O1 a O4 e MIX; TENS, a tensão; SECT, ROLE, CLMX, BRTH e END, os momentos da forma.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue quatro vozes em IN1 a IN4 e MIX no MIXER. Com LEN em 1, ouça a peça subir, chegar ao clímax e terminar.</li>
+      <li>Ligue TENS no cutoff de um FILTER: o filtro abre junto com a forma.</li>
+      <li>Ligue SECT, TENS e END no TEMPO: o andamento segue a mesma forma.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
-  <h2>TIME <small>14 módulos</small></h2>
+  <h2>TIME <small>16 módulos</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="Painel do módulo CLOCK" width="189" height="300" loading="lazy" /></figure>
@@ -1735,6 +1760,60 @@
       <li>Ligue SUN no corte de um FILTER: o timbre clareia de dia e escurece à noite.</li>
       <li>Ligue DAWN num gatilho que acorda uma voz e DUSK num que a cala.</li>
       <li>Ponha LAT em 70: ouça o verão sem noite e o inverno sem dia.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-TEMPO">
+    <h3>TEMPO</h3>
+    <h4>O que é</h4>
+    <p>O TEMPO faz o andamento respirar. Ele dá ao CLOCK um andamento que se move: acelera rumo ao clímax, alarga no fim de cada frase, rouba e devolve tempo, segura uma fermata e desacelera até parar no final.</p>
+    <h4>Como pensar nele</h4>
+    <p>Um relógio fixo soa como máquina; uma pessoa tocando nunca mantém o andamento parado. O TEMPO sai em RATE, que vai à entrada RATE do CLOCK. Sozinho, ele já respira nas frases; ligado ao FORM, segue a mesma forma da peça.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>ACCEL</b>: quanto o andamento acelera com a tensão.</li>
+      <li><b>FINAL</b>: o andamento de chegada no fim, como fração.</li>
+      <li><b>SHAPE</b>: a curva da desaceleração final.</li>
+      <li><b>RIT</b>: quanto dura a desaceleração final, em segundos.</li>
+      <li><b>MODE</b>: estrito, com arco de frase, ou elástico, com o rubato também.</li>
+      <li><b>PHR</b>: o tamanho da frase em tempos.</li>
+      <li><b>ARCH</b>: o arco da frase — mais rápido no meio.</li>
+      <li><b>RUBATO</b>: o tempo emprestado e devolvido dentro da frase.</li>
+      <li><b>MOLA</b>: a rapidez com que o andamento segue as mudanças, sempre sem saltos.</li>
+      <li><b>FERMT</b>: quantos tempos dura a fermata.</li>
+      <li><b>SEED</b>: a semente dos saltos e do rubato.</li>
+    </ul>
+    <p>Entradas: TENS, a tensão; SECT, as trocas de seção; CODA, o começo do final; FERM, uma fermata; CLK, o relógio que conta os tempos. Saídas: RATE, para o CLOCK; ARCH, o arco da frase como sinal; BEAT, o pulso já deformado; END, o fim.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue RATE do TEMPO no RATE do CLOCK e CLK do CLOCK no CLK do TEMPO. Ouça o andamento respirar nas frases.</li>
+      <li>Ligue TENS, SECT e END do FORM no TENS, no SECT e no CODA do TEMPO: a peça acelera no clímax e para devagar no fim.</li>
+      <li>Ligue um pulso raro (de um DECISION, por exemplo) no FERM: de vez em quando o tempo para e volta.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-VOLTA">
+    <h3>VOLTA</h3>
+    <h4>O que é</h4>
+    <p>A VOLTA é um laço de passos que varia sem se perder. Ela guarda uma sequência-base e a transforma por cima; quando você volta o knob, a sequência original volta exatamente como era.</p>
+    <h4>Como pensar nele</h4>
+    <p>O TURING reescreve o próprio laço, e o que muda se perde. A VOLTA nunca reescreve a base: cada passo tem a sua vez de mudar, sempre na mesma ordem, e por isso dá para ir e voltar. Só um pulso em NEW troca a base por uma nova.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: o andamento do relógio interno, quando não há CLK.</li>
+      <li><b>LEN</b>: quantos passos tem o laço.</li>
+      <li><b>MUT</b>: quantos passos trocam pelo valor alternativo.</li>
+      <li><b>ERODE</b>: quantos passos calam.</li>
+      <li><b>MEM</b>: os passos protegidos, que não mudam nem calam.</li>
+      <li><b>RANGE</b>: a amplitude da CV.</li>
+      <li><b>STEPS</b>: em quantos degraus a CV é quantizada.</li>
+      <li><b>OFST</b>: um deslocamento somado à CV.</li>
+      <li><b>SEED</b>: a semente do laço e da ordem das mudanças.</li>
+    </ul>
+    <p>Entradas: CLK, o relógio; RST, volta ao primeiro passo; NEW, uma base nova; MUT e ERO, sinais somados aos knobs. Saídas: CV e CV2, as alturas; PULSE, os gates; POS, a posição no laço.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o CLK do CLOCK no CLK da VOLTA, a CV num QUANTIZER e dali num OSC, e PULSE num ENVELOPE.</li>
+      <li>Suba o MUT devagar: a melodia varia. Volte o MUT a zero: ela volta inteira.</li>
+      <li>Ligue um FUNCTION lento em MUT: a melodia se afasta e retorna sozinha.</li>
     </ol>
   </article>
 </section>
@@ -2098,7 +2177,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-ROUTE">
-  <h2>ROUTE <small>6 módulos</small></h2>
+  <h2>ROUTE <small>7 módulos</small></h2>
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="Painel do módulo SWITCH" width="142" height="300" loading="lazy" /></figure>
@@ -2245,6 +2324,26 @@
       <li>Com VERBO em hoqueto, ouça as vozes passarem a se revezar.</li>
       <li>Troque para sombra e suba TEMPO: a segunda voz vira o eco rítmico da primeira.</li>
       <li>Ligue ENC no MIX de um SPACE: quando as duas se encontram, o espaço se abre.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SUM">
+    <h3>SUM</h3>
+    <h4>O que é</h4>
+    <p>O SUM junta sinais. Quatro entradas, cada uma com o seu atenuversor, viram uma saída só: a soma, a soma invertida e a média.</p>
+    <h4>Como pensar nele</h4>
+    <p>No Rasgo Modular cada entrada recebe um cabo só. Para um filtro andar com dois movimentos ao mesmo tempo, os dois passam antes pelo SUM. O MULT copia um sinal para vários lugares; o SUM junta vários sinais num lugar.</p>
+    <h4>Controles</h4>
+    <ul class="controles">
+      <li><b>A1 a A4</b>: quanto de cada entrada entra na soma, de −2 a +2. No meio, a entrada fica de fora; abaixo do meio, entra invertida.</li>
+      <li><b>OFS</b>: um valor fixo somado ao resultado.</li>
+      <li><b>SAT</b>: ligado, a soma satura de leve e nunca passa de ±1, bom para somar áudio.</li>
+    </ul>
+    <p>Entradas: IN1 a IN4. Saídas: SUM, a soma; INV, a soma invertida; AVG, a média das entradas ligadas.</p>
+    <h4>Experimente</h4>
+    <ol class="passos">
+      <li>Ligue o BI de um FUNCTION em IN1 e uma saída de um DRIFT em IN2. Ligue SUM no cutoff de um FILTER: o filtro anda com os dois.</li>
+      <li>Gire A2 para baixo do meio: o DRIFT passa a empurrar o filtro para o lado contrário.</li>
+      <li>Ligue dois osciladores em IN1 e IN2, ligue SAT e mande SUM para o MIXER: os dois tocam juntos sem estourar.</li>
     </ol>
   </article>
 </section>

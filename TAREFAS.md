@@ -23,6 +23,19 @@ sem interface; hoje isso existe em parte por variáveis (`RASGO_SEED`,
 (silêncio no Infinite, queda da janela `BadWindow`); (2) esta linha de
 comando; (3) Maestruc ↔ Infinite por OSC (TAREFAS do Maestruc); (4) MCP.
 
+## ▶ Ponto de retomada — 21/11/2026: SUM, VCA4, FORM, TEMPO, VOLTA, escalas, papéis da seed
+
+- Feito e commitado localmente (história com o e-mail RASGO; GitHub `main`
+  ainda em v0.1.11): SUM (#104), VCA4 SAT, FORM (#105), TEMPO (#106), VOLTA
+  (#107), máquina de escalas do QUANTIZER, RATE do CLOCK, linha de comando
+  (`rasgo_modular_cli`), parâmetros do plugin, papéis dos módulos novos na
+  seed e o tamanho da seed. Suíte 135/135; site com 105 módulos.
+- Falta: a escuta do autor (tudo isso); as imagens de painel do site (17
+  módulos novos e os painéis mudados de SIGNAL-IN, QUANTIZER, CLOCK, VCA4);
+  as cópias de vozes nas seeds orquestrais; o banco completo de escalas do
+  Trioio (com seletor, imagem para o autor); o piloto VCV/Cardinal (SDK do
+  Rack); a v0.1.12 (envio dos commits, CI, release) — decisão do autor.
+
 ## ▶ Ponto de retomada — 20/11/2026 (noite, depois): outros programas, MIDI clock, parâmetros sem lock, plugin
 
 - Feito localmente, sem commit: receita "Com outros programas" (INSTALL e

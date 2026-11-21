@@ -10,7 +10,9 @@ TURING rewrites its own loop, and what changes is lost. VOLTA never rewrites the
 - MUT: how many steps switch to their alternative value.
 - ERODE: how many steps go silent.
 - MEM: the protected steps, which neither change nor go silent.
-- RANGE, STEPS and OFST: the CV's amplitude, quantization and offset.
+- RANGE: the CV's amplitude.
+- STEPS: how many steps the CV is quantized to.
+- OFST: an offset added to the CV.
 - SEED: the seed of the loop and of the order of changes.
 Inputs: CLK, the clock; RST, back to the first step; NEW, a new base; MUT and ERO, signals added to the knobs. Outputs: CV and CV2, the pitches; PULSE, the gates; POS, the position in the loop.
 

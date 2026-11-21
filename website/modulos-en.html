@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular — module guide</title>
-<meta name="description" content="The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
+<meta name="description" content="The 105 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app." />
 <link rel="icon" href="assets/identity/favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
 <link rel="apple-touch-icon" href="assets/identity/favicon-256.png" />
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rasgo Modular">
 <meta property="og:title" content="Rasgo Modular — module guide">
-<meta property="og:description" content="The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
+<meta property="og:description" content="The 105 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.">
 <meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/modulos-en.html">
 <meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg">
 <meta property="og:image:width" content="1200">
@@ -36,7 +36,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Rasgo Modular",
-  "description": "The 101 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
+  "description": "The 105 modules of Rasgo Modular explained for beginners: what each one does to the sound, what every control changes, and an exercise to try in the app.",
   "url": "https://lucioaraujo.github.io/rasgo-modular/",
   "inLanguage": "en",
   "image": "https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg",
@@ -99,18 +99,18 @@
 
 <main id="conteudo">
 <section class="hero" id="top">
-  <span class="status-pill">101 modules · 8 families</span>
+  <span class="status-pill">105 modules · 8 families</span>
   <h1>Module guide</h1>
-  <p class="lead">The 101 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
+  <p class="lead">The 105 modules of Rasgo Modular, family by family. Each entry tells you what the module does to the sound, how it relates to its neighbours, what each control changes, and ends with a few steps to try in the app. The exercises start from a patch where MIXER is already connected to MASTER, as in every seed. Inside the instrument, the LEARN box shows a summary of each module and each control when you hover over them.</p>
 </section>
 
 <nav class="familias" aria-label="Families">
   <a href="#fam-SOURCE">SOURCE <span>16</span></a>
   <a href="#fam-TRANSFORM">TRANSFORM <span>18</span></a>
-  <a href="#fam-MODULATE">MODULATE <span>16</span></a>
-  <a href="#fam-TIME">TIME <span>14</span></a>
+  <a href="#fam-MODULATE">MODULATE <span>17</span></a>
+  <a href="#fam-TIME">TIME <span>16</span></a>
   <a href="#fam-DECISION">DECISION <span>14</span></a>
-  <a href="#fam-ROUTE">ROUTE <span>6</span></a>
+  <a href="#fam-ROUTE">ROUTE <span>7</span></a>
   <a href="#fam-SPACE">SPACE <span>12</span></a>
   <a href="#fam-OUT">OUT <span>5</span></a>
 </nav>
@@ -991,7 +991,7 @@
   </article>
 </section>
 <section class="section" id="fam-MODULATE">
-  <h2>MODULATE <small>16 modules</small></h2>
+  <h2>MODULATE <small>17 modules</small></h2>
   <article class="modulo" id="mod-ENVELOPE">
     <h3>ENVELOPE</h3>
     <figure class="painel"><img src="assets/modulos/ENVELOPE.webp" alt="ENVELOPE module panel" width="142" height="300" loading="lazy" /></figure>
@@ -1387,9 +1387,34 @@
       <li>Raise WILD: the cycles stop being alike, as in a real ecosystem.</li>
     </ol>
   </article>
+  <article class="modulo" id="mod-FORM">
+    <h3>FORM</h3>
+    <h4>What it is</h4>
+    <p>FORM shapes the whole piece. Four sound layers come in, go through an arc with intro, rise, climax, fall and coda, and come out with crescendo, diminuendo, a silence before the climax and the closing morendo.</p>
+    <h4>How to think about it</h4>
+    <p>A form is only heard when every layer follows it. That is why FORM is a mixer: whatever goes through it follows the arc. The arc's tension also comes out as a signal, so the filter opens at the climax and TEMPO speeds up with it. The level never goes above the input level.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>GRAM</b>: the form — arc, waves, growth, a lull between agitations, or kishō, where the turn is a hard cut.</li>
+      <li><b>LEN</b>: the approximate length, from 1 to 20 minutes.</li>
+      <li><b>DEPTH</b>: the contrast between valley and climax, in dB.</li>
+      <li><b>GEST</b>: the chance of the gestures, such as the silence before the climax.</li>
+      <li><b>MODE</b>: impose the arc, follow the energy at ENV, or oppose the arc.</li>
+      <li><b>SEG1 to SEG4</b>: how much each layer follows the form. Layer 1 is the essential one; layer 4, the ornament.</li>
+      <li><b>LOOP</b>: after the coda, a new piece starts.</li>
+      <li><b>SEED</b>: the same seed gives the same form.</li>
+    </ul>
+    <p>Inputs: IN1 to IN4, the layers; CLK, so changes land on the beat; NEXT, the next section; RST, start again; ENV, the energy to follow. Outputs: O1 to O4 and MIX; TENS, the tension; SECT, ROLE, CLMX, BRTH and END, the moments of the form.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect four voices to IN1 to IN4 and MIX to the MIXER. With LEN at 1, hear the piece rise, reach the climax and end.</li>
+      <li>Connect TENS to a FILTER's cutoff: the filter opens with the form.</li>
+      <li>Connect SECT, TENS and END to TEMPO: the tempo follows the same form.</li>
+    </ol>
+  </article>
 </section>
 <section class="section section-dark" id="fam-TIME">
-  <h2>TIME <small>14 modules</small></h2>
+  <h2>TIME <small>16 modules</small></h2>
   <article class="modulo" id="mod-CLOCK">
     <h3>CLOCK</h3>
     <figure class="painel"><img src="assets/modulos/CLOCK.webp" alt="CLOCK module panel" width="189" height="300" loading="lazy" /></figure>
@@ -1735,6 +1760,60 @@
       <li>Patch SUN into the cutoff of a FILTER: the timbre brightens by day and darkens at night.</li>
       <li>Patch DAWN into a trigger that wakes a voice and DUSK into one that silences it.</li>
       <li>Set LAT to 70: hear the summer without night and the winter without day.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-TEMPO">
+    <h3>TEMPO</h3>
+    <h4>What it is</h4>
+    <p>TEMPO makes the tempo breathe. It gives CLOCK a moving tempo: it speeds up toward the climax, broadens at the end of each phrase, borrows and returns time, holds a fermata and slows down to a stop at the end.</p>
+    <h4>How to think about it</h4>
+    <p>A fixed clock sounds like a machine; a person playing never keeps the tempo still. TEMPO comes out at RATE, which goes to CLOCK's RATE input. On its own it already breathes in phrases; connected to FORM, it follows the same shape as the piece.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>ACCEL</b>: how much the tempo speeds up with tension.</li>
+      <li><b>FINAL</b>: the arrival tempo at the end, as a fraction.</li>
+      <li><b>SHAPE</b>: the curve of the final slowdown.</li>
+      <li><b>RIT</b>: how long the final slowdown lasts, in seconds.</li>
+      <li><b>MODE</b>: strict, with phrase arch, or elastic, with rubato too.</li>
+      <li><b>PHR</b>: the phrase length in beats.</li>
+      <li><b>ARCH</b>: the phrase arch — faster in the middle.</li>
+      <li><b>RUBATO</b>: time borrowed and given back within the phrase.</li>
+      <li><b>MOLA</b>: how quickly the tempo follows changes, always without jumps.</li>
+      <li><b>FERMT</b>: how many beats the fermata lasts.</li>
+      <li><b>SEED</b>: the seed of the jumps and the rubato.</li>
+    </ul>
+    <p>Inputs: TENS, the tension; SECT, section changes; CODA, the start of the ending; FERM, a fermata; CLK, the clock that counts the beats. Outputs: RATE, for CLOCK; ARCH, the phrase arch as a signal; BEAT, the beat already shaped; END, the end.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect TEMPO's RATE to CLOCK's RATE and CLOCK's CLK to TEMPO's CLK. Hear the tempo breathe in phrases.</li>
+      <li>Connect FORM's TENS, SECT and END to TEMPO's TENS, SECT and CODA: the piece speeds up at the climax and slows to a stop at the end.</li>
+      <li>Connect a rare pulse (from a DECISION, for example) to FERM: now and then time stops and comes back.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-VOLTA">
+    <h3>VOLTA</h3>
+    <h4>What it is</h4>
+    <p>VOLTA is a loop of steps that varies without getting lost. It keeps a base sequence and transforms it on top; when you turn the knob back, the original sequence returns exactly as it was.</p>
+    <h4>How to think about it</h4>
+    <p>TURING rewrites its own loop, and what changes is lost. VOLTA never rewrites the base: each step has its turn to change, always in the same order, so you can go and come back. Only a pulse at NEW replaces the base with a new one.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>RATE</b>: the internal clock rate, when there is no CLK.</li>
+      <li><b>LEN</b>: how many steps the loop has.</li>
+      <li><b>MUT</b>: how many steps switch to their alternative value.</li>
+      <li><b>ERODE</b>: how many steps go silent.</li>
+      <li><b>MEM</b>: the protected steps, which neither change nor go silent.</li>
+      <li><b>RANGE</b>: the CV's amplitude.</li>
+      <li><b>STEPS</b>: how many steps the CV is quantized to.</li>
+      <li><b>OFST</b>: an offset added to the CV.</li>
+      <li><b>SEED</b>: the seed of the loop and of the order of changes.</li>
+    </ul>
+    <p>Inputs: CLK, the clock; RST, back to the first step; NEW, a new base; MUT and ERO, signals added to the knobs. Outputs: CV and CV2, the pitches; PULSE, the gates; POS, the position in the loop.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect CLOCK's CLK to VOLTA's CLK, CV to a QUANTIZER and from there to an OSC, and PULSE to an ENVELOPE.</li>
+      <li>Raise MUT slowly: the melody varies. Bring MUT back to zero: it returns whole.</li>
+      <li>Connect a slow FUNCTION to MUT: the melody drifts away and returns on its own.</li>
     </ol>
   </article>
 </section>
@@ -2098,7 +2177,7 @@
   </article>
 </section>
 <section class="section section-dark" id="fam-ROUTE">
-  <h2>ROUTE <small>6 modules</small></h2>
+  <h2>ROUTE <small>7 modules</small></h2>
   <article class="modulo" id="mod-SWITCH">
     <h3>SWITCH</h3>
     <figure class="painel"><img src="assets/modulos/SWITCH.webp" alt="SWITCH module panel" width="142" height="300" loading="lazy" /></figure>
@@ -2245,6 +2324,26 @@
       <li>With VERBO on hocket, hear the voices start taking turns.</li>
       <li>Switch to shadow and raise TEMPO: the second voice becomes the rhythmic echo of the first.</li>
       <li>Patch ENC into the MIX of a SPACE: when the two meet, the space opens up.</li>
+    </ol>
+  </article>
+  <article class="modulo" id="mod-SUM">
+    <h3>SUM</h3>
+    <h4>What it is</h4>
+    <p>SUM joins signals. Four inputs, each with its own attenuverter, become a single output: the sum, the inverted sum and the average.</p>
+    <h4>How to think about it</h4>
+    <p>In Rasgo Modular each input takes a single cable. For a filter to move with two motions at once, both go through SUM first. MULT copies one signal to many places; SUM joins many signals in one place.</p>
+    <h4>Controls</h4>
+    <ul class="controles">
+      <li><b>A1 to A4</b>: how much of each input goes into the sum, from −2 to +2. At the centre the input is left out; below the centre it comes in inverted.</li>
+      <li><b>OFS</b>: a fixed value added to the result.</li>
+      <li><b>SAT</b>: on, the sum saturates gently and never exceeds ±1, good for summing audio.</li>
+    </ul>
+    <p>Inputs: IN1 to IN4. Outputs: SUM, the sum; INV, the inverted sum; AVG, the average of the connected inputs.</p>
+    <h4>Try this</h4>
+    <ol class="passos">
+      <li>Connect a FUNCTION's BI to IN1 and a DRIFT output to IN2. Connect SUM to a FILTER's cutoff: the filter moves with both.</li>
+      <li>Turn A2 below the centre: DRIFT now pushes the filter the other way.</li>
+      <li>Connect two oscillators to IN1 and IN2, switch SAT on and send SUM to the MIXER: both play together without clipping.</li>
     </ol>
   </article>
 </section>

@@ -22,6 +22,13 @@ escuta do autor.
   blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
   mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
   6 para 8 HP. Patches e seeds antigos iguais.
+- **Papéis dos módulos novos na seed** (21/11, "ok para suas
+  recomendações"): 14 papéis (voz estocástica, coração, corpo elástico,
+  lente, fita, gás, raio, franjas, ecologia, cardume, eclipse, estação,
+  volta, duas mãos) e o **tamanho** da seed — camerístico, médio,
+  orquestral; nas orquestrais, as vozes passam pelo FORM e o CLOCK pelo
+  TEMPO. As fontes e os processadores novos aparecem ligados ao som em 29 %
+  das seeds (eram 14 %). **As seeds mudam.**
 - **FORM** (#105, MODULATE) e **TEMPO** (#106, TIME), da proposta "forma e
   andamento" (21/11, "pode implementar"): a dinâmica da forma (um mixer que
   conduz pelo arco da peça, em cinco gramáticas, com respiração, subito e

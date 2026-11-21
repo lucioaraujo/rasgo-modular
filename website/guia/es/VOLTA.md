@@ -10,7 +10,9 @@ El TURING reescribe su propio bucle, y lo que cambia se pierde. VOLTA nunca rees
 - MUT: cuántos pasos cambian a su valor alternativo.
 - ERODE: cuántos pasos callan.
 - MEM: los pasos protegidos, que no cambian ni callan.
-- RANGE, STEPS y OFST: la amplitud, la cuantización y el desplazamiento de la CV.
+- RANGE: la amplitud de la CV.
+- STEPS: en cuántos escalones se cuantiza la CV.
+- OFST: un desplazamiento sumado a la CV.
 - SEED: la semilla del bucle y del orden de los cambios.
 Entradas: CLK, el reloj; RST, vuelve al primer paso; NEW, una base nueva; MUT y ERO, señales sumadas a los controles. Salidas: CV y CV2, las alturas; PULSE, los gates; POS, la posición en el bucle.
 

@@ -1,6 +1,8 @@
 # Proposta — papéis dos módulos novos na seed, e patches mais complexos
 
-Data: 21/11/2026. Estado: **proposta, nada implementado**. Pedido do autor:
+Data: 21/11/2026. Estado: **implementado em 21/11/2026** ("ok para suas
+recomendações"), exceto as **cópias de vozes** do gene de tamanho (§3.1–3.2),
+que pedem o passo 3 das instâncias — próximo passo. Pedido do autor:
 "testei várias seeds do rasgo modular e nunca abriu os módulos novos"; "pode
 propor"; e "com as implementações dos novos módulos, também atualizou como os
 cabeamentos são feitos considerando patches mais complexos?".
@@ -79,3 +81,20 @@ qualidade:
 2. Três papéis por seed em vez de dois.
 3. O tamanho como gene (camerístico / médio / orquestral).
 4. FORM e TEMPO nas seeds orquestrais (decisão maior).
+
+## 6. Implementado (21/11/2026)
+
+- `PatchSeed.hpp`: o **tamanho** da seed (corrente 95): camerístico 30 % (até
+  1 papel), médio 50 % (2), orquestral 20 % (3 e a forma). Os 14 papéis da
+  tabela, na corrente 120…, depois dos papéis de antes e até o teto; cada um
+  volta "como era" se um cabo falha.
+- **Orquestral:** as vozes do MIXER passam pelo FORM (DEPTH 6–9 dB, LEN 3–7
+  min, LOOP) e o CLOCK pelo TEMPO (RATE), com TENS, SECT e END ligados.
+- Medido em 400 seeds (antes → depois, ligados ao som): GENDYN 2 → 6,5 %,
+  RUNGLER 5,5 → 8 %, LENS 1 → 5,5 %, TAPE 5 → 9 %, ELASTIC 2 → 3 % (só com
+  DRUM no MIXER), VOLTA 10,5 %, SUM 8,5 %, FORM/TEMPO 17 %; seeds com uma
+  fonte ou processador novo: 14 → 29 %. Nenhuma seed caiu no recurso de
+  emergência (seed 1). Régua de qualidade verde (suíte 135/135).
+- **As seeds mudam** (CHANGELOG).
+- Falta: as cópias de vozes (orquestral com 4 vozes de verdade), e subir o
+  ELASTIC (um papel que dispense o DRUM).
