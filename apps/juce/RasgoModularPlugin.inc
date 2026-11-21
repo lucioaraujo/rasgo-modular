@@ -117,18 +117,34 @@ public:
     bool hasEditor() const override { return true; }
     juce::AudioProcessorEditor* createEditor() override;
 
+    // O estado: o patch (o texto do .rmp) e, numa primeira linha própria, o
+    // tamanho da janela que o músico deixou (21/11/2026). Estados sem essa
+    // linha abrem igual.
+    static constexpr const char* kEditorTag = "rasgo-plugin-editor ";
     void getStateInformation(juce::MemoryBlock& dest) override {
-        const std::string text = main_->patchText();
+        std::string text;
+        if (editorW > 0 && editorH > 0)
+            text = kEditorTag + std::to_string(editorW) + " " + std::to_string(editorH) + "\n";
+        text += main_->patchText();
         dest.append(text.data(), text.size());
     }
     void setStateInformation(const void* data, const int size) override {
         if (data == nullptr || size <= 0) return;
-        const std::string text(static_cast<const char*>(data), static_cast<std::size_t>(size));
+        std::string text(static_cast<const char*>(data), static_cast<std::size_t>(size));
+        if (text.rfind(kEditorTag, 0) == 0) {
+            const auto eol = text.find('\n');
+            int w = 0, h = 0;
+            if (std::sscanf(text.c_str() + std::strlen(kEditorTag), "%d %d", &w, &h) == 2
+                && w >= 960 && h >= 600 && w <= 8192 && h <= 8192) {
+                editorW = w; editorH = h;
+            }
+            text.erase(0, eol == std::string::npos ? text.size() : eol + 1);
+        }
         onMessageThread([this, &text] { main_->loadPatchText(text); });
     }
 
     MainComponent& mainComponent() { return *main_; }
-    int editorW = 1280, editorH = 800;
+    int editorW = 0, editorH = 0;   // 0 = ainda não escolhido: 80% da tela
 
 private:
     // O transporte da DAW como MIDI clock: 24 clocks por semínima, cada um
@@ -186,7 +202,18 @@ public:
         addAndMakeVisible(proc_.mainComponent());
         setResizable(true, true);
         setResizeLimits(960, 600, 8192, 8192);
-        setSize(proc_.editorW, proc_.editorH);
+        // o tamanho que o músico deixou; na primeira vez, 80% da área útil
+        // da tela principal (o app abre em ~88%, mas aqui a DAW está junto)
+        int w = proc_.editorW, h = proc_.editorH;
+        if (w <= 0 || h <= 0) {
+            w = 1280; h = 800;
+            if (const auto* d = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()) {
+                const auto area = d->userBounds;   // userArea é obsoleto
+                w = juce::jlimit(960, 8192, juce::roundToInt(area.getWidth() * 0.8f));
+                h = juce::jlimit(600, 8192, juce::roundToInt(area.getHeight() * 0.8f));
+            }
+        }
+        setSize(w, h);
     }
     ~RasgoModularEditor() override {
         // o componente é do processador: só sai da janela
