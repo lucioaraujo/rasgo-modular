@@ -763,6 +763,16 @@ if(BUILD_TESTING)
     add_test(NAME rasgo_modular_learn_coverage_tests
              COMMAND rasgo_modular_learn_coverage --exigir)
 
+    # a linha de comando (21/11/2026): render de seed/patch, validate, info
+    add_executable(rasgo_modular_cli tools/rasgo_modular_cli.cpp)
+    target_include_directories(rasgo_modular_cli PRIVATE src apps)
+    target_link_libraries(rasgo_modular_cli PRIVATE rasgo_modular_core)
+    target_compile_options(rasgo_modular_cli PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_cli_info COMMAND rasgo_modular_cli info SUM)
+    add_test(NAME rasgo_modular_cli_render
+             COMMAND rasgo_modular_cli render --seed 7 --dur 1
+                     ${CMAKE_CURRENT_BINARY_DIR}/cli_teste.wav)
+
     add_executable(rasgo_modular_port_exam tests/tool_port_exam.cpp)
     target_include_directories(rasgo_modular_port_exam PRIVATE src apps)
     target_compile_options(rasgo_modular_port_exam PRIVATE ${rasgo_modular_warnings})
@@ -786,6 +796,21 @@ if(BUILD_TESTING)
     target_link_libraries(rasgo_modular_signal_in_tests PRIVATE rasgo_modular_core)
     target_compile_options(rasgo_modular_signal_in_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_signal_in_tests COMMAND rasgo_modular_signal_in_tests)
+
+    add_executable(rasgo_modular_form_tempo_volta_tests tests/test_form_tempo_volta.cpp)
+    target_include_directories(rasgo_modular_form_tempo_volta_tests PRIVATE src)
+    target_compile_options(rasgo_modular_form_tempo_volta_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_form_tempo_volta_tests COMMAND rasgo_modular_form_tempo_volta_tests)
+
+    add_executable(rasgo_modular_quantizer_morph_tests tests/test_quantizer_morph.cpp)
+    target_include_directories(rasgo_modular_quantizer_morph_tests PRIVATE src)
+    target_compile_options(rasgo_modular_quantizer_morph_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_quantizer_morph_tests COMMAND rasgo_modular_quantizer_morph_tests)
+
+    add_executable(rasgo_modular_sum_tests tests/test_sum.cpp)
+    target_include_directories(rasgo_modular_sum_tests PRIVATE src)
+    target_compile_options(rasgo_modular_sum_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_sum_tests COMMAND rasgo_modular_sum_tests)
 
     add_executable(rasgo_modular_poly_in_tests tests/test_poly_in.cpp)
     target_include_directories(rasgo_modular_poly_in_tests PRIVATE src)

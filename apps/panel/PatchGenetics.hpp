@@ -76,6 +76,8 @@ inline bool isMutationBlocked(const std::string& id) noexcept {
         "listen",
         // DIV do MIDI clock do SIGNAL-IN (20/11/2026)
         "clk_div",
+        // a máquina de escalas do QUANTIZER (21/11/2026)
+        "scale_b", "morph",
         // ganhos de nível — mutar isto joga o barramento pra fora e o
         // MASTER limita demais / distorce (o "clipe" reportado 2026-09-05)
         "gain1", "gain2", "gain3", "gain4", "level1", "level2",

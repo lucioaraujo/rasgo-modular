@@ -304,6 +304,20 @@ usuários"):**
   `cmake -B .local-build/plugin -DRASGO_MODULAR_BUILD_PLUGIN=ON …` e
   `cmake --build .local-build/plugin --target RasgoModularPlugin_VST3
   RasgoModularPlugin_LV2 RasgoModularPluginCheck`;
+- **testes em DAWs (21/11/2026):** no **Ardour 8.4** (Ubuntu), VST3 e LV2
+  carregam, tocam e a janela abre (Edit…). Três defeitos achados e corrigidos
+  nesse teste: o ABRE do plugin gravava o `init.rmp` e a escolha de abertura
+  do aplicativo; o scanner VST3 do Ardour travava ao destruir o plugin
+  (`onMessageThread` esperava a thread de mensagens que o wrapper do JUCE
+  segura); o LV2 com entrada de áudio era listado como efeito. A janela abre
+  em 80% da tela e guarda o tamanho no projeto; no LV2 ela não acompanha a
+  janela do host (o JUCE não recebe o redimensionamento), no VST3 sim. Três
+  parâmetros para automação: VARIA (ligado), VARIA amount e Master (dB). No
+  **Infinite 2.0.0**, a janela do plugin derruba o host: `BadWindow` em
+  `X_CreateWindow` dentro de `JuceVST3Editor::attached` (a janela-mãe que o
+  Infinite passa ainda não chegou ao servidor X, e o tratador de erros do X
+  aborta o processo). O mesmo editor abre no Ardour; registrado como defeito
+  do lado do host, com o texto de relato entregue ao autor.
 - relógio de fora no aplicativo também: SIGNAL-IN com MIDI clock (dossiê 49
   §8) e a receita "Com outros programas" (INSTALL e página de Instalação).
 

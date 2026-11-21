@@ -79,7 +79,9 @@ public:
                // (raiz/12, índice/11). No FIM da lista para não mudar o
                // índice das portas nos patches salvos.
                {"root_cv", PortKind::Control, ""},
-               {"scale_cv", PortKind::Control, ""}},
+               {"scale_cv", PortKind::Control, ""},
+               // MORPH por cabo (21/11/2026): soma ao knob MRPH, 0–1
+               {"morph_cv", PortKind::Control, ""}},
               {{"pitch", PortKind::Audio, "v/oct"},
                {"gate", PortKind::Control, "gate"},
                {"semitone", PortKind::Audio, ""}},
@@ -93,7 +95,12 @@ public:
                {"sieve_r1", 0.0f, 12.0f, 0.0f, ""},
                {"sieve_m2", 2.0f, 13.0f, 4.0f, ""},
                {"sieve_r2", 0.0f, 12.0f, 1.0f, ""},
-               {"sieve_and", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"sieve_and", 0.0f, 1.0f, 0.0f, ""},
+               // A máquina de escalas (21/11/2026; do Trioio, ESTUDO §4.4,
+               // aprovado em 9/11): a escala B e a interpolação A → B. No
+               // FIM: patches iguais; MRPH 0 = o QUANTIZER de antes.
+               {"scale_b", 0.0f, 11.0f, 2.0f, ""},
+               {"morph", 0.0f, 1.0f, 0.0f, ""}}) {}
 
     static constexpr int kSieveIndex = 12;   // SCALE = 12 → o CRIVO
 
@@ -163,6 +170,9 @@ public:
         p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 29.0f, 100.0f);
         p.add(Widget::Kind::Jack, "ROOT", "in:root_cv", 29.0f, 78.0f);
         p.add(Widget::Kind::Jack, "SCL", "in:scale_cv", 41.0f, 78.0f);
+        p.add(Widget::Kind::Knob, "B", "scale_b", 8.0f, 78.0f);
+        p.add(Widget::Kind::Knob, "MRPH", "morph", 55.0f, 96.0f);
+        p.add(Widget::Kind::Jack, "MRPH", "in:morph_cv", 41.0f, 100.0f);
         p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "GATE", "out:gate", 17.0f, 116.0f);
         p.add(Widget::Kind::Jack, "ST", "out:semitone", 29.0f, 116.0f);
@@ -211,6 +221,15 @@ public:
         const float glide = parameterValue("glide");
         const float hysteresis = parameterValue("hysteresis");
         const ScaleDef& sc = scales()[static_cast<std::size_t>(useSieve ? 0 : scaleIdx)];
+        // a interpolação entre a escala A (SCALE) e a B, lida por bloco
+        const AudioBlock* morphCv = inputs.size() > 5 ? inputs[5] : nullptr;
+        float morph = parameterValue("morph") + (morphCv ? morphCv->at(0, 0) : 0.0f);
+        morph = morph < 0.0f ? 0.0f : (morph > 1.0f ? 1.0f : morph);
+        const bool useMorph = !useSieve && morph > 0.0f;
+        if (useMorph) {
+            const int bIdx = clampi(static_cast<int>(std::lround(parameterValue("scale_b"))), 0, 11);
+            morphCount_ = morphDegrees(sc, scales()[static_cast<std::size_t>(bIdx)], morph, morphDeg_);
+        }
 
         const AudioBlock* cv = inputs[0];
         const AudioBlock* transpose = inputs[1];
@@ -239,6 +258,7 @@ public:
 
             if (update) {
                 const float snapped = useSieve ? snapSieve(wantSemi, sv, root)
+                                    : useMorph ? snapDegrees(wantSemi, morphDeg_.data(), morphCount_, root)
                                                : snap(wantSemi, sc, root);
                 if (!initialized_) {
                     gateCountdown_ = gateSamples;
@@ -341,6 +361,47 @@ private:
         return best;
     }
 
+    // A máquina de escalas: os graus de A deslizam até o grau mais próximo
+    // de B (a distância circular na oitava), em linha reta nos cents — no
+    // meio do caminho aparecem alturas entre as duas escalas; os graus que
+    // só B tem entram a partir da metade. m = 0 → A; m = 1 → B (graus de A
+    // que caem no mesmo grau de B viram um só). Sem alocação.
+    static int morphDegrees(const ScaleDef& a, const ScaleDef& b, const float m,
+                            std::array<float, 24>& out) noexcept {
+        int n = 0;
+        bool used[12] = {};
+        for (int i = 0; i < a.length; ++i) {
+            const float da = static_cast<float>(a.degrees[static_cast<std::size_t>(i)]);
+            float best = 0.0f, bestD = 1e9f; int bestJ = 0;
+            for (int j = 0; j < b.length; ++j) {
+                const float db = static_cast<float>(b.degrees[static_cast<std::size_t>(j)]);
+                for (const float wrap : {-12.0f, 0.0f, 12.0f}) {
+                    const float d = std::fabs(db + wrap - da);
+                    if (d < bestD) { bestD = d; best = db + wrap; bestJ = j; }
+                }
+            }
+            used[bestJ] = true;
+            out[static_cast<std::size_t>(n++)] = da + m * (best - da);
+        }
+        if (m >= 0.5f)
+            for (int j = 0; j < b.length && n < 24; ++j)
+                if (!used[j]) out[static_cast<std::size_t>(n++)] =
+                    static_cast<float>(b.degrees[static_cast<std::size_t>(j)]);
+        return n;
+    }
+    static float snapDegrees(const float semi, const float* deg, const int count,
+                             const int root) noexcept {
+        const int baseOct = static_cast<int>(std::floor(semi / 12.0f));
+        float best = 0.0f, bestDist = 1.0e9f;
+        for (int oct = baseOct - 1; oct <= baseOct + 1; ++oct)
+            for (int d = 0; d < count; ++d) {
+                const float cand = static_cast<float>(oct * 12 + root) + deg[d];
+                const float dist = std::fabs(cand - semi);
+                if (dist < bestDist) { bestDist = dist; best = cand; }
+            }
+        return best;
+    }
+
     // o semitom do crivo (a partir da tônica) mais próximo de `semi`
     static float snapSieve(const float semi, const Sieve& s, const int root) noexcept {
         const int c = static_cast<int>(std::lround(semi));
@@ -352,6 +413,8 @@ private:
         return static_cast<float>(root);
     }
 
+    std::array<float, 24> morphDeg_{};
+    int morphCount_ = 0;
     float heldSemi_ = 0.0f;
     float glideSemi_ = 0.0f;
     float prevTrigger_ = 0.0f;

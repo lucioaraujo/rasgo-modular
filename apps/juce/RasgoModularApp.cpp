@@ -5728,6 +5728,24 @@ public:
     }
 
     // ---- para o plugin (20/11/2026) -------------------------------------
+    // Parâmetros da DAW (21/11/2026): o processador escreve, a interface
+    // aplica no próprio timer (fio de mensagens), pelos mesmos caminhos do
+    // slider do VARIA e do knob GAIN do MASTER.
+    std::function<void()> onTimerHook;
+    void hostSetVaria(const bool on, const float amount) {
+        if (on != rack_.motionOn && header_.onVary) header_.onVary();
+        const float v = juce::jlimit(0.0f, 2.0f, amount);
+        if (std::fabs(v - header_.varyAmount()) > 1e-4f) {
+            header_.setVaryAmount(v);
+            if (header_.onVaryAmount) header_.onVaryAmount(v);
+        }
+    }
+    void hostSetMasterDb(const float db) {
+        const float v = juce::jlimit(-60.0f, 12.0f, db);
+        for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
+            if (rack_.graph.node(i).type() == "MASTER")
+                rack_.graph.setParameterBase(i, "gain", v);
+    }
     // O patch como texto (o mesmo do `.rmp`), para o projeto da DAW.
     std::string patchText() {
         std::lock_guard<std::mutex> lk(rack_.gmx);
@@ -5809,6 +5827,7 @@ private:
     // congela à espera do áudio (`redraw()` do painel X11 faz igual).
     void timerCallback() override {
         if (!primeiroQuadro_) { primeiroQuadro_ = true; arranque::marca("primeiro quadro"); }
+        if (onTimerHook) onTimerHook();
         if (maestrucLink_ != nullptr && ++maestrucMixerTick_ >= 6) {
             // o mixer do patch mudou à mão (knob, patch novo): o Maestruc fica sabendo
             maestrucMixerTick_ = 0;

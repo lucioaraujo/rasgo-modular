@@ -20,8 +20,8 @@ class ModuleGuideTests(unittest.TestCase):
 
     def test_all_distinct_modules_and_eight_families(self):
         self.assertEqual(len(self.catalogue), 8)
-        self.assertEqual(len(self.types), 101)
-        self.assertEqual(len(set(self.types)), 101)
+        self.assertEqual(len(self.types), 105)
+        self.assertEqual(len(set(self.types)), 105)
         self.assertTrue({"LISTEN", "PHRASE"}.issubset(self.types))
 
     def test_complete_guides_and_real_images_in_each_language(self):
@@ -55,7 +55,7 @@ class ModuleGuideTests(unittest.TestCase):
             # SEO é acrescentado depois; o restante deve bater com o arquivo.
             disk = (gerar.AQUI / data["arquivo"]).read_text(encoding="utf-8")
             self.assertEqual(page, seo.BLOCO.sub("", disk))
-            self.assertEqual(page.count('<article class="modulo"'), 101)
+            self.assertEqual(page.count('<article class="modulo"'), 105)
 
     def test_new_recipes_use_actual_drum_and_vca_labels(self):
         for language in gerar.IDIOMAS:

@@ -217,6 +217,10 @@ Estado: **✓** pronto · **·** a fazer.
 | 101 | `GENDYN` | [`101_gendyn.md`](101_gendyn.md) | local, após 0.1.11 |
 | 102 | `RUNGLER` | [`102_rungler.md`](102_rungler.md) | local, após 0.1.11 |
 | 103 | `POLY-IN` | [`103_poly_in.md`](103_poly_in.md) | local, após 0.1.11 |
+| 104 | `SUM` | [`104_sum.md`](104_sum.md) | local, após 0.1.11 |
+| 105 | `FORM` | [`105_form.md`](105_form.md) | local, após 0.1.11 |
+| 106 | `TEMPO` | [`106_tempo.md`](106_tempo.md) | local, após 0.1.11 |
+| 107 | `VOLTA` | [`107_volta.md`](107_volta.md) | local, após 0.1.11 |
 | 14 | `HARMONY` | [`14_harmony.md`](14_harmony.md) | ✓ |
 | 31 | `ABACUS` | [`31_abacus.md`](31_abacus.md) | ✓ |
 | 51 | `BOXCAR` | [`51_boxcar.md`](51_boxcar.md) | ✓ |

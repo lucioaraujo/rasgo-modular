@@ -58,7 +58,22 @@ public:
             .withOutput("Output", juce::AudioChannelSet::stereo(), true);
     }
     RasgoModularProcessor() : AudioProcessor(buses()) {
-        onMessageThread([this] { main_ = std::make_unique<MainComponent>(); });
+        // Parâmetros para a DAW automatizar (21/11/2026): poucos e claros —
+        // o VARIA (ligado e intensidade) e o ganho do MASTER. A DAW escreve;
+        // a interface aplica no timer dela, só quando o valor muda (o slider
+        // e o knob na tela continuam livres até a automação andar).
+        addParameter(variaOn_ = new juce::AudioParameterBool(
+            juce::ParameterID("varia_on", 1), "VARIA", true));
+        addParameter(varia_ = new juce::AudioParameterFloat(
+            juce::ParameterID("varia", 1), "VARIA amount",
+            juce::NormalisableRange<float>(0.0f, 2.0f, 0.01f), 1.0f));
+        addParameter(master_ = new juce::AudioParameterFloat(
+            juce::ParameterID("master_db", 1), "Master (dB)",
+            juce::NormalisableRange<float>(-60.0f, 12.0f, 0.1f), -24.0f));
+        onMessageThread([this] {
+            main_ = std::make_unique<MainComponent>();
+            main_->onTimerHook = [this] { applyHostParameters(); };
+        });
     }
     ~RasgoModularProcessor() override {
         onMessageThread([this] { main_.reset(); });
@@ -144,6 +159,20 @@ public:
     }
 
     MainComponent& mainComponent() { return *main_; }
+
+    // no timer da interface: aplica o que a DAW mudou desde a última vez
+    void applyHostParameters() {
+        const bool on = variaOn_->get();
+        const float amount = varia_->get(), db = master_->get();
+        if (on != lastOn_ || std::fabs(amount - lastAmount_) > 1e-4f) {
+            main_->hostSetVaria(on, amount);
+            lastOn_ = on; lastAmount_ = amount;
+        }
+        if (std::fabs(db - lastDb_) > 1e-3f) {
+            main_->hostSetMasterDb(db);
+            lastDb_ = db;
+        }
+    }
     int editorW = 0, editorH = 0;   // 0 = ainda não escolhido: 80% da tela
 
 private:
@@ -187,6 +216,12 @@ private:
     }
 
     std::unique_ptr<MainComponent> main_;
+    juce::AudioParameterBool* variaOn_ = nullptr;
+    juce::AudioParameterFloat* varia_ = nullptr;
+    juce::AudioParameterFloat* master_ = nullptr;
+    // começam iguais aos padrões: a primeira passada não mexe no patch
+    bool lastOn_ = true;
+    float lastAmount_ = 1.0f, lastDb_ = -24.0f;
     double sr_ = 48000.0;
     std::int64_t samplePos_ = 0;
     bool wasPlaying_ = false;

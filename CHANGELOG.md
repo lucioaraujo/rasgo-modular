@@ -22,6 +22,24 @@ escuta do autor.
   blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
   mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
   6 para 8 HP. Patches e seeds antigos iguais.
+- **FORM** (#105, MODULATE) e **TEMPO** (#106, TIME), da proposta "forma e
+  andamento" (21/11, "pode implementar"): a dinâmica da forma (um mixer que
+  conduz pelo arco da peça, em cinco gramáticas, com respiração, subito e
+  morendo; ganho ≤ 0 dB) e o andamento que respira (salto nas seções,
+  accelerando, arco de frase, rubato, fermata e o ritardando do corredor que
+  para). Fora da seed e do VARIA. **CLOCK** ganha a entrada **RATE** (1 V =
+  ×2), para o TEMPO.
+- **VOLTA** (#107, TIME; 21/11, "turing reversível, módulo irmão"): o laço
+  que volta — MUT e ERODE em ordem fixa por passo, MEM protege, NEW troca a
+  base; voltar o knob devolve o laço exato.
+- **QUANTIZER: a máquina de escalas** (21/11): escala B e MRPH (knob e CV),
+  os graus deslizando de A a B por microtons. MRPH 0 = como antes.
+- **SUM** (#104, ROUTE; 21/11, auditoria 2): soma de sinais — quatro
+  entradas com atenuversor, offset, SUM, INV e AVG, saturação suave
+  opcional. O fan-in explícito que o núcleo pressupunha; o MULT fica como
+  está.
+- **VCA4 com SAT** (21/11): a saturação OTA do VCA em cada canal (núcleo
+  comum em `OtaSat.hpp`). Em 0, o VCA4 soa como antes; o VCA não mudou.
 - **Licença dupla dos módulos** (20/11, decisão do autor): `src/dsp/` e
   `src/core/` são oferecidos também sob **GPL-3.0-or-later**, para o VCV Rack
   e o Cardinal; o instrumento continua AGPL-3.0-or-later. `LICENSING.md` (pt,

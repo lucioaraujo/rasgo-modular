@@ -170,6 +170,23 @@ void testBounded() {
     }
 }
 
+// SAT (21/11/2026): a saturação OTA do VCA, por canal. Em 0 nada muda; ligada,
+// arredonda a onda (o pico relativo ao RMS cai) e segue finita e limitada.
+void testSaturation() {
+    Ins g; g.in[0] = sine(220.0, 0.9f);
+    Vca4 a; a.setParameter("level1", 1.0f);
+    Vca4 b; b.setParameter("level1", 1.0f); b.setParameter("saturation", 1.0f);
+    const auto ya = run(a, 40, g, 0), yb = run(b, 40, g, 0);
+    double peakA = 0, peakB = 0;
+    for (std::size_t i = 2000; i < ya.size(); ++i) {
+        peakA = std::max(peakA, (double)std::fabs(ya[i]));
+        peakB = std::max(peakB, (double)std::fabs(yb[i]));
+        EXPECT(std::isfinite(yb[i]) && std::fabs(yb[i]) < 1.05f);
+    }
+    const double crestA = peakA / rms(ya, 2000), crestB = peakB / rms(yb, 2000);
+    check(crestB < crestA - 0.05, "SAT arredonda a onda (fator de crista menor)");
+}
+
 void testPanel() {
     Vca4 v;
     check(validatePanel(v).empty(), "painel VCA4 fecha");
@@ -186,6 +203,7 @@ int main() {
     testCurveExp();
     testDeterminismAndDrift();
     testBounded();
+    testSaturation();
     testPanel();
 
     if (g_failures == 0) {

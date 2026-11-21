@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SignalGraph.hpp"
+#include "dsp/OtaSat.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -88,7 +89,7 @@ public:
         driftState_ = 0.0f;
         driftCounter_ = 0;
         rng_ = 0x853C49E6748FEA9BULL;
-        adaaPrev_[0] = adaaPrev_[1] = 0.0f;
+        ota_[0].reset(); ota_[1].reset();
         smoothCoef_ =
             1.0f - std::exp(-1.0f / std::max(1.0f, 0.0015f * sampleRate));
         driftInterval_ =
@@ -136,8 +137,8 @@ public:
                 gSmooth_[k] += (gFinal - gSmooth_[k]) * smoothCoef_;
                 float x = in[k] != nullptr ? in[k]->at(0, frame) : 0.0f;
                 if (!std::isfinite(x)) x = 0.0f;
-                if (sat > 0.0f) x = otaSat(k, x, satDrive);
-                else adaaPrev_[k] = 0.0f;
+                if (sat > 0.0f) x = ota_[k].process(x, satDrive);
+                else ota_[k].reset();
                 y[k] = softSat(x * gSmooth_[k]);
             }
             const float s = softSat(y[0] + y[1]);
@@ -160,22 +161,7 @@ private:
         if (x < -0.9f) return -0.9f + 0.1f * std::tanh((x + 0.9f) * 8.0f);
         return x;
     }
-    // log cosh(u), estável para |u| grande
-    static double logCosh(const double u) noexcept {
-        const double a = std::fabs(u);
-        return a + std::log1p(std::exp(-2.0 * a)) - 0.69314718055994531;
-    }
-    // tanh(d·x)/d com ADAA de 1ª ordem (u = d·x)
-    float otaSat(const int k, const float x, const float d) noexcept {
-        const double u1 = static_cast<double>(x) * d;
-        const double u0 = static_cast<double>(adaaPrev_[k]) * d;
-        adaaPrev_[k] = x;
-        const double du = u1 - u0;
-        const double y = std::fabs(du) > 1.0e-5
-            ? (logCosh(u1) - logCosh(u0)) / du
-            : std::tanh(0.5 * (u0 + u1));
-        return static_cast<float>(y / d);
-    }
+    // a saturação OTA está em `dsp/OtaSat.hpp` (a mesma do VCA4)
     float noise() noexcept {
         rng_ ^= rng_ >> 12; rng_ ^= rng_ << 25; rng_ ^= rng_ >> 27;
         const std::uint64_t x = rng_ * 0x2545F4914F6CDD1DULL;
@@ -184,7 +170,7 @@ private:
     }
 
     float gSmooth_[2] = {0.0f, 0.0f};
-    float adaaPrev_[2] = {0.0f, 0.0f};
+    OtaSaturator ota_[2];
     float driftState_ = 0.0f;
     float smoothCoef_ = 0.05f;
     std::uint32_t driftCounter_ = 0;

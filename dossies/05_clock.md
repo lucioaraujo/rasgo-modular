@@ -215,3 +215,7 @@ Do estudo da família, sobre o Rasgo Synth Studio e o Batruc: "phasing
   - PHAS 0: FASE = CLK (40/40 em 10 s);
   - PHAS 1: 42 contra 40;
   - MET dá 1 no tempo forte e ½ no meio do ciclo.
+
+## RATE (21/11/2026)
+
+Entrada `rate` (no fim da lista): o andamento multiplicado, 1 V = ×2, 0 V = o knob; só no relógio interno. Feita para o TEMPO. As entradas do CLOCK ficam fora da seed (seeds iguais).

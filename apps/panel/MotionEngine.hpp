@@ -135,7 +135,10 @@ public:
             // respira, não onde as vozes estão nem quanto soam. GAIN, PAN,
             // MUTE, OUT e MODO continuam do músico e da seed.
             // POLY-IN (20/11/2026): como o SIGNAL-IN, é o aparelho de quem toca
-            if (t == "MASTER" || t == "SIGNAL-IN" || t == "POLY-IN" || t == "LISTEN") continue;
+            // FORM e TEMPO (21/11/2026): a forma e o andamento são escolhas
+            // de composição; a mão do VARIA não as move
+            if (t == "MASTER" || t == "SIGNAL-IN" || t == "POLY-IN" || t == "LISTEN"
+                || t == "FORM" || t == "TEMPO") continue;
             const bool mixer = t == "MIXER";
             if (mixer) {
                 bool hasStage = false;

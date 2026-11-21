@@ -108,6 +108,9 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
             if (t == "SIGNAL-IN" && (nm == "clk" || nm == "run" || nm == "rst")) continue;
             // POLY-IN (20/11/2026): mudo sem teclado; a seed não o cabeia
             if (t == "POLY-IN") continue;
+            // FORM e TEMPO (21/11/2026): fora da seed, decisão da proposta
+            // (a peça ganharia começo, meio e fim — decisão maior)
+            if (t == "FORM" || t == "TEMPO") continue;
             int c = SEED_SRC_NONE;
             if (d.kind == PortKind::Audio) {
                 if (t == "NOISE" && (nm == "smooth" || nm == "sh")) c = SEED_SRC_RAND;
@@ -134,6 +137,7 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
         // tudo que depende do euclid fica mudo). Achado 2026-09-06 (seed
         // 18). As entradas do CLOCK ficam FORA dos destinos do passeio.
         if (t == "CLOCK") continue;
+        if (t == "FORM" || t == "TEMPO" || t == "POLY-IN") continue;
 
         for (std::size_t p = 0; p < node.inputCount(); ++p) {
             const auto& d = node.inputDescriptor(p);
@@ -141,7 +145,7 @@ inline void seedClassifyPorts(rasgo::modular::SignalGraph& g,
             // Portas acrescentadas DEPOIS da v0.1.2 ficam fora do passeio:
             // entrar no sorteio mudaria os patches de seeds antigos, e o
             // mesmo número tem de dar sempre o mesmo patch.
-            if (t == "QUANTIZER" && (nm == "root_cv" || nm == "scale_cv")) continue;
+            if (t == "QUANTIZER" && (nm == "root_cv" || nm == "scale_cv" || nm == "morph_cv")) continue;
             int c = SEED_DST_NONE;
             if (d.kind == PortKind::Audio) c = (nm == "fm") ? SEED_DST_FM : SEED_DST_AUDIO;
             else if (nm == "pitch" || nm == "freq_mod" || nm == "transpose") c = SEED_DST_PITCH;

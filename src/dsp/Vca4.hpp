@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/SignalGraph.hpp"
+#include "dsp/OtaSat.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -52,6 +53,7 @@ public:
         p.add(Widget::Kind::Knob, "CURVE", "curve", 8.0f, 54.0f);
         p.add(Widget::Kind::Knob, "MIXG", "mix_gain", 26.0f, 54.0f);
         p.add(Widget::Kind::Knob, "DRIFT", "drift", 44.0f, 54.0f);
+        p.add(Widget::Kind::Knob, "SAT", "saturation", 62.0f, 54.0f);
         p.add(Widget::Kind::Jack, "MIX", "out:mix", 80.0f, 118.0f);
         return p;
     }
@@ -63,6 +65,7 @@ public:
         driftState_ = 0.0f;
         driftCounter_ = 0;
         rng_ = 0xC4A5EEDBAD5EED04ULL;
+        for (auto& o : ota_) o.reset();
         smoothCoef_ =
             1.0f - std::exp(-1.0f / std::max(1.0f, 0.0015f * sampleRate));
         driftInterval_ =
@@ -84,6 +87,10 @@ public:
         const float mixGain = clampf(parameterValue("mix_gain"), 0.0f, 2.0f);
         const float drift = clamp01(parameterValue("drift"));
         const float driftStep = 0.0004f * drift * drift;
+        // SAT (21/11/2026): a mesma saturação OTA do VCA, na entrada de
+        // cada canal; em 0, o VCA4 é o de antes, amostra a amostra
+        const float sat = clampf(parameterValue("saturation"), 0.0f, 1.0f);
+        const float satDrive = 1.0f + 5.0f * sat;
 
         const AudioBlock* in[4] = {inputs[0], inputs[2], inputs[4], inputs[6]};
         const AudioBlock* cv[4] = {inputs[1], inputs[3], inputs[5], inputs[7]};
@@ -105,7 +112,9 @@ public:
                 const float gShaped =
                     curve <= 0.0f ? g : std::pow(g, 1.0f + 3.0f * curve);
                 gSmooth_[k] += (gShaped * driftMul - gSmooth_[k]) * smoothCoef_;
-                const float x = in[k] != nullptr ? in[k]->at(0, f) : 0.0f;
+                float x = in[k] != nullptr ? in[k]->at(0, f) : 0.0f;
+                if (sat > 0.0f) x = ota_[k].process(x, satDrive);
+                else ota_[k].reset();
                 y[k] = softSat(x * gSmooth_[k]);
                 sum += y[k];
             }
@@ -146,6 +155,7 @@ private:
         v.push_back({"curve", 0.0f, 1.0f, 0.0f, ""});
         v.push_back({"mix_gain", 0.0f, 2.0f, 1.0f, ""});
         v.push_back({"drift", 0.0f, 1.0f, 0.0f, ""});
+        v.push_back({"saturation", 0.0f, 1.0f, 0.0f, ""});   // no FIM (21/11/2026)
         return v;
     }
 
@@ -166,6 +176,7 @@ private:
     }
 
     float gSmooth_[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    OtaSaturator ota_[4];
     float driftState_ = 0.0f;
     float smoothCoef_ = 0.05f;
     std::uint32_t driftCounter_ = 0;

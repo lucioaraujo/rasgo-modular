@@ -14,6 +14,10 @@
 #include "dsp/Boxcar.hpp"
 #include "dsp/SignalIn.hpp"
 #include "dsp/PolyIn.hpp"
+#include "dsp/Sum.hpp"
+#include "dsp/Form.hpp"
+#include "dsp/Tempo.hpp"
+#include "dsp/Volta.hpp"
 #include "dsp/Chaos.hpp"
 #include "dsp/Control.hpp"
 #include "dsp/Crush.hpp"
@@ -128,6 +132,10 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "SIGNAL-IN" || t == "AUDIO-IN")
         return std::make_unique<SignalIn>();   // AUDIO-IN = alias de migração
     if (t == "POLY-IN")    return std::make_unique<PolyIn>();
+    if (t == "SUM")        return std::make_unique<Summer>();
+    if (t == "FORM")       return std::make_unique<Form>();
+    if (t == "TEMPO")      return std::make_unique<Tempo>();
+    if (t == "VOLTA")      return std::make_unique<Volta>();
     if (t == "CHAOS")      return std::make_unique<Chaos>();
     if (t == "PLL")        return std::make_unique<Pll>();
     if (t == "NOISE")      return std::make_unique<Noise>();
@@ -271,10 +279,10 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
     static const std::vector<CatalogGroup> c = {
         {"SOURCE",    {"OSC", "WAVETABLE", "ADDITIVE", "OPERATOR", "PULSAR", "SPECTRA", "PLL", "CHORD", "NOISE", "MATTER", "STRING", "DRUM", "SIGNAL-IN", "GENDYN", "RUNGLER", "POLY-IN"}},
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS", "ELASTIC", "TAPE"}},
-        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT", "PRESSURE", "REFRACT", "PREDATOR"}},
-        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET", "INTERFERENCE", "SWARM", "ECLIPSE", "SEASON"}},
+        {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT", "PRESSURE", "REFRACT", "PREDATOR", "FORM"}},
+        {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET", "INTERFERENCE", "SWARM", "ECLIPSE", "SEASON", "TEMPO", "VOLTA"}},
         {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "INTERPRET", "PHRASE"}},
-        {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE"}},
+        {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE", "SUM"}},
         {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO", "CUTUP", "LENS"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},
     };

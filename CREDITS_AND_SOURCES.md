@@ -81,6 +81,22 @@ Cardinal; implementação própria sob AGPL-3.0-or-later.
 Contratos em [65](dossies/65_cell.md), [66](dossies/66_markov.md),
 [67](dossies/67_bounce.md) e [68](dossies/68_spring.md).
 
+## FORM, TEMPO, VOLTA e a máquina de escalas (21/11/2026)
+
+- **FORM:** a forma do rasgo-synth / Rasgo Synth Studio (caminhada de
+  Markov sobre papéis, coda absorvente; Freytag, Kishōtenketsu) e o Trioio
+  (arco de tensão, dinâmica nunca acima da base), do mesmo autor; a medida de
+  11 dB entre vale e clímax é do Studio (`docs/COMPOSICAO.md`).
+- **TEMPO:** N. P. McAngus Todd, "The dynamics of dynamics" (JASA, 1992) — o
+  arco de frase; A. Friberg & J. Sundberg, "Does music performance allude to
+  locomotion?" (JASA 105, 1999) — o ritardando final; a mola de andamento e o
+  rubato de Fourier do Rasgo Synth Asterismus (mesmo autor).
+- **VOLTA:** a "transformação reversível" do Navalha 2 (Glerm Soares / Lúcio
+  Araújo), como conceito; o TURING (Music Thing Turing Machine, Tom
+  Whitwell) como ponto de partida. Nenhum código copiado.
+- **QUANTIZER, máquina de escalas:** a interpolação entre escalas do Trioio
+  (`ScaleMachine`, mesmo autor), como conceito; implementação própria.
+
 ## POLY-IN (#103, 20/11/2026)
 
 - A alocação de vozes dos sintetizadores polifônicos (rodízio, a mesma

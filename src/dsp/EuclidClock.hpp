@@ -64,7 +64,10 @@ public:
         : Signal(
               {{"ext_clock", PortKind::Control, "trig"},
                {"reset", PortKind::Control, "trig"},
-               {"bpm_mod", PortKind::Control, ""}},
+               {"bpm_mod", PortKind::Control, ""},
+               // RATE (21/11/2026, para o TEMPO): o andamento MULTIPLICADO,
+               // 1 V = ×2 (0 V = o andamento do knob). No fim: patches iguais.
+               {"rate", PortKind::Control, "v/oct"}},
               {{"clock", PortKind::Control, "gate"},
                {"euclid", PortKind::Control, "gate"},
                {"accent", PortKind::Control, "gate"},
@@ -109,6 +112,7 @@ public:
         p.add(Widget::Kind::Jack, "EXT", "in:ext_clock", 5.0f, 100.0f);
         p.add(Widget::Kind::Jack, "RST", "in:reset", 17.0f, 100.0f);
         p.add(Widget::Kind::Jack, "BPM", "in:bpm_mod", 29.0f, 100.0f);
+        p.add(Widget::Kind::Jack, "RATE", "in:rate", 41.0f, 100.0f);
         p.add(Widget::Kind::Jack, "CLK", "out:clock", 5.0f, 116.0f);
         p.add(Widget::Kind::Jack, "EUC", "out:euclid", 17.0f, 116.0f);
         p.add(Widget::Kind::Jack, "ACC", "out:accent", 29.0f, 116.0f);
@@ -176,6 +180,7 @@ public:
         const AudioBlock* ext = inputs[0];
         const AudioBlock* reset = inputs[1];
         const AudioBlock* bpmMod = inputs[2];
+        const AudioBlock* rateIn = inputs.size() > 3 ? inputs[3] : nullptr;
         const bool externalClock = (ext != nullptr);
 
         for (std::size_t frame = 0; frame < frames; ++frame) {
@@ -217,8 +222,10 @@ public:
                     clampf(bpm + (bpmMod ? bpmMod->at(0, frame) : 0.0f),
                            1.0f, 1000.0f);
                 const float glitchMul = glitch ? glitchFactor_ : 1.0f;
+                const float rateMul = rateIn
+                    ? std::exp2(clampf(rateIn->at(0, frame), -4.0f, 4.0f)) : 1.0f;
                 const float stepHz = effBpm / 60.0f * mult * tupletRatio
-                    * (1.0f + driftState_) * glitchMul;
+                    * (1.0f + driftState_) * glitchMul * rateMul;
                 phase_ += static_cast<double>(std::max(0.0001f, stepHz))
                     / sampleRate_;
                 phase2_ += phasing * static_cast<double>(std::max(0.0001f, stepHz))
