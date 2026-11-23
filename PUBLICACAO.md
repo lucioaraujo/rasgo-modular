@@ -1,5 +1,42 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.12 — preparação (23 nov. 2026)
+
+Pedido do autor (23/11): "ok, prepare a v0.1.12".
+
+Feito localmente (nada enviado):
+
+- versão 0.1.12 no `CMakeLists.txt`; CHANGELOG fechado (seção "v0.1.12 — a
+  publicar"); README (abertura, versão, 105 módulos, links nos 4 idiomas) e
+  INSTALL na v0.1.12;
+- `modulos.json` despejado do binário, páginas regeneradas, imagens dos 105
+  painéis num só padrão (`1c91009`);
+- o estado do site (`estado.py --depois`, `seo.py` VERSAO) **fica em 0.1.11**
+  até a release existir, como na v0.1.11 (`ce73a43`): o site nunca aponta
+  para downloads que ainda não existem.
+
+Validação: build completo e **137/137 testes** CTest; testes Python do site
+OK; `verificar.py` acusa 1 aviso esperado (versão pública 0.1.11 ≠ CMake
+0.1.12), que zera no passo 4.
+
+Os pacotes levam só o aplicativo. O plugin (VST3/LV2) e a linha de comando
+se constroem a partir do código; levar o plugin nos pacotes é decisão à
+parte (CI por plataforma, testes em DAWs fora do Linux).
+
+Riscos que só a CI mostra: o banco de escalas entra no binário como 81
+literais de até 12 KB (abaixo do limite do MSVC, mas o Windows só se confirma
+na matriz); `/bigobj` já está ligado.
+
+Portões, nesta ordem:
+
+1. **Escuta do autor** (`dossies/ESCUTA_lote_novembro.md`).
+2. **Decisão do autor de publicar.**
+3. Enviar a tag `v0.1.12`; a matriz gera os seis pacotes e a release.
+4. Com os seis anexos publicados: `estado.py --depois 0.1.12`, `seo.py`
+   (VERSAO), `verificar.py` com zero avisos; então enviar `main` (deploy de
+   Pages); data da release no CHANGELOG e no README.
+5. Conferir os links e as páginas públicas.
+
 ## Release v0.1.8 — 11 nov. 2026 (publicada)
 
 A [release v0.1.8](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.8)

@@ -7,12 +7,34 @@ pronto.
 
 ---
 
-## Não publicado (desde a v0.1.11)
+## v0.1.12 — a publicar (preparada em 2026-11-23)
 
-**Resumo.** De 88 a 100 módulos, com 12 novos. O visor do KEY foi refeito, e
-os módulos novos da v0.1.8 ganharam papéis na seed. Os 12 novos entram no
-rack da seed, então **as seeds mudam**. Nada disto foi publicado: espera a
-escuta do autor.
+**Resumo.** De 88 a **105 módulos**, com 17 novos (os doze de 20/11,
+POLY-IN, SUM, FORM, TEMPO e VOLTA). A peça ganha forma (FORM e TEMPO, e o
+tamanho da seed: camerístico, médio, orquestral, com cópias de vozes); o
+QUANTIZER ganha a máquina de escalas e o banco de 2576 escalas do Trioio; o
+Modular segue o MIDI clock de uma DAW, reparte um teclado em vozes e grava
+as notas em `.mid`. Os módulos novos entram no rack da seed e ganham papéis
+nela, então **as seeds mudam**. Patches salvos continuam abrindo iguais.
+
+- **Parâmetros sem trava** (20/11, etapa 1 do plugin): o valor de cada
+  parâmetro e a base da modulação passam a ser atômicos (`RtFloat`); girar
+  knobs e o VARIA não disputam mais o grafo com o áudio. As edições de
+  estrutura (cabos, módulos) continuam sob o lock.
+- **Plugin VST3 e LV2, experimental** (20–21/11): o mesmo instrumento dentro
+  de uma DAW, no Linux, testado no Ardour 8.4 (VST3 e LV2): estado salvo no
+  projeto, transporte da DAW como MIDI clock no SIGNAL-IN, automação de
+  VARIA (ligado, intensidade) e Master. **Não vai nos pacotes desta
+  versão**: constrói-se a partir do código (`-DRASGO_MODULAR_BUILD_PLUGIN=ON`,
+  ver `DESENVOLVIMENTO.md`). No Infinite 2.0.0, abrir a janela do plugin
+  derruba o host (defeito registrado do lado dele).
+- **Linha de comando** `rasgo_modular_cli` (21/11, a partir do código):
+  `render` (uma seed em WAV, sem placa de som), `render-patch`, `validate`,
+  `info` (módulos, portas e parâmetros) e `demo-patch` (o patch das imagens
+  de painel do site).
+- **Site:** imagens de painel dos 105 módulos num só padrão (escala, cinza
+  dos rótulos, painéis atuais), guias novos e atualizados nas 4 línguas,
+  tutorial com o SIGNAL-IN/POLY-IN, o tamanho da seed e o SUM.
 
 - **SIGNAL-IN segue o MIDI clock** (20/11, pedido do autor: "para que
   funcione com outros softwares"). Saídas novas CLK (na divisão DIV), RUN e

@@ -52,7 +52,7 @@ repositório. O site resume e aponta; cópia editada à mão diverge.
 
 ## O guia dos módulos é GERADO, e por quê
 
-As quatro páginas são montadas pelo gerador. O catálogo de 88 tipos vem
+As quatro páginas são montadas pelo gerador. O catálogo de 105 tipos vem
 do app (`LearnCatalog.hpp` e `ReactiveLearn.hpp`); os textos didáticos
 completos vêm de `guia/<idioma>/<TIPO>.md`, conforme `ESTILO.md`.
 Cada texto tem explicação, função musical, controles e experiência guiada.
