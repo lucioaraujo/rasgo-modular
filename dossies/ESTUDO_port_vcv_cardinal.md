@@ -112,3 +112,27 @@ O mesmo código de casca serve aos dois.
   tiver visor, o widget. O gerador reduz isso a pouco.
 - **Expectativa:** no Rack não há seeds nem VARIA; a página do plugin deve
   dizer que o instrumento completo é o aplicativo.
+
+## 8. O piloto (23/11/2026)
+
+Autor: "pode baixar o kit vcv e começar o piloto" (o kit é gratuito, sem
+cadastro: conferido na página da VCV antes do download).
+
+- **Kit:** Rack SDK 2.6.6 (Linux x64) em `RASGO/third_party/vcv-rack-sdk-2.6.6/`,
+  com sha256 e licença em `PROVENANCE.md`.
+- **Onde:** `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` (local, fora deste
+  repositório; o repositório próprio é decisão do autor, §5.4). O DSP entra
+  por cópia fixada do commit `bee38c0`, sem alteração.
+- **A casca** (`src/Casca.hpp`): genérica, gerada do próprio módulo
+  (parâmetros, portas, `panel()`); blocos de 16 amostras; ±5 V para áudio e
+  CV, 0–10 V para gate/trigger, 1 V/oct igual.
+- **Compila** sem aviso com o SDK (`-std=gnu++17` depois do `-std=c++11` do
+  SDK; sem o `jq`, `make SLUG=RasgoModular VERSION=2.0.0`).
+- **Teste sem janela** (`tests/teste_casca.cpp`, ligado à `libRack.so`): OSC a
+  440 Hz exatos com pico de 5,00 V; +1 V na entrada de altura dobra a
+  frequência; atraso de 16 amostras (0,33 ms); LADDER estável.
+- **Achado do SDK:** o Rack compila plugins com `-funsafe-math-optimizations`;
+  vigiar módulos que dependem de NaN/infinito ou de denormais (o Rasgo já
+  zera denormais por conta própria).
+- **Falta:** abrir no VCV Rack Free (gratuito) e ouvir; imagens dos painéis
+  (provisórios: fundo liso e rótulos) para o autor; decisões §5.1, 5.2, 5.4.

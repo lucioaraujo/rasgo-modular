@@ -32,6 +32,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   padrão. Achado, para o autor: o visor do TRIGSEQ mostra só os últimos 128
   pontos (~8 ms em blocos de 128) e quase nunca pega um pulso; o do KEY fica
   vazio no patch de demonstração.
+- **Piloto VCV** (autor: "pode baixar o kit vcv e começar o piloto"): SDK
+  2.6.6 gratuito; `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` com 6 módulos e a
+  casca genérica; compila e passa no teste sem janela (estudo §8). Falta
+  abrir no VCV Rack Free e as imagens dos painéis para o autor.
 - Falta: a escuta do autor (módulos novos, seeds, painéis, o banco); o piloto
   VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 
