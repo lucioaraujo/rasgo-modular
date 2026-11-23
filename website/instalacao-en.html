@@ -158,6 +158,7 @@
   <h2>With other programs</h2>
   <p>Rasgo Modular is a standalone application that talks to DAWs, other synthesizers and machines through the system's audio and MIDI. The way in is the SIGNAL-IN module: switch it <strong>ON</strong> and patch one of its outputs. From then on it receives sound, notes and tempo; NOTE-OUT sends notes out.</p>
   <ul class="tut-list">
+    <li><strong>Inside a DAW, as a plugin (VST3 and LV2):</strong> the same instrument opens on a DAW instrument track, with the patch saved in the project. The DAW's transport reaches SIGNAL-IN as MIDI clock, and VARIA and Master show up for automation. Tested on Linux with Ardour. For now, the plugin is built from source (<code>INSTALL.md</code>, "VST3 and LV2 plugin"); this version's packages carry the application.</li>
     <li><strong>Sound from another program into Rasgo:</strong> on Linux, connect the program's output to Rasgo Modular's input in PipeWire or JACK (qpwgraph, Helvum or Carla); on macOS, use a virtual device such as BlackHole; on Windows, VB-Cable. The sound arrives at SIGNAL-IN's L and R outputs.</li>
     <li><strong>Rasgo's sound in a DAW:</strong> the same path the other way round. Rasgo Modular's output becomes the input of a DAW track (Ardour, Reaper, Bitwig, Live, Infinite and others) to record or process.</li>
     <li><strong>Notes:</strong> a MIDI keyboard or a DAW MIDI track arrives at SIGNAL-IN (1V/O, GATE, VEL and CC). NOTE-OUT sends the patch's notes to another instrument.</li>

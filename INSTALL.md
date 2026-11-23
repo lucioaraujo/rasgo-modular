@@ -351,11 +351,30 @@ perdidos, que deve ficar em zero.
 
 O Rasgo Modular é um aplicativo próprio e conversa com DAWs, outros sintetizadores e máquinas pelo áudio e pelo MIDI do sistema. A porta de entrada é o módulo SIGNAL-IN: ligue o **ON** e cabeie uma saída dele. A partir daí ele recebe o som, as notas e o andamento; o NOTE-OUT manda as notas para fora.
 
+- **Dentro de uma DAW, como plugin (VST3 e LV2):** o mesmo instrumento abre numa faixa de instrumento da DAW, com o patch guardado no projeto. O transporte da DAW chega ao SIGNAL-IN como MIDI clock, e o VARIA e o Master aparecem para automação. Testado no Linux com o Ardour. Por enquanto, o plugin se constrói a partir do código (abaixo, "Plugin VST3 e LV2"); os pacotes desta versão trazem o aplicativo.
 - **Som de outro programa no Rasgo:** no Linux, ligue a saída do programa à entrada do Rasgo Modular no PipeWire ou no JACK (qpwgraph, Helvum ou Carla); no macOS, use um dispositivo virtual como o BlackHole; no Windows, o VB-Cable. O som chega nas saídas L e R do SIGNAL-IN.
 - **Som do Rasgo numa DAW:** o mesmo caminho ao contrário. A saída do Rasgo Modular vira a entrada de uma faixa da DAW (Ardour, Reaper, Bitwig, Live, Infinite e outras) para gravar ou processar.
 - **Notas:** um teclado MIDI ou uma faixa MIDI da DAW chega no SIGNAL-IN (1V/O, GATE, VEL e CC). O NOTE-OUT manda as notas do patch para outro instrumento.
 - **O andamento da DAW (MIDI clock):** na DAW, ligue o envio de MIDI clock para a porta que o Rasgo Modular escuta. Cabeie o **CLK** do SIGNAL-IN no **EXT** do CLOCK e o **RST** no **RST** do CLOCK: o patch segue o andamento e o "um" da DAW e para no STOP. O **DIV** escolhe a divisão; a colcheia, o padrão, casa com o MULT 2 do CLOCK. O **RUN** fica alto enquanto a DAW toca.
 - **Portas MIDI entre programas:** no Linux, as portas aparecem no próprio sistema (ALSA); no macOS, use o driver IAC; no Windows, um cabo MIDI virtual como o loopMIDI. O Rasgo Modular escuta as entradas MIDI que existem quando o SIGNAL-IN é ligado: abra a DAW antes.
+
+### Plugin VST3 e LV2
+
+O plugin é o mesmo instrumento dentro de uma DAW. Ele se constrói a partir do
+código, com a mesma JUCE do aplicativo:
+
+```sh
+cmake -B build-plugin -DCMAKE_BUILD_TYPE=Release \
+      -DRASGO_MODULAR_JUCE_PATH=/caminho/para/JUCE \
+      -DRASGO_MODULAR_BUILD_PLUGIN=ON
+cmake --build build-plugin --target RasgoModularPlugin_VST3 RasgoModularPlugin_LV2 -j2
+```
+
+Os plugins ficam em `build-plugin/apps/juce/RasgoModularPlugin_artefacts/Release/`
+(`VST3/Rasgo Modular.vst3` e `LV2/Rasgo Modular.lv2`). No Linux, copie a pasta
+`.vst3` para `~/.vst3/` e a `.lv2` para `~/.lv2/`, e peça à DAW para procurar
+plugins de novo. Na DAW, o Rasgo Modular aparece como instrumento; a janela
+abre pelo botão de editar do plugin. Testado no Linux com o Ardour 8.4.
 
 ### Onde o instrumento guarda as coisas
 
@@ -542,11 +561,30 @@ recording folder; `RASGO_REC_TAP` picks where REC captures from —
 
 Rasgo Modular is a standalone application that talks to DAWs, other synthesizers and machines through the system's audio and MIDI. The way in is the SIGNAL-IN module: switch it **ON** and patch one of its outputs. From then on it receives sound, notes and tempo; NOTE-OUT sends notes out.
 
+- **Inside a DAW, as a plugin (VST3 and LV2):** the same instrument opens on a DAW instrument track, with the patch saved in the project. The DAW's transport reaches SIGNAL-IN as MIDI clock, and VARIA and Master show up for automation. Tested on Linux with Ardour. For now, the plugin is built from source (below, "VST3 and LV2 plugin"); this version's packages carry the application.
 - **Sound from another program into Rasgo:** on Linux, connect the program's output to Rasgo Modular's input in PipeWire or JACK (qpwgraph, Helvum or Carla); on macOS, use a virtual device such as BlackHole; on Windows, VB-Cable. The sound arrives at SIGNAL-IN's L and R outputs.
 - **Rasgo's sound in a DAW:** the same path the other way round. Rasgo Modular's output becomes the input of a DAW track (Ardour, Reaper, Bitwig, Live, Infinite and others) to record or process.
 - **Notes:** a MIDI keyboard or a DAW MIDI track arrives at SIGNAL-IN (1V/O, GATE, VEL and CC). NOTE-OUT sends the patch's notes to another instrument.
 - **The DAW's tempo (MIDI clock):** in the DAW, turn on MIDI clock output to the port Rasgo Modular listens to. Patch SIGNAL-IN's **CLK** into the CLOCK's **EXT** and **RST** into the CLOCK's **RST**: the patch follows the DAW's tempo and "one" and stops on STOP. **DIV** picks the division; the eighth note, the default, matches the CLOCK's MULT 2. **RUN** stays high while the DAW plays.
 - **MIDI ports between programs:** on Linux, the ports appear in the system itself (ALSA); on macOS, use the IAC driver; on Windows, a virtual MIDI cable such as loopMIDI. Rasgo Modular listens to the MIDI inputs that exist when SIGNAL-IN is switched on: open the DAW first.
+
+### VST3 and LV2 plugin
+
+The plugin is the same instrument inside a DAW. It is built from source,
+with the same JUCE as the application:
+
+```sh
+cmake -B build-plugin -DCMAKE_BUILD_TYPE=Release \
+      -DRASGO_MODULAR_JUCE_PATH=/path/to/JUCE \
+      -DRASGO_MODULAR_BUILD_PLUGIN=ON
+cmake --build build-plugin --target RasgoModularPlugin_VST3 RasgoModularPlugin_LV2 -j2
+```
+
+The plugins land in `build-plugin/apps/juce/RasgoModularPlugin_artefacts/Release/`
+(`VST3/Rasgo Modular.vst3` and `LV2/Rasgo Modular.lv2`). On Linux, copy the
+`.vst3` folder to `~/.vst3/` and the `.lv2` one to `~/.lv2/`, then ask the DAW
+to rescan plugins. In the DAW, Rasgo Modular shows up as an instrument; its
+window opens from the plugin's edit button. Tested on Linux with Ardour 8.4.
 
 ### Where state lives
 
