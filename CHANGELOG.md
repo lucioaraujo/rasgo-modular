@@ -22,6 +22,10 @@ escuta do autor.
   blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
   mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
   6 para 8 HP. Patches e seeds antigos iguais.
+- **REC grava as notas em .mid** (23/11, pendência do dossiê 38): com um
+  NOTE-OUT no caminho, a tomada sai também como `rec-….mid` (uma trilha por
+  NOTE-OUT, 0 V = dó central, microtons por pitch bend, andamento do
+  CLOCK), para abrir numa DAW ou num editor de partitura.
 - **Banco de escalas do Trioio no QUANTIZER** (23/11, opção A da proposta):
   SCALE ganha a posição BANCO, com as 2576 escalas do Trioio (gêneros
   gregos, temperamentos, maqam, rāgas, gamelão, EDO, MOS…), cada uma com a

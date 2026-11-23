@@ -78,3 +78,20 @@ está feita); polifonia; não adicionado ao `PatchSeed.hpp`. Painel
 compila, não testado visualmente.
 
 **Não commitado.**
+
+## Exportação para .mid (23/11/2026)
+
+A pendência acima, feita no app JUCE: ao parar o REC, se a tomada teve
+notas, sai `rec-….mid` ao lado do `.wav` e do `.score.txt`
+(`apps/panel/ScoreMidi.hpp`, teste `tests/test_score_midi.cpp`).
+
+- Standard MIDI File tipo 1, 480 tiques por semínima, tempo = o `bpm` do
+  primeiro CLOCK no fim da tomada (ou 120).
+- Uma trilha e um canal por NOTE-OUT (monofônico), pulando o canal 10
+  (percussão no General MIDI); até 15 NOTE-OUT.
+- Altura: **0 V = dó central (MIDI 60)**, a convenção do VCV Rack; a nota
+  mais próxima, e o resto (microtons do banco de escalas, AFIN, MRPH) num
+  pitch bend antes da nota, faixa ±2 semitons declarada por RPN 0.
+- Velocidade 0–1 → 1–127. O acento não vira nada à parte (fica no
+  `.score.txt`).
+- O painel X11 não exporta (fica como está). Falta: MusicXML.

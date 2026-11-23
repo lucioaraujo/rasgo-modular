@@ -807,6 +807,11 @@ if(BUILD_TESTING)
     target_compile_options(rasgo_modular_quantizer_morph_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_quantizer_morph_tests COMMAND rasgo_modular_quantizer_morph_tests)
 
+    add_executable(rasgo_modular_score_midi_tests tests/test_score_midi.cpp)
+    target_include_directories(rasgo_modular_score_midi_tests PRIVATE src apps)
+    target_compile_options(rasgo_modular_score_midi_tests PRIVATE ${rasgo_modular_warnings})
+    add_test(NAME rasgo_modular_score_midi_tests COMMAND rasgo_modular_score_midi_tests)
+
     add_executable(rasgo_modular_banco_escalas_tests tests/test_banco_escalas.cpp)
     target_include_directories(rasgo_modular_banco_escalas_tests PRIVATE src)
     target_compile_options(rasgo_modular_banco_escalas_tests PRIVATE ${rasgo_modular_warnings})

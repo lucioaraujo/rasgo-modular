@@ -21,6 +21,9 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   reinstalado.
 - **Banco de escalas do Trioio no QUANTIZER** (opção A, "faça sua
   recomendação"): SCALE = BANCO, navegador no visor, 2576 escalas.
+- **REC grava as notas em .mid** (pendência do dossiê 38): com NOTE-OUT no
+  caminho, sai `rec-….mid` ao lado do WAV. Formato conferido pelo leitor do
+  teste; falta abrir um numa DAW (o autor).
 - Falta: a escuta do autor (módulos novos, seeds, painéis, o banco); o piloto
   VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 

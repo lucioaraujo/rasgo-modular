@@ -32,6 +32,7 @@
 #include "io/WavWriter.hpp"       // REC: o mesmo .wav do painel X11
 #include "juce/StreamingVersion.h" // REC: a versão de entrega (16/11/2026)
 #include "panel/ScoreRecorder.hpp"  // SYSTEM SCORE da tomada
+#include "panel/ScoreMidi.hpp"      // as notas do NOTE-OUT em .mid
 #include "panel/SinkOut.hpp"      // sink + guarda de segurança
 #include "panel/LearnCatalog.hpp"
 #include "panel/LearnPresentation.hpp"
@@ -7021,7 +7022,7 @@ private:
             out = recDir().getChildFile(stamp + "-" + juce::String(n) + ".wav");
 
         std::vector<float> take, takePre;
-        std::string scoreText;
+        std::string scoreText, midiBytes;
         {
             std::lock_guard<std::mutex> lk(rack_.gmx);
             take.swap(rack_.recBuf);
@@ -7049,6 +7050,15 @@ private:
                 {"contato", "rasgo.instruments@gmail.com"},
             });
             scoreText = rack_.score.toText();
+            // as notas do NOTE-OUT em .mid (23/11/2026, dossiê 38), no
+            // andamento do primeiro CLOCK (ou 120)
+            double bpm = 120.0;
+            for (std::size_t i = 0; i < rack_.graph.nodeCount(); ++i)
+                if (rack_.graph.node(i).type() == "CLOCK") {
+                    bpm = rack_.graph.parameterUserValue(i, "bpm");
+                    break;
+                }
+            midiBytes = rasgo::panel::scoreToMidi(rack_.score.events(), bpm);
         }
         if (take.empty() && takePre.empty()) return;
 
@@ -7095,6 +7105,9 @@ private:
         const juce::File scoreFile =
             out.getSiblingFile(out.getFileNameWithoutExtension() + ".score.txt");
         scoreFile.replaceWithText(u8(scoreText));
+        if (!midiBytes.empty())
+            out.getSiblingFile(out.getFileNameWithoutExtension() + ".mid")
+                .replaceWithData(midiBytes.data(), midiBytes.size());
         std::fprintf(stderr, "[rec] %.1f s -> %s (+ %s)\n",
                      static_cast<double>(take.size()) / 2.0 / sampleRate_,
                      out.getFullPathName().toRawUTF8(),
