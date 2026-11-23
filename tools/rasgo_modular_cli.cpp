@@ -6,6 +6,7 @@
 //   rasgo_modular_cli render-patch patch.rmp [--dur S] [--sr HZ] saida.wav
 //   rasgo_modular_cli validate patch.rmp
 //   rasgo_modular_cli info [TIPO]
+//   rasgo_modular_cli demo-patch TIPO,TIPO,… saida.rmp
 //
 // `render` faz o mesmo que o app ao abrir uma seed: o rack de fábrica, a
 // seed (`seedPatch`) e o equilíbrio de volume (`balanceSeedLevel`); depois
@@ -40,7 +41,8 @@ int usage() {
         "  render --seed N [--dur S] [--sr HZ] saida.wav   uma seed para WAV (24 bits)\n"
         "  render-patch patch.rmp [--dur S] [--sr HZ] saida.wav\n"
         "  validate patch.rmp                              confere um patch salvo\n"
-        "  info [TIPO]                                     os módulos; com TIPO, portas e parâmetros\n");
+        "  info [TIPO]                                     os módulos; com TIPO, portas e parâmetros\n"
+        "  demo-patch T1,T2,… saida.rmp                    patch de demonstração para os painéis\n");
     return 2;
 }
 
@@ -188,6 +190,57 @@ int cmdInfo(int argc, char** argv) {
     return 0;
 }
 
+// O patch de demonstração das imagens de painel do site (21/11/2026): o rack
+// de fábrica, e cada entrada livre dos módulos pedidos recebe uma fonte de
+// teste — áudio ← a serra do OSC, gate/trigger ← o CLK do CLOCK, controle ← o
+// BI do FUNCTION —, para o visor mostrar o módulo funcionando. É o mesmo
+// critério da exportação por seed (`RASGO_EXPORTAR_PAINEIS`), num arquivo,
+// para `website/exportar_patch.sh` (sem áudio nem MIDI).
+int cmdDemoPatch(int argc, char** argv) {
+    if (argc != 4) return usage();
+    std::vector<std::string> want;
+    { std::stringstream ss(argv[2]); std::string tok;
+      while (std::getline(ss, tok, ',')) if (!tok.empty()) want.push_back(tok); }
+    SignalGraph g;
+    for (const auto& f : rasgo::panel::seedModuleCatalog())
+        for (const char* t : f.types)
+            if (auto n = rasgo::panel::makeModule(t)) g.add(std::move(n));
+    g.add(std::make_unique<rasgo::panel::SinkOut>());
+    auto first = [&](const char* t) {
+        for (std::size_t i = 0; i < g.nodeCount(); ++i) if (g.node(i).type() == t) return i;
+        return static_cast<std::size_t>(-1);
+    };
+    auto outPort = [&](std::size_t n, const char* nm) {
+        for (std::size_t p = 0; p < g.node(n).outputCount(); ++p)
+            if (g.node(n).outputDescriptor(p).name == nm) return p;
+        return static_cast<std::size_t>(-1);
+    };
+    const std::size_t osc = first("OSC"), clk = first("CLOCK"), fun = first("FUNCTION");
+    const std::size_t saw = outPort(osc, "saw"), ck = outPort(clk, "clock"), bi = outPort(fun, "bi");
+    int wired = 0, missing = 0;
+    for (const auto& t : want) {
+        const std::size_t n = first(t.c_str());
+        if (n == static_cast<std::size_t>(-1)) { std::fprintf(stderr, "módulo desconhecido: %s\n", t.c_str()); ++missing; continue; }
+        if (n == osc || n == clk || n == fun) continue;
+        for (std::size_t p = 0; p < g.node(n).inputCount(); ++p) {
+            const auto& d = g.node(n).inputDescriptor(p);
+            std::size_t sn = fun, sp = bi;
+            if (d.kind == PortKind::Audio) { sn = osc; sp = saw; }
+            else if (d.unit == "trig" || d.unit == "gate") { sn = clk; sp = ck; }
+            try { g.connect(sn, sp, n, p); ++wired; }
+            catch (...) { try { g.connect(sn, sp, n, p, true); ++wired; } catch (...) {} }
+        }
+    }
+    std::string text = g.serialize() + "panel shown";
+    for (std::size_t i = 0; i + 1 < g.nodeCount(); ++i) text += ' ' + std::to_string(i);
+    text += '\n';
+    std::ofstream out(argv[3], std::ios::binary);
+    if (!out) { std::fprintf(stderr, "não consegui escrever %s\n", argv[3]); return 1; }
+    out << text;
+    std::printf("%s: %zu módulos, %d cabos de demonstração\n", argv[3], g.nodeCount(), wired);
+    return missing > 0 ? 1 : 0;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -197,5 +250,6 @@ int main(int argc, char** argv) {
     if (cmd == "render-patch") return cmdRenderPatch(argc, argv);
     if (cmd == "validate") return cmdValidate(argc, argv);
     if (cmd == "info") return cmdInfo(argc, argv);
+    if (cmd == "demo-patch") return cmdDemoPatch(argc, argv);
     return usage();
 }

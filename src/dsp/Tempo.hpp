@@ -61,9 +61,9 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        p.hp = 16;
         p.add(Widget::Kind::Label, "TEMPO", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "tempo", "", 2.5f, 6.0f, 66.0f);
+        p.add(Widget::Kind::Display, "tempo", "", 2.5f, 6.0f, 76.0f);
         p.add(Widget::Kind::Knob, "ACCEL", "accel", 7.0f, 30.0f);
         p.add(Widget::Kind::Knob, "FINAL", "final", 21.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SHAPE", "shape", 35.0f, 30.0f);

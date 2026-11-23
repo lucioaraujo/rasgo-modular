@@ -83,8 +83,8 @@ public:
             const std::string n = std::to_string(k + 1);
             p.add(Widget::Kind::Knob, "SEG" + n, "follow" + n, 7.0f + 15.0f * static_cast<float>(k), 50.0f);
         }
-        p.add(Widget::Kind::Toggle, "LOOP", "loop", 66.0f, 47.0f);
-        p.add(Widget::Kind::Knob, "SEED", "seed", 75.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 67.0f, 50.0f);
+        p.add(Widget::Kind::Toggle, "LOOP", "loop", 56.0f, 99.0f);
         for (int k = 0; k < 4; ++k) {
             const std::string n = std::to_string(k + 1);
             p.add(Widget::Kind::Jack, "IN" + n, "in:in" + n, 5.0f + 12.0f * static_cast<float>(k), 70.0f);
