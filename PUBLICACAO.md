@@ -27,6 +27,15 @@ Riscos que só a CI mostra: o banco de escalas entra no binário como 81
 literais de até 12 KB (abaixo do limite do MSVC, mas o Windows só se confirma
 na matriz); `/bigobj` já está ligado.
 
+**Tag enviada (23/11, autor: "pode fazer o push"):** execução `45248420037`.
+Linux e Windows passaram (o banco de escalas compila no MSVC). **macOS
+falhou em 1 de 137 testes:** `rasgo_modular_tape_tests`, "o chiado fica por
+baixo": RMS do chiado com HISS 1 = 0,0216 no macOS contra 0,0051 no Linux
+(limite 0,02). Diferença de 4× entre plataformas: diagnosticar no `Tape.hpp`
+(o gerador `unit()` e os filtros do chiado) antes de mexer no limite. A
+release **não** foi criada e o `main` **não** foi enviado. Depois da
+correção: refazer a tag `v0.1.12` no commit corrigido (como na v0.1.8).
+
 Portões, nesta ordem:
 
 1. **Escuta do autor** (`dossies/ESCUTA_lote_novembro.md`).
