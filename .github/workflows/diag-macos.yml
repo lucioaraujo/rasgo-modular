@@ -1,0 +1,19 @@
+# Diagnóstico (23/11/2026): o chiado do TAPE no macOS. Só no ramo diag/macos-tape.
+name: Diagnóstico — TAPE no macOS
+on:
+  push:
+    branches: ['diag/macos-tape']
+jobs:
+  sonda:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sonda
+        run: |
+          c++ -std=c++17 -O2 -Isrc tools/sonda_tape.cpp -o sonda
+          ./sonda
+          c++ -std=c++17 -O0 -Isrc tools/sonda_tape.cpp -o sonda0
+          echo "--- -O0"; ./sonda0
