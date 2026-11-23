@@ -5,15 +5,19 @@ on:
     branches: ['diag/macos-tape']
 jobs:
   sonda:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Sonda
+      - name: Teste do TAPE com opções diferentes
         run: |
-          c++ -std=c++17 -O2 -Isrc tools/sonda_tape.cpp -o sonda
-          ./sonda
-          c++ -std=c++17 -O0 -Isrc tools/sonda_tape.cpp -o sonda0
-          echo "--- -O0"; ./sonda0
+          echo "=== a: c++ -O2"; c++ -std=c++17 -O2 -Isrc tests/test_tape.cpp -o ta && ./ta || true
+          echo "=== b: -O3 -DNDEBUG 10.15 arm64"; c++ -std=c++17 -O3 -DNDEBUG -mmacosx-version-min=10.15 -arch arm64 -Isrc tests/test_tape.cpp -o tb && ./tb || true
+          echo "=== c: universal"; c++ -std=c++17 -O3 -DNDEBUG -mmacosx-version-min=10.15 -arch x86_64 -arch arm64 -Isrc tests/test_tape.cpp -o tc && ./tc || true
+          echo "=== c x86_64 (Rosetta)"; arch -x86_64 ./tc || true
+          echo "=== sonda universal"; c++ -std=c++17 -O3 -DNDEBUG -mmacosx-version-min=10.15 -arch x86_64 -arch arm64 -Isrc tools/sonda_tape.cpp -o sc && ./sc || true
+      - name: CMake (como a CI)
+        run: |
+          cmake -B b -DCMAKE_BUILD_TYPE=Release > /dev/null
+          cmake --build b --target rasgo_modular_tape_tests --config Release > /dev/null
+          echo "=== d: cmake"; ./b/rasgo_modular_tape_tests || true
+          grep -E "CMAKE_CXX_FLAGS_RELEASE|CMAKE_OSX" b/CMakeCache.txt
