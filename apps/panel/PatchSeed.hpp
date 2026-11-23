@@ -1475,13 +1475,15 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
             std::size_t cutSp = 0;
             const std::size_t cutSrc = cutIn >= 0 ? sourceOf(fltNode, "cutoff_mod", cutSp) : N;
             bool busTaken = !busDirect, drumGateTaken = false, cutTaken = !cutFree;
+            bool chanTaken = freeChan == nullptr;   // o canal livre do MIXER (GENDYN ou ELASTIC)
             // 0 VOZ ESTOCÁSTICA · 1 CORAÇÃO · 2 CORPO ELÁSTICO · 3 LENTE · 4 FITA
             // 5 GÁS · 6 RAIO · 7 FRANJAS · 8 ECOLOGIA · 9 CARDUME · 10 ECLIPSE
             // 11 ESTAÇÃO · 12 VOLTA · 13 DUAS MÃOS
             const bool can2[14] = {
                 freeChan != nullptr && freeFor("GENDYN") && voiceHz > 0.0f,
                 cutFree && freeFor("RUNGLER"),
-                drumCh != nullptr && freeFor("ELASTIC"),
+                (drumCh != nullptr || (freeChan != nullptr && hasT("CLOCK") && voiceHz > 0.0f))
+                    && freeFor("ELASTIC"),
                 busDirect && freeFor("LENS"),
                 busDirect && freeFor("TAPE"),
                 drumGateSrc < N && freeFor("PRESSURE"),
@@ -1506,13 +1508,14 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 bool done = false;
                 switch (r) {
                 case 0: {   // VOZ ESTOCÁSTICA: GENDYN como a textura
+                    if (chanTaken) break;
                     const std::size_t gd = firstT("GENDYN");
                     setP(gd, "freq", std::clamp(voiceHz * 0.5f, 30.0f, 400.0f));
                     setP(gd, "band", 0.1f + 0.2f * w(40));
                     if (connectIds(gd, "out", mx, freeChan)) {
                         const std::string gk = std::string("gain") + freeChan[2];
                         setP(mx, gk.c_str(), -16.0f + 6.0f * w(41));
-                        spine[gd] = 1; done = true;
+                        spine[gd] = 1; done = true; chanTaken = true;
                     }
                     break; }
                 case 1: case 6: case 8: {   // CORAÇÃO / RAIO / ECOLOGIA no corte do filtro
@@ -1526,7 +1529,23 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                     }
                     break; }
                 case 2: {   // CORPO ELÁSTICO: o golpe do DRUM vira um corpo
-                    const std::size_t el = firstT("ELASTIC"), dr = firstT("DRUM");
+                    const std::size_t el = firstT("ELASTIC");
+                    if (drumCh == nullptr) {
+                        // sem DRUM (23/11/2026): a corda de massas vira uma voz
+                        // pinçada pelo euclidiano do CLOCK, no canal livre
+                        if (chanTaken) break;
+                        setP(el, "tune", std::clamp(voiceHz * (w(52) < 0.5f ? 1.0f : 2.0f), 30.0f, 1500.0f));
+                        setP(el, "damping", 0.2f + 0.4f * w(53));
+                        setP(el, "mix", 1.0f);
+                        if (connectIds(firstT("CLOCK"), w(54) < 0.5f ? "euclid" : "accent", el, "pluck")
+                            && connectIds(el, "l", mx, freeChan)) {
+                            const std::string gk = std::string("gain") + freeChan[2];
+                            setP(mx, gk.c_str(), -14.0f + 6.0f * w(55));
+                            spine[el] = 1; done = true; chanTaken = true;
+                        }
+                        break;
+                    }
+                    const std::size_t dr = firstT("DRUM");
                     setP(el, "mix", 0.6f + 0.3f * w(42));
                     freeIn2(mx, drumCh);
                     if (connectIds(dr, "out", el, "in") && connectIds(el, "l", mx, drumCh)) {
@@ -1614,6 +1633,56 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
 
             // ORQUESTRAL: a forma da peça — as vozes passam pelo FORM, o
             // CLOCK pelo TEMPO (a decisão maior da proposta de forma)
+            // ORQUESTRAL: cópias de vozes (23/11/2026, proposta §3.1 — "ok
+            // para suas recomendações"). Os canais vazios do MIXER recebem
+            // uma corda (STRING) ou um corpo (MATTER) ainda sem cabos no rack,
+            // pinçado pelo CLOCK e seguindo a altura do QUANTIZER — a mesma
+            // harmonia —, cada cópia num registro: a primeira uma oitava
+            // abaixo (o baixo), as outras uma oitava acima.
+            if (sizeClass == 2 && mx < N && hasT("CLOCK") && hasT("QUANTIZER")
+                && spine[firstT("QUANTIZER")] && voiceHz > 0.0f) {
+                auto untouched = [&](std::size_t n) {
+                    if (spine[n]) return false;
+                    for (std::size_t c = 0; c < g.cableCount(); ++c)
+                        if (g.cable(c).source().node == n || g.cable(c).target().node == n) return false;
+                    return true;
+                };
+                const std::size_t ck = firstT("CLOCK"), q = firstT("QUANTIZER");
+                static const char* kVc[4] = {"ch1", "ch2", "ch3", "ch4"};
+                static const char* kGate[3] = {"accent", "euclid", "clock"};
+                int copies = 0;
+                for (int k = 0; k < 4; ++k) {
+                    if (!chanFree(kVc[k])) continue;
+                    // a cópia: STRING ou MATTER livre, a ordem sorteada
+                    const bool strFirst = w(70 + k) < 0.5f;
+                    std::size_t v = N;
+                    for (const char* ty : {strFirst ? "STRING" : "MATTER", strFirst ? "MATTER" : "STRING"}) {
+                        for (std::size_t n = 0; n < N && v == N; ++n)
+                            if (typ(n) == ty && untouched(n)) v = n;
+                        if (v < N) break;
+                    }
+                    if (v == N) break;
+                    const bool isStr = typ(v) == "STRING";
+                    const float reg = copies == 0 ? 0.5f : 2.0f;
+                    setP(v, "freq", std::clamp(voiceHz * reg, 30.0f, 1200.0f));
+                    setP(v, "damping", 0.3f + 0.4f * w(75 + k));
+                    if (!isStr) setP(v, "structure", 0.5f * w(80 + k));
+                    const char* gate = kGate[static_cast<int>(w(85 + k) * 3.0f) % 3];
+                    if (connectIds(ck, gate, v, isStr ? "pluck" : "strike")
+                        && connectIds(q, "pitch", v, "freq_mod")
+                        && connectIds(v, "out", mx, kVc[k])) {
+                        const std::string gk = std::string("gain") + kVc[k][2];
+                        setP(mx, gk.c_str(), (copies == 0 ? -12.0f : -16.0f) + 4.0f * w(90 + k));
+                        spine[v] = 1; ++copies;
+                    } else {
+                        // como era: nenhuma ponta solta
+                        freeIn2(v, isStr ? "pluck" : "strike");
+                        freeIn2(v, "freq_mod");
+                        break;
+                    }
+                }
+            }
+
             if (sizeClass == 2 && mx < N && hasT("FORM") && hasT("TEMPO") && hasT("CLOCK")) {
                 const std::size_t fo = firstT("FORM"), te = firstT("TEMPO"), ck = firstT("CLOCK");
                 setP(fo, "grammar", std::floor(5.0f * w(60)));

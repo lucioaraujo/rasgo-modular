@@ -22,6 +22,14 @@ escuta do autor.
   blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
   mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
   6 para 8 HP. Patches e seeds antigos iguais.
+- **Seeds orquestrais com cópias de vozes** (23/11, proposta §3.1): os
+  canais vazios do MIXER recebem uma STRING ou um MATTER livre do rack,
+  pinçado pelo CLOCK e seguindo a altura do QUANTIZER — a primeira cópia
+  uma oitava abaixo (o baixo), as outras uma acima. Orquestrais com 4 vozes:
+  13 → 56 de 69 (em 400 seeds). As seeds camerísticas e médias não mudam.
+- **ELASTIC sem DRUM** (23/11): quando a seed não tem DRUM, a corda de
+  massas pode entrar como voz pinçada pelo euclidiano do CLOCK, num canal
+  livre. Presença ligada ao som: 3 → 6,75 % das seeds.
 - **Papéis dos módulos novos na seed** (21/11, "ok para suas
   recomendações"): 14 papéis (voz estocástica, coração, corpo elástico,
   lente, fita, gás, raio, franjas, ecologia, cardume, eclipse, estação,

@@ -1,6 +1,6 @@
 # RASGO Modular — tarefas e continuidade
 
-Atualizado: 2026-11-20.
+Atualizado: 2026-11-23.
 Estado publicado: consultar o README e os registros datados ao final deste arquivo.
 Os marcos iniciais abaixo são históricos, não o estado atual da publicação.
 
@@ -10,6 +10,18 @@ transversais e reutilização continuam no inventário global; um dossiê por
 módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
+
+## ▶ Ponto de retomada — 23/11/2026: imagens de painel, tutorial, cópias de vozes
+
+- Feito e commitado localmente: imagens de painel dos 105 módulos no site
+  (`rasgo_modular_cli demo-patch` + `website/exportar_patch.sh`, sem áudio);
+  tutorial (O QUE É, SEED, CABOS) nas 4 línguas; TEMPO em 16 HP e LOOP do
+  FORM fora da borda; **cópias de vozes nas seeds orquestrais** e **ELASTIC
+  sem DRUM** (proposta de papéis §7; as orquestrais mudam). Plugin
+  reinstalado.
+- Falta: a escuta do autor (módulos novos, seeds, painéis); o banco
+  completo de escalas do Trioio (imagem do seletor para o autor); o piloto
+  VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 
 ## ▶ Ideia registrada — 21/11/2026: a linha de comando do Modular
 

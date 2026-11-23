@@ -1,8 +1,8 @@
 # Proposta — papéis dos módulos novos na seed, e patches mais complexos
 
 Data: 21/11/2026. Estado: **implementado em 21/11/2026** ("ok para suas
-recomendações"), exceto as **cópias de vozes** do gene de tamanho (§3.1–3.2),
-que pedem o passo 3 das instâncias — próximo passo. Pedido do autor:
+recomendações"); as **cópias de vozes** do gene de tamanho (§3.1) e o ELASTIC
+sem DRUM entraram em 23/11/2026 (§7). Pedido do autor:
 "testei várias seeds do rasgo modular e nunca abriu os módulos novos"; "pode
 propor"; e "com as implementações dos novos módulos, também atualizou como os
 cabeamentos são feitos considerando patches mais complexos?".
@@ -98,3 +98,23 @@ qualidade:
 - **As seeds mudam** (CHANGELOG).
 - Falta: as cópias de vozes (orquestral com 4 vozes de verdade), e subir o
   ELASTIC (um papel que dispense o DRUM).
+
+## 7. Cópias de vozes e ELASTIC sem DRUM (23/11/2026)
+
+- **Medido antes:** das 69 seeds orquestrais (em 400), 21 tocavam com uma
+  voz só no MIXER e 12 com duas — o "orquestral" não aparecia.
+- **Cópias de vozes** (`PatchSeed.hpp`, corrente 70–93): nas orquestrais,
+  cada canal vazio do MIXER recebe uma STRING ou um MATTER ainda sem cabos
+  no rack (as cópias de fábrica), pinçado por ACC, EUC ou CLK do CLOCK e com
+  o 1V/O no PITCH do QUANTIZER (a mesma harmonia da voz principal). A
+  primeira cópia fica uma oitava abaixo da voz (o baixo, −12 a −8 dB), as
+  outras uma acima (−16 a −12 dB). Depois passam pelo FORM como as outras.
+  Resultado: orquestrais com 4 vozes 13 → 56 de 69; as que ficam com menos
+  não têm QUANTIZER na espinha ou têm voz sem altura (ruído).
+- **ELASTIC sem DRUM:** a corda de massas entra como voz pinçada pelo EUC ou
+  pelo ACC do CLOCK, num canal livre (disputa o canal com o GENDYN). Ligado
+  ao som: 3 → 6,75 %; fontes/processadores novos 29 → 31,5 %.
+- As seeds camerísticas e médias ficaram idênticas (mesma distribuição de
+  canais). Ainda falta: vozes com função rítmica própria (o contraponto do
+  Trioio/Batruc, §3.2) — hoje as cópias dividem a altura da voz principal e
+  variam no registro e no ritmo do pinçar.
