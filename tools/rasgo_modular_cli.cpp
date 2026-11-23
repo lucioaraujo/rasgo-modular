@@ -197,6 +197,14 @@ int cmdInfo(int argc, char** argv) {
 // BI do FUNCTION —, para o visor mostrar o módulo funcionando. É o mesmo
 // critério da exportação por seed (`RASGO_EXPORTAR_PAINEIS`), num arquivo,
 // para `website/exportar_patch.sh` (sem áudio nem MIDI).
+// entradas de pulso que não declaram a unidade (o CLOCK do TRIGSEQ, o KICK
+// do PENDULUM…): reconhecidas pelo nome
+bool isPulseName(const std::string& n) {
+    for (const char* k : {"clock", "gate", "trig", "kick", "strike", "pluck", "fill"})
+        if (n.find(k) != std::string::npos) return true;
+    return false;
+}
+
 int cmdDemoPatch(int argc, char** argv) {
     if (argc != 4) return usage();
     std::vector<std::string> want;
@@ -218,6 +226,9 @@ int cmdDemoPatch(int argc, char** argv) {
     };
     const std::size_t osc = first("OSC"), clk = first("CLOCK"), fun = first("FUNCTION");
     const std::size_t saw = outPort(osc, "saw"), ck = outPort(clk, "clock"), bi = outPort(fun, "bi");
+    // altura (v/oct) ← a melodia do QUANTIZER (o KEY precisa de notas)
+    const std::size_t qz = first("QUANTIZER");
+    const std::size_t qp = qz == static_cast<std::size_t>(-1) ? qz : outPort(qz, "pitch");
     int wired = 0, missing = 0;
     for (const auto& t : want) {
         const std::size_t n = first(t.c_str());
@@ -225,9 +236,14 @@ int cmdDemoPatch(int argc, char** argv) {
         if (n == osc || n == clk || n == fun) continue;
         for (std::size_t p = 0; p < g.node(n).inputCount(); ++p) {
             const auto& d = g.node(n).inputDescriptor(p);
+            // reset fica livre: o mesmo pulso no RST zera o módulo a cada
+            // passo (o TRIGSEQ, o KEY e o VOLTA saíam com o visor parado)
+            if (d.name.find("reset") != std::string::npos || d.name == "rst") continue;
             std::size_t sn = fun, sp = bi;
             if (d.kind == PortKind::Audio) { sn = osc; sp = saw; }
-            else if (d.unit == "trig" || d.unit == "gate") { sn = clk; sp = ck; }
+            else if (d.unit == "trig" || d.unit == "gate" || isPulseName(d.name)) { sn = clk; sp = ck; }
+            else if (d.unit == "v/oct" && qz != static_cast<std::size_t>(-1) && n != qz
+                     && qp != static_cast<std::size_t>(-1)) { sn = qz; sp = qp; }
             try { g.connect(sn, sp, n, p); ++wired; }
             catch (...) { try { g.connect(sn, sp, n, p, true); ++wired; } catch (...) {} }
         }

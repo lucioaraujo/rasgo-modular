@@ -24,6 +24,14 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
 - **REC grava as notas em .mid** (pendência do dossiê 38): com NOTE-OUT no
   caminho, sai `rec-….mid` ao lado do WAV. Formato conferido pelo leitor do
   teste; falta abrir um numa DAW (o autor).
+- **Imagens de painel do site num só padrão** (autor: "refaça o que estiver
+  fora do padrão"): 102 das 105 reexportadas na mesma escala (600 px) e com
+  o cinza atual dos rótulos — eram 28 menores (11/11), 52 de outubro com o
+  cinza antigo e painéis velhos (OSC sem PD/UNI/SUBD, ENVELOPE sem LOOP/EOC,
+  DRIFT/MIXER/SWITCH mais estreitos). LISTEN, FILTER, PHRASE já estavam no
+  padrão. Achado, para o autor: o visor do TRIGSEQ mostra só os últimos 128
+  pontos (~8 ms em blocos de 128) e quase nunca pega um pulso; o do KEY fica
+  vazio no patch de demonstração.
 - Falta: a escuta do autor (módulos novos, seeds, painéis, o banco); o piloto
   VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 
