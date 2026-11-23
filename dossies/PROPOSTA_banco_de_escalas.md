@@ -1,7 +1,7 @@
 # Proposta — o banco de escalas do Trioio no Rasgo Modular
 
-Data: 23/11/2026. Estado: **proposta, nada implementado** — espera a escolha
-do autor (seletor e lugar). Pedido do autor (21/11): "concordo, mas depois
+Data: 23/11/2026. Estado: **opção A implementada em 23/11/2026** (autor: "faça
+sua recomendação") — §5. Pedido do autor (21/11): "concordo, mas depois
 vamos implementar o banco completo se possível". Base: a interpolação de
 escalas do QUANTIZER (dossiê 12, 21/11) e o recurso transversal
 `KNOW-ESCALAS` (inventário global; o autor o declarou recurso de todos os
@@ -62,3 +62,31 @@ banco com CV ao vivo, B (ou FAM/ESC em A, numa segunda etapa).
 2. Se B: o nome do módulo.
 3. Começar só com as escalas de período de oitava (2571) e deixar as 5 não
    oitavantes para depois — sugestão, por segurança do RANGE.
+
+## 5. Implementado (23/11/2026)
+
+- **Dados:** `third_party/trioio-escalas/arquivo_trioio.txt` (cópia fixada,
+  `PROVENANCE.md`); `tools/gerar_banco_escalas.py` gera
+  `src/escalas/BancoEscalasDados.inc` (~950 KB: nome, família, período,
+  graus, fonte; 81 pedaços de string crua, dentro do limite dos
+  compiladores). As 2576 escalas, as 5 não oitavantes também (o
+  quantizador trabalha num período qualquer).
+- **Leitor:** `src/escalas/BancoEscalas.hpp` (AGPL), lido uma vez no início
+  do app, do plugin e da linha de comando, com o locale "C".
+- **QUANTIZER:** SCALE vai a 13 (BANCO); parâmetro `bank` no fim da lista
+  (o id do nome, FNV-1a em 24 bits, exato no float; o patch continua certo
+  se o banco for reordenado). Sem resolvedor ou com id desconhecido, toca a
+  cromática. No banco, AFIN e MRPH não valem. SCALE 0–12, o CRIVO e o MRPH
+  idênticos (teste). Fora da seed, do MUDA e do VARIA (a mão vai até 12; com
+  o BANCO escolhido, o SCALE fica com quem toca).
+- **App:** clicar no visor do QUANTIZER abre o navegador (famílias, escalas
+  com o número de graus, busca por nome ou família, graus, período, fonte,
+  régua); clicar numa escala liga SCALE = BANCO com ela; o visor mostra o
+  nome. Textos da interface nas 4 línguas; os nomes das escalas e das
+  famílias ficam em português, como no banco.
+- **Conferência:** `tests/test_banco_escalas.cpp` (2576 lidas, ids únicos,
+  Rast nos cents, não oitavante, desconhecido → cromática, 0–12 intactas);
+  imagem do navegador e do visor pela exportação sem áudio
+  (`RASGO_EXPORTAR_BANCO=1 website/exportar_patch.sh …`).
+- **Depois:** um papel na seed (com escuta); o navegador para HARMONY, KEY e
+  ARP; FAM/ESC por CV (a opção B) se o autor quiser andar pelo banco ao vivo.

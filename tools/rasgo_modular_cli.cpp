@@ -16,6 +16,7 @@
 // O teto de saída é o do `SinkOut` (−1 dBFS), como na régua das seeds.
 
 #include "core/SignalGraph.hpp"
+#include "escalas/BancoEscalas.hpp"
 #include "io/WavWriter.hpp"
 #include "panel/ModuleCatalog.hpp"
 #include "panel/PatchSeed.hpp"
@@ -244,6 +245,7 @@ int cmdDemoPatch(int argc, char** argv) {
 }  // namespace
 
 int main(int argc, char** argv) {
+    rasgo::escalas::BancoEscalas::ligarAoQuantizer();   // SCALE = BANCO nos patches
     if (argc < 2) return usage();
     const std::string cmd = argv[1];
     if (cmd == "render") return cmdRender(argc, argv);

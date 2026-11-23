@@ -1765,7 +1765,7 @@ inline void seedPatch(rasgo::modular::SignalGraph& g, std::uint64_t seed,
                 // SAT do VCA4 (21/11/2026): fora do sorteio, como o lote do oscilador
                 || (nm == "saturation" && node.type() == "VCA4")
                 // máquina de escalas do QUANTIZER (21/11/2026): escolha de quem toca
-                || nm == "scale_b" || nm == "morph"
+                || nm == "scale_b" || nm == "morph" || nm == "bank"
                 // depois da v0.1.7 — fora do sorteio (seeds antigas iguais)
                 || nm == "pit_keep" || nm == "pit_oct"
                 // lote do oscilador (11/11/2026): fora do sorteio genérico

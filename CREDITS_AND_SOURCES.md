@@ -26,6 +26,14 @@ licença comercial. Como o código deste projeto já é AGPLv3-or-later, o
 encaixe é direto — detalhe e conferência em
 [`apps/juce/LICENSE_STATUS.md`](apps/juce/LICENSE_STATUS.md).
 
+## Banco de escalas do Trioio (23/11/2026)
+
+O QUANTIZER (SCALE = BANCO) toca as 2576 escalas do banco do Trioio, cópia
+fixada e sem alteração em `third_party/trioio-escalas/` (commit `7f09d60`,
+sha256 em `PROVENANCE.md`). Conteúdo próprio da família, escrito a partir da
+teoria pública; cada escala traz a sua fonte, mostrada no navegador do app.
+AGPL-3.0-or-later. Proposta e decisão: `dossies/PROPOSTA_banco_de_escalas.md`.
+
 ## Escuta e fraseado — implementação própria
 
 Os módulos locais LISTEN e PHRASE, de 17/10/2026, são implementações

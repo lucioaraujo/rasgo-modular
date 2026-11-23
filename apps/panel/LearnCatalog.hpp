@@ -2631,7 +2631,9 @@ inline const LearnTable& learnTable() {
             {"scale", {
                 "Escala musical (12 tabelas curadas — cromática, maior, "
                 "modos, pentatônicas, tons inteiros, oitava — e a 13ª, o "
-                "CRIVO, desenhado pelos knobs M1/R1/M2/R2). Com cabo "
+                "CRIVO, desenhado pelos knobs M1/R1/M2/R2). A 14ª é o "
+                "BANCO: as 2576 escalas do Trioio, cada uma com a fonte "
+                "citada — clique no visor para escolher. Com cabo "
                 "na entrada SCL, quem manda é o cabo (até a 12ª).", "", ""}},
             {"tuning", {"A afinação: 12-EDO (o temperamento de sempre) · Justa (razões puras de 5-limite) · Pitagórica (quintas puras) · Mesotônica ¼ de coma — as três medidas a partir da tônica, então acompanham o HARMONY e o TOM — · 19-EDO · 31-EDO (outra grade de notas).", "", ""}},
             {"sieve_m1", {"CRIVO: o 1º módulo (2–13). Entram as notas n ≡ R1 (mod M1), contadas da tônica. Com um módulo que não divide 12, a escala não se repete na oitava.", "", ""}},

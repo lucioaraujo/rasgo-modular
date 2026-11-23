@@ -22,6 +22,11 @@ escuta do autor.
   blocos de áudio. O MIDI de fora passa por um anel próprio e não se perde
   mais quando a interface está com o grafo. O painel do SIGNAL-IN passa de
   6 para 8 HP. Patches e seeds antigos iguais.
+- **Banco de escalas do Trioio no QUANTIZER** (23/11, opção A da proposta):
+  SCALE ganha a posição BANCO, com as 2576 escalas do Trioio (gêneros
+  gregos, temperamentos, maqam, rāgas, gamelão, EDO, MOS…), cada uma com a
+  fonte citada. Clicar no visor abre o navegador (famílias, busca, graus em
+  cents, régua); o visor mostra o nome da escala. Patches e seeds iguais.
 - **Seeds orquestrais com cópias de vozes** (23/11, proposta §3.1): os
   canais vazios do MIXER recebem uma STRING ou um MATTER livre do rack,
   pinçado pelo CLOCK e seguindo a altura do QUANTIZER — a primeira cópia

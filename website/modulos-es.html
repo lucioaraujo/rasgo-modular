@@ -1843,7 +1843,7 @@
     <p>Las señales de control varían de forma continua, y las notas musicales no. Sin un cuantizador, una melodía generada al azar cae entre las notas y suena desafinada. QUANTIZER redondea cada valor a la nota más cercana de la escala elegida. Con un pulso en la entrada TRIG, solo cambia de nota en el pulso, y la melodía gana ritmo. La salida GATE pulsa cada vez que la nota cambia de verdad, lo que sirve para disparar una envolvente solo en las notas nuevas. Las entradas ROOT y SCL cambian la tónica y la escala por cable: conectadas a las salidas de HARMONY, la tonalidad de la melodía cambia a lo largo de la música.</p>
     <h4>Controles</h4>
     <ul class="controles">
-      <li><b>SCALE</b>: la escala, entre trece: cromática, mayor, menor natural, dórica, frigia dominante, lidia, menor melódica, pentatónica menor, pentatónica mayor, hirajoshi, tonos enteros, solo octavas y la criba.</li>
+      <li><b>SCALE</b>: la escala, entre catorce: cromática, mayor, menor natural, dórica, frigia dominante, lidia, menor melódica, pentatónica menor, pentatónica mayor, hirajoshi, tonos enteros, solo octavas, la criba y, en la última posición, el banco: las 2576 escalas del Trioio, de los géneros griegos a maqam, rāgas y gamelán, cada una con su fuente citada. Haga clic en el visor para abrir el banco, buscar por nombre o familia y elegir; el visor muestra el nombre de la escala.</li>
       <li><b>ROOT</b>: la tónica, la nota de partida de la escala, de do a si.</li>
       <li><b>RANGE</b>: cuántas octavas cubre la señal de entrada, de 1 a 6. Más octavas, saltos más grandes.</li>
       <li><b>GLIDE</b>: hace que la altura se deslice de una nota a la siguiente.</li>
@@ -1851,6 +1851,7 @@
       <li><b>AFIN</b>: la afinación, aplicada después de elegir la nota: temperamento igual de 12 notas (como antes), justa, pitagórica, mesotónica, 19 o 31 divisiones de la octava. Las tres históricas se miden desde la tónica y la siguen cuando cambia.</li>
       <li><b>M1, R1, M2, R2</b>: la criba de Xenakis, usada por la escala número 13. Una nota entra si el resto de su división por M1 es R1, o si el resto de su división por M2 es R2. Con un M que no divide 12, la escala no se repite en la octava.</li>
       <li><b>AND</b>: cambia el o de la criba por y: la nota tiene que pasar las dos cribas. Si ninguna nota pasa, la criba vuelve al o, para no quedarse nunca muda.</li>
+      <li><b>B y MRPH</b>: la máquina de escalas. B elige una segunda escala, y MRPH lleva los grados de la escala de SCALE hasta los de B, pasando por alturas entre las dos.</li>
     </ul>
     <p>Entradas: CV, la señal a cuantizar; TRSP, para transponer antes de cuantizar; TRIG, el pulso que decide cuándo cambiar de nota; ROOT y SCL, que, conectadas, mandan en la tónica y la escala en lugar de las perillas. Salidas: PTCH, la altura; GATE, un pulso en cada nota nueva; ST, la nota en semitonos.</p>
     <h4>Pruebe esto</h4>

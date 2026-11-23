@@ -19,8 +19,9 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   FORM fora da borda; **cópias de vozes nas seeds orquestrais** e **ELASTIC
   sem DRUM** (proposta de papéis §7; as orquestrais mudam). Plugin
   reinstalado.
-- Falta: a escuta do autor (módulos novos, seeds, painéis); o banco
-  completo de escalas do Trioio (imagem do seletor para o autor); o piloto
+- **Banco de escalas do Trioio no QUANTIZER** (opção A, "faça sua
+  recomendação"): SCALE = BANCO, navegador no visor, 2576 escalas.
+- Falta: a escuta do autor (módulos novos, seeds, painéis, o banco); o piloto
   VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 
 ## ▶ Ideia registrada — 21/11/2026: a linha de comando do Modular

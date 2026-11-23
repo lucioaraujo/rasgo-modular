@@ -248,3 +248,10 @@ recomendações: crivo com **união e interseção** (chave AND) e arquivos
 ## A máquina de escalas (21/11/2026)
 
 Do Trioio (estudo da família §4.4; aprovado em 9/11; o autor, 21/11: "concordo, mas depois vamos implementar o banco completo"). `scale_b` (a escala B) e `morph` (0–1) + entrada `morph_cv`, no fim das listas. Os graus de A deslizam em cents até o grau mais próximo de B (distância circular); os graus só de B entram a partir de 0,5. MRPH 0 = o QUANTIZER de antes (testado); 1 = a escala B; no meio, microtons. Fora da seed e do MUDA. Próximo: o banco completo do Trioio (2576 escalas, com proveniência) e o seletor, com imagem para o autor.
+
+## O banco de escalas (23/11/2026)
+
+SCALE = 13 → BANCO: as 2576 escalas do Trioio (graus em cents, período
+qualquer), escolhidas no navegador que o visor abre; o patch guarda o id do
+nome em `bank`. AFIN e MRPH não valem no banco. Detalhes, licença e
+conferência em [`PROPOSTA_banco_de_escalas.md`](PROPOSTA_banco_de_escalas.md) §5.

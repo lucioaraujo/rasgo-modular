@@ -163,7 +163,11 @@ public:
                     || w.bind == "tuning" || w.bind.rfind("sieve_", 0) == 0
                     || w.bind == "nr_cycle" // afinação, crivo, ciclo: estrutura, do músico
                     || (t == "ADDITIVE" && w.bind == "tension") // FIBRA: rasga para sempre
-                    || (t == "PHRASE" && w.bind == "seed")) // motif identity
+                    || (t == "PHRASE" && w.bind == "seed") // motif identity
+                    // BANCO do QUANTIZER (23/11/2026): a escala do banco é
+                    // escolha de quem toca — a mão não a troca
+                    || (t == "QUANTIZER" && w.bind == "scale"
+                        && graph.parameterUserValue(id, "scale") > 12.5f))
                     continue;
                 const rasgo::modular::ParameterDescriptor* d = nullptr;
                 for (const auto& pr : node.parameters())
@@ -188,6 +192,9 @@ public:
                 f.tau = motionTau(f.reach);
                 f.pmin = d->minimum;
                 f.pmax = d->maximum;
+                // o SCALE do QUANTIZER ganhou a posição 13 (BANCO) em
+                // 23/11/2026; a mão segue até 12, como antes
+                if (t == "QUANTIZER" && w.bind == "scale") f.pmax = 12.0f;
                 f.center = clampf(graph.parameterUserValue(id, w.bind),
                                   d->minimum, d->maximum);
                 f.cabled = graph.parameterIsModulated(id, w.bind);

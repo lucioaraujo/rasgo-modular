@@ -28,6 +28,7 @@
 #include "dsp/Master.hpp"          // gainReductionDb() — clip-latch do VU
 #include "dsp/NoteOut.hpp"        // notas concluídas -> SYSTEM SCORE
 #include "dsp/SignalIn.hpp"       // entrada de áudio/MIDI (módulo adaptador)
+#include "escalas/BancoEscalas.hpp" // o banco de escalas do Trioio (QUANTIZER)
 #include "io/WavWriter.hpp"       // REC: o mesmo .wav do painel X11
 #include "juce/StreamingVersion.h" // REC: a versão de entrega (16/11/2026)
 #include "panel/ScoreRecorder.hpp"  // SYSTEM SCORE da tomada
@@ -2573,6 +2574,14 @@ public:
                 }
                 return;
             }
+            // QUANTIZER: clicar no visor abre o banco de escalas (23/11/2026)
+            if (node.type() == "QUANTIZER" && onOpenScaleBank)
+                for (const auto& w : m.panel.widgets)
+                    if (w.kind == Widget::Kind::Display
+                        && widgetBounds(m, w).contains(e.getPosition())) {
+                        onOpenScaleBank(m.id);
+                        return;
+                    }
             // SCOPE: clicar no Display alterna onda ↔ espectro
             if (node.type() == "SCOPE")
                 for (const auto& w : m.panel.widgets)
@@ -3515,6 +3524,8 @@ public:
     // gesto de parâmetro concluído (pra o SYSTEM SCORE da gravação)
     std::function<void(std::size_t, const std::string&, float, float)>
         onParamGesture;
+    // clique no visor do QUANTIZER: abrir o banco de escalas
+    std::function<void(std::size_t)> onOpenScaleBank;
 
     // Tipo sob o mouse na paleta: o módulo correspondente no rack ganha
     // borda de acento. É a ponte entre a lista e a case — sem ela, achar
@@ -4455,6 +4466,12 @@ private:
             }
         }
 
+        if (mtype == "QUANTIZER" && node.parameterValue("scale") > 12.5f) {
+            // BANCO: o nome da escala no visor (o banco é imutável: leitura livre)
+            const auto* e = rasgo::escalas::BancoEscalas::instancia().procura(
+                static_cast<std::uint32_t>(std::lround(node.parameterValue("bank"))));
+            dlabel = e ? u8(e->nome) : u8(rasgo::panel::tr(rasgo::panel::strings::scaleBankEmpty, lang_));
+        }
         g.setColour(T.textSecondary);
         g.setFont(juce::FontOptions(9.0f));
         g.drawText(dlabel, wx + 3, wy + dh - 12, dw - 6, 11,
@@ -4500,6 +4517,222 @@ private:
 // Padrão da família RASGO (cf. Antitotem, Rasgo Synth). No Modular ela vai
 // na faixa acima da 1ª fileira de módulos, alinhada à direita, com o ano na
 // frase e o carimbo de build ao fim — não no rodapé.
+// ---- o navegador do banco de escalas (QUANTIZER, SCALE = BANCO) -------
+// `dossies/PROPOSTA_banco_de_escalas.md`, opção A (23/11/2026). Clicar no
+// visor do QUANTIZER abre: famílias à esquerda, escalas à direita, busca
+// por nome ou família, os graus em cents, o período, a fonte citada e a
+// régua dos graus. Clicar numa escala liga o BANCO com ela. Só leitura do
+// banco (imutável depois de lido); nada aqui toca o áudio diretamente.
+class ScaleBrowser : public juce::Component, private juce::TextEditor::Listener {
+public:
+    std::function<void(std::uint32_t)> onPick;
+    std::function<void()> onClose;
+
+    ScaleBrowser() {
+        search_.setFont(juce::FontOptions(13.0f));
+        search_.setColour(juce::TextEditor::backgroundColourId, T.recessed);
+        search_.setColour(juce::TextEditor::textColourId, T.textPrimary);
+        search_.setColour(juce::TextEditor::outlineColourId, T.line);
+        search_.setColour(juce::TextEditor::focusedOutlineColourId, T.accent);
+        search_.addListener(this);
+        addAndMakeVisible(search_);
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        for (const auto& f : b.familias()) {
+            int n = 0;
+            for (const auto& e : b.escalas()) if (e.familia == f) ++n;
+            counts_.push_back(n);
+        }
+    }
+
+    void open(const std::uint32_t current, const rasgo::panel::Lang l) {
+        lang_ = l;
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        sel_ = b.procura(current);
+        fam_ = 0;
+        if (sel_ != nullptr)
+            for (std::size_t i = 0; i < b.familias().size(); ++i)
+                if (b.familias()[i] == sel_->familia) fam_ = static_cast<int>(i);
+        search_.setText({}, false);
+        search_.setTextToShowWhenEmpty(str(rasgo::panel::strings::scaleBankSearch), T.textSecondary);
+        famScroll_ = std::max(0, fam_ - 4);
+        refilter();
+        setVisible(true);
+        toFront(true);
+        search_.grabKeyboardFocus();
+    }
+    void close() {
+        if (!isVisible()) return;
+        setVisible(false);
+        if (onClose) onClose();
+    }
+
+    void resized() override {
+        const int w = std::min(820, getWidth() - 40), h = std::min(600, getHeight() - 40);
+        card_ = juce::Rectangle<int>(w, std::max(200, h)).withCentre(getLocalBounds().getCentre());
+        search_.setBounds(card_.getX() + 16, card_.getY() + 44, card_.getWidth() - 32, 26);
+        const int listTop = card_.getY() + 82, listBottom = card_.getBottom() - 150;
+        famBox_ = {card_.getX() + 12, listTop, card_.getWidth() * 2 / 5 - 12, std::max(40, listBottom - listTop)};
+        scBox_ = {famBox_.getRight() + 10, listTop, card_.getRight() - 12 - famBox_.getRight() - 10, famBox_.getHeight()};
+        closeBtn_ = {card_.getRight() - 30, card_.getY() + 8, 22, 22};
+    }
+
+    void paint(juce::Graphics& g) override {
+        g.fillAll(juce::Colours::black.withAlpha(0.55f));
+        g.setColour(T.surface);
+        g.fillRect(card_);
+        g.setColour(T.line);
+        g.drawRect(card_, 2);
+        g.setColour(T.textPrimary);
+        g.setFont(juce::FontOptions(16.0f, juce::Font::bold));
+        g.drawText(str(rasgo::panel::strings::scaleBankTitle), card_.getX() + 16, card_.getY() + 10,
+                   card_.getWidth() - 60, 24, juce::Justification::centredLeft);
+        g.drawText(u8("\xc3\x97"), closeBtn_, juce::Justification::centred);   // ×
+
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        g.setFont(juce::FontOptions(13.0f));
+        // famílias (com a busca ativa, a lista da direita é o resultado)
+        const bool searching = search_.getText().isNotEmpty();
+        for (int r = 0; r < rows(); ++r) {
+            const int i = famScroll_ + r;
+            if (i >= static_cast<int>(b.familias().size())) break;
+            const auto row = rowRect(famBox_, r);
+            const bool on = !searching && i == fam_;
+            if (on) { g.setColour(T.accent.withAlpha(0.18f)); g.fillRect(row); }
+            g.setColour(on ? T.accent : T.textPrimary);
+            g.drawText(u8(b.familias()[static_cast<std::size_t>(i)]) + "  (" + juce::String(counts_[static_cast<std::size_t>(i)]) + ")",
+                       row.reduced(6, 0), juce::Justification::centredLeft, true);
+        }
+        g.setColour(T.line);
+        g.drawVerticalLine(famBox_.getRight() + 4, static_cast<float>(famBox_.getY()),
+                           static_cast<float>(famBox_.getBottom()));
+        for (int r = 0; r < rows(); ++r) {
+            const int i = scScroll_ + r;
+            if (i >= static_cast<int>(list_.size())) break;
+            const auto* e = list_[static_cast<std::size_t>(i)];
+            const auto row = rowRect(scBox_, r);
+            const bool on = e == sel_;
+            if (on) { g.setColour(T.accent.withAlpha(0.18f)); g.fillRect(row); }
+            g.setColour(on ? T.accent : T.textPrimary);
+            juce::String t = u8(e->nome) + "  \xc2\xb7 " + juce::String(static_cast<int>(e->graus.size()));
+            g.drawText(juce::String::fromUTF8(t.toRawUTF8()), row.reduced(6, 0), juce::Justification::centredLeft, true);
+        }
+        if (list_.size() > static_cast<std::size_t>(rows())) {
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(11.0f));
+            g.drawText(juce::String(scScroll_ + 1) + "–" + juce::String(std::min<int>(scScroll_ + rows(), static_cast<int>(list_.size())))
+                       + " / " + juce::String(static_cast<int>(list_.size())),
+                       scBox_.getX(), scBox_.getBottom() + 2, scBox_.getWidth() - 6, 14, juce::Justification::centredRight);
+        }
+
+        // a escala escolhida: graus, período, fonte, régua
+        const int y0 = card_.getBottom() - 132;
+        g.setColour(T.line);
+        g.drawHorizontalLine(y0, static_cast<float>(card_.getX() + 12), static_cast<float>(card_.getRight() - 12));
+        const juce::Rectangle<int> info(card_.getX() + 16, y0 + 8, card_.getWidth() - 32, 116);
+        if (sel_ != nullptr) {
+            juce::String deg;
+            for (float c : sel_->graus) deg << juce::String(c, c == std::floor(c) ? 0 : 1) << "  ";
+            g.setColour(T.textPrimary);
+            g.setFont(juce::FontOptions(13.0f, juce::Font::bold));
+            g.drawText(u8(sel_->nome), info.getX(), info.getY(), info.getWidth(), 18, juce::Justification::centredLeft, true);
+            g.setFont(juce::FontOptions(12.0f));
+            g.drawText(str(rasgo::panel::strings::scaleBankDegrees) + ": " + deg.trim()
+                       + "   \xc2\xb7  " + str(rasgo::panel::strings::scaleBankPeriod) + " "
+                       + juce::String(sel_->periodo, sel_->periodo == std::floor(sel_->periodo) ? 0 : 1),
+                       info.getX(), info.getY() + 20, info.getWidth(), 16, juce::Justification::centredLeft, true);
+            g.setColour(T.textSecondary);
+            g.setFont(juce::FontOptions(11.0f));
+            g.drawFittedText(str(rasgo::panel::strings::scaleBankSource) + ": " + u8(sel_->fonte),
+                             info.getX(), info.getY() + 38, info.getWidth(), 28, juce::Justification::topLeft, 2, 0.9f);
+            const juce::Rectangle<int> ruler(info.getX(), info.getY() + 70, info.getWidth(), 20);
+            g.setColour(T.recessed);
+            g.fillRect(ruler);
+            g.setColour(T.accent);
+            for (float c : sel_->graus) {
+                const float x = static_cast<float>(ruler.getX() + 2)
+                    + (c / sel_->periodo) * static_cast<float>(ruler.getWidth() - 4);
+                g.drawLine(x, static_cast<float>(ruler.getY() + 2), x, static_cast<float>(ruler.getBottom() - 2), 2.0f);
+            }
+        }
+        g.setColour(T.textSecondary);
+        g.setFont(juce::FontOptions(11.0f));
+        g.drawText(str(rasgo::panel::strings::scaleBankHint), info.getX(), info.getBottom() - 16,
+                   info.getWidth(), 14, juce::Justification::centredLeft, true);
+    }
+
+    void mouseDown(const juce::MouseEvent& e) override {
+        const auto p = e.getPosition();
+        if (!card_.contains(p) || closeBtn_.contains(p)) { close(); return; }
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        if (famBox_.contains(p)) {
+            const int i = famScroll_ + (p.y - famBox_.getY()) / kRow;
+            if (i < static_cast<int>(b.familias().size())) {
+                fam_ = i;
+                search_.setText({}, false);
+                refilter();
+                repaint();
+            }
+            return;
+        }
+        if (scBox_.contains(p)) {
+            const int i = scScroll_ + (p.y - scBox_.getY()) / kRow;
+            if (i < static_cast<int>(list_.size())) {
+                sel_ = list_[static_cast<std::size_t>(i)];
+                if (onPick) onPick(sel_->id);
+                repaint();
+            }
+        }
+    }
+    void mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& w) override {
+        const int step = w.deltaY > 0 ? -3 : 3;
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        if (famBox_.contains(e.getPosition()))
+            famScroll_ = juce::jlimit(0, std::max(0, static_cast<int>(b.familias().size()) - rows()), famScroll_ + step);
+        else
+            scScroll_ = juce::jlimit(0, std::max(0, static_cast<int>(list_.size()) - rows()), scScroll_ + step);
+        repaint();
+    }
+    bool keyPressed(const juce::KeyPress& k) override {
+        if (k == juce::KeyPress::escapeKey) { close(); return true; }
+        return false;
+    }
+
+private:
+    static constexpr int kRow = 22;
+    int rows() const { return std::max(1, famBox_.getHeight() / kRow); }
+    static juce::Rectangle<int> rowRect(const juce::Rectangle<int>& box, const int r) {
+        return {box.getX(), box.getY() + r * kRow, box.getWidth(), kRow};
+    }
+    juce::String str(const rasgo::panel::L4& s) const { return u8(rasgo::panel::tr(s, lang_)); }
+    void textEditorTextChanged(juce::TextEditor&) override { refilter(); repaint(); }
+    void textEditorEscapeKeyPressed(juce::TextEditor&) override { close(); }
+    void refilter() {
+        const auto& b = rasgo::escalas::BancoEscalas::instancia();
+        list_.clear();
+        const juce::String q = search_.getText().trim().toLowerCase();
+        for (const auto& e : b.escalas()) {
+            if (q.isNotEmpty()) {
+                if (u8(e.nome).toLowerCase().contains(q) || u8(e.familia).toLowerCase().contains(q))
+                    list_.push_back(&e);
+            } else if (fam_ < static_cast<int>(b.familias().size())
+                       && e.familia == b.familias()[static_cast<std::size_t>(fam_)]) {
+                list_.push_back(&e);
+            }
+        }
+        scScroll_ = 0;
+        for (std::size_t i = 0; i < list_.size(); ++i)
+            if (list_[i] == sel_) scScroll_ = std::max(0, static_cast<int>(i) - 3);
+    }
+
+    juce::TextEditor search_;
+    rasgo::panel::Lang lang_{};
+    std::vector<int> counts_;
+    std::vector<const rasgo::escalas::Escala*> list_;
+    const rasgo::escalas::Escala* sel_ = nullptr;
+    int fam_ = 0, famScroll_ = 0, scScroll_ = 0;
+    juce::Rectangle<int> card_, famBox_, scBox_, closeBtn_;
+};
+
 class CreditsStrip : public juce::Component {
 public:
     static constexpr int kHeight = 16;
@@ -4966,6 +5199,8 @@ class MainComponent : public AppAudioBase,
 public:
     MainComponent() {
         arranque::marca("MainComponent: início");
+        // o banco de escalas (lido aqui, antes do áudio; depois é imutável)
+        rasgo::escalas::BancoEscalas::ligarAoQuantizer();
         loadPrefs();
         palette_.setReadingPreferences(reading_);
         palette_.onReadingSettings = [this] { showReadingMenu(); };
@@ -5216,6 +5451,28 @@ public:
 
         addAndMakeVisible(credits_);
         addChildComponent(overlay_);
+        // o banco de escalas do QUANTIZER (23/11/2026)
+        addChildComponent(scaleBrowser_);
+        view_->onOpenScaleBank = [this](std::size_t id) {
+            if (id >= rack_.graph.nodeCount()) return;
+            scaleNode_ = id;
+            scaleBrowser_.open(static_cast<std::uint32_t>(std::lround(
+                rack_.graph.parameterUserValue(id, "bank"))), lang_);
+        };
+        scaleBrowser_.onPick = [this](std::uint32_t bankId) {
+            if (scaleNode_ >= rack_.graph.nodeCount()
+                || rack_.graph.node(scaleNode_).type() != "QUANTIZER") return;
+            float from = 0.0f;
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                from = rack_.graph.parameterUserValue(scaleNode_, "scale");
+                rack_.graph.setParameterBase(scaleNode_, "bank", static_cast<float>(bankId));
+                rack_.graph.setParameterBase(scaleNode_, "scale", 13.0f);
+            }
+            if (view_->onParamGesture) view_->onParamGesture(scaleNode_, "scale", from, 13.0f);
+            view_->repaint();
+        };
+        scaleBrowser_.onClose = [this] { grabKeyboardFocus(); };
         overlay_.onClose = [this] { header_.setOverlay(0); grabKeyboardFocus(); };
         header_.onVaryAmount = [this](const float v) {
             std::lock_guard<std::mutex> lk(rack_.gmx);
@@ -5313,6 +5570,19 @@ public:
                     for (const auto& [id, trace] : rack_.scopes) rack_.scopeSnap[id] = trace;
                     const int count = view_->exportPanels(juce::File(dir), 2.0f, only);
                     std::fprintf(stderr, "[panels] %d exported offline\n", count);
+                    // o navegador do banco de escalas, para conferir sem
+                    // tocar na tela (`RASGO_EXPORTAR_BANCO=1`, 23/11/2026)
+                    if (std::getenv("RASGO_EXPORTAR_BANCO"))
+                        for (std::size_t n = 0; n < rack_.graph.nodeCount(); ++n)
+                            if (rack_.graph.node(n).type() == "QUANTIZER") {
+                                view_->onOpenScaleBank(n);
+                                const auto img = scaleBrowser_.createComponentSnapshot(
+                                    scaleBrowser_.getLocalBounds(), true, 1.0f);
+                                juce::FileOutputStream os(juce::File(dir).getChildFile("BANCO.png"));
+                                if (os.openedOk()) { os.setPosition(0); os.truncate(); juce::PNGImageFormat().writeImageToStream(img, os); }
+                                scaleBrowser_.close();
+                                break;
+                            }
                     bool valid = count > 0 && (only.isEmpty() || count == only.size());
                     if (valid && std::getenv("RASGO_TEST_PATCH_SWAP"))
                         valid = validatePatchSwap();
@@ -5516,6 +5786,7 @@ public:
 
     void resized() override {
         overlay_.setBounds(getLocalBounds());
+        scaleBrowser_.setBounds(getLocalBounds());
         auto area = getLocalBounds();
         header_.setBounds(area.removeFromTop(
             header_.preferredHeight(getWidth())));
@@ -7024,6 +7295,8 @@ private:
     HeaderBar header_;
     CreditsStrip credits_;
     OverlayView overlay_;
+    ScaleBrowser scaleBrowser_;
+    std::size_t scaleNode_ = 0;
     std::uint64_t seed_ = 0;
     rasgo::panel::Lang lang_ = rasgo::panel::Lang::pt;
     bool standby_ = false;

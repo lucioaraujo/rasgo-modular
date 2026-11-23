@@ -20,6 +20,7 @@ GPL-3.0-or-later), sem mudar a licença do instrumento.
 |---|---|---|
 | Módulos de DSP e o núcleo do grafo | `src/dsp/`, `src/core/` | **AGPL-3.0-or-later ou GPL-3.0-or-later**, à escolha de quem recebe |
 | O instrumento: aplicativo JUCE, plugin, painel, seed, VARIA, LEARN, interface | `apps/`, `src/ui/`, `src/io/`, `src/saida/` e o resto do repositório | **AGPL-3.0-or-later** |
+| O banco de escalas do Trioio e o seu leitor (23/11/2026) | `src/escalas/`, `third_party/trioio-escalas/` | **AGPL-3.0-or-later** (fica fora da oferta dupla; o QUANTIZER em `src/dsp/` só recebe um resolvedor e continua na oferta) |
 | Site, guias e dossiês | `website/`, `guia/`, `dossies/` | os mesmos termos do repositório (AGPL-3.0-or-later) |
 | Código de terceiros | ver abaixo | a licença de cada um |
 
@@ -93,6 +94,7 @@ GPL-3.0-or-later), without changing the instrument's license.
 |---|---|---|
 | DSP modules and the graph core | `src/dsp/`, `src/core/` | **AGPL-3.0-or-later or GPL-3.0-or-later**, at the recipient's choice |
 | The instrument: JUCE application, plugin, panel, seed, VARIA, LEARN, interface | `apps/`, `src/ui/`, `src/io/`, `src/saida/` and the rest of the repository | **AGPL-3.0-or-later** |
+| Trioio's scale bank and its reader (23/11/2026) | `src/escalas/`, `third_party/trioio-escalas/` | **AGPL-3.0-or-later** (outside the dual offer; the QUANTIZER in `src/dsp/` only receives a resolver and stays in the offer) |
 | Website, guides and dossiers | `website/`, `guia/`, `dossies/` | the repository's terms (AGPL-3.0-or-later) |
 | Third-party code | see below | each one's own license |
 

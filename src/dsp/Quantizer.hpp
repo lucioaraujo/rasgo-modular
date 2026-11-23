@@ -3,7 +3,9 @@
 #include "core/SignalGraph.hpp"
 
 #include <array>
+#include <atomic>
 #include <cmath>
+#include <cstdint>
 
 // ============================================================================
 // QUANTIZER — quantizador de escala (Módulo 12)
@@ -39,6 +41,14 @@
 //     mudando a tônica, a afinação acompanha: adaptativa) · 19-EDO · 31-EDO
 //     (a grade muda: cada semitom vai ao passo mais próximo da divisão).
 //     Aplicada na saída, depois da escolha da nota e antes do glide.
+//
+// O banco de escalas do Trioio (23/11/2026; `dossies/PROPOSTA_banco_de_escalas.md`,
+// opção A): SCALE = 13 → BANCO. A escala vem do banco pelo número em `bank`
+// (o id do nome), graus em cents e período qualquer. Os dados e o leitor
+// ficam fora daqui (`src/escalas/`, AGPL); este módulo só recebe um
+// resolvedor (`setBankResolver`). Sem resolvedor ou com id desconhecido, o
+// BANCO toca a cromática (nunca mudo). No banco o AFIN e o MRPH não valem:
+// os graus já são a afinação.
 
 namespace rasgo::modular {
 
@@ -85,7 +95,7 @@ public:
               {{"pitch", PortKind::Audio, "v/oct"},
                {"gate", PortKind::Control, "gate"},
                {"semitone", PortKind::Audio, ""}},
-              {{"scale", 0.0f, 12.0f, 1.0f, ""},
+              {{"scale", 0.0f, 13.0f, 1.0f, ""},
                {"root", 0.0f, 11.0f, 0.0f, "st"},
                {"range", 1.0f, 6.0f, 2.0f, "oct"},
                {"glide", 0.0f, 1.0f, 0.0f, ""},
@@ -100,7 +110,17 @@ public:
                // aprovado em 9/11): a escala B e a interpolação A → B. No
                // FIM: patches iguais; MRPH 0 = o QUANTIZER de antes.
                {"scale_b", 0.0f, 11.0f, 2.0f, ""},
-               {"morph", 0.0f, 1.0f, 0.0f, ""}}) {}
+               {"morph", 0.0f, 1.0f, 0.0f, ""},
+               // o banco (23/11/2026): o id (24 bits, exato no float) da
+               // escala escolhida no navegador; sem knob. No FIM da lista.
+               {"bank", 0.0f, 16777215.0f, 0.0f, ""}}) {}
+
+    static constexpr int kBankIndex = 13;   // SCALE = 13 → o BANCO
+
+    // uma escala do banco, como o resolvedor a entrega (memória imutável)
+    struct BankScale { const float* cents = nullptr; int count = 0; float period = 1200.0f; };
+    using BankResolver = bool (*)(std::uint32_t id, BankScale& out);
+    static void setBankResolver(const BankResolver r) noexcept { resolver().store(r); }
 
     static constexpr int kSieveIndex = 12;   // SCALE = 12 → o CRIVO
 
@@ -186,6 +206,7 @@ public:
         prevTrigger_ = 0.0f;
         gateCountdown_ = 0;
         initialized_ = false;
+        bankId_ = 0xFFFFFFFFu;
     }
 
     void process(const std::vector<const AudioBlock*>& inputs,
@@ -204,8 +225,25 @@ public:
         // CRIVO (12) é só pelo knob
         const int scaleIdx = scaleCv
             ? clampi(static_cast<int>(std::lround(scaleCv->at(0, 0) * 11.0f)), 0, 11)
-            : clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, kSieveIndex);
+            : clampi(static_cast<int>(std::lround(parameterValue("scale"))), 0, kBankIndex);
         const bool useSieve = scaleIdx == kSieveIndex;
+        bool useBank = false;
+        if (scaleIdx == kBankIndex) {
+            const auto id = static_cast<std::uint32_t>(std::lround(parameterValue("bank")));
+            if (id != bankId_ || bankCount_ == 0) {   // quando a escolha muda (ou o banco chega depois)
+                bankId_ = id;
+                bankCount_ = 0;
+                BankScale b;
+                const BankResolver r = resolver().load();
+                if (r != nullptr && r(id, b) && b.count > 0 && b.period > 1.0f) {
+                    bankCount_ = b.count < kBankMax ? b.count : kBankMax;
+                    for (int i = 0; i < bankCount_; ++i)
+                        bankDeg_[static_cast<std::size_t>(i)] = b.cents[i] / 100.0f;
+                    bankPeriod_ = b.period / 100.0f;
+                }
+            }
+            useBank = bankCount_ > 0;
+        }
         Sieve sv{
             clampi(static_cast<int>(std::lround(parameterValue("sieve_m1"))), 2, 13),
             clampi(static_cast<int>(std::lround(parameterValue("sieve_r1"))), 0, 12),
@@ -220,12 +258,13 @@ public:
         const float range = parameterValue("range");
         const float glide = parameterValue("glide");
         const float hysteresis = parameterValue("hysteresis");
-        const ScaleDef& sc = scales()[static_cast<std::size_t>(useSieve ? 0 : scaleIdx)];
+        const ScaleDef& sc = scales()[static_cast<std::size_t>(
+            useSieve || scaleIdx >= kBankIndex ? 0 : scaleIdx)];
         // a interpolação entre a escala A (SCALE) e a B, lida por bloco
         const AudioBlock* morphCv = inputs.size() > 5 ? inputs[5] : nullptr;
         float morph = parameterValue("morph") + (morphCv ? morphCv->at(0, 0) : 0.0f);
         morph = morph < 0.0f ? 0.0f : (morph > 1.0f ? 1.0f : morph);
-        const bool useMorph = !useSieve && morph > 0.0f;
+        const bool useMorph = !useSieve && scaleIdx < kBankIndex && morph > 0.0f;
         if (useMorph) {
             const int bIdx = clampi(static_cast<int>(std::lround(parameterValue("scale_b"))), 0, 11);
             morphCount_ = morphDegrees(sc, scales()[static_cast<std::size_t>(bIdx)], morph, morphDeg_);
@@ -257,7 +296,8 @@ public:
             }
 
             if (update) {
-                const float snapped = useSieve ? snapSieve(wantSemi, sv, root)
+                const float snapped = useBank ? snapPeriod(wantSemi, bankDeg_.data(), bankCount_, bankPeriod_, root)
+                                    : useSieve ? snapSieve(wantSemi, sv, root)
                                     : useMorph ? snapDegrees(wantSemi, morphDeg_.data(), morphCount_, root)
                                                : snap(wantSemi, sc, root);
                 if (!initialized_) {
@@ -315,7 +355,8 @@ public:
 
             // glide até o alvo
             const int heldInt = static_cast<int>(std::lround(heldSemi_));
-            const float target = heldSemi_ + tuningOffset(tuning, heldInt, heldInt - root);
+            const float target = useBank ? heldSemi_
+                                         : heldSemi_ + tuningOffset(tuning, heldInt, heldInt - root);
             if (glideCoeff >= 1.0f)
                 glideSemi_ = target;
             else
@@ -402,6 +443,26 @@ private:
         return best;
     }
 
+    // o grau do banco mais próximo de `semi`: graus em semitons (fração) num
+    // período qualquer (não oitavante também), a partir da tônica
+    static float snapPeriod(const float semi, const float* deg, const int count,
+                            const float period, const int root) noexcept {
+        const float rel = semi - static_cast<float>(root);
+        const int base = static_cast<int>(std::floor(rel / period));
+        float best = 0.0f, bestDist = 1.0e9f;
+        for (int k = base - 1; k <= base + 1; ++k)
+            for (int d = 0; d < count; ++d) {
+                const float cand = static_cast<float>(root) + static_cast<float>(k) * period + deg[d];
+                const float dist = std::fabs(cand - semi);
+                if (dist < bestDist) { bestDist = dist; best = cand; }
+            }
+        return best;
+    }
+    static std::atomic<BankResolver>& resolver() noexcept {
+        static std::atomic<BankResolver> r{nullptr};
+        return r;
+    }
+
     // o semitom do crivo (a partir da tônica) mais próximo de `semi`
     static float snapSieve(const float semi, const Sieve& s, const int root) noexcept {
         const int c = static_cast<int>(std::lround(semi));
@@ -415,6 +476,11 @@ private:
 
     std::array<float, 24> morphDeg_{};
     int morphCount_ = 0;
+    static constexpr int kBankMax = 128;   // o banco vai até 100 graus
+    std::array<float, kBankMax> bankDeg_{};
+    int bankCount_ = 0;
+    float bankPeriod_ = 12.0f;
+    std::uint32_t bankId_ = 0xFFFFFFFFu;   // força a primeira leitura
     float heldSemi_ = 0.0f;
     float glideSemi_ = 0.0f;
     float prevTrigger_ = 0.0f;

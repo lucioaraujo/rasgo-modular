@@ -125,6 +125,24 @@ inline const L4 startNoteInit {
     "Ce patch est maintenant votre patch d’ouverture : la prochaine fois, il s’ouvre dessus. Pour le changer, revenez à MON PATCH avec le patch voulu.",
     "Este patch es ahora su patch de apertura: la próxima vez abre con él. Para cambiarlo, vuelva a MI PATCH con el patch que quiera."};
 // no plugin (20/11/2026): quem abre o patch é o projeto da DAW
+// o navegador do banco de escalas do QUANTIZER (23/11/2026)
+inline const L4 scaleBankTitle {
+    "SCALES — Trioio’s bank", "ESCALAS — banco do Trioio",
+    "GAMMES — banque du Trioio", "ESCALAS — banco del Trioio"};
+inline const L4 scaleBankSearch {"search", "buscar", "chercher", "buscar"};
+inline const L4 scaleBankDegrees {"degrees (¢)", "graus (¢)", "degrés (¢)", "grados (¢)"};
+inline const L4 scaleBankPeriod {"period", "período", "période", "período"};
+inline const L4 scaleBankSource {"source", "fonte", "source", "fuente"};
+inline const L4 scaleBankHint {
+    "Click a scale: the QUANTIZER plays it (SCALE = BANK). Esc closes.",
+    "Clique numa escala: o QUANTIZER passa a tocá-la (SCALE = BANCO). Esc fecha.",
+    "Cliquez sur une gamme : le QUANTIZER la joue (SCALE = BANQUE). Échap ferme.",
+    "Haga clic en una escala: el QUANTIZER la toca (SCALE = BANCO). Esc cierra."};
+inline const L4 scaleBankAll {"all", "todas", "toutes", "todas"};
+inline const L4 scaleBankEmpty {
+    "BANK — click the display", "BANCO — clique no visor",
+    "BANQUE — cliquez l’écran", "BANCO — clic en el visor"};
+
 inline const L4 startNotePlugin {
     "In the plugin, the patch opens from the DAW project; the app's opening choice stays as it is.",
     "No plugin, o patch abre pelo projeto da DAW; a escolha de abertura do app fica como está.",

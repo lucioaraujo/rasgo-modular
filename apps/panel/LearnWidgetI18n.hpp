@@ -36,7 +36,7 @@ inline void registrarLotesTraduzidos() {
     // ---- familia DECISION (72 verbetes) ----
     {
         LearnTable& t = learnTableEnMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over. The 13th, SIEVE, is drawn by the M1/R1/M2/R2 knobs.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Musical scale (12 curated tables — chromatic, major, modes, pentatonics, whole tone, octave). With a cable on the SCL input, the cable takes over. The 13th, SIEVE, is drawn by the M1/R1/M2/R2 knobs. The 14th is the BANK: Trioio’s 2576 scales, each with its source cited — click the display to choose.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tonic of the scale (0=C ... 11=B). With a cable on the ROOT input, the cable takes over.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"How many octaves the input CV covers before quantising.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Portamento time between one quantised note and the next.", "", ""};
@@ -119,7 +119,7 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableFrMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande. La 13e, le CRIBLE, est dessinée par les boutons M1/R1/M2/R2.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Gamme musicale (12 tables choisies — chromatique, majeure, modes, pentatoniques, par tons, octave). Avec un câble sur l’entrée SCL, c’est le câble qui commande. La 13e, le CRIBLE, est dessinée par les boutons M1/R1/M2/R2. La 14e est la BANQUE : les 2576 gammes du Trioio, chacune avec sa source citée — cliquez sur l’écran pour choisir.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tonique de la gamme (0=C ... 11=B). Avec un câble sur l’entrée ROOT, c’est le câble qui commande.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Combien d’octaves couvre la CV d’entrée avant la quantification.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Temps de portamento entre une note quantifiée et la suivante.", "", ""};
@@ -202,7 +202,7 @@ inline void registrarLotesTraduzidos() {
     }
     {
         LearnTable& t = learnTableEsMutable();
-        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable. La 13.ª, la CRIBA, se dibuja con los knobs M1/R1/M2/R2.", "", ""};
+        t["QUANTIZER"]["scale"] = LearnEntry{"Escala musical (12 tablas curadas — cromática, mayor, modos, pentatónicas, tonos enteros, octava). Con un cable en la entrada SCL, manda el cable. La 13.ª, la CRIBA, se dibuja con los knobs M1/R1/M2/R2. La 14.ª es el BANCO: las 2576 escalas del Trioio, cada una con su fuente citada — haga clic en el visor para elegir.", "", ""};
         t["QUANTIZER"]["root"] = LearnEntry{"Tónica de la escala (0=C ... 11=B). Con un cable en la entrada ROOT, manda el cable.", "", ""};
         t["QUANTIZER"]["range"] = LearnEntry{"Cuántas octavas cubre la CV de entrada antes de cuantizar.", "", ""};
         t["QUANTIZER"]["glide"] = LearnEntry{"Tiempo de portamento entre una nota cuantizada y la siguiente.", "", ""};

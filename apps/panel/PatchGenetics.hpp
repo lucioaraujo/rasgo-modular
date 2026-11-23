@@ -78,6 +78,8 @@ inline bool isMutationBlocked(const std::string& id) noexcept {
         "clk_div",
         // a máquina de escalas do QUANTIZER (21/11/2026)
         "scale_b", "morph",
+        // o banco de escalas (23/11/2026): o id da escala escolhida
+        "bank",
         // ganhos de nível — mutar isto joga o barramento pra fora e o
         // MASTER limita demais / distorce (o "clipe" reportado 2026-09-05)
         "gain1", "gain2", "gain3", "gain4", "level1", "level2",
