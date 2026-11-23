@@ -134,5 +134,11 @@ cadastro: conferido na página da VCV antes do download).
 - **Achado do SDK:** o Rack compila plugins com `-funsafe-math-optimizations`;
   vigiar módulos que dependem de NaN/infinito ou de denormais (o Rasgo já
   zera denormais por conta própria).
-- **Falta:** abrir no VCV Rack Free (gratuito) e ouvir; imagens dos painéis
-  (provisórios: fundo liso e rótulos) para o autor; decisões §5.1, 5.2, 5.4.
+- **No VCV Rack Free 2.6.6** (gratuito, `RASGO/third_party/vcv-rack-free-2.6.6/`,
+  pasta de usuário isolada): os 6 módulos carregam e o modo de imagens do
+  Rack (`-t`) desenha os painéis, montados das posições do `panel()`
+  (`RASGO_MODULAR_VCV/docs/paineis_provisorios_2026-11-23.png`). Provisórios:
+  visores vazios, rótulos dos jacks encostados no jack (o PJ301M do Rack é
+  maior que o jack do Rasgo), rótulo do interruptor sobre ele.
+- **Falta:** ouvir os módulos tocando no Rack (o autor); a aparência dos
+  painéis e os visores (§5.1); nome do plugin (§5.2); repositório (§5.4).
