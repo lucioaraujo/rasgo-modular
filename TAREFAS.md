@@ -36,6 +36,19 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   2.6.6 gratuito; `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` com 6 módulos e a
   casca genérica; compila e passa no teste sem janela (estudo §8). Falta
   abrir no VCV Rack Free e as imagens dos painéis para o autor.
+- **Visual do plugin VCV decidido** (autor, 23/11): "gostei mais do prata"
+  — as peças do VCV (knob, jack, slider, botão de trava), faixa da família em
+  degradê, reflexo prata nos knobs, arruela e círculo interno do jack no
+  mesmo cinza, traço dos visores na cor da família, wordmark RASGO na base.
+  "A versão VCV fica do jeito que decidimos." As peças do VCV são CC BY-NC
+  4.0 (© VCV): usadas só como o Rack as fornece, nunca copiadas.
+- **Próximo, depois da v0.1.12 — o visual novo no app** (autor: "podemos
+  fazer do nosso jeito para o app, sem pegar nada do VCV"): knobs nossos
+  (corpo escuro, reflexo prata), pega do slider e botão nossos, faixa em
+  degradê, wordmark na base, traço dos visores na cor da família. **Os jacks
+  ficam como são, sem arruela** — no app o cabeamento se lê pelos halos.
+  Num ramo de experimento, com imagens antes/depois e o tempo de desenho por
+  quadro medido, para o autor aprovar antes do `main`.
 - Falta: a escuta do autor (módulos novos, seeds, painéis, o banco); o piloto
   VCV/Cardinal (SDK do Rack — perguntar); a v0.1.12 — decisão do autor.
 

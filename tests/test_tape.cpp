@@ -1,5 +1,6 @@
 // TAPE (#96) — a fita magnética. Critérios de `dossies/96_tape.md`.
 
+#include <algorithm>
 #include "dsp/Tape.hpp"
 
 #include <cmath>
@@ -42,7 +43,11 @@ std::vector<float> render(const Set& s, float amp, float hz, double seconds, int
     return y;
 }
 
+// (23/11/2026) `b` nunca passa do fim: 1 s em blocos de 256 dá 47 872
+// amostras, e medir até 48 000 lia 128 amostras além do vetor — no macOS
+// essa memória não era zero e o "chiado" media 0,0216 em vez de 0,0051.
 double goertzel(const std::vector<float>& y, std::size_t a, std::size_t b, double hz) {
+    b = std::min(b, y.size());
     const double w = 2.0 * 3.14159265358979 * hz / kSr, cw = 2.0 * std::cos(w);
     double s1 = 0, s2 = 0;
     for (std::size_t i = a; i < b; ++i) { const double s0 = y[i] + cw * s1 - s2; s2 = s1; s1 = s0; }
@@ -50,6 +55,7 @@ double goertzel(const std::vector<float>& y, std::size_t a, std::size_t b, doubl
 }
 
 double rms(const std::vector<float>& y, std::size_t a, std::size_t b) {
+    b = std::min(b, y.size());
     double e = 0; for (std::size_t i = a; i < b; ++i) e += double(y[i]) * y[i];
     return std::sqrt(e / double(b - a));
 }
