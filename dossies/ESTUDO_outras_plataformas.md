@@ -34,6 +34,15 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
    controles do aparelho) e, na MOD, o pacote para a loja deles.
    **Teste:** o autor não tem o aparelho; a MOD tem um emulador
    (`mod-host` + `mod-ui`) que roda no Linux e cobre parte.
+   **Detalhe (24/11, conversa do autor):** já existe um LV2 (JUCE, Linux
+   x86-64, na v0.1.13). Para o MOD faltam: (a) uma casca LV2 **sem JUCE**
+   (o MOD não abre janela; a interface é o modgui na página web dele),
+   gerada como a do VCV; (b) compilação aarch64 pelo `mod-plugin-builder`;
+   (c) a forma — recomendação: **cada módulo como um plugin LV2** (cadeias
+   de pedal, leve para o ARM do Dwarf), começando por um lote de 5–10.
+   Teste sem hardware: **MOD Desktop** (gratuito, Linux x86, roda a mesma
+   casca). Loja do MOD: revisão deles; conferir a política sobre código
+   feito com IA antes de pedir.
 4. **Raspberry Pi / mini computador** — caixa generativa autônoma, sem
    tela, para instalação: a linha de comando tocando ao vivo (seed ou
    patch, VARIA ligado) na saída de áudio. Compilação aarch64.
