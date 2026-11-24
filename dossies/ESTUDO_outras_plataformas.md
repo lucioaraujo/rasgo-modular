@@ -41,8 +41,9 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
    (c) a forma — recomendação: **cada módulo como um plugin LV2** (cadeias
    de pedal, leve para o ARM do Dwarf), começando por um lote de 5–10.
    Teste sem hardware: **MOD Desktop** (gratuito, Linux x86, roda a mesma
-   casca). Loja do MOD: revisão deles; conferir a política sobre código
-   feito com IA antes de pedir.
+   casca). Loja do MOD: revisão deles. **Decisão do autor (24/11): não
+   enviar nada ao fórum do MOD** (nem pedido à loja); os plugins LV2, se
+   feitos, ficam publicados por conta própria, como o `.vcvplugin`.
 4. **Raspberry Pi / mini computador** — caixa generativa autônoma, sem
    tela, para instalação: a linha de comando tocando ao vivo (seed ou
    patch, VARIA ligado) na saída de áudio. Compilação aarch64.
