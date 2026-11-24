@@ -71,8 +71,15 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
   bundle `rasgo-modular.lv2`; teste próprio no CTest; o lilv valida os 100.
   É a base do MOD, do Raspberry Pi e do Zynthian. Falta: teste do autor no
   Ardour e no MOD Desktop; compilar para aarch64 (CI com máquina ARM).
-- **WebAssembly:** precisa do Emscripten; a instalação (emsdk, ~1 GB no
-  disco de 4 TB) espera a autorização do autor.
+- **WebAssembly:** Emscripten 4.0.10 instalado (autor: "pode instalar o
+  emscipten"; `third_party/emsdk`, 1,4 GB, proveniência lá). Protótipo em
+  `apps/web/` (`build.sh`): o motor inteiro em 2,3 MB de wasm autônomo,
+  tocando uma seed num AudioWorklet; página de teste com TOCAR, SEED NOVA,
+  PARAR, número da seed e volume. Conferido no Node: a seed
+  4303935450909092226 monta os mesmos 63 cabos e soa igual ao app nativo
+  (RMS −33,5 dBFS, pico −22,0 dBFS), a 5× o tempo real; montar a seed leva
+  ~1,8 s (o equilíbrio de volume). Falta: o teste do autor no navegador; o
+  VARIA; a aparência e o lugar no site (decisão do autor).
 
 ## 5. Próximo passo
 

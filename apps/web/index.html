@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rasgo Modular no navegador — protótipo</title>
+<style>
+  :root { --bg: #131a1a; --surface: #262b36; --line: #485060; --text: #f0f3f8; --muted: #a8b0bf; --prata: #d8dde6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+         font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; padding: 16px; }
+  main { width: 100%; max-width: 520px; background: var(--surface); border: 1px solid var(--line);
+         border-radius: 6px; padding: 24px; }
+  h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: .04em; }
+  p { margin: 0 0 16px; color: var(--muted); }
+  .linha { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  button { background: transparent; color: var(--prata); border: 1px solid var(--line); padding: 8px 14px;
+           font: inherit; font-size: 14px; letter-spacing: .06em; cursor: pointer; border-radius: 3px; }
+  button:hover:not(:disabled) { border-color: var(--prata); }
+  button.on { background: var(--prata); color: var(--bg); }
+  button:disabled { opacity: .45; cursor: default; }
+  input[type=text] { flex: 1; min-width: 0; background: #0e1015; color: var(--text); border: 1px solid var(--line);
+                     padding: 8px; font: 14px ui-monospace, monospace; border-radius: 3px; }
+  input[type=range] { flex: 1; accent-color: var(--prata); }
+  #estado { font-size: 14px; color: var(--muted); min-height: 1.5em; margin: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>RASGO MODULAR</h1>
+  <p>Protótipo: o mesmo motor do aplicativo, compilado para o navegador. Uma seed monta um patch com os 110 módulos do rack e toca.</p>
+  <div class="linha">
+    <button id="tocar" disabled>TOCAR</button>
+    <button id="nova" disabled>SEED NOVA</button>
+    <button id="parar" disabled>PARAR</button>
+  </div>
+  <div class="linha">
+    <input id="seed" type="text" inputmode="numeric" value="4303935450909092226" aria-label="Número da seed" />
+  </div>
+  <div class="linha">
+    <label for="volume">Volume</label>
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" />
+  </div>
+  <p id="estado">Carregando o motor…</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let ctx = null, no = null, bytes = null;
+const estado = (t) => { $('estado').textContent = t; };
+
+fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(b => {
+  bytes = b;
+  $('tocar').disabled = false; $('nova').disabled = false;
+  estado('Pronto. Aperte TOCAR.');
+}).catch(() => estado('Não consegui carregar rasgo.wasm (abra por um servidor http).'));
+
+async function ligar() {
+  if (ctx) return;
+  ctx = new AudioContext();
+  await ctx.audioWorklet.addModule('rasgo-worklet.js');
+  no = new AudioWorkletNode(ctx, 'rasgo', { numberOfInputs: 0, outputChannelCount: [2] });
+  no.connect(ctx.destination);
+  await new Promise(ok => {
+    no.port.onmessage = (ev) => {
+      const m = ev.data;
+      if (m.tipo === 'pronto') ok();
+      if (m.tipo === 'seed') { estado(`Seed ${m.seed} · ${m.cabos} cabos`); $('parar').disabled = false; $('tocar').classList.add('on'); }
+    };
+    no.port.postMessage({ tipo: 'wasm', bytes });
+  });
+  no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) });
+}
+
+function seedValida() {
+  const s = $('seed').value.trim();
+  return /^\d{1,20}$/.test(s) && BigInt(s) > 0n && BigInt(s) < (1n << 64n) ? s : null;
+}
+
+async function tocar() {
+  const s = seedValida();
+  if (!s) { estado('A seed é um número inteiro positivo.'); return; }
+  estado('Montando o patch…');
+  await ligar();
+  await ctx.resume();
+  no.port.postMessage({ tipo: 'seed', seed: s });
+}
+
+$('tocar').onclick = tocar;
+$('nova').onclick = () => {
+  const a = new Uint32Array(2); crypto.getRandomValues(a);
+  let s = (BigInt(a[0]) << 32n) | BigInt(a[1]); if (s === 0n) s = 1n;
+  $('seed').value = s.toString();
+  tocar();
+};
+$('parar').onclick = () => {
+  if (no) no.port.postMessage({ tipo: 'parar' });
+  $('tocar').classList.remove('on'); $('parar').disabled = true; estado('Parado.');
+};
+$('volume').oninput = () => { if (no) no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) }); };
+</script>
+</body>
+</html>
