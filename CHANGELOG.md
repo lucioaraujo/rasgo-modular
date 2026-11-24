@@ -7,7 +7,7 @@ pronto.
 
 ---
 
-## v0.1.12 — a publicar (preparada em 2026-11-23)
+## v0.1.12 — 2026-11-24
 
 **Resumo.** De 88 a **105 módulos**, com 17 novos (os doze de 20/11,
 POLY-IN, SUM, FORM, TEMPO e VOLTA). A peça ganha forma (FORM e TEMPO, e o

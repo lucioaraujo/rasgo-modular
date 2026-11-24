@@ -1,6 +1,6 @@
 # Rasgo Modular
 
-A **v0.1.12** (a publicar, preparada em 23 nov. 2026) leva o instrumento de 88 a
+A **v0.1.12** (24 nov. 2026) é a atual e leva o instrumento de 88 a
 **105 módulos**. A peça ganha forma: o FORM conduz a dinâmica pelo arco da
 música e o TEMPO faz o andamento respirar, e as seeds orquestrais começam,
 crescem até um clímax e terminam, com quatro vozes. O QUANTIZER toca as

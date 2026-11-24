@@ -1,5 +1,16 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.12 — 24 nov. 2026 (publicada)
+
+A [release v0.1.12](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12)
+foi criada pela execução `45290581772`, sobre a tag `v0.1.12` refeita em
+`d0334b2` (a primeira tag parou no macOS: o teste do TAPE lia além do fim do
+vetor — corrigido em `3dce50c`; nenhuma release existia). Todos os jobs
+passaram: Linux, Windows e macOS, e a abertura no Fedora, Ubuntu 24.04,
+Debian 12 e Arch. Seis anexos. Depois: `estado.py --depois 0.1.12`, `seo.py`
+(VERSAO 0.1.12), `verificar.py` sem problemas, testes do site OK, e o envio
+do `main` (deploy de Pages).
+
 ## Release v0.1.12 — preparação (23 nov. 2026)
 
 Pedido do autor (23/11): "ok, prepare a v0.1.12".
