@@ -22,6 +22,7 @@
 #include "MaestrucLink.h"   // regente da família (maestruc.link/1)
 
 #include "panel/assets/rasgo_logo_gray.h"
+#include "RasgoWordmark.h"          // o wordmark RASGO na base dos módulos
 
 #include "core/SignalGraph.hpp"
 #include "dsp/Loudness.hpp"       // medição BS.1770/EBU R128
@@ -3782,7 +3783,11 @@ private:
         g.fillRect(m.bounds);
         // faixa da família: na camada fixa, então custa zero por quadro
         if (const std::string fam = familyOfType(node.type()); !fam.empty()) {
-            g.setColour(familyColour(fam));
+            // em degradê (visual novo, 24/11/2026): a cor cheia à esquerda,
+            // transparente à direita
+            const auto c = familyColour(fam);
+            g.setGradientFill(juce::ColourGradient(c, static_cast<float>(m.bounds.getX() + 1), 0.0f,
+                                                   c.withAlpha(0.0f), static_cast<float>(m.bounds.getRight() - 1), 0.0f, false));
             g.fillRect(m.bounds.getX() + 1, m.bounds.getY() + 1,
                        m.bounds.getWidth() - 2, 3);
         }
@@ -3811,6 +3816,7 @@ private:
                 && ui::isMatrixCellBind(w.bind)) continue;
             paintWidget(g, m, node, w, Pass::Static);
         }
+        paintWordmark(g, m);
         if (matrix) {
             g.setColour(T.textSecondary);
             g.setFont(juce::FontOptions(9.0f));
@@ -3819,6 +3825,42 @@ private:
                        m.bounds.getY() + mmpx(16.0f), mmpx(40.0f), mmpx(5.0f),
                        juce::Justification::centredLeft, false);
         }
+    }
+
+    // O wordmark RASGO na base de cada módulo (visual novo, 24/11/2026), no
+    // tamanho cheio (22 mm) e na mesma altura em todos; no centro, ou encostado
+    // à esquerda se um controle de baixo esbarraria. Camada fixa: custo zero
+    // por quadro.
+    void paintWordmark(juce::Graphics& g, const ModBox& m) {
+        static const juce::Path marca = [] {
+            juce::Path p = juce::Drawable::parseSVGPath(ui::kWordmarkPath);
+            p.applyTransform(juce::AffineTransform::translation(-ui::kWordmarkX, -ui::kWordmarkY));
+            return p;
+        }();
+        const float lw = static_cast<float>(mmpx(22.0f));
+        if (lw > static_cast<float>(m.bounds.getWidth()) - 6.0f) return;
+        const float lh = lw * ui::kWordmarkH / ui::kWordmarkW;
+        const float topo = static_cast<float>(m.bounds.getBottom()) - 5.0f - lh;
+        auto bate = [&](float xa, float xb) {
+            for (const auto& w : m.panel.widgets) {
+                float cx = 0, meia = 0, fundo = 0;
+                if (w.kind == Widget::Kind::Jack) { cx = static_cast<float>(mmpx(w.x)); meia = static_cast<float>(mmpx(3.0f)); fundo = static_cast<float>(mmpx(w.y + 2.6f)); }
+                else if (w.kind == Widget::Kind::Knob) { const float d = ui::knobDiameterMM(w); cx = static_cast<float>(mmpx(w.x + d * 0.5f)); meia = static_cast<float>(mmpx(d * 0.6f)); fundo = static_cast<float>(mmpx(w.y + d)); }
+                else if (w.kind == Widget::Kind::Toggle) { cx = static_cast<float>(mmpx(w.x + 2.0f)); meia = static_cast<float>(mmpx(3.0f)); fundo = static_cast<float>(mmpx(w.y + 8.0f)); }
+                else continue;
+                cx += static_cast<float>(m.bounds.getX());
+                fundo += static_cast<float>(m.bounds.getY());
+                if (cx + meia > xa && cx - meia < xb && fundo > topo - 2.0f) return true;
+            }
+            return false;
+        };
+        float x = static_cast<float>(m.bounds.getCentreX()) - lw * 0.5f;
+        if (bate(x, x + lw)) {
+            const float xe = static_cast<float>(m.bounds.getX()) + 4.0f;
+            if (!bate(xe, xe + lw)) x = xe;
+        }
+        g.setColour(T.textSecondary.withAlpha(0.85f));
+        g.fillPath(marca, juce::AffineTransform::scale(lw / ui::kWordmarkW).translated(x, topo));
     }
 
     void paintWidget(juce::Graphics& g, const ModBox& m, Signal& node,
@@ -3846,10 +3888,19 @@ private:
             const int r = mmpx(ui::knobDiameterMM(w) * 0.5f);
             const juce::Rectangle<int> box(wx, wy, 2 * r, 2 * r);
             if (st) {
-                g.setColour(T.recessed);
-                g.fillEllipse(box.toFloat());
+                // corpo escuro com leve volume (mais claro em cima) e o reflexo
+                // prata no contorno, claro no alto à esquerda e sumindo embaixo
+                // à direita (visual novo, 24/11/2026: desenho nosso)
+                const auto bf = box.toFloat();
+                g.setGradientFill(juce::ColourGradient(T.recessed.brighter(0.35f), bf.getX(), bf.getY(),
+                                                       T.recessed, bf.getX(), bf.getBottom(), false));
+                g.fillEllipse(bf);
                 g.setColour(T.line);
-                g.drawEllipse(box.toFloat(), 1.0f);
+                g.drawEllipse(bf, 1.0f);
+                g.setGradientFill(juce::ColourGradient(juce::Colour(0xd0d8dde6), bf.getX(), bf.getY(),
+                                                       juce::Colour(0x00d8dde6), bf.getX() + bf.getWidth() * 0.8f,
+                                                       bf.getY() + bf.getHeight() * 0.8f, false));
+                g.drawEllipse(bf.reduced(1.0f), 1.4f);
                 g.setColour(T.textSecondary);
                 // drawFittedText: rótulo que não cabe é comprimido na
                 // horizontal (até 70%) em vez de cortado ("RANG", "ROO")
@@ -3885,6 +3936,13 @@ private:
                 g.fillRect(box.getX() + 1, box.getBottom() - fill,
                            box.getWidth() - 2, fill - 1);
             }
+            {   // a pega prateada no nível (visual novo, 24/11/2026)
+                const float y = static_cast<float>(std::min(box.getBottom() - 3, box.getBottom() - fill - 1));
+                const float x0 = static_cast<float>(box.getX() - 1), x1 = static_cast<float>(box.getRight() + 1);
+                g.setGradientFill(juce::ColourGradient(juce::Colour(0xffe2e6ee), x0, y,
+                                                       juce::Colour(0xff8a93a4), x0, y + 3.0f, false));
+                g.fillRect(juce::Rectangle<float>(x0, y, x1 - x0, 3.0f));
+            }
             break;
         }
         case Widget::Kind::Toggle: {
@@ -3907,6 +3965,10 @@ private:
             g.fillRect(box);
             g.setColour(T.line);
             g.drawRect(box, 1);
+            // brilho prata na borda de cima e da esquerda (visual novo)
+            g.setColour(juce::Colour(0x90d8dde6));
+            g.drawHorizontalLine(box.getY() + 1, static_cast<float>(box.getX() + 1), static_cast<float>(box.getRight() - 1));
+            g.drawVerticalLine(box.getX() + 1, static_cast<float>(box.getY() + 1), static_cast<float>(box.getBottom() - 1));
             break;
         }
         case Widget::Kind::Jack: {
@@ -4060,6 +4122,10 @@ private:
         g.fillRect(box.reduced(1));
 
         const std::string mtype = node.type();
+        // o traço na cor da família do módulo, a mesma da faixa (visual novo,
+        // 24/11/2026); o MASTER guarda as cores de aviso do medidor
+        const std::string famT = familyOfType(mtype);
+        const juce::Colour traco = famT.empty() || famT == "OUT" ? T.accent : familyColour(famT);
         const auto si = rack_.scopeSnap.find(m.id);
         juce::String dlabel = w.label;
 
@@ -4107,7 +4173,7 @@ private:
                     const int y = wy + 1 + b * row;
                     g.setColour(T.textPrimary);
                     g.drawText(names[b], wx + 2, y, label, row, juce::Justification::centredLeft);
-                    g.setColour((hits & (1 << b)) != 0 ? T.warning : T.accent);
+                    g.setColour((hits & (1 << b)) != 0 ? T.warning : traco);
                     g.fillRect(wx + label + 2, y + 2,
                                static_cast<int>(fraction * std::max(0, dw - label - 8)), std::max(1, row - 4));
                 }
@@ -4143,7 +4209,7 @@ private:
                     if (k == 0) path.startNewSubPath(px(k), yOf(sc.lane(0, k)));
                     else path.lineTo(px(k), yOf(sc.lane(0, k)));
                 }
-                g.setColour(T.accent);
+                g.setColour(traco);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel = node.parameterValue("mode") >= 0.5f ? "gate" : "comp";
             } else if (mtype == "CELL") {
@@ -4152,7 +4218,7 @@ private:
                 const int cells = std::clamp(static_cast<int>(std::lround(sc.lane(1, nL - 1))), 1, 24);
                 const float colw = static_cast<float>(dw - 2) / static_cast<float>(nL);
                 const float rowh = static_cast<float>(dh - 2) / static_cast<float>(cells);
-                g.setColour(T.accent);
+                g.setColour(traco);
                 for (std::size_t k = 0; k < nL; ++k) {
                     const auto row = static_cast<std::uint32_t>(std::max(0.0f, sc.lane(0, k)));
                     for (int i = 0; i < cells; ++i)
@@ -4166,7 +4232,7 @@ private:
                 // a espuma vista de lado: a superfície afunda de cima para baixo
                 const std::size_t nL = rasgo::ui::kLaneLen;
                 const float colw = static_cast<float>(dw - 2) / static_cast<float>(nL);
-                g.setColour(T.accent.withAlpha(0.35f));
+                g.setColour(traco.withAlpha(0.35f));
                 for (std::size_t k = 0; k < nL; ++k) {
                     const float d = juce::jlimit(0.0f, 1.0f, sc.lane(0, k));
                     const float top = static_cast<float>(wy + 1) + d * static_cast<float>(dh - 3);
@@ -4179,7 +4245,7 @@ private:
                     const float py = static_cast<float>(wy + 1) + juce::jlimit(0.0f, 1.0f, sc.lane(0, k)) * static_cast<float>(dh - 3);
                     if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
                 }
-                g.setColour(T.accent);
+                g.setColour(traco);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel.clear();
             } else if (mtype == "KEY") {
@@ -4209,7 +4275,7 @@ private:
                     const int ty = wy + 2;
                     const int tomW = static_cast<int>(std::ceil(juce::GlyphArrangement::getStringWidth(fTom, tom)));
                     g.setFont(fTom);
-                    g.setColour(t >= 0 ? T.accent : T.textSecondary);
+                    g.setColour(t >= 0 ? traco : T.textSecondary);
                     g.drawText(tom, wx + 4, ty, std::min(tomW + 2, dw - 6), static_cast<int>(textH) + 2,
                                juce::Justification::centredLeft, false);
                     if (now >= 0) {
@@ -4228,7 +4294,7 @@ private:
                             const float bx = x0 + bw * static_cast<float>(k) + 1.0f;
                             const float bwk = std::max(1.0f, bw - 2.0f);
                             const float bh = (bot - top) * h[static_cast<std::size_t>(k)] / mx;
-                            g.setColour(k == t ? T.accent : T.textSecondary.withAlpha(0.55f));
+                            g.setColour(k == t ? traco : T.textSecondary.withAlpha(0.55f));
                             g.fillRect(bx, bot - bh, bwk, bh);
                             if (k == now) {   // a nota atual: contorno na altura toda
                                 g.setColour(T.textPrimary);
@@ -4236,7 +4302,7 @@ private:
                             }
                         }
                     }
-                    g.setColour(T.accent.withAlpha(0.8f));
+                    g.setColour(traco.withAlpha(0.8f));
                     g.fillRect(x0, bot + 2.0f, ww * ky->certainty(), 2.0f);
                 }
                 dlabel.clear();
@@ -4254,7 +4320,7 @@ private:
                     int mx = 1;
                     for (const int v : h) mx = std::max(mx, v);
                     const float bw = ww / 12.0f;
-                    g.setColour(T.accent.withAlpha(0.75f));
+                    g.setColour(traco.withAlpha(0.75f));
                     for (int k = 0; k < 12; ++k) {
                         const float bh = (hBot - hTop) * static_cast<float>(h[static_cast<std::size_t>(k)])
                                        / static_cast<float>(mx);
@@ -4277,7 +4343,7 @@ private:
                         const float px = lx(k), py = ly(sc.lane(static_cast<std::size_t>(lane), k));
                         if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
                     }
-                    g.setColour(lane == 0 ? T.textPrimary : T.accent);
+                    g.setColour(lane == 0 ? T.textPrimary : traco);
                     g.strokePath(path, juce::PathStrokeType(lane == 0 ? 1.2f : 1.6f));
                 }
                 dlabel.clear();
@@ -4291,7 +4357,7 @@ private:
                 const float top = static_cast<float>(wy + 2), bot = static_cast<float>(wy + dh - 6);
                 g.setColour(T.line);
                 g.drawVerticalLine(static_cast<int>(px(0.0f)), top, bot + 4.0f);
-                const juce::Colour cols[4] = {T.textPrimary, T.accent, T.warning, T.textSecondary};
+                const juce::Colour cols[4] = {T.textPrimary, traco, T.warning, T.textSecondary};
                 const auto* mx = dynamic_cast<const rasgo::modular::Mixer*>(&node);
                 for (int c = 0; c < 4; ++c) {
                     const float wgt = mx ? mx->stageWeight(c) : 0.0f;
@@ -4310,7 +4376,7 @@ private:
                 }
                 if (mx && node.parameterValue("stage") >= 0.5f) {
                     const float cx = px(mx->stageCentre());
-                    g.setColour(T.accent);
+                    g.setColour(traco);
                     g.drawLine(cx - 4.0f, bot + 4.0f, cx + 4.0f, bot + 4.0f, 1.5f);
                     g.drawLine(cx, bot + 1.0f, cx, bot + 4.0f, 1.5f);
                 }
@@ -4327,14 +4393,14 @@ private:
                     const float px = cx + sc.lane(2, k) * r, py = cy - sc.lane(3, k) * r;
                     if (k == 0) trail.startNewSubPath(px, py); else trail.lineTo(px, py);
                 }
-                g.setColour(T.accent.withAlpha(0.5f));
+                g.setColour(traco.withAlpha(0.5f));
                 g.strokePath(trail, juce::PathStrokeType(1.0f));
                 const float x1 = cx + sc.lane(0, nL - 1) * r, y1 = cy - sc.lane(1, nL - 1) * r;
                 const float x2 = cx + sc.lane(2, nL - 1) * r, y2 = cy - sc.lane(3, nL - 1) * r;
                 g.setColour(T.textPrimary);
                 g.drawLine(cx, cy, x1, y1, 1.5f);
                 g.drawLine(x1, y1, x2, y2, 1.5f);
-                g.setColour(T.accent);
+                g.setColour(traco);
                 g.fillEllipse(x2 - 2.5f, y2 - 2.5f, 5.0f, 5.0f);
                 dlabel.clear();
             } else if (mtype == "BOUNCE") {
@@ -4343,7 +4409,7 @@ private:
                 const int balls = std::clamp(static_cast<int>(std::lround(sc.lane(3, nL - 1))), 1, 3);
                 g.setColour(T.line);
                 g.drawHorizontalLine(wy + dh - 2, static_cast<float>(wx + 1), static_cast<float>(wx + dw - 1));
-                const juce::Colour cols[3] = {T.accent, T.textPrimary, T.warning};
+                const juce::Colour cols[3] = {traco, T.textPrimary, T.warning};
                 for (int b = 0; b < balls; ++b) {
                     juce::Path path;
                     for (std::size_t k = 0; k < nL; ++k) {
@@ -4380,7 +4446,7 @@ private:
                 };
                 for (std::size_t k = 0; k + 1 < nL; ++k) {
                     const bool on = sc.lane(1, k) >= 0.5f;
-                    g.setColour(on ? T.accent : T.line);
+                    g.setColour(on ? traco : T.line);
                     g.drawLine(px(k), py(k), px(k + 1), py(k), on ? 2.0f : 1.0f);
                     if (std::fabs(py(k + 1) - py(k)) > 0.5f) {
                         g.setColour(T.line);
@@ -4402,7 +4468,7 @@ private:
                     const float py = static_cast<float>(wy) + static_cast<float>(dh) * (0.5f - 0.42f * delta);
                     if (k == 0) path.startNewSubPath(px, py); else path.lineTo(px, py);
                 }
-                g.setColour(T.accent);
+                g.setColour(traco);
                 g.strokePath(path, juce::PathStrokeType(1.5f));
                 dlabel = juce::String(step) + "/" + juce::String(length);
             } else if (mtype == "TRIGSEQ") {
@@ -4416,7 +4482,7 @@ private:
                     g.setColour(T.line);
                     g.drawHorizontalLine(ly + lh - 1, static_cast<float>(wx + 1),
                                          static_cast<float>(wx + dw - 2));
-                    g.setColour(T.accent);
+                    g.setColour(traco);
                     for (int k = 0; k < nL; ++k) {
                         if (sc.lane(static_cast<std::size_t>(L),
                                     static_cast<std::size_t>(k)) < 0.5f) continue;
@@ -4435,7 +4501,7 @@ private:
                 float mmax = 1.0e-6f;
                 for (int b = 0; b < nb; ++b) mmax = std::max(mmax, mag[b]);
                 const int bw = std::max(1, (dw - 2) / nb);
-                g.setColour(T.accent);
+                g.setColour(traco);
                 for (int b = 0; b < nb; ++b) {
                     const float db = 20.0f * std::log10(mag[b] / mmax + 1.0e-6f);
                     const float t = juce::jlimit(0.0f, 1.0f, 1.0f + db / 54.0f);
@@ -4462,7 +4528,7 @@ private:
                     if (k == 0) p.startNewSubPath(px, py);
                     else        p.lineTo(px, py);
                 }
-                g.setColour(T.accent);
+                g.setColour(traco);
                 g.strokePath(p, juce::PathStrokeType(1.0f));
             }
         }
