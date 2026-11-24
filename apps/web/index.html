@@ -38,6 +38,10 @@
     <input id="seed" type="text" inputmode="numeric" value="4303935450909092226" aria-label="Número da seed" />
   </div>
   <div class="linha">
+    <button id="varia" class="on" aria-pressed="true">VARIA</button>
+    <input id="intensidade" type="range" min="0" max="2" step="0.01" value="1" aria-label="Intensidade do VARIA" />
+  </div>
+  <div class="linha">
     <label for="volume">Volume</label>
     <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" />
   </div>
@@ -69,6 +73,12 @@ async function ligar() {
     no.port.postMessage({ tipo: 'wasm', bytes });
   });
   no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) });
+  enviarVaria();
+}
+
+function enviarVaria() {
+  if (no) no.port.postMessage({ tipo: 'varia', ligado: $('varia').classList.contains('on'),
+                                intensidade: Number($('intensidade').value) });
 }
 
 function seedValida() {
@@ -96,6 +106,12 @@ $('parar').onclick = () => {
   if (no) no.port.postMessage({ tipo: 'parar' });
   $('tocar').classList.remove('on'); $('parar').disabled = true; estado('Parado.');
 };
+$('varia').onclick = () => {
+  const on = $('varia').classList.toggle('on');
+  $('varia').setAttribute('aria-pressed', String(on));
+  enviarVaria();
+};
+$('intensidade').oninput = enviarVaria;
 $('volume').oninput = () => { if (no) no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) }); };
 </script>
 </body>

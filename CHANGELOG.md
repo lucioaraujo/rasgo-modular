@@ -9,6 +9,11 @@ pronto.
 
 ## Não publicado (desde a v0.1.13)
 
+- **VARIA no protótipo do navegador** (25/11, `apps/web/`): a mão caótica
+  toca também no motor em WebAssembly, no mesmo caminho do app; botão VARIA
+  e intensidade na página de teste. Conferido no Node (três seeds, 30 s,
+  sem clip); sem teste do autor num navegador ainda.
+
 - **Audio Unit no macOS** (24/11, dossiê `ESTUDO_outras_plataformas.md`, item
   1): o plugin passa a sair também como AU (instrumento, `aumu RsMd Rsgo`),
   para Logic, GarageBand e MainStage. A CI valida com o `auval` da Apple e

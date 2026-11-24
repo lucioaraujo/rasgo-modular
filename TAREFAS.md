@@ -1,6 +1,6 @@
 # RASGO Modular — tarefas e continuidade
 
-Atualizado: 2026-11-23.
+Atualizado: 2026-11-25.
 Estado publicado: consultar o README e os registros datados ao final deste arquivo.
 Os marcos iniciais abaixo são históricos, não o estado atual da publicação.
 
@@ -10,6 +10,25 @@ transversais e reutilização continuam no inventário global; um dossiê por
 módulo em [`dossies/`](dossies/00_indice.md).
 
 Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE](#pedidos-registrados-em-2026-10-13--acessibilidade-e-scope).
+
+## ▶ Ponto de retomada — 24–25/11/2026: v0.1.13, AU, LV2, prata, navegador
+
+A sessão de 24/11 fechou de repente antes deste registro; refeito em 25/11
+pelo `git log` e pela conversa.
+
+- **v0.1.13 publicada** (24/11, `514674e`): site com os downloads do app e
+  do plugin. Portal RASGO conferido no ar (páginas e captura idênticas ao
+  pacote; README do portal).
+- Commitado localmente, **sem push** (`main` 5–6 à frente de `origin`):
+  plugin **AU** no macOS (só CI, `a12094b`); **LV2 por módulo** sem JUCE,
+  100 plugins (`791dbd6`); **ícone e favicon em prata** (`9101e26`);
+  **protótipo no navegador** (`8436804`) e, em 25/11, o **VARIA** nele.
+  Dossiê `ESTUDO_outras_plataformas.md` §4.
+- MOD: sem envio ao fórum (decisão do autor, `f5d4a40`).
+- Falta (autor): ouvir o protótipo no navegador (`bash apps/web/build.sh`,
+  servir `.local-build/web` e abrir `http://localhost:8765`); testar o LV2
+  no Ardour e no MOD Desktop; decidir o push e quando sai a próxima versão;
+  aparência e lugar do protótipo no site. VCV Library: aguardando resposta.
 
 ## ▶ Ponto de retomada — 23/11/2026: imagens de painel, tutorial, cópias de vozes
 

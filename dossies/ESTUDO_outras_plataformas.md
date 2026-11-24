@@ -78,8 +78,16 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
   PARAR, número da seed e volume. Conferido no Node: a seed
   4303935450909092226 monta os mesmos 63 cabos e soa igual ao app nativo
   (RMS −33,5 dBFS, pico −22,0 dBFS), a 5× o tempo real; montar a seed leva
-  ~1,8 s (o equilíbrio de volume). Falta: o teste do autor no navegador; o
-  VARIA; a aparência e o lugar no site (decisão do autor).
+  ~1,8 s (o equilíbrio de volume).
+- **VARIA no navegador** (25/11): a mão caótica (`MotionEngine`) no motor
+  wasm, no caminho do app JUCE — um passo a cada ~1/30 s, energia da saída
+  (RMS × 2,2 ou redução de ganho do MASTER × 0,18), LUFS de curto prazo
+  guiando chão e teto, cabos relidos a cada 30 passos. Ligado por padrão,
+  como no app; botão VARIA e intensidade 0–2 na página. Conferido no Node,
+  30 s por seed (4303935450909092226, 597512815, 42): 4–11× o tempo real
+  com o VARIA, pico sempre abaixo de 0 dBFS (−19 a −7 dBFS), nível e brilho
+  mudando segundo a segundo em relação ao VARIA desligado. Falta: o teste
+  do autor no navegador; a aparência e o lugar no site (decisão do autor).
 
 ## 5. Próximo passo
 

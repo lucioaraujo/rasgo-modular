@@ -36,6 +36,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.port.postMessage({ tipo: 'seed', seed: m.seed, cabos: this.e.rw_cabos() });
     } else if (m.tipo === 'parar') {
       this.tocando = false;
+    } else if (m.tipo === 'varia' && this.e) {
+      this.e.rw_varia(m.ligado ? 1 : 0, m.intensidade);
     } else if (m.tipo === 'ganho') {
       this.ganho = m.valor;
     }
