@@ -43,7 +43,8 @@ int usage() {
         "  render-patch patch.rmp [--dur S] [--sr HZ] saida.wav\n"
         "  validate patch.rmp                              confere um patch salvo\n"
         "  info [TIPO]                                     os módulos; com TIPO, portas e parâmetros\n"
-        "  demo-patch T1,T2,… saida.rmp                    patch de demonstração para os painéis\n");
+        "  demo-patch T1,T2,… saida.rmp                    patch de demonstração para os painéis\n"
+        "  seed-patch --seed N saida.rmp                   a seed como patch salvo\n");
     return 2;
 }
 
@@ -127,6 +128,31 @@ int cmdRender(int argc, char** argv) {
     rasgo::panel::balanceSeedLevel(g, o.seed, o.sr, 256);
     std::printf("seed %llu: %zu cabos\n", static_cast<unsigned long long>(o.seed), g.cableCount());
     return renderGraph(g, sink, o.dur, o.sr, o.pos[0]);
+}
+
+// `seed-patch`: a seed como patch salvo (.rmp), para abrir no app ou na
+// exportação de imagens (a captura do site, 24/11/2026).
+int cmdSeedPatch(int argc, char** argv) {
+    const Opts o = parse(argc, argv, 2);
+    if (!o.ok || !o.hasSeed || o.seed == 0 || o.pos.size() != 1) return usage();
+    SignalGraph g;
+    for (const auto& f : rasgo::panel::seedModuleCatalog())
+        for (const char* t : f.types)
+            if (auto n = rasgo::panel::makeModule(t)) g.add(std::move(n));
+    const auto sink = g.add(std::make_unique<rasgo::panel::SinkOut>());
+    rasgo::panel::seedPatch(g, o.seed, 0, factory);
+    g.prepare(o.sr, 2, 256);
+    g.setActiveOutput(sink);
+    rasgo::panel::balanceSeedLevel(g, o.seed, o.sr, 256);
+    std::string text = g.serialize() + "panel shown";
+    for (std::size_t i = 0; i + 1 < g.nodeCount(); ++i) text += ' ' + std::to_string(i);
+    text += '\n';
+    std::ofstream out(o.pos[0], std::ios::binary);
+    if (!out) { std::fprintf(stderr, "não consegui escrever %s\n", o.pos[0].c_str()); return 1; }
+    out << text;
+    std::printf("seed %llu: %zu cabos em %s\n", static_cast<unsigned long long>(o.seed),
+                g.cableCount(), o.pos[0].c_str());
+    return 0;
 }
 
 bool loadPatch(const std::string& path, SignalGraph& g, std::string& err) {
@@ -269,5 +295,6 @@ int main(int argc, char** argv) {
     if (cmd == "validate") return cmdValidate(argc, argv);
     if (cmd == "info") return cmdInfo(argc, argv);
     if (cmd == "demo-patch") return cmdDemoPatch(argc, argv);
+    if (cmd == "seed-patch") return cmdSeedPatch(argc, argv);
     return usage();
 }

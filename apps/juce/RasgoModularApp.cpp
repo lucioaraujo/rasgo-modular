@@ -901,7 +901,7 @@ public:
             g.setColour(T.accent);
             g.drawRect(1, learnTop + 1, kWidth - 2, kLearnH - 2, 1);
         }
-        g.setColour(T.accent);
+        g.setColour(kPrata);   // títulos do LEARN em prata (autor, 24/11/2026)
         g.setFont(juce::FontOptions(10.0f));
         g.drawText("LEARN", 8, learnTop + 6, kWidth - 16, 12,
                    juce::Justification::centredLeft, false);
@@ -4178,7 +4178,7 @@ private:
         // o traço na cor da família do módulo, a mesma da faixa (visual novo,
         // 24/11/2026); o MASTER guarda as cores de aviso do medidor
         const std::string famT = familyOfType(mtype);
-        const juce::Colour traco = famT.empty() || famT == "OUT" ? T.accent : familyColour(famT);
+        const juce::Colour traco = famT.empty() || famT == "OUT" ? kPrata : familyColour(famT);   // OUT: prata (o laranja saiu, 24/11/2026)
         const auto si = rack_.scopeSnap.find(m.id);
         juce::String dlabel = w.label;
 
@@ -5703,6 +5703,23 @@ public:
                                 scaleBrowser_.close();
                                 break;
                             }
+                    // a tela inteira, só os módulos que chegam à saída, para
+                    // a captura do site (`RASGO_EXPORTAR_TELA=1920x1006`,
+                    // 24/11/2026): tela.png ao lado dos painéis
+                    if (const char* tela = std::getenv("RASGO_EXPORTAR_TELA")) {
+                        int tw = 1920, th = 1006;
+                        std::sscanf(tela, "%dx%d", &tw, &th);
+                        view_->setOutputOnly(true);
+                        if (const char* sd = std::getenv("RASGO_EXPORTAR_SEED"))
+                            rack_.curSeed = std::strtoull(sd, nullptr, 10);   // só o número no cabeçalho
+                        syncHeader();
+                        setSize(tw, th); resized();
+                        header_.setReadout(view_->visibleModuleCount(), rack_.shown.size(),
+                                           rack_.graph.cableCount(), 0.5f, false, false, 0.0);
+                        const auto img = createComponentSnapshot(getLocalBounds(), true, 1.0f);
+                        juce::FileOutputStream os(juce::File(dir).getChildFile("tela.png"));
+                        if (os.openedOk()) { os.setPosition(0); os.truncate(); juce::PNGImageFormat().writeImageToStream(img, os); }
+                    }
                     bool valid = count > 0 && (only.isEmpty() || count == only.size());
                     if (valid && std::getenv("RASGO_TEST_PATCH_SWAP"))
                         valid = validatePatchSwap();

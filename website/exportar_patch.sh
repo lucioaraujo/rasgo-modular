@@ -22,6 +22,11 @@ app="$project_dir/build/apps/juce/RasgoModularApp_artefacts/Release/Rasgo Modula
 mkdir -p "$output_dir"
 capture_state=$(mktemp -d "$output_dir/.capture-state.XXXXXX")
 mkdir -p "$capture_state/config" "$capture_state/cache" "$capture_state/tmp"
+# idioma da interface na captura (RASGO_EXPORTAR_LANG=pt|en|fr|es; 24/11/2026)
+if [[ -n ${RASGO_EXPORTAR_LANG:-} ]]; then
+    mkdir -p "$capture_state/config/rasgo-modular"
+    printf '%s\n' "$RASGO_EXPORTAR_LANG" > "$capture_state/config/rasgo-modular/ui-lang"
+fi
 ulimit -v 5242880
 ulimit -t 20
 env "${extra_env[@]}" XDG_CONFIG_HOME="$capture_state/config" XDG_CACHE_HOME="$capture_state/cache" \
