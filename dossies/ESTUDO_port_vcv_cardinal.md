@@ -174,3 +174,11 @@ vozes (SPACE mono), fileiras muito espaçadas aproximadas (KEY, TAP, SWITCH).
 Próximo: o pedido à VCV Library (decisão do autor), depois o Cardinal. Pelo
 padrão da família, a pasta `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` passa a
 ser a fonte única desse repositório.
+
+## 11. Pedidos abertos (24/11/2026)
+
+Autor: "pode publicar e fazer as solicitações".
+- VCV Library: https://github.com/VCVRack/library/issues/1048 (commit `ebdee9e`;
+  `make dist` testado no Linux; a VCV compila Windows/macOS/Linux).
+- Cardinal: https://github.com/DISTRHO/Cardinal/issues/953.
+Esperando a resposta dos mantenedores.
