@@ -11,10 +11,10 @@ SITE = {
     # 1200×630, derivada de ../screenshots/rack-completo-2026-09-18.png
     "imagem": "assets/images/og-rasgo-modular.jpg",
     "imagem_alt": {
-        "pt-BR": "Rasgo Modular em execução: rack de três fileiras de módulos cruzado por cerca de setenta cabos em laranja e azul.",
-        "en": "Rasgo Modular running: a three-row rack of modules crossed by some seventy orange and blue cables.",
-        "fr": "Rasgo Modular en fonctionnement : un rack de trois rangées de modules traversé par environ soixante-dix câbles orange et bleus.",
-        "es": "Rasgo Modular en ejecución: un rack de tres filas de módulos cruzado por unos setenta cables naranjas y azules.",
+        "pt-BR": "Rasgo Modular em execução: rack de três fileiras de módulos com faixas em degradê na cor de cada família e knobs prateados, cruzado por cerca de sessenta cabos em laranja e azul.",
+        "en": "Rasgo Modular running: a three-row rack of modules with gradient stripes in each family colour and silver knobs, crossed by some sixty orange and blue cables.",
+        "fr": "Rasgo Modular en fonctionnement : un rack de trois rangées de modules avec des bandes en dégradé à la couleur de chaque famille et des boutons argentés, traversé par une soixantaine de câbles orange et bleus.",
+        "es": "Rasgo Modular en ejecución: un rack de tres filas de módulos con franjas en degradado del color de cada familia y perillas plateadas, cruzado por unos sesenta cables naranjas y azules.",
     },
     # github.io/rasgo-modular/ não é raiz de domínio: um robots.txt aqui
     # seria ignorado. O sitemap vai ao Search Console à mão.
