@@ -1,5 +1,17 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.13 — 24 nov. 2026 (publicada)
+
+Autor: "ok" (enviar as tags). Execução `45488627408` sobre a tag `v0.1.13`:
+pacotes Linux, Windows e macOS, abertura em Debian 12, Ubuntu 24.04, Fedora
+e Arch, e a release — tudo com sucesso. **Nove anexos:** os seis do app e os
+três do plugin (`rasgo-modular-plugin-0.1.13-{windows-x64.zip,
+macos-universal.zip, linux-x86_64.tar.gz}`), cada um conferido na CI pelo
+hospedeiro de teste. Antes, o plugin do VCV saiu como release v2.0.0 do
+`rasgo-modular-vcv` (quatro `.vcvplugin`). Depois: `estado.py --depois
+0.1.13`, `seo.py` (VERSAO 0.1.13), `verificar.py` sem problemas, testes do
+site OK, envio do `main`.
+
 ## Release v0.1.13 — preparação (24 nov. 2026)
 
 Pedido do autor (24/11): "sim, prepare a v0.1.13 com o plugin".

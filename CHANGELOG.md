@@ -7,7 +7,7 @@ pronto.
 
 ---
 
-## v0.1.13 — a publicar
+## v0.1.13 — 2026-11-24
 
 > **English summary.** The **VST3/LV2 plugin** now ships as its own download
 > for Windows, macOS and Linux, next to the application packages, which stay

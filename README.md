@@ -1,6 +1,6 @@
 # Rasgo Modular
 
-A **v0.1.13** é a atual. O **plugin VST3/LV2** ganha download próprio para
+A **v0.1.13** (24 nov. 2026) é a atual. O **plugin VST3/LV2** ganha download próprio para
 Windows, macOS e Linux: o mesmo instrumento numa faixa de instrumento da
 DAW, ao lado do aplicativo, que continua igual. Os painéis ganham **visual
 novo**, todo desenhado pelo projeto: faixa da família em degradê, knobs com
