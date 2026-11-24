@@ -86,8 +86,13 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
   como no app; botão VARIA e intensidade 0–2 na página. Conferido no Node,
   30 s por seed (4303935450909092226, 597512815, 42): 4–11× o tempo real
   com o VARIA, pico sempre abaixo de 0 dBFS (−19 a −7 dBFS), nível e brilho
-  mudando segundo a segundo em relação ao VARIA desligado. Falta: o teste
-  do autor no navegador; a aparência e o lugar no site (decisão do autor).
+  mudando segundo a segundo em relação ao VARIA desligado.
+- **Escuta do autor** (25/11): "funciona, mas parece mais simples que o
+  estágio atual de desenvolvimento do rasgo modular juce". O som é o do
+  app; falta o instrumento em volta (rack, cabos, knobs, visores, LEARN,
+  REC…). Caminhos propostos: (1) demonstração de escuta no site; (2) o
+  rack da seed só para ver, com as imagens de painel do site; (3) rack
+  tocável em canvas, uma segunda interface. Decisão do autor.
 
 ## 5. Próximo passo
 
