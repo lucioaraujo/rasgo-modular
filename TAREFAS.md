@@ -43,6 +43,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   "A versão VCV fica do jeito que decidimos." As peças do VCV são CC BY-NC
   4.0 (© VCV): usadas só como o Rack as fornece, nunca copiadas.
 - **v0.1.12 publicada** (24/11): release com os seis anexos, site no ar.
+- **Repositório público do plugin VCV** (24/11):
+  https://github.com/lucioaraujo/rasgo-modular-vcv. COMPARADOR → VERSUS no
+  Modular (`66421f6`, não publicado: entra na próxima versão). Próximo: VCV
+  Library (decisão do autor).
 - **Plugin VCV com os 100 módulos** (24/11), local em
   `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` (estudo VCV §9). Falta para publicar:
   repositório próprio, VCV Library, depois Cardinal.

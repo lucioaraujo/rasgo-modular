@@ -163,3 +163,14 @@ cadastro: conferido na página da VCV antes do download).
   compila Windows/macOS/Linux); depois, a proposta ao Cardinal. Opcionais:
   visores próprios por módulo (hoje o traço genérico), polifonia por cópia,
   aproximar as fileiras curtas de KEY/TAP/SWITCH, o nome curto do COMPARADOR.
+
+## 10. Repositório público (24/11/2026)
+
+Autor: "pode fazer o repositório público rasgo-modular-vcv". Publicado em
+https://github.com/lucioaraujo/rasgo-modular-vcv (commit `6f67a30`, DSP de
+`66421f6`, com o VERSUS). Junto: as melhorias opcionais pedidas — visores
+próprios (traço, XY para saídas x/y, pistas de gatilhos), polifonia até 16
+vozes (SPACE mono), fileiras muito espaçadas aproximadas (KEY, TAP, SWITCH).
+Próximo: o pedido à VCV Library (decisão do autor), depois o Cardinal. Pelo
+padrão da família, a pasta `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` passa a
+ser a fonte única desse repositório.
