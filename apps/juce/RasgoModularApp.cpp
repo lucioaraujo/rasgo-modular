@@ -1496,7 +1496,7 @@ public:
             g.fillRect(rx, my, mw, mh);
             const float frac = juce::jlimit(0.0f, 1.0f, vu_ / 0.891f);
             if (frac > 0.001f) {
-                g.setColour(frac < 0.85f ? T.accent : T.warning);
+                g.setColour(frac < 0.85f ? kPrata : T.warning);
                 g.fillRect(rx, my, static_cast<int>(frac * mw), mh);
             }
             rx -= 12;
@@ -4015,7 +4015,7 @@ private:
                 }
                 break;
             }
-            g.setColour(value >= 0.5f ? T.accent : T.recessed);
+            g.setColour(value >= 0.5f ? kPrata : T.recessed);   // ligado = prata (autor, 24/11/2026)
             g.fillRect(box);
             g.setColour(T.line);
             g.drawRect(box, 1);
@@ -4196,7 +4196,7 @@ private:
                 const float frac = std::min(1.0f, peak / 0.891f);
                 const int barW = static_cast<int>(frac * (dw - 2));
                 if (barW > 0) {
-                    g.setColour(frac < 0.7f ? T.accent : T.warning);
+                    g.setColour(frac < 0.7f ? kPrata : T.warning);
                     g.fillRect(wx + 1, wy + 1, barW, dh - 2);
                 }
                 if (auto* mst = dynamic_cast<rasgo::modular::Master*>(&node))
