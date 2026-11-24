@@ -87,7 +87,7 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
   30 s por seed (4303935450909092226, 597512815, 42): 4–11× o tempo real
   com o VARIA, pico sempre abaixo de 0 dBFS (−19 a −7 dBFS), nível e brilho
   mudando segundo a segundo em relação ao VARIA desligado.
-- **Escuta do autor** (25/11): "funciona, mas parece mais simples que o
+- **Escuta do autor** (25/11, Firefox no Linux): "funciona, mas parece mais simples que o
   estágio atual de desenvolvimento do rasgo modular juce". O som é o do
   app; falta o instrumento em volta (rack, cabos, knobs, visores, LEARN,
   REC…). Caminhos propostos: (1) demonstração de escuta no site; (2) o
