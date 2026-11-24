@@ -1,5 +1,5 @@
 ## O que é
-O COMPARADOR mistura dois sinais com polaridade e decide quando a mistura passa de um limiar. Os knobs A e B têm o zero no centro: para a direita a entrada soma, para a esquerda entra invertida. A saída COMP é um gate que fica alto enquanto a mistura está acima do limiar.
+O VERSUS mistura dois sinais com polaridade e decide quando a mistura passa de um limiar. Os knobs A e B têm o zero no centro: para a direita a entrada soma, para a esquerda entra invertida. A saída COMP é um gate que fica alto enquanto a mistura está acima do limiar.
 
 ## Como pensar nele
 É uma balança. Com A à direita e B à esquerda, a mistura é a diferença entre os dois sinais; com o mesmo sinal nos dois, ela se anula. A decisão vem depois: o gate abre quando a balança pende para um lado. A histerese impede que ele tremule quando o sinal tem ruído perto do limiar.

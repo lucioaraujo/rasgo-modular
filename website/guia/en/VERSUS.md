@@ -1,5 +1,5 @@
 ## O que é
-COMPARADOR mixes two signals with polarity and decides when the mix crosses a threshold. The A and B knobs have zero in the centre: to the right the input adds, to the left it comes in inverted. The COMP output is a gate that stays high while the mix is above the threshold.
+VERSUS mixes two signals with polarity and decides when the mix crosses a threshold. The A and B knobs have zero in the centre: to the right the input adds, to the left it comes in inverted. The COMP output is a gate that stays high while the mix is above the threshold.
 
 ## Como pensar nele
 It is a balance. With A to the right and B to the left, the mix is the difference between the two signals; with the same signal in both, it cancels out. The decision comes after: the gate opens when the balance tips one way. Hysteresis keeps it from flickering when the signal is noisy near the threshold.

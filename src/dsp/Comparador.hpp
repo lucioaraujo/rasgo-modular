@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <cmath>
 
-// COMPARADOR (#80) — o limiar como acontecimento (2026-11-11; dossiê
+// VERSUS (#80; até 24/11/2026, COMPARADOR — renomeado pelo autor: "mude o
+// comparador para versus") — o limiar como acontecimento (2026-11-11; dossiê
 // `dossies/80_comparador.md`; estudo da família §4.5, aprovado; "pode
 // avançar nos módulos restantes").
 //
@@ -41,12 +42,12 @@ public:
          {"threshold", -1.0f, 1.0f, 0.0f, ""},
          {"hysteresis", 0.0f, 0.5f, 0.05f, ""}}) {}
 
-    std::string type() const override { return "COMPARADOR"; }
+    std::string type() const override { return "VERSUS"; }
 
     Panel panel() const override {
         Panel p;
         p.hp = 8;
-        p.add(Widget::Kind::Label, "COMPARADOR", "", 2.5f, 2.0f);
+        p.add(Widget::Kind::Label, "VERSUS", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Knob, "A", "pol_a", 6.0f, 14.0f);
         p.add(Widget::Kind::Knob, "B", "pol_b", 24.0f, 14.0f);
         p.add(Widget::Kind::Knob, "OFS", "offset", 6.0f, 36.0f);

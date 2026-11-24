@@ -1,4 +1,4 @@
-# COMPARADOR — o limiar como acontecimento
+# VERSUS — o limiar como acontecimento
 
 **Família:** DECISION · **Módulo 80**
 **Essência:** mistura dois sinais com o zero no meio (somar, opor, anular) e

@@ -1,5 +1,5 @@
 ## O que é
-COMPARADOR mélange deux signaux avec polarité et décide quand le mélange franchit un seuil. Les boutons A et B ont le zéro au centre : vers la droite l'entrée s'ajoute, vers la gauche elle entre inversée. La sortie COMP est un gate qui reste haut tant que le mélange est au-dessus du seuil.
+VERSUS mélange deux signaux avec polarité et décide quand le mélange franchit un seuil. Les boutons A et B ont le zéro au centre : vers la droite l'entrée s'ajoute, vers la gauche elle entre inversée. La sortie COMP est un gate qui reste haut tant que le mélange est au-dessus du seuil.
 
 ## Como pensar nele
 C'est une balance. Avec A à droite et B à gauche, le mélange est la différence entre les deux signaux ; avec le même signal des deux côtés, il s'annule. La décision vient ensuite : le gate s'ouvre quand la balance penche d'un côté. L'hystérésis l'empêche de trembler quand le signal est bruité près du seuil.

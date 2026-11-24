@@ -160,7 +160,8 @@ inline std::unique_ptr<rasgo::modular::Signal> makeModule(const std::string& t) 
     if (t == "APOCRIFO")   return std::make_unique<Apocrifo>();
     if (t == "TAP")        return std::make_unique<Tap>();
     if (t == "FRONTEIRA")  return std::make_unique<Fronteira>();
-    if (t == "COMPARADOR") return std::make_unique<Comparador>();
+    if (t == "VERSUS" || t == "COMPARADOR")   // COMPARADOR = o nome até 24/11/2026
+        return std::make_unique<Comparador>();
     if (t == "EPICYCLE")   return std::make_unique<Epicycle>();
     if (t == "POLYGON")    return std::make_unique<Polygon>();
     if (t == "VIA")        return std::make_unique<Via>();
@@ -281,7 +282,7 @@ inline const std::vector<CatalogGroup>& seedModuleCatalog() {
         {"TRANSFORM", {"FILTER", "LADDER", "FORMANT", "VOCODER", "RESONATOR", "WASP", "LPG", "VCA", "VCA4", "SHAPE", "SHIFTER", "CRUSH", "PARAMETRIC", "GLIDE", "CONTROL", "DYNAMICS", "ELASTIC", "TAPE"}},
         {"MODULATE",  {"ENVELOPE", "FUNCTION", "STAGES", "DRIFT", "CHAOS", "SH", "BOUNCE", "MOUSSE", "PENDULUM", "EPICYCLE", "SUPPLY", "MAGNET", "ORBIT", "PRESSURE", "REFRACT", "PREDATOR", "FORM"}},
         {"TIME",      {"CLOCK", "LOGIC", "TURING", "SEQUENCE", "TRIGSEQ", "ARP", "CELL", "TAP", "POLYGON", "BUDGET", "INTERFERENCE", "SWARM", "ECLIPSE", "SEASON", "TEMPO", "VOLTA"}},
-        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "COMPARADOR", "INTERPRET", "PHRASE"}},
+        {"DECISION",  {"QUANTIZER", "HARMONY", "ABACUS", "DECISION", "BOXCAR", "MARKOV", "COHERENCE", "KEY", "ACCENT", "BLEFE", "FRONTEIRA", "VERSUS", "INTERPRET", "PHRASE"}},
         {"ROUTE",     {"SWITCH", "MATRIX", "MULT", "PLANAR", "VIA", "RELATE", "SUM"}},
         {"SPACE",     {"SPACE", "HALL", "LOOPER", "SWIRL", "MEMORY", "SAMPLER", "TURNTABLE", "SPRING", "PRISM", "APOCRIFO", "CUTUP", "LENS"}},
         {"OUT",       {"MIXER", "MASTER", "SCOPE", "NOTE-OUT", "LISTEN"}},

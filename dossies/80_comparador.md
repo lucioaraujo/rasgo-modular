@@ -1,5 +1,7 @@
 # 80 — COMPARADOR: o limiar como acontecimento
 
+> **Renomeado para VERSUS em 24/11/2026** (autor: "mude o comparador para versus"). Patches salvos com COMPARADOR continuam abrindo (apelido no catálogo). O texto abaixo é o registro de 11/11 e mantém o nome da época.
+
 Data: 11/11/2026. Estado: **em implementação** (estudo da família §4.5:
 "COMPARADOR com mixer polarizador", aprovado; "pode avançar nos módulos
 restantes").

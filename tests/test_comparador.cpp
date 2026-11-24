@@ -1,4 +1,4 @@
-// COMPARADOR (#80) — o limiar como acontecimento. Critérios de
+// VERSUS (#80) — o limiar como acontecimento. Critérios de
 // `dossies/80_comparador.md`.
 
 #include "dsp/Comparador.hpp"

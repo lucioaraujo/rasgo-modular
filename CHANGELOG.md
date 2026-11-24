@@ -7,6 +7,14 @@ pronto.
 
 ---
 
+## Não publicado (desde a v0.1.12)
+
+- **COMPARADOR passa a se chamar VERSUS** (24/11, autor: "mude o comparador
+  para versus"): o módulo, o painel, o LEARN nas 4 línguas, os guias e a
+  imagem do site. Patches salvos com COMPARADOR continuam abrindo (o nome
+  antigo é apelido no catálogo) e, ao salvar, passam a gravar VERSUS. As
+  seeds não mudam.
+
 ## v0.1.12 — 2026-11-24
 
 **Resumo.** De 88 a **105 módulos**, com 17 novos (os doze de 20/11,

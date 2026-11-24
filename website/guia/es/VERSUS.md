@@ -1,5 +1,5 @@
 ## O que é
-COMPARADOR mezcla dos señales con polaridad y decide cuándo la mezcla pasa de un umbral. Los mandos A y B tienen el cero en el centro: hacia la derecha la entrada suma, hacia la izquierda entra invertida. La salida COMP es un gate que queda alto mientras la mezcla está por encima del umbral.
+VERSUS mezcla dos señales con polaridad y decide cuándo la mezcla pasa de un umbral. Los mandos A y B tienen el cero en el centro: hacia la derecha la entrada suma, hacia la izquierda entra invertida. La salida COMP es un gate que queda alto mientras la mezcla está por encima del umbral.
 
 ## Como pensar nele
 Es una balanza. Con A a la derecha y B a la izquierda, la mezcla es la diferencia entre las dos señales; con la misma señal en las dos, se anula. La decisión viene después: el gate se abre cuando la balanza se inclina hacia un lado. La histéresis impide que tiemble cuando la señal tiene ruido cerca del umbral.
