@@ -234,7 +234,7 @@ Quem usa leitor de tela precisa da imagem, não do rótulo dela.
 `href`/`src` interno aponta para arquivo que existe; **nenhum recurso
 externo** além dos links para o portal e para o GitHub — nada de CDN, nada
 de fonte remota; seletor de idioma e `.page-nav` marcando a página certa em
-cada uma; os 88 módulos presentes nas quatro páginas de guia; nenhum
+cada uma; todos os módulos (105 em 24/11/2026) presentes nas quatro páginas de guia; nenhum
 resíduo de português nas traduções.
 
 **Ainda não verificado, e é honesto dizer:** nenhum navegador real abriu

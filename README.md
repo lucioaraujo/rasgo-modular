@@ -36,6 +36,7 @@ quatro idiomas.
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
 **Download:** [v0.1.12 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) ·
+**VCV Rack:** [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv) (100 modules) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
 Languages:
@@ -112,6 +113,8 @@ saved as `.rmp` files.
 [**v0.1.12 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
 Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
 macOS `.dmg`, all built and packaged by continuous integration.
+
+The modules also exist as a **VCV Rack 2 plugin** (100 modules, same DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
 | Platform | Built | Run | Audio verified |
 |---|---|---|---|
@@ -212,6 +215,8 @@ arquivos `.rmp`.
 [**Release v0.1.12**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
 Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
 `.dmg` — todos construídos e empacotados pela integração contínua.
+
+Os módulos também existem como **plugin do VCV Rack 2** (100 módulos, o mesmo DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
 | Plataforma | Construído | Executado | Áudio verificado |
 |---|---|---|---|
@@ -316,6 +321,8 @@ sont enregistrés dans des fichiers `.rmp`.
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
 empaquetés par l'intégration continue.
 
+Les modules existent aussi comme **plugin pour VCV Rack 2** (100 modules, le même DSP) : [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
+
 | Plateforme | Construit | Lancé | Audio vérifié |
 |---|---|---|---|
 | Linux x86-64 | oui | oui | oui, sur matériel réel |
@@ -416,6 +423,8 @@ archivos `.rmp`.
 [**Versión v0.1.12**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
 y empaquetados por la integración continua.
+
+Los módulos también existen como **plugin de VCV Rack 2** (100 módulos, el mismo DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
 | Plataforma | Construido | Ejecutado | Audio verificado |
 |---|---|---|---|

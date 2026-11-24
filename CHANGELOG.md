@@ -9,6 +9,12 @@ pronto.
 
 ## Não publicado (desde a v0.1.12)
 
+- **Plugin do VCV Rack** (24/11): 100 módulos do Rasgo Modular como plugin do
+  VCV Rack 2, em repositório próprio
+  (`github.com/lucioaraujo/rasgo-modular-vcv`, GPL-3.0-or-later), com o mesmo
+  DSP, dicas do LEARN em inglês, manual, créditos e polifonia. Pedidos
+  abertos na VCV Library e no Cardinal. Página de Instalação e INSTALL
+  ("Com outros programas") e README citam o plugin.
 - **COMPARADOR passa a se chamar VERSUS** (24/11, autor: "mude o comparador
   para versus"): o módulo, o painel, o LEARN nas 4 línguas, os guias e a
   imagem do site. Patches salvos com COMPARADOR continuam abrindo (o nome
