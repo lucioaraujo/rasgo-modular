@@ -792,6 +792,11 @@ inline juce::Colour familyColour(const std::string& family) {
     return juce::Colour::fromHSL(it->second / 360.0f, sat, 0.56f, 1.0f);
 }
 
+// Prata: substitui o laranja onde ele só marcava destaque (autor,
+// 24/11/2026) — ponteiros, wordmark, VARIA, RACK, ABRE, títulos do LEARN,
+// do tutorial e do sobre.
+inline const juce::Colour kPrata{0xffd8dde6};
+
 class PaletteColumn : public juce::Component, private juce::Timer {
 public:
     // A coluna cresceu de 158 pra 186 px e a caixa LEARN de 172 pra 232:
@@ -862,7 +867,7 @@ public:
             if (y < -14 || y > learnTop) continue;
             g.setColour(familyColour(h.first));   // legenda da faixa
             g.fillRect(10, y + 3, 8, 8);
-            g.setColour(T.accent);
+            g.setColour(familyColour(h.first));   // título na cor da família
             g.drawText(u8(h.first), 22, y, kWidth - 32, 14,
                        juce::Justification::centredLeft, false);
         }
@@ -945,14 +950,14 @@ public:
         };
         const auto primary = reading_.whiteText ? juce::Colours::white : T.textPrimary;
         const auto secondary = reading_.whiteText ? juce::Colours::white : T.textSecondary;
-        heading(learn_.title, reading_.whiteText ? juce::Colours::white : T.accent, true);
+        heading(learn_.title, reading_.whiteText ? juce::Colours::white : kPrata, true);
         if (!learn_.value.empty()) heading(learn_.value, primary, false);
 
         if (learnCacheEntry_ != learn_.entry || learnCacheW_ != wrapW) {
             const std::string texts[] = {learn_.entry->quick, learn_.entry->understand,
                                          learn_.entry->explore};
             const juce::Colour colours[] = {primary, secondary,
-                reading_.whiteText ? juce::Colours::white : T.accent};
+                reading_.whiteText ? juce::Colours::white : kPrata};
             learnContentH_ = 0;
             for (int i = 0; i < 3; ++i) {
                 learnHeights_[i] = 0;
@@ -1349,7 +1354,7 @@ public:
             for (int x = 0; x < rasgo_logo_w; ++x) {
                 const float t = static_cast<float>(
                     rasgo_logo_gray[y * rasgo_logo_w + x]) / 255.0f;
-                px.setPixelColour(x, y, T.bg.interpolatedWith(T.accent, t));
+                px.setPixelColour(x, y, T.bg.interpolatedWith(kPrata, t));   // prata (autor, 24/11/2026)
             }
     }
 
@@ -1451,7 +1456,7 @@ public:
         rx -= buttonR(g, rx, langLabel(), false, Act::lang);
         // ABRE — preferência de abertura, junto do idioma (as duas são
         // preferências de quem usa, não estado do patch)
-        rx -= buttonR(g, rx, startLabel(), flashing(Act::startup), Act::startup);
+        rx -= buttonR(g, rx, startLabel(), flashing(Act::startup), Act::startup, kPrata);
         // REC — ponto cheio quando gravando, como no painel X11
         // gravando: o botão é também o relógio da tomada (pedido do autor,
         // 10/11/2026) — `● REC 01:23`; no último meio minuto mostra o
@@ -1580,7 +1585,7 @@ public:
             const int fw = juce::roundToInt(
                 (varyAmount_ * 0.5f) * static_cast<float>(kVaryW - 2));
             if (fw > 0) {
-                g.setColour(flashing(Act::vary) ? T.textPrimary : T.accent);
+                g.setColour(flashing(Act::vary) ? T.textPrimary : kPrata);
                 g.fillRoundedRectangle(
                     juce::Rectangle<int>(varySlider_.getX() + 1,
                                          varySlider_.getY() + 1,
@@ -1633,7 +1638,7 @@ public:
             // As duas palavras vinham FIXAS em português — o botão dizia
             // "RACK · SAÍDA" mesmo com a interface em inglês (achado do
             // autor, 18 set. 2026); hoje vêm de `UiLanguage.hpp`.
-            x += button(g, x, rackLabel(), rackOut_, Act::rackView);
+            x += drawButton(g, x, rackLabel(), rackOut_, Act::rackView, kPrata);
         }
         if (hasKeyboardFocus(false) && keyboardAction_)
             for (const auto& hit : keyboardChoices())
@@ -3863,7 +3868,7 @@ private:
             else if (std::getenv("RASGO_LOGO_LOG"))
                 std::fprintf(stderr, "[logo] modulo %zu: sem lugar livre\n", m.id);
         }
-        g.setColour(T.textSecondary.withAlpha(0.85f));
+        g.setColour(kPrata.withAlpha(0.85f));
         g.fillPath(marca, juce::AffineTransform::scale(lw / ui::kWordmarkW).translated(x, topo));
     }
 
@@ -3966,7 +3971,7 @@ private:
             }
             const int fill = juce::roundToInt(box.getHeight() * norm);
             if (fill > 0) {
-                g.setColour(T.accent);
+                g.setColour(familyColour(familyOfType(node.type())));   // cor da família (autor, 24/11/2026)
                 g.fillRect(box.getX() + 1, box.getBottom() - fill,
                            box.getWidth() - 2, fill - 1);
             }
@@ -4910,7 +4915,7 @@ public:
         link_ = {};
         g.setColour(T.surface);
         g.fillRect(card);
-        g.setColour(T.accent);
+        g.setColour(kPrata);
         g.drawRect(card, 1);
 
         namespace S = rasgo::panel::strings;
@@ -4932,7 +4937,7 @@ public:
         const int top = cy + 30;
 
         if (mode_ == Mode::tutorial) {
-            g.setColour(T.accent);
+            g.setColour(kPrata);
             g.setFont(juce::FontOptions(kTitlePt));
             g.drawText(str(S::tutTitle), px, top, wrapW, 18,
                        juce::Justification::topLeft, false);
@@ -4980,7 +4985,7 @@ public:
                         0, 0, cache_.getWidth(), cache_.getHeight());
             // o link do guia, ao vivo
             g.setFont(juce::FontOptions(kBodyPt));
-            g.setColour(linkHover_ ? T.textPrimary : T.accent);
+            g.setColour(linkHover_ ? T.textPrimary : kPrata);
             g.drawText(str(S::guideUrl), px, oy + linkY_, linkW_, 18,
                        juce::Justification::topLeft, true);
             g.drawHorizontalLine(oy + linkY_ + 16, static_cast<float>(px),
@@ -5004,14 +5009,14 @@ public:
                 viewTop_ = viewTop;
                 g.setColour(T.recessed);
                 g.fillRect(track_.reduced(3, 0));
-                g.setColour(dragging_ ? T.accent : T.line);
+                g.setColour(dragging_ ? kPrata : T.line);
                 g.fillRect(thumb_.reduced(3, 0));
             }
         } else {
             g.saveState();
             g.reduceClipRegion({cx + 1, cy + 1, cw - 2, chh - 2});
             int py = top;
-            g.setColour(T.accent);
+            g.setColour(kPrata);
             g.setFont(juce::FontOptions(kTitlePt));
             g.drawText("RASGO MODULAR", px, py, wrapW, 18,
                        juce::Justification::topLeft, false);
@@ -5185,7 +5190,7 @@ private:
             }
             first = false;
             if (g) {
-                g->setColour(T.accent);
+                g->setColour(kPrata);
                 g->setFont(juce::FontOptions(kCardPt, juce::Font::bold));
                 g->drawText(str(*c[0]), 0, py, w, 18,
                             juce::Justification::topLeft, false);
