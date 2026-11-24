@@ -59,7 +59,7 @@ public:
         p.add(Widget::Kind::Jack, "MIX", "out:mix", 6.0f, 104.0f);
         p.add(Widget::Kind::Jack, "INV", "out:inv", 18.0f, 104.0f);
         p.add(Widget::Kind::Jack, "COMP", "out:comp", 30.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "CRUZ", "out:cross", 18.0f, 120.0f);
+        p.add(Widget::Kind::Jack, "CRUZ", "out:cross", 18.0f, 118.0f);
         return p;
     }
 

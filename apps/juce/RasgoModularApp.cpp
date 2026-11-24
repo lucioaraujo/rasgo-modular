@@ -3857,10 +3857,46 @@ private:
         float x = static_cast<float>(m.bounds.getCentreX()) - lw * 0.5f;
         if (bate(x, x + lw)) {
             const float xe = static_cast<float>(m.bounds.getX()) + 4.0f;
+            const float xd = static_cast<float>(m.bounds.getRight()) - 4.0f - lw;
             if (!bate(xe, xe + lw)) x = xe;
+            else if (!bate(xd, xd + lw)) x = xd;
+            else if (std::getenv("RASGO_LOGO_LOG"))
+                std::fprintf(stderr, "[logo] modulo %zu: sem lugar livre\n", m.id);
         }
         g.setColour(T.textSecondary.withAlpha(0.85f));
         g.fillPath(marca, juce::AffineTransform::scale(lw / ui::kWordmarkW).translated(x, topo));
+    }
+
+    // Cabe o rótulo à direita do botão sem encostar no próximo controle da
+    // mesma fileira nem passar da borda? (autor, 24/11/2026)
+    bool rotuloCabeADireita(const ModBox& m, const Widget& w, const juce::Font& f) const {
+        const float tw = juce::GlyphArrangement::getStringWidth(f, w.label);
+        float limite = static_cast<float>(m.bounds.getRight() - 3);
+        for (const auto& o : m.panel.widgets) {
+            if (&o == &w || o.kind == Widget::Kind::Label) continue;
+            float ox = o.x, oy0 = o.y, oy1 = o.y + 4.0f;
+            if (o.kind == Widget::Kind::Jack) { ox = o.x - 2.4f; oy0 = o.y - 7.0f; oy1 = o.y + 2.4f; }
+            else if (o.kind == Widget::Kind::Knob) { ox = o.x - 2.0f; oy0 = o.y - 4.0f; oy1 = o.y + ui::knobDiameterMM(o); }
+            else if (o.kind == Widget::Kind::Slider) { ox = o.x - 2.0f; oy1 = o.y + 33.5f; }
+            else if (o.kind == Widget::Kind::Display) { oy1 = o.y + o.height; }
+            if (ox <= w.x || oy1 < w.y || oy0 > w.y + 4.0f) continue;
+            limite = std::min(limite, static_cast<float>(m.bounds.getX() + mmpx(ox)) - 2.0f);
+        }
+        return static_cast<float>(m.bounds.getX() + mmpx(w.x) + mmpx(4.0f) + 2) + tw <= limite;
+    }
+
+    // Rótulo centrado na caixa dada, mas sempre DENTRO do módulo: perto da
+    // borda ele desliza para dentro em vez de ser cortado (DERIVA, COMB;
+    // autor, 24/11/2026). Comprime até 70% só se nem assim couber.
+    void rotulo(juce::Graphics& g, const ModBox& m, const std::string& texto,
+                int x, int y, int w, int h) const {
+        const int tw = std::min(w, static_cast<int>(std::ceil(
+            juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), texto))) + 2);
+        int rx = x + (w - tw) / 2;
+        const int lo = m.bounds.getX() + 2, hi = m.bounds.getRight() - 2;
+        int rw = std::min(tw, hi - lo);
+        rx = std::clamp(rx, lo, hi - rw);
+        g.drawFittedText(texto, rx, y, rw, h, juce::Justification::centred, 1, 0.7f);
     }
 
     void paintWidget(juce::Graphics& g, const ModBox& m, Signal& node,
@@ -3904,15 +3940,14 @@ private:
                 g.setColour(T.textSecondary);
                 // drawFittedText: rótulo que não cabe é comprimido na
                 // horizontal (até 70%) em vez de cortado ("RANG", "ROO")
-                g.drawFittedText(w.label, wx - mmpx(2.0f), wy - mmpx(4.0f),
-                                 2 * r + mmpx(4.0f), mmpx(3.5f),
-                                 juce::Justification::centred, 1, 0.7f);
+                rotulo(g, m, w.label, wx - mmpx(2.0f), wy - mmpx(4.0f),
+                       2 * r + mmpx(4.0f), mmpx(3.5f));
                 break;
             }
             // ponteiro: -135° a +135°, como o painel X11
             const float a = juce::degreesToRadians(-135.0f + 270.0f * norm);
             const auto c = box.getCentre().toFloat();
-            g.setColour(T.accent);
+            g.setColour(juce::Colour(0xffd8dde6));   // ponteiro prata (autor, 24/11/2026)
             g.drawLine(c.x, c.y, c.x + std::sin(a) * static_cast<float>(r) * 0.8f,
                        c.y - std::cos(a) * static_cast<float>(r) * 0.8f, 2.0f);
             break;
@@ -3925,9 +3960,8 @@ private:
                 g.setColour(T.line);
                 g.drawRect(box, 1);
                 g.setColour(T.textSecondary);
-                g.drawFittedText(w.label, box.getX() - mmpx(2.0f), box.getBottom(),
-                                 box.getWidth() + mmpx(4.0f), mmpx(3.5f),
-                                 juce::Justification::centred, 1, 0.7f);
+                rotulo(g, m, w.label, box.getX() - mmpx(2.0f), box.getBottom(),
+                       box.getWidth() + mmpx(4.0f), mmpx(3.5f));
                 break;
             }
             const int fill = juce::roundToInt(box.getHeight() * norm);
@@ -3937,11 +3971,11 @@ private:
                            box.getWidth() - 2, fill - 1);
             }
             {   // a pega prateada no nível (visual novo, 24/11/2026)
-                const float y = static_cast<float>(std::min(box.getBottom() - 3, box.getBottom() - fill - 1));
+                const float y = static_cast<float>(std::min(box.getBottom() - 4, box.getBottom() - fill - 2));
                 const float x0 = static_cast<float>(box.getX() - 1), x1 = static_cast<float>(box.getRight() + 1);
                 g.setGradientFill(juce::ColourGradient(juce::Colour(0xffe2e6ee), x0, y,
-                                                       juce::Colour(0xff8a93a4), x0, y + 3.0f, false));
-                g.fillRect(juce::Rectangle<float>(x0, y, x1 - x0, 3.0f));
+                                                       juce::Colour(0xff8a93a4), x0, y + 4.0f, false));
+                g.fillRect(juce::Rectangle<float>(x0, y, x1 - x0, 4.0f));
             }
             break;
         }
@@ -3956,8 +3990,23 @@ private:
                                      box.getBottom() + mmpx(1.0f), width, mmpx(3.5f),
                                      juce::Justification::centred, 1, 0.7f);
                 } else {
-                    g.drawText(w.label, box.getRight() + 2, wy, mmpx(12.0f), s,
-                               juce::Justification::centredLeft, false);
+                    // rótulo à direita só se couber até o próximo controle da
+                    // mesma fileira (ou a borda); senão vai para baixo do botão,
+                    // centrado — o texto não encosta em botão vizinho (pedido do
+                    // autor, 24/11/2026: MUTE do MIXER, HOLD do MEMORY)
+                    bool aDireita = rotuloCabeADireita(m, w, g.getCurrentFont());
+                    for (const auto& o : m.panel.widgets)   // a fileira toda igual
+                        if (aDireita && &o != &w && o.kind == Widget::Kind::Toggle && o.span <= 1.0f
+                            && std::abs(o.y - w.y) < 0.5f && !rotuloCabeADireita(m, o, g.getCurrentFont()))
+                            aDireita = false;
+                    if (aDireita) {
+                        g.drawText(w.label, box.getRight() + 2, wy, mmpx(12.0f), s,
+                                   juce::Justification::centredLeft, false);
+                    } else {
+                        const int width = mmpx(9.0f);
+                        rotulo(g, m, w.label, box.getCentreX() - width / 2,
+                               box.getBottom() + mmpx(1.0f), width, mmpx(3.5f));
+                    }
                 }
                 break;
             }
@@ -3990,9 +4039,8 @@ private:
                 g.setColour(T.recessed);
                 g.fillEllipse(box);
                 g.setColour(T.textSecondary);
-                g.drawFittedText(w.label, wx - mmpx(5.0f), wy - mmpx(6.5f),
-                                 mmpx(10.0f), mmpx(3.5f),
-                                 juce::Justification::centred, 1, 0.7f);
+                rotulo(g, m, w.label, wx - mmpx(5.0f), wy - mmpx(6.5f),
+                       mmpx(10.0f), mmpx(3.5f));
                 break;
             }
 

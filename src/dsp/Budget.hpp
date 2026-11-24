@@ -64,8 +64,8 @@ public:
         p.add(Widget::Kind::Jack, "O2", "out:o2", 19.0f, 104.0f);
         p.add(Widget::Kind::Jack, "O3", "out:o3", 31.0f, 104.0f);
         p.add(Widget::Kind::Jack, "O4", "out:o4", 43.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "SALDO", "out:balance", 7.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "FIM", "out:spent", 21.0f, 120.0f);
+        p.add(Widget::Kind::Jack, "SALDO", "out:balance", 7.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "FIM", "out:spent", 21.0f, 118.0f);
         return p;
     }
 

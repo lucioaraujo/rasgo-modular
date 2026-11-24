@@ -67,9 +67,9 @@ public:
         p.add(Widget::Kind::Jack, "SIG", "out:signal", 7.0f, 106.0f);
         p.add(Widget::Kind::Jack, "VERD", "out:truth", 19.0f, 106.0f);
         p.add(Widget::Kind::Jack, "CONF", "out:confirm", 31.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "CNF", "out:trust", 7.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "RESP", "out:response", 19.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "TRAI", "out:betrayal", 31.0f, 120.0f);
+        p.add(Widget::Kind::Jack, "CNF", "out:trust", 7.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "RESP", "out:response", 19.0f, 118.0f);
+        p.add(Widget::Kind::Jack, "TRAI", "out:betrayal", 31.0f, 118.0f);
         return p;
     }
 

@@ -2,8 +2,10 @@
 """Escolhe, por módulo, o painel de display mais movimentado entre as
 exportações de `exportar_paineis.sh` e grava `assets/modulos/<TIPO>.webp`.
 
-Medida: pixels de traço (cor de destaque) na faixa do display, fora da
-linha mais cheia — que é a linha de repouso. Uso:
+Medida: pixels de traço na faixa do display, fora da linha mais cheia —
+que é a linha de repouso. Desde 24/11/2026 o traço tem a cor da família
+do módulo; conta-se qualquer pixel claro e saturado (a faixa da família
+no topo soma o mesmo a todos os candidatos do módulo). Uso:
     python3 website/escolher_paineis.py /tmp/paineis
 """
 import pathlib, sys
@@ -23,7 +25,7 @@ def movimento(png):
         n = 0
         for x in range(w):
             r, g, b = px[x, y]
-            if r > 180 and 80 < g < 200 and b < 110:   # laranja do traço
+            if max(r, g, b) > 120 and max(r, g, b) - min(r, g, b) > 60:
                 n += 1
         linhas.append(n)
     return sum(linhas) - max(linhas, default=0)

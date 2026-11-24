@@ -182,3 +182,11 @@ Autor: "pode publicar e fazer as solicitações".
   `make dist` testado no Linux; a VCV compila Windows/macOS/Linux).
 - Cardinal: https://github.com/DISTRHO/Cardinal/issues/953.
 Esperando a resposta dos mantenedores.
+
+**Cardinal: recusado (resposta recebida em 24/11/2026).** O mantenedor
+(dromer) fechou o #953: o projeto Cardinal não aceita código gerado com IA
+e acha 100 módulos demais para um plugin; sugere, se quisermos, um fork
+próprio do Cardinal com outro nome (permitido pela GPL). A recusa é de
+política, não técnica. Recomendação: não fazer o fork por ora (custo alto,
+ganho pequeno); o plugin segue no VCV Rack, e a VCV Library (#1048)
+continua aberta.
