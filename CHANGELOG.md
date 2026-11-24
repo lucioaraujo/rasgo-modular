@@ -7,6 +7,13 @@ pronto.
 
 ---
 
+## Não publicado (desde a v0.1.13)
+
+- **Audio Unit no macOS** (24/11, dossiê `ESTUDO_outras_plataformas.md`, item
+  1): o plugin passa a sair também como AU (instrumento, `aumu RsMd Rsgo`),
+  para Logic, GarageBand e MainStage. A CI valida com o `auval` da Apple e
+  põe o `.component` no zip do plugin para macOS. Sem teste em Mac real.
+
 ## v0.1.13 — 2026-11-24
 
 > **English summary.** The **VST3/LV2 plugin** now ships as its own download

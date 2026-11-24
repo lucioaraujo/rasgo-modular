@@ -122,6 +122,11 @@ if (RASGO_MODULAR_BUILD_PLUGIN)
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         list(APPEND RASGO_MODULAR_PLUGIN_FORMATS LV2)
     endif()
+    # Audio Unit no macOS (Logic, GarageBand, MainStage não usam VST3;
+    # 24/11/2026, dossies/ESTUDO_outras_plataformas.md). Instrumento: aumu.
+    if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        list(APPEND RASGO_MODULAR_PLUGIN_FORMATS AU)
+    endif()
     juce_add_plugin(RasgoModularPlugin
         PRODUCT_NAME "Rasgo Modular"
         COMPANY_NAME "RASGO"

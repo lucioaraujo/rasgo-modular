@@ -255,6 +255,7 @@ jobs:
         run: |
           T="--target RasgoModularPlugin_VST3 --target RasgoModularPluginCheck"
           if [ "$RUNNER_OS" = Linux ]; then T="$T --target RasgoModularPlugin_LV2"; fi
+          if [ "$RUNNER_OS" = macOS ]; then T="$T --target RasgoModularPlugin_AU"; fi
           cmake --build build $T --config Release --parallel 2
 
       # O hospedeiro de teste carrega o VST3, confere que soa ao ser inserido,
@@ -272,6 +273,17 @@ jobs:
           else
             "$CHECK" "$VST3"
           fi
+          # Audio Unit (macOS): o validador da própria Apple, como o Logic faz
+          # ao procurar plugins novos
+          if [ "$RUNNER_OS" = macOS ]; then
+            AU=$(find build -maxdepth 7 -path '*RasgoModularPlugin_artefacts*' -name '*.component' | head -1)
+            mkdir -p ~/Library/Audio/Plug-Ins/Components
+            cp -R "$AU" ~/Library/Audio/Plug-Ins/Components/
+            codesign --force --deep --sign - ~/Library/Audio/Plug-Ins/Components/"$(basename "$AU")"
+            killall -9 AudioComponentRegistrar 2>/dev/null || true
+            auval -a | grep -i rasgo || true
+            auval -strict -v aumu RsMd Rsgo
+          fi
 
       - name: Package the plugin
         shell: bash
@@ -287,9 +299,12 @@ jobs:
               cp -R "$ART/LV2/Rasgo Modular.lv2" plugin-stage/
               tar -czf "build/rasgo-modular-plugin-$V-linux-x86_64.tar.gz" -C plugin-stage . ;;
             macOS)
+              cp -R "$ART/AU/Rasgo Modular.component" plugin-stage/
               codesign --force --deep --sign - "plugin-stage/Rasgo Modular.vst3"
+              codesign --force --deep --sign - "plugin-stage/Rasgo Modular.component"
               lipo -info "plugin-stage/Rasgo Modular.vst3/Contents/MacOS/Rasgo Modular"
-              (cd plugin-stage && ditto -c -k --sequesterRsrc --keepParent "Rasgo Modular.vst3" "../build/rasgo-modular-plugin-$V-macos-universal.zip") ;;
+              lipo -info "plugin-stage/Rasgo Modular.component/Contents/MacOS/Rasgo Modular"
+              (cd plugin-stage && zip -qry "../build/rasgo-modular-plugin-$V-macos-universal.zip" "Rasgo Modular.vst3" "Rasgo Modular.component" LICENSE*) ;;
             Windows)
               (cd plugin-stage && 7z a -tzip "../build/rasgo-modular-plugin-$V-windows-x64.zip" . >/dev/null) ;;
           esac
