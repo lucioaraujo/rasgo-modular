@@ -17,6 +17,13 @@ mesmo desenho (`convert` do ImageMagick). No Linux, `mark-source.svg` é
 instalado como ícone do menu e da barra (`../CMakeLists.txt`). O site usa
 os mesmos arquivos (`website/assets/identity/favicon*`).
 
+## Desde 24 nov. 2026: prata
+
+Autor: "precisa alterar a favicon do rasgo modular e ícones para a cor
+prata". O monograma e o wordmark-fonte passam de laranja `#ff9d4c` para o
+prata do app (`#d8dde6`, o `kPrata`), no mesmo fundo. Regenerados: os dois
+PNG daqui, o `.ico` do Windows (256/64/48/32/16) e os favicons do site.
+
 ## Desde 2 out. 2026: o monograma em todos os tamanhos
 
 O autor não gostou de ver o wordmark no menu e na barra de tarefas. O

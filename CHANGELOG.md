@@ -24,6 +24,10 @@ pronto.
   o OSC soa sozinho); o lilv valida os 100. Vai no pacote do plugin para
   Linux. Sem teste do autor ainda.
 
+- **Ícone e favicon em prata** (24/11, autor): o monograma do app (Linux,
+  Windows, macOS) e os favicons do site passam do laranja ao prata do visual
+  novo.
+
 ## v0.1.13 — 2026-11-24
 
 > **English summary.** The **VST3/LV2 plugin** now ships as its own download
