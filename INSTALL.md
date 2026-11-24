@@ -381,6 +381,13 @@ autor no Linux (Ardour 8.4); no Windows e no macOS, a CI carrega o plugin,
 confere que ele soa e que o estado volta igual. No Infinite 2.0.0, abrir a
 janela do plugin derruba o host (defeito registrado do lado dele).
 
+**Os módulos como plugins LV2 (Linux):** além do instrumento inteiro, o
+bundle `rasgo-modular.lv2` traz 100 plugins, um por módulo ("Rasgo FILTER",
+"Rasgo TAPE"…), leves e sem janela: os controles aparecem no próprio
+hospedeiro (Ardour, Carla, MOD Desktop). Copie a pasta para `~/.lv2/`. Ele se
+compila com o motor, sem JUCE (`cmake --build build --target
+rasgo_modular_lv2`, em `build/lv2/`).
+
 **A partir do código**, com a mesma JUCE do aplicativo:
 
 ```sh
@@ -608,6 +615,13 @@ its window opens from the plugin's edit button. Tested by the author on
 Linux (Ardour 8.4); on Windows and macOS, CI loads the plugin and checks that
 it sounds and that its state comes back the same. In Infinite 2.0.0, opening
 the plugin window crashes the host (a defect logged on its side).
+
+**The modules as LV2 plugins (Linux):** besides the whole instrument, the
+`rasgo-modular.lv2` bundle holds 100 plugins, one per module ("Rasgo
+FILTER", "Rasgo TAPE"…), light and windowless: the controls show up in the
+host itself (Ardour, Carla, MOD Desktop). Copy the folder to `~/.lv2/`. It
+builds with the engine, without JUCE (`cmake --build build --target
+rasgo_modular_lv2`, in `build/lv2/`).
 
 **From source**, with the same JUCE as the application:
 

@@ -63,6 +63,17 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
 - Publicar só o que tem algum teste: do autor quando ele puder, senão da CI
   (que carrega, toca e confere), e dizer no site qual foi.
 
-## 4. Próximo passo
+## 4. Feito depois da v0.1.13 (24/11, autor: "avance nas ideias novas")
+
+- **AU no macOS:** formato ligado no CMake; a CI valida com `auval` e põe o
+  `.component` no zip do plugin. Sem Mac para testar: só a CI.
+- **LV2 por módulo, sem JUCE** (`apps/lv2/rasgo_lv2.cpp`): 100 plugins num
+  bundle `rasgo-modular.lv2`; teste próprio no CTest; o lilv valida os 100.
+  É a base do MOD, do Raspberry Pi e do Zynthian. Falta: teste do autor no
+  Ardour e no MOD Desktop; compilar para aarch64 (CI com máquina ARM).
+- **WebAssembly:** precisa do Emscripten; a instalação (emsdk, ~1 GB no
+  disco de 4 TB) espera a autorização do autor.
+
+## 5. Próximo passo
 
 Depois da v0.1.13: AU (item 1), então protótipo no navegador (item 2).

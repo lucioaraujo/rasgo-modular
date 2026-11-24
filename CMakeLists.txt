@@ -773,6 +773,30 @@ if(BUILD_TESTING)
              COMMAND rasgo_modular_cli render --seed 7 --dur 1
                      ${CMAKE_CURRENT_BINARY_DIR}/cli_teste.wav)
 
+    # os módulos como plugins LV2, sem JUCE (24/11/2026; apps/lv2/). Um
+    # bundle, `lv2/rasgo-modular.lv2/`, com um plugin por módulo.
+    if (UNIX AND NOT APPLE)
+        add_library(rasgo_modular_lv2 MODULE apps/lv2/rasgo_lv2.cpp)
+        target_include_directories(rasgo_modular_lv2 PRIVATE src apps)
+        target_link_libraries(rasgo_modular_lv2 PRIVATE rasgo_modular_core)
+        target_compile_options(rasgo_modular_lv2 PRIVATE ${rasgo_modular_warnings} -fvisibility=hidden)
+        set_target_properties(rasgo_modular_lv2 PROPERTIES PREFIX "" OUTPUT_NAME "rasgo-modular"
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lv2/rasgo-modular.lv2)
+        add_executable(rasgo_lv2_ttl apps/lv2/rasgo_lv2.cpp)
+        target_compile_definitions(rasgo_lv2_ttl PRIVATE RASGO_LV2_TTL=1)
+        target_include_directories(rasgo_lv2_ttl PRIVATE src apps)
+        target_link_libraries(rasgo_lv2_ttl PRIVATE rasgo_modular_core)
+        add_custom_command(TARGET rasgo_modular_lv2 POST_BUILD
+            COMMAND rasgo_lv2_ttl ${CMAKE_CURRENT_BINARY_DIR}/lv2/rasgo-modular.lv2 rasgo-modular.so)
+        add_dependencies(rasgo_modular_lv2 rasgo_lv2_ttl)
+        add_executable(rasgo_modular_lv2_tests tests/test_lv2.cpp)
+        target_include_directories(rasgo_modular_lv2_tests PRIVATE src apps)
+        target_link_libraries(rasgo_modular_lv2_tests PRIVATE rasgo_modular_core ${CMAKE_DL_LIBS})
+        add_dependencies(rasgo_modular_lv2_tests rasgo_modular_lv2)
+        add_test(NAME rasgo_modular_lv2_tests COMMAND rasgo_modular_lv2_tests
+                 ${CMAKE_CURRENT_BINARY_DIR}/lv2/rasgo-modular.lv2/rasgo-modular.so)
+    endif()
+
     add_executable(rasgo_modular_port_exam tests/tool_port_exam.cpp)
     target_include_directories(rasgo_modular_port_exam PRIVATE src apps)
     target_compile_options(rasgo_modular_port_exam PRIVATE ${rasgo_modular_warnings})

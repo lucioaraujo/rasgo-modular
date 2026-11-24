@@ -297,6 +297,8 @@ jobs:
           case "$RUNNER_OS" in
             Linux)
               cp -R "$ART/LV2/Rasgo Modular.lv2" plugin-stage/
+              # os módulos, um plugin LV2 por módulo, sem JUCE (apps/lv2/)
+              cp -R build/lv2/rasgo-modular.lv2 plugin-stage/
               tar -czf "build/rasgo-modular-plugin-$V-linux-x86_64.tar.gz" -C plugin-stage . ;;
             macOS)
               cp -R "$ART/AU/Rasgo Modular.component" plugin-stage/

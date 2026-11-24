@@ -14,6 +14,16 @@ pronto.
   para Logic, GarageBand e MainStage. A CI valida com o `auval` da Apple e
   põe o `.component` no zip do plugin para macOS. Sem teste em Mac real.
 
+- **Os módulos como plugins LV2** (24/11, dossiê de outras plataformas,
+  itens 3 e 4): o bundle `rasgo-modular.lv2`, com **100 plugins**, um por
+  módulo ("Rasgo FILTER", "Rasgo TAPE"…), sem JUCE e sem janela: os
+  parâmetros aparecem como controles do hospedeiro. Mesmo DSP do app, em
+  blocos de 16 amostras; todas as portas são de áudio, nos valores do Rasgo.
+  Base para o MOD, o Raspberry Pi e o Zynthian. Teste
+  `rasgo_modular_lv2_tests` (carrega o .so como um hospedeiro, roda os 100,
+  o OSC soa sozinho); o lilv valida os 100. Vai no pacote do plugin para
+  Linux. Sem teste do autor ainda.
+
 ## v0.1.13 — 2026-11-24
 
 > **English summary.** The **VST3/LV2 plugin** now ships as its own download
