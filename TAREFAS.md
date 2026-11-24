@@ -42,6 +42,10 @@ Novas pendências: [acessibilidade e novo módulo de escuta, preservando o SCOPE
   mesmo cinza, traço dos visores na cor da família, wordmark RASGO na base.
   "A versão VCV fica do jeito que decidimos." As peças do VCV são CC BY-NC
   4.0 (© VCV): usadas só como o Rack as fornece, nunca copiadas.
+- **v0.1.12 publicada** (24/11): release com os seis anexos, site no ar.
+- **Plugin VCV com os 100 módulos** (24/11), local em
+  `PROJETOS_AUTORAIS/RASGO_MODULAR_VCV/` (estudo VCV §9). Falta para publicar:
+  repositório próprio, VCV Library, depois Cardinal.
 - **Próximo, depois da v0.1.12 — o visual novo no app** (autor: "podemos
   fazer do nosso jeito para o app, sem pegar nada do VCV"): knobs nossos
   (corpo escuro, reflexo prata), pega do slider e botão nossos, faixa em

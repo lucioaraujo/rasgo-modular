@@ -142,3 +142,24 @@ cadastro: conferido na página da VCV antes do download).
   maior que o jack do Rasgo), rótulo do interruptor sobre ele.
 - **Falta:** ouvir os módulos tocando no Rack (o autor); a aparência dos
   painéis e os visores (§5.1); nome do plugin (§5.2); repositório (§5.4).
+
+## 9. O plugin completo (24/11/2026)
+
+- **100 módulos** (todos menos SIGNAL-IN, POLY-IN, NOTE-OUT, MIXER, MASTER),
+  gerados do catálogo por `RASGO_MODULAR_VCV/tools/gerar_plugin.py`; DSP em
+  cópia fixada de `3dce50c`. Compila sem aviso; os 100 carregam no VCV Rack
+  Free 2.6.6; o autor tocou vários ao vivo.
+- **Visual decidido pelo autor:** B prata, faixa em degradê, reflexo nos
+  knobs, arruela e círculo interno do jack em cinza, botões com luz laranja,
+  visores na cor da família, wordmark RASGO na base (tamanho cheio, mesma
+  altura em todos; à esquerda e com um parafuso só onde não cabe no
+  centro), parafusos (topo só à direita), knobs em três tamanhos, painéis
+  estreitados sem encolher objetos (7–17 HP; antes 7–22).
+- **Informação:** dica do LEARN em inglês em cada knob e jack (o autor
+  ofereceu esses textos também sob GPL), "User manual" para o guia do site,
+  créditos no botão direito.
+- **Falta para publicar:** repositório próprio e público (§5.4); conferir o
+  `plugin.json` (sourceUrl do repositório novo); pedido à VCV Library (a VCV
+  compila Windows/macOS/Linux); depois, a proposta ao Cardinal. Opcionais:
+  visores próprios por módulo (hoje o traço genérico), polifonia por cópia,
+  aproximar as fileiras curtas de KEY/TAP/SWITCH, o nome curto do COMPARADOR.
