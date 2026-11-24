@@ -1,5 +1,39 @@
 # Rasgo Modular — prontidão para publicação
 
+## Release v0.1.13 — preparação (24 nov. 2026)
+
+Pedido do autor (24/11): "sim, prepare a v0.1.13 com o plugin".
+
+Feito localmente (nada enviado):
+
+- versão 0.1.13 no `CMakeLists.txt`; CHANGELOG (seção "v0.1.13 — a publicar",
+  com resumo em inglês); README (abertura, versão, captura nova, plugin nos
+  downloads nos 4 idiomas); INSTALL ("Plugin VST3 e LV2": download e onde
+  copiar em cada sistema, pt/en);
+- **CI** (`package.yml`): configura com `-DRASGO_MODULAR_BUILD_PLUGIN=ON`,
+  compila o VST3 (e o LV2 no Linux), roda o hospedeiro de teste
+  (`RasgoModularPluginCheck`: soa ao ser inserido, estado reaberto idêntico)
+  e anexa `rasgo-modular-plugin-<v>-{windows-x64.zip, macos-universal.zip,
+  linux-x86_64.tar.gz}` (macOS: ad-hoc). O `.tar.gz` do teste de abertura
+  passou a ser o do app (`rasgo-modular-[0-9]*`);
+- **site:** página de Instalação com "Três formas de usar", "Plugin para DAW"
+  e "Plugin do VCV Rack" (passo a passo, 4 línguas, `paginas_extra.py`);
+  `estado.py` com os botões do plugin (entram com `--depois 0.1.13`); frase
+  na página inicial (DAW e VCV); imagens dos 105 painéis e a captura da capa
+  e do OG no visual novo (`screenshots/rack-completo-2026-11-24.png`, seed
+  4303935450909092226, exportada sem áudio com `RASGO_EXPORTAR_TELA`);
+- `rasgo_modular_cli seed-patch` (a seed como `.rmp`) e
+  `RASGO_EXPORTAR_LANG` no `exportar_patch.sh`, para refazer a captura.
+
+Validação local: plugin VST3 compilado e conferido pelo hospedeiro de teste
+(−32,6 dBFS, estado idêntico); testes do site OK; `verificar.py` com 1 aviso
+esperado (versão pública 0.1.12 ≠ 0.1.13).
+
+Portões: decisão do autor de enviar a tag `v0.1.13`; a matriz gera os seis
+pacotes do app e os três do plugin; depois `estado.py --depois 0.1.13`,
+`seo.py` (VERSAO), `verificar.py` e envio do `main`. O plugin do VCV
+(`rasgo-modular-vcv` v2.0.0) sai antes, para os links da página valerem.
+
 ## Release v0.1.12 — 24 nov. 2026 (publicada)
 
 A [release v0.1.12](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12)

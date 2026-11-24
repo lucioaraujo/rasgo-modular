@@ -104,12 +104,22 @@
 </section>
 
 <section class="section">
+  <h2>Trois façons de l’utiliser</h2>
+  <table class="ref">
+    <tr><th scope="row"><strong>Application</strong></th><td>L’instrument complet, seul sur l’ordinateur : seeds, VARIA, câbles qui jouent, enregistrement. Windows, macOS et Linux. Installation juste en dessous.</td></tr>
+    <tr><th scope="row"><strong>Plugin pour DAW</strong></th><td>Le même instrument sur une piste d’instrument de la DAW : VST3 (Reaper, Bitwig, Ableton Live, Ardour, Cubase, Studio One, FL Studio et d’autres) et LV2 sous Linux. Téléchargement à part, à côté de l’application.</td></tr>
+    <tr><th scope="row"><strong>Plugin pour VCV Rack</strong></th><td>100 des modules dans VCV Rack 2, à combiner avec les modules d’autres auteurs. Téléchargement sur le dépôt rasgo-modular-vcv.</td></tr>
+  </table>
+  <p>Les trois sont gratuites et open source, et peuvent cohabiter sur le même ordinateur.</p>
+</section>
+
+<section class="section section-dark">
   <h2>Avant de commencer</h2>
   <p>Les paquets sont dans <strong>Télécharger</strong>, sur la page d'accueil, et sur la page des releases GitHub. Les avertissements de sécurité de Windows et de macOS sont attendus et n'apparaissent que la première fois.</p>
 </section>
 
-<section class="section section-dark">
-  <h2>Windows</h2>
+<section class="section">
+  <h2>Application : Windows</h2>
   <ol class="tut-list">
     <li>Téléchargez <code>rasgo-modular-&lt;version&gt;-windows-x64.exe</code> et ouvrez-le.</li>
     <li>Windows affiche <strong>« Windows a protégé votre ordinateur »</strong> : cliquez sur <strong>« Informations complémentaires »</strong>, puis sur <strong>« Exécuter quand même »</strong>.</li>
@@ -119,8 +129,8 @@
   <p><strong>Sans installer :</strong> décompressez le <code>.zip</code> et ouvrez <code>Rasgo Modular.exe</code>. S'il ne s'ouvre pas, appuyez sur Win + R, tapez <code>%APPDATA%\rasgo-modular</code> et envoyez <code>arranque.log</code> dans une issue GitHub : sa dernière ligne dit où le démarrage s'est arrêté.</p>
 </section>
 
-<section class="section">
-  <h2>macOS</h2>
+<section class="section section-dark">
+  <h2>Application : macOS</h2>
   <ol class="tut-list">
     <li>Téléchargez <code>rasgo-modular-&lt;version&gt;-macos-universal.dmg</code>. Il fonctionne sur les Mac Intel et Apple Silicon.</li>
     <li>Ouvrez le <code>.dmg</code> et glissez Rasgo Modular dans <strong>Applications</strong>.</li>
@@ -132,8 +142,8 @@
   <pre class="tut-code"><code>xattr -dr com.apple.quarantine "/Applications/Rasgo Modular.app"</code></pre>
 </section>
 
-<section class="section section-dark">
-  <h2>Linux</h2>
+<section class="section">
+  <h2>Application : Linux</h2>
   <ul class="tut-list">
     <li><strong>Ubuntu, Debian et Mint :</strong> double-cliquez sur le <code>.deb</code>, ou <code>sudo apt install ./rasgo-modular-&lt;version&gt;-linux-x86_64.deb</code>.</li>
     <li><strong>Autres distributions, AppImage :</strong> rendez-le exécutable (Propriétés → autoriser l'exécution, ou <code>chmod +x</code>) et ouvrez-le.</li>
@@ -141,7 +151,33 @@
   </ul>
 </section>
 
+<section class="section section-dark">
+  <h2>Plugin pour DAW (VST3 et LV2)</h2>
+  <p>Téléchargez le fichier de votre système dans <strong>Télécharger</strong>, sur la page d’accueil (boutons <strong>Plugin</strong>), ou sur la page des releases GitHub. Fermez la DAW avant de copier.</p>
+  <ul class="tut-list">
+    <li><strong>Windows :</strong> décompressez <code>rasgo-modular-plugin-&lt;version&gt;-windows-x64.zip</code> et copiez le dossier <code>Rasgo Modular.vst3</code> dans <code>C:\Program Files\Common Files\VST3\</code> (Windows demande l’autorisation d’administrateur).</li>
+    <li><strong>macOS :</strong> décompressez <code>rasgo-modular-plugin-&lt;version&gt;-macos-universal.zip</code> (Intel et Apple Silicon) et copiez <code>Rasgo Modular.vst3</code> dans <code>~/Library/Audio/Plug-Ins/VST3/</code> (dans le Finder : <strong>Aller → Aller au dossier</strong>). Si la DAW refuse le plugin, autorisez-le une fois dans le Terminal :</li>
+  </ul>
+  <pre class="tut-code"><code>xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Rasgo Modular.vst3"</code></pre>
+  <ul class="tut-list">
+    <li><strong>Linux :</strong> décompressez <code>rasgo-modular-plugin-&lt;version&gt;-linux-x86_64.tar.gz</code> ; copiez <code>Rasgo Modular.vst3</code> dans <code>~/.vst3/</code> et <code>Rasgo Modular.lv2</code> dans <code>~/.lv2/</code>.</li>
+  </ul>
+  <p>Ouvrez la DAW et demandez-lui de rechercher les plugins. Créez une piste d’instrument et choisissez <strong>Rasgo Modular</strong> (fabricant RASGO) ; la fenêtre s’ouvre par le bouton d’édition du plugin. Le patch est gardé dans le projet ; le transport de la DAW arrive au SIGNAL-IN comme horloge MIDI, et VARIA et Master acceptent l’automation.</p>
+  <p>Testé par l’auteur sous Linux, dans Ardour 8.4. Sous Windows et macOS, l’intégration continue charge le plugin et vérifie qu’il sonne et que son état revient identique. Logic et GarageBand utilisent le format Audio Unit, prévu pour une prochaine version. Dans Infinite 2.0.0, ouvrir la fenêtre du plugin ferme le programme (défaut enregistré de son côté).</p>
+</section>
+
 <section class="section">
+  <h2>Plugin pour VCV Rack</h2>
+  <ol class="tut-list">
+    <li>Téléchargez le <code>.vcvplugin</code> de votre système sur la page des releases du dépôt <strong>rasgo-modular-vcv</strong> (<code>github.com/lucioaraujo/rasgo-modular-vcv/releases</code>) : <code>win-x64</code> pour Windows, <code>mac-arm64</code> pour Mac Apple Silicon, <code>mac-x64</code> pour Mac Intel, <code>lin-x64</code> pour Linux.</li>
+    <li>Dans VCV Rack 2, choisissez <strong>Help → Open user folder</strong>.</li>
+    <li>Placez le fichier dans le dossier <code>plugins-&lt;système&gt;-&lt;architecture&gt;</code> qui s’y trouve (par exemple <code>plugins-win-x64</code>).</li>
+    <li>Rouvrez VCV Rack. Les modules apparaissent dans le navigateur de modules sous la marque <strong>Rasgo</strong>.</li>
+  </ol>
+  <p>Chaque contrôle a son infobulle ; clic droit sur un module pour le manuel et les crédits. Polyphonie jusqu’à 16 voix. SIGNAL-IN, POLY-IN, NOTE-OUT, MIXER et MASTER restent dans l’application, car VCV Rack a les siens.</p>
+</section>
+
+<section class="section section-dark">
   <h2>Configuration requise</h2>
   <table class="ref">
     <tr><th scope="row"><strong>Windows</strong></th><td>Windows 10 (1607 ou ultérieur) ou 11, 64 bits</td></tr>
@@ -154,12 +190,12 @@
   </table>
 </section>
 
-<section class="section section-dark">
+<section class="section">
   <h2>Avec d’autres logiciels</h2>
   <p>Rasgo Modular est une application autonome qui dialogue avec les DAW, d’autres synthétiseurs et des machines par l’audio et le MIDI du système. La porte d’entrée est le module SIGNAL-IN : allumez <strong>ON</strong> et câblez une de ses sorties. Il reçoit alors le son, les notes et le tempo ; NOTE-OUT envoie les notes vers l’extérieur.</p>
   <ul class="tut-list">
-    <li><strong>Dans une DAW, comme plugin (VST3 et LV2) :</strong> le même instrument s’ouvre sur une piste d’instrument de la DAW, avec le patch gardé dans le projet. Le transport de la DAW arrive au SIGNAL-IN comme horloge MIDI, et VARIA et Master apparaissent pour l’automation. Testé sous Linux avec Ardour. Pour l’instant, le plugin se construit à partir du code (<code>INSTALL.md</code>, « VST3 and LV2 plugin ») ; les paquets de cette version contiennent l’application.</li>
-    <li><strong>Dans VCV Rack :</strong> 100 modules du Rasgo Modular existent aussi comme plugin pour VCV Rack 2, avec le même DSP que l’application, des infobulles sur chaque contrôle, un manuel et les crédits, et une polyphonie jusqu’à 16 voix. Code sur <code>github.com/lucioaraujo/rasgo-modular-vcv</code> ; les demandes d’inclusion dans la VCV Library et dans Cardinal sont en cours. L’instrument complet (seeds, VARIA, les câbles comme processus) est cette application.</li>
+    <li><strong>Dans une DAW, comme plugin (VST3 et LV2) :</strong> voir la section « Plugin pour DAW », plus haut.</li>
+    <li><strong>Dans VCV Rack :</strong> voir la section « Plugin pour VCV Rack », plus haut.</li>
     <li><strong>Le son d’un autre logiciel dans Rasgo :</strong> sous Linux, reliez la sortie du logiciel à l’entrée de Rasgo Modular dans PipeWire ou JACK (qpwgraph, Helvum ou Carla) ; sous macOS, utilisez un périphérique virtuel comme BlackHole ; sous Windows, VB-Cable. Le son arrive sur les sorties L et R de SIGNAL-IN.</li>
     <li><strong>Le son de Rasgo dans une DAW :</strong> le même chemin en sens inverse. La sortie de Rasgo Modular devient l’entrée d’une piste de la DAW (Ardour, Reaper, Bitwig, Live, Infinite et d’autres) pour enregistrer ou traiter.</li>
     <li><strong>Les notes :</strong> un clavier MIDI ou une piste MIDI de la DAW arrive sur SIGNAL-IN (1V/O, GATE, VEL et CC). NOTE-OUT envoie les notes du patch vers un autre instrument.</li>
@@ -168,7 +204,7 @@
   </ul>
 </section>
 
-<section class="section">
+<section class="section section-dark">
   <h2>Où vivent les choses</h2>
   <ul class="tut-list">
     <li><strong>État et préférences :</strong> <code>~/.config/rasgo-modular/</code> sous Linux (session, patches, langue) ; sous macOS et Windows, le dossier de données d'application du système.</li>
@@ -176,7 +212,7 @@
   </ul>
 </section>
 
-<section class="section section-dark">
+<section class="section">
   <h2>S'il n'y a pas de son</h2>
   <p>Rasgo Modular sonne dès l'ouverture. Sans son, vérifiez la sortie audio du système, le bouton ATTENTE (qui coupe le master) et le <code>gain</code> du module MASTER. Pour autre chose, écrivez à <strong>rasgo.instruments@gmail.com</strong> avec votre système, la version et ce qui s'est affiché.</p>
 </section>

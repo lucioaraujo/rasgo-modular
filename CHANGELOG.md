@@ -7,13 +7,47 @@ pronto.
 
 ---
 
-## Não publicado (desde a v0.1.12)
+## v0.1.13 — a publicar
+
+> **English summary.** The **VST3/LV2 plugin** now ships as its own download
+> for Windows, macOS and Linux, next to the application packages, which stay
+> the same. A **new look** for the panels, all drawn by the project: family
+> colour stripe in a gradient, knobs with a silver reflection, silver
+> pointers and latched buttons, sliders and displays in the family colour,
+> the RASGO wordmark at the base of every module. COMPARADOR is renamed
+> **VERSUS**. The modules also exist as a **VCV Rack 2 plugin**
+> (`rasgo-modular-vcv`).
+
+**Resumo.** O **plugin VST3/LV2** passa a ter download próprio para Windows,
+macOS e Linux, ao lado dos pacotes do aplicativo, que continuam iguais.
+**Visual novo** dos painéis, todo desenhado pelo projeto. COMPARADOR vira
+**VERSUS**. Os módulos também existem como **plugin do VCV Rack 2**.
+
+- **Plugin nos downloads** (24/11, autor: "prepare a v0.1.13 com o plugin"):
+  a CI compila o VST3 nos três sistemas (e o LV2 no Linux), carrega-o num
+  hospedeiro de teste (`tools/plugin_check.cpp`: soa ao ser inserido, o
+  estado volta igual) e anexa à release
+  `rasgo-modular-plugin-<versão>-{windows-x64.zip, macos-universal.zip,
+  linux-x86_64.tar.gz}`. macOS: Universal 2, assinatura ad-hoc. Instalação
+  no INSTALL ("Plugin VST3 e LV2") e no site. Testado pelo autor no Linux
+  (Ardour 8.4); Windows e macOS só na CI.
+- **Visual novo** (24/11, decidido com o autor, peça por peça): faixa da
+  família em degradê; knobs com volume, reflexo e ponteiro prata; pega prata
+  nos sliders, com o preenchimento na cor da família; botões ligados em
+  prata; visores na cor da família; wordmark RASGO na base de cada módulo,
+  em prata; os jacks continuam sem arruela. No cabeçalho, logo, VARIA, RACK
+  e ABRE em prata; na coluna lateral, os títulos das famílias na cor de cada
+  uma; títulos do LEARN, do tutorial e do sobre em prata. Rótulos de botão
+  que não cabem à direita vão para baixo, e rótulos perto da borda
+  deslizam para dentro (nada encosta nem é cortado). BLEFE, BUDGET e VERSUS:
+  a fileira de jacks de baixo subiu 2 mm, para o wordmark.
 
 - **Plugin do VCV Rack** (24/11): 100 módulos do Rasgo Modular como plugin do
   VCV Rack 2, em repositório próprio
   (`github.com/lucioaraujo/rasgo-modular-vcv`, GPL-3.0-or-later), com o mesmo
-  DSP, dicas do LEARN em inglês, manual, créditos e polifonia. Pedidos
-  abertos na VCV Library e no Cardinal. Página de Instalação e INSTALL
+  DSP, dicas do LEARN em inglês, manual, créditos e polifonia, com o
+  `.vcvplugin` para baixar no próprio repositório; pedido aberto na VCV
+  Library (o Cardinal recusou). Página de Instalação e INSTALL
   ("Com outros programas") e README citam o plugin.
 - **COMPARADOR passa a se chamar VERSUS** (24/11, autor: "mude o comparador
   para versus"): o módulo, o painel, o LEARN nas 4 línguas, os guias e a

@@ -1,14 +1,13 @@
 # Rasgo Modular
 
-A **v0.1.12** (24 nov. 2026) é a atual e leva o instrumento de 88 a
-**105 módulos**. A peça ganha forma: o FORM conduz a dinâmica pelo arco da
-música e o TEMPO faz o andamento respirar, e as seeds orquestrais começam,
-crescem até um clímax e terminam, com quatro vozes. O QUANTIZER toca as
-**2576 escalas** do banco do Trioio, cada uma com a fonte citada. O Modular
-conversa melhor com outros programas: segue o andamento de uma DAW (MIDI
-clock), reparte um teclado em até quatro vozes (POLY-IN) e grava as notas em
-`.mid`. Entre os módulos novos: SUM, VOLTA, GENDYN, RUNGLER, TAPE, LENS,
-PREDATOR, SWARM e ECLIPSE. **As seeds mudam** nesta versão.
+A **v0.1.13** é a atual. O **plugin VST3/LV2** ganha download próprio para
+Windows, macOS e Linux: o mesmo instrumento numa faixa de instrumento da
+DAW, ao lado do aplicativo, que continua igual. Os painéis ganham **visual
+novo**, todo desenhado pelo projeto: faixa da família em degradê, knobs com
+reflexo prata, visores e sliders na cor da família e a marca RASGO na base de
+cada módulo. COMPARADOR passa a se chamar **VERSUS**, e 100 dos módulos
+também existem como **plugin do VCV Rack 2**. A v0.1.12 levou o instrumento
+de 88 a **105 módulos**, com o FORM, o TEMPO e as 2576 escalas do QUANTIZER.
 
 A **v0.1.11** (17 nov. 2026) foi a anterior. A 0.1.9 e a 0.1.10 ligam o Modular
 ao [Maestruc](https://lucioaraujo.github.io/maestruc/), o regente da família
@@ -32,10 +31,10 @@ e no [site](https://lucioaraujo.github.io/rasgo-modular/modulos.html), nos
 quatro idiomas.
 
 
-![Rasgo Modular running: a three-row rack of modules, each with a thin stripe in its family colour, crossed by dozens of orange and blue cables; one cable is lit and its box is open in the bottom-right corner](screenshots/rack-completo-2026-10-03.png)
+![Rasgo Modular running: a three-row rack of modules, each with a gradient stripe in its family colour, silver knobs and the RASGO wordmark at the base, crossed by dozens of orange and blue cables](screenshots/rack-completo-2026-11-24.png)
 
 **Website:** [lucioaraujo.github.io/rasgo-modular](https://lucioaraujo.github.io/rasgo-modular/) ·
-**Download:** [v0.1.12 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) ·
+**Download:** [v0.1.13 release](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.13) ·
 **VCV Rack:** [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv) (100 modules) ·
 **Contact:** **rasgo.instruments@gmail.com**
 
@@ -56,7 +55,7 @@ hand, or take it all apart and start from scratch. Every patch comes from a
 number, the seed, and the same number always brings back the same sound.
 
 **Authorship:** Lúcio Araújo · **Family:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version:** v0.1.12 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
+**Version:** v0.1.13 · **License:** GNU AGPL-3.0-or-later (see [`LICENSE`](LICENSE)
 and [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); the DSP modules
 (`src/dsp/`, `src/core/`) are also offered under GPL-3.0-or-later, for VCV Rack
 and Cardinal (see [`LICENSING.md`](LICENSING.md))
@@ -110,9 +109,12 @@ saved as `.rmp` files.
 
 ### Download
 
-[**v0.1.12 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
+[**v0.1.13 release**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.13) —
 Linux `.deb`, AppImage and `.tar.gz`, Windows `.exe` and portable `.zip`,
-macOS `.dmg`, all built and packaged by continuous integration.
+macOS `.dmg`, all built and packaged by continuous integration. The
+**VST3/LV2 plugin** (the same instrument inside a DAW) has its own download in
+the same release, for Windows, macOS and Linux; see
+[INSTALL.md](INSTALL.md#vst3-and-lv2-plugin).
 
 The modules also exist as a **VCV Rack 2 plugin** (100 modules, same DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
@@ -157,7 +159,7 @@ cabos à mão ou desmontar tudo e começar do zero. Cada patch nasce de um
 número, a semente, e o mesmo número traz sempre o mesmo som.
 
 **Autoria:** Lúcio Araújo · **Família:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versão:** v0.1.12 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versão:** v0.1.13 · **Licença:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 e [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); os módulos de DSP
 (`src/dsp/`, `src/core/`) também são oferecidos sob GPL-3.0-or-later, para o VCV
 Rack e o Cardinal (ver [`LICENSING.md`](LICENSING.md))
@@ -212,9 +214,12 @@ arquivos `.rmp`.
 
 ### Download
 
-[**Release v0.1.12**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
+[**Release v0.1.13**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.13) —
 Linux `.deb`, AppImage e `.tar.gz`; Windows `.exe` e `.zip` portátil; macOS
-`.dmg` — todos construídos e empacotados pela integração contínua.
+`.dmg` — todos construídos e empacotados pela integração contínua. O
+**plugin VST3/LV2** (o mesmo instrumento dentro de uma DAW) tem download
+próprio na mesma release, para Windows, macOS e Linux; ver
+[INSTALL.md](INSTALL.md#plugin-vst3-e-lv2).
 
 Os módulos também existem como **plugin do VCV Rack 2** (100 módulos, o mesmo DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
@@ -259,7 +264,7 @@ patch naît d'un nombre, la graine, et le même nombre redonne toujours le même
 son.
 
 **Auteur :** Lúcio Araújo · **Famille :** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Version :** v0.1.12 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
+**Version :** v0.1.13 · **Licence :** GNU AGPL-3.0-or-later (voir [`LICENSE`](LICENSE)
 et [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)) ; les modules DSP
 (`src/dsp/`, `src/core/`) sont aussi proposés sous GPL-3.0-or-later, pour VCV
 Rack et Cardinal (voir [`LICENSING.md`](LICENSING.md))
@@ -317,9 +322,11 @@ sont enregistrés dans des fichiers `.rmp`.
 
 ### Téléchargement
 
-[**Version v0.1.12**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
+[**Version v0.1.13**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.13) —
 `.deb` pour Linux, `.exe` pour Windows, `.dmg` pour macOS, tous construits et
-empaquetés par l'intégration continue.
+empaquetés par l'intégration continue. Le **plugin VST3/LV2** (le même
+instrument dans une DAW) a son propre téléchargement dans la même version,
+pour Windows, macOS et Linux ; voir [INSTALL.md](INSTALL.md#vst3-and-lv2-plugin).
 
 Les modules existent aussi comme **plugin pour VCV Rack 2** (100 modules, le même DSP) : [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 
@@ -365,7 +372,7 @@ los cables a mano o desarmarlo todo y empezar de cero. Cada patch nace de un
 número, la semilla, y el mismo número trae siempre el mismo sonido.
 
 **Autoría:** Lúcio Araújo · **Familia:** [RASGO](https://rasgoinstruments.arquiviagem.net/) ·
-**Versión:** v0.1.12 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
+**Versión:** v0.1.13 · **Licencia:** GNU AGPL-3.0-or-later (ver [`LICENSE`](LICENSE)
 y [`CREDITS_AND_SOURCES.md`](CREDITS_AND_SOURCES.md)); los módulos de DSP
 (`src/dsp/`, `src/core/`) también se ofrecen bajo GPL-3.0-or-later, para VCV
 Rack y Cardinal (ver [`LICENSING.md`](LICENSING.md))
@@ -420,9 +427,11 @@ archivos `.rmp`.
 
 ### Descarga
 
-[**Versión v0.1.12**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.12) —
+[**Versión v0.1.13**](https://github.com/lucioaraujo/rasgo-modular/releases/tag/v0.1.13) —
 `.deb` para Linux, `.exe` para Windows, `.dmg` para macOS, todos construidos
-y empaquetados por la integración continua.
+y empaquetados por la integración continua. El **plugin VST3/LV2** (el mismo
+instrumento dentro de una DAW) tiene descarga propia en la misma versión,
+para Windows, macOS y Linux; ver [INSTALL.md](INSTALL.md#vst3-and-lv2-plugin).
 
 Los módulos también existen como **plugin de VCV Rack 2** (100 módulos, el mismo DSP): [rasgo-modular-vcv](https://github.com/lucioaraujo/rasgo-modular-vcv).
 

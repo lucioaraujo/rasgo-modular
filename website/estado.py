@@ -42,6 +42,13 @@ PACOTES = [
     ("winzip",  "rasgo-modular-%s-windows-x64.zip"),
 ]
 
+# O plugin (VST3/LV2), desde a v0.1.13: download próprio ao lado do app.
+PLUGINS = [
+    ("plugwin", "rasgo-modular-plugin-%s-windows-x64.zip"),
+    ("plugmac", "rasgo-modular-plugin-%s-macos-universal.zip"),
+    ("pluglin", "rasgo-modular-plugin-%s-linux-x86_64.tar.gz"),
+]
+
 TEXTO = {
     "pt": {
         "pilula_antes": "Em desenvolvimento — ainda sem release",
@@ -69,6 +76,15 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portátil)</a>
+  </div>
+
+  <p><strong>Plugin para DAW (VST3 e LV2).</strong> O mesmo instrumento numa faixa de instrumento da DAW, com o patch guardado no projeto. Onde copiar em cada sistema:
+    <a href="%(repo)s/blob/v%(v)s/INSTALL.md#plugin-vst3-e-lv2">INSTALL.md</a>.</p>
+
+  <div class="contact-row">
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugwin)s">Plugin &middot; Windows</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugmac)s">Plugin &middot; macOS</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(pluglin)s">Plugin &middot; Linux</a>
   </div>
 
   <p>Todas as versões, inclusive as de teste: <a href="%(repo)s/releases">página de releases no GitHub</a>.</p>
@@ -117,6 +133,15 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portable)</a>
+  </div>
+
+  <p><strong>DAW plugin (VST3 and LV2).</strong> The same instrument on a DAW instrument track, with the patch saved in the project. Where to copy it on each system:
+    <a href="%(repo)s/blob/v%(v)s/INSTALL.md#vst3-and-lv2-plugin">INSTALL.md</a>.</p>
+
+  <div class="contact-row">
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugwin)s">Plugin &middot; Windows</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugmac)s">Plugin &middot; macOS</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(pluglin)s">Plugin &middot; Linux</a>
   </div>
 
   <p>All versions, including test builds: <a href="%(repo)s/releases">releases page on GitHub</a>.</p>
@@ -169,6 +194,15 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portable)</a>
   </div>
 
+  <p><strong>Plugin pour DAW (VST3 et LV2).</strong> Le même instrument sur une piste d'instrument de la DAW, avec le patch enregistré dans le projet. Où le copier sur chaque système :
+    <a href="%(repo)s/blob/v%(v)s/INSTALL.md#vst3-and-lv2-plugin">INSTALL.md</a>.</p>
+
+  <div class="contact-row">
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugwin)s">Plugin &middot; Windows</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugmac)s">Plugin &middot; macOS</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(pluglin)s">Plugin &middot; Linux</a>
+  </div>
+
   <p>Toutes les versions, y compris celles de test : <a href="%(repo)s/releases">page des releases sur GitHub</a>.</p>
 
   <p><strong>Deux choses dites en entier avant de télécharger.</strong> Les
@@ -217,6 +251,15 @@ TEXTO = {
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(appimage)s">Linux &middot; AppImage</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(targz)s">Linux &middot; .tar.gz</a>
     <a class="button" href="%(repo)s/releases/download/v%(v)s/%(winzip)s">Windows &middot; .zip (portátil)</a>
+  </div>
+
+  <p><strong>Plugin para DAW (VST3 y LV2).</strong> El mismo instrumento en una pista de instrumento de la DAW, con el patch guardado en el proyecto. Dónde copiarlo en cada sistema:
+    <a href="%(repo)s/blob/v%(v)s/INSTALL.md#vst3-and-lv2-plugin">INSTALL.md</a>.</p>
+
+  <div class="contact-row">
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugwin)s">Plugin &middot; Windows</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(plugmac)s">Plugin &middot; macOS</a>
+    <a class="button" href="%(repo)s/releases/download/v%(v)s/%(pluglin)s">Plugin &middot; Linux</a>
   </div>
 
   <p>Todas las versiones, incluidas las de prueba: <a href="%(repo)s/releases">página de releases en GitHub</a>.</p>
@@ -279,7 +322,7 @@ def main():
             v = args.depois
             pilula = t["pilula_depois"] % v
             dados = {"v": v, "repo": REPO}
-            for chave, molde in PACOTES:
+            for chave, molde in PACOTES + PLUGINS:
                 dados[chave] = molde % v
             bloco = t["depois"] % dados
         s = trocar(s, "PILULA",

@@ -351,7 +351,7 @@ perdidos, que deve ficar em zero.
 
 O Rasgo Modular é um aplicativo próprio e conversa com DAWs, outros sintetizadores e máquinas pelo áudio e pelo MIDI do sistema. A porta de entrada é o módulo SIGNAL-IN: ligue o **ON** e cabeie uma saída dele. A partir daí ele recebe o som, as notas e o andamento; o NOTE-OUT manda as notas para fora.
 
-- **Dentro de uma DAW, como plugin (VST3 e LV2):** o mesmo instrumento abre numa faixa de instrumento da DAW, com o patch guardado no projeto. O transporte da DAW chega ao SIGNAL-IN como MIDI clock, e o VARIA e o Master aparecem para automação. Testado no Linux com o Ardour. Por enquanto, o plugin se constrói a partir do código (abaixo, "Plugin VST3 e LV2"); os pacotes desta versão trazem o aplicativo.
+- **Dentro de uma DAW, como plugin (VST3 e LV2):** o mesmo instrumento abre numa faixa de instrumento da DAW, com o patch guardado no projeto. O transporte da DAW chega ao SIGNAL-IN como MIDI clock, e o VARIA e o Master aparecem para automação. Desde a v0.1.13, o plugin tem download próprio para Windows, macOS e Linux (abaixo, "Plugin VST3 e LV2").
 - **No VCV Rack:** 100 módulos do Rasgo Modular também existem como plugin do VCV Rack 2, com o mesmo DSP do aplicativo, dicas de cada controle, manual e créditos, e polifonia até 16 vozes. Código em `github.com/lucioaraujo/rasgo-modular-vcv`; o pedido de inclusão na VCV Library e no Cardinal está em andamento. O instrumento completo (seeds, VARIA, os cabos como processo) é este aplicativo.
 - **Som de outro programa no Rasgo:** no Linux, ligue a saída do programa à entrada do Rasgo Modular no PipeWire ou no JACK (qpwgraph, Helvum ou Carla); no macOS, use um dispositivo virtual como o BlackHole; no Windows, o VB-Cable. O som chega nas saídas L e R do SIGNAL-IN.
 - **Som do Rasgo numa DAW:** o mesmo caminho ao contrário. A saída do Rasgo Modular vira a entrada de uma faixa da DAW (Ardour, Reaper, Bitwig, Live, Infinite e outras) para gravar ou processar.
@@ -361,8 +361,27 @@ O Rasgo Modular é um aplicativo próprio e conversa com DAWs, outros sintetizad
 
 ### Plugin VST3 e LV2
 
-O plugin é o mesmo instrumento dentro de uma DAW. Ele se constrói a partir do
-código, com a mesma JUCE do aplicativo:
+O plugin é o mesmo instrumento dentro de uma DAW: VST3 nos três sistemas e
+também LV2 no Linux. O aplicativo continua igual; o plugin é um download a
+mais, na [página de releases](https://github.com/lucioaraujo/rasgo-modular/releases):
+
+- **Windows:** `rasgo-modular-plugin-<versão>-windows-x64.zip`. Descompacte e
+  copie a pasta `Rasgo Modular.vst3` para `C:\Program Files\Common Files\VST3\`.
+- **macOS:** `rasgo-modular-plugin-<versão>-macos-universal.zip` (Intel e Apple
+  Silicon). Descompacte e copie `Rasgo Modular.vst3` para
+  `~/Library/Audio/Plug-Ins/VST3/`. O plugin tem assinatura ad-hoc, sem
+  notarização: se a DAW recusar o plugin, libere-o uma vez no Terminal com
+  `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/Rasgo\ Modular.vst3`.
+- **Linux:** `rasgo-modular-plugin-<versão>-linux-x86_64.tar.gz`. Descompacte;
+  copie `Rasgo Modular.vst3` para `~/.vst3/` e `Rasgo Modular.lv2` para `~/.lv2/`.
+
+Depois, peça à DAW para procurar plugins de novo. O Rasgo Modular aparece
+como instrumento; a janela abre pelo botão de editar do plugin. Testado pelo
+autor no Linux (Ardour 8.4); no Windows e no macOS, a CI carrega o plugin,
+confere que ele soa e que o estado volta igual. No Infinite 2.0.0, abrir a
+janela do plugin derruba o host (defeito registrado do lado dele).
+
+**A partir do código**, com a mesma JUCE do aplicativo:
 
 ```sh
 cmake -B build-plugin -DCMAKE_BUILD_TYPE=Release \
@@ -372,10 +391,8 @@ cmake --build build-plugin --target RasgoModularPlugin_VST3 RasgoModularPlugin_L
 ```
 
 Os plugins ficam em `build-plugin/apps/juce/RasgoModularPlugin_artefacts/Release/`
-(`VST3/Rasgo Modular.vst3` e `LV2/Rasgo Modular.lv2`). No Linux, copie a pasta
-`.vst3` para `~/.vst3/` e a `.lv2` para `~/.lv2/`, e peça à DAW para procurar
-plugins de novo. Na DAW, o Rasgo Modular aparece como instrumento; a janela
-abre pelo botão de editar do plugin. Testado no Linux com o Ardour 8.4.
+(`VST3/Rasgo Modular.vst3` e `LV2/Rasgo Modular.lv2`), prontos para copiar
+para as pastas acima.
 
 ### Onde o instrumento guarda as coisas
 
@@ -562,7 +579,7 @@ recording folder; `RASGO_REC_TAP` picks where REC captures from —
 
 Rasgo Modular is a standalone application that talks to DAWs, other synthesizers and machines through the system's audio and MIDI. The way in is the SIGNAL-IN module: switch it **ON** and patch one of its outputs. From then on it receives sound, notes and tempo; NOTE-OUT sends notes out.
 
-- **Inside a DAW, as a plugin (VST3 and LV2):** the same instrument opens on a DAW instrument track, with the patch saved in the project. The DAW's transport reaches SIGNAL-IN as MIDI clock, and VARIA and Master show up for automation. Tested on Linux with Ardour. For now, the plugin is built from source (below, "VST3 and LV2 plugin"); this version's packages carry the application.
+- **Inside a DAW, as a plugin (VST3 and LV2):** the same instrument opens on a DAW instrument track, with the patch saved in the project. The DAW's transport reaches SIGNAL-IN as MIDI clock, and VARIA and Master show up for automation. Since v0.1.13 the plugin has its own download for Windows, macOS and Linux (below, "VST3 and LV2 plugin").
 - **In VCV Rack:** 100 Rasgo Modular modules also exist as a VCV Rack 2 plugin, with the same DSP as the application, tooltips on every control, a manual and credits, and polyphony up to 16 voices. Source at `github.com/lucioaraujo/rasgo-modular-vcv`; the inclusion requests to the VCV Library and Cardinal are under way. The complete instrument (seeds, VARIA, cables as processes) is this application.
 - **Sound from another program into Rasgo:** on Linux, connect the program's output to Rasgo Modular's input in PipeWire or JACK (qpwgraph, Helvum or Carla); on macOS, use a virtual device such as BlackHole; on Windows, VB-Cable. The sound arrives at SIGNAL-IN's L and R outputs.
 - **Rasgo's sound in a DAW:** the same path the other way round. Rasgo Modular's output becomes the input of a DAW track (Ardour, Reaper, Bitwig, Live, Infinite and others) to record or process.
@@ -572,8 +589,27 @@ Rasgo Modular is a standalone application that talks to DAWs, other synthesizers
 
 ### VST3 and LV2 plugin
 
-The plugin is the same instrument inside a DAW. It is built from source,
-with the same JUCE as the application:
+The plugin is the same instrument inside a DAW: VST3 on all three systems,
+plus LV2 on Linux. The application stays the same; the plugin is an extra
+download on the [releases page](https://github.com/lucioaraujo/rasgo-modular/releases):
+
+- **Windows:** `rasgo-modular-plugin-<version>-windows-x64.zip`. Unzip and copy
+  the `Rasgo Modular.vst3` folder to `C:\Program Files\Common Files\VST3\`.
+- **macOS:** `rasgo-modular-plugin-<version>-macos-universal.zip` (Intel and
+  Apple Silicon). Unzip and copy `Rasgo Modular.vst3` to
+  `~/Library/Audio/Plug-Ins/VST3/`. The plugin is ad-hoc signed, without
+  notarisation: if the DAW rejects it, allow it once in Terminal with
+  `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/Rasgo\ Modular.vst3`.
+- **Linux:** `rasgo-modular-plugin-<version>-linux-x86_64.tar.gz`. Unpack;
+  copy `Rasgo Modular.vst3` to `~/.vst3/` and `Rasgo Modular.lv2` to `~/.lv2/`.
+
+Then ask the DAW to rescan plugins. Rasgo Modular shows up as an instrument;
+its window opens from the plugin's edit button. Tested by the author on
+Linux (Ardour 8.4); on Windows and macOS, CI loads the plugin and checks that
+it sounds and that its state comes back the same. In Infinite 2.0.0, opening
+the plugin window crashes the host (a defect logged on its side).
+
+**From source**, with the same JUCE as the application:
 
 ```sh
 cmake -B build-plugin -DCMAKE_BUILD_TYPE=Release \
@@ -583,10 +619,8 @@ cmake --build build-plugin --target RasgoModularPlugin_VST3 RasgoModularPlugin_L
 ```
 
 The plugins land in `build-plugin/apps/juce/RasgoModularPlugin_artefacts/Release/`
-(`VST3/Rasgo Modular.vst3` and `LV2/Rasgo Modular.lv2`). On Linux, copy the
-`.vst3` folder to `~/.vst3/` and the `.lv2` one to `~/.lv2/`, then ask the DAW
-to rescan plugins. In the DAW, Rasgo Modular shows up as an instrument; its
-window opens from the plugin's edit button. Tested on Linux with Ardour 8.4.
+(`VST3/Rasgo Modular.vst3` and `LV2/Rasgo Modular.lv2`), ready to copy to the
+folders above.
 
 ### Where state lives
 

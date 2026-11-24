@@ -93,7 +93,9 @@ jobs:
               build/*.zip
           - os: macos-latest
             generator: DragNDrop
-            artifact-glob: build/*.dmg
+            artifact-glob: |
+              build/*.dmg
+              build/rasgo-modular-plugin-*.zip
     # nome explícito: o padrão juntaria a lista de globs do Ubuntu ao nome
     name: package (${{ matrix.os }}, ${{ matrix.generator }})
     runs-on: ${{ matrix.os }}
@@ -144,6 +146,7 @@ jobs:
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Release
           -DRASGO_MODULAR_JUCE_PATH=${{ github.workspace }}/JUCE-checkout
+          -DRASGO_MODULAR_BUILD_PLUGIN=ON
 
       # O MOTOR nos três sistemas. O núcleo é framework-free por projeto,
       # mas até aqui só tinha sido compilado no Linux — esta é a primeira
@@ -243,6 +246,54 @@ jobs:
           $bad = $deps | Select-String -Pattern 'VCRUNTIME|MSVCP|api-ms-win-crt'
           if ($bad) { Write-Error "o .exe depende do runtime dinâmico do Visual C++: $bad"; exit 1 }
           "ok: sem dependência do Visual C++ Redistributable"
+
+      # ---- o plugin (VST3 nos três; LV2 também no Linux), desde a v0.1.13
+      # Mesmo instrumento do app, para abrir numa faixa de instrumento da
+      # DAW. Vai num arquivo próprio ao lado dos pacotes do app.
+      - name: Build the plugin
+        shell: bash
+        run: |
+          T="--target RasgoModularPlugin_VST3 --target RasgoModularPluginCheck"
+          if [ "$RUNNER_OS" = Linux ]; then T="$T --target RasgoModularPlugin_LV2"; fi
+          cmake --build build $T --config Release --parallel 2
+
+      # O hospedeiro de teste carrega o VST3, confere que soa ao ser inserido,
+      # salva e restaura o estado (tools/plugin_check.cpp).
+      - name: Check the plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          VST3=$(find build -maxdepth 7 -path '*RasgoModularPlugin_artefacts*' -name '*.vst3' | head -1)
+          CHECK=$(find build -path '*PluginCheck_artefacts*' -type f \( -name 'RasgoModularPluginCheck' -o -name 'RasgoModularPluginCheck.exe' -o -name 'rasgo_modular_plugin_check*' \) | grep -v '\.txt$' | head -1)
+          echo "VST3: $VST3 · check: $CHECK"
+          if [ "$RUNNER_OS" = Linux ]; then
+            sudo apt-get install -y xvfb >/dev/null
+            xvfb-run -a "$CHECK" "$VST3"
+          else
+            "$CHECK" "$VST3"
+          fi
+
+      - name: Package the plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          V=$(sed -n 's/^project(RasgoModularPrototype VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          ART=$(dirname "$(find build -maxdepth 7 -path '*RasgoModularPlugin_artefacts*' -name '*.vst3' | head -1)")/..
+          mkdir -p plugin-stage
+          cp -R "$ART/VST3/Rasgo Modular.vst3" plugin-stage/
+          cp LICENSE* plugin-stage/ 2>/dev/null || true
+          case "$RUNNER_OS" in
+            Linux)
+              cp -R "$ART/LV2/Rasgo Modular.lv2" plugin-stage/
+              tar -czf "build/rasgo-modular-plugin-$V-linux-x86_64.tar.gz" -C plugin-stage . ;;
+            macOS)
+              codesign --force --deep --sign - "plugin-stage/Rasgo Modular.vst3"
+              lipo -info "plugin-stage/Rasgo Modular.vst3/Contents/MacOS/Rasgo Modular"
+              (cd plugin-stage && ditto -c -k --sequesterRsrc --keepParent "Rasgo Modular.vst3" "../build/rasgo-modular-plugin-$V-macos-universal.zip") ;;
+            Windows)
+              (cd plugin-stage && 7z a -tzip "../build/rasgo-modular-plugin-$V-windows-x64.zip" . >/dev/null) ;;
+          esac
+          ls -l build/rasgo-modular-plugin-*
 
       - name: Package
         working-directory: build
@@ -359,7 +410,7 @@ jobs:
 
       - name: Abrir o .tar.gz
         run: |
-          mkdir tgz && tar -xzf pacotes/*.tar.gz -C tgz
+          mkdir tgz && tar -xzf pacotes/rasgo-modular-[0-9]*.tar.gz -C tgz
           packaging/linux/testar-arranque.sh "$(ls tgz/*/bin/rasgo-modular)"
 
   # ---- release: onde a tag vira algo que alguém consegue BAIXAR --------
