@@ -190,3 +190,8 @@ próprio do Cardinal com outro nome (permitido pela GPL). A recusa é de
 política, não técnica. Recomendação: não fazer o fork por ora (custo alto,
 ganho pequeno); o plugin segue no VCV Rack, e a VCV Library (#1048)
 continua aberta.
+
+**Decisão do autor (24/11/2026):** não fazer o "Rasgo Rack" (fork do
+Cardinal) por ora. Aguardar a resposta da VCV Library (#1048); se ela também
+recusar, publicar o `.vcvplugin` por conta própria (release no repositório
+`rasgo-modular-vcv`, instalação manual).
