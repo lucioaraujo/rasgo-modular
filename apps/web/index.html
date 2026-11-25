@@ -966,6 +966,13 @@ async function previa() {
   const texto = dec.decode(new Uint8Array(mem.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
   const wp = e.rw_wordmark(), b = new Uint8Array(mem.buffer); let fim = wp; while (b[fim]) fim++;
   rack.carregar(texto, dec.decode(b.slice(wp, fim)));
+  // `?so=TIPO,TIPO,…`: só esses módulos, nessa ordem (folhas da auditoria
+  // de diagramação, tools/auditar_paineis.mjs)
+  if (q.has('so')) {
+    const tipos = q.get('so').split(',');
+    rack.mods = tipos.map((t) => rack.mods.find((m) => m.tipo === t)).filter(Boolean);
+    rack.layout();
+  }
   // `?insp=N`: abre o inspetor do cabo N; com `&rel`, liga nele uma relação
   // RING (companion = a origem do cabo seguinte), para ver o selo
   if (q.has('insp')) {
