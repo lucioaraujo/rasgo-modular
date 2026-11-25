@@ -1,13 +1,13 @@
 #!/bin/bash
 # Motor de PROVA para a auditoria: aplica as propostas de painel (patches em
-# .local-build/propostas/*.patch) numa cópia da árvore e compila para
+# dossies/propostas_paineis/*.patch) numa cópia da árvore e compila para
 # .local-build/web-prova/, servida à parte. A página do autor não muda.
 set -euo pipefail
 raiz=$(cd "$(dirname "$0")/.." && pwd)
 tmp=$raiz/.local-build/prova-src
 rm -rf "$tmp"; mkdir -p "$tmp"
 cp -r "$raiz/src" "$raiz/apps" "$tmp/"
-for p in "$raiz"/.local-build/propostas/*.patch; do (cd "$tmp" && patch -p1 -s < "$p"); done
+for p in "$raiz"/dossies/propostas_paineis/*.patch; do (cd "$tmp" && patch -p1 -s < "$p"); done
 source "$raiz/../../third_party/emsdk/emsdk_env.sh" >/dev/null 2>&1
 obj=$raiz/.local-build/web-obj; out=$raiz/.local-build/web-prova
 mkdir -p "$out"

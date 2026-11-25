@@ -140,8 +140,14 @@ esquerda; as 8 saídas nos dois terços da esquerda; fileiras em 30, 60, 88 e
 Proposta (G1–G4): **10 HP**, quatro colunas simétricas a 12,7 mm; fileiras
 a cada 24 mm (knobs, TRIG e IN nas duas colunas do meio, as duas fileiras de
 saídas); o visor na largura do painel. Patch em
-`.local-build/propostas/NOISE.patch`; antes e depois em
-`capturas/auditoria/noise-antes-depois.png`. **Aguarda o OK do autor.**
+`dossies/propostas_paineis/NOISE.patch`; antes e depois (normal e compacto)
+em `.local-build/web/capturas/auditoria/noise-antes-depois.png`, feito com
+`tools/prova_paineis.sh` (aplica as propostas numa cópia da árvore e compila
+um motor de prova à parte; a página do autor não muda). **Aguarda o OK do
+autor.** Duas observações da imagem: no compacto, o NOISE novo ainda aperta
+um pouco os rótulos dos knobs — com os painéis bem diagramados, talvez o
+COMPACTO deva parar no passo de 10,16 mm; e o G5 (hierarquia) não foi
+aplicado aqui: o RATE poderia ser o knob grande.
 
 ## 7. Próximos passos
 
