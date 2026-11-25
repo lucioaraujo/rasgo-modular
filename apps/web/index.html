@@ -443,8 +443,13 @@ function mostrarAntes() {
 // O primeiro clique liga o som e abre como o ABRE manda (`StartupPolicy`):
 // SEED = a seed da caixa; SEM CABOS = ela, descabeada; MEU PATCH e ÚLTIMA =
 // o patch guardado neste navegador (se não houver, a seed)
-async function tocar() {
-  if (no) return;
+// uma partida só, mesmo se o primeiro clique e um comando chegarem juntos
+let partida = null;
+function tocar() {
+  if (no) return Promise.resolve();
+  return partida ||= tocar1();
+}
+async function tocar1() {
   const s = seedValida() || '4303935450909092226';
   aviso(W('montando'), 1e9);
   await ligar();
@@ -563,6 +568,19 @@ $('arquivo').onchange = async () => {
 
 // ---- os controles do cabeçalho -------------------------------------------
 $('b-tocar').onclick = () => tocar();
+// O navegador só deixa soar depois de um gesto: o PRIMEIRO clique ou tecla,
+// em qualquer lugar da página, liga o som (autor, 25/11) — e o clique ainda
+// faz o que faria (girar o knob, abrir a paleta…). Não liga se for o TOCAR
+// (ele mesmo liga) nem se o motor ainda não carregou.
+function primeiroGesto(ev) {
+  if (no || !bytes) return;
+  if (ev.target === $('b-tocar')) return;
+  removeEventListener('pointerdown', primeiroGesto, true);
+  removeEventListener('keydown', primeiroGesto, true);
+  tocar();
+}
+addEventListener('pointerdown', primeiroGesto, true);
+addEventListener('keydown', primeiroGesto, true);
 for (const b of document.querySelectorAll('header button[data-acao]')) b.onclick = () => acao(b.dataset.acao);
 $('r-varia').onclick = () => acao('variaLiga');
 $('seed').addEventListener('keydown', (ev) => {
