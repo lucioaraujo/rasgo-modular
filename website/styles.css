@@ -130,6 +130,13 @@ h1 { margin: 0 0 1rem; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; }
 h2 { margin: 0 0 1rem; font-size: clamp(1.3rem, 3vw, 1.7rem); }
 h3 { margin: 1.6rem 0 .5rem; font-size: 1.05rem; color: var(--accent); }
 .lead { font-size: 1.12rem; color: var(--ink); max-width: 46rem; }
+/* o destaque para tocar no navegador (25/11/2026): o botão de acento do
+   instrumento, logo abaixo da apresentação */
+.cta-tocar { margin-top: 1.4rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; }
+.cta-tocar a { display: inline-block; padding: .7rem 1.2rem; background: var(--accent); color: var(--ground);
+               font-weight: 700; letter-spacing: .04em; text-decoration: none; border-radius: 3px; }
+.cta-tocar a:hover { background: var(--ink); color: var(--ground); }
+.cta-tocar span { color: var(--muted); font-size: .95rem; }
 p { max-width: 46rem; }
 
 .section { padding: 2.2rem 0; border-top: 1px solid var(--line); }

@@ -79,7 +79,10 @@ def conferir_estrutura():
         if m.pilha:
             m.erros.append("não fechadas: %s" % m.pilha)
         for href in re.findall(r'href="([^"#h][^"]*)"', s):
-            alvo = href.split("#")[0]
+            # sem a âncora e sem a query (`play/?lang=pt`); pasta = index.html
+            alvo = href.split("#")[0].split("?")[0]
+            if alvo.endswith("/"):
+                alvo += "index.html"
             if alvo and not (AQUI / alvo).exists():
                 m.erros.append("link quebrado: %s" % alvo)
         for atr in re.findall(r'(?:src|srcset)="([^"]*)"', s):

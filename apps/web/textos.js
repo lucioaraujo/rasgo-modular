@@ -70,6 +70,21 @@ const T = {
   taxa: ['Hz   ·   WebAssembly, in this browser', 'Hz   ·   WebAssembly, neste navegador',
          'Hz   ·   WebAssembly, dans ce navigateur', 'Hz   ·   WebAssembly, en este navegador'],
 
+  // o SOBRE: baixar o app ou um plugin
+  baixarApp: ['Download the app or a plugin', 'Baixar o app ou um plugin', 'Télécharger l’application ou un plugin', 'Descargar la aplicación o un plugin'],
+  baixarDica: ['Windows, macOS and Linux; VST3/LV2 for a DAW; VCV Rack.',
+               'Windows, macOS e Linux; VST3/LV2 para DAW; VCV Rack.',
+               'Windows, macOS et Linux ; VST3/LV2 pour une DAW ; VCV Rack.',
+               'Windows, macOS y Linux; VST3/LV2 para DAW; VCV Rack.'],
+  // entradas
+  semMic: ['The SIGNAL-IN asked for the microphone, but the browser did not allow it (check the permission next to the address bar).',
+           'O SIGNAL-IN pediu o microfone, mas o navegador não permitiu (veja a permissão ao lado da barra de endereço).',
+           'Le SIGNAL-IN a demandé le micro, mais le navigateur ne l’a pas permis (vérifiez l’autorisation près de la barre d’adresse).',
+           'El SIGNAL-IN pidió el micrófono, pero el navegador no lo permitió (revise el permiso junto a la barra de direcciones).'],
+  semMidi: ['This browser does not give MIDI to the page (Chrome and Edge do; Firefox asks for a permission add-on).',
+            'Este navegador não dá MIDI à página (o Chrome e o Edge dão; o Firefox pede um complemento de permissão).',
+            'Ce navigateur ne donne pas le MIDI à la page (Chrome et Edge le font ; Firefox demande un module de permission).',
+            'Este navegador no da MIDI a la página (Chrome y Edge sí; Firefox pide un complemento de permiso).'],
   // REC: os arquivos
   recMontando: ['Preparing the recording files…', 'Preparando os arquivos da gravação…',
                 'Préparation des fichiers de l’enregistrement…', 'Preparando los archivos de la grabación…'],
@@ -119,6 +134,9 @@ const T = {
 
 // a língua inicial: a escolhida antes neste navegador, senão a do navegador
 export function linguaInicial(guardada) {
+  // `?lang=pt` (o link do site leva a língua da página de onde se veio)
+  const q = new URLSearchParams(location.search).get('lang');
+  if (q && LINGUAS.includes(q)) return LINGUAS.indexOf(q);
   const g = Number(guardada);
   if (guardada !== null && g >= 0 && g <= 3) return g;
   const n = (navigator.language || 'en').slice(0, 2).toLowerCase();

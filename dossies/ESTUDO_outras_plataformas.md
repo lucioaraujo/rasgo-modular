@@ -201,7 +201,28 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      código do app (`writeWav24`, `DeliveryMaster`, em
      `apps/web/rasgo_rec.cpp`), montados na página e baixados: `rec-…wav`,
      `.streaming.wav` + `.txt`, `.score.txt`, `.mid`. Nada sai do navegador.
-     Conferido no Node (`teste_rec.mjs`) e no Firefox sem janela. REC: teto de 4 minutos, como no app (autor,
+     Conferido no Node (`teste_rec.mjs`) e no Firefox sem janela.
+   - **Conferência completa app → página** (25/11, pedido do autor): o que
+     faltava entrou — microfone e MIDI no SIGNAL-IN (e MIDI no POLY-IN), com
+     a regra do app (só com o ON ligado e uma saída cabeada; o navegador pede
+     a permissão nessa hora; sem cancelamento de eco); o cabo puxado de uma
+     fonte muda sai acinzentado; o rack rola na borda enquanto se puxa um
+     cabo; o botão do meio arrasta o rack; F6 leva o teclado ao cabeçalho
+     (setas, Enter, F1 explica); a segurança da abertura (sessão que caiu
+     abre sem cabos). O que fica de fora, por ser do sistema e não da página:
+     o plugin de DAW, a ligação com o Maestruc, as pastas do disco (aqui os
+     arquivos são baixados) e as variáveis de ambiente de desenvolvimento. O
+     MIDI clock chega sem o carimbo de tempo da placa (pode tremer um pouco
+     mais que no app); o Web MIDI existe no Chrome e no Edge, e no Firefox
+     pede um complemento de permissão.
+   - **F4d, o lugar no site** (25/11): a página vai para `website/play/`
+     (`apps/web/publicar_no_site.sh`; o nome em inglês, pedido do autor),
+     com o motor pronto, porque o site é publicado copiando `website/` sem
+     build — o `.wasm` (4,7 MB) é atualizado a cada versão. "No navegador"
+     no menu de todas as páginas, um botão de destaque na apresentação nas 4
+     línguas (`?lang=` leva a língua), `play/` no sitemap. No SOBRE da
+     página, o link para baixar o app ou um plugin (a área de downloads do
+     site). Os testes da página foram para `apps/web/testes/`. REC: teto de 4 minutos, como no app (autor,
    25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na
    página e baixado, nada vai a servidor.
 

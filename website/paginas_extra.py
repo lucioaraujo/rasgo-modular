@@ -40,10 +40,10 @@ def arquivo(tipo, lang):
 
 
 MENU = {
-    "pt": ("Seções", [("conceito", "Conceito"), ("tutorial", "Tutorial"), ("modulos", "Módulos"), ("instalacao", "Instalação"), ("baixar", "Baixar")]),
-    "en": ("Sections", [("conceito", "Concept"), ("tutorial", "Tutorial"), ("modulos", "Modules"), ("instalacao", "Installation"), ("baixar", "Download")]),
-    "fr": ("Sections", [("conceito", "Concept"), ("tutorial", "Tutoriel"), ("modulos", "Modules"), ("instalacao", "Installation"), ("baixar", "Télécharger")]),
-    "es": ("Secciones", [("conceito", "Concepto"), ("tutorial", "Tutorial"), ("modulos", "Módulos"), ("instalacao", "Instalación"), ("baixar", "Descargar")]),
+    "pt": ("Seções", [("conceito", "Conceito"), ("tocar", "No navegador"), ("tutorial", "Tutorial"), ("modulos", "Módulos"), ("instalacao", "Instalação"), ("baixar", "Baixar")]),
+    "en": ("Sections", [("conceito", "Concept"), ("tocar", "In the browser"), ("tutorial", "Tutorial"), ("modulos", "Modules"), ("instalacao", "Installation"), ("baixar", "Download")]),
+    "fr": ("Sections", [("conceito", "Concept"), ("tocar", "Dans le navigateur"), ("tutorial", "Tutoriel"), ("modulos", "Modules"), ("instalacao", "Installation"), ("baixar", "Télécharger")]),
+    "es": ("Secciones", [("conceito", "Concepto"), ("tocar", "En el navegador"), ("tutorial", "Tutorial"), ("modulos", "Módulos"), ("instalacao", "Instalación"), ("baixar", "Descargar")]),
 }
 
 TUT = {
@@ -291,7 +291,9 @@ def menu(lang, atual):
     rotulo, itens = MENU[lang]
     links = []
     for tipo, nome in itens:
-        href = arquivo("conceito", lang) + "#baixar" if tipo == "baixar" else arquivo(tipo, lang)
+        # "No navegador": o instrumento em website/play/, na língua da página
+        href = (arquivo("conceito", lang) + "#baixar" if tipo == "baixar"
+                else "play/?lang=" + lang if tipo == "tocar" else arquivo(tipo, lang))
         cur = ' aria-current="page"' if tipo == atual else ""
         links.append('      <a href="%s"%s>%s</a>' % (href, cur, nome))
     return '<nav class="page-nav" aria-label="%s">\n%s\n    </nav>' % (rotulo, "\n".join(links))

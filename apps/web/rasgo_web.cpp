@@ -48,6 +48,8 @@
 #include "dsp/Master.hpp"
 #include "dsp/Mixer.hpp"
 #include "dsp/NoteOut.hpp"
+#include "dsp/PolyIn.hpp"
+#include "dsp/SignalIn.hpp"
 #include "escalas/BancoEscalas.hpp"
 #include "juce/RasgoWordmark.h"   // só o vetor do wordmark, sem JUCE
 #include "panel/ModuleCatalog.hpp"
@@ -613,6 +615,56 @@ void rw_descabear() {
     descrever();
 }
 
+// ---- ENTRADAS: microfone e MIDI (`syncSignalIn` do app) ----------------
+
+// O que o patch pede agora: 1 = áudio (um SIGNAL-IN com o ON ligado e alguma
+// saída cabeada), 2 = MIDI (o mesmo, ou um POLY-IN). A página só abre o
+// microfone e o MIDI quando pedidos — o Rasgo soa sozinho; entrada é
+// adaptador opcional, e pedir microfone a quem não vai usar é ruído.
+__attribute__((used, visibility("default")))
+int rw_entrada_necessaria() {
+    if (!g_grafo) return 0;
+    int r = 0;
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i) {
+        const std::string ty = g_grafo->node(i).type();
+        if (ty != "SIGNAL-IN" && ty != "POLY-IN") continue;
+        if (parametro(g_grafo->node(i), "listen") < 0.5f) continue;
+        bool cabeado = false;
+        for (std::size_t c = 0; c < g_grafo->cableCount() && !cabeado; ++c)
+            cabeado = g_grafo->cable(c).source().node == i;
+        if (!cabeado) continue;
+        r |= 2;
+        if (ty == "SIGNAL-IN") r |= 1;
+    }
+    return r;
+}
+
+// o microfone: 128 quadros L R intercalados em rw_audio_buffer(), entregues
+// a cada SIGNAL-IN antes do bloco (`pushSamples`, como a placa no app)
+float g_audioIn[kQuantum * 2] = {};
+__attribute__((used, visibility("default")))
+float* rw_audio_buffer() { return g_audioIn; }
+__attribute__((used, visibility("default")))
+void rw_audio_in(int quadros) {
+    if (!g_grafo) return;
+    const auto n = static_cast<std::size_t>(std::clamp(quadros, 0, static_cast<int>(kQuantum)));
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i)
+        if (auto* si = dynamic_cast<rasgo::modular::SignalIn*>(&g_grafo->node(i))) si->pushSamples(g_audioIn, n);
+}
+
+// um evento MIDI (bytes crus) para os SIGNAL-IN e POLY-IN (`deliverMidi`)
+__attribute__((used, visibility("default")))
+void rw_midi(int st, int d1, int d2) {
+    if (!g_grafo) return;
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i) {
+        auto& nd = g_grafo->node(i);
+        if (auto* si = dynamic_cast<rasgo::modular::SignalIn*>(&nd))
+            si->pushMidi(static_cast<std::uint8_t>(st), static_cast<std::uint8_t>(d1), static_cast<std::uint8_t>(d2), 0.0f);
+        else if (auto* pi = dynamic_cast<rasgo::modular::PolyIn*>(&nd))
+            pi->pushMidi(static_cast<std::uint8_t>(st), static_cast<std::uint8_t>(d1), static_cast<std::uint8_t>(d2));
+    }
+}
+
 // ---- REC (`startRec`/`finishRec` do app) -------------------------------
 
 // começa a tomada: a fiação inteira em t = 0, o dicionário dos módulos, a
@@ -972,6 +1024,7 @@ SignalGraph* rw_web_grafo() { return g_grafo.get(); }
     X(scaleBankAll) \
     X(scaleBankEmpty) \
     X(startNoteLast) \
+    X(startNoteSafe) \
     X(hdrRackAll) \
     X(hdrRackOut) \
     X(rackViewEmpty) \

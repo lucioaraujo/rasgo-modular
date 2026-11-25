@@ -129,4 +129,7 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://lucioaraujo.github.io/rasgo-modular/instalacao-es.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://lucioaraujo.github.io/rasgo-modular/instalacao.html"/>
   </url>
+  <url>
+    <loc>https://lucioaraujo.github.io/rasgo-modular/play/</loc>
+  </url>
 </urlset>

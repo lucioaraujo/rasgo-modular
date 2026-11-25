@@ -195,6 +195,11 @@ def sitemap():
                 L.append('    <xhtml:link rel="alternate" hreflang="x-default" href="%s"/>'
                          % url(grupo[0]["url"]))
             L.append("  </url>")
+    # o instrumento no navegador (play/): uma página só, a língua vem de
+    # ?lang=; o <head> dela é do app (apps/web/index.html), fora do seo.py
+    L.append("  <url>")
+    L.append("    <loc>%s</loc>" % url("play/"))
+    L.append("  </url>")
     L.append("</urlset>")
     return "\n".join(L) + "\n"
 

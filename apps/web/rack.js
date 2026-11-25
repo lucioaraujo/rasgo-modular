@@ -96,6 +96,8 @@ export class Rack {
     canvas.addEventListener('pointerup', (e) => this.sobe(e));
     canvas.addEventListener('pointercancel', () => this.cancela());
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    // o botão do meio é do rack (arrastar), não da rolagem automática do navegador
+    canvas.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });
     canvas.addEventListener('wheel', (e) => this.roda(e), { passive: false });
   }
 
@@ -611,7 +613,11 @@ export class Rack {
       g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
     }
     const cor = c.pk === 1 ? CABO_CTRL[0] : CABO_AUDIO[0];
+    // fonte sem sinal agora: o cabo sai acinzentado (`dragSourceSilent_`) —
+    // explica o "liguei e nada aconteceu" antes de ligar
+    g.globalAlpha = c.mudo ? 0.3 : 1;
     this.tracarCabo(g, c.ax, c.ay, this.mouse.x, this.mouse.y, cor, true);
+    g.globalAlpha = 1;
   }
 
   pega() {
@@ -859,6 +865,15 @@ export class Rack {
     return null;
   }
 
+  // a fonte do cabo puxado está em silêncio agora? (o pico do visor dela)
+  fonteMuda(no) {
+    const v = this.visores.get(no);
+    if (!v) return false;   // sem telemetria (fora da tela, sem visor): não acusa
+    let p = 0;
+    for (let k = 0; k < 220; k++) p = Math.max(p, Math.abs(v[k]));
+    return p < 1e-4;
+  }
+
   // o [x] (`removeBox`) e a faixa do nome, a pega do módulo (`titleStrip`)
   caixaX(m) { return { x: m.bx + m.bw - 15, y: m.by + 2, w: 13, h: 13 }; }
   faixaTitulo(m) { return { x: m.bx, y: m.by, w: m.bw - 17, h: this.mmpx(6) }; }
@@ -965,7 +980,14 @@ export class Rack {
   }
 
   baixa(e) {
-    if (e.button === 1) return;                  // o meio: o navegador rola
+    // o botão do meio arrasta o rack para cima e para baixo (`pan_` do app),
+    // também enquanto se cabeia
+    if (e.button === 1) {
+      e.preventDefault();
+      this.panorama = { y0: e.clientY, topo0: this.rolagem.scrollTop };
+      this.cv.setPointerCapture(e.pointerId);
+      return;
+    }
     const p = this.ponto(e);
     this.mouse = p;
     // escolhendo o companion: o próximo clique numa saída o define
@@ -997,13 +1019,14 @@ export class Rack {
             const s = this.jacks.get(`${c[i]}:${c[i + 1]}:1`);
             this.enviar({ tipo: 'cortarEntrada', d: j.no, pd: j.p });
             this.gesto = { tipo: 'cabo', no: c[i], p: c[i + 1], deSaida: true, pk: s ? s.pk : 0,
-                           ax: s ? s.x : p.x, ay: s ? s.y : p.y };
+                           ax: s ? s.x : p.x, ay: s ? s.y : p.y, mudo: this.fonteMuda(c[i]) };
             this.enviar({ tipo: 'mao', ativa: true });
             this.redesenhar();
             return;
           }
       }
-      this.gesto = { tipo: 'cabo', no: j.no, p: j.p, deSaida: !!j.out, pk: j.pk, ax: j.x, ay: j.y };
+      this.gesto = { tipo: 'cabo', no: j.no, p: j.p, deSaida: !!j.out, pk: j.pk, ax: j.x, ay: j.y,
+                     mudo: !!j.out && this.fonteMuda(j.no) };
       this.enviar({ tipo: 'mao', ativa: true });
       this.redesenhar();
       return;
@@ -1057,7 +1080,8 @@ export class Rack {
       this.enviar({ tipo: 'arrasto', i: gs.w.v, dy: (gs.y0 - e.clientY) / 220, lo: gs.w.min, hi: gs.w.max });
       return;
     }
-    if (gs?.tipo === 'cabo') { this.redesenhar(); return; }
+    if (this.panorama) { this.rolagem.scrollTop = this.panorama.topo0 + (this.panorama.y0 - e.clientY); return; }
+    if (gs?.tipo === 'cabo') { this.rolarNaBorda(e); this.redesenhar(); return; }
     if (gs?.tipo === 'trilha') { this.trilha(e); return; }
     if (gs?.tipo === 'clique-cabo' || gs?.tipo === 'x') {
       if (Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 6) this.gesto = null;
@@ -1087,6 +1111,7 @@ export class Rack {
   }
 
   sobe(e) {
+    if (this.panorama && e.button === 1) { this.panorama = null; return; }
     const gs = this.gesto;
     this.gesto = null;
     if (!gs) return;

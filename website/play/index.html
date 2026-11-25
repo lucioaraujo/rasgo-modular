@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rasgo Modular — tocar no navegador</title>
+<meta name="description" content="O Rasgo Modular inteiro no navegador: um patch de seed já montado, 105 módulos, cabos, VARIA, LEARN e gravação. Clique e toque." />
+<link rel="canonical" href="https://lucioaraujo.github.io/rasgo-modular/play/" />
+<link rel="icon" href="../assets/identity/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="../assets/identity/favicon-32.png" type="image/png" sizes="32x32" />
+<meta property="og:title" content="Rasgo Modular — tocar no navegador" />
+<meta property="og:description" content="O sintetizador modular generativo da família RASGO, inteiro no navegador." />
+<meta property="og:url" content="https://lucioaraujo.github.io/rasgo-modular/play/" />
+<meta property="og:image" content="https://lucioaraujo.github.io/rasgo-modular/assets/images/og-rasgo-modular.jpg" />
+<style>
+  /* os tokens do app (`T` em RasgoModularApp.cpp) */
+  :root { --bg: #131a1a; --surface: #262b36; --recessed: #0e1015; --line: #485060; --text: #f0f3f8;
+          --muted: #bec8d8; --prata: #d8dde6; --accent: #ff9d4c; --warning: #ff6b5b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif;
+         display: flex; flex-direction: column; overflow: hidden; }
+  /* O cabeçalho do app (`HeaderBar`): uma fileira de 46 px que quebra em
+     duas quando não cabe; grupos separados por uma régua fina */
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 6px; padding: 12px 12px 11px 14px;
+           background: var(--bg); border-bottom: 1px solid var(--line); font: 9.5px system-ui, sans-serif; }
+  .grupo { display: flex; align-items: center; gap: 6px; }
+  .direita { margin-left: auto; }
+  .marca { display: flex; align-items: center; gap: 7px; margin-right: 6px; padding-right: 10px;
+           border-right: 1px solid var(--line); height: 26px; }
+  .marca span { color: var(--muted); font-size: 9.5px; letter-spacing: .02em; }
+  .regua { width: 1px; height: 16px; background: var(--line); margin: 0 3px 0 1px; }
+  header button { height: 22px; padding: 0 7px; background: transparent; color: var(--muted);
+                  border: 1px solid var(--line); border-radius: 0; font: inherit; cursor: pointer;
+                  white-space: nowrap; }
+  header button:hover { border-color: var(--muted); }
+  /* o foco do teclado no cabeçalho (F6): o contorno de acento, como no app */
+  header button:focus-visible, header .trilho:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  /* ligado / o realce de um instante (`flashing`): cheio, com o anel */
+  header button.on { background: var(--accent); border-color: var(--accent); color: var(--bg);
+                     outline: 1px solid var(--accent); outline-offset: 2px; }
+  header button.prata.on { background: var(--prata); border-color: var(--prata); outline-color: var(--prata); }
+  header button.tocar { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  /* REC gravando: o botão é também o relógio da tomada (`T.recording`) */
+  header button.gravando { background: #e0362c; border-color: #e0362c; color: var(--bg);
+                           outline: 1px solid #e0362c; outline-offset: 2px; }
+  .rotulo { color: var(--muted); }
+  .rotulo.vivo { color: var(--text); }
+  #r-varia { cursor: pointer; }
+  #seed { width: 21ch; height: 22px; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
+          padding: 0 4px; font: 11px ui-monospace, monospace; border-radius: 0; }
+  #seed:focus { outline: none; border-color: var(--accent); }
+  /* slider do VARIA e do volume (`varySlider_`): 84 × 14, zero = desligado */
+  .trilho { position: relative; width: 84px; height: 14px; background: var(--recessed); border-radius: 3px;
+            cursor: pointer; touch-action: none; }
+  .trilho .cheio { position: absolute; left: 1px; top: 1px; bottom: 1px; background: var(--prata); border-radius: 2px; }
+  .trilho .meio { position: absolute; left: 42px; top: 2px; bottom: 2px; width: 1px; background: rgba(190, 200, 216, .7); }
+  #leitura { color: var(--muted); font-size: 9.5px; white-space: nowrap; }
+  #leitura.aviso { color: var(--text); white-space: normal; max-width: 46ch; }
+  #vu { width: 54px; height: 8px; background: var(--recessed); position: relative; }
+  #vu div { position: absolute; left: 0; top: 0; bottom: 0; background: var(--prata); }
+  #corpo { flex: 1; display: flex; min-height: 0; }
+  #direita { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  /* a faixa de crédito (`CreditsStrip`): 16 px, à direita, em cima do rack */
+  #creditos { height: 16px; flex: none; text-align: right; padding-right: 10px; color: var(--muted);
+              font: 8.6px/16px system-ui, sans-serif; white-space: nowrap; overflow: hidden; }
+  /* TUTORIAL e SOBRE (`OverlayView`): véu sobre o rack e um cartão */
+  #sobrepor { position: fixed; inset: 0; background: rgba(19, 26, 26, .82); display: none; z-index: 9;
+              align-items: center; justify-content: center; }
+  #sobrepor.aberto { display: flex; }
+  #sobrepor .cartao { position: relative; width: min(820px, calc(100vw - 60px)); max-height: calc(100vh - 60px);
+                      background: var(--surface); border: 1px solid var(--prata); padding: 30px 24px 16px 24px;
+                      display: flex; flex-direction: column; }
+  #sobrepor.sobre .cartao { height: auto; }
+  #sobrepor.tutorial .cartao { height: calc(100vh - 60px); }
+  #o-fechar { position: absolute; right: 12px; top: 10px; height: 20px; background: none; border: 1px solid var(--line);
+              color: var(--muted); font: 9.5px system-ui, sans-serif; padding: 0 7px; cursor: pointer; }
+  #o-titulo { margin: 0; font: 13.8px system-ui, sans-serif; color: var(--prata); }
+  #o-sub { margin: 4px 0 8px; font: 11.2px system-ui, sans-serif; color: var(--muted); }
+  #o-corpo { flex: 1; min-height: 0; overflow-y: auto; outline: none; font: 11.2px/1.45 system-ui, sans-serif;
+             color: var(--muted); max-width: 640px; padding-right: 10px;
+             scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #o-corpo h3 { font: bold 12px system-ui, sans-serif; color: var(--prata); margin: 0 0 8px; }
+  #o-corpo p { margin: 0 0 18px; white-space: pre-line; }
+  #o-corpo hr { border: 0; border-top: 1px solid var(--line); margin: 0 0 14px; }
+  #o-corpo a { color: var(--prata); }
+  #o-corpo a:hover { color: var(--text); }
+  #o-corpo .linha { margin: 0 0 3px; }
+  #o-corpo .alerta { color: var(--warning); }
+  #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
+  /* a paleta (`PaletteColumn`): as famílias na cor delas, os tipos em 11 px;
+     arrastar um tipo para o rack o acrescenta; um módulo solto aqui sai */
+  #paleta { width: 186px; flex: none; display: flex; flex-direction: column; background: var(--bg);
+            border-right: 1px solid var(--line); font: 9.5px system-ui, sans-serif; user-select: none; touch-action: none; }
+  #lista { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 0 14px;
+           scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  /* a caixa LEARN, no pé da paleta: título, valor, e os três níveis do
+     verbete (o que é · como funciona · → para experimentar) */
+  #learn { flex: none; height: 232px; background: var(--recessed); border-top: 1px solid var(--line);
+           display: flex; flex-direction: column; padding: 6px 8px 4px; user-select: text; outline: none;
+           --lf: 10.3px; --lp: var(--text); --ls: var(--muted); --le: var(--prata); }
+  #learn.foco { box-shadow: inset 0 0 0 1px var(--accent); }
+  #learn.branco { --lp: #fff; --ls: #fff; --le: #fff; }
+  #learn .topo { display: flex; align-items: center; color: var(--prata); font-size: 8.6px; height: 14px; }
+  #learn .topo button { margin-left: auto; height: 18px; background: none; border: 0; color: var(--prata);
+                        font: inherit; cursor: pointer; padding: 0 4px; }
+  #learn .corpo { flex: 1; min-height: 0; overflow-y: auto; margin-top: 8px; font-size: var(--lf); line-height: 1.3;
+                  scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); padding-right: 4px; }
+  #learn .corpo p { margin: 0 0 7px; white-space: pre-line; }
+  #learn .t { color: var(--le); font-weight: bold; margin-bottom: 5px; }
+  #learn .v { color: var(--lp); }
+  #learn .q { color: var(--lp); }
+  #learn .u { color: var(--ls); }
+  #learn .e { color: var(--le); }
+  #learn .ocioso { color: var(--muted); }
+  #learn .aviso { color: var(--accent); }
+  #learn .dica { color: var(--muted); font-size: 8.6px; height: 13px; }
+  #leitura-menu { position: fixed; z-index: 11; background: var(--surface); border: 1px solid var(--line);
+                  font: 11px system-ui, sans-serif; min-width: 270px; padding: 4px 0; display: none; }
+  #leitura-menu.aberto { display: block; }
+  #leitura-menu div { padding: 6px 14px; color: var(--text); cursor: pointer; }
+  #leitura-menu div:hover { background: rgba(255, 157, 76, .18); }
+  #leitura-menu .cab { color: var(--muted); cursor: default; }
+  #leitura-menu .cab:hover { background: none; }
+  #leitura-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+  #paleta.alvo { outline: 1px solid var(--accent); outline-offset: -2px; }
+  #paleta h3 { display: flex; align-items: center; gap: 4px; margin: 0; padding: 0 10px; height: 18px;
+               font: inherit; font-weight: normal; }
+  #paleta h3 i { width: 8px; height: 8px; display: inline-block; }
+  #paleta li { list-style: none; padding-left: 18px; height: 15px; line-height: 15px; color: var(--muted);
+               cursor: grab; }
+  #paleta li:hover { color: var(--accent); }
+  #paleta ul { margin: 0 0 4px; padding: 0; }
+  /* o banco de escalas do QUANTIZER (`ScaleBrowser`) */
+  #banco { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); display: none; z-index: 10;
+           align-items: center; justify-content: center; font: 11px system-ui, sans-serif; }
+  #banco.aberto { display: flex; }
+  #banco .cartao { width: min(820px, calc(100vw - 40px)); height: min(600px, calc(100vh - 40px));
+                   background: var(--surface); border: 2px solid var(--line); display: flex; flex-direction: column;
+                   padding: 10px 12px 12px; gap: 8px; }
+  #banco h2 { margin: 0 4px; font: bold 13.5px system-ui, sans-serif; color: var(--text); display: flex; }
+  #banco h2 button { margin-left: auto; background: none; border: 0; color: var(--text); font-size: 16px; cursor: pointer; }
+  #banco input { height: 26px; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
+                 padding: 0 6px; font: 11px system-ui, sans-serif; margin: 0 4px; }
+  #banco input:focus { outline: none; border-color: var(--accent); }
+  #banco .listas { flex: 1; min-height: 0; display: flex; gap: 10px; }
+  #banco .lista { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #b-familias { width: 40%; border-right: 1px solid var(--line); }
+  #b-escalas { flex: 1; }
+  #banco .lista div { height: 22px; line-height: 22px; padding: 0 6px; color: var(--text); cursor: pointer;
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #banco .lista div:hover { color: var(--accent); }
+  #banco .lista div.on { background: rgba(255, 157, 76, .18); color: var(--accent); }
+  #b-conta { text-align: right; color: var(--muted); font-size: 9.5px; height: 12px; }
+  #b-info { border-top: 1px solid var(--line); padding: 8px 4px 0; height: 124px; display: flex; flex-direction: column; gap: 3px; }
+  #b-info b { color: var(--text); font-size: 11px; }
+  #b-info .fonte { color: var(--muted); font-size: 9.5px; max-height: 26px; overflow: hidden; }
+  #b-regua { height: 20px; background: var(--recessed); position: relative; margin-top: 4px; }
+  #b-regua i { position: absolute; top: 2px; bottom: 2px; width: 2px; background: var(--accent); }
+  #b-dica { color: var(--muted); font-size: 9.5px; margin-top: auto; }
+  #rack { position: sticky; top: 0; display: block; }
+  .espaco { position: absolute; top: 0; left: 0; width: 1px; pointer-events: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="marca"><svg id="logo" width="118" height="15" viewBox="6.63 12.62 258.74 30.75" aria-label="RASGO"></svg><span>MODULAR</span></div>
+  <div class="grupo">
+    <input id="seed" type="text" inputmode="numeric" maxlength="20" value="4303935450909092226" aria-label="Número da seed" />
+    <button id="b-tocar" class="tocar">TOCAR</button>
+    <button data-acao="seed" title="g">SEED</button>
+    <button data-acao="repor" title="r">REPOR</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <span id="r-varia" class="rotulo vivo" title="v">VARIA</span>
+    <div id="t-varia" class="trilho" tabindex="0"><div class="cheio"></div><div class="meio"></div></div>
+    <button data-acao="mudar" title="m">MUDA</button>
+    <button data-acao="evoluir" title="e">EVOLUI</button>
+    <button data-acao="cruzar" title="c">CRUZA</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <button data-acao="banco" title="Ctrl+B">BANCO</button>
+    <button data-acao="salvar" title="Ctrl+S">SALVA</button>
+    <button data-acao="abrir" title="Ctrl+O">ABRIR</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <button data-acao="desfazer" title="Ctrl+Z">DESFAZ</button>
+    <button data-acao="descabear" title="n">DESCABEIA</button>
+    <button data-acao="espera" id="b-espera">ESPERA</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <span class="rotulo">ZOOM</span>
+    <button data-acao="zoomMenos" title="Ctrl+−">−</button>
+    <button data-acao="zoomMais" title="Ctrl+=">+</button>
+    <button data-acao="vista" id="b-vista" class="prata">RACK · TODOS</button>
+    <button data-acao="compacto" id="b-compacto" class="prata">COMPACTO</button>
+  </div>
+  <div class="grupo direita">
+    <span id="leitura"></span>
+    <div id="vu"><div></div></div>
+    <span class="rotulo" id="r-volume">VOLUME</span>
+    <div id="t-volume" class="trilho" tabindex="0"><div class="cheio"></div></div>
+    <button data-acao="rec" id="b-rec">● REC</button>
+    <button data-acao="abre" id="b-abre" class="prata">ABRE · SEED</button>
+    <button data-acao="lingua" id="b-lingua">PT</button>
+    <button data-acao="tutorial" id="b-tutorial">TUTORIAL</button>
+    <button data-acao="sobre" id="b-sobre">SOBRE</button>
+  </div>
+  <input id="arquivo" type="file" accept=".rmp,text/plain" hidden />
+</header>
+<div id="corpo">
+  <nav id="paleta" aria-label="Módulos">
+    <div id="lista"></div>
+    <section id="learn" tabindex="-1" aria-live="polite">
+      <div class="topo">LEARN<button id="b-leitura" title="F2">Aa (F2)</button></div>
+      <div class="corpo" id="learn-corpo"></div>
+      <div class="dica" id="learn-dica">F1: LEARN</div>
+    </section>
+  </nav>
+  <div id="leitura-menu" role="menu"></div>
+  <div id="direita">
+  <div id="creditos"></div>
+  <div id="rolagem">
+    <div class="espaco"></div>
+    <canvas id="rack"></canvas>
+  </div>
+  </div>
+</div>
+<div id="sobrepor" role="dialog">
+  <div class="cartao">
+    <button id="o-fechar">FECHAR</button>
+    <h2 id="o-titulo"></h2>
+    <p id="o-sub"></p>
+    <div id="o-corpo" tabindex="-1"></div>
+  </div>
+</div>
+<div id="banco" role="dialog" aria-label="Banco de escalas">
+  <div class="cartao">
+    <h2><span id="b-titulo"></span> <button id="b-fechar" aria-label="×">×</button></h2>
+    <input id="b-busca" type="text" />
+    <div class="listas">
+      <div id="b-familias" class="lista"></div>
+      <div id="b-escalas" class="lista"></div>
+    </div>
+    <div id="b-conta"></div>
+    <div id="b-info"><b id="b-nome"></b><span id="b-graus"></span><span id="b-fonte" class="fonte"></span>
+      <div id="b-regua"></div>
+      <span id="b-dica"></span></div>
+  </div>
+</div>
+<script type="module">
+import { Rack, corFamilia } from './rack.js';
+import { web, temWeb, linguaInicial, ROTULO_LINGUA as ROTULO_L } from './textos.js';
+const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
+const rack = new Rack($('rack'), $('rolagem'));
+// COMPACTO (a vista compacta dos painéis, src/ui/CompactPanel.hpp, a mesma
+// regra do app) e `?cabos=` (opacidade dos cabos, para comparar; o padrão é 0,5)
+let compacto = q.has('estreito') || (() => { try { return localStorage.getItem('rasgoModular.compacto') === '1'; } catch { return false; } })();
+if (q.has('cabos')) rack.opacidade = Math.min(1, Math.max(0.1, Number(q.get('cabos')) || 1));
+rack.layout();
+
+// ---- estado do cabeçalho ------------------------------------------------
+const est = { seed: $('seed').value, cabos: 0, espera: false, variaOn: true, variaAmt: 1,
+              volume: 0.7, avisoAte: 0, aviso: '' };
+const guardar = (k, v) => { try { localStorage.setItem('rasgoModular.' + k, v); } catch { /* sem armazenamento */ } };
+const ler = (k) => { try { return localStorage.getItem('rasgoModular.' + k); } catch { return null; } };
+
+// ---- os idiomas ----------------------------------------------------------
+// Os textos do app vêm do motor (`rw_textos`, UiLanguage.hpp); os da página,
+// de textos.js. L: 0 en, 1 pt, 2 fr, 3 es.
+let L = linguaInicial(ler('lingua'));
+let TX = {};
+const tx = (k) => TX[k] ?? k;
+const W = (k, v) => web(k, L, v);
+rack.tx = tx;
+function carregarTextos() {
+  if (!local) return;
+  TX = JSON.parse(cTexto(local, local.rw_textos(L)));
+  local.rw_lingua(L);
+  if (no) no.port.postMessage({ tipo: 'lingua', l: L });
+  aplicarTextos();
+}
+const ROTULOS = { seed: 'hdrSeed', repor: 'hdrRestore', mudar: 'hdrChange', evoluir: 'hdrEvolve', cruzar: 'hdrCross',
+                  banco: 'hdrBank', salvar: 'hdrSave', abrir: 'hdrOpen', desfazer: 'hdrUndo', descabear: 'hdrUncable',
+                  espera: 'hdrStandby', tutorial: 'hdrTutorial', sobre: 'hdrAbout' };
+function aplicarTextos() {
+  document.documentElement.lang = ['en', 'pt-BR', 'fr', 'es'][L];
+  for (const [a, k] of Object.entries(ROTULOS)) document.querySelector(`[data-acao="${a}"]`).textContent = tx(k);
+  $('r-varia').textContent = tx('hdrVary');
+  $('b-tocar').textContent = W('tocar');
+  $('r-volume').textContent = W('volume');
+  $('b-lingua').textContent = ROTULO_L[L];
+  $('creditos').textContent = tx('footerCredit') + versao().replace(' ', '  ·  ');
+  relogioRec();
+  $('b-titulo').textContent = tx('scaleBankTitle');
+  $('b-busca').placeholder = tx('scaleBankSearch');
+  $('b-dica').textContent = tx('scaleBankHint');
+  if ($('banco').classList.contains('aberto')) listarBanco();
+  if ($('sobrepor').classList.contains('aberto')) sobrepor(sobreporModo);
+  learn.mostrado = null; learn.chave = '';
+  mostrarLearn();
+  syncCabecalho();
+}
+const versao = () => (local ? cTexto(local, local.rw_versao()) : '');
+
+// avisos na caixa LEARN, por 6 s (`PaletteColumn::setNotice`)
+function aviso(t, ms = 6000) { est.aviso = t; est.avisoAte = performance.now() + ms; mostrarLearn(); }
+rack.aviso = (t) => aviso(t);
+
+function leitura() {
+  const el = $('leitura');
+  const mods = rack.soSaida ? `${rack.vistos.length}/${rack.mods.length}` : `${rack.vistos.length}`;
+  el.textContent = no ? `${mods} ${tx('rdModules')}  ·  ${est.cabos} ${tx('rdCables')}` : '';
+}
+setInterval(leitura, 500);
+
+// o realce de um instante no botão da ação (`flashing`, 160 ms)
+function acende(acao) {
+  const b = document.querySelector(`[data-acao="${acao}"]`);
+  if (!b || b.id === 'b-espera' || b.id === 'b-vista' || b.id === 'b-compacto') return;
+  b.classList.add('on');
+  setTimeout(() => b.classList.remove('on'), 160);
+}
+
+function trilho(el, frac) { el.querySelector('.cheio').style.width = Math.round(frac * 82) + 'px'; }
+function syncCabecalho() {
+  if (document.activeElement !== $('seed')) $('seed').value = est.seed === '0' ? '' : est.seed;
+  document.querySelector('[data-acao="repor"]').hidden = est.seed === '0';
+  $('b-tocar').hidden = !!no;
+  $('b-espera').classList.toggle('on', est.espera);
+  $('b-vista').classList.toggle('on', rack.soSaida);
+  $('b-compacto').classList.toggle('on', compacto);
+  $('b-compacto').textContent = W('compacto');
+  $('b-vista').textContent = 'RACK · ' + tx(rack.soSaida ? 'hdrRackOut' : 'hdrRackAll');
+  trilho($('t-varia'), est.variaOn ? est.variaAmt * 0.5 : 0);
+  $('r-varia').classList.toggle('vivo', est.variaOn && est.variaAmt > 0);
+  trilho($('t-volume'), est.volume);
+  const modo = ler('abre') || 'seed';
+  $('b-abre').textContent = tx('hdrOpens') + ' · ' + tx({ seed: 'startSeed', uncabled: 'startUncabled', init: 'startInit', last: 'startLast' }[modo]);
+  leitura();
+}
+
+// ---- o motor ------------------------------------------------------------
+fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
+  bytes = b;
+  // a marca RASGO do cabeçalho vem do motor (o mesmo vetor dos painéis)
+  const e = local = await instanciar();
+  construirPaleta(JSON.parse(cTexto(e, e.rw_catalogo())));
+  // `?lingua=0..3` e `?abrir=tutorial|sobre`: capturas de teste
+  if (q.has('lingua')) L = Math.min(3, Math.max(0, Number(q.get('lingua')) | 0));
+  carregarTextos();
+  if (q.has('abrir')) sobrepor(q.get('abrir'));
+  const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
+  $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
+  aviso(W('pronto'), 1e9);
+  if (!q.has('previa')) mostrarAntes();
+  if (q.has('auto')) tocar();
+  if (q.has('previa')) previa().catch((x) => aviso('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1], 1e9));
+}).catch(() => aviso(W('semWasm'), 1e9));
+
+// um texto terminado em zero na memória do motor
+function cTexto(e, p) {
+  const u8 = new Uint8Array(e.memory.buffer); let f = p; while (u8[f]) f++;
+  return new TextDecoder().decode(u8.slice(p, f));
+}
+
+async function instanciar() {
+  let mem;
+  const stub = new Proxy({}, { get: (_, n) => (...a) => {
+    if (n === 'fd_write') { const v = new DataView(mem.buffer); let s = 0;
+      for (let k = 0; k < a[2]; k++) s += v.getUint32(a[1] + 8 * k + 4, true); v.setUint32(a[3], s, true); }
+    return 0; } });
+  const { instance } = await WebAssembly.instantiate(bytes, { wasi_snapshot_preview1: stub, env: stub });
+  const e = instance.exports; mem = e.memory; if (e._initialize) e._initialize();
+  return e;
+}
+
+async function ligar() {
+  if (ctx) return;
+  ctx = new AudioContext();
+  await ctx.audioWorklet.addModule('rasgo-worklet.js');
+  const n = new AudioWorkletNode(ctx, 'rasgo', { numberOfInputs: 1, outputChannelCount: [2] });
+  n.connect(ctx.destination);
+  await new Promise(ok => {
+    n.port.onmessage = (ev) => {
+      const m = ev.data;
+      if (m.tipo === 'pronto') ok();
+      // seed nova, DESFAZ, REPOR, ABRIR: patch novo; 'rack': os cabos mudaram;
+      // 'redesenho': o mesmo patch com outra vista (o COMPACTO)
+      if (m.tipo === 'seed' || m.tipo === 'patch' || m.tipo === 'rack' || m.tipo === 'redesenho') {
+        est.seed = m.seed; est.cabos = m.cabos;
+        rack.carregar(m.texto, m.wordmark, m.tipo === 'redesenho' ? 'manter' : m.tipo === 'rack');
+        // módulo novo: à vista na SAÍDA por exceção, até chegar ao som
+        if (m.novo >= 0 && !rack.porId.get(m.novo)?.chega) { rack.pendentes.add(m.novo); rack.layout(); }
+        syncCabecalho();
+      }
+      if (m.tipo === 'quadro') {
+        est.lufs = m.lufs;
+        if (m.entrada !== est.entrada) { est.entrada = m.entrada; entradas(m.entrada); }
+        if ((m.rec >= 0) !== (est.rec >= 0) || Math.floor(m.rec) !== Math.floor(est.rec)) { est.rec = m.rec; relogioRec(); }
+        if (m.learnValor !== learn.valor) { learn.valor = m.learnValor; if (learn.mostrado?.param) mostrarLearn(); }
+        rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
+        est.cabos = m.cabos.length / 14;
+        // o VU do cabeçalho (`setReadout`): pico contra −1 dBFS
+        const f = Math.min(1, m.vu / 0.891), vu = $('vu').firstChild;
+        vu.style.width = Math.round(f * 54) + 'px';
+        vu.style.background = f < 0.85 ? 'var(--prata)' : 'var(--warning)';
+      }
+      if (m.tipo === 'salvo') salvo(m);
+      if (m.tipo === 'recAudio') est.tomada.push(m.bloco);
+      if (m.tipo === 'recFim') { est.rec = -1; relogioRec(); arquivosRec(m); }
+      if (m.tipo === 'recusa') aviso(m.modulo + (m.motivo === -1 ? tx('instanceSingle') : m.motivo === -2 ? tx('instanceMax') : W('tipoDesconhecido')));
+      if (m.tipo === 'bancoAtual') abrirBanco(m.id, Math.round(m.banco));
+      if (m.tipo === 'nada' && m.acao === 'desfazer') aviso(W('nadaDesfazer'));
+      if (m.tipo === 'nada' && m.acao === 'abrir') aviso(W('abrirFalhou'));
+    };
+    n.port.postMessage({ tipo: 'wasm', bytes });
+  });
+  no = n;
+  rack.enviar = (msg) => no.port.postMessage(msg);
+  // a lista dos visores na tela foi calculada antes de haver motor: reenviar
+  rack.idsVisiveis = ''; rack.redesenhar();
+  no.port.postMessage({ tipo: 'ganho', valor: est.volume });
+  if (compacto) no.port.postMessage({ tipo: 'compacto', ligado: true });
+  enviarVaria();
+  if (est.espera) no.port.postMessage({ tipo: 'espera', ligada: true });
+}
+
+// Antes do primeiro clique o navegador não deixa soar, mas o rack já
+// aparece: o motor da página monta o mesmo patch que o TOCAR vai tocar (a
+// seed da caixa, ou o patch guardado pelo ABRE) e o desenha parado.
+// Segurança da abertura (`StartupPolicy`, como no app): a página marca que
+// está aberta e desmarca ao fechar normalmente; se a marca já estava lá, a
+// sessão anterior caiu — e o patch dela (ÚLTIMA, MEU PATCH) pode ser a
+// causa: abre sem cabos, com aviso
+const caiu = ler('aberta') === '1';
+guardar('aberta', '1');
+addEventListener('pagehide', () => guardar('aberta', '0'));
+function mostrarAntes() {
+  const e = local;
+  e.rw_iniciar(48000);
+  e.rw_compacto(compacto ? 1 : 0);
+  const modo = caiu ? 'uncabled' : (ler('abre') || 'seed');
+  const guardado = modo === 'init' ? ler('init') : modo === 'last' ? ler('sessao') : null;
+  let aberto = false;
+  if (guardado) {
+    const b = new TextEncoder().encode(guardado);
+    new Uint8Array(e.memory.buffer, e.rw_entrada(b.length), b.length).set(b);
+    aberto = !!e.rw_abrir(b.length);
+  }
+  if (!aberto) {
+    const s = BigInt(seedValida() || '4303935450909092226');
+    e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
+    if (modo === 'uncabled') e.rw_descabear();
+  }
+  const texto = new TextDecoder().decode(new Uint8Array(e.memory.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
+  rack.carregar(texto, cTexto(e, e.rw_wordmark()));
+  rack.quadro(new Float32Array(e.memory.buffer, e.rw_valores(), e.rw_num_controles()).slice(),
+              new Float32Array(e.memory.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice());
+  est.cabos = e.rw_cabos();
+}
+
+// O primeiro clique liga o som e abre como o ABRE manda (`StartupPolicy`):
+// SEED = a seed da caixa; SEM CABOS = ela, descabeada; MEU PATCH e ÚLTIMA =
+// o patch guardado neste navegador (se não houver, a seed)
+// uma partida só, mesmo se o primeiro clique e um comando chegarem juntos
+let partida = null;
+function tocar() {
+  if (no) return Promise.resolve();
+  return partida ||= tocar1();
+}
+async function tocar1() {
+  const s = seedValida() || '4303935450909092226';
+  aviso(W('montando'), 1e9);
+  await ligar();
+  await ctx.resume();
+  const modo = caiu ? 'uncabled' : (ler('abre') || 'seed');
+  const guardado = modo === 'init' ? ler('init') : modo === 'last' ? ler('sessao') : null;
+  if (guardado) no.port.postMessage({ tipo: 'abrir', texto: guardado });
+  else {
+    no.port.postMessage({ tipo: 'seed', seed: s });
+    if (modo === 'uncabled') no.port.postMessage({ tipo: 'descabear' });
+  }
+  est.avisoAte = 0; mostrarLearn();
+  if (caiu && (ler('abre') === 'init' || ler('abre') === 'last')) aviso(tx('startNoteSafe'), 12000);
+  syncCabecalho();
+}
+
+const sorteio = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return [a[0], a[1]]; };
+function novaSeed() {
+  const [a, b] = sorteio();
+  let s = (BigInt(a) << 32n) | BigInt(b); if (s === 0n) s = 1n;
+  return s.toString();
+}
+function seedValida() {
+  const s = $('seed').value.trim();
+  return /^\d{1,20}$/.test(s) && BigInt(s) > 0n && BigInt(s) < (1n << 64n) ? s : null;
+}
+function enviarVaria() {
+  if (no) no.port.postMessage({ tipo: 'varia', ligado: est.variaOn && est.variaAmt > 0, intensidade: est.variaAmt });
+}
+
+// ---- as ações (o despacho único do app: clique e atalho entram por aqui)
+async function acao(a) {
+  acende(a);
+  if (a === 'zoomMenos' || a === 'zoomMais' || a === 'zoom0') { rack.mudarZoom(a === 'zoom0' ? 0 : a === 'zoomMais' ? 1 : -1); return; }
+  if (a === 'vista') {
+    rack.vistaSaida(!rack.soSaida); syncCabecalho();
+    aviso(W(rack.soSaida ? 'vistaSaida' : 'vistaTodos') + `${rack.vistos.length}/${rack.mods.length}`);
+    return;
+  }
+  if (a === 'abre') {
+    const ordem = ['seed', 'uncabled', 'init', 'last'];
+    const modo = ordem[(ordem.indexOf(ler('abre') || 'seed') + 1) % 4];
+    guardar('abre', modo);
+    if (modo === 'init' && no) no.port.postMessage({ tipo: 'salvar', destino: 'init' });
+    aviso({ seed: W('abreSeed'), uncabled: tx('startNoteUncabled'), init: tx('startNoteInit'), last: W('abreUltima') }[modo], 7000);
+    syncCabecalho();
+    return;
+  }
+  if (a === 'abrir') { $('arquivo').click(); return; }
+  if (a === 'rec') {
+    if (!no) await tocar();
+    if (est.rec >= 0) no.port.postMessage({ tipo: 'rec', ligar: false });
+    else { est.tomada = []; est.rec = 0; relogioRec(); no.port.postMessage({ tipo: 'rec', ligar: true }); }
+    return;
+  }
+  // COMPACTO: os painéis com as regras do plugin VCV (knobs em três
+  // tamanhos, fileiras aproximadas, painel estreitado), à escolha de quem toca
+  if (a === 'compacto') {
+    compacto = !compacto;
+    guardar('compacto', compacto ? '1' : '0');
+    if (no) no.port.postMessage({ tipo: 'compacto', ligado: compacto });   // o motor que toca manda o rack
+    else if (local) { local.rw_compacto(compacto ? 1 : 0); mostrarAntes(); }
+    syncCabecalho();
+    return;
+  }
+  if (a === 'lingua') { L = (L + 1) % 4; guardar('lingua', String(L)); carregarTextos(); return; }
+  if (a === 'tutorial' || a === 'sobre') {
+    if ($('sobrepor').classList.contains('aberto') && sobreporModo === a) fecharSobrepor(); else sobrepor(a);
+    return;
+  }
+  if (a === 'variaLiga') { est.variaOn = !est.variaOn; enviarVaria(); syncCabecalho(); return; }
+  if (a === 'espera') {
+    est.espera = !est.espera; syncCabecalho();
+    rack.silenciado = est.espera; rack.redesenhar();
+    if (no) no.port.postMessage({ tipo: 'espera', ligada: est.espera });
+    return;
+  }
+  if (a === 'seed') {
+    const s = novaSeed();
+    $('seed').value = s;
+    if (!no) { await tocar(); return; }
+    no.port.postMessage({ tipo: 'seed', seed: s });
+    return;
+  }
+  if (!no) await tocar();
+  if (a === 'repor') no.port.postMessage({ tipo: 'repor' });
+  else if (a === 'mudar') no.port.postMessage({ tipo: 'mudar', s: sorteio() });
+  else if (a === 'evoluir') no.port.postMessage({ tipo: 'evoluir', s: sorteio() });
+  else if (a === 'cruzar') no.port.postMessage({ tipo: 'cruzar', s: [...sorteio(), ...sorteio()] });
+  else if (a === 'desfazer') no.port.postMessage({ tipo: 'desfazer' });
+  else if (a === 'descabear') no.port.postMessage({ tipo: 'descabear' });
+  else if (a === 'romperTodos') no.port.postMessage({ tipo: 'romperTodos' });
+  else if (a === 'salvar' || a === 'banco') no.port.postMessage({ tipo: 'salvar', destino: a });
+}
+
+// ---- ENTRADAS: microfone e MIDI ----------------------------------------------
+// A regra do app (`syncSignalIn`): o microfone só é pedido quando um
+// SIGNAL-IN com o ON ligado tem uma saída cabeada; o MIDI, também para o
+// POLY-IN. Cortar o cabo ou desligar o ON fecha de novo. O navegador pede a
+// permissão nessa hora, nunca ao abrir a página. Sem cancelamento de eco nem
+// redução de ruído: o sinal chega cru, como da placa.
+est.entrada = 0;
+let mic = null, micFonte = null, midiAcesso = null, pedindoMic = false;
+async function entradas(pede) {
+  if ((pede & 1) && !mic && !pedindoMic) {
+    pedindoMic = true;
+    try {
+      mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      if (est.entrada & 1) { micFonte = ctx.createMediaStreamSource(mic); micFonte.connect(no); }
+      else { mic.getTracks().forEach((t) => t.stop()); mic = null; }
+    } catch { aviso(W('semMic')); }
+    pedindoMic = false;
+  } else if (!(pede & 1) && mic) {
+    if (micFonte) micFonte.disconnect();
+    mic.getTracks().forEach((t) => t.stop());
+    mic = null; micFonte = null;
+  }
+  if ((pede & 2) && !midiAcesso) {
+    if (!navigator.requestMIDIAccess) { aviso(W('semMidi')); midiAcesso = 'nenhum'; return; }
+    try {
+      midiAcesso = await navigator.requestMIDIAccess();
+      const liga = () => { for (const i of midiAcesso.inputs.values()) i.onmidimessage = (ev) => { if (no && (est.entrada & 2)) no.port.postMessage({ tipo: 'midi', d: Array.from(ev.data) }); }; };
+      liga(); midiAcesso.onstatechange = liga;   // teclado ligado depois também entra
+    } catch { aviso(W('semMidi')); midiAcesso = 'nenhum'; }
+  }
+}
+
+// ---- REC ------------------------------------------------------------------
+// O botão é o relógio da tomada (`● REC 01:23`; no último meio minuto,
+// `/ 04:00`); ao parar, a página monta os arquivos com o código do app
+// (rasgo_rec.cpp) e os baixa: o WAV de 24 bits, a versão de entrega a
+// -14 LUFS (.streaming.wav + .txt), a partitura (.score.txt) e, se houve
+// notas no NOTE-OUT, o .mid. Nada sai do navegador.
+est.rec = -1; est.tomada = [];
+const mmss = (t) => { t = Math.max(0, Math.floor(t)); return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; };
+function relogioRec() {
+  const b = $('b-rec');
+  b.classList.toggle('gravando', est.rec >= 0);
+  b.textContent = '● ' + tx('hdrRec') + (est.rec >= 0 ? ' ' + mmss(est.rec) + (est.rec >= 210 ? ' / 04:00' : '') : '');
+}
+function baixar(nome, dados, tipo) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([dados], { type: tipo }));
+  a.download = nome; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function arquivosRec(m) {
+  const blocos = est.tomada; est.tomada = [];
+  const total = blocos.reduce((n, b) => n + b.length, 0);
+  if (!total || !local) return;
+  aviso(W('recMontando'), 1e9);
+  await new Promise((r) => setTimeout(r, 30));   // o aviso aparece antes do trabalho
+  const e = local, arquivos = [];
+  const p = e.rw_rec_buffer(total);
+  let off = 0;
+  for (const b of blocos) { new Float32Array(e.memory.buffer, p, total).set(b, off); off += b.length; }
+  const arquivo = () => new Uint8Array(e.memory.buffer, e.rw_rec_arquivo(), e.rw_rec_bytes()).slice();
+  e.rw_rec_wav(m.taxa);
+  baixar(m.nome + '.wav', arquivo(), 'audio/wav'); arquivos.push(m.nome + '.wav');
+  // a versão de entrega, com o nome da tomada no texto das medidas
+  const nb = new TextEncoder().encode(m.nome + '.wav');
+  const np = e.rw_entrada(nb.length); new Uint8Array(e.memory.buffer, np, nb.length).set(nb);
+  if (e.rw_rec_entrega(m.taxa, np)) {
+    baixar(m.nome + '.streaming.wav', arquivo(), 'audio/wav');
+    baixar(m.nome + '.streaming.txt', cTexto(e, e.rw_rec_texto()), 'text/plain');
+    arquivos.push(m.nome + '.streaming.wav', m.nome + '.streaming.txt');
+  }
+  e.rw_rec_liberar();
+  baixar(m.nome + '.score.txt', m.partitura, 'text/plain'); arquivos.push(m.nome + '.score.txt');
+  if (m.midi.length) { baixar(m.nome + '.mid', m.midi, 'audio/midi'); arquivos.push(m.nome + '.mid'); }
+  aviso(W('recPronto', { arquivos: arquivos.join(', ') }), 9000);
+}
+
+// SALVA guarda a sessão neste navegador; BANCO baixa o patch num arquivo
+// com o nome da seed (`bankPatchName`: seed-N.rmp, ou patch-<hora>.rmp)
+function salvo(m) {
+  if (m.destino === 'salvar') { guardar('sessao', m.texto); aviso(W('salvoAqui')); }
+  else if (m.destino === 'init') guardar('init', m.texto);
+  else if (m.destino === 'ultima') guardar('sessao', m.texto);
+  else if (m.destino === 'banco') {
+    const nome = m.seed !== '0' ? `seed-${m.seed}.rmp` : `patch-${Math.floor(Date.now() / 1000)}.rmp`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([m.texto], { type: 'text/plain' }));
+    a.download = nome; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    aviso(W('noBanco', { nome }));
+  }
+}
+// ABRE · ÚLTIMA: a sessão vai sendo guardada enquanto se toca
+setInterval(() => { if (no && ler('abre') === 'last') no.port.postMessage({ tipo: 'salvar', destino: 'ultima' }); }, 5000);
+
+$('arquivo').onchange = async () => {
+  const f = $('arquivo').files[0];
+  $('arquivo').value = '';
+  if (!f) return;
+  if (f.size > 4e6) { aviso(W('grande')); return; }
+  const texto = await f.text();
+  if (!no) await tocar();
+  no.port.postMessage({ tipo: 'abrir', texto });
+};
+
+// ---- os controles do cabeçalho -------------------------------------------
+$('b-tocar').onclick = () => tocar();
+// O navegador só deixa soar depois de um gesto: o PRIMEIRO clique ou tecla,
+// em qualquer lugar da página, liga o som (autor, 25/11) — e o clique ainda
+// faz o que faria (girar o knob, abrir a paleta…). Não liga se for o TOCAR
+// (ele mesmo liga) nem se o motor ainda não carregou.
+function primeiroGesto(ev) {
+  if (no || !bytes) return;
+  if (ev.target === $('b-tocar')) return;
+  removeEventListener('pointerdown', primeiroGesto, true);
+  removeEventListener('keydown', primeiroGesto, true);
+  tocar();
+}
+addEventListener('pointerdown', primeiroGesto, true);
+addEventListener('keydown', primeiroGesto, true);
+for (const b of document.querySelectorAll('header button[data-acao]')) b.onclick = () => acao(b.dataset.acao);
+$('r-varia').onclick = () => acao('variaLiga');
+$('seed').addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter') {
+    const s = seedValida();
+    if (!s) { aviso(W('seedInvalida')); return; }
+    $('seed').blur();
+    if (!no) tocar(); else no.port.postMessage({ tipo: 'seed', seed: s });
+  } else if (ev.key === 'Escape') { $('seed').value = est.seed; $('seed').blur(); }
+});
+$('seed').addEventListener('blur', () => { if (no) $('seed').value = est.seed === '0' ? '' : est.seed; });
+$('seed').addEventListener('input', () => { $('seed').value = $('seed').value.replace(/\D/g, ''); });
+
+// arrastar no trilho: clicar em qualquer ponto salta para lá (`setVaryFromX`)
+function arrastoTrilho(el, aplicar) {
+  const em = (ev) => { const r = el.getBoundingClientRect(); aplicar(Math.min(1, Math.max(0, (ev.clientX - r.left - 1) / (r.width - 2)))); };
+  el.addEventListener('pointerdown', (ev) => { el.setPointerCapture(ev.pointerId); em(ev); });
+  el.addEventListener('pointermove', (ev) => { if (el.hasPointerCapture(ev.pointerId)) em(ev); });
+}
+arrastoTrilho($('t-varia'), (f) => { est.variaAmt = f * 2; est.variaOn = true; enviarVaria(); syncCabecalho(); });
+arrastoTrilho($('t-volume'), (f) => {
+  est.volume = f; syncCabecalho();
+  if (no) no.port.postMessage({ tipo: 'ganho', valor: f });
+});
+
+// ---- a paleta -------------------------------------------------------------
+// Arrastar um tipo para o rack acrescenta o módulo; parar o mouse num tipo
+// acende os módulos dele no rack; um módulo arrastado pelo título e solto
+// aqui sai da case.
+function construirPaleta(cat) {
+  const nav = $('lista');
+  for (const f of cat) {
+    const h = document.createElement('h3');
+    h.style.color = corFamilia(f.familia);
+    h.innerHTML = `<i style="background:${corFamilia(f.familia)}"></i>`;
+    h.append(f.familia);
+    const ul = document.createElement('ul');
+    for (const t of f.tipos) {
+      const li = document.createElement('li');
+      li.textContent = t; li.dataset.tipo = t;
+      ul.append(li);
+    }
+    nav.append(h, ul);
+  }
+}
+let puxando = null;   // { tipo } enquanto um tipo é arrastado da paleta
+const sobre = (el, ev) => { const r = el.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX < r.right && ev.clientY >= r.top && ev.clientY < r.bottom; };
+rack.sobrePaleta = (ev) => sobre($('paleta'), ev);
+$('paleta').addEventListener('pointerover', (ev) => {
+  const t = ev.target.dataset?.tipo || '';
+  if (t !== rack.paletaTipo) { rack.paletaTipo = t; rack.redesenhar(); }
+});
+$('paleta').addEventListener('pointerleave', () => { if (!puxando && rack.paletaTipo) { rack.paletaTipo = ''; rack.redesenhar(); } });
+$('paleta').addEventListener('pointerdown', (ev) => {
+  const t = ev.target.dataset?.tipo;
+  if (!t || ev.button !== 0) return;
+  ev.preventDefault();
+  $('paleta').setPointerCapture(ev.pointerId);
+  puxando = { tipo: t };
+});
+$('paleta').addEventListener('pointermove', (ev) => {
+  if (!puxando) return;
+  const dentro = sobre($('rolagem'), ev);
+  if (dentro) { const r = $('rack').getBoundingClientRect(); rack.fantasma = { tipo: puxando.tipo, x: ev.clientX - r.left, y: ev.clientY - r.top + $('rolagem').scrollTop }; }
+  else rack.fantasma = null;
+  rack.redesenhar();
+});
+$('paleta').addEventListener('pointerup', async (ev) => {
+  if (!puxando) return;
+  const t = puxando.tipo; puxando = null;
+  rack.fantasma = null; rack.redesenhar();
+  if (!sobre($('rolagem'), ev)) return;
+  if (!no) await tocar();
+  no.port.postMessage({ tipo: 'adicionar', modulo: t });
+});
+// o módulo arrastado pelo título acende a paleta quando passa sobre ela
+addEventListener('pointermove', (ev) => {
+  $('paleta').classList.toggle('alvo', rack.gesto?.tipo === 'modulo' && rack.gesto.movido && sobre($('paleta'), ev));
+});
+addEventListener('pointerup', () => $('paleta').classList.remove('alvo'));
+
+// ---- o banco de escalas do QUANTIZER (`ScaleBrowser`) --------------------
+let banco = null, bancoNo = -1, bancoFam = 0, bancoSel = null;
+rack.abrirBanco = (id) => { if (no) no.port.postMessage({ tipo: 'lerBanco', id }); };
+function abrirBanco(id, atual) {
+  if (!banco) banco = JSON.parse(cTexto(local, local.rw_banco()));
+  bancoNo = id;
+  bancoSel = banco.escalas.find((e) => e.id === atual) || null;
+  bancoFam = bancoSel ? bancoSel.f : 0;
+  $('b-busca').value = '';
+  const fams = $('b-familias'); fams.innerHTML = '';
+  banco.familias.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.textContent = `${f}  (${banco.escalas.filter((e) => e.f === i).length})`;
+    d.onclick = () => { bancoFam = i; $('b-busca').value = ''; listarBanco(); };
+    fams.append(d);
+  });
+  $('banco').classList.add('aberto');
+  listarBanco();
+  fams.children[bancoFam]?.scrollIntoView({ block: 'center' });
+  $('b-busca').focus();
+}
+function listarBanco() {
+  const q = $('b-busca').value.trim().toLowerCase();
+  [...$('b-familias').children].forEach((d, i) => d.classList.toggle('on', !q && i === bancoFam));
+  const lista = banco.escalas.filter((e) => q ? (e.n.toLowerCase().includes(q) || banco.familias[e.f].toLowerCase().includes(q)) : e.f === bancoFam);
+  const box = $('b-escalas'); box.innerHTML = '';
+  for (const e of lista) {
+    const d = document.createElement('div');
+    d.textContent = `${e.n}  · ${e.g.length}`;
+    if (e === bancoSel) d.className = 'on';
+    d.onclick = () => {
+      bancoSel = e;
+      if (no) no.port.postMessage({ tipo: 'escala', id: bancoNo, banco: e.id });
+      for (const x of box.children) x.classList.remove('on');
+      d.classList.add('on');
+      infoBanco();
+    };
+    box.append(d);
+  }
+  $('b-conta').textContent = `${lista.length} ${W(lista.length === 1 ? 'escalas1' : 'escalasN')}`;
+  box.querySelector('.on')?.scrollIntoView({ block: 'center' });
+  infoBanco();
+}
+function infoBanco() {
+  const e = bancoSel, n = (v) => (v === Math.floor(v) ? String(v) : v.toFixed(1)).replace('.', ',');
+  $('b-nome').textContent = e ? e.n : '';
+  $('b-graus').textContent = e ? `${tx('scaleBankDegrees')}: ${e.g.map(n).join('  ')}   ·  ${tx('scaleBankPeriod')} ${n(e.p)}` : '';
+  $('b-fonte').textContent = e ? `${tx('scaleBankSource')}: ${e.s}` : '';
+  $('b-regua').innerHTML = e ? e.g.map((c) => `<i style="left:calc(2px + ${c / e.p} * (100% - 6px))"></i>`).join('') : '';
+}
+function fecharBanco() { $('banco').classList.remove('aberto'); }
+$('b-busca').addEventListener('input', listarBanco);
+$('b-fechar').onclick = fecharBanco;
+$('banco').addEventListener('pointerdown', (ev) => { if (ev.target === $('banco')) fecharBanco(); });
+$('banco').addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.stopPropagation(); fecharBanco(); } });
+
+// ---- o LEARN (`tickLearn` + `PaletteColumn`) -------------------------------
+// O que está sob o mouse — um widget ou um cabo do rack, o corpo de um
+// módulo, um tipo na paleta, um botão do cabeçalho — vira verbete depois de
+// 1 s parado sobre o MESMO objeto; sobre nada, fica o último. Enquanto se
+// gira um controle, é ele, na hora, com o valor ao vivo.
+const learn = { chave: '', desde: 0, mostrado: null, valor: '', foco: false, x: -1, y: -1, alvo: null };
+const CHAVES = { seed: 'seed', repor: 'restore', mudar: 'mutate', evoluir: 'evolve', cruzar: 'cross', banco: 'bank',
+                 salvar: 'save', abrir: 'open', desfazer: 'undo', descabear: 'uncable', espera: 'standby',
+                 zoomMais: 'zoom-in', zoomMenos: 'zoom-out', vista: 'rack-view', abre: 'startup',
+                 rec: 'rec', compacto: 'compact', lingua: 'language', tutorial: 'tutorial', sobre: 'about' };
+function consultar(fn, texto, ...mais) {
+  if (!local) return null;
+  let n = 0;
+  if (texto != null) {
+    const b = new TextEncoder().encode(texto);
+    new Uint8Array(local.memory.buffer, local.rw_entrada(b.length), b.length).set(b);
+    n = b.length;
+  }
+  const t = cTexto(local, texto != null ? fn(n, ...mais) : fn(...mais));
+  return t ? JSON.parse(t) : null;
+}
+addEventListener('pointermove', (ev) => { learn.x = ev.clientX; learn.y = ev.clientY; learn.el = ev.target; }, { passive: true });
+// o que está em foco no cabeçalho (teclado) também é explicado pelo LEARN
+addEventListener('focusin', (ev) => { if (ev.target.closest?.('header')) learn.el = ev.target; });
+const botoesCabecalho = () => [...document.querySelectorAll('header button, header #seed, header .trilho')].filter((b) => !b.hidden && b.offsetParent);
+function alvoLearn() {
+  const el = learn.el;
+  if (!el || !local) return null;
+  if (el.closest?.('#learn')) return null;
+  const b = el.closest?.('[data-acao]');
+  if (b && CHAVES[b.dataset.acao]) return { chave: 'cab|' + CHAVES[b.dataset.acao], cabecalho: CHAVES[b.dataset.acao] };
+  if (el === $('seed')) return { chave: 'cab|seed-value', cabecalho: 'seed-value' };
+  if (el.closest?.('#t-varia')) return { chave: 'cab|vary-amount', cabecalho: 'vary-amount' };
+  if (el === $('r-varia')) return { chave: 'cab|vary', cabecalho: 'vary' };
+  if (el.dataset?.tipo) return { chave: 'pal|' + el.dataset.tipo, tipo: el.dataset.tipo, modulo: true };
+  if (el === $('rack')) { const r = $('rack').getBoundingClientRect(); return rack.learnEm({ x: learn.x - r.left, y: learn.y - r.top + $('rolagem').scrollTop }); }
+  return null;
+}
+function verbete(h) {
+  if (h.cabecalho) {
+    const v = consultar(local.rw_learn_cabecalho, h.cabecalho, L);
+    if (v && temWeb('ajuda_' + h.cabecalho)) v.q = W('ajuda_' + h.cabecalho);   // a versão do navegador
+    return v;
+  }
+  if (h.cabo) return consultar(local.rw_learn_cabo, null, L);
+  if (h.modulo) return consultar(local.rw_learn_modulo, h.tipo, L);
+  const v = consultar(local.rw_learn_widget, h.tipo + '\t' + h.bind, L);
+  if (v) { v.t = h.titulo; return v; }
+  // widget sem verbete: cai no módulo
+  return consultar(local.rw_learn_modulo, h.tipo, L);
+}
+setInterval(() => {
+  if (learn.foco) return;   // F1: lendo com o teclado, o texto fica
+  const editando = rack.gesto?.tipo === 'controle';
+  const h = alvoLearn();
+  if (!h) return;
+  const agora = performance.now();
+  if (h.chave !== learn.chave) { learn.chave = h.chave; learn.desde = agora; if (!editando) return; }
+  if (editando) est.avisoAte = 0;
+  if (!editando && agora - learn.desde < 1000) return;
+  if (learn.mostrado?.chave === h.chave) return;
+  const v = verbete(h);
+  if (!v) return;
+  learn.mostrado = { ...v, chave: h.chave, param: !!h.param };
+  learn.valor = '';
+  if (no) no.port.postMessage(h.param ? { tipo: 'learnAlvo', id: h.no, bind: h.bind } : { tipo: 'learnAlvo', id: -1 });
+  if (performance.now() >= est.avisoAte) mostrarLearn();
+}, 100);
+function mostrarLearn() {
+  const corpo = $('learn-corpo');
+  const p = (cl, t) => { const e = document.createElement('p'); e.className = cl; e.textContent = t; return e; };
+  corpo.replaceChildren();
+  if (performance.now() < est.avisoAte) {
+    corpo.append(p('aviso', est.aviso));
+    clearTimeout(learn.fimAviso);
+    learn.fimAviso = setTimeout(mostrarLearn, est.avisoAte - performance.now() + 20);
+  } else if (!learn.mostrado) {
+    corpo.append(p('ocioso', (local ? cTexto(local, local.rw_learn_ocioso(L)) : '') + '\n\nF1: LEARN'));
+  } else {
+    const v = learn.mostrado;
+    if (v.t) corpo.append(p('t', v.t));
+    if (v.param && learn.valor) corpo.append(p('v', learn.valor));
+    if (v.q) corpo.append(p('q', v.q));
+    if (v.u) corpo.append(p('u', v.u));
+    if (v.e) corpo.append(p('e', '→ ' + v.e));
+  }
+  const rola = corpo.scrollHeight > corpo.clientHeight + 1;
+  $('learn-dica').textContent = learn.foco ? '↑↓ PgUp/PgDn - Esc' : rola ? W('learnRole') : 'F1: LEARN';
+}
+// F1: fixa o verbete para ler com o teclado; Esc (ou F1) devolve
+function focoLearn(sim) {
+  learn.foco = sim;
+  $('learn').classList.toggle('foco', sim);
+  if (sim) $('learn').focus(); else $('learn').blur();
+  mostrarLearn();
+}
+$('learn').addEventListener('pointerdown', () => focoLearn(true));
+$('learn').addEventListener('keydown', (ev) => {
+  const c = $('learn-corpo'), passo = { ArrowUp: -36, ArrowDown: 36, PageUp: -c.clientHeight, PageDown: c.clientHeight,
+                                         Home: -1e6, End: 1e6 }[ev.key];
+  if (ev.key === 'Escape' || ev.key === 'F1') { ev.preventDefault(); ev.stopPropagation(); focoLearn(false); return; }
+  if (passo !== undefined) { ev.preventDefault(); ev.stopPropagation(); c.scrollTop += passo; }
+});
+$('learn').addEventListener('blur', () => { if (learn.foco) focoLearn(false); });
+
+// "Aa (F2)": a leitura do LEARN (`ReadingPreferences`): 12, 14 ou 16 px,
+// texto branco; a coluna e a caixa crescem junto
+const leitura0 = () => { try { const r = JSON.parse(ler('leitura') || '{}'); return { tam: Math.min(2, Math.max(0, r.tam | 0)), branco: !!r.branco }; } catch { return { tam: 0, branco: false }; } };
+let leituraPref = leitura0();
+function aplicarLeitura() {
+  const t = leituraPref.tam;
+  $('paleta').style.width = (186 + 40 * t) + 'px';
+  $('learn').style.height = Math.max(0, Math.min(232 + 40 * t, $('corpo').clientHeight - 120)) + 'px';
+  $('learn').style.setProperty('--lf', ((12 + 2 * t) * 0.86).toFixed(1) + 'px');
+  $('learn').classList.toggle('branco', leituraPref.branco);
+  rack.layout();
+}
+function menuLeitura() {
+  const m = $('leitura-menu');
+  if (m.classList.contains('aberto')) { m.classList.remove('aberto'); return; }
+  const itens = [['cab', W('leitura')], [0, W('leitura0')], [1, W('leitura1')], [2, W('leitura2')], ['hr'],
+                 ['branco', W('leituraBranco')], ['padrao', W('leituraPadrao')]];
+  m.replaceChildren();
+  for (const [k, t] of itens) {
+    if (k === 'hr') { m.append(document.createElement('hr')); continue; }
+    const d = document.createElement('div');
+    d.textContent = (k === leituraPref.tam || (k === 'branco' && leituraPref.branco) ? '✓ ' : '') + t;
+    if (k === 'cab') d.className = 'cab';
+    else d.onclick = () => {
+      if (typeof k === 'number') leituraPref.tam = k;
+      else if (k === 'branco') leituraPref.branco = !leituraPref.branco;
+      else leituraPref = { tam: 0, branco: false };
+      guardar('leitura', JSON.stringify(leituraPref));
+      m.classList.remove('aberto'); aplicarLeitura();
+    };
+    m.append(d);
+  }
+  const r = $('b-leitura').getBoundingClientRect();
+  m.style.left = r.left + 'px'; m.style.top = Math.max(8, r.top - 200) + 'px';
+  m.classList.add('aberto');
+}
+$('b-leitura').addEventListener('pointerdown', (ev) => ev.stopPropagation());
+$('b-leitura').onclick = (ev) => { ev.stopPropagation(); menuLeitura(); };
+addEventListener('pointerdown', (ev) => { if (!ev.target.closest('#leitura-menu')) $('leitura-menu').classList.remove('aberto'); });
+addEventListener('resize', aplicarLeitura);
+
+// ---- TUTORIAL e SOBRE (`OverlayView`) ---------------------------------------
+// Os cartões são os do app, na mesma ordem; os que no navegador são outros
+// (a caixa do seed, guardar, gravar, navegar, teclado) vêm de textos.js.
+let sobreporModo = '', sobreTimer = 0;
+const CARTOES = [['tutWhatTitle', 'tutWhatBody'], ['tutSeedTitle', 'tutSeedBody'], ['tutSeedBoxTitle', 'tutSeedBoxBody'],
+                 ['tutVaryTitle', 'tutVaryBody'], ['tutStoreTitle', 'tutStoreBody'], ['tutRecTitle', 'tutRecBody'],
+                 ['tutHdrTitle', 'tutHdrBody'], ['tutCableTitle', 'tutCableBody'], ['tutNavTitle', 'tutNavBody'],
+                 ['tutKeysTitle', 'tutKeysBody'], ['tutModTitle', 'tutModBody'], ['tutScratchTitle', 'tutScratchBody'],
+                 ['tutFamTitle', 'tutFamBody'], ['tutLearnTitle', 'tutLearnBody']];
+const DO_NAVEGADOR = new Set(['tutSeedBoxBody', 'tutStoreBody', 'tutRecBody', 'tutNavBody', 'tutKeysBody']);
+function sobrepor(modo) {
+  sobreporModo = modo;
+  const o = $('sobrepor'), corpo = $('o-corpo');
+  o.className = 'aberto ' + modo;
+  $('o-fechar').textContent = tx('close');
+  corpo.replaceChildren();
+  clearInterval(sobreTimer);
+  const el = (tag, cl, t) => { const e = document.createElement(tag); if (cl) e.className = cl; if (t != null) e.textContent = t; return e; };
+  if (modo === 'tutorial') {
+    $('o-titulo').textContent = tx('tutTitle');
+    $('o-sub').textContent = tx('tutSubtitle');
+    CARTOES.forEach(([t, b], i) => {
+      if (i) corpo.append(el('hr'));
+      corpo.append(el('h3', '', tx(t)));
+      let texto = DO_NAVEGADOR.has(b) ? W(b) : tx(b);
+      if (texto.includes(' · ')) texto = '•  ' + texto.split(' · ').join('\n•  ');
+      corpo.append(el('p', '', texto));
+      if (t === 'tutLearnTitle') {
+        const a = el('a', '', tx('guideUrl')); a.href = tx('guideUrl'); a.target = '_blank'; a.rel = 'noopener';
+        const p = el('p'); p.append(a); corpo.append(p);
+      }
+    });
+  } else {
+    $('o-titulo').textContent = 'RASGO MODULAR';
+    const v = versao(), i = v.lastIndexOf(' ');
+    $('o-sub').textContent = i > 0 ? `${v.slice(0, i)}  ·  ${tx('builtOn')} ${v.slice(i + 1)}` : v;
+    const l1 = el('p', 'linha'), l2 = el('p', 'linha'), l3 = el('p', 'linha');
+    l3.style.marginBottom = '18px';
+    corpo.append(l1, l2, l3, el('p', '', tx('aboutBody')));
+    // o app e os plugins: a área de downloads do site, onde se escolhe
+    const a = el('a', '', W('baixarApp'));
+    a.href = 'https://lucioaraujo.github.io/rasgo-modular/' + ['en.html', 'index.html', 'fr.html', 'es.html'][L] + '#baixar';
+    a.target = '_blank'; a.rel = 'noopener';
+    const pb = el('p'); pb.append(a, document.createTextNode(' — ' + W('baixarDica'))); corpo.append(pb);
+    // o loudness da saída, ao vivo (BS.1770-4), e o alvo de −14 LUFS / −1 dBTP
+    const atualiza = () => {
+      const lu = est.lufs, f = (x) => (x <= -70 ? '--' : x.toFixed(1));
+      l1.textContent = lu ? `LUFS   M ${f(lu[0])}   S ${f(lu[1])}   I ${f(lu[2])}   (BS.1770-4)` : 'LUFS   --';
+      l2.textContent = `${ctx ? ctx.sampleRate : 48000} ${W('taxa')}`;
+      const tp = lu ? lu[3] : -120;
+      let alvo = `${tx('aboutTarget')}  -14 LUFS / -1 dBTP   ·   TP ${tp <= -119 ? '--' : tp.toFixed(1) + ' dBTP'}`;
+      if (lu && lu[2] > -70) { const d = -14 - lu[2]; alvo += `   ·   ${d >= 0 ? '+' : ''}${d.toFixed(1)} LU`; }
+      l3.textContent = alvo;
+      l3.classList.toggle('alerta', tp > -1);
+    };
+    atualiza();
+    sobreTimer = setInterval(atualiza, 500);
+  }
+  corpo.scrollTop = 0;
+  corpo.focus();
+  $('b-tutorial').classList.toggle('on', modo === 'tutorial');
+  $('b-sobre').classList.toggle('on', modo === 'sobre');
+}
+function fecharSobrepor() {
+  $('sobrepor').className = ''; sobreporModo = ''; clearInterval(sobreTimer);
+  $('b-tutorial').classList.remove('on'); $('b-sobre').classList.remove('on');
+}
+$('o-fechar').onclick = fecharSobrepor;
+$('sobrepor').addEventListener('pointerdown', (ev) => { if (ev.target === $('sobrepor')) fecharSobrepor(); });
+
+// ---- os atalhos do app (cartão ATALHOS em UiLanguage.hpp) ----------------
+addEventListener('keydown', (ev) => {
+  if (ev.target === $('seed') || $('banco').classList.contains('aberto')) return;
+  // TUTORIAL e SOBRE: as setas rolam o texto (o navegador já faz), Esc fecha
+  if ($('sobrepor').classList.contains('aberto')) {
+    if (ev.key === 'Escape') { ev.preventDefault(); fecharSobrepor(); }
+    return;
+  }
+  // as setas rolam o rack
+  const rolar = { ArrowUp: -60, ArrowDown: 60, PageUp: -0.9, PageDown: 0.9 }[ev.key];
+  if (rolar !== undefined && !ev.ctrlKey && !ev.altKey && ev.target === document.body) {
+    ev.preventDefault();
+    const r = $('rolagem');
+    r.scrollTop += Math.abs(rolar) < 1 ? rolar * r.clientHeight : rolar;
+    return;
+  }
+  // F6: o teclado vai para os botões do cabeçalho (e volta); lá, as setas
+  // andam entre eles, Enter/espaço acionam e o LEARN explica o que está em
+  // foco (`HeaderBar::focusCommands` do app)
+  if (ev.key === 'F6') {
+    ev.preventDefault();
+    const bs = botoesCabecalho();
+    if (bs.includes(document.activeElement)) document.activeElement.blur(); else bs[0]?.focus();
+    return;
+  }
+  if (document.activeElement?.closest?.('header') && (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight')) {
+    const bs = botoesCabecalho(), i = bs.indexOf(document.activeElement);
+    if (i >= 0) { ev.preventDefault(); bs[(i + (ev.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length].focus(); }
+    return;
+  }
+  // no slider em foco, ↑↓ andam 0,05 (VARIA) como no app
+  if ((ev.key === 'ArrowUp' || ev.key === 'ArrowDown') && document.activeElement?.classList?.contains('trilho')) {
+    ev.preventDefault();
+    const d = ev.key === 'ArrowUp' ? 0.05 : -0.05;
+    if (document.activeElement.id === 't-varia') { est.variaAmt = Math.min(2, Math.max(0, est.variaAmt + d)); est.variaOn = true; enviarVaria(); }
+    else { est.volume = Math.min(1, Math.max(0, est.volume + d / 2)); if (no) no.port.postMessage({ tipo: 'ganho', valor: est.volume }); }
+    syncCabecalho();
+    return;
+  }
+  if (document.activeElement?.closest?.('header') && document.activeElement.tagName === 'BUTTON') {
+    if (ev.key === 'Escape') { document.activeElement.blur(); return; }
+    if (ev.key === 'Enter' || ev.key === ' ') return;   // o navegador aciona o botão
+  }
+  if (ev.key === 'F1') { ev.preventDefault(); focoLearn(!learn.foco); return; }
+  if (ev.key === 'F2') { ev.preventDefault(); menuLeitura(); return; }
+  const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
+  const mapa = ctrl ? { r: 'rec', z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
+                    : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
+  const a = mapa[k];
+  if (!a || ev.altKey) {
+    if (k === 'escape') rack.cancela();
+    return;
+  }
+  ev.preventDefault();
+  acao(a);
+});
+
+// `?previa[=segundos]`: o motor roda AQUI, sem som, alguns segundos, e o
+// rack é desenhado com o estado a que chegou. Só para capturas de teste num
+// navegador sem saída de áudio; tocar continua sendo pelo worklet.
+async function previa() {
+  const seg = Number(q.get('previa')) || 4;
+  const e = await instanciar(), mem = e.memory;
+  e.rw_iniciar(48000);
+  e.rw_compacto(compacto ? 1 : 0);
+  const s = BigInt(seedValida() || '1');
+  e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
+  if (q.has('descabear')) e.rw_descabear();
+  const dec = new TextDecoder();
+  const texto = dec.decode(new Uint8Array(mem.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
+  const wp = e.rw_wordmark(), b = new Uint8Array(mem.buffer); let fim = wp; while (b[fim]) fim++;
+  rack.carregar(texto, dec.decode(b.slice(wp, fim)));
+  // `?so=TIPO,TIPO,…`: só esses módulos, nessa ordem (folhas da auditoria
+  // de diagramação, tools/auditar_paineis.mjs)
+  if (q.has('so')) {
+    const tipos = q.get('so').split(',');
+    rack.mods = tipos.map((t) => rack.mods.find((m) => m.tipo === t)).filter(Boolean);
+    rack.layout();
+  }
+  // `?insp=N`: abre o inspetor do cabo N; com `&rel`, liga nele uma relação
+  // RING (companion = a origem do cabo seguinte), para ver o selo
+  if (q.has('insp')) {
+    const n = Number(q.get('insp')) || 0;
+    const c = new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice();
+    const d = c[n * 14 + 2], pd = c[n * 14 + 3];
+    if (q.has('rel')) e.rw_cabo_relacao(d, pd, 1, c[(n + 1) * 14], c[(n + 1) * 14 + 1], 0.6);
+    rack.insp = { d, pd };
+  }
+  for (let i = 0; i < seg * 48000 / 128; i++) e.rw_processar();
+  const nc = e.rw_num_controles();
+  // todos os visores (a prévia não rola): 748 números cada, como no worklet
+  const ids = []; for (let k = 0; k < e.rw_num_visores(); k++) ids.push(e.rw_visor_id(k));
+  const vis = new Float32Array(ids.length * 748), escalas = {};
+  ids.forEach((id, k) => vis.set(new Float32Array(mem.buffer, e.rw_visor(id), 748), k * 748));
+  for (const md of rack.mods)
+    if (md.tipo === 'QUANTIZER' && vis[ids.indexOf(md.id) * 748 + 732] > 12.5) {
+      const p = e.rw_nome_escala(md.id), bb = new Uint8Array(mem.buffer); let f = p; while (bb[f]) f++;
+      escalas[md.id] = dec.decode(bb.slice(p, f));
+    }
+  if (q.has('espectro')) for (const md of rack.mods) if (md.tipo === 'SCOPE') rack.espectro.add(md.id);
+  rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
+              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice(), ids, vis, escalas);
+  if (q.has('rolar')) { $('rolagem').scrollTop = q.get('rolar') === 'fim' ? 1e9 : Number(q.get('rolar')); rack.desenhar(); }
+  const vu = Math.min(1, e.rw_vu() / 0.891);
+  $('vu').firstChild.style.width = Math.round(vu * 54) + 'px';
+  est.cabos = e.rw_cabos(); est.seed = String(s);
+  // `?banco`: abre o banco de escalas do QUANTIZER (captura de teste)
+  if (q.has('banco')) { local = e; const qz = rack.mods.find((m) => m.tipo === 'QUANTIZER'); abrirBanco(qz.id, Math.round(e.rw_parametro(qz.id, 0))); }
+  if (q.has('paletaTipo')) rack.paletaTipo = q.get('paletaTipo');
+  // `?learn=TIPO.bind` (ou só TIPO): mostra esse verbete na caixa
+  if (q.has('learn')) {
+    const [t, b] = q.get('learn').split('.');
+    const md = rack.mods.find((m) => m.tipo === t);
+    const w = b && md?.w.find((x) => x.b === b);
+    const h = w ? { tipo: t, bind: b, titulo: `${t}  ·  ${w.l}`, param: true } : { tipo: t, modulo: true };
+    learn.mostrado = { ...verbete(h), param: !!w };
+    if (w) learn.valor = cTexto(e, e.rw_learn_valor(md.id, (() => { const bb = new TextEncoder().encode(b); new Uint8Array(e.memory.buffer, e.rw_entrada(bb.length), bb.length).set(bb); return bb.length; })()));
+    mostrarLearn();
+  }
+  no = { port: { postMessage: () => {} } };   // a leitura e o cabeçalho como se tocasse
+  est.avisoAte = 0; mostrarLearn(); syncCabecalho();
+  if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
+    rack.desenhar();
+    const t0 = performance.now();
+    for (let i = 0; i < 60; i++) rack.desenhar();
+    const t1 = performance.now();
+    for (let i = 0; i < 20; i++) { rack.chaveCabos = null; rack.desenhar(); }
+    aviso(`${rack.vistos.length} mód · quadro ${((t1 - t0) / 60).toFixed(2)} ms · com cabos mudando ${((performance.now() - t1) / 20).toFixed(2)} ms`, 1e9);
+  }
+  document.title += ' · pronto';
+}
+
+if (q.has('saida')) rack.vistaSaida(true);
+aplicarLeitura();
+syncCabecalho();
+</script>
+</body>
+</html>

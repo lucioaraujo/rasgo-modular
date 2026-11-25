@@ -179,6 +179,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_escolher_escala(m.id, m.banco);
     } else if (m.tipo === 'lerBanco' && this.e) {
       this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
+    } else if (m.tipo === 'midi' && this.e) {
+      this.e.rw_midi(m.d[0], m.d[1], m.d[2] ?? 0);
     } else if (m.tipo === 'rec' && this.e) {
       if (m.ligar && !this.gravando) this.iniciarRec();
       else if (!m.ligar && this.gravando) this.terminarRec();
@@ -261,9 +263,17 @@ class RasgoProcessor extends AudioWorkletProcessor {
     this.port.postMessage({ tipo, novo, seed, cabos: this.e.rw_cabos(), texto, wordmark });
   }
 
-  process(_in, outputs) {
+  process(inputs, outputs) {
     const out = outputs[0];
     if (!this.e || !this.tocando || out.length < 2) return true;
+    // o microfone (a página só o liga quando um SIGNAL-IN pede): mono vira
+    // L = R; entregue antes do bloco, como a placa de som no app
+    const ent = inputs[0];
+    if (ent && ent.length) {
+      const a = ent[0], b = ent[1] || ent[0], buf = new Float32Array(this.mem.buffer, this.e.rw_audio_buffer(), 256);
+      for (let i = 0; i < a.length; i++) { buf[2 * i] = a[i]; buf[2 * i + 1] = b[i]; }
+      this.e.rw_audio_in(a.length);
+    }
     const p = this.e.rw_processar();
     const f = new Float32Array(this.mem.buffer, p, 256);
     const L = out[0], R = out[1], g = this.ganho;
@@ -299,7 +309,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
         let f = p; while (u[f]) f++;
         learnValor = deUtf8(u.slice(p, f));
       }
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor, rec: this.gravando ? this.recQuadros / sampleRate : -1,
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor, entrada: this.e.rw_entrada_necessaria(), rec: this.gravando ? this.recQuadros / sampleRate : -1,
                               lufs: Array.from(new Float32Array(this.mem.buffer, this.e.rw_lufs(), 4)) },
                             [v.buffer, c.buffer, vis.buffer]);
     }
