@@ -628,6 +628,165 @@ int rw_abrir(int n) {
     return 0;
 }
 
+// ---- a paleta: acrescentar, tirar e reordenar módulos -----------------
+
+void depoisDosCabos();   // mais abaixo, junto dos cabos
+
+// Acrescenta um módulo do tipo (`addModule` do app): respeita as instâncias
+// (`canAddInstance`), entra junto da família, um MASTER novo vai direto à
+// saída se ela estiver vazia. Devolve o id novo, −1 se o tipo é único no
+// rack e já está, −2 se já há o máximo de cópias, −3 se o tipo não existe.
+__attribute__((used, visibility("default")))
+int rw_adicionar(int tamanho) {
+    if (!g_grafo || tamanho <= 0 || static_cast<std::size_t>(tamanho) >= g_entrada.size()) return -3;
+    const std::string tipo(g_entrada.data(), static_cast<std::size_t>(tamanho));
+    const auto why = rasgo::panel::canAddInstance(*g_grafo, g_shown, tipo);
+    if (why == rasgo::panel::AddRefusal::singleton) return -1;
+    if (why != rasgo::panel::AddRefusal::none) return -2;
+    auto n = rasgo::panel::makeModule(tipo);
+    if (!n) return -3;
+    foto();
+    std::vector<std::size_t> ordem = g_shown;
+    const std::size_t id = g_grafo->add(std::move(n));
+    const auto at = rasgo::panel::moduleInsertionIndex(
+        ordem, tipo, [](std::size_t i) { return g_grafo->node(i).type(); });
+    ordem.insert(ordem.begin() + static_cast<std::ptrdiff_t>(at), id);
+    if (tipo == "MASTER") {
+        bool ligada = false;
+        for (std::size_t i = 0; i < g_grafo->cableCount(); ++i)
+            ligada |= g_grafo->cable(i).target().node == g_saida;
+        if (!ligada) try { g_grafo->connect(id, 0, g_saida, 0); } catch (...) {}
+        if (auto* m = dynamic_cast<rasgo::modular::Master*>(&g_grafo->node(id))) {
+            g_masters.push_back(m);
+            if (g_espera) g_grafo->setParameterBase(id, "mute", 1.0f);
+        }
+    }
+    g_ordem = ordem;
+    depoisDosCabos();
+    return static_cast<int>(id);
+}
+
+// Tira o módulo da case (`removeModule`): desliga só os cabos que encostam
+// nele; o nó fica órfão no grafo, sem custo (a saída poda o que não chega)
+__attribute__((used, visibility("default")))
+int rw_remover(int id, int comFoto) {
+    if (!g_grafo || id < 0 || static_cast<std::size_t>(id) >= g_grafo->nodeCount()
+        || static_cast<std::size_t>(id) == g_saida) return 0;
+    if (comFoto) foto();   // arrastado à paleta: a foto já veio no começo do arrasto
+    const auto n = static_cast<std::size_t>(id);
+    for (std::size_t i = g_grafo->cableCount(); i-- > 0;) {
+        const auto& c = g_grafo->cable(i);
+        if (c.source().node == n || c.target().node == n)
+            g_grafo->disconnect(c.target().node, c.target().port);
+    }
+    g_ordem = g_shown;
+    g_ordem.erase(std::remove(g_ordem.begin(), g_ordem.end(), n), g_ordem.end());
+    g_scopes.erase(n);
+    depoisDosCabos();
+    return 1;
+}
+
+// A ordem nova do rack depois de arrastar um módulo pelo título: os ids
+// em texto ("3 0 7 …") em rw_entrada. Os que faltarem continuam no fim.
+__attribute__((used, visibility("default")))
+int rw_ordem(int tamanho) {
+    if (!g_grafo || tamanho <= 0 || static_cast<std::size_t>(tamanho) >= g_entrada.size()) return 0;
+    std::istringstream is(std::string(g_entrada.data(), static_cast<std::size_t>(tamanho)));
+    std::vector<std::size_t> ordem;
+    std::size_t id = 0;
+    while (is >> id)
+        if (std::find(g_shown.begin(), g_shown.end(), id) != g_shown.end()
+            && std::find(ordem.begin(), ordem.end(), id) == ordem.end()) ordem.push_back(id);
+    for (const auto s : g_shown)
+        if (std::find(ordem.begin(), ordem.end(), s) == ordem.end()) ordem.push_back(s);
+    g_ordem = ordem;
+    descrever();
+    return 1;
+}
+
+// o catálogo da paleta (`PaletteColumn::layoutRows`): as famílias na ordem
+// do catálogo e, dentro de cada uma, a ordem do rack (alfabética, MIXER e
+// MASTER no fim) — [{"familia":…, "tipos":[…]}, …]
+__attribute__((used, visibility("default")))
+const char* rw_catalogo() {
+    g_salvo = "[";
+    bool pf = true;
+    for (const auto& fam : rasgo::panel::moduleCatalog()) {
+        if (!pf) g_salvo += ',';
+        pf = false;
+        g_salvo += "{\"familia\":";
+        json(g_salvo, fam.family);
+        g_salvo += ",\"tipos\":[";
+        std::vector<const char*> ord(fam.types.begin(), fam.types.end());
+        rasgo::panel::sortFamilyForDisplay(ord);
+        for (std::size_t i = 0; i < ord.size(); ++i) {
+            if (i) g_salvo += ',';
+            json(g_salvo, ord[i]);
+        }
+        g_salvo += "]}";
+    }
+    g_salvo += ']';
+    return g_salvo.c_str();
+}
+
+// ---- o banco de escalas (o navegador do QUANTIZER) ---------------------
+
+// o banco inteiro em JSON, para a janela de escalas: famílias na ordem do
+// banco e cada escala {id, n(ome), f(amília: índice), p(eríodo), g(raus), s(fonte)}
+__attribute__((used, visibility("default")))
+const char* rw_banco() {
+    const auto& b = rasgo::escalas::BancoEscalas::instancia();
+    g_salvo = "{\"familias\":[";
+    for (std::size_t i = 0; i < b.familias().size(); ++i) {
+        if (i) g_salvo += ',';
+        json(g_salvo, b.familias()[i]);
+    }
+    g_salvo += "],\"escalas\":[";
+    bool primeiro = true;
+    for (const auto& e : b.escalas()) {
+        if (!primeiro) g_salvo += ',';
+        primeiro = false;
+        std::size_t f = 0;
+        while (f < b.familias().size() && b.familias()[f] != e.familia) ++f;
+        g_salvo += "{\"id\":" + std::to_string(e.id) + ",\"n\":";
+        json(g_salvo, e.nome);
+        g_salvo += ",\"f\":" + std::to_string(f) + ",\"p\":";
+        numero(g_salvo, e.periodo);
+        g_salvo += ",\"g\":[";
+        for (std::size_t k = 0; k < e.graus.size(); ++k) {
+            if (k) g_salvo += ',';
+            numero(g_salvo, e.graus[k]);
+        }
+        g_salvo += "],\"s\":";
+        json(g_salvo, e.fonte);
+        g_salvo += '}';
+    }
+    g_salvo += "]}";
+    return g_salvo.c_str();
+}
+
+// o QUANTIZER `id` passa a tocar a escala `banco` do banco (SCALE = BANCO)
+__attribute__((used, visibility("default")))
+void rw_escolher_escala(int id, std::uint32_t banco) {
+    if (!g_grafo || id < 0 || static_cast<std::size_t>(id) >= g_grafo->nodeCount()) return;
+    auto& n = g_grafo->node(static_cast<std::size_t>(id));
+    if (n.type() != "QUANTIZER") return;
+    try {
+        g_grafo->setParameterBase(static_cast<std::size_t>(id), "bank", static_cast<float>(banco));
+        g_grafo->setParameterBase(static_cast<std::size_t>(id), "scale", 13.0f);
+    } catch (...) {}
+}
+
+// o valor do músico num parâmetro qualquer (o banco atual do QUANTIZER)
+__attribute__((used, visibility("default")))
+float rw_parametro(int id, int tamanho) {
+    if (!g_grafo || id < 0 || static_cast<std::size_t>(id) >= g_grafo->nodeCount()
+        || tamanho <= 0 || static_cast<std::size_t>(tamanho) >= g_entrada.size()) return 0.0f;
+    try { return g_grafo->parameterUserValue(static_cast<std::size_t>(id),
+                                             std::string(g_entrada.data(), static_cast<std::size_t>(tamanho))); }
+    catch (...) { return 0.0f; }
+}
+
 // o VU do cabeçalho: o pico recente do MASTER (o mesmo anel do visor)
 __attribute__((used, visibility("default")))
 float rw_vu() {

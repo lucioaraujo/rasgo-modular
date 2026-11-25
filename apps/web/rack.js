@@ -27,7 +27,7 @@ const S_MIN = 1.6, S_MAX = 2.6, FILEIRAS = 3, PAD = 14, TOPO = 2, VAO_MM = 3;
 const DPR_MAX = 1.5;
 const WM = { x: 6.63, y: 12.62, w: 258.74, h: 30.75 };
 
-function corFamilia(f, alfa = 1) {
+export function corFamilia(f, alfa = 1) {
   if (!(f in MATIZ)) return T.line;
   const sat = f === 'OUT' ? 12 : 34;
   return `hsla(${MATIZ[f]}, ${sat}%, 56%, ${alfa})`;
@@ -81,6 +81,11 @@ export class Rack {
     this.espectro = new Set();    // SCOPE mostrando o espectro (clique no visor)
     this.clipAte = new Map();     // MASTER: até quando o aviso de limite fica aceso
     this.idsVisiveis = '';
+    this.paletaTipo = '';         // tipo sob o mouse na paleta: os módulos dele acendem
+    this.fantasma = null;         // { tipo, x, y }: o módulo vindo da paleta
+    this.sobrePaleta = () => false;   // a página diz se o ponto está sobre a paleta
+    this.abrirBanco = () => {};       // QUANTIZER: clique no visor abre o banco de escalas
+    this.ultimaOrdem = 0;
     addEventListener('resize', () => this.layout());
     rolagem.addEventListener('scroll', () => this.redesenhar(), { passive: true });
     canvas.addEventListener('pointerdown', (e) => this.baixa(e));
@@ -152,8 +157,11 @@ export class Rack {
     for (const m of this.vistos) {
       const w = this.mmpx(m.hp * MM_HP);
       if (x + w > vw - PAD && x > PAD) { x = PAD; y += this.modH + PAD; }
+      // a camada fixa não depende da posição (só do tamanho e da escala):
+      // reordenar não a refaz
+      const chave = `${w}x${this.modH}@${this.escala}/${dpr}`;
+      if (m.chaveCromo !== chave) { m.cromo = null; m.chaveCromo = chave; }
       m.bx = x; m.by = y; m.bw = w; m.bh = this.modH;
-      m.cromo = null;
       x += w + this.mmpx(VAO_MM);
     }
     this.alturaConteudo = y + this.modH + PAD;
@@ -254,6 +262,15 @@ export class Rack {
         g.restore();
       }
     }
+    // borda acesa: o módulo sendo arrastado e os do tipo sob o mouse na paleta
+    const arrastado = this.gesto?.tipo === 'modulo' && this.gesto.movido ? this.gesto.id : -1;
+    g.strokeStyle = T.accent; g.lineWidth = 1;
+    for (const m of this.vistos) {
+      if (m.id !== arrastado && (!this.paletaTipo || m.tipo !== this.paletaTipo)) continue;
+      if (m.by + m.bh < topo || m.by > topo + vh) continue;
+      g.strokeRect(m.bx + 0.5, m.by + 0.5, m.bw - 1, m.bh - 1);
+      g.strokeRect(m.bx - 0.5, m.by - 0.5, m.bw + 1, m.bh + 1);
+    }
     // os cabos: uma camada própria, refeita só quando um cabo muda (ganho,
     // condução, ruptura) ou a vista rola — redesenhar 63 cabos atravessando
     // a tela custava ~6 ms por quadro
@@ -282,6 +299,10 @@ export class Rack {
     }
     this.desenharDestaques(g, topo, vh);
     if (this.gesto?.tipo === 'cabo') this.desenharPuxada(g);
+    if (this.fantasma) {   // o módulo vindo da paleta
+      g.fillStyle = T.accent; g.font = fonte(11); g.textAlign = 'left'; g.textBaseline = 'middle';
+      g.fillText('+ ' + this.fantasma.tipo, this.fantasma.x + 8, this.fantasma.y);
+    }
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.desenharInspetor(g, vw, vh);
   }
@@ -830,6 +851,44 @@ export class Rack {
     return null;
   }
 
+  // o [x] (`removeBox`) e a faixa do nome, a pega do módulo (`titleStrip`)
+  caixaX(m) { return { x: m.bx + m.bw - 15, y: m.by + 2, w: 13, h: 13 }; }
+  faixaTitulo(m) { return { x: m.bx, y: m.by, w: m.bw - 17, h: this.mmpx(6) }; }
+
+  // `reorderTo`: a fileira e o lado do cursor dizem onde o módulo entra,
+  // contado entre os visíveis e traduzido para a ordem inteira; no máximo
+  // ~25 por segundo
+  reordenar(id, p) {
+    const agora = performance.now();
+    if (agora - this.ultimaOrdem < 40) return;
+    this.ultimaOrdem = agora;
+    const linhaH = this.modH + PAD;
+    const linha = Math.max(0, Math.floor((p.y - TOPO) / linhaH));
+    const vis = this.vistos.filter((m) => m.id !== id);
+    let i = 0;
+    for (const m of vis) {
+      const ml = Math.floor((m.by - TOPO) / linhaH);
+      if (ml < linha || (ml === linha && m.bx + m.bw / 2 < p.x)) i++;
+    }
+    const prox = this.mods.filter((m) => m.id !== id);
+    const pos = (mm) => prox.indexOf(mm);
+    let at;
+    if (!vis.length) at = prox.length;
+    else if (i <= 0) at = pos(vis[0]);
+    else if (i >= vis.length) at = pos(vis[vis.length - 1]) + 1;
+    else at = pos(vis[i]);
+    at = clamp(at, 0, prox.length);
+    prox.splice(at, 0, this.porId.get(id));
+    if (prox.some((m, k) => m !== this.mods[k])) { this.mods = prox; this.layout(); }
+  }
+
+  // arrastando perto da borda de cima/de baixo, o rack rola
+  rolarNaBorda(e) {
+    const r = this.rolagem.getBoundingClientRect();
+    if (e.clientY < r.top + 30) this.rolagem.scrollTop -= 14;
+    else if (e.clientY > r.bottom - 30) this.rolagem.scrollTop += 14;
+  }
+
   // a área de toque de um controle (`ui::footprintMM`)
   caixa(m, w) {
     const lbl = w.l.length;
@@ -913,7 +972,17 @@ export class Rack {
     }
     if (e.button !== 0) return;
     const m = this.moduloEm(p);
+    // o [x]: tira o módulo ao soltar, se o mouse não escorregou
+    if (m && this.dentro(p, this.caixaX(m))) {
+      this.gesto = { tipo: 'x', id: m.id, x0: e.clientX, y0: e.clientY };
+      return;
+    }
     const w = m && (this.celulaEm(m, p) || this.controleEm(m, p));
+    // QUANTIZER: clicar no visor abre o banco de escalas
+    if (!w && m?.tipo === 'QUANTIZER' && m.w.some((x) => x.k === K.Display && this.dentro(p, this.caixa(m, x)))) {
+      this.abrirBanco(m.id);
+      return;
+    }
     // SCOPE: clicar no visor alterna onda ↔ espectro
     if (!w && m?.tipo === 'SCOPE' && m.w.some((x) => x.k === K.Display && this.dentro(p, this.caixa(m, x)))) {
       if (!this.espectro.delete(m.id)) this.espectro.add(m.id);
@@ -922,8 +991,14 @@ export class Rack {
     }
     if (!w) {
       // um clique (sem arrastar) num cabo abre o inspetor dele
+      // clique sobre um cabo é sempre do cabo (regra do autor, 2 out. 2026)
       const k = this.caboEm(p);
-      if (k >= 0) this.gesto = { tipo: 'clique-cabo', k, x0: e.clientX, y0: e.clientY };
+      if (k >= 0) { this.gesto = { tipo: 'clique-cabo', k, x0: e.clientX, y0: e.clientY }; return; }
+      // o módulo só se move pela faixa do nome
+      if (m && this.dentro(p, this.faixaTitulo(m))) {
+        this.cv.setPointerCapture(e.pointerId);
+        this.gesto = { tipo: 'modulo', id: m.id, x0: e.clientX, y0: e.clientY, movido: false };
+      }
       return;
     }
     if (w.k === K.Toggle) {
@@ -946,16 +1021,31 @@ export class Rack {
     }
     if (gs?.tipo === 'cabo') { this.redesenhar(); return; }
     if (gs?.tipo === 'trilha') { this.trilha(e); return; }
-    if (gs?.tipo === 'clique-cabo') {
+    if (gs?.tipo === 'clique-cabo' || gs?.tipo === 'x') {
       if (Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 6) this.gesto = null;
       return;
     }
+    if (gs?.tipo === 'modulo') {
+      if (!gs.movido) {                // zona morta de 6 px: ainda é clique
+        if (Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) <= 6) return;
+        gs.movido = true;
+        this.enviar({ tipo: 'foto' });   // desfazer devolve o módulo ao lugar
+      }
+      this.rolarNaBorda(e);
+      this.reordenar(gs.id, this.ponto(e));
+      this.redesenhar();
+      return;
+    }
     // o cursor diz o que dá para pegar; fora de controle, o cabo acende
-    let pega = !!this.jackEm(p);
-    if (!pega) { const m = this.moduloEm(p); pega = !!(m && (this.celulaEm(m, p) || this.controleEm(m, p))); }
+    let pega = !!this.jackEm(p), mover = false;
+    if (!pega) {
+      const m = this.moduloEm(p);
+      pega = !!(m && (this.celulaEm(m, p) || this.controleEm(m, p) || this.dentro(p, this.caixaX(m))));
+      mover = !pega && !!m && this.dentro(p, this.faixaTitulo(m));
+    }
     const sob = pega ? -1 : this.caboEm(p);
     if (sob !== this.sobCabo) { this.sobCabo = sob; this.redesenhar(); }
-    this.cv.style.cursor = pega || sob >= 0 ? 'pointer' : 'default';
+    this.cv.style.cursor = pega || sob >= 0 ? 'pointer' : mover ? 'grab' : 'default';
   }
 
   sobe(e) {
@@ -964,6 +1054,19 @@ export class Rack {
     if (!gs) return;
     if (gs.tipo === 'controle') { this.enviar({ tipo: 'solta' }); return; }
     if (gs.tipo === 'trilha') return;
+    if (gs.tipo === 'x') {
+      const m = this.porId.get(gs.id);
+      if (m && this.dentro(this.ponto(e), this.caixaX(m)) && Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) <= 6)
+        this.enviar({ tipo: 'remover', id: gs.id });
+      return;
+    }
+    if (gs.tipo === 'modulo') {
+      // solto sobre a paleta: sai da case; senão a ordem nova vai ao motor
+      if (gs.movido && this.sobrePaleta(e)) this.enviar({ tipo: 'remover', id: gs.id, foto: false });
+      else if (gs.movido) this.enviar({ tipo: 'ordem', ids: this.mods.map((m) => m.id) });
+      this.redesenhar();
+      return;
+    }
     if (gs.tipo === 'clique-cabo') {
       const c = this.cabos;
       for (const v of this.cabosVisiveis())

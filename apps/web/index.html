@@ -46,7 +46,48 @@
   #leitura.aviso { color: var(--text); white-space: normal; max-width: 46ch; }
   #vu { width: 54px; height: 8px; background: var(--recessed); position: relative; }
   #vu div { position: absolute; left: 0; top: 0; bottom: 0; background: var(--prata); }
+  #corpo { flex: 1; display: flex; min-height: 0; }
   #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
+  /* a paleta (`PaletteColumn`): as famílias na cor delas, os tipos em 11 px;
+     arrastar um tipo para o rack o acrescenta; um módulo solto aqui sai */
+  #paleta { width: 186px; flex: none; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--line);
+            padding: 10px 0 14px; font: 9.5px system-ui, sans-serif; user-select: none; touch-action: none;
+            scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #paleta.alvo { outline: 1px solid var(--accent); outline-offset: -2px; }
+  #paleta h3 { display: flex; align-items: center; gap: 4px; margin: 0; padding: 0 10px; height: 18px;
+               font: inherit; font-weight: normal; }
+  #paleta h3 i { width: 8px; height: 8px; display: inline-block; }
+  #paleta li { list-style: none; padding-left: 18px; height: 15px; line-height: 15px; color: var(--muted);
+               cursor: grab; }
+  #paleta li:hover { color: var(--accent); }
+  #paleta ul { margin: 0 0 4px; padding: 0; }
+  /* o banco de escalas do QUANTIZER (`ScaleBrowser`) */
+  #banco { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); display: none; z-index: 10;
+           align-items: center; justify-content: center; font: 11px system-ui, sans-serif; }
+  #banco.aberto { display: flex; }
+  #banco .cartao { width: min(820px, calc(100vw - 40px)); height: min(600px, calc(100vh - 40px));
+                   background: var(--surface); border: 2px solid var(--line); display: flex; flex-direction: column;
+                   padding: 10px 12px 12px; gap: 8px; }
+  #banco h2 { margin: 0 4px; font: bold 13.5px system-ui, sans-serif; color: var(--text); display: flex; }
+  #banco h2 button { margin-left: auto; background: none; border: 0; color: var(--text); font-size: 16px; cursor: pointer; }
+  #banco input { height: 26px; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
+                 padding: 0 6px; font: 11px system-ui, sans-serif; margin: 0 4px; }
+  #banco input:focus { outline: none; border-color: var(--accent); }
+  #banco .listas { flex: 1; min-height: 0; display: flex; gap: 10px; }
+  #banco .lista { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #b-familias { width: 40%; border-right: 1px solid var(--line); }
+  #b-escalas { flex: 1; }
+  #banco .lista div { height: 22px; line-height: 22px; padding: 0 6px; color: var(--text); cursor: pointer;
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #banco .lista div:hover { color: var(--accent); }
+  #banco .lista div.on { background: rgba(255, 157, 76, .18); color: var(--accent); }
+  #b-conta { text-align: right; color: var(--muted); font-size: 9.5px; height: 12px; }
+  #b-info { border-top: 1px solid var(--line); padding: 8px 4px 0; height: 124px; display: flex; flex-direction: column; gap: 3px; }
+  #b-info b { color: var(--text); font-size: 11px; }
+  #b-info .fonte { color: var(--muted); font-size: 9.5px; max-height: 26px; overflow: hidden; }
+  #b-regua { height: 20px; background: var(--recessed); position: relative; margin-top: 4px; }
+  #b-regua i { position: absolute; top: 2px; bottom: 2px; width: 2px; background: var(--accent); }
+  #b-dica { color: var(--muted); font-size: 9.5px; margin-top: auto; }
   #rack { position: sticky; top: 0; display: block; }
   .espaco { position: absolute; top: 0; left: 0; width: 1px; pointer-events: none; }
 </style>
@@ -96,15 +137,32 @@
   </div>
   <input id="arquivo" type="file" accept=".rmp,text/plain" hidden />
 </header>
-<div id="rolagem">
-  <div class="espaco"></div>
-  <canvas id="rack"></canvas>
+<div id="corpo">
+  <nav id="paleta" aria-label="Módulos"></nav>
+  <div id="rolagem">
+    <div class="espaco"></div>
+    <canvas id="rack"></canvas>
+  </div>
+</div>
+<div id="banco" role="dialog" aria-label="Banco de escalas">
+  <div class="cartao">
+    <h2>ESCALAS — banco do Trioio <button id="b-fechar" aria-label="Fechar">×</button></h2>
+    <input id="b-busca" type="text" placeholder="buscar" />
+    <div class="listas">
+      <div id="b-familias" class="lista"></div>
+      <div id="b-escalas" class="lista"></div>
+    </div>
+    <div id="b-conta"></div>
+    <div id="b-info"><b id="b-nome"></b><span id="b-graus"></span><span id="b-fonte" class="fonte"></span>
+      <div id="b-regua"></div>
+      <span id="b-dica">Clique numa escala: o QUANTIZER passa a tocá-la (SCALE = BANCO). Esc fecha.</span></div>
+  </div>
 </div>
 <script type="module">
-import { Rack } from './rack.js';
+import { Rack, corFamilia } from './rack.js';
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
-let ctx = null, no = null, bytes = null;
+let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
 const rack = new Rack($('rack'), $('rolagem'));
 rack.layout();
 
@@ -155,13 +213,20 @@ function syncCabecalho() {
 fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
   bytes = b;
   // a marca RASGO do cabeçalho vem do motor (o mesmo vetor dos painéis)
-  const e = await instanciar();
+  const e = local = await instanciar();
+  construirPaleta(JSON.parse(cTexto(e, e.rw_catalogo())));
   const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
   $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
   aviso('Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.', 1e9);
   if (q.has('auto')) tocar();
   if (q.has('previa')) previa().catch((x) => aviso('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1], 1e9));
 }).catch(() => aviso('Não consegui carregar rasgo.wasm (abra por um servidor http).', 1e9));
+
+// um texto terminado em zero na memória do motor
+function cTexto(e, p) {
+  const u8 = new Uint8Array(e.memory.buffer); let f = p; while (u8[f]) f++;
+  return new TextDecoder().decode(u8.slice(p, f));
+}
 
 async function instanciar() {
   let mem;
@@ -188,6 +253,8 @@ async function ligar() {
       if (m.tipo === 'seed' || m.tipo === 'patch' || m.tipo === 'rack') {
         est.seed = m.seed; est.cabos = m.cabos;
         rack.carregar(m.texto, m.wordmark, m.tipo === 'rack');
+        // módulo novo: à vista na SAÍDA por exceção, até chegar ao som
+        if (m.novo >= 0 && !rack.porId.get(m.novo)?.chega) { rack.pendentes.add(m.novo); rack.layout(); }
         syncCabecalho();
       }
       if (m.tipo === 'quadro') {
@@ -199,6 +266,8 @@ async function ligar() {
         vu.style.background = f < 0.85 ? 'var(--prata)' : 'var(--warning)';
       }
       if (m.tipo === 'salvo') salvo(m);
+      if (m.tipo === 'recusa') aviso(m.modulo + (m.motivo === -1 ? ' é único no rack.' : m.motivo === -2 ? ': no máximo 4 cópias.' : ': tipo desconhecido.'));
+      if (m.tipo === 'bancoAtual') abrirBanco(m.id, Math.round(m.banco));
       if (m.tipo === 'nada' && m.acao === 'desfazer') aviso('Nada para desfazer.');
       if (m.tipo === 'nada' && m.acao === 'abrir') aviso('Não consegui abrir esse arquivo: não parece um patch do Rasgo Modular (.rmp).');
     };
@@ -347,9 +416,121 @@ arrastoTrilho($('t-volume'), (f) => {
   if (no) no.port.postMessage({ tipo: 'ganho', valor: f });
 });
 
+// ---- a paleta -------------------------------------------------------------
+// Arrastar um tipo para o rack acrescenta o módulo; parar o mouse num tipo
+// acende os módulos dele no rack; um módulo arrastado pelo título e solto
+// aqui sai da case.
+function construirPaleta(cat) {
+  const nav = $('paleta');
+  for (const f of cat) {
+    const h = document.createElement('h3');
+    h.style.color = corFamilia(f.familia);
+    h.innerHTML = `<i style="background:${corFamilia(f.familia)}"></i>`;
+    h.append(f.familia);
+    const ul = document.createElement('ul');
+    for (const t of f.tipos) {
+      const li = document.createElement('li');
+      li.textContent = t; li.dataset.tipo = t;
+      ul.append(li);
+    }
+    nav.append(h, ul);
+  }
+}
+let puxando = null;   // { tipo } enquanto um tipo é arrastado da paleta
+const sobre = (el, ev) => { const r = el.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX < r.right && ev.clientY >= r.top && ev.clientY < r.bottom; };
+rack.sobrePaleta = (ev) => sobre($('paleta'), ev);
+$('paleta').addEventListener('pointerover', (ev) => {
+  const t = ev.target.dataset?.tipo || '';
+  if (t !== rack.paletaTipo) { rack.paletaTipo = t; rack.redesenhar(); }
+});
+$('paleta').addEventListener('pointerleave', () => { if (!puxando && rack.paletaTipo) { rack.paletaTipo = ''; rack.redesenhar(); } });
+$('paleta').addEventListener('pointerdown', (ev) => {
+  const t = ev.target.dataset?.tipo;
+  if (!t || ev.button !== 0) return;
+  ev.preventDefault();
+  $('paleta').setPointerCapture(ev.pointerId);
+  puxando = { tipo: t };
+});
+$('paleta').addEventListener('pointermove', (ev) => {
+  if (!puxando) return;
+  const dentro = sobre($('rolagem'), ev);
+  if (dentro) { const r = $('rack').getBoundingClientRect(); rack.fantasma = { tipo: puxando.tipo, x: ev.clientX - r.left, y: ev.clientY - r.top + $('rolagem').scrollTop }; }
+  else rack.fantasma = null;
+  rack.redesenhar();
+});
+$('paleta').addEventListener('pointerup', async (ev) => {
+  if (!puxando) return;
+  const t = puxando.tipo; puxando = null;
+  rack.fantasma = null; rack.redesenhar();
+  if (!sobre($('rolagem'), ev)) return;
+  if (!no) await tocar();
+  no.port.postMessage({ tipo: 'adicionar', modulo: t });
+});
+// o módulo arrastado pelo título acende a paleta quando passa sobre ela
+addEventListener('pointermove', (ev) => {
+  $('paleta').classList.toggle('alvo', rack.gesto?.tipo === 'modulo' && rack.gesto.movido && sobre($('paleta'), ev));
+});
+addEventListener('pointerup', () => $('paleta').classList.remove('alvo'));
+
+// ---- o banco de escalas do QUANTIZER (`ScaleBrowser`) --------------------
+let banco = null, bancoNo = -1, bancoFam = 0, bancoSel = null;
+rack.abrirBanco = (id) => { if (no) no.port.postMessage({ tipo: 'lerBanco', id }); };
+function abrirBanco(id, atual) {
+  if (!banco) banco = JSON.parse(cTexto(local, local.rw_banco()));
+  bancoNo = id;
+  bancoSel = banco.escalas.find((e) => e.id === atual) || null;
+  bancoFam = bancoSel ? bancoSel.f : 0;
+  $('b-busca').value = '';
+  const fams = $('b-familias'); fams.innerHTML = '';
+  banco.familias.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.textContent = `${f}  (${banco.escalas.filter((e) => e.f === i).length})`;
+    d.onclick = () => { bancoFam = i; $('b-busca').value = ''; listarBanco(); };
+    fams.append(d);
+  });
+  $('banco').classList.add('aberto');
+  listarBanco();
+  fams.children[bancoFam]?.scrollIntoView({ block: 'center' });
+  $('b-busca').focus();
+}
+function listarBanco() {
+  const q = $('b-busca').value.trim().toLowerCase();
+  [...$('b-familias').children].forEach((d, i) => d.classList.toggle('on', !q && i === bancoFam));
+  const lista = banco.escalas.filter((e) => q ? (e.n.toLowerCase().includes(q) || banco.familias[e.f].toLowerCase().includes(q)) : e.f === bancoFam);
+  const box = $('b-escalas'); box.innerHTML = '';
+  for (const e of lista) {
+    const d = document.createElement('div');
+    d.textContent = `${e.n}  · ${e.g.length}`;
+    if (e === bancoSel) d.className = 'on';
+    d.onclick = () => {
+      bancoSel = e;
+      if (no) no.port.postMessage({ tipo: 'escala', id: bancoNo, banco: e.id });
+      for (const x of box.children) x.classList.remove('on');
+      d.classList.add('on');
+      infoBanco();
+    };
+    box.append(d);
+  }
+  $('b-conta').textContent = `${lista.length} ${lista.length === 1 ? 'escala' : 'escalas'}`;
+  box.querySelector('.on')?.scrollIntoView({ block: 'center' });
+  infoBanco();
+}
+function infoBanco() {
+  const e = bancoSel, n = (v) => (v === Math.floor(v) ? String(v) : v.toFixed(1)).replace('.', ',');
+  $('b-nome').textContent = e ? e.n : '';
+  $('b-graus').textContent = e ? `graus (¢): ${e.g.map(n).join('  ')}   ·  período ${n(e.p)}` : '';
+  $('b-fonte').textContent = e ? `fonte: ${e.s}` : '';
+  $('b-regua').innerHTML = e ? e.g.map((c) => `<i style="left:calc(2px + ${c / e.p} * (100% - 6px))"></i>`).join('') : '';
+}
+function fecharBanco() { $('banco').classList.remove('aberto'); }
+$('b-busca').addEventListener('input', listarBanco);
+$('b-fechar').onclick = fecharBanco;
+$('banco').addEventListener('pointerdown', (ev) => { if (ev.target === $('banco')) fecharBanco(); });
+$('banco').addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.stopPropagation(); fecharBanco(); } });
+
 // ---- os atalhos do app (cartão ATALHOS em UiLanguage.hpp) ----------------
 addEventListener('keydown', (ev) => {
-  if (ev.target === $('seed')) return;
+  if (ev.target === $('seed') || $('banco').classList.contains('aberto')) return;
   const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
   const mapa = ctrl ? { z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
                     : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
@@ -403,6 +584,9 @@ async function previa() {
   const vu = Math.min(1, e.rw_vu() / 0.891);
   $('vu').firstChild.style.width = Math.round(vu * 54) + 'px';
   est.cabos = e.rw_cabos(); est.seed = String(s);
+  // `?banco`: abre o banco de escalas do QUANTIZER (captura de teste)
+  if (q.has('banco')) { local = e; const qz = rack.mods.find((m) => m.tipo === 'QUANTIZER'); abrirBanco(qz.id, Math.round(e.rw_parametro(qz.id, 0))); }
+  if (q.has('paletaTipo')) rack.paletaTipo = q.get('paletaTipo');
   no = { port: { postMessage: () => {} } };   // a leitura e o cabeçalho como se tocasse
   est.avisoAte = 0; syncCabecalho();
   if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)

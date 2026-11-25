@@ -158,6 +158,20 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      cada 5 s). Fora deste lote: REC, idioma, TUTORIAL e SOBRE (F4; botão
      sem função não entra, como no app) e o navegador do banco de escalas
      do QUANTIZER (próximo lote, com a paleta).
+   - **F3c, a paleta** (feito, 25/11; falta o teste do autor): a coluna
+     `PaletteColumn` à esquerda, lida do catálogo do motor (`rw_catalogo`),
+     famílias na cor delas; arrastar um tipo para o rack acrescenta o
+     módulo (`addModule`: instâncias com `canAddInstance` — único no rack,
+     até 4 cópias —, entra junto da família, à vista na SAÍDA por exceção);
+     parar o mouse num tipo acende os módulos dele. O [x] tira o módulo ao
+     soltar sem escorregar; o módulo se move só pela faixa do nome, com a
+     zona morta de 6 px e a reordenação ao vivo de `reorderTo` (o rack
+     rola na borda); solto sobre a paleta, sai da case. Tirar, acrescentar
+     e mover entram no DESFAZ, e a ordem vai no `.rmp`. O banco de escalas
+     do QUANTIZER (`ScaleBrowser`): clique no visor abre a janela com as 42
+     famílias, a busca, as 2576 escalas, graus, período, fonte e a régua.
+     Conferido no Node (`teste_f3c.mjs`) e por captura (`?previa&banco`,
+     `&paletaTipo=`). O LEARN, embaixo da paleta no app, entra na F4.
 4. **F4 — o resto do app:** tutorial, LEARN, REC (WAV e .mid para baixar),
    4 idiomas, o lugar no site. REC: teto de 4 minutos, como no app (autor,
    25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na

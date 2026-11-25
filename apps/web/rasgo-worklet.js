@@ -129,11 +129,30 @@ class RasgoProcessor extends AudioWorkletProcessor {
       new Uint8Array(this.mem.buffer, this.e.rw_entrada(b.length), b.length).set(b);
       if (this.e.rw_abrir(b.length)) { this.tocando = true; this.mandarRack('patch'); }
       else this.port.postMessage({ tipo: 'nada', acao: 'abrir' });
+    } else if (m.tipo === 'adicionar' && this.e) {
+      const id = this.e.rw_adicionar(this.texto(m.modulo));
+      if (id >= 0) this.mandarRack('rack', id);
+      else this.port.postMessage({ tipo: 'recusa', modulo: m.modulo, motivo: id });
+    } else if (m.tipo === 'remover' && this.e) {
+      if (this.e.rw_remover(m.id, m.foto === false ? 0 : 1)) this.mandarRack('rack');
+    } else if (m.tipo === 'ordem' && this.e) {
+      if (this.e.rw_ordem(this.texto(m.ids.join(' ')))) this.mandarRack('rack');
+    } else if (m.tipo === 'escala' && this.e) {
+      this.e.rw_escolher_escala(m.id, m.banco);
+    } else if (m.tipo === 'lerBanco' && this.e) {
+      this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
     } else if (m.tipo === 'visiveis') {
       this.visiveis = m.ids;
     } else if (m.tipo === 'ganho') {
       this.ganho = m.valor;
     }
+  }
+
+  // um texto na entrada do motor (`rw_entrada`); devolve o tamanho
+  texto(t) {
+    const b = new TextEncoder().encode(t);
+    new Uint8Array(this.mem.buffer, this.e.rw_entrada(b.length), b.length).set(b);
+    return b.length;
   }
 
   // a seed do patch que soa (0 = feito à mão), como texto
@@ -142,7 +161,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
   }
 
   // o rack para a página desenhar: a cada seed e a cada mudança de cabos
-  mandarRack(tipo) {
+  mandarRack(tipo, novo = -1) {
     const seed = this.seedAtual();
     const dec = new TextDecoder();
     const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
@@ -152,7 +171,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
     this.nc = this.e.rw_num_controles();
     this.tipos = {};
     for (const md of JSON.parse(texto).modulos) this.tipos[md.id] = md.tipo;
-    this.port.postMessage({ tipo, seed, cabos: this.e.rw_cabos(), texto, wordmark });
+    this.port.postMessage({ tipo, novo, seed, cabos: this.e.rw_cabos(), texto, wordmark });
   }
 
   process(_in, outputs) {
