@@ -66,7 +66,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
       const s = BigInt(m.seed);
       this.e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
       this.tocando = true;
-      this.mandarRack('seed', m.seed);
+      this.mandarRack('seed');
     } else if (m.tipo === 'parar') {
       this.tocando = false;
     } else if (m.tipo === 'pega' && this.e) {
@@ -100,6 +100,35 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_cabo_romper(m.d, m.pd);
     } else if (m.tipo === 'varia' && this.e) {
       this.e.rw_varia(m.ligado ? 1 : 0, m.intensidade);
+    } else if (m.tipo === 'foto' && this.e) {
+      this.e.rw_foto();
+    } else if (m.tipo === 'desfazer' && this.e) {
+      if (this.e.rw_desfazer()) this.mandarRack('patch');
+      else this.port.postMessage({ tipo: 'nada', acao: 'desfazer' });
+    } else if (m.tipo === 'repor' && this.e) {
+      if (this.e.rw_repor()) this.mandarRack('patch');
+    } else if (m.tipo === 'mudar' && this.e) {
+      this.e.rw_mudar(m.s[0], m.s[1]);
+    } else if (m.tipo === 'evoluir' && this.e) {
+      this.e.rw_evoluir(m.s[0], m.s[1]);
+    } else if (m.tipo === 'cruzar' && this.e) {
+      this.e.rw_cruzar(m.s[0], m.s[1], m.s[2], m.s[3]);
+    } else if (m.tipo === 'descabear' && this.e) {
+      this.e.rw_descabear();
+      this.mandarRack('rack');
+    } else if (m.tipo === 'romperTodos' && this.e) {
+      this.e.rw_romper_todos();
+    } else if (m.tipo === 'espera' && this.e) {
+      this.e.rw_espera(m.ligada ? 1 : 0);
+    } else if (m.tipo === 'salvar' && this.e) {
+      const p = this.e.rw_salvar(), n = this.e.rw_salvo_tamanho();
+      const texto = new TextDecoder().decode(new Uint8Array(this.mem.buffer, p, n).slice());
+      this.port.postMessage({ tipo: 'salvo', destino: m.destino, texto, seed: this.seedAtual() });
+    } else if (m.tipo === 'abrir' && this.e) {
+      const b = new TextEncoder().encode(m.texto);
+      new Uint8Array(this.mem.buffer, this.e.rw_entrada(b.length), b.length).set(b);
+      if (this.e.rw_abrir(b.length)) { this.tocando = true; this.mandarRack('patch'); }
+      else this.port.postMessage({ tipo: 'nada', acao: 'abrir' });
     } else if (m.tipo === 'visiveis') {
       this.visiveis = m.ids;
     } else if (m.tipo === 'ganho') {
@@ -107,8 +136,14 @@ class RasgoProcessor extends AudioWorkletProcessor {
     }
   }
 
+  // a seed do patch que soa (0 = feito à mão), como texto
+  seedAtual() {
+    return ((BigInt(this.e.rw_seed_alto() >>> 0) << 32n) | BigInt(this.e.rw_seed_baixo() >>> 0)).toString();
+  }
+
   // o rack para a página desenhar: a cada seed e a cada mudança de cabos
-  mandarRack(tipo, seed) {
+  mandarRack(tipo) {
+    const seed = this.seedAtual();
     const dec = new TextDecoder();
     const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
     const wp = this.e.rw_wordmark(), b = new Uint8Array(this.mem.buffer);
@@ -145,7 +180,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
           escalas[id] = new TextDecoder().decode(b.slice(p, f));
         }
       });
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas },
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu() },
                             [v.buffer, c.buffer, vis.buffer]);
     }
     return true;

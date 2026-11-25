@@ -5,25 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular no navegador — protótipo</title>
 <style>
+  /* os tokens do app (`T` em RasgoModularApp.cpp) */
   :root { --bg: #131a1a; --surface: #262b36; --recessed: #0e1015; --line: #485060; --text: #f0f3f8;
-          --muted: #bec8d8; --prata: #d8dde6; }
+          --muted: #bec8d8; --prata: #d8dde6; --accent: #ff9d4c; --warning: #ff6b5b; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif;
          display: flex; flex-direction: column; overflow: hidden; }
-  header { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 14px;
-           background: var(--surface); border-bottom: 1px solid var(--line); }
-  header strong { letter-spacing: .08em; margin-right: 8px; }
-  button { background: transparent; color: var(--prata); border: 1px solid var(--line); padding: 5px 12px;
-           font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; border-radius: 3px; }
-  button:hover:not(:disabled) { border-color: var(--prata); }
-  button.on { background: var(--prata); color: var(--bg); }
-  button:disabled { opacity: .45; cursor: default; }
-  input[type=text] { width: 13em; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
-                     padding: 5px 8px; font: 13px ui-monospace, monospace; border-radius: 3px; }
-  input[type=range] { width: 7em; accent-color: var(--prata); }
-  label { color: var(--muted); font-size: 13px; }
-  #estado { color: var(--muted); font-size: 13px; margin-left: auto; }
+  /* O cabeçalho do app (`HeaderBar`): uma fileira de 46 px que quebra em
+     duas quando não cabe; grupos separados por uma régua fina */
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 6px; padding: 12px 12px 11px 14px;
+           background: var(--bg); border-bottom: 1px solid var(--line); font: 9.5px system-ui, sans-serif; }
+  .grupo { display: flex; align-items: center; gap: 6px; }
+  .direita { margin-left: auto; }
+  .marca { display: flex; align-items: center; gap: 7px; margin-right: 6px; padding-right: 10px;
+           border-right: 1px solid var(--line); height: 26px; }
+  .marca span { color: var(--muted); font-size: 9.5px; letter-spacing: .02em; }
+  .regua { width: 1px; height: 16px; background: var(--line); margin: 0 3px 0 1px; }
+  header button { height: 22px; padding: 0 7px; background: transparent; color: var(--muted);
+                  border: 1px solid var(--line); border-radius: 0; font: inherit; cursor: pointer;
+                  white-space: nowrap; }
+  header button:hover { border-color: var(--muted); }
+  /* ligado / o realce de um instante (`flashing`): cheio, com o anel */
+  header button.on { background: var(--accent); border-color: var(--accent); color: var(--bg);
+                     outline: 1px solid var(--accent); outline-offset: 2px; }
+  header button.prata.on { background: var(--prata); border-color: var(--prata); outline-color: var(--prata); }
+  header button.tocar { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .rotulo { color: var(--muted); }
+  .rotulo.vivo { color: var(--text); }
+  #r-varia { cursor: pointer; }
+  #seed { width: 21ch; height: 22px; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
+          padding: 0 4px; font: 11px ui-monospace, monospace; border-radius: 0; }
+  #seed:focus { outline: none; border-color: var(--accent); }
+  /* slider do VARIA e do volume (`varySlider_`): 84 × 14, zero = desligado */
+  .trilho { position: relative; width: 84px; height: 14px; background: var(--recessed); border-radius: 3px;
+            cursor: pointer; touch-action: none; }
+  .trilho .cheio { position: absolute; left: 1px; top: 1px; bottom: 1px; background: var(--prata); border-radius: 2px; }
+  .trilho .meio { position: absolute; left: 42px; top: 2px; bottom: 2px; width: 1px; background: rgba(190, 200, 216, .7); }
+  #leitura { color: var(--muted); font-size: 9.5px; white-space: nowrap; }
+  #leitura.aviso { color: var(--text); white-space: normal; max-width: 46ch; }
+  #vu { width: 54px; height: 8px; background: var(--recessed); position: relative; }
+  #vu div { position: absolute; left: 0; top: 0; bottom: 0; background: var(--prata); }
   #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
   #rack { position: sticky; top: 0; display: block; }
   .espaco { position: absolute; top: 0; left: 0; width: 1px; pointer-events: none; }
@@ -31,17 +53,48 @@
 </head>
 <body>
 <header>
-  <strong>RASGO MODULAR</strong>
-  <button id="tocar" disabled>TOCAR</button>
-  <button id="nova" disabled>SEED NOVA</button>
-  <button id="parar" disabled>PARAR</button>
-  <input id="seed" type="text" inputmode="numeric" value="4303935450909092226" aria-label="Número da seed" />
-  <button id="varia" class="on" aria-pressed="true">VARIA</button>
-  <input id="intensidade" type="range" min="0" max="2" step="0.01" value="1" aria-label="Intensidade do VARIA" />
-  <button id="vista" aria-pressed="false" title="RACK: todos os módulos · SAÍDA: só os que chegam ao som">RACK · SAÍDA</button>
-  <label for="volume">Volume</label>
-  <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" />
-  <span id="estado">Carregando o motor…</span>
+  <div class="marca"><svg id="logo" width="118" height="15" viewBox="6.63 12.62 258.74 30.75" aria-label="RASGO"></svg><span>MODULAR</span></div>
+  <div class="grupo">
+    <input id="seed" type="text" inputmode="numeric" maxlength="20" value="4303935450909092226" aria-label="Número da seed" />
+    <button id="b-tocar" class="tocar" title="O navegador só deixa tocar depois de um clique">TOCAR</button>
+    <button data-acao="seed" title="g">SEED</button>
+    <button data-acao="repor" title="r">REPOR</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <span id="r-varia" class="rotulo vivo" title="v liga/desliga">VARIA</span>
+    <div id="t-varia" class="trilho" title="Intensidade da variação (0 = desligado; a marca é o 1,0)"><div class="cheio"></div><div class="meio"></div></div>
+    <button data-acao="mudar" title="m">MUDA</button>
+    <button data-acao="evoluir" title="e">EVOLUI</button>
+    <button data-acao="cruzar" title="c">CRUZA</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <button data-acao="banco" title="Ctrl+B: baixa o patch (.rmp)">BANCO</button>
+    <button data-acao="salvar" title="Ctrl+S: guarda a sessão neste navegador">SALVA</button>
+    <button data-acao="abrir" title="Ctrl+O: abre um patch (.rmp)">ABRIR</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <button data-acao="desfazer" title="Ctrl+Z">DESFAZ</button>
+    <button data-acao="descabear" title="n">DESCABEIA</button>
+    <button data-acao="espera" id="b-espera">ESPERA</button>
+  </div>
+  <div class="regua"></div>
+  <div class="grupo">
+    <span class="rotulo">ZOOM</span>
+    <button data-acao="zoomMenos" title="Ctrl+−">−</button>
+    <button data-acao="zoomMais" title="Ctrl+=">+</button>
+    <button data-acao="vista" id="b-vista" class="prata">RACK · TODOS</button>
+  </div>
+  <div class="grupo direita">
+    <span id="leitura"></span>
+    <div id="vu" title="O pico do MASTER"><div></div></div>
+    <span class="rotulo">VOLUME</span>
+    <div id="t-volume" class="trilho" title="O volume desta página"><div class="cheio"></div></div>
+    <button data-acao="abre" id="b-abre" class="prata" title="Como a página abre na próxima vez">ABRE · SEED</button>
+  </div>
+  <input id="arquivo" type="file" accept=".rmp,text/plain" hidden />
 </header>
 <div id="rolagem">
   <div class="espaco"></div>
@@ -50,52 +103,67 @@
 <script type="module">
 import { Rack } from './rack.js';
 const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
 let ctx = null, no = null, bytes = null;
-const estado = (t) => { $('estado').textContent = t; };
 const rack = new Rack($('rack'), $('rolagem'));
 rack.layout();
 
-fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(b => {
-  bytes = b;
-  $('tocar').disabled = false; $('nova').disabled = false;
-  estado('Pronto. Aperte TOCAR.');
-  // `?auto`: toca sem clique (capturas de teste num navegador sem janela)
-  if (new URLSearchParams(location.search).has('auto')) tocar();
-  if (new URLSearchParams(location.search).has('previa')) previa().catch((x) => estado('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1]));
-}).catch(() => estado('Não consegui carregar rasgo.wasm (abra por um servidor http).'));
+// ---- estado do cabeçalho ------------------------------------------------
+const est = { seed: $('seed').value, cabos: 0, espera: false, variaOn: true, variaAmt: 1,
+              volume: 0.7, avisoAte: 0, aviso: '' };
+const guardar = (k, v) => { try { localStorage.setItem('rasgoModular.' + k, v); } catch { /* sem armazenamento */ } };
+const ler = (k) => { try { return localStorage.getItem('rasgoModular.' + k); } catch { return null; } };
 
-async function ligar() {
-  if (ctx) return;
-  ctx = new AudioContext();
-  await ctx.audioWorklet.addModule('rasgo-worklet.js');
-  no = new AudioWorkletNode(ctx, 'rasgo', { numberOfInputs: 0, outputChannelCount: [2] });
-  no.connect(ctx.destination);
-  await new Promise(ok => {
-    no.port.onmessage = (ev) => {
-      const m = ev.data;
-      if (m.tipo === 'pronto') ok();
-      if (m.tipo === 'seed') {
-        estado(`Seed ${m.seed} · ${m.cabos} cabos · ${ctx.sampleRate} Hz`);
-        $('parar').disabled = false; $('tocar').classList.add('on');
-        rack.carregar(m.texto, m.wordmark);
-      }
-      if (m.tipo === 'rack') { estado(`Seed ${$('seed').value} · ${m.cabos} cabos · ${ctx.sampleRate} Hz`); rack.carregar(m.texto, m.wordmark, true); }
-      if (m.tipo === 'quadro') rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
-    };
-    no.port.postMessage({ tipo: 'wasm', bytes });
-    rack.enviar = (msg) => no.port.postMessage(msg);
-    rack.aviso = (t) => estado(t);
-  });
-  no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) });
-  enviarVaria();
+// avisos no lugar da leitura, por alguns segundos (no app, na paleta)
+function aviso(t, ms = 4500) { est.aviso = t; est.avisoAte = performance.now() + ms; leitura(); }
+rack.aviso = (t) => aviso(t);
+
+function leitura() {
+  const el = $('leitura');
+  if (performance.now() < est.avisoAte) { el.textContent = est.aviso; el.className = 'aviso'; return; }
+  const mods = rack.soSaida ? `${rack.vistos.length}/${rack.mods.length}` : `${rack.vistos.length}`;
+  el.textContent = no ? `${mods} mód  ·  ${est.cabos} cabos` : '';
+  el.className = '';
+}
+setInterval(leitura, 500);
+
+// o realce de um instante no botão da ação (`flashing`, 160 ms)
+function acende(acao) {
+  const b = document.querySelector(`[data-acao="${acao}"]`);
+  if (!b || b.id === 'b-espera' || b.id === 'b-vista') return;
+  b.classList.add('on');
+  setTimeout(() => b.classList.remove('on'), 160);
 }
 
-// `?previa[=segundos]`: o motor roda AQUI, sem som, alguns segundos, e o
-// rack é desenhado com o estado a que chegou. Só para capturas de teste num
-// navegador sem saída de áudio; tocar continua sendo pelo worklet.
-async function previa() {
-  const q = new URLSearchParams(location.search);
-  const seg = Number(q.get('previa')) || 4;
+function trilho(el, frac) { el.querySelector('.cheio').style.width = Math.round(frac * 82) + 'px'; }
+function syncCabecalho() {
+  if (document.activeElement !== $('seed')) $('seed').value = est.seed === '0' ? '' : est.seed;
+  document.querySelector('[data-acao="repor"]').hidden = est.seed === '0';
+  $('b-tocar').hidden = !!no;
+  $('b-espera').classList.toggle('on', est.espera);
+  $('b-vista').classList.toggle('on', rack.soSaida);
+  $('b-vista').textContent = 'RACK · ' + (rack.soSaida ? 'SAÍDA' : 'TODOS');
+  trilho($('t-varia'), est.variaOn ? est.variaAmt * 0.5 : 0);
+  $('r-varia').classList.toggle('vivo', est.variaOn && est.variaAmt > 0);
+  trilho($('t-volume'), est.volume);
+  const modo = ler('abre') || 'seed';
+  $('b-abre').textContent = 'ABRE · ' + { seed: 'SEED', uncabled: 'SEM CABOS', init: 'MEU PATCH', last: 'ÚLTIMA' }[modo];
+  leitura();
+}
+
+// ---- o motor ------------------------------------------------------------
+fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
+  bytes = b;
+  // a marca RASGO do cabeçalho vem do motor (o mesmo vetor dos painéis)
+  const e = await instanciar();
+  const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
+  $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
+  aviso('Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.', 1e9);
+  if (q.has('auto')) tocar();
+  if (q.has('previa')) previa().catch((x) => aviso('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1], 1e9));
+}).catch(() => aviso('Não consegui carregar rasgo.wasm (abra por um servidor http).', 1e9));
+
+async function instanciar() {
   let mem;
   const stub = new Proxy({}, { get: (_, n) => (...a) => {
     if (n === 'fd_write') { const v = new DataView(mem.buffer); let s = 0;
@@ -103,9 +171,207 @@ async function previa() {
     return 0; } });
   const { instance } = await WebAssembly.instantiate(bytes, { wasi_snapshot_preview1: stub, env: stub });
   const e = instance.exports; mem = e.memory; if (e._initialize) e._initialize();
+  return e;
+}
+
+async function ligar() {
+  if (ctx) return;
+  ctx = new AudioContext();
+  await ctx.audioWorklet.addModule('rasgo-worklet.js');
+  const n = new AudioWorkletNode(ctx, 'rasgo', { numberOfInputs: 0, outputChannelCount: [2] });
+  n.connect(ctx.destination);
+  await new Promise(ok => {
+    n.port.onmessage = (ev) => {
+      const m = ev.data;
+      if (m.tipo === 'pronto') ok();
+      // seed nova, DESFAZ, REPOR, ABRIR: patch novo; 'rack': os cabos mudaram
+      if (m.tipo === 'seed' || m.tipo === 'patch' || m.tipo === 'rack') {
+        est.seed = m.seed; est.cabos = m.cabos;
+        rack.carregar(m.texto, m.wordmark, m.tipo === 'rack');
+        syncCabecalho();
+      }
+      if (m.tipo === 'quadro') {
+        rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
+        est.cabos = m.cabos.length / 14;
+        // o VU do cabeçalho (`setReadout`): pico contra −1 dBFS
+        const f = Math.min(1, m.vu / 0.891), vu = $('vu').firstChild;
+        vu.style.width = Math.round(f * 54) + 'px';
+        vu.style.background = f < 0.85 ? 'var(--prata)' : 'var(--warning)';
+      }
+      if (m.tipo === 'salvo') salvo(m);
+      if (m.tipo === 'nada' && m.acao === 'desfazer') aviso('Nada para desfazer.');
+      if (m.tipo === 'nada' && m.acao === 'abrir') aviso('Não consegui abrir esse arquivo: não parece um patch do Rasgo Modular (.rmp).');
+    };
+    n.port.postMessage({ tipo: 'wasm', bytes });
+  });
+  no = n;
+  rack.enviar = (msg) => no.port.postMessage(msg);
+  no.port.postMessage({ tipo: 'ganho', valor: est.volume });
+  enviarVaria();
+  if (est.espera) no.port.postMessage({ tipo: 'espera', ligada: true });
+}
+
+// O primeiro clique liga o som e abre como o ABRE manda (`StartupPolicy`):
+// SEED = a seed da caixa; SEM CABOS = ela, descabeada; MEU PATCH e ÚLTIMA =
+// o patch guardado neste navegador (se não houver, a seed)
+async function tocar() {
+  if (no) return;
+  const s = seedValida() || '4303935450909092226';
+  aviso('Montando o patch…', 1e9);
+  await ligar();
+  await ctx.resume();
+  const modo = ler('abre') || 'seed';
+  const guardado = modo === 'init' ? ler('init') : modo === 'last' ? ler('sessao') : null;
+  if (guardado) no.port.postMessage({ tipo: 'abrir', texto: guardado });
+  else {
+    no.port.postMessage({ tipo: 'seed', seed: s });
+    if (modo === 'uncabled') no.port.postMessage({ tipo: 'descabear' });
+  }
+  est.avisoAte = 0;
+  syncCabecalho();
+}
+
+const sorteio = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return [a[0], a[1]]; };
+function novaSeed() {
+  const [a, b] = sorteio();
+  let s = (BigInt(a) << 32n) | BigInt(b); if (s === 0n) s = 1n;
+  return s.toString();
+}
+function seedValida() {
+  const s = $('seed').value.trim();
+  return /^\d{1,20}$/.test(s) && BigInt(s) > 0n && BigInt(s) < (1n << 64n) ? s : null;
+}
+function enviarVaria() {
+  if (no) no.port.postMessage({ tipo: 'varia', ligado: est.variaOn && est.variaAmt > 0, intensidade: est.variaAmt });
+}
+
+// ---- as ações (o despacho único do app: clique e atalho entram por aqui)
+async function acao(a) {
+  acende(a);
+  if (a === 'zoomMenos' || a === 'zoomMais' || a === 'zoom0') { rack.mudarZoom(a === 'zoom0' ? 0 : a === 'zoomMais' ? 1 : -1); return; }
+  if (a === 'vista') {
+    rack.vistaSaida(!rack.soSaida); syncCabecalho();
+    aviso(rack.soSaida ? `SAÍDA: módulos que chegam ao áudio: ${rack.vistos.length}/${rack.mods.length}`
+                       : `TODOS: módulos deste patch: ${rack.vistos.length}`);
+    return;
+  }
+  if (a === 'abre') {
+    const ordem = ['seed', 'uncabled', 'init', 'last'];
+    const modo = ordem[(ordem.indexOf(ler('abre') || 'seed') + 1) % 4];
+    guardar('abre', modo);
+    if (modo === 'init' && no) no.port.postMessage({ tipo: 'salvar', destino: 'init' });
+    aviso({ seed: 'Na próxima vez, abre com um patch novo (seed), depois do TOCAR.',
+            uncabled: 'Na próxima vez, abre com todos os módulos e sem cabos.',
+            init: 'Este patch agora é o seu patch de abertura: na próxima vez, abre com ele. Para trocar, volte a MEU PATCH com o patch que quiser.',
+            last: 'Na próxima vez, abre com a sessão como estiver ao fechar a página.' }[modo], 7000);
+    syncCabecalho();
+    return;
+  }
+  if (a === 'abrir') { $('arquivo').click(); return; }
+  if (a === 'variaLiga') { est.variaOn = !est.variaOn; enviarVaria(); syncCabecalho(); return; }
+  if (a === 'espera') {
+    est.espera = !est.espera; syncCabecalho();
+    if (no) no.port.postMessage({ tipo: 'espera', ligada: est.espera });
+    return;
+  }
+  if (a === 'seed') {
+    const s = novaSeed();
+    $('seed').value = s;
+    if (!no) { await tocar(); return; }
+    no.port.postMessage({ tipo: 'seed', seed: s });
+    return;
+  }
+  if (!no) await tocar();
+  if (a === 'repor') no.port.postMessage({ tipo: 'repor' });
+  else if (a === 'mudar') no.port.postMessage({ tipo: 'mudar', s: sorteio() });
+  else if (a === 'evoluir') no.port.postMessage({ tipo: 'evoluir', s: sorteio() });
+  else if (a === 'cruzar') no.port.postMessage({ tipo: 'cruzar', s: [...sorteio(), ...sorteio()] });
+  else if (a === 'desfazer') no.port.postMessage({ tipo: 'desfazer' });
+  else if (a === 'descabear') no.port.postMessage({ tipo: 'descabear' });
+  else if (a === 'romperTodos') no.port.postMessage({ tipo: 'romperTodos' });
+  else if (a === 'salvar' || a === 'banco') no.port.postMessage({ tipo: 'salvar', destino: a });
+}
+
+// SALVA guarda a sessão neste navegador; BANCO baixa o patch num arquivo
+// com o nome da seed (`bankPatchName`: seed-N.rmp, ou patch-<hora>.rmp)
+function salvo(m) {
+  if (m.destino === 'salvar') { guardar('sessao', m.texto); aviso('Sessão salva neste navegador.'); }
+  else if (m.destino === 'init') guardar('init', m.texto);
+  else if (m.destino === 'ultima') guardar('sessao', m.texto);
+  else if (m.destino === 'banco') {
+    const nome = m.seed !== '0' ? `seed-${m.seed}.rmp` : `patch-${Math.floor(Date.now() / 1000)}.rmp`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([m.texto], { type: 'text/plain' }));
+    a.download = nome; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    aviso(`Patch no banco: ${nome} (na pasta de downloads).`);
+  }
+}
+// ABRE · ÚLTIMA: a sessão vai sendo guardada enquanto se toca
+setInterval(() => { if (no && ler('abre') === 'last') no.port.postMessage({ tipo: 'salvar', destino: 'ultima' }); }, 5000);
+
+$('arquivo').onchange = async () => {
+  const f = $('arquivo').files[0];
+  $('arquivo').value = '';
+  if (!f) return;
+  if (f.size > 4e6) { aviso('Arquivo grande demais para um patch.'); return; }
+  const texto = await f.text();
+  if (!no) await tocar();
+  no.port.postMessage({ tipo: 'abrir', texto });
+};
+
+// ---- os controles do cabeçalho -------------------------------------------
+$('b-tocar').onclick = () => tocar();
+for (const b of document.querySelectorAll('header button[data-acao]')) b.onclick = () => acao(b.dataset.acao);
+$('r-varia').onclick = () => acao('variaLiga');
+$('seed').addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter') {
+    const s = seedValida();
+    if (!s) { aviso('A seed é um número inteiro positivo (até 20 dígitos).'); return; }
+    $('seed').blur();
+    if (!no) tocar(); else no.port.postMessage({ tipo: 'seed', seed: s });
+  } else if (ev.key === 'Escape') { $('seed').value = est.seed; $('seed').blur(); }
+});
+$('seed').addEventListener('blur', () => { if (no) $('seed').value = est.seed === '0' ? '' : est.seed; });
+$('seed').addEventListener('input', () => { $('seed').value = $('seed').value.replace(/\D/g, ''); });
+
+// arrastar no trilho: clicar em qualquer ponto salta para lá (`setVaryFromX`)
+function arrastoTrilho(el, aplicar) {
+  const em = (ev) => { const r = el.getBoundingClientRect(); aplicar(Math.min(1, Math.max(0, (ev.clientX - r.left - 1) / (r.width - 2)))); };
+  el.addEventListener('pointerdown', (ev) => { el.setPointerCapture(ev.pointerId); em(ev); });
+  el.addEventListener('pointermove', (ev) => { if (el.hasPointerCapture(ev.pointerId)) em(ev); });
+}
+arrastoTrilho($('t-varia'), (f) => { est.variaAmt = f * 2; est.variaOn = true; enviarVaria(); syncCabecalho(); });
+arrastoTrilho($('t-volume'), (f) => {
+  est.volume = f; syncCabecalho();
+  if (no) no.port.postMessage({ tipo: 'ganho', valor: f });
+});
+
+// ---- os atalhos do app (cartão ATALHOS em UiLanguage.hpp) ----------------
+addEventListener('keydown', (ev) => {
+  if (ev.target === $('seed')) return;
+  const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
+  const mapa = ctrl ? { z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
+                    : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
+  const a = mapa[k];
+  if (!a || ev.altKey) {
+    if (k === 'escape') rack.cancela();
+    return;
+  }
+  ev.preventDefault();
+  acao(a);
+});
+
+// `?previa[=segundos]`: o motor roda AQUI, sem som, alguns segundos, e o
+// rack é desenhado com o estado a que chegou. Só para capturas de teste num
+// navegador sem saída de áudio; tocar continua sendo pelo worklet.
+async function previa() {
+  const seg = Number(q.get('previa')) || 4;
+  const e = await instanciar(), mem = e.memory;
   e.rw_iniciar(48000);
   const s = BigInt(seedValida() || '1');
   e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
+  if (q.has('descabear')) e.rw_descabear();
   const dec = new TextDecoder();
   const texto = dec.decode(new Uint8Array(mem.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
   const wp = e.rw_wordmark(), b = new Uint8Array(mem.buffer); let fim = wp; while (b[fim]) fim++;
@@ -134,61 +400,24 @@ async function previa() {
   rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
               new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice(), ids, vis, escalas);
   if (q.has('rolar')) { $('rolagem').scrollTop = q.get('rolar') === 'fim' ? 1e9 : Number(q.get('rolar')); rack.desenhar(); }
-  estado(`Prévia sem som · seed ${s} · ${rack.vistos.length}/${rack.mods.length} mód · ${e.rw_cabos()} cabos · ${seg} s`);
+  const vu = Math.min(1, e.rw_vu() / 0.891);
+  $('vu').firstChild.style.width = Math.round(vu * 54) + 'px';
+  est.cabos = e.rw_cabos(); est.seed = String(s);
+  no = { port: { postMessage: () => {} } };   // a leitura e o cabeçalho como se tocasse
+  est.avisoAte = 0; syncCabecalho();
   if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
     rack.desenhar();
     const t0 = performance.now();
     for (let i = 0; i < 60; i++) rack.desenhar();
     const t1 = performance.now();
     for (let i = 0; i < 20; i++) { rack.chaveCabos = null; rack.desenhar(); }
-    estado(`${rack.vistos.length} mód · quadro ${((t1 - t0) / 60).toFixed(2)} ms · com cabos mudando ${((performance.now() - t1) / 20).toFixed(2)} ms`);
+    aviso(`${rack.vistos.length} mód · quadro ${((t1 - t0) / 60).toFixed(2)} ms · com cabos mudando ${((performance.now() - t1) / 20).toFixed(2)} ms`, 1e9);
   }
   document.title += ' · pronto';
 }
 
-function enviarVaria() {
-  if (no) no.port.postMessage({ tipo: 'varia', ligado: $('varia').classList.contains('on'),
-                                intensidade: Number($('intensidade').value) });
-}
-
-function seedValida() {
-  const s = $('seed').value.trim();
-  return /^\d{1,20}$/.test(s) && BigInt(s) > 0n && BigInt(s) < (1n << 64n) ? s : null;
-}
-
-async function tocar() {
-  const s = seedValida();
-  if (!s) { estado('A seed é um número inteiro positivo.'); return; }
-  estado('Montando o patch…');
-  await ligar();
-  await ctx.resume();
-  no.port.postMessage({ tipo: 'seed', seed: s });
-}
-
-$('tocar').onclick = tocar;
-$('nova').onclick = () => {
-  const a = new Uint32Array(2); crypto.getRandomValues(a);
-  let s = (BigInt(a[0]) << 32n) | BigInt(a[1]); if (s === 0n) s = 1n;
-  $('seed').value = s.toString();
-  tocar();
-};
-$('parar').onclick = () => {
-  if (no) no.port.postMessage({ tipo: 'parar' });
-  $('tocar').classList.remove('on'); $('parar').disabled = true; estado('Parado.');
-};
-$('varia').onclick = () => {
-  const on = $('varia').classList.toggle('on');
-  $('varia').setAttribute('aria-pressed', String(on));
-  enviarVaria();
-};
-$('intensidade').oninput = enviarVaria;
-$('vista').onclick = () => {
-  const on = $('vista').classList.toggle('on');
-  $('vista').setAttribute('aria-pressed', String(on));
-  rack.vistaSaida(on);
-};
-if (new URLSearchParams(location.search).has('saida')) $('vista').click();
-$('volume').oninput = () => { if (no) no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) }); };
+if (q.has('saida')) rack.vistaSaida(true);
+syncCabecalho();
 </script>
 </body>
 </html>

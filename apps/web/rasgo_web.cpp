@@ -52,6 +52,7 @@
 #include "panel/ModuleCatalog.hpp"
 #include "panel/Instances.hpp"
 #include "panel/MotionEngine.hpp"
+#include "panel/PatchGenetics.hpp"
 #include "panel/PatchSeed.hpp"
 #include "panel/SeedBalance.hpp"
 #include "panel/SinkOut.hpp"
@@ -65,7 +66,9 @@
 #include <map>
 #include <memory>
 #include <stdexcept>
+#include <sstream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using rasgo::modular::AudioBlock;
@@ -115,6 +118,19 @@ int g_quantaBloco = 0;
 float g_visor[kVisor] = {};
 std::string g_nomeEscala;
 
+// o patch como o app o guarda: a seed de origem (0 = feito à mão), a ordem
+// dos módulos no rack (vazia = a de fábrica), a pilha do DESFAZ (fotos em
+// texto, como `Rack::snapshot`), a ESPERA e o texto de SALVA/ABRIR
+std::uint64_t g_seedAtual = 0;
+std::vector<std::size_t> g_ordem;
+std::vector<std::size_t> g_shown;                  // a última ordem mostrada
+constexpr std::size_t kUndo = 24;                  // `kUndoDepth` do app
+std::vector<std::string> g_undo;
+bool g_espera = false;
+bool g_todosRompidos = false;                      // [espaço]: todos rompidos
+std::string g_salvo;
+std::vector<char> g_entrada;
+
 std::string familia(const std::string& tipo) {
     for (const auto& grp : rasgo::panel::moduleCatalog())
         for (const char* t : grp.types)
@@ -162,8 +178,12 @@ void descrever() {
     // dela, MIXER e MASTER no fim; das cópias que a seed criou, só as
     // cabeadas, junto da sua família
     std::vector<std::size_t> shown;
-    {
-        std::vector<std::size_t> primeiro;   // 1ª instância de cada tipo
+    if (!g_ordem.empty()) {
+        // a ordem que veio do arquivo (ABRIR/DESFAZ), só ids válidos
+        for (const auto id : g_ordem)
+            if (id < g.nodeCount() && g.node(id).type() != "OUT") shown.push_back(id);
+    }
+    if (shown.empty()) {
         for (const auto& fam : rasgo::panel::moduleCatalog()) {
             std::vector<const char*> ord(fam.types.begin(), fam.types.end());
             rasgo::panel::sortFamilyForDisplay(ord);
@@ -171,6 +191,8 @@ void descrever() {
                 for (std::size_t i = 0; i < g.nodeCount(); ++i)
                     if (g.node(i).type() == t) { shown.push_back(i); break; }
         }
+    }
+    {
         std::vector<char> cabeado(g.nodeCount(), 0);
         for (std::size_t i = 0; i < g.cableCount(); ++i) {
             const auto& c = g.cable(i);
@@ -178,7 +200,8 @@ void descrever() {
             if (c.target().node < cabeado.size()) cabeado[c.target().node] = 1;
         }
         for (std::size_t id = 0; id < g.nodeCount(); ++id) {
-            if (id == g_saida || !cabeado[id]) continue;
+            if (id == g_saida || !cabeado[id]
+                || std::find(shown.begin(), shown.end(), id) != shown.end()) continue;
             const std::string t = g.node(id).type();
             bool antes = false;
             for (std::size_t j = 0; j < id && !antes; ++j) antes = g.node(j).type() == t;
@@ -188,6 +211,7 @@ void descrever() {
             shown.insert(shown.begin() + static_cast<std::ptrdiff_t>(at), id);
         }
     }
+    g_shown = shown;
     const std::vector<char> chega = g.nodesFeeding(g_saida);
     g_visores.clear();
     for (const std::size_t id : shown)
@@ -346,6 +370,109 @@ std::unique_ptr<Signal> fabrica(const std::string& t) {
     return rasgo::panel::makeModule(t);
 }
 
+// um grafo novo passa a ser o patch (seed, ABRIR, DESFAZ): o MASTER, a
+// saída, a mão do VARIA e os visores são refeitos em volta dele
+void adotar(std::unique_ptr<SignalGraph> g, std::uint64_t seed) {
+    g_saida = 0;
+    for (std::size_t i = 0; i < g->nodeCount(); ++i)
+        if (g->node(i).type() == "OUT") g_saida = i;
+    g->prepare(g_taxa, 2, kQuantum);
+    g->setActiveOutput(g_saida);
+    // a mão habita o rack inteiro, como no app depois de uma seed
+    std::vector<std::size_t> shown;
+    g_masters.clear();
+    for (std::size_t i = 0; i < g->nodeCount(); ++i) {
+        if (g->node(i).type() == "OUT") continue;
+        shown.push_back(i);
+        if (auto* m = dynamic_cast<rasgo::modular::Master*>(&g->node(i))) {
+            g_masters.push_back(m);
+            // a ESPERA vale para o patch que chega
+            if (g_espera) g->setParameterBase(i, "mute", 1.0f);
+        }
+    }
+    g_seedAtual = seed;
+    g_todosRompidos = false;
+    g_mao.inhabit(*g, seed, shown);
+    g_mao.setLoudnessTarget(rasgo::panel::kSeedTargetLufs);
+    g_lufs.reset();
+    g_blocos = 0; g_passos = 0;
+    g_grafo = std::move(g);
+    g_scopes.clear(); g_maxBloco.clear(); g_faseOnda = 0; g_quantaBloco = 0;
+    descrever();
+}
+
+std::unique_ptr<SignalGraph> grafoDaSeed(std::uint64_t seed) {
+    auto g = std::make_unique<SignalGraph>();
+    for (const auto& f : rasgo::panel::seedModuleCatalog())
+        for (const char* t : f.types)
+            if (auto n = rasgo::panel::makeModule(t)) g->add(std::move(n));
+    const auto saida = g->add(std::make_unique<rasgo::panel::SinkOut>());
+    rasgo::panel::seedPatch(*g, seed, 0, fabrica);
+    g->prepare(g_taxa, 2, kQuantum);
+    g->setActiveOutput(saida);
+    rasgo::panel::balanceSeedLevel(*g, seed, g_taxa, kQuantum);
+    return g;
+}
+
+// o patch em texto, o mesmo `.rmp` do app (`patchText`/`snapshot`)
+std::string textoDoPatch() {
+    std::string t = g_grafo->serialize();
+    if (g_seedAtual) t += "seed " + std::to_string(g_seedAtual) + "\n";
+    t += "panel shown";
+    for (const auto id : g_shown) t += ' ' + std::to_string(id);
+    t += '\n';
+    return t;
+}
+
+// `Rack::pushUndo`: a foto do patch antes de uma ação que o muda
+void foto() {
+    if (!g_grafo) return;
+    g_undo.push_back(textoDoPatch());
+    if (g_undo.size() > kUndo) g_undo.erase(g_undo.begin());
+}
+
+// `applyPatchText`: a ordem e a seed do arquivo, ids fora de faixa fora
+bool aplicarTexto(const std::string& texto) {
+    std::vector<std::size_t> ord;
+    std::uint64_t seed = 0;
+    std::istringstream is(texto);
+    std::string linha;
+    while (std::getline(is, linha)) {
+        if (linha.rfind("panel shown", 0) == 0) {
+            std::istringstream ls(linha.substr(11));
+            std::size_t id = 0;
+            while (ls >> id) ord.push_back(id);
+        } else if (linha.rfind("seed ", 0) == 0) {
+            seed = std::strtoull(linha.c_str() + 5, nullptr, 10);
+        }
+    }
+    try {
+        auto g = std::make_unique<SignalGraph>(SignalGraph::deserialize(texto, fabrica));
+        bool temSaida = false;
+        for (std::size_t i = 0; i < g->nodeCount(); ++i) temSaida |= g->node(i).type() == "OUT";
+        if (!temSaida || g->nodeCount() < 2) return false;
+        g_ordem = ord;
+        adotar(std::move(g), seed);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+// MIXER e MASTER ficam fora das operações genéticas (`freezeMixMaster`)
+std::unordered_set<std::size_t> congelados() {
+    std::unordered_set<std::size_t> f;
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i) {
+        const std::string t = g_grafo->node(i).type();
+        if (t == "MIXER" || t == "MASTER") f.insert(i);
+    }
+    return f;
+}
+
+std::uint64_t seed64(std::uint32_t alto, std::uint32_t baixo) {
+    return (static_cast<std::uint64_t>(alto) << 32) | baixo;
+}
+
 }  // namespace
 
 extern "C" {
@@ -360,34 +487,158 @@ void rw_iniciar(float taxa) {
         std::lround(taxa / 30.0f / static_cast<float>(kQuantum))));
 }
 
+
 __attribute__((used, visibility("default")))
 void rw_seed(std::uint32_t alto, std::uint32_t baixo) {
-    const std::uint64_t seed = (static_cast<std::uint64_t>(alto) << 32) | baixo;
-    auto g = std::make_unique<SignalGraph>();
-    for (const auto& f : rasgo::panel::seedModuleCatalog())
-        for (const char* t : f.types)
-            if (auto n = rasgo::panel::makeModule(t)) g->add(std::move(n));
-    g_saida = g->add(std::make_unique<rasgo::panel::SinkOut>());
-    rasgo::panel::seedPatch(*g, seed, 0, fabrica);
-    g->prepare(g_taxa, 2, kQuantum);
-    g->setActiveOutput(g_saida);
-    rasgo::panel::balanceSeedLevel(*g, seed, g_taxa, kQuantum);
-    // a mão habita o rack inteiro, como no app depois de uma seed
-    std::vector<std::size_t> shown;
-    g_masters.clear();
-    for (std::size_t i = 0; i < g->nodeCount(); ++i) {
-        if (g->node(i).type() == "OUT") continue;
-        shown.push_back(i);
-        if (auto* m = dynamic_cast<rasgo::modular::Master*>(&g->node(i)))
-            g_masters.push_back(m);
+    const std::uint64_t seed = seed64(alto, baixo);
+    foto();
+    g_ordem.clear();
+    adotar(grafoDaSeed(seed), seed);
+}
+
+// REPOR: a seed atual de novo, sem a edição à mão (desfazível)
+__attribute__((used, visibility("default")))
+int rw_repor() {
+    if (!g_grafo || g_seedAtual == 0) return 0;
+    foto();
+    g_ordem.clear();
+    adotar(grafoDaSeed(g_seedAtual), g_seedAtual);
+    return 1;
+}
+
+// a seed do patch que soa (0 = feito à mão), em duas metades
+__attribute__((used, visibility("default")))
+std::uint32_t rw_seed_alto() { return static_cast<std::uint32_t>(g_seedAtual >> 32); }
+__attribute__((used, visibility("default")))
+std::uint32_t rw_seed_baixo() { return static_cast<std::uint32_t>(g_seedAtual & 0xffffffffu); }
+
+// uma foto para o DESFAZ (a página chama no começo de um gesto do inspetor)
+__attribute__((used, visibility("default")))
+void rw_foto() { foto(); }
+
+__attribute__((used, visibility("default")))
+int rw_pode_desfazer() { return g_undo.empty() ? 0 : 1; }
+
+__attribute__((used, visibility("default")))
+int rw_desfazer() {
+    if (g_undo.empty()) return 0;
+    const std::string t = std::move(g_undo.back());
+    g_undo.pop_back();
+    return aplicarTexto(t) ? 1 : 0;
+}
+
+// MUDA, EVOLUI, CRUZA (`PatchGenetics.hpp`), com as seeds sorteadas pela
+// página; MIXER e MASTER congelados, a mão do VARIA rehabita o patch
+void rehabitar() {
+    std::vector<std::size_t> todos;
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i)
+        if (i != g_saida) todos.push_back(i);
+    g_mao.inhabit(*g_grafo, g_seedAtual, todos);
+}
+
+__attribute__((used, visibility("default")))
+void rw_mudar(std::uint32_t alto, std::uint32_t baixo) {
+    if (!g_grafo) return;
+    foto();
+    rasgo::panel::mutatePatch(*g_grafo, seed64(alto, baixo), 0.25f, congelados());
+    rehabitar();
+}
+
+__attribute__((used, visibility("default")))
+void rw_evoluir(std::uint32_t alto, std::uint32_t baixo) {
+    if (!g_grafo) return;
+    foto();
+    rasgo::panel::evolvePatch(*g_grafo, seed64(alto, baixo), 6, 0.12f, congelados());
+    rehabitar();
+}
+
+// CRUZA: recombina com um doador novo — o catálogo semeado com outra seed
+__attribute__((used, visibility("default")))
+void rw_cruzar(std::uint32_t alto, std::uint32_t baixo, std::uint32_t dAlto, std::uint32_t dBaixo) {
+    if (!g_grafo) return;
+    foto();
+    SignalGraph doador;
+    for (const auto& fam : rasgo::panel::seedModuleCatalog())
+        for (const char* t : fam.types)
+            if (auto n = rasgo::panel::makeModule(t)) doador.add(std::move(n));
+    rasgo::panel::seedPatch(doador, seed64(dAlto, dBaixo));
+    rasgo::panel::crossPatch(*g_grafo, doador, seed64(alto, baixo), 0.5f, congelados());
+    rehabitar();
+}
+
+// DESCABEIA: tira todos os cabos menos o da saída de som (`clearCables`)
+__attribute__((used, visibility("default")))
+void rw_descabear() {
+    if (!g_grafo) return;
+    foto();
+    for (std::size_t i = g_grafo->cableCount(); i-- > 0;) {
+        const auto& c = g_grafo->cable(i);
+        if (c.target().node == g_saida) continue;
+        g_grafo->disconnect(c.target().node, c.target().port);
     }
-    g_mao.inhabit(*g, seed, shown);
-    g_mao.setLoudnessTarget(rasgo::panel::kSeedTargetLufs);
-    g_lufs.reset();
-    g_blocos = 0; g_passos = 0;
-    g_grafo = std::move(g);
-    g_scopes.clear(); g_maxBloco.clear(); g_faseOnda = 0; g_quantaBloco = 0;
+    g_grafo->prepare(g_taxa, 2, kQuantum);
+    g_grafo->setActiveOutput(g_saida);
+    rehabitar();
     descrever();
+}
+
+// [espaço]: rompe e reata todos os cabos de uma vez (`toggleRupture`)
+__attribute__((used, visibility("default")))
+void rw_romper_todos() {
+    if (!g_grafo) return;
+    g_todosRompidos = !g_todosRompidos;
+    for (std::size_t i = 0; i < g_grafo->cableCount(); ++i) {
+        if (g_todosRompidos) g_grafo->cable(i).rupture();
+        else g_grafo->cable(i).reconnect();
+    }
+}
+
+// ESPERA: o MASTER mudo (com a rampa dele), o patch segue correndo
+__attribute__((used, visibility("default")))
+void rw_espera(int ligada) {
+    g_espera = ligada != 0;
+    if (!g_grafo) return;
+    for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i)
+        if (g_grafo->node(i).type() == "MASTER")
+            g_grafo->setParameterBase(i, "mute", g_espera ? 1.0f : 0.0f);
+}
+
+// SALVA/BANCO: o patch em texto (.rmp); tamanho em rw_salvo_tamanho()
+__attribute__((used, visibility("default")))
+const char* rw_salvar() {
+    g_salvo = g_grafo ? textoDoPatch() : std::string{};
+    return g_salvo.c_str();
+}
+__attribute__((used, visibility("default")))
+int rw_salvo_tamanho() { return static_cast<int>(g_salvo.size()); }
+
+// ABRIR: a página escreve o texto em rw_entrada(n) e chama rw_abrir(n)
+__attribute__((used, visibility("default")))
+char* rw_entrada(int n) {
+    g_entrada.assign(static_cast<std::size_t>(std::max(0, n)) + 1, 0);
+    return g_entrada.data();
+}
+__attribute__((used, visibility("default")))
+int rw_abrir(int n) {
+    if (n <= 0 || static_cast<std::size_t>(n) >= g_entrada.size()) return 0;
+    const std::string t(g_entrada.data(), static_cast<std::size_t>(n));
+    foto();
+    if (aplicarTexto(t)) return 1;
+    g_undo.pop_back();   // não abriu: a foto não tem o que desfazer
+    return 0;
+}
+
+// o VU do cabeçalho: o pico recente do MASTER (o mesmo anel do visor)
+__attribute__((used, visibility("default")))
+float rw_vu() {
+    float p = 0.0f;
+    for (auto* m : g_masters)
+        for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i)
+            if (&g_grafo->node(i) == m) {
+                const auto it = g_scopes.find(i);
+                if (it != g_scopes.end()) p = std::max(p, it->second.peak());
+            }
+    return p;
 }
 
 __attribute__((used, visibility("default")))
@@ -507,6 +758,7 @@ int rw_ligar(int o, int po, int d, int pd) {
     // como `tryPatch`: o laço só aparece no `prepare`, que por isso fica
     // dentro do mesmo try — um ciclo vira ligação de realimentação
     auto preparar = [] { g_grafo->prepare(g_taxa, 2, kQuantum); };
+    foto();   // repatchear é desfazível
     try { g_grafo->disconnect(t, tp); } catch (...) {}
     try {
         g_grafo->connect(s, sp, t, tp);
@@ -526,8 +778,10 @@ __attribute__((used, visibility("default")))
 int rw_cortar_entrada(int d, int pd) {
     if (!g_grafo || d < 0 || static_cast<std::size_t>(d) >= g_grafo->nodeCount()) return 0;
     bool mudou = false;
+    foto();   // cortar é desfazível
     try { mudou = g_grafo->disconnect(static_cast<std::size_t>(d), static_cast<std::size_t>(pd)); } catch (...) {}
     if (mudou) depoisDosCabos();
+    else g_undo.pop_back();
     return mudou ? 1 : 0;
 }
 
@@ -535,6 +789,7 @@ __attribute__((used, visibility("default")))
 int rw_cortar_saida(int o, int po) {
     if (!g_grafo || o < 0) return 0;
     bool mudou = false;
+    foto();
     for (std::size_t i = g_grafo->cableCount(); i-- > 0;) {
         const auto& c = g_grafo->cable(i);
         if (c.target().node == g_saida) continue;   // a ligação ao sink fica
@@ -546,6 +801,7 @@ int rw_cortar_saida(int o, int po) {
         }
     }
     if (mudou) depoisDosCabos();
+    else g_undo.pop_back();
     return mudou ? 1 : 0;
 }
 

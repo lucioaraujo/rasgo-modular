@@ -137,6 +137,27 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      escalas do QUANTIZER (o clique no visor; vai com o cabeçalho e o
      banco). O custo do quadro com os visores não foi medido: a captura
      sem janela roda em tempo virtual.
+   - **F3b, o cabeçalho** (feito, 25/11; falta o teste do autor): a
+     `HeaderBar` do app em HTML, com os mesmos grupos e réguas — marca ·
+     seed SEED REPOR | VARIA (o slider, 0 = desligado) MUDA EVOLUI CRUZA |
+     BANCO SALVA ABRIR | DESFAZ DESCABEIA ESPERA | ZOOM − + RACK ·
+     TODOS/SAÍDA, e à direita a leitura (módulos · cabos), o VU do MASTER e
+     o ABRE —, o realce de 160 ms em cada ação e os atalhos do cartão
+     ATALHOS (g v m e c n r, espaço, Ctrl+Z/S/B/O, Ctrl+=/−/0). No motor
+     web: a pilha do DESFAZ (24 fotos em texto, como `Rack::snapshot`; cada
+     cabo ligado/cortado e cada gesto do inspetor entram), `mutatePatch`/
+     `evolvePatch`/`crossPatch` com MIXER e MASTER congelados, DESCABEIA
+     (fica o cabo da saída), ESPERA (o `mute` do MASTER), REPOR, e o `.rmp`
+     do app para salvar e abrir (mesmo formato: um patch do navegador abre
+     no app e vice-versa). Conferido no Node (`teste_f3b.mjs`). O que é do
+     navegador, e por isso escolha minha para o autor revisar: o TOCAR
+     (o navegador só deixa soar depois de um clique; some depois), o
+     VOLUME da página, SALVA guardando a sessão no próprio navegador
+     (localStorage), BANCO baixando `seed-N.rmp`, ABRIR pelo seletor de
+     arquivo, e o ABRE valendo no primeiro TOCAR (ÚLTIMA guarda a sessão a
+     cada 5 s). Fora deste lote: REC, idioma, TUTORIAL e SOBRE (F4; botão
+     sem função não entra, como no app) e o navegador do banco de escalas
+     do QUANTIZER (próximo lote, com a paleta).
 4. **F4 — o resto do app:** tutorial, LEARN, REC (WAV e .mid para baixar),
    4 idiomas, o lugar no site. REC: teto de 4 minutos, como no app (autor,
    25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na

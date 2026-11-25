@@ -65,6 +65,7 @@ export class Rack {
     this.cabos = null;
     this.marca = null;
     this.escala = 2;
+    this.zoom = 1;          // ZOOM − + do cabeçalho (`nudgeZoom`: 0,55–1,40)
     this.pedido = false;
     this.soSaida = false;   // vista SAÍDA: só os módulos que chegam ao som
     this.pendentes = new Set();   // à vista na SAÍDA por exceção (cortados agora)
@@ -91,6 +92,12 @@ export class Rack {
   }
 
   mmpx(mm) { return Math.round(mm * this.escala); }
+
+  // `nudgeZoom`: ±0,10, entre 0,55 e 1,40; 0 volta a 1
+  mudarZoom(dir) {
+    this.zoom = dir === 0 ? 1 : clamp(this.zoom + 0.1 * dir, 0.55, 1.4);
+    this.layout();
+  }
 
   vistaSaida(v) { this.soSaida = v; this.pendentes.clear(); this.layout(); }
 
@@ -138,7 +145,7 @@ export class Rack {
     this.dpr = dpr;
     const vw = this.rolagem.clientWidth, vh = this.rolagem.clientHeight;
     const budget = (Math.max(120, vh) - TOPO) / FILEIRAS;
-    this.escala = clamp((budget - PAD - 0.5) / MM_3U, S_MIN, S_MAX);
+    this.escala = clamp((budget - PAD - 0.5) / MM_3U, S_MIN, S_MAX) * this.zoom;
     this.modH = this.mmpx(MM_3U);
     let x = PAD, y = TOPO;
     this.vistos = this.soSaida ? this.mods.filter((m) => m.chega || this.pendentes.has(m.id)) : this.mods;
@@ -514,6 +521,9 @@ export class Rack {
     const i = this.caboInspecionado();
     if (i < 0) return true;
     const c = this.cabos, d = this.insp.d, pd = this.insp.pd, a = alvo.acao;
+    // relação, condutância, ganho e ruptura são desfazíveis (a foto do
+    // DESFAZ antes do gesto; tirar o cabo já fotografa no motor)
+    if (a.tipo !== 'comp' && a.tipo !== 'tirar') this.enviar({ tipo: 'foto' });
     if (a.tipo === 'rel') {
       if (a.r === 0) this.enviar({ tipo: 'caboRelacao', d, pd, rel: 0 });
       else if (!c[i + 7]) {             // relação nova: companion = a própria origem, e escolher
@@ -866,6 +876,7 @@ export class Rack {
       const j = this.jackEm(p), i = this.caboInspecionado();
       if (j && j.out && i >= 0) {
         const c = this.cabos;
+        this.enviar({ tipo: 'foto' });
         this.enviar({ tipo: 'caboRelacao', d: this.insp.d, pd: this.insp.pd, rel: c[i + 9], cn: j.no, cp: j.p, amt: c[i + 10] });
       }
       this.escolhendo = false;

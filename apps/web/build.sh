@@ -14,7 +14,7 @@ mkdir -p "$saida"
 nice -n 19 em++ -std=c++17 -O2 -I"$raiz/src" -I"$raiz/apps" -fwasm-exceptions \
     "$raiz/apps/web/rasgo_web.cpp" -sSTANDALONE_WASM --no-entry \
     -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB \
-    -sEXPORTED_FUNCTIONS=_rw_iniciar,_rw_seed,_rw_processar,_rw_cabos,_rw_varia,_rw_descrever,_rw_texto_tamanho,_rw_num_controles,_rw_valores,_rw_cabos_estado,_rw_wordmark,_rw_param,_rw_param_usuario,_rw_ligar,_rw_cortar_entrada,_rw_cortar_saida,_rw_mao,_rw_cabo_relacao,_rw_cabo_condutancia,_rw_cabo_ganho,_rw_cabo_romper,_rw_num_visores,_rw_visor_id,_rw_visor,_rw_nome_escala \
+    -sEXPORTED_FUNCTIONS=_rw_iniciar,_rw_seed,_rw_processar,_rw_cabos,_rw_varia,_rw_descrever,_rw_texto_tamanho,_rw_num_controles,_rw_valores,_rw_cabos_estado,_rw_wordmark,_rw_param,_rw_param_usuario,_rw_ligar,_rw_cortar_entrada,_rw_cortar_saida,_rw_mao,_rw_cabo_relacao,_rw_cabo_condutancia,_rw_cabo_ganho,_rw_cabo_romper,_rw_num_visores,_rw_visor_id,_rw_visor,_rw_nome_escala,_rw_repor,_rw_seed_alto,_rw_seed_baixo,_rw_foto,_rw_pode_desfazer,_rw_desfazer,_rw_mudar,_rw_evoluir,_rw_cruzar,_rw_descabear,_rw_espera,_rw_salvar,_rw_salvo_tamanho,_rw_entrada,_rw_abrir,_rw_vu,_rw_romper_todos \
     -o "$saida/rasgo.wasm"
 cp "$raiz/apps/web/index.html" "$raiz/apps/web/rasgo-worklet.js" "$raiz/apps/web/rack.js" "$raiz/apps/web/visores.js" "$saida/"
 ls -l "$saida"
