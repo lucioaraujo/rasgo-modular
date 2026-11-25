@@ -49,8 +49,9 @@ export function desenharVisor(g, c) {
     for (let k = 0; k < pts.length; k += 2) (k ? g.lineTo : g.moveTo).call(g, pts[k], pts[k + 1]);
     g.stroke();
   };
+  // sem dados ainda (a telemetria chega no quadro seguinte): só a moldura
   let pico = 0;
-  for (let k = 0; k < NS; k++) pico = Math.max(pico, Math.abs(v[k]));
+  if (v) for (let k = 0; k < NS; k++) pico = Math.max(pico, Math.abs(v[k]));
 
   if (v && dw > 6) {
     if (tipo === 'MASTER') {

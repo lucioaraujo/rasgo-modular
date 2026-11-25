@@ -255,6 +255,7 @@ fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
   const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
   $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
   aviso('Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.', 1e9);
+  if (!q.has('previa')) mostrarAntes();
   if (q.has('auto')) tocar();
   if (q.has('previa')) previa().catch((x) => aviso('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1], 1e9));
 }).catch(() => aviso('Não consegui carregar rasgo.wasm (abra por um servidor http).', 1e9));
@@ -316,6 +317,32 @@ async function ligar() {
   no.port.postMessage({ tipo: 'ganho', valor: est.volume });
   enviarVaria();
   if (est.espera) no.port.postMessage({ tipo: 'espera', ligada: true });
+}
+
+// Antes do primeiro clique o navegador não deixa soar, mas o rack já
+// aparece: o motor da página monta o mesmo patch que o TOCAR vai tocar (a
+// seed da caixa, ou o patch guardado pelo ABRE) e o desenha parado.
+function mostrarAntes() {
+  const e = local;
+  e.rw_iniciar(48000);
+  const modo = ler('abre') || 'seed';
+  const guardado = modo === 'init' ? ler('init') : modo === 'last' ? ler('sessao') : null;
+  let aberto = false;
+  if (guardado) {
+    const b = new TextEncoder().encode(guardado);
+    new Uint8Array(e.memory.buffer, e.rw_entrada(b.length), b.length).set(b);
+    aberto = !!e.rw_abrir(b.length);
+  }
+  if (!aberto) {
+    const s = BigInt(seedValida() || '4303935450909092226');
+    e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
+    if (modo === 'uncabled') e.rw_descabear();
+  }
+  const texto = new TextDecoder().decode(new Uint8Array(e.memory.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
+  rack.carregar(texto, cTexto(e, e.rw_wordmark()));
+  rack.quadro(new Float32Array(e.memory.buffer, e.rw_valores(), e.rw_num_controles()).slice(),
+              new Float32Array(e.memory.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice());
+  est.cabos = e.rw_cabos();
 }
 
 // O primeiro clique liga o som e abre como o ABRE manda (`StartupPolicy`):
