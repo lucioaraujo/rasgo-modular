@@ -29,11 +29,20 @@ pelo `git log` e pela conversa.
   servir `.local-build/web` e abrir `http://localhost:8765`); testar o LV2
   no Ardour e no MOD Desktop; decidir o push e quando sai a próxima versão;
   aparência e lugar do protótipo no site.
-- **Rack no navegador** (25/11, depois): F1–F3 feitas e commitadas (rack,
-  mão no instrumento, visores e MATRIX, cabeçalho, paleta, banco de
-  escalas); em curso a F4 (LEARN, TUTORIAL/SOBRE, idiomas, REC com teto de
-  4 min, lugar no site). Falta o teste do autor com o mouse (F2 e F3).
-  Plano e estado: dossiê `ESTUDO_outras_plataformas.md` §6.
+- **Rack no navegador — feito** (24–25/11, até `f1f01f5`): F1–F4 completas
+  (rack, mão no instrumento, visores, MATRIX, cabeçalho, paleta, banco de
+  escalas, LEARN, 4 idiomas, TUTORIAL/SOBRE, REC com WAV/entrega/partitura/
+  .mid, microfone e MIDI no SIGNAL-IN, COMPACTO, cabos a 50%) e posta no
+  site em `website/play/` com destaque na apresentação. Sem push: publicar
+  é decisão do autor (o deploy do site roda ao empurrar `website/`).
+  Atualizar o motor da página a cada versão: `bash apps/web/build.sh` e
+  `bash apps/web/publicar_no_site.sh`. Testes: `apps/web/testes/`.
+  Estado e decisões: dossiê `ESTUDO_outras_plataformas.md` §6.
+- **Próximo: a auditoria de diagramação dos painéis** (pedido do autor, 25/11;
+  `tools/auditar_paineis.mjs`, normal e compacto, com a leitura de "human
+  polish"). Primeiro exemplo: o NOISE, proposta guardada em
+  `.local-build/proposta_noise.patch` (10 HP, quatro colunas, fileiras a cada
+  24 mm), ainda sem OK do autor.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já
