@@ -14,6 +14,7 @@ export const ROTULO_LINGUA = ['EN', 'PT', 'FR', 'ES'];
 const T = {
   tocar: ['PLAY', 'TOCAR', 'JOUER', 'TOCAR'],
   volume: ['VOLUME', 'VOLUME', 'VOLUME', 'VOLUMEN'],
+  compacto: ['COMPACT', 'COMPACTO', 'COMPACT', 'COMPACTO'],
   pronto: ['Ready. Press PLAY — the browser only lets it sound after a click.',
            'Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.',
            'Prêt. Appuyez sur JOUER — le navigateur ne laisse sonner qu’après un clic.',

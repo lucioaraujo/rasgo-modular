@@ -184,6 +184,7 @@
     <button data-acao="zoomMenos" title="Ctrl+−">−</button>
     <button data-acao="zoomMais" title="Ctrl+=">+</button>
     <button data-acao="vista" id="b-vista" class="prata">RACK · TODOS</button>
+    <button data-acao="compacto" id="b-compacto" class="prata">COMPACTO</button>
   </div>
   <div class="grupo direita">
     <span id="leitura"></span>
@@ -246,7 +247,7 @@ let ctx = null, no = null, bytes = null, local = null;   // local: o motor na p�
 const rack = new Rack($('rack'), $('rolagem'));
 // PROTÓTIPO para o autor comparar: `?estreito` (as regras de painel do
 // plugin VCV) e `?cabos=0.5` (a opacidade dos cabos; o VCV usa 0,5)
-rack.estreito = q.has('estreito');
+rack.estreito = q.has('estreito') || ler('compacto') === '1';
 if (q.has('cabos')) rack.opacidade = Math.min(1, Math.max(0.1, Number(q.get('cabos')) || 1));
 rack.layout();
 
@@ -307,7 +308,7 @@ setInterval(leitura, 500);
 // o realce de um instante no botão da ação (`flashing`, 160 ms)
 function acende(acao) {
   const b = document.querySelector(`[data-acao="${acao}"]`);
-  if (!b || b.id === 'b-espera' || b.id === 'b-vista') return;
+  if (!b || b.id === 'b-espera' || b.id === 'b-vista' || b.id === 'b-compacto') return;
   b.classList.add('on');
   setTimeout(() => b.classList.remove('on'), 160);
 }
@@ -319,6 +320,8 @@ function syncCabecalho() {
   $('b-tocar').hidden = !!no;
   $('b-espera').classList.toggle('on', est.espera);
   $('b-vista').classList.toggle('on', rack.soSaida);
+  $('b-compacto').classList.toggle('on', rack.estreito);
+  $('b-compacto').textContent = W('compacto');
   $('b-vista').textContent = 'RACK · ' + tx(rack.soSaida ? 'hdrRackOut' : 'hdrRackAll');
   trilho($('t-varia'), est.variaOn ? est.variaAmt * 0.5 : 0);
   $('r-varia').classList.toggle('vivo', est.variaOn && est.variaAmt > 0);
@@ -487,6 +490,15 @@ async function acao(a) {
     return;
   }
   if (a === 'abrir') { $('arquivo').click(); return; }
+  // COMPACTO: os painéis com as regras do plugin VCV (knobs em três
+  // tamanhos, fileiras aproximadas, painel estreitado), à escolha de quem toca
+  if (a === 'compacto') {
+    rack.estreito = !rack.estreito;
+    guardar('compacto', rack.estreito ? '1' : '0');
+    if (rack.textoAtual) rack.carregar(rack.textoAtual, null, 'manter');
+    syncCabecalho();
+    return;
+  }
   if (a === 'lingua') { L = (L + 1) % 4; guardar('lingua', String(L)); carregarTextos(); return; }
   if (a === 'tutorial' || a === 'sobre') {
     if ($('sobrepor').classList.contains('aberto') && sobreporModo === a) fecharSobrepor(); else sobrepor(a);

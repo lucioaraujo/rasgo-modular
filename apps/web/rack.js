@@ -167,7 +167,7 @@ export class Rack {
     this.sobrePaleta = () => false;   // a página diz se o ponto está sobre a paleta
     this.abrirBanco = () => {};       // QUANTIZER: clique no visor abre o banco de escalas
     this.ultimaOrdem = 0;
-    this.opacidade = 1;           // dos cabos (o cabo sob o mouse e o do inspetor ficam opacos)
+    this.opacidade = 0.5;         // dos cabos: 50%, como o VCV (autor, 25/11; `ui::kCableOpacity` no app)
     this.silenciado = false;      // ESPERA: os cabos esmaecem (32%), como no app
     this.estreito = false;        // PROTÓTIPO: as regras de painel do plugin VCV
     addEventListener('resize', () => this.layout());
@@ -194,8 +194,12 @@ export class Rack {
   // seed nova) — na vista SAÍDA, quem deixou de chegar ao som fica à vista,
   // tracejado, até voltar a chegar (`keepVisibleAfterCut` do app)
   carregar(texto, wordmark, mesmoPatch = false) {
+    this.textoAtual = texto;   // para refazer os painéis ao ligar/desligar o COMPACTO
     const r = JSON.parse(texto);
-    if (mesmoPatch) {
+    // 'manter': o mesmo patch redesenhado (o COMPACTO), sem mexer em nada
+    const manter = mesmoPatch === 'manter';
+    if (manter) { /* pendentes, valores e cabos ficam */ }
+    else if (mesmoPatch) {
       for (const m of this.vistos) this.pendentes.add(m.id);
     } else this.pendentes.clear();
     this.saida = r.saida;
@@ -209,6 +213,7 @@ export class Rack {
     if (wordmark) this.marca = new Path2D(wordmark);
     for (const m of this.mods) if (m.chega) this.pendentes.delete(m.id);
     if (!mesmoPatch) { this.valores = null; this.cabos = null; }
+    if (manter) this.chaveCabos = null;
     this.layout();
   }
 
