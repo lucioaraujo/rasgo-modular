@@ -1101,7 +1101,11 @@ addEventListener('keydown', (ev) => {
   if (ev.key === 'F1') { ev.preventDefault(); focoLearn(!learn.foco); return; }
   if (ev.key === 'F2') { ev.preventDefault(); menuLeitura(); return; }
   const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
-  const mapa = ctrl ? { r: 'rec', z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
+  // Ctrl+R e Ctrl+Shift+R são o recarregar do navegador e ficam com ele (o
+  // app usa Ctrl+R para o REC; aqui o REC é o botão); nenhum atalho com
+  // Shift é tomado (autor, 26/11: o Ctrl+Shift+R começava a gravar)
+  if (ev.shiftKey && ctrl) return;
+  const mapa = ctrl ? { z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
                     : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
   const a = mapa[k];
   if (!a || ev.altKey) {
