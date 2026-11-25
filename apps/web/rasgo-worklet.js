@@ -41,6 +41,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
     this.ganho = 1.0;
     this.nc = 0;
     this.quadro = 0;   // blocos desde o último quadro mandado à página
+    this.visiveis = [];   // ids dos visores na tela (a página diz quais)
     this.port.onmessage = (ev) => this.mensagem(ev.data);
   }
 
@@ -99,6 +100,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_cabo_romper(m.d, m.pd);
     } else if (m.tipo === 'varia' && this.e) {
       this.e.rw_varia(m.ligado ? 1 : 0, m.intensidade);
+    } else if (m.tipo === 'visiveis') {
+      this.visiveis = m.ids;
     } else if (m.tipo === 'ganho') {
       this.ganho = m.valor;
     }
@@ -112,6 +115,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
     let fim = wp; while (b[fim]) fim++;
     const wordmark = dec.decode(b.slice(wp, fim));
     this.nc = this.e.rw_num_controles();
+    this.tipos = {};
+    for (const md of JSON.parse(texto).modulos) this.tipos[md.id] = md.tipo;
     this.port.postMessage({ tipo, seed, cabos: this.e.rw_cabos(), texto, wordmark });
   }
 
@@ -128,7 +133,20 @@ class RasgoProcessor extends AudioWorkletProcessor {
       const v = new Float32Array(this.mem.buffer, this.e.rw_valores(), this.nc).slice();
       const nCab = this.e.rw_cabos();
       const c = new Float32Array(this.mem.buffer, this.e.rw_cabos_estado(), nCab * 14).slice();
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c }, [v.buffer, c.buffer]);
+      // os visores na tela (748 números cada, `rw_visor`) e, no QUANTIZER,
+      // o nome da escala do banco
+      const ids = this.visiveis, VISOR = 748;
+      const vis = new Float32Array(ids.length * VISOR), escalas = {};
+      ids.forEach((id, k) => {
+        vis.set(new Float32Array(this.mem.buffer, this.e.rw_visor(id), VISOR), k * VISOR);
+        if (vis[k * VISOR + 732] > 12.5 && this.tipos?.[id] === 'QUANTIZER') {
+          const p = this.e.rw_nome_escala(id), b = new Uint8Array(this.mem.buffer);
+          let f = p; while (b[f]) f++;
+          escalas[id] = new TextDecoder().decode(b.slice(p, f));
+        }
+      });
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas },
+                            [v.buffer, c.buffer, vis.buffer]);
     }
     return true;
   }

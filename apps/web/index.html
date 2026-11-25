@@ -80,7 +80,7 @@ async function ligar() {
         rack.carregar(m.texto, m.wordmark);
       }
       if (m.tipo === 'rack') { estado(`Seed ${$('seed').value} · ${m.cabos} cabos · ${ctx.sampleRate} Hz`); rack.carregar(m.texto, m.wordmark, true); }
-      if (m.tipo === 'quadro') rack.quadro(m.valores, m.cabos);
+      if (m.tipo === 'quadro') rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
     };
     no.port.postMessage({ tipo: 'wasm', bytes });
     rack.enviar = (msg) => no.port.postMessage(msg);
@@ -121,8 +121,19 @@ async function previa() {
   }
   for (let i = 0; i < seg * 48000 / 128; i++) e.rw_processar();
   const nc = e.rw_num_controles();
+  // todos os visores (a prévia não rola): 748 números cada, como no worklet
+  const ids = []; for (let k = 0; k < e.rw_num_visores(); k++) ids.push(e.rw_visor_id(k));
+  const vis = new Float32Array(ids.length * 748), escalas = {};
+  ids.forEach((id, k) => vis.set(new Float32Array(mem.buffer, e.rw_visor(id), 748), k * 748));
+  for (const md of rack.mods)
+    if (md.tipo === 'QUANTIZER' && vis[ids.indexOf(md.id) * 748 + 732] > 12.5) {
+      const p = e.rw_nome_escala(md.id), bb = new Uint8Array(mem.buffer); let f = p; while (bb[f]) f++;
+      escalas[md.id] = dec.decode(bb.slice(p, f));
+    }
+  if (q.has('espectro')) for (const md of rack.mods) if (md.tipo === 'SCOPE') rack.espectro.add(md.id);
   rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
-              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice());
+              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice(), ids, vis, escalas);
+  if (q.has('rolar')) { $('rolagem').scrollTop = q.get('rolar') === 'fim' ? 1e9 : Number(q.get('rolar')); rack.desenhar(); }
   estado(`Prévia sem som · seed ${s} · ${rack.vistos.length}/${rack.mods.length} mód · ${e.rw_cabos()} cabos · ${seg} s`);
   if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
     rack.desenhar();

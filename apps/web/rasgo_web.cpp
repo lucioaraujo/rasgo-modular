@@ -29,6 +29,8 @@
 //   rw_cortar_saida(o, p)   tira todos os cabos que saem de uma saída
 //   rw_mao(ativa)           o músico está com a mão num controle: o VARIA
 //                           não disputa (como `interacting()` no app)
+//   rw_visor(id)            o visor (Display) do módulo agora; ids em
+//                           rw_num_visores()/rw_visor_id(k)
 //   rw_varia(ligado, int.)  o VARIA (a mão caótica, `MotionEngine`): ligado
 //                           por padrão, intensidade 0–2 (1 = a do app)
 //
@@ -39,8 +41,12 @@
 // blocos: no navegador há uma thread só, então não há o que disputar.
 
 #include "core/SignalGraph.hpp"
+#include "dsp/Cell.hpp"
+#include "dsp/Coherence.hpp"
+#include "dsp/Key.hpp"
 #include "dsp/Loudness.hpp"
 #include "dsp/Master.hpp"
+#include "dsp/Mixer.hpp"
 #include "escalas/BancoEscalas.hpp"
 #include "juce/RasgoWordmark.h"   // só o vetor do wordmark, sem JUCE
 #include "panel/ModuleCatalog.hpp"
@@ -49,11 +55,14 @@
 #include "panel/PatchSeed.hpp"
 #include "panel/SeedBalance.hpp"
 #include "panel/SinkOut.hpp"
+#include "panel/UiLanguage.hpp"
+#include "ui/ScopeTrace.hpp"
 
 #include <cmath>
 #include <cstdio>
 #include <cstdint>
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -87,6 +96,24 @@ std::string g_texto;
 struct Controle { std::size_t no; std::string bind; };
 std::vector<Controle> g_controles;
 std::vector<float> g_valores, g_cabos;
+
+// os visores (`Display`): a mesma telemetria do app (`Rack::feedScopes`),
+// um `ScopeTrace` por módulo com visor. O app enche no bloco do
+// dispositivo (512 amostras, o usual); aqui o quantum é 128, então o
+// passo da onda segue contínuo entre quanta e o que o app empurra "uma vez
+// por bloco" sai a cada 4 quanta, com o máximo dos 4 onde o app usa o
+// máximo do bloco. Assim o visor cobre o mesmo tempo que no app.
+constexpr std::size_t kBlocoApp = 512;
+constexpr std::size_t kPassoOnda = kBlocoApp / 44;          // = o `stride` do app
+constexpr int kQuantaPorBloco = static_cast<int>(kBlocoApp / kQuantum);
+constexpr std::size_t kVisor = rasgo::ui::kScopeLen + 4 * rasgo::ui::kLaneLen + 16;
+std::vector<std::size_t> g_visores;                // ids com visor, à vista
+std::map<std::size_t, rasgo::ui::ScopeTrace> g_scopes;
+std::map<std::size_t, float> g_maxBloco;           // gate/GR/colapso: o máximo do bloco
+std::size_t g_faseOnda = 0;
+int g_quantaBloco = 0;
+float g_visor[kVisor] = {};
+std::string g_nomeEscala;
 
 std::string familia(const std::string& tipo) {
     for (const auto& grp : rasgo::panel::moduleCatalog())
@@ -162,6 +189,10 @@ void descrever() {
         }
     }
     const std::vector<char> chega = g.nodesFeeding(g_saida);
+    g_visores.clear();
+    for (const std::size_t id : shown)
+        for (const auto& w : g.node(id).panel().widgets)
+            if (w.kind == Kind::Display) { g_visores.push_back(id); g_scopes[id]; break; }
     std::string& o = g_texto;
     o += "{\"saida\":";
     o += std::to_string(g_saida);
@@ -218,6 +249,98 @@ void descrever() {
     g_valores.assign(g_controles.size(), 0.0f);
 }
 
+// `Rack::feedScopes` do app, quantum a quantum (ver `kBlocoApp`)
+void alimentarVisores() {
+    auto& g = *g_grafo;
+    const bool fimDoBloco = ++g_quantaBloco >= kQuantaPorBloco;
+    if (fimDoBloco) g_quantaBloco = 0;
+    const std::size_t inicio = (kPassoOnda - g_faseOnda % kPassoOnda) % kPassoOnda;
+    g_faseOnda = (g_faseOnda + kQuantum) % kPassoOnda;
+    for (const std::size_t id : g_visores) {
+        Signal& n = g.node(id);
+        if (n.outputCount() == 0) continue;
+        const AudioBlock* ob = g.lastOutput(id, 0);
+        if (!ob || ob->frames() == 0) continue;
+        auto& sc = g_scopes[id];
+        const std::size_t fr = ob->frames(), ult = fr - 1;
+        for (std::size_t i = inicio; i < fr; i += kPassoOnda) sc.push(ob->at(0, i));
+        const std::string t = n.type();
+        float& mx = g_maxBloco[id];
+        auto maxDe = [](const AudioBlock* b) {
+            float r = 0.0f;
+            for (std::size_t i = 0; i < b->frames(); ++i) r = std::max(r, b->at(0, i));
+            return r;
+        };
+        if (t == "TRIGSEQ" && n.outputCount() >= 4) {
+            const AudioBlock *o1 = g.lastOutput(id, 1), *o2 = g.lastOutput(id, 2), *o3 = g.lastOutput(id, 3);
+            if (o1 && o2 && o3)
+                for (std::size_t i = inicio; i < fr; i += kPassoOnda)
+                    sc.pushLanes(ob->at(0, i), o1->at(0, i), o2->at(0, i), o3->at(0, i));
+        } else if (t == "LISTEN") {
+            const AudioBlock *lo = g.lastOutput(id, 1), *mi = g.lastOutput(id, 2), *hi = g.lastOutput(id, 3);
+            const AudioBlock *lh = g.lastOutput(id, 4), *mh = g.lastOutput(id, 5), *hh = g.lastOutput(id, 6);
+            if (lo && mi && hi && lh && mh && hh)
+                for (std::size_t i = inicio; i < fr; i += kPassoOnda) {
+                    const int mask = (lh->at(0, i) >= 0.5f ? 1 : 0) | (mh->at(0, i) >= 0.5f ? 2 : 0)
+                                   | (hh->at(0, i) >= 0.5f ? 4 : 0);
+                    sc.pushLanes(lo->at(0, i), mi->at(0, i), hi->at(0, i), static_cast<float>(mask));
+                }
+        } else if (t == "PHRASE") {
+            const AudioBlock *ga = g.lastOutput(id, 1), *ac = g.lastOutput(id, 2), *ph = g.lastOutput(id, 4);
+            if (ga && ac && ph)
+                for (std::size_t i = inicio; i < fr; i += kPassoOnda)
+                    sc.pushLanes(ob->at(0, i), ga->at(0, i), ac->at(0, i), ph->at(0, i));
+        } else if (t == "DYNAMICS") {
+            const AudioBlock *env = g.lastOutput(id, 1), *gr = g.lastOutput(id, 2);
+            if (env && gr) {
+                mx = std::max(mx, maxDe(gr));
+                if (fimDoBloco) { sc.pushLanes(env->at(0, env->frames() - 1), mx, 0.0f, 0.0f); mx = 0.0f; }
+            }
+        } else if (t == "CELL") {
+            if (fimDoBloco)
+                if (const auto* c = dynamic_cast<const rasgo::modular::Cell*>(&n))
+                    sc.pushLanes(c->rowAsFloat(), n.parameterValue("cells"), 0.0f, 0.0f);
+        } else if (t == "MOUSSE") {
+            if (fimDoBloco) sc.pushLanes(ob->at(0, ult), 0.0f, 0.0f, 0.0f);
+        } else if (t == "COHERENCE") {
+            const AudioBlock *ord = g.lastOutput(id, 0), *pres = g.lastOutput(id, 1), *col = g.lastOutput(id, 2);
+            if (ord && pres && col) {
+                mx = std::max(mx, maxDe(col));
+                if (fimDoBloco) {
+                    sc.pushLanes(ord->at(0, ord->frames() - 1), pres->at(0, pres->frames() - 1), mx, 0.0f);
+                    mx = 0.0f;
+                }
+            }
+        } else if (t == "MIXER") {
+            if (fimDoBloco)
+                if (const auto* m = dynamic_cast<const rasgo::modular::Mixer*>(&n))
+                    sc.pushLanes(m->stagePosition(0), m->stagePosition(1), m->stagePosition(2), m->stagePosition(3));
+        } else if (t == "PENDULUM") {
+            const AudioBlock *x1 = g.lastOutput(id, 0), *y1 = g.lastOutput(id, 1);
+            const AudioBlock *x2 = g.lastOutput(id, 2), *y2 = g.lastOutput(id, 3);
+            if (fimDoBloco && x1 && y1 && x2 && y2 && x1->frames() > 0) {
+                const std::size_t k = x1->frames() - 1;
+                sc.pushLanes(x1->at(0, k), y1->at(0, k), x2->at(0, k), y2->at(0, k));
+            }
+        } else if (t == "BOUNCE") {
+            const AudioBlock *h1 = g.lastOutput(id, 2), *h2 = g.lastOutput(id, 3), *h3 = g.lastOutput(id, 4);
+            if (fimDoBloco && h1 && h2 && h3 && h1->frames() > 0) {
+                const std::size_t k = h1->frames() - 1;
+                sc.pushLanes(h1->at(0, k), h2->at(0, k), h3->at(0, k), n.parameterValue("balls"));
+            }
+        } else if (t == "ARP" || t == "MARKOV") {
+            if (const AudioBlock* ga = g.lastOutput(id, 1)) {
+                mx = std::max(mx, maxDe(ga));
+                if (fimDoBloco) { sc.pushLanes(ob->at(0, ult), mx, 0.0f, 0.0f); mx = 0.0f; }
+            }
+        }
+    }
+}
+
+float parametro(Signal& n, const char* id) {
+    try { return n.parameterValue(id); } catch (...) { return 0.0f; }
+}
+
 std::unique_ptr<Signal> fabrica(const std::string& t) {
     if (t == "OUT") return std::make_unique<rasgo::panel::SinkOut>();
     return rasgo::panel::makeModule(t);
@@ -263,6 +386,7 @@ void rw_seed(std::uint32_t alto, std::uint32_t baixo) {
     g_lufs.reset();
     g_blocos = 0; g_passos = 0;
     g_grafo = std::move(g);
+    g_scopes.clear(); g_maxBloco.clear(); g_faseOnda = 0; g_quantaBloco = 0;
     descrever();
 }
 
@@ -273,6 +397,7 @@ float* rw_processar() {
         return g_pcm;
     }
     g_grafo->process(*g_bloco, g_saida, 0);
+    alimentarVisores();
     double s2 = 0.0;
     for (std::size_t i = 0; i < kQuantum; ++i) {
         float l = g_bloco->at(0, i), r = g_bloco->at(1, i);
@@ -464,6 +589,67 @@ void rw_cabo_romper(int d, int pd) {
     if (!c) return;
     if (c->state() == rasgo::modular::CableState::Ruptured) c->reconnect();
     else c->rupture();
+}
+
+// os ids com visor, na ordem do rack (quantos em rw_num_visores)
+__attribute__((used, visibility("default")))
+int rw_num_visores() { return static_cast<int>(g_visores.size()); }
+
+__attribute__((used, visibility("default")))
+int rw_visor_id(int k) {
+    return k >= 0 && static_cast<std::size_t>(k) < g_visores.size() ? static_cast<int>(g_visores[k]) : -1;
+}
+
+// o visor do módulo `id` agora, `kVisor` números: o anel da onda (220, em
+// ordem cronológica), as 4 lanes (128 cada, cronológicas) e 16 extras por
+// tipo — o que o desenho do app lê direto do módulo:
+//   MASTER    redução de ganho (dB)
+//   DYNAMICS  thresh, mode          CELL   rule
+//   KEY       histograma (12), tônica, nota atual, menor, certeza
+//   COHERENCE histograma (12)       PHRASE length, span
+//   MIXER     peso dos 4 canais, centro, stage        QUANTIZER scale
+__attribute__((used, visibility("default")))
+float* rw_visor(int id) {
+    std::fill(std::begin(g_visor), std::end(g_visor), 0.0f);
+    if (!g_grafo || id < 0) return g_visor;
+    const auto it = g_scopes.find(static_cast<std::size_t>(id));
+    if (it == g_scopes.end()) return g_visor;
+    const auto& sc = it->second;
+    float* v = g_visor;
+    for (std::size_t k = 0; k < rasgo::ui::kScopeLen; ++k) *v++ = sc.at(k);
+    for (std::size_t L = 0; L < 4; ++L)
+        for (std::size_t k = 0; k < rasgo::ui::kLaneLen; ++k) *v++ = sc.lane(L, k);
+    Signal& n = g_grafo->node(static_cast<std::size_t>(id));
+    const std::string t = n.type();
+    if (auto* m = dynamic_cast<rasgo::modular::Master*>(&n)) v[0] = m->gainReductionDb();
+    else if (t == "DYNAMICS") { v[0] = parametro(n, "thresh"); v[1] = parametro(n, "mode"); }
+    else if (t == "CELL") v[0] = parametro(n, "rule");
+    else if (const auto* k = dynamic_cast<const rasgo::modular::Key*>(&n)) {
+        const auto h = k->histogram();
+        for (int i = 0; i < 12; ++i) v[i] = h[static_cast<std::size_t>(i)];
+        v[12] = static_cast<float>(k->tonic()); v[13] = static_cast<float>(k->currentNote());
+        v[14] = k->minor() ? 1.0f : 0.0f; v[15] = k->certainty();
+    } else if (const auto* c = dynamic_cast<const rasgo::modular::Coherence*>(&n)) {
+        const auto h = c->histogram();
+        for (int i = 0; i < 12; ++i) v[i] = static_cast<float>(h[static_cast<std::size_t>(i)]);
+    } else if (const auto* m = dynamic_cast<const rasgo::modular::Mixer*>(&n)) {
+        for (int i = 0; i < 4; ++i) v[i] = m->stageWeight(i);
+        v[4] = m->stageCentre(); v[5] = parametro(n, "stage");
+    } else if (t == "PHRASE") { v[0] = parametro(n, "length"); v[1] = parametro(n, "span"); }
+    else if (t == "QUANTIZER") v[0] = parametro(n, "scale");
+    return g_visor;
+}
+
+// QUANTIZER com o BANCO: o nome da escala, para o rótulo do visor
+__attribute__((used, visibility("default")))
+const char* rw_nome_escala(int id) {
+    g_nomeEscala.clear();
+    if (!g_grafo || id < 0 || static_cast<std::size_t>(id) >= g_grafo->nodeCount()) return g_nomeEscala.c_str();
+    Signal& n = g_grafo->node(static_cast<std::size_t>(id));
+    const auto* e = rasgo::escalas::BancoEscalas::instancia().procura(
+        static_cast<std::uint32_t>(std::lround(parametro(n, "bank"))));
+    g_nomeEscala = e ? e->nome : rasgo::panel::tr(rasgo::panel::strings::scaleBankEmpty, rasgo::panel::Lang::pt);
+    return g_nomeEscala.c_str();
 }
 
 __attribute__((used, visibility("default")))

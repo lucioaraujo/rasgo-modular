@@ -122,9 +122,25 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
    mover módulos pelo título, o [x] de remover (vão com a paleta, F3).
 3. **F3 — o que falta do painel:** os visores (SCOPE, KEY, VU…), a MATRIX,
    o cabeçalho do app (seed, banco, VARIA, volume, loudness), a paleta para
-   acrescentar e tirar módulos.
+   acrescentar e tirar módulos. Em lotes:
+   - **F3a, visores e MATRIX** (feito, 25/11; falta o teste do autor): a
+     telemetria de `Rack::feedScopes` portada para o motor web
+     (`rw_visor`: o anel da onda, as 4 lanes e extras por tipo — histograma
+     do KEY e do COHERENCE, pesos do PALCO, redução de ganho do MASTER), com
+     o bloco de 512 do app emulado sobre o quantum de 128, para o visor
+     cobrir o mesmo tempo. O desenho de `paintDisplay`, tipo a tipo, em
+     `apps/web/visores.js`; o motor só manda os visores que estão na tela.
+     SCOPE: clique no visor alterna onda ↔ espectro. MATRIX: as 16 células
+     de `matrixCellMM`, arrasto vertical em cada uma. Conferido no Node
+     (`teste_visor.mjs`: 100 visores, sinal nos do caminho da seed) e por
+     captura (`?previa&rolar=fim`). Ainda sem: o navegador do banco de
+     escalas do QUANTIZER (o clique no visor; vai com o cabeçalho e o
+     banco). O custo do quadro com os visores não foi medido: a captura
+     sem janela roda em tempo virtual.
 4. **F4 — o resto do app:** tutorial, LEARN, REC (WAV e .mid para baixar),
-   4 idiomas, o lugar no site.
+   4 idiomas, o lugar no site. REC: teto de 4 minutos, como no app (autor,
+   25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na
+   página e baixado, nada vai a servidor.
 
 **Como é feito.** O painel de cada módulo não é copiado: o motor web
 entrega o `Panel` do próprio módulo (`Signal::panel()`, posições em mm),

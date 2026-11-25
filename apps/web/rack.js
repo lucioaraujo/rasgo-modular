@@ -10,6 +10,8 @@
 // pixel limitada a 1,5; nada de sombra borrada; o canvas tem o tamanho da
 // janela, não do rack, e só os módulos à vista são desenhados.
 
+import { VISOR, desenharVisor } from './visores.js';
+
 const T = {
   bg: '#131a1a', surface: '#262b36', recessed: '#0e1015', line: '#485060',
   textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#ff9d4c',
@@ -73,6 +75,11 @@ export class Rack {
     this.sobCabo = -1;            // índice do cabo sob o mouse (destaque)
     this.aviso = () => {};        // texto de aviso para a página
     this.mouse = { x: 0, y: 0 };
+    this.visores = new Map();     // id → o visor agora (Float32Array, `rw_visor`)
+    this.escalas = {};            // QUANTIZER com BANCO: id → nome da escala
+    this.espectro = new Set();    // SCOPE mostrando o espectro (clique no visor)
+    this.clipAte = new Map();     // MASTER: até quando o aviso de limite fica aceso
+    this.idsVisiveis = '';
     addEventListener('resize', () => this.layout());
     rolagem.addEventListener('scroll', () => this.redesenhar(), { passive: true });
     canvas.addEventListener('pointerdown', (e) => this.baixa(e));
@@ -107,10 +114,22 @@ export class Rack {
     this.layout();
   }
 
-  quadro(valores, cabos) {
+  quadro(valores, cabos, ids = [], visores = null, escalas = {}) {
     this.valores = valores;
     this.cabos = cabos;
+    this.visores.clear();
+    if (visores) ids.forEach((id, k) => this.visores.set(id, visores.subarray(k * VISOR, (k + 1) * VISOR)));
+    this.escalas = escalas;
     this.redesenhar();
+  }
+
+  // os visores que estão na tela: só deles o motor manda a telemetria
+  visiveis(topo, vh) {
+    const ids = [];
+    for (const m of this.vistos)
+      if (m.by + m.bh >= topo && m.by <= topo + vh && m.w.some((w) => w.k === K.Display)) ids.push(m.id);
+    const chave = ids.join(',');
+    if (chave !== this.idsVisiveis) { this.idsVisiveis = chave; this.enviar({ tipo: 'visiveis', ids }); }
   }
 
   // `relayout` do app: a escala faz caber três fileiras na altura da janela
@@ -207,6 +226,27 @@ export class Rack {
     g.strokeStyle = T.line; g.lineWidth = 1; g.stroke(bordas);
     g.strokeStyle = 'rgba(216, 221, 230, 0.56)'; g.stroke(brilhos);
     g.strokeStyle = T.prata; g.lineWidth = 2; g.lineCap = 'butt'; g.stroke(ponteiros);
+    this.visiveis(topo, vh);
+    const agora = performance.now();
+    for (const m of this.vistos) {
+      if (m.by + m.bh < topo || m.by > topo + vh) continue;
+      if (m.tipo === 'MATRIX') this.desenharMatriz(g, m);
+      const v = this.visores.get(m.id);
+      for (const w of m.w) {
+        if (w.k !== K.Display) continue;
+        let dw = this.mmpx(w.s > 1 ? w.s : 16);
+        dw = Math.min(dw, m.bw - this.mmpx(w.x) - this.mmpx(2));
+        const wx = m.bx + this.mmpx(w.x), wy = m.by + this.mmpx(w.y);
+        if (m.tipo === 'MASTER' && v && v[VISOR - 16] > 0.05) this.clipAte.set(m.id, agora + 2000);
+        g.save();
+        g.beginPath(); g.rect(wx + 1, wy + 1, dw - 2, this.mmpx(w.h) - 2); g.clip();
+        desenharVisor(g, { T, wx, wy, dw, dh: this.mmpx(w.h), tipo: m.tipo, v, rotulo: w.l,
+          traco: !m.familia || m.familia === 'OUT' ? T.prata : corFamilia(m.familia),
+          espectro: this.espectro.has(m.id), clip: (this.clipAte.get(m.id) || 0) > agora,
+          escala: this.escalas[m.id] });
+        g.restore();
+      }
+    }
     // os cabos: uma camada própria, refeita só quando um cabo muda (ganho,
     // condução, ruptura) ou a vista rola — redesenhar 63 cabos atravessando
     // a tela custava ~6 ms por quadro
@@ -237,6 +277,40 @@ export class Rack {
     if (this.gesto?.tipo === 'cabo') this.desenharPuxada(g);
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.desenharInspetor(g, vw, vh);
+  }
+
+  // MATRIX: a grade 4×4 como células (`paintMatrix` + `ui::matrixCellMM`);
+  // a barra parte do centro: para cima ganho positivo, para baixo negativo
+  celula(m, j, k) {
+    const cx = 27 + k * 17, cy = 35 + j * 18;
+    return { x: m.bx + this.mmpx(cx - 8), y: m.by + this.mmpx(cy - 8.5), w: this.mmpx(16), h: this.mmpx(17) };
+  }
+
+  celulaEm(m, p) {
+    if (m.tipo !== 'MATRIX') return null;
+    for (let j = 0; j < 4; j++)
+      for (let k = 0; k < 4; k++)
+        if (this.dentro(p, this.celula(m, j, k))) return m.w.find((w) => w.b === `g${j + 1}${k + 1}` && w.v !== undefined) || null;
+    return null;
+  }
+
+  desenharMatriz(g, m) {
+    for (let j = 0; j < 4; j++)
+      for (let k = 0; k < 4; k++) {
+        const r = this.celula(m, j, k);
+        const w = m.w.find((x) => x.b === `g${j + 1}${k + 1}`);
+        const v = w ? this.valor(w) : 0;
+        g.fillStyle = T.recessed; g.fillRect(r.x, r.y, r.w, r.h);
+        const mid = r.y + Math.floor(r.h / 2), bar = Math.trunc(v * (Math.floor(r.h / 2) - 2));
+        if (bar !== 0) {
+          g.fillStyle = v >= 0 ? T.accent : CABO_CTRL[0];
+          g.fillRect(r.x + 2, bar > 0 ? mid - bar : mid, r.w - 4, Math.abs(bar));
+        }
+        g.fillStyle = T.line; g.fillRect(r.x + 1, mid, r.w - 3, 1);
+        const quente = this.gesto?.tipo === 'controle' && this.gesto.w === w;
+        g.strokeStyle = quente ? T.accent : T.line; g.lineWidth = 1;
+        g.strokeRect(r.x + 0.5, r.y + 0.5, r.w - 1, r.h - 1);
+      }
   }
 
   // os pontos de um cabo, para desenho e clique (`ui::cablePoints`)
@@ -753,6 +827,7 @@ export class Rack {
     if (w.k === K.Knob) { const d = diamKnob(w); r = [w.x - 0.5, w.y - 1, d + 2, d + 7]; }
     else if (w.k === K.Slider) r = [w.x - 1, w.y - 1, 10, 36];
     else if (w.k === K.Toggle) r = w.s > 1 ? [w.x + 2 - w.s * 0.5 - 0.5, w.y - 0.5, Math.max(w.s, 4) + 1, 9] : [w.x - 0.5, w.y - 0.5, 5 + lbl * 1.7, 6];
+    else if (w.k === K.Display) r = [w.x, w.y, Math.min(w.s > 1 ? w.s : 16, m.hp * MM_HP - w.x - 2), w.h];
     else return null;
     return { x: m.bx + this.mmpx(r[0]), y: m.by + this.mmpx(r[1]), w: this.mmpx(r[2]), h: this.mmpx(r[3]) };
   }
@@ -827,7 +902,13 @@ export class Rack {
     }
     if (e.button !== 0) return;
     const m = this.moduloEm(p);
-    const w = m && this.controleEm(m, p);
+    const w = m && (this.celulaEm(m, p) || this.controleEm(m, p));
+    // SCOPE: clicar no visor alterna onda ↔ espectro
+    if (!w && m?.tipo === 'SCOPE' && m.w.some((x) => x.k === K.Display && this.dentro(p, this.caixa(m, x)))) {
+      if (!this.espectro.delete(m.id)) this.espectro.add(m.id);
+      this.redesenhar();
+      return;
+    }
     if (!w) {
       // um clique (sem arrastar) num cabo abre o inspetor dele
       const k = this.caboEm(p);
@@ -860,7 +941,7 @@ export class Rack {
     }
     // o cursor diz o que dá para pegar; fora de controle, o cabo acende
     let pega = !!this.jackEm(p);
-    if (!pega) { const m = this.moduloEm(p); pega = !!(m && this.controleEm(m, p)); }
+    if (!pega) { const m = this.moduloEm(p); pega = !!(m && (this.celulaEm(m, p) || this.controleEm(m, p))); }
     const sob = pega ? -1 : this.caboEm(p);
     if (sob !== this.sobCabo) { this.sobCabo = sob; this.redesenhar(); }
     this.cv.style.cursor = pega || sob >= 0 ? 'pointer' : 'default';
