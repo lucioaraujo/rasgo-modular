@@ -141,6 +141,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_escolher_escala(m.id, m.banco);
     } else if (m.tipo === 'lerBanco' && this.e) {
       this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
+    } else if (m.tipo === 'learnAlvo') {
+      this.learnAlvo = m.id >= 0 ? m : null;
     } else if (m.tipo === 'visiveis') {
       this.visiveis = m.ids;
     } else if (m.tipo === 'ganho') {
@@ -199,7 +201,14 @@ class RasgoProcessor extends AudioWorkletProcessor {
           escalas[id] = new TextDecoder().decode(b.slice(p, f));
         }
       });
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu() },
+      // LEARN: o valor ao vivo do controle sob o mouse
+      let learnValor = '';
+      if (this.learnAlvo) {
+        const p = this.e.rw_learn_valor(this.learnAlvo.id, this.texto(this.learnAlvo.bind)), u = new Uint8Array(this.mem.buffer);
+        let f = p; while (u[f]) f++;
+        learnValor = new TextDecoder().decode(u.slice(p, f));
+      }
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor },
                             [v.buffer, c.buffer, vis.buffer]);
     }
     return true;

@@ -889,6 +889,36 @@ export class Rack {
     else if (e.clientY > r.bottom - 30) this.rolagem.scrollTop += 14;
   }
 
+  // LEARN (`learnAt`): o que está sob o ponto, na prioridade do clique —
+  // 1. widget (knob, slider, botão, jack, célula), 2. cabo, 3. corpo do
+  // módulo. Durante um arrasto, o controle arrastado continua sendo o alvo.
+  learnEm(p) {
+    const widget = (m, w) => ({ chave: `${m.id}|${w.b}`, tipo: m.tipo, bind: w.b, no: m.id,
+                                titulo: `${m.tipo}  ·  ${w.l}`, param: w.v !== undefined });
+    if (this.gesto?.tipo === 'controle') {
+      const m = this.porId.get(this.gesto.no);
+      if (m) return widget(m, this.gesto.w);
+    }
+    const m = this.moduloEm(p);
+    if (m) {
+      const j = this.jackEm(p);
+      if (j && j.no === m.id) {
+        const w = m.w.find((x) => x.k === K.Jack && x.p === j.p && !!x.out === !!j.out);
+        if (w?.b) return widget(m, w);
+      }
+      const c = this.celulaEm(m, p);
+      if (c) return widget(m, c);
+      for (const w of m.w) {
+        if (!w.b || w.k === K.Jack || (m.tipo === 'MATRIX' && celulaMatriz(w.b))) continue;
+        if (this.dentro(p, this.caixa(m, w))) return widget(m, w);
+      }
+    }
+    const k = this.caboEm(p);
+    if (k >= 0) return { chave: 'cabo|' + k, cabo: true };
+    if (m) return { chave: `${m.id}|\u0001mod`, tipo: m.tipo, modulo: true };
+    return null;
+  }
+
   // a área de toque de um controle (`ui::footprintMM`)
   caixa(m, w) {
     const lbl = w.l.length;
@@ -1007,7 +1037,7 @@ export class Rack {
       return;
     }
     this.cv.setPointerCapture(e.pointerId);
-    this.gesto = { tipo: 'controle', w, y0: e.clientY };
+    this.gesto = { tipo: 'controle', w, no: m.id, y0: e.clientY };
     this.enviar({ tipo: 'pega', i: w.v });
   }
 

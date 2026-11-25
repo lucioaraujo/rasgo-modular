@@ -50,9 +50,39 @@
   #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
   /* a paleta (`PaletteColumn`): as famílias na cor delas, os tipos em 11 px;
      arrastar um tipo para o rack o acrescenta; um módulo solto aqui sai */
-  #paleta { width: 186px; flex: none; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--line);
-            padding: 10px 0 14px; font: 9.5px system-ui, sans-serif; user-select: none; touch-action: none;
-            scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #paleta { width: 186px; flex: none; display: flex; flex-direction: column; background: var(--bg);
+            border-right: 1px solid var(--line); font: 9.5px system-ui, sans-serif; user-select: none; touch-action: none; }
+  #lista { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 0 14px;
+           scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  /* a caixa LEARN, no pé da paleta: título, valor, e os três níveis do
+     verbete (o que é · como funciona · → para experimentar) */
+  #learn { flex: none; height: 232px; background: var(--recessed); border-top: 1px solid var(--line);
+           display: flex; flex-direction: column; padding: 6px 8px 4px; user-select: text; outline: none;
+           --lf: 10.3px; --lp: var(--text); --ls: var(--muted); --le: var(--prata); }
+  #learn.foco { box-shadow: inset 0 0 0 1px var(--accent); }
+  #learn.branco { --lp: #fff; --ls: #fff; --le: #fff; }
+  #learn .topo { display: flex; align-items: center; color: var(--prata); font-size: 8.6px; height: 14px; }
+  #learn .topo button { margin-left: auto; height: 18px; background: none; border: 0; color: var(--prata);
+                        font: inherit; cursor: pointer; padding: 0 4px; }
+  #learn .corpo { flex: 1; min-height: 0; overflow-y: auto; margin-top: 8px; font-size: var(--lf); line-height: 1.3;
+                  scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); padding-right: 4px; }
+  #learn .corpo p { margin: 0 0 7px; white-space: pre-line; }
+  #learn .t { color: var(--le); font-weight: bold; margin-bottom: 5px; }
+  #learn .v { color: var(--lp); }
+  #learn .q { color: var(--lp); }
+  #learn .u { color: var(--ls); }
+  #learn .e { color: var(--le); }
+  #learn .ocioso { color: var(--muted); }
+  #learn .aviso { color: var(--accent); }
+  #learn .dica { color: var(--muted); font-size: 8.6px; height: 13px; }
+  #leitura-menu { position: fixed; z-index: 11; background: var(--surface); border: 1px solid var(--line);
+                  font: 11px system-ui, sans-serif; min-width: 270px; padding: 4px 0; display: none; }
+  #leitura-menu.aberto { display: block; }
+  #leitura-menu div { padding: 6px 14px; color: var(--text); cursor: pointer; }
+  #leitura-menu div:hover { background: rgba(255, 157, 76, .18); }
+  #leitura-menu .cab { color: var(--muted); cursor: default; }
+  #leitura-menu .cab:hover { background: none; }
+  #leitura-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
   #paleta.alvo { outline: 1px solid var(--accent); outline-offset: -2px; }
   #paleta h3 { display: flex; align-items: center; gap: 4px; margin: 0; padding: 0 10px; height: 18px;
                font: inherit; font-weight: normal; }
@@ -138,7 +168,15 @@
   <input id="arquivo" type="file" accept=".rmp,text/plain" hidden />
 </header>
 <div id="corpo">
-  <nav id="paleta" aria-label="Módulos"></nav>
+  <nav id="paleta" aria-label="Módulos">
+    <div id="lista"></div>
+    <section id="learn" tabindex="-1" aria-live="polite">
+      <div class="topo">LEARN<button id="b-leitura" title="F2">Aa (F2)</button></div>
+      <div class="corpo" id="learn-corpo"></div>
+      <div class="dica" id="learn-dica">F1: LEARN</div>
+    </section>
+  </nav>
+  <div id="leitura-menu" role="menu"></div>
   <div id="rolagem">
     <div class="espaco"></div>
     <canvas id="rack"></canvas>
@@ -172,16 +210,14 @@ const est = { seed: $('seed').value, cabos: 0, espera: false, variaOn: true, var
 const guardar = (k, v) => { try { localStorage.setItem('rasgoModular.' + k, v); } catch { /* sem armazenamento */ } };
 const ler = (k) => { try { return localStorage.getItem('rasgoModular.' + k); } catch { return null; } };
 
-// avisos no lugar da leitura, por alguns segundos (no app, na paleta)
-function aviso(t, ms = 4500) { est.aviso = t; est.avisoAte = performance.now() + ms; leitura(); }
+// avisos na caixa LEARN, por 6 s (`PaletteColumn::setNotice`)
+function aviso(t, ms = 6000) { est.aviso = t; est.avisoAte = performance.now() + ms; mostrarLearn(); }
 rack.aviso = (t) => aviso(t);
 
 function leitura() {
   const el = $('leitura');
-  if (performance.now() < est.avisoAte) { el.textContent = est.aviso; el.className = 'aviso'; return; }
   const mods = rack.soSaida ? `${rack.vistos.length}/${rack.mods.length}` : `${rack.vistos.length}`;
   el.textContent = no ? `${mods} mód  ·  ${est.cabos} cabos` : '';
-  el.className = '';
 }
 setInterval(leitura, 500);
 
@@ -215,6 +251,7 @@ fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
   // a marca RASGO do cabeçalho vem do motor (o mesmo vetor dos painéis)
   const e = local = await instanciar();
   construirPaleta(JSON.parse(cTexto(e, e.rw_catalogo())));
+  mostrarLearn();
   const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
   $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
   aviso('Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.', 1e9);
@@ -258,6 +295,7 @@ async function ligar() {
         syncCabecalho();
       }
       if (m.tipo === 'quadro') {
+        if (m.learnValor !== learn.valor) { learn.valor = m.learnValor; if (learn.mostrado?.param) mostrarLearn(); }
         rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
         est.cabos = m.cabos.length / 14;
         // o VU do cabeçalho (`setReadout`): pico contra −1 dBFS
@@ -296,7 +334,7 @@ async function tocar() {
     no.port.postMessage({ tipo: 'seed', seed: s });
     if (modo === 'uncabled') no.port.postMessage({ tipo: 'descabear' });
   }
-  est.avisoAte = 0;
+  est.avisoAte = 0; mostrarLearn();
   syncCabecalho();
 }
 
@@ -421,7 +459,7 @@ arrastoTrilho($('t-volume'), (f) => {
 // acende os módulos dele no rack; um módulo arrastado pelo título e solto
 // aqui sai da case.
 function construirPaleta(cat) {
-  const nav = $('paleta');
+  const nav = $('lista');
   for (const f of cat) {
     const h = document.createElement('h3');
     h.style.color = corFamilia(f.familia);
@@ -528,9 +566,150 @@ $('b-fechar').onclick = fecharBanco;
 $('banco').addEventListener('pointerdown', (ev) => { if (ev.target === $('banco')) fecharBanco(); });
 $('banco').addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.stopPropagation(); fecharBanco(); } });
 
+// ---- o LEARN (`tickLearn` + `PaletteColumn`) -------------------------------
+// O que está sob o mouse — um widget ou um cabo do rack, o corpo de um
+// módulo, um tipo na paleta, um botão do cabeçalho — vira verbete depois de
+// 1 s parado sobre o MESMO objeto; sobre nada, fica o último. Enquanto se
+// gira um controle, é ele, na hora, com o valor ao vivo.
+const LINGUA = 1;   // pt (os quatro idiomas entram na F4b)
+const learn = { chave: '', desde: 0, mostrado: null, valor: '', foco: false, x: -1, y: -1, alvo: null };
+const CHAVES = { seed: 'seed', repor: 'restore', mudar: 'mutate', evoluir: 'evolve', cruzar: 'cross', banco: 'bank',
+                 salvar: 'save', abrir: 'open', desfazer: 'undo', descabear: 'uncable', espera: 'standby',
+                 zoomMais: 'zoom-in', zoomMenos: 'zoom-out', vista: 'rack-view', abre: 'startup' };
+function consultar(fn, texto, ...mais) {
+  if (!local) return null;
+  let n = 0;
+  if (texto != null) {
+    const b = new TextEncoder().encode(texto);
+    new Uint8Array(local.memory.buffer, local.rw_entrada(b.length), b.length).set(b);
+    n = b.length;
+  }
+  const t = cTexto(local, texto != null ? fn(n, ...mais) : fn(...mais));
+  return t ? JSON.parse(t) : null;
+}
+addEventListener('pointermove', (ev) => { learn.x = ev.clientX; learn.y = ev.clientY; learn.el = ev.target; }, { passive: true });
+function alvoLearn() {
+  const el = learn.el;
+  if (!el || !local) return null;
+  if (el.closest?.('#learn')) return null;
+  const b = el.closest?.('[data-acao]');
+  if (b && CHAVES[b.dataset.acao]) return { chave: 'cab|' + CHAVES[b.dataset.acao], cabecalho: CHAVES[b.dataset.acao] };
+  if (el === $('seed')) return { chave: 'cab|seed-value', cabecalho: 'seed-value' };
+  if (el.closest?.('#t-varia')) return { chave: 'cab|vary-amount', cabecalho: 'vary-amount' };
+  if (el === $('r-varia')) return { chave: 'cab|vary', cabecalho: 'vary' };
+  if (el.dataset?.tipo) return { chave: 'pal|' + el.dataset.tipo, tipo: el.dataset.tipo, modulo: true };
+  if (el === $('rack')) { const r = $('rack').getBoundingClientRect(); return rack.learnEm({ x: learn.x - r.left, y: learn.y - r.top + $('rolagem').scrollTop }); }
+  return null;
+}
+function verbete(h) {
+  if (h.cabecalho) return consultar(local.rw_learn_cabecalho, h.cabecalho, LINGUA);
+  if (h.cabo) return consultar(local.rw_learn_cabo, null, LINGUA);
+  if (h.modulo) return consultar(local.rw_learn_modulo, h.tipo, LINGUA);
+  const v = consultar(local.rw_learn_widget, h.tipo + '\t' + h.bind, LINGUA);
+  if (v) { v.t = h.titulo; return v; }
+  // widget sem verbete: cai no módulo
+  return consultar(local.rw_learn_modulo, h.tipo, LINGUA);
+}
+setInterval(() => {
+  if (learn.foco) return;   // F1: lendo com o teclado, o texto fica
+  const editando = rack.gesto?.tipo === 'controle';
+  const h = alvoLearn();
+  if (!h) return;
+  const agora = performance.now();
+  if (h.chave !== learn.chave) { learn.chave = h.chave; learn.desde = agora; if (!editando) return; }
+  if (editando) est.avisoAte = 0;
+  if (!editando && agora - learn.desde < 1000) return;
+  if (learn.mostrado?.chave === h.chave) return;
+  const v = verbete(h);
+  if (!v) return;
+  learn.mostrado = { ...v, chave: h.chave, param: !!h.param };
+  learn.valor = '';
+  if (no) no.port.postMessage(h.param ? { tipo: 'learnAlvo', id: h.no, bind: h.bind } : { tipo: 'learnAlvo', id: -1 });
+  if (performance.now() >= est.avisoAte) mostrarLearn();
+}, 100);
+function mostrarLearn() {
+  const corpo = $('learn-corpo');
+  const p = (cl, t) => { const e = document.createElement('p'); e.className = cl; e.textContent = t; return e; };
+  corpo.replaceChildren();
+  if (performance.now() < est.avisoAte) {
+    corpo.append(p('aviso', est.aviso));
+    clearTimeout(learn.fimAviso);
+    learn.fimAviso = setTimeout(mostrarLearn, est.avisoAte - performance.now() + 20);
+  } else if (!learn.mostrado) {
+    corpo.append(p('ocioso', (local ? cTexto(local, local.rw_learn_ocioso(LINGUA)) : '') + '\n\nF1: LEARN'));
+  } else {
+    const v = learn.mostrado;
+    if (v.t) corpo.append(p('t', v.t));
+    if (v.param && learn.valor) corpo.append(p('v', learn.valor));
+    if (v.q) corpo.append(p('q', v.q));
+    if (v.u) corpo.append(p('u', v.u));
+    if (v.e) corpo.append(p('e', '→ ' + v.e));
+  }
+  const rola = corpo.scrollHeight > corpo.clientHeight + 1;
+  $('learn-dica').textContent = learn.foco ? '↑↓ PgUp/PgDn - Esc' : rola ? 'role / F1: ler' : 'F1: LEARN';
+}
+// F1: fixa o verbete para ler com o teclado; Esc (ou F1) devolve
+function focoLearn(sim) {
+  learn.foco = sim;
+  $('learn').classList.toggle('foco', sim);
+  if (sim) $('learn').focus(); else $('learn').blur();
+  mostrarLearn();
+}
+$('learn').addEventListener('pointerdown', () => focoLearn(true));
+$('learn').addEventListener('keydown', (ev) => {
+  const c = $('learn-corpo'), passo = { ArrowUp: -36, ArrowDown: 36, PageUp: -c.clientHeight, PageDown: c.clientHeight,
+                                         Home: -1e6, End: 1e6 }[ev.key];
+  if (ev.key === 'Escape' || ev.key === 'F1') { ev.preventDefault(); ev.stopPropagation(); focoLearn(false); return; }
+  if (passo !== undefined) { ev.preventDefault(); ev.stopPropagation(); c.scrollTop += passo; }
+});
+$('learn').addEventListener('blur', () => { if (learn.foco) focoLearn(false); });
+
+// "Aa (F2)": a leitura do LEARN (`ReadingPreferences`): 12, 14 ou 16 px,
+// texto branco; a coluna e a caixa crescem junto
+const leitura0 = () => { try { const r = JSON.parse(ler('leitura') || '{}'); return { tam: Math.min(2, Math.max(0, r.tam | 0)), branco: !!r.branco }; } catch { return { tam: 0, branco: false }; } };
+let leituraPref = leitura0();
+function aplicarLeitura() {
+  const t = leituraPref.tam;
+  $('paleta').style.width = (186 + 40 * t) + 'px';
+  $('learn').style.height = Math.max(0, Math.min(232 + 40 * t, $('corpo').clientHeight - 120)) + 'px';
+  $('learn').style.setProperty('--lf', ((12 + 2 * t) * 0.86).toFixed(1) + 'px');
+  $('learn').classList.toggle('branco', leituraPref.branco);
+  rack.layout();
+}
+function menuLeitura() {
+  const m = $('leitura-menu');
+  if (m.classList.contains('aberto')) { m.classList.remove('aberto'); return; }
+  const itens = [['cab', 'Leitura do LEARN'], [0, 'Padrão — 12 px'], [1, 'Grande — 14 px'], [2, 'Maior — 16 px'], ['hr'],
+                 ['branco', 'Texto de leitura branco'], ['padrao', 'Restaurar padrão de leitura']];
+  m.replaceChildren();
+  for (const [k, t] of itens) {
+    if (k === 'hr') { m.append(document.createElement('hr')); continue; }
+    const d = document.createElement('div');
+    d.textContent = (k === leituraPref.tam || (k === 'branco' && leituraPref.branco) ? '✓ ' : '') + t;
+    if (k === 'cab') d.className = 'cab';
+    else d.onclick = () => {
+      if (typeof k === 'number') leituraPref.tam = k;
+      else if (k === 'branco') leituraPref.branco = !leituraPref.branco;
+      else leituraPref = { tam: 0, branco: false };
+      guardar('leitura', JSON.stringify(leituraPref));
+      m.classList.remove('aberto'); aplicarLeitura();
+    };
+    m.append(d);
+  }
+  const r = $('b-leitura').getBoundingClientRect();
+  m.style.left = r.left + 'px'; m.style.top = Math.max(8, r.top - 200) + 'px';
+  m.classList.add('aberto');
+}
+$('b-leitura').addEventListener('pointerdown', (ev) => ev.stopPropagation());
+$('b-leitura').onclick = (ev) => { ev.stopPropagation(); menuLeitura(); };
+addEventListener('pointerdown', (ev) => { if (!ev.target.closest('#leitura-menu')) $('leitura-menu').classList.remove('aberto'); });
+addEventListener('resize', aplicarLeitura);
+
 // ---- os atalhos do app (cartão ATALHOS em UiLanguage.hpp) ----------------
 addEventListener('keydown', (ev) => {
   if (ev.target === $('seed') || $('banco').classList.contains('aberto')) return;
+  if (ev.key === 'F1') { ev.preventDefault(); focoLearn(!learn.foco); return; }
+  if (ev.key === 'F2') { ev.preventDefault(); menuLeitura(); return; }
   const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
   const mapa = ctrl ? { z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
                     : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
@@ -587,8 +766,18 @@ async function previa() {
   // `?banco`: abre o banco de escalas do QUANTIZER (captura de teste)
   if (q.has('banco')) { local = e; const qz = rack.mods.find((m) => m.tipo === 'QUANTIZER'); abrirBanco(qz.id, Math.round(e.rw_parametro(qz.id, 0))); }
   if (q.has('paletaTipo')) rack.paletaTipo = q.get('paletaTipo');
+  // `?learn=TIPO.bind` (ou só TIPO): mostra esse verbete na caixa
+  if (q.has('learn')) {
+    const [t, b] = q.get('learn').split('.');
+    const md = rack.mods.find((m) => m.tipo === t);
+    const w = b && md?.w.find((x) => x.b === b);
+    const h = w ? { tipo: t, bind: b, titulo: `${t}  ·  ${w.l}`, param: true } : { tipo: t, modulo: true };
+    learn.mostrado = { ...verbete(h), param: !!w };
+    if (w) learn.valor = cTexto(e, e.rw_learn_valor(md.id, (() => { const bb = new TextEncoder().encode(b); new Uint8Array(e.memory.buffer, e.rw_entrada(bb.length), bb.length).set(bb); return bb.length; })()));
+    mostrarLearn();
+  }
   no = { port: { postMessage: () => {} } };   // a leitura e o cabeçalho como se tocasse
-  est.avisoAte = 0; syncCabecalho();
+  est.avisoAte = 0; mostrarLearn(); syncCabecalho();
   if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
     rack.desenhar();
     const t0 = performance.now();
@@ -601,6 +790,7 @@ async function previa() {
 }
 
 if (q.has('saida')) rack.vistaSaida(true);
+aplicarLeitura();
 syncCabecalho();
 </script>
 </body>

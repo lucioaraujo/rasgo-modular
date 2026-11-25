@@ -173,7 +173,19 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      Conferido no Node (`teste_f3c.mjs`) e por captura (`?previa&banco`,
      `&paletaTipo=`). O LEARN, embaixo da paleta no app, entra na F4.
 4. **F4 — o resto do app:** tutorial, LEARN, REC (WAV e .mid para baixar),
-   4 idiomas, o lugar no site. REC: teto de 4 minutos, como no app (autor,
+   4 idiomas, o lugar no site.
+   - **F4a, o LEARN** (feito, 25/11; falta o teste do autor): a caixa do
+     pé da paleta, com os verbetes do app (`LearnCatalog`, `HeaderHelp`,
+     4 línguas) num arquivo à parte, `apps/web/rasgo_learn.cpp`, compilado
+     sem otimização (com -O2 o compilador passava de 15 minutos nas tabelas;
+     sem otimização elas pedem 4 MB de pilha no wasm). O `.wasm` foi de
+     2,4 para 4,7 MB. As regras do app: 1 s parado sobre o mesmo objeto,
+     widget > cabo > corpo do módulo, a paleta e os botões do cabeçalho
+     também explicam; girando um controle, o verbete é dele na hora, com
+     BASE/DSP ao vivo; os avisos aparecem ali por 6 s; "Aa (F2)" (12/14/16
+     px, texto branco) e F1 para ler com o teclado. Conferido no Node
+     (`teste_learn.mjs`: 1515 de 1520 controles e jacks com verbete) e por
+     captura (`?previa&learn=FILTER.cutoff`). REC: teto de 4 minutos, como no app (autor,
    25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na
    página e baixado, nada vai a servidor.
 

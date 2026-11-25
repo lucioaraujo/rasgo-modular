@@ -787,6 +787,11 @@ float rw_parametro(int id, int tamanho) {
     catch (...) { return 0.0f; }
 }
 
+// a entrada de texto e o patch que toca, para o LEARN (rasgo_learn.cpp,
+// compilado à parte)
+const std::vector<char>& rw_web_entrada() { return g_entrada; }
+SignalGraph* rw_web_grafo() { return g_grafo.get(); }
+
 // o VU do cabeçalho: o pico recente do MASTER (o mesmo anel do visor)
 __attribute__((used, visibility("default")))
 float rw_vu() {
