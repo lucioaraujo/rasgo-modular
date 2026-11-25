@@ -314,6 +314,8 @@ async function ligar() {
   });
   no = n;
   rack.enviar = (msg) => no.port.postMessage(msg);
+  // a lista dos visores na tela foi calculada antes de haver motor: reenviar
+  rack.idsVisiveis = ''; rack.redesenhar();
   no.port.postMessage({ tipo: 'ganho', valor: est.volume });
   enviarVaria();
   if (est.espera) no.port.postMessage({ tipo: 'espera', ligada: true });

@@ -32,6 +32,38 @@ function valorRoda(v0, dir, fino, lo, hi) {
   return Math.min(hi, Math.max(lo, v));
 }
 
+// TextDecoder/TextEncoder não existem dentro de um AudioWorklet (nem no
+// Firefox nem no Chrome): o UTF-8 é feito aqui. Sem isto, a descrição do
+// rack não saía do worklet — o som tocava e a página ficava sem módulos.
+function deUtf8(b) {
+  let s = '', parte = [];
+  for (let i = 0; i < b.length;) {
+    const c = b[i++];
+    let u;
+    if (c < 0x80) u = c;
+    else if (c < 0xe0) u = ((c & 0x1f) << 6) | (b[i++] & 0x3f);
+    else if (c < 0xf0) u = ((c & 0x0f) << 12) | ((b[i++] & 0x3f) << 6) | (b[i++] & 0x3f);
+    else u = ((c & 0x07) << 18) | ((b[i++] & 0x3f) << 12) | ((b[i++] & 0x3f) << 6) | (b[i++] & 0x3f);
+    if (u > 0xffff) { u -= 0x10000; parte.push(0xd800 + (u >> 10), 0xdc00 + (u & 0x3ff)); }
+    else parte.push(u);
+    if (parte.length > 8000) { s += String.fromCharCode.apply(null, parte); parte = []; }
+  }
+  return s + String.fromCharCode.apply(null, parte);
+}
+function paraUtf8(t) {
+  const out = [];
+  for (let i = 0; i < t.length; i++) {
+    let u = t.charCodeAt(i);
+    if (u >= 0xd800 && u < 0xdc00 && i + 1 < t.length) u = 0x10000 + ((u - 0xd800) << 10) + (t.charCodeAt(++i) - 0xdc00);
+    if (u < 0x80) out.push(u);
+    else if (u < 0x800) out.push(0xc0 | (u >> 6), 0x80 | (u & 63));
+    else if (u < 0x10000) out.push(0xe0 | (u >> 12), 0x80 | ((u >> 6) & 63), 0x80 | (u & 63));
+    else out.push(0xf0 | (u >> 18), 0x80 | ((u >> 12) & 63), 0x80 | ((u >> 6) & 63), 0x80 | (u & 63));
+  }
+  return new Uint8Array(out);
+}
+const decoder = { decode: deUtf8 };
+
 class RasgoProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
@@ -122,10 +154,10 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_espera(m.ligada ? 1 : 0);
     } else if (m.tipo === 'salvar' && this.e) {
       const p = this.e.rw_salvar(), n = this.e.rw_salvo_tamanho();
-      const texto = new TextDecoder().decode(new Uint8Array(this.mem.buffer, p, n).slice());
+      const texto = deUtf8(new Uint8Array(this.mem.buffer, p, n).slice());
       this.port.postMessage({ tipo: 'salvo', destino: m.destino, texto, seed: this.seedAtual() });
     } else if (m.tipo === 'abrir' && this.e) {
-      const b = new TextEncoder().encode(m.texto);
+      const b = paraUtf8(m.texto);
       new Uint8Array(this.mem.buffer, this.e.rw_entrada(b.length), b.length).set(b);
       if (this.e.rw_abrir(b.length)) { this.tocando = true; this.mandarRack('patch'); }
       else this.port.postMessage({ tipo: 'nada', acao: 'abrir' });
@@ -152,7 +184,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
 
   // um texto na entrada do motor (`rw_entrada`); devolve o tamanho
   texto(t) {
-    const b = new TextEncoder().encode(t);
+    const b = paraUtf8(t);
     new Uint8Array(this.mem.buffer, this.e.rw_entrada(b.length), b.length).set(b);
     return b.length;
   }
@@ -165,7 +197,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
   // o rack para a página desenhar: a cada seed e a cada mudança de cabos
   mandarRack(tipo, novo = -1) {
     const seed = this.seedAtual();
-    const dec = new TextDecoder();
+    const dec = decoder;
     const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
     const wp = this.e.rw_wordmark(), b = new Uint8Array(this.mem.buffer);
     let fim = wp; while (b[fim]) fim++;
@@ -198,7 +230,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
         if (vis[k * VISOR + 732] > 12.5 && this.tipos?.[id] === 'QUANTIZER') {
           const p = this.e.rw_nome_escala(id), b = new Uint8Array(this.mem.buffer);
           let f = p; while (b[f]) f++;
-          escalas[id] = new TextDecoder().decode(b.slice(p, f));
+          escalas[id] = deUtf8(b.slice(p, f));
         }
       });
       // LEARN: o valor ao vivo do controle sob o mouse
@@ -206,7 +238,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
       if (this.learnAlvo) {
         const p = this.e.rw_learn_valor(this.learnAlvo.id, this.texto(this.learnAlvo.bind)), u = new Uint8Array(this.mem.buffer);
         let f = p; while (u[f]) f++;
-        learnValor = new TextDecoder().decode(u.slice(p, f));
+        learnValor = deUtf8(u.slice(p, f));
       }
       this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor },
                             [v.buffer, c.buffer, vis.buffer]);
