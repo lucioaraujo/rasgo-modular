@@ -47,6 +47,33 @@
   #vu { width: 54px; height: 8px; background: var(--recessed); position: relative; }
   #vu div { position: absolute; left: 0; top: 0; bottom: 0; background: var(--prata); }
   #corpo { flex: 1; display: flex; min-height: 0; }
+  #direita { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  /* a faixa de crédito (`CreditsStrip`): 16 px, à direita, em cima do rack */
+  #creditos { height: 16px; flex: none; text-align: right; padding-right: 10px; color: var(--muted);
+              font: 8.6px/16px system-ui, sans-serif; white-space: nowrap; overflow: hidden; }
+  /* TUTORIAL e SOBRE (`OverlayView`): véu sobre o rack e um cartão */
+  #sobrepor { position: fixed; inset: 0; background: rgba(19, 26, 26, .82); display: none; z-index: 9;
+              align-items: center; justify-content: center; }
+  #sobrepor.aberto { display: flex; }
+  #sobrepor .cartao { position: relative; width: min(820px, calc(100vw - 60px)); max-height: calc(100vh - 60px);
+                      background: var(--surface); border: 1px solid var(--prata); padding: 30px 24px 16px 24px;
+                      display: flex; flex-direction: column; }
+  #sobrepor.sobre .cartao { height: auto; }
+  #sobrepor.tutorial .cartao { height: calc(100vh - 60px); }
+  #o-fechar { position: absolute; right: 12px; top: 10px; height: 20px; background: none; border: 1px solid var(--line);
+              color: var(--muted); font: 9.5px system-ui, sans-serif; padding: 0 7px; cursor: pointer; }
+  #o-titulo { margin: 0; font: 13.8px system-ui, sans-serif; color: var(--prata); }
+  #o-sub { margin: 4px 0 8px; font: 11.2px system-ui, sans-serif; color: var(--muted); }
+  #o-corpo { flex: 1; min-height: 0; overflow-y: auto; outline: none; font: 11.2px/1.45 system-ui, sans-serif;
+             color: var(--muted); max-width: 640px; padding-right: 10px;
+             scrollbar-width: thin; scrollbar-color: var(--line) var(--recessed); }
+  #o-corpo h3 { font: bold 12px system-ui, sans-serif; color: var(--prata); margin: 0 0 8px; }
+  #o-corpo p { margin: 0 0 18px; white-space: pre-line; }
+  #o-corpo hr { border: 0; border-top: 1px solid var(--line); margin: 0 0 14px; }
+  #o-corpo a { color: var(--prata); }
+  #o-corpo a:hover { color: var(--text); }
+  #o-corpo .linha { margin: 0 0 3px; }
+  #o-corpo .alerta { color: var(--warning); }
   #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
   /* a paleta (`PaletteColumn`): as famílias na cor delas, os tipos em 11 px;
      arrastar um tipo para o rack o acrescenta; um módulo solto aqui sai */
@@ -127,23 +154,23 @@
   <div class="marca"><svg id="logo" width="118" height="15" viewBox="6.63 12.62 258.74 30.75" aria-label="RASGO"></svg><span>MODULAR</span></div>
   <div class="grupo">
     <input id="seed" type="text" inputmode="numeric" maxlength="20" value="4303935450909092226" aria-label="Número da seed" />
-    <button id="b-tocar" class="tocar" title="O navegador só deixa tocar depois de um clique">TOCAR</button>
+    <button id="b-tocar" class="tocar">TOCAR</button>
     <button data-acao="seed" title="g">SEED</button>
     <button data-acao="repor" title="r">REPOR</button>
   </div>
   <div class="regua"></div>
   <div class="grupo">
-    <span id="r-varia" class="rotulo vivo" title="v liga/desliga">VARIA</span>
-    <div id="t-varia" class="trilho" title="Intensidade da variação (0 = desligado; a marca é o 1,0)"><div class="cheio"></div><div class="meio"></div></div>
+    <span id="r-varia" class="rotulo vivo" title="v">VARIA</span>
+    <div id="t-varia" class="trilho"><div class="cheio"></div><div class="meio"></div></div>
     <button data-acao="mudar" title="m">MUDA</button>
     <button data-acao="evoluir" title="e">EVOLUI</button>
     <button data-acao="cruzar" title="c">CRUZA</button>
   </div>
   <div class="regua"></div>
   <div class="grupo">
-    <button data-acao="banco" title="Ctrl+B: baixa o patch (.rmp)">BANCO</button>
-    <button data-acao="salvar" title="Ctrl+S: guarda a sessão neste navegador">SALVA</button>
-    <button data-acao="abrir" title="Ctrl+O: abre um patch (.rmp)">ABRIR</button>
+    <button data-acao="banco" title="Ctrl+B">BANCO</button>
+    <button data-acao="salvar" title="Ctrl+S">SALVA</button>
+    <button data-acao="abrir" title="Ctrl+O">ABRIR</button>
   </div>
   <div class="regua"></div>
   <div class="grupo">
@@ -160,10 +187,13 @@
   </div>
   <div class="grupo direita">
     <span id="leitura"></span>
-    <div id="vu" title="O pico do MASTER"><div></div></div>
-    <span class="rotulo">VOLUME</span>
-    <div id="t-volume" class="trilho" title="O volume desta página"><div class="cheio"></div></div>
-    <button data-acao="abre" id="b-abre" class="prata" title="Como a página abre na próxima vez">ABRE · SEED</button>
+    <div id="vu"><div></div></div>
+    <span class="rotulo" id="r-volume">VOLUME</span>
+    <div id="t-volume" class="trilho"><div class="cheio"></div></div>
+    <button data-acao="abre" id="b-abre" class="prata">ABRE · SEED</button>
+    <button data-acao="lingua" id="b-lingua">PT</button>
+    <button data-acao="tutorial" id="b-tutorial">TUTORIAL</button>
+    <button data-acao="sobre" id="b-sobre">SOBRE</button>
   </div>
   <input id="arquivo" type="file" accept=".rmp,text/plain" hidden />
 </header>
@@ -177,15 +207,26 @@
     </section>
   </nav>
   <div id="leitura-menu" role="menu"></div>
+  <div id="direita">
+  <div id="creditos"></div>
   <div id="rolagem">
     <div class="espaco"></div>
     <canvas id="rack"></canvas>
   </div>
+  </div>
+</div>
+<div id="sobrepor" role="dialog">
+  <div class="cartao">
+    <button id="o-fechar">FECHAR</button>
+    <h2 id="o-titulo"></h2>
+    <p id="o-sub"></p>
+    <div id="o-corpo" tabindex="-1"></div>
+  </div>
 </div>
 <div id="banco" role="dialog" aria-label="Banco de escalas">
   <div class="cartao">
-    <h2>ESCALAS — banco do Trioio <button id="b-fechar" aria-label="Fechar">×</button></h2>
-    <input id="b-busca" type="text" placeholder="buscar" />
+    <h2><span id="b-titulo"></span> <button id="b-fechar" aria-label="×">×</button></h2>
+    <input id="b-busca" type="text" />
     <div class="listas">
       <div id="b-familias" class="lista"></div>
       <div id="b-escalas" class="lista"></div>
@@ -193,11 +234,12 @@
     <div id="b-conta"></div>
     <div id="b-info"><b id="b-nome"></b><span id="b-graus"></span><span id="b-fonte" class="fonte"></span>
       <div id="b-regua"></div>
-      <span id="b-dica">Clique numa escala: o QUANTIZER passa a tocá-la (SCALE = BANCO). Esc fecha.</span></div>
+      <span id="b-dica"></span></div>
   </div>
 </div>
 <script type="module">
 import { Rack, corFamilia } from './rack.js';
+import { web, linguaInicial, ROTULO_LINGUA as ROTULO_L } from './textos.js';
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
@@ -210,6 +252,43 @@ const est = { seed: $('seed').value, cabos: 0, espera: false, variaOn: true, var
 const guardar = (k, v) => { try { localStorage.setItem('rasgoModular.' + k, v); } catch { /* sem armazenamento */ } };
 const ler = (k) => { try { return localStorage.getItem('rasgoModular.' + k); } catch { return null; } };
 
+// ---- os idiomas ----------------------------------------------------------
+// Os textos do app vêm do motor (`rw_textos`, UiLanguage.hpp); os da página,
+// de textos.js. L: 0 en, 1 pt, 2 fr, 3 es.
+let L = linguaInicial(ler('lingua'));
+let TX = {};
+const tx = (k) => TX[k] ?? k;
+const W = (k, v) => web(k, L, v);
+rack.tx = tx;
+function carregarTextos() {
+  if (!local) return;
+  TX = JSON.parse(cTexto(local, local.rw_textos(L)));
+  local.rw_lingua(L);
+  if (no) no.port.postMessage({ tipo: 'lingua', l: L });
+  aplicarTextos();
+}
+const ROTULOS = { seed: 'hdrSeed', repor: 'hdrRestore', mudar: 'hdrChange', evoluir: 'hdrEvolve', cruzar: 'hdrCross',
+                  banco: 'hdrBank', salvar: 'hdrSave', abrir: 'hdrOpen', desfazer: 'hdrUndo', descabear: 'hdrUncable',
+                  espera: 'hdrStandby', tutorial: 'hdrTutorial', sobre: 'hdrAbout' };
+function aplicarTextos() {
+  document.documentElement.lang = ['en', 'pt-BR', 'fr', 'es'][L];
+  for (const [a, k] of Object.entries(ROTULOS)) document.querySelector(`[data-acao="${a}"]`).textContent = tx(k);
+  $('r-varia').textContent = tx('hdrVary');
+  $('b-tocar').textContent = W('tocar');
+  $('r-volume').textContent = W('volume');
+  $('b-lingua').textContent = ROTULO_L[L];
+  $('creditos').textContent = tx('footerCredit') + versao().replace(' ', '  ·  ');
+  $('b-titulo').textContent = tx('scaleBankTitle');
+  $('b-busca').placeholder = tx('scaleBankSearch');
+  $('b-dica').textContent = tx('scaleBankHint');
+  if ($('banco').classList.contains('aberto')) listarBanco();
+  if ($('sobrepor').classList.contains('aberto')) sobrepor(sobreporModo);
+  learn.mostrado = null; learn.chave = '';
+  mostrarLearn();
+  syncCabecalho();
+}
+const versao = () => (local ? cTexto(local, local.rw_versao()) : '');
+
 // avisos na caixa LEARN, por 6 s (`PaletteColumn::setNotice`)
 function aviso(t, ms = 6000) { est.aviso = t; est.avisoAte = performance.now() + ms; mostrarLearn(); }
 rack.aviso = (t) => aviso(t);
@@ -217,7 +296,7 @@ rack.aviso = (t) => aviso(t);
 function leitura() {
   const el = $('leitura');
   const mods = rack.soSaida ? `${rack.vistos.length}/${rack.mods.length}` : `${rack.vistos.length}`;
-  el.textContent = no ? `${mods} mód  ·  ${est.cabos} cabos` : '';
+  el.textContent = no ? `${mods} ${tx('rdModules')}  ·  ${est.cabos} ${tx('rdCables')}` : '';
 }
 setInterval(leitura, 500);
 
@@ -236,12 +315,12 @@ function syncCabecalho() {
   $('b-tocar').hidden = !!no;
   $('b-espera').classList.toggle('on', est.espera);
   $('b-vista').classList.toggle('on', rack.soSaida);
-  $('b-vista').textContent = 'RACK · ' + (rack.soSaida ? 'SAÍDA' : 'TODOS');
+  $('b-vista').textContent = 'RACK · ' + tx(rack.soSaida ? 'hdrRackOut' : 'hdrRackAll');
   trilho($('t-varia'), est.variaOn ? est.variaAmt * 0.5 : 0);
   $('r-varia').classList.toggle('vivo', est.variaOn && est.variaAmt > 0);
   trilho($('t-volume'), est.volume);
   const modo = ler('abre') || 'seed';
-  $('b-abre').textContent = 'ABRE · ' + { seed: 'SEED', uncabled: 'SEM CABOS', init: 'MEU PATCH', last: 'ÚLTIMA' }[modo];
+  $('b-abre').textContent = tx('hdrOpens') + ' · ' + tx({ seed: 'startSeed', uncabled: 'startUncabled', init: 'startInit', last: 'startLast' }[modo]);
   leitura();
 }
 
@@ -251,14 +330,17 @@ fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(async (b) => {
   // a marca RASGO do cabeçalho vem do motor (o mesmo vetor dos painéis)
   const e = local = await instanciar();
   construirPaleta(JSON.parse(cTexto(e, e.rw_catalogo())));
-  mostrarLearn();
+  // `?lingua=0..3` e `?abrir=tutorial|sobre`: capturas de teste
+  if (q.has('lingua')) L = Math.min(3, Math.max(0, Number(q.get('lingua')) | 0));
+  carregarTextos();
+  if (q.has('abrir')) sobrepor(q.get('abrir'));
   const wp = e.rw_wordmark(), u8 = new Uint8Array(e.memory.buffer); let fim = wp; while (u8[fim]) fim++;
   $('logo').innerHTML = `<path fill="#d8dde6" d="${new TextDecoder().decode(u8.slice(wp, fim))}"/>`;
-  aviso('Pronto. Aperte TOCAR — o navegador só deixa soar depois de um clique.', 1e9);
+  aviso(W('pronto'), 1e9);
   if (!q.has('previa')) mostrarAntes();
   if (q.has('auto')) tocar();
   if (q.has('previa')) previa().catch((x) => aviso('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1], 1e9));
-}).catch(() => aviso('Não consegui carregar rasgo.wasm (abra por um servidor http).', 1e9));
+}).catch(() => aviso(W('semWasm'), 1e9));
 
 // um texto terminado em zero na memória do motor
 function cTexto(e, p) {
@@ -296,6 +378,7 @@ async function ligar() {
         syncCabecalho();
       }
       if (m.tipo === 'quadro') {
+        est.lufs = m.lufs;
         if (m.learnValor !== learn.valor) { learn.valor = m.learnValor; if (learn.mostrado?.param) mostrarLearn(); }
         rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
         est.cabos = m.cabos.length / 14;
@@ -305,10 +388,10 @@ async function ligar() {
         vu.style.background = f < 0.85 ? 'var(--prata)' : 'var(--warning)';
       }
       if (m.tipo === 'salvo') salvo(m);
-      if (m.tipo === 'recusa') aviso(m.modulo + (m.motivo === -1 ? ' é único no rack.' : m.motivo === -2 ? ': no máximo 4 cópias.' : ': tipo desconhecido.'));
+      if (m.tipo === 'recusa') aviso(m.modulo + (m.motivo === -1 ? tx('instanceSingle') : m.motivo === -2 ? tx('instanceMax') : W('tipoDesconhecido')));
       if (m.tipo === 'bancoAtual') abrirBanco(m.id, Math.round(m.banco));
-      if (m.tipo === 'nada' && m.acao === 'desfazer') aviso('Nada para desfazer.');
-      if (m.tipo === 'nada' && m.acao === 'abrir') aviso('Não consegui abrir esse arquivo: não parece um patch do Rasgo Modular (.rmp).');
+      if (m.tipo === 'nada' && m.acao === 'desfazer') aviso(W('nadaDesfazer'));
+      if (m.tipo === 'nada' && m.acao === 'abrir') aviso(W('abrirFalhou'));
     };
     n.port.postMessage({ tipo: 'wasm', bytes });
   });
@@ -353,7 +436,7 @@ function mostrarAntes() {
 async function tocar() {
   if (no) return;
   const s = seedValida() || '4303935450909092226';
-  aviso('Montando o patch…', 1e9);
+  aviso(W('montando'), 1e9);
   await ligar();
   await ctx.resume();
   const modo = ler('abre') || 'seed';
@@ -387,8 +470,7 @@ async function acao(a) {
   if (a === 'zoomMenos' || a === 'zoomMais' || a === 'zoom0') { rack.mudarZoom(a === 'zoom0' ? 0 : a === 'zoomMais' ? 1 : -1); return; }
   if (a === 'vista') {
     rack.vistaSaida(!rack.soSaida); syncCabecalho();
-    aviso(rack.soSaida ? `SAÍDA: módulos que chegam ao áudio: ${rack.vistos.length}/${rack.mods.length}`
-                       : `TODOS: módulos deste patch: ${rack.vistos.length}`);
+    aviso(W(rack.soSaida ? 'vistaSaida' : 'vistaTodos') + `${rack.vistos.length}/${rack.mods.length}`);
     return;
   }
   if (a === 'abre') {
@@ -396,14 +478,16 @@ async function acao(a) {
     const modo = ordem[(ordem.indexOf(ler('abre') || 'seed') + 1) % 4];
     guardar('abre', modo);
     if (modo === 'init' && no) no.port.postMessage({ tipo: 'salvar', destino: 'init' });
-    aviso({ seed: 'Na próxima vez, abre com um patch novo (seed), depois do TOCAR.',
-            uncabled: 'Na próxima vez, abre com todos os módulos e sem cabos.',
-            init: 'Este patch agora é o seu patch de abertura: na próxima vez, abre com ele. Para trocar, volte a MEU PATCH com o patch que quiser.',
-            last: 'Na próxima vez, abre com a sessão como estiver ao fechar a página.' }[modo], 7000);
+    aviso({ seed: W('abreSeed'), uncabled: tx('startNoteUncabled'), init: tx('startNoteInit'), last: W('abreUltima') }[modo], 7000);
     syncCabecalho();
     return;
   }
   if (a === 'abrir') { $('arquivo').click(); return; }
+  if (a === 'lingua') { L = (L + 1) % 4; guardar('lingua', String(L)); carregarTextos(); return; }
+  if (a === 'tutorial' || a === 'sobre') {
+    if ($('sobrepor').classList.contains('aberto') && sobreporModo === a) fecharSobrepor(); else sobrepor(a);
+    return;
+  }
   if (a === 'variaLiga') { est.variaOn = !est.variaOn; enviarVaria(); syncCabecalho(); return; }
   if (a === 'espera') {
     est.espera = !est.espera; syncCabecalho();
@@ -431,7 +515,7 @@ async function acao(a) {
 // SALVA guarda a sessão neste navegador; BANCO baixa o patch num arquivo
 // com o nome da seed (`bankPatchName`: seed-N.rmp, ou patch-<hora>.rmp)
 function salvo(m) {
-  if (m.destino === 'salvar') { guardar('sessao', m.texto); aviso('Sessão salva neste navegador.'); }
+  if (m.destino === 'salvar') { guardar('sessao', m.texto); aviso(W('salvoAqui')); }
   else if (m.destino === 'init') guardar('init', m.texto);
   else if (m.destino === 'ultima') guardar('sessao', m.texto);
   else if (m.destino === 'banco') {
@@ -440,7 +524,7 @@ function salvo(m) {
     a.href = URL.createObjectURL(new Blob([m.texto], { type: 'text/plain' }));
     a.download = nome; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    aviso(`Patch no banco: ${nome} (na pasta de downloads).`);
+    aviso(W('noBanco', { nome }));
   }
 }
 // ABRE · ÚLTIMA: a sessão vai sendo guardada enquanto se toca
@@ -450,7 +534,7 @@ $('arquivo').onchange = async () => {
   const f = $('arquivo').files[0];
   $('arquivo').value = '';
   if (!f) return;
-  if (f.size > 4e6) { aviso('Arquivo grande demais para um patch.'); return; }
+  if (f.size > 4e6) { aviso(W('grande')); return; }
   const texto = await f.text();
   if (!no) await tocar();
   no.port.postMessage({ tipo: 'abrir', texto });
@@ -463,7 +547,7 @@ $('r-varia').onclick = () => acao('variaLiga');
 $('seed').addEventListener('keydown', (ev) => {
   if (ev.key === 'Enter') {
     const s = seedValida();
-    if (!s) { aviso('A seed é um número inteiro positivo (até 20 dígitos).'); return; }
+    if (!s) { aviso(W('seedInvalida')); return; }
     $('seed').blur();
     if (!no) tocar(); else no.port.postMessage({ tipo: 'seed', seed: s });
   } else if (ev.key === 'Escape') { $('seed').value = est.seed; $('seed').blur(); }
@@ -578,15 +662,15 @@ function listarBanco() {
     };
     box.append(d);
   }
-  $('b-conta').textContent = `${lista.length} ${lista.length === 1 ? 'escala' : 'escalas'}`;
+  $('b-conta').textContent = `${lista.length} ${W(lista.length === 1 ? 'escalas1' : 'escalasN')}`;
   box.querySelector('.on')?.scrollIntoView({ block: 'center' });
   infoBanco();
 }
 function infoBanco() {
   const e = bancoSel, n = (v) => (v === Math.floor(v) ? String(v) : v.toFixed(1)).replace('.', ',');
   $('b-nome').textContent = e ? e.n : '';
-  $('b-graus').textContent = e ? `graus (¢): ${e.g.map(n).join('  ')}   ·  período ${n(e.p)}` : '';
-  $('b-fonte').textContent = e ? `fonte: ${e.s}` : '';
+  $('b-graus').textContent = e ? `${tx('scaleBankDegrees')}: ${e.g.map(n).join('  ')}   ·  ${tx('scaleBankPeriod')} ${n(e.p)}` : '';
+  $('b-fonte').textContent = e ? `${tx('scaleBankSource')}: ${e.s}` : '';
   $('b-regua').innerHTML = e ? e.g.map((c) => `<i style="left:calc(2px + ${c / e.p} * (100% - 6px))"></i>`).join('') : '';
 }
 function fecharBanco() { $('banco').classList.remove('aberto'); }
@@ -600,7 +684,6 @@ $('banco').addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.s
 // módulo, um tipo na paleta, um botão do cabeçalho — vira verbete depois de
 // 1 s parado sobre o MESMO objeto; sobre nada, fica o último. Enquanto se
 // gira um controle, é ele, na hora, com o valor ao vivo.
-const LINGUA = 1;   // pt (os quatro idiomas entram na F4b)
 const learn = { chave: '', desde: 0, mostrado: null, valor: '', foco: false, x: -1, y: -1, alvo: null };
 const CHAVES = { seed: 'seed', repor: 'restore', mudar: 'mutate', evoluir: 'evolve', cruzar: 'cross', banco: 'bank',
                  salvar: 'save', abrir: 'open', desfazer: 'undo', descabear: 'uncable', espera: 'standby',
@@ -631,13 +714,13 @@ function alvoLearn() {
   return null;
 }
 function verbete(h) {
-  if (h.cabecalho) return consultar(local.rw_learn_cabecalho, h.cabecalho, LINGUA);
-  if (h.cabo) return consultar(local.rw_learn_cabo, null, LINGUA);
-  if (h.modulo) return consultar(local.rw_learn_modulo, h.tipo, LINGUA);
-  const v = consultar(local.rw_learn_widget, h.tipo + '\t' + h.bind, LINGUA);
+  if (h.cabecalho) return consultar(local.rw_learn_cabecalho, h.cabecalho, L);
+  if (h.cabo) return consultar(local.rw_learn_cabo, null, L);
+  if (h.modulo) return consultar(local.rw_learn_modulo, h.tipo, L);
+  const v = consultar(local.rw_learn_widget, h.tipo + '\t' + h.bind, L);
   if (v) { v.t = h.titulo; return v; }
   // widget sem verbete: cai no módulo
-  return consultar(local.rw_learn_modulo, h.tipo, LINGUA);
+  return consultar(local.rw_learn_modulo, h.tipo, L);
 }
 setInterval(() => {
   if (learn.foco) return;   // F1: lendo com o teclado, o texto fica
@@ -665,7 +748,7 @@ function mostrarLearn() {
     clearTimeout(learn.fimAviso);
     learn.fimAviso = setTimeout(mostrarLearn, est.avisoAte - performance.now() + 20);
   } else if (!learn.mostrado) {
-    corpo.append(p('ocioso', (local ? cTexto(local, local.rw_learn_ocioso(LINGUA)) : '') + '\n\nF1: LEARN'));
+    corpo.append(p('ocioso', (local ? cTexto(local, local.rw_learn_ocioso(L)) : '') + '\n\nF1: LEARN'));
   } else {
     const v = learn.mostrado;
     if (v.t) corpo.append(p('t', v.t));
@@ -675,7 +758,7 @@ function mostrarLearn() {
     if (v.e) corpo.append(p('e', '→ ' + v.e));
   }
   const rola = corpo.scrollHeight > corpo.clientHeight + 1;
-  $('learn-dica').textContent = learn.foco ? '↑↓ PgUp/PgDn - Esc' : rola ? 'role / F1: ler' : 'F1: LEARN';
+  $('learn-dica').textContent = learn.foco ? '↑↓ PgUp/PgDn - Esc' : rola ? W('learnRole') : 'F1: LEARN';
 }
 // F1: fixa o verbete para ler com o teclado; Esc (ou F1) devolve
 function focoLearn(sim) {
@@ -708,8 +791,8 @@ function aplicarLeitura() {
 function menuLeitura() {
   const m = $('leitura-menu');
   if (m.classList.contains('aberto')) { m.classList.remove('aberto'); return; }
-  const itens = [['cab', 'Leitura do LEARN'], [0, 'Padrão — 12 px'], [1, 'Grande — 14 px'], [2, 'Maior — 16 px'], ['hr'],
-                 ['branco', 'Texto de leitura branco'], ['padrao', 'Restaurar padrão de leitura']];
+  const itens = [['cab', W('leitura')], [0, W('leitura0')], [1, W('leitura1')], [2, W('leitura2')], ['hr'],
+                 ['branco', W('leituraBranco')], ['padrao', W('leituraPadrao')]];
   m.replaceChildren();
   for (const [k, t] of itens) {
     if (k === 'hr') { m.append(document.createElement('hr')); continue; }
@@ -734,9 +817,87 @@ $('b-leitura').onclick = (ev) => { ev.stopPropagation(); menuLeitura(); };
 addEventListener('pointerdown', (ev) => { if (!ev.target.closest('#leitura-menu')) $('leitura-menu').classList.remove('aberto'); });
 addEventListener('resize', aplicarLeitura);
 
+// ---- TUTORIAL e SOBRE (`OverlayView`) ---------------------------------------
+// Os cartões são os do app, na mesma ordem; os que no navegador são outros
+// (a caixa do seed, guardar, gravar, navegar, teclado) vêm de textos.js.
+let sobreporModo = '', sobreTimer = 0;
+const CARTOES = [['tutWhatTitle', 'tutWhatBody'], ['tutSeedTitle', 'tutSeedBody'], ['tutSeedBoxTitle', 'tutSeedBoxBody'],
+                 ['tutVaryTitle', 'tutVaryBody'], ['tutStoreTitle', 'tutStoreBody'], ['tutRecTitle', 'tutRecBody'],
+                 ['tutHdrTitle', 'tutHdrBody'], ['tutCableTitle', 'tutCableBody'], ['tutNavTitle', 'tutNavBody'],
+                 ['tutKeysTitle', 'tutKeysBody'], ['tutModTitle', 'tutModBody'], ['tutScratchTitle', 'tutScratchBody'],
+                 ['tutFamTitle', 'tutFamBody'], ['tutLearnTitle', 'tutLearnBody']];
+const DO_NAVEGADOR = new Set(['tutSeedBoxBody', 'tutStoreBody', 'tutRecBody', 'tutNavBody', 'tutKeysBody']);
+function sobrepor(modo) {
+  sobreporModo = modo;
+  const o = $('sobrepor'), corpo = $('o-corpo');
+  o.className = 'aberto ' + modo;
+  $('o-fechar').textContent = tx('close');
+  corpo.replaceChildren();
+  clearInterval(sobreTimer);
+  const el = (tag, cl, t) => { const e = document.createElement(tag); if (cl) e.className = cl; if (t != null) e.textContent = t; return e; };
+  if (modo === 'tutorial') {
+    $('o-titulo').textContent = tx('tutTitle');
+    $('o-sub').textContent = tx('tutSubtitle');
+    CARTOES.forEach(([t, b], i) => {
+      if (i) corpo.append(el('hr'));
+      corpo.append(el('h3', '', tx(t)));
+      let texto = DO_NAVEGADOR.has(b) ? W(b) : tx(b);
+      if (texto.includes(' · ')) texto = '•  ' + texto.split(' · ').join('\n•  ');
+      corpo.append(el('p', '', texto));
+      if (t === 'tutLearnTitle') {
+        const a = el('a', '', tx('guideUrl')); a.href = tx('guideUrl'); a.target = '_blank'; a.rel = 'noopener';
+        const p = el('p'); p.append(a); corpo.append(p);
+      }
+    });
+  } else {
+    $('o-titulo').textContent = 'RASGO MODULAR';
+    const v = versao(), i = v.lastIndexOf(' ');
+    $('o-sub').textContent = i > 0 ? `${v.slice(0, i)}  ·  ${tx('builtOn')} ${v.slice(i + 1)}` : v;
+    const l1 = el('p', 'linha'), l2 = el('p', 'linha'), l3 = el('p', 'linha');
+    l3.style.marginBottom = '18px';
+    corpo.append(l1, l2, l3, el('p', '', tx('aboutBody')));
+    // o loudness da saída, ao vivo (BS.1770-4), e o alvo de −14 LUFS / −1 dBTP
+    const atualiza = () => {
+      const lu = est.lufs, f = (x) => (x <= -70 ? '--' : x.toFixed(1));
+      l1.textContent = lu ? `LUFS   M ${f(lu[0])}   S ${f(lu[1])}   I ${f(lu[2])}   (BS.1770-4)` : 'LUFS   --';
+      l2.textContent = `${ctx ? ctx.sampleRate : 48000} ${W('taxa')}`;
+      const tp = lu ? lu[3] : -120;
+      let alvo = `${tx('aboutTarget')}  -14 LUFS / -1 dBTP   ·   TP ${tp <= -119 ? '--' : tp.toFixed(1) + ' dBTP'}`;
+      if (lu && lu[2] > -70) { const d = -14 - lu[2]; alvo += `   ·   ${d >= 0 ? '+' : ''}${d.toFixed(1)} LU`; }
+      l3.textContent = alvo;
+      l3.classList.toggle('alerta', tp > -1);
+    };
+    atualiza();
+    sobreTimer = setInterval(atualiza, 500);
+  }
+  corpo.scrollTop = 0;
+  corpo.focus();
+  $('b-tutorial').classList.toggle('on', modo === 'tutorial');
+  $('b-sobre').classList.toggle('on', modo === 'sobre');
+}
+function fecharSobrepor() {
+  $('sobrepor').className = ''; sobreporModo = ''; clearInterval(sobreTimer);
+  $('b-tutorial').classList.remove('on'); $('b-sobre').classList.remove('on');
+}
+$('o-fechar').onclick = fecharSobrepor;
+$('sobrepor').addEventListener('pointerdown', (ev) => { if (ev.target === $('sobrepor')) fecharSobrepor(); });
+
 // ---- os atalhos do app (cartão ATALHOS em UiLanguage.hpp) ----------------
 addEventListener('keydown', (ev) => {
   if (ev.target === $('seed') || $('banco').classList.contains('aberto')) return;
+  // TUTORIAL e SOBRE: as setas rolam o texto (o navegador já faz), Esc fecha
+  if ($('sobrepor').classList.contains('aberto')) {
+    if (ev.key === 'Escape') { ev.preventDefault(); fecharSobrepor(); }
+    return;
+  }
+  // as setas rolam o rack
+  const rolar = { ArrowUp: -60, ArrowDown: 60, PageUp: -0.9, PageDown: 0.9 }[ev.key];
+  if (rolar !== undefined && !ev.ctrlKey && !ev.altKey && ev.target === document.body) {
+    ev.preventDefault();
+    const r = $('rolagem');
+    r.scrollTop += Math.abs(rolar) < 1 ? rolar * r.clientHeight : rolar;
+    return;
+  }
   if (ev.key === 'F1') { ev.preventDefault(); focoLearn(!learn.foco); return; }
   if (ev.key === 'F2') { ev.preventDefault(); menuLeitura(); return; }
   const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;

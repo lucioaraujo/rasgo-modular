@@ -32,6 +32,7 @@ void json(std::string& o, const std::string& s) {
     o += '"';
     for (const char c : s) {
         if (c == '"' || c == '\\') { o += '\\'; o += c; }
+        else if (c == '\n') o += "\\n";   // as quebras de linha dos textos ficam
         else if (static_cast<unsigned char>(c) < 0x20) o += ' ';
         else o += c;
     }

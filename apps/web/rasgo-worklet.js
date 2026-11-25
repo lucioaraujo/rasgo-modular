@@ -173,6 +173,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_escolher_escala(m.id, m.banco);
     } else if (m.tipo === 'lerBanco' && this.e) {
       this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
+    } else if (m.tipo === 'lingua' && this.e) {
+      this.e.rw_lingua(m.l);
     } else if (m.tipo === 'learnAlvo') {
       this.learnAlvo = m.id >= 0 ? m : null;
     } else if (m.tipo === 'visiveis') {
@@ -240,7 +242,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
         let f = p; while (u[f]) f++;
         learnValor = deUtf8(u.slice(p, f));
       }
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor },
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor,
+                              lufs: Array.from(new Float32Array(this.mem.buffer, this.e.rw_lufs(), 4)) },
                             [v.buffer, c.buffer, vis.buffer]);
     }
     return true;

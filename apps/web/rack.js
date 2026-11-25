@@ -75,6 +75,7 @@ export class Rack {
     this.escolhendo = false;      // escolhendo o companion da relação
     this.sobCabo = -1;            // índice do cabo sob o mouse (destaque)
     this.aviso = () => {};        // texto de aviso para a página
+    this.tx = (k) => k;           // os textos do app na língua escolhida (a página põe)
     this.mouse = { x: 0, y: 0 };
     this.visores = new Map();     // id → o visor agora (Float32Array, `rw_visor`)
     this.escalas = {};            // QUANTIZER com BANCO: id → nome da escala
@@ -478,7 +479,7 @@ export class Rack {
     g.strokeStyle = T.line; g.stroke();
     if (c[i + 13]) {
       g.font = fonte(8); g.fillStyle = T.warning; g.textAlign = 'right';
-      g.fillText('\u21ba REALIMENTA', bx + bw - pad, ry + 2 * rowH - 3);
+      g.fillText('\u21ba ' + this.tx('inspFeedback'), bx + bw - pad, ry + 2 * rowH - 3);
       g.textAlign = 'left';
     }
     ry += 2 * rowH;
@@ -524,8 +525,8 @@ export class Rack {
     trilha('GAIN', c[i + 6] * 0.5, { tipo: 'ganho' }, true);
     trilha('COND', c[i + 8], { tipo: 'cond' }, false);
     const metade = Math.floor((bw - pad * 2 - 4) / 2);
-    botao(bx + pad, ry, metade, rowH - 2, c[i + 4] ? 'RECONECTAR' : 'ROMPER', !!c[i + 4], { tipo: 'romper' });
-    botao(bx + pad + metade + 4, ry, metade, rowH - 2, 'DESPLUGAR', false, { tipo: 'tirar' });
+    botao(bx + pad, ry, metade, rowH - 2, this.tx(c[i + 4] ? 'inspReconnect' : 'inspRupture'), !!c[i + 4], { tipo: 'romper' });
+    botao(bx + pad + metade + 4, ry, metade, rowH - 2, this.tx('inspRemove'), false, { tipo: 'tirar' });
   }
 
   // um clique no inspetor; true = o clique era dele
@@ -1110,7 +1111,7 @@ export class Rack {
       const [o, po, d, pd] = gs.deSaida ? [gs.no, gs.p, j.no, j.p] : [j.no, j.p, gs.no, gs.p];
       this.enviar({ tipo: 'ligar', o, po, d, pd });
       if (!this.porId.get(d)?.chega)
-        this.aviso('Ligado — mas este caminho ainda não chega ao som. Siga cabeando até o MASTER pra ouvir.');
+        this.aviso(this.tx('cableNotAudible'));
     }
     this.redesenhar();
   }

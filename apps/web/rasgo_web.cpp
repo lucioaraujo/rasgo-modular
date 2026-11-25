@@ -142,6 +142,7 @@ void json(std::string& o, const std::string& s) {
     o += '"';
     for (const char c : s) {
         if (c == '"' || c == '\\') { o += '\\'; o += c; }
+        else if (c == '\n') o += "\\n";   // as quebras de linha dos textos ficam
         else if (static_cast<unsigned char>(c) < 0x20) o += ' ';
         else o += c;
     }
@@ -792,6 +793,135 @@ float rw_parametro(int id, int tamanho) {
 const std::vector<char>& rw_web_entrada() { return g_entrada; }
 SignalGraph* rw_web_grafo() { return g_grafo.get(); }
 
+// ---- os textos da interface (`UiLanguage.hpp`), para os 4 idiomas -------
+
+#define RW_TEXTOS \
+    X(hdrVary) \
+    X(hdrStandby) \
+    X(hdrChange) \
+    X(hdrEvolve) \
+    X(hdrCross) \
+    X(hdrBank) \
+    X(hdrSave) \
+    X(hdrOpen) \
+    X(hdrUndo) \
+    X(hdrUncable) \
+    X(hdrRestore) \
+    X(cableNotAudible) \
+    X(hdrRec) \
+    X(instanceSingle) \
+    X(instanceMax) \
+    X(hdrSeed) \
+    X(hdrOpens) \
+    X(startSeed) \
+    X(startUncabled) \
+    X(startInit) \
+    X(startLast) \
+    X(startNoteSeed) \
+    X(startNoteUncabled) \
+    X(startNoteInit) \
+    X(scaleBankTitle) \
+    X(scaleBankSearch) \
+    X(scaleBankDegrees) \
+    X(scaleBankPeriod) \
+    X(scaleBankSource) \
+    X(scaleBankHint) \
+    X(scaleBankAll) \
+    X(scaleBankEmpty) \
+    X(startNoteLast) \
+    X(hdrRackAll) \
+    X(hdrRackOut) \
+    X(rackViewEmpty) \
+    X(hdrTutorial) \
+    X(hdrAbout) \
+    X(close) \
+    X(inspRupture) \
+    X(inspReconnect) \
+    X(learnCableHead) \
+    X(inspRemove) \
+    X(inspFeedback) \
+    X(openPatch) \
+    X(builtOn) \
+    X(rdModules) \
+    X(rdCables) \
+    X(rdPeak) \
+    X(tutTitle) \
+    X(tutSubtitle) \
+    X(tutWhatTitle) \
+    X(tutWhatBody) \
+    X(tutSeedTitle) \
+    X(tutSeedBody) \
+    X(tutSeedBoxTitle) \
+    X(tutSeedBoxBody) \
+    X(tutVaryTitle) \
+    X(tutVaryBody) \
+    X(tutStoreTitle) \
+    X(tutStoreBody) \
+    X(tutRecTitle) \
+    X(tutRecBody) \
+    X(tutHdrTitle) \
+    X(tutHdrBody) \
+    X(tutCableTitle) \
+    X(tutCableBody) \
+    X(tutNavTitle) \
+    X(tutNavBody) \
+    X(tutModTitle) \
+    X(tutModBody) \
+    X(tutFamTitle) \
+    X(tutFamBody) \
+    X(tutScratchTitle) \
+    X(tutScratchBody) \
+    X(tutKeysTitle) \
+    X(tutKeysBody) \
+    X(tutLearnTitle) \
+    X(tutLearnBody) \
+    X(guideUrl) \
+    X(aboutTarget) \
+    X(learnIdle) \
+    X(aboutBody) \
+    X(footerCredit)
+
+// Todos os textos da interface do app que a página usa, na língua pedida
+// (0 en, 1 pt, 2 fr, 3 es), em JSON {"chave":"texto",…}
+__attribute__((used, visibility("default")))
+const char* rw_textos(int l) {
+    const auto lg = static_cast<rasgo::panel::Lang>(std::clamp(l, 0, 3));
+    g_salvo = "{";
+    bool pr = true;
+#define X(k) \
+    if (!pr) g_salvo += ','; \
+    pr = false; \
+    json(g_salvo, #k); \
+    g_salvo += ':'; \
+    json(g_salvo, rasgo::panel::tr(rasgo::panel::strings::k, lg));
+    RW_TEXTOS
+#undef X
+    g_salvo += '}';
+    return g_salvo.c_str();
+}
+
+// a língua dos textos que o motor escreve (o nome da escala vazia do BANCO)
+int g_lingua = 1;
+__attribute__((used, visibility("default")))
+void rw_lingua(int l) { g_lingua = std::clamp(l, 0, 3); }
+
+// a versão do motor (o `git describe` do build, como no SOBRE do app)
+#ifndef RASGO_MODULAR_BUILD
+#define RASGO_MODULAR_BUILD "dev"
+#endif
+__attribute__((used, visibility("default")))
+const char* rw_versao() { return RASGO_MODULAR_BUILD; }
+
+// o loudness da saída (BS.1770-4) para o SOBRE: momentâneo, curto,
+// integrado (LUFS) e o pico verdadeiro (dBTP)
+float g_lufsOut[4] = {};
+__attribute__((used, visibility("default")))
+float* rw_lufs() {
+    g_lufsOut[0] = g_lufs.momentary(); g_lufsOut[1] = g_lufs.shortTerm();
+    g_lufsOut[2] = g_lufs.integrated(); g_lufsOut[3] = g_lufs.truePeakDbtp();
+    return g_lufsOut;
+}
+
 // o VU do cabeçalho: o pico recente do MASTER (o mesmo anel do visor)
 __attribute__((used, visibility("default")))
 float rw_vu() {
@@ -1068,7 +1198,7 @@ const char* rw_nome_escala(int id) {
     Signal& n = g_grafo->node(static_cast<std::size_t>(id));
     const auto* e = rasgo::escalas::BancoEscalas::instancia().procura(
         static_cast<std::uint32_t>(std::lround(parametro(n, "bank"))));
-    g_nomeEscala = e ? e->nome : rasgo::panel::tr(rasgo::panel::strings::scaleBankEmpty, rasgo::panel::Lang::pt);
+    g_nomeEscala = e ? e->nome : rasgo::panel::tr(rasgo::panel::strings::scaleBankEmpty, static_cast<rasgo::panel::Lang>(g_lingua));
     return g_nomeEscala.c_str();
 }
 
