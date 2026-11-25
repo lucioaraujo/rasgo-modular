@@ -49,6 +49,7 @@
 #include "panel/UiLanguage.hpp"
 #include "panel/WindowPolicy.hpp"   // mesma política de abertura do painel X11
 #include "ui/CableGeometry.hpp"
+#include "ui/CompactPanel.hpp"
 #include "ui/PanelGeometry.hpp"
 #include "ui/ScopeTrace.hpp"
 #include "ui/Shortcuts.hpp"        // tabela ÚNICA de atalhos (testada)
@@ -202,10 +203,13 @@ struct Rack {
     // vez por quadro como o laço do X11). Eram dezenas de milhares de
     // construções por segundo: a interface parava de responder.
     std::map<std::size_t, Panel> panelCache;
+    bool compact = false;   // a vista COMPACTA (botão do cabeçalho, src/ui/CompactPanel.hpp)
     const Panel& panelOf(const std::size_t id) {
         const auto it = panelCache.find(id);
         if (it != panelCache.end()) return it->second;
-        return panelCache.emplace(id, graph.node(id).panel()).first->second;
+        Panel p = graph.node(id).panel();
+        if (compact) rasgo::ui::compactPanel(p, graph.node(id).type());
+        return panelCache.emplace(id, std::move(p)).first->second;
     }
     void invalidatePanels() { panelCache.clear(); }
 
@@ -1286,6 +1290,8 @@ public:
         return commandsFit(width) ? kHeight : kHeight + kRow2;
     }
 
+    std::function<void()> onCompact;
+    void setCompact(bool c) { compact_ = c; repaint(); }
     std::function<void()> onSeed, onLang, onRackView, onStandby,
         onVary, onMutate, onEvolve, onCross, onBank, onSave,
         onTutorial, onAbout, onRec, onOpen, onUndo, onUncable, onRestore,
@@ -1438,6 +1444,7 @@ public:
             cmdsW_ += 50 + labelW(u8("\xe2\x88\x92")) + labelW("+") + 6;
             cmdsW_ += labelW(str(S2::hdrStandby)) + 6;
             cmdsW_ += labelW(rackLabel()) + 6;      // RACK, junto do ZOOM
+            cmdsW_ += labelW(str(S2::hdrCompact)) + 6;   // COMPACTO, junto do RACK
             cmdsW_ += 4 * kGroupSepW;               // réguas entre grupos
             // A fileira é decidida AQUI, antes de qualquer coisa que a
             // consulte. Decidir depois deixava as guardas do VU e da
@@ -1624,7 +1631,8 @@ public:
         // próprios `button`/`buttonR` acima, via `flashing`)
         // ZOOM e RACK juntos: os dois dizem respeito a COMO se vê o rack
         // (pedido do autor, 2 out. 2026). O RACK vinha do canto direito.
-        if (x + kGroupSepW + 24 + 40 + labelW(rackLabel()) < rx - 8) {
+        if (x + kGroupSepW + 24 + 40 + labelW(rackLabel())
+                + labelW(str(rasgo::panel::strings::hdrCompact)) + 6 < rx - 8) {
             x += groupSeparator(g, x);
             g.setColour(T.textSecondary);
             g.setFont(juce::FontOptions(11.0f));
@@ -1639,6 +1647,9 @@ public:
             // "RACK · SAÍDA" mesmo com a interface em inglês (achado do
             // autor, 18 set. 2026); hoje vêm de `UiLanguage.hpp`.
             x += drawButton(g, x, rackLabel(), rackOut_, Act::rackView, kPrata);
+            // COMPACTO (25/11/2026): a vista compacta dos painéis, ao lado do RACK
+            x += drawButton(g, x, str(rasgo::panel::strings::hdrCompact), compact_,
+                            Act::compact, kPrata);
         }
         if (hasKeyboardFocus(false) && keyboardAction_)
             for (const auto& hit : keyboardChoices())
@@ -1716,6 +1727,7 @@ public:
         case Act::lang:      if (onLang) onLang(); break;
         case Act::startup:   if (onStartup) onStartup(); break;
         case Act::rackView:  if (onRackView) onRackView(); break;
+        case Act::compact:   if (onCompact) onCompact(); break;
         case Act::standby:   if (onStandby) onStandby(); break;
         case Act::zoomIn:    if (onZoom) onZoom(+1); break;
         case Act::zoomOut:   if (onZoom) onZoom(-1); break;
@@ -1917,6 +1929,7 @@ public:
     void setOverlay(int o) { overlay_ = o; repaint(); }
 private:
     int overlay_ = 0;   // 0 nenhum · 1 tutorial · 2 sobre
+    bool compact_ = false;   // o COMPACTO aceso
 };
 
 // ---- o rack desenhado --------------------------------------------------
@@ -2032,6 +2045,7 @@ public:
             if (isHot)
                 hot.push_back({s->x, s->y, t->x, t->y, col.brighter(0.45f), cut,
                                w + 2.0f});
+            col = col.withMultipliedAlpha(ui::kCableOpacity);   // 50%, como o VCV (autor, 25/11)
             if (!cut && !c.conducting) col = col.withMultipliedAlpha(0.22f);
             if (silenced_) col = col.withMultipliedAlpha(0.32f);
             strokeCable(g, s->x, s->y, t->x, t->y, col, cut, w);
@@ -5415,6 +5429,17 @@ public:
             palette_.setNotice(u8(rasgo::panel::tr(view_->outputOnly()
                 ? noticeOutput : noticeAll, lang_)) + count);
         };
+        // COMPACTO: os painéis refeitos pela vista compacta (CompactPanel.hpp)
+        header_.onCompact = [this] {
+            {
+                std::lock_guard<std::mutex> lk(rack_.gmx);
+                rack_.compact = !rack_.compact;
+                rack_.invalidatePanels();
+            }
+            header_.setCompact(rack_.compact);
+            saveCompactPref();
+            view_->refresh();
+        };
         header_.onStandby = [this] {
             standby_ = !standby_;
             view_->setSilenced(standby_);
@@ -6827,6 +6852,8 @@ private:
         const auto rf = dataDir().getChildFile("rack-view");
         if (rf.existsAsFile())
             rackOutputPref_ = rf.loadFileAsString().trim() == "output";
+        const auto cf = dataDir().getChildFile("rack-compact");
+        if (cf.existsAsFile()) rack_.compact = cf.loadFileAsString().trim() == "1";
         const auto sf = dataDir().getChildFile("startup");
         if (sf.existsAsFile())
             startMode_ = rasgo::panel::startModeFromCode(
@@ -6843,6 +6870,10 @@ private:
     void saveLangPref() const {
         dataDir().getChildFile("ui-lang")
             .replaceWithText(u8(rasgo::panel::langCode(lang_)));
+    }
+    void saveCompactPref() const {
+        if (kPlugin) return;   // como a vista RACK: o plugin não muda a do aplicativo
+        dataDir().getChildFile("rack-compact").replaceWithText(rack_.compact ? "1" : "0");
     }
     void saveRackViewPref() const {
         if (kPlugin) return;   // a vista do plugin não muda a do aplicativo
@@ -7434,6 +7465,7 @@ private:
     void syncHeader() {
         seed_ = rack_.curSeed;
         header_.setState(seed_, lang_, view_->outputOnly(), standby_);
+        header_.setCompact(rack_.compact);
         header_.setStartMode(startMode_);
     }
 

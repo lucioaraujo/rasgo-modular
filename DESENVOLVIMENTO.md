@@ -10,6 +10,18 @@ solicitar uma escuta ou julgamento perceptivo específico, curto e opcional;
 o autor não deve gastar tempo depurando exemplos ou seeds mal preparados.
 O diário abaixo é histórico e não substitui o estado atual em TAREFAS.md.
 
+**Regra de front-ends (autor, 25/11/2026 — metodologia do Rasgo Modular):**
+toda mudança visual, de interface ou de comportamento vai **junto** para
+todos os front-ends: o app JUCE (que é também o plugin de DAW VST3/LV2/AU),
+a página do navegador (`apps/web/`) e o plugin VCV (`RASGO_MODULAR_VCV`).
+A regra mora num lugar só, em código comum (`src/ui/` — ex.:
+`CableGeometry.hpp` para a opacidade dos cabos, `CompactPanel.hpp` para a
+vista COMPACTA) ou no motor, e cada front-end a lê; nada de cópias por
+front-end (a cópia das regras de painel no `Casca.hpp` do VCV é a dívida a
+pagar na próxima regeneração do plugin). O autor só é avisado quando houver
+uma situação específica de um front-end (ex.: no VCV a opacidade dos cabos é
+uma preferência do próprio Rack, que o plugin não controla).
+
 > Este era o `README.md` até 2 out. 2026. Passou a se chamar
 > `DESENVOLVIMENTO.md` (com `git mv`, histórico preservado) quando o
 > `README.md` virou a apresentação pública em quatro idiomas, como pede o

@@ -164,6 +164,8 @@ inline const L4 seedCopied {"COPIED",  "COPIADO",  "COPIÉ",    "COPIADO"};
 // TODOS os módulos  ↔  só os que chegam à saída (os que de fato soam).
 inline const L4 hdrRackAll {"ALL",    "TODOS", "TOUS",   "TODOS"};
 inline const L4 hdrRackOut {"OUTPUT", "SAÍDA", "SORTIE", "SALIDA"};
+// a vista COMPACTA dos painéis (25/11/2026, src/ui/CompactPanel.hpp)
+inline const L4 hdrCompact {"COMPACT", "COMPACTO", "COMPACT", "COMPACTO"};
 inline const L4 rackViewEmpty {
     "no module reaches the output yet — patch toward the MASTER, or RACK: ALL",
     "nenhum módulo chega à saída ainda — cabeie até o MASTER, ou RACK: TODOS",

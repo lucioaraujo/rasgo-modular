@@ -7,7 +7,7 @@
 namespace rasgo::panel {
 enum class HeaderAction { seed, lang, rackView, standby, zoomIn, zoomOut,
     vary, mutate, evolve, cross, bank, save, tutorial, about, rec, open,
-    undo, uncable, restore, startup, seedValue, varyAmount };
+    undo, uncable, restore, startup, seedValue, varyAmount, compact };
 
 struct HeaderHelpRow {
     HeaderAction action;
@@ -16,14 +16,14 @@ struct HeaderHelpRow {
     std::array<LearnEntry, 4> entries; // en, pt, fr, es
 };
 
-inline const std::array<HeaderHelpRow, 22>& headerHelpRows() {
+inline const std::array<HeaderHelpRow, 23>& headerHelpRows() {
     const auto row = [](HeaderAction action, const char* key, L4 title, L4 text) {
         return HeaderHelpRow{action, key, title, {{{text.en, "", ""}, {text.pt, "", ""},
                                                   {text.fr, "", ""}, {text.es, "", ""}}}};
     };
     using A = HeaderAction;
     namespace S = strings;
-    static const std::array<HeaderHelpRow, 22> rows{{
+    static const std::array<HeaderHelpRow, 23> rows{{
         row(A::seed, "seed", S::hdrSeed, {
             "Draw a new seed and generate a new patch. Save the current patch first if you want to keep it.",
             "Sorteia outra seed e gera outro patch. Salve o patch atual antes se quiser guardá-lo.",
@@ -109,6 +109,11 @@ inline const std::array<HeaderHelpRow, 22>& headerHelpRows() {
             "Alterna entre todos os módulos do patch atual e os que chegam à saída de áudio. Não carrega o catálogo inteiro; acrescente outros pela paleta. Os ocultos não são apagados.",
             "Alterner entre tous les modules du patch actuel et ceux reliés à la sortie audio. Le catalogue entier n'est pas chargé ; ajoutez des modules depuis la palette. Rien n'est supprimé.",
             "Alterna entre todos los módulos del patch actual y los que llegan a la salida de audio. No carga el catálogo entero; añada otros desde la paleta. Los ocultos no se borran."}),
+        row(A::compact, "compact", S::hdrCompact, {
+            "Show the panels in compact form: narrower modules, closer rows, and larger knobs where there is room. Nothing shrinks and nothing changes in the sound; it is only a way of seeing the rack.",
+            "Mostra os painéis em forma compacta: módulos mais estreitos, fileiras mais próximas e knobs maiores onde há espaço. Nada encolhe e nada muda no som; é só um jeito de ver o rack.",
+            "Affiche les panneaux en forme compacte : modules plus étroits, rangées plus proches et potentiomètres plus grands là où il y a de la place. Rien ne rétrécit et le son ne change pas ; c'est seulement une façon de voir le rack.",
+            "Muestra los paneles en forma compacta: módulos más estrechos, filas más cercanas y knobs más grandes donde hay espacio. Nada se encoge y el sonido no cambia; es solo una forma de ver el rack."}),
         row(A::rec, "rec", S::hdrRec, {
             "Start or stop recording the stereo output to WAV (up to 4 min; the button shows the elapsed time). Saved in Music/RasgoModular as rec-date-time-seedN.wav, or -manual for a hand-edited patch; -montage is added if the seed changed during the take. Patch saving and audio recording are separate actions.",
             "Inicia ou termina a gravação da saída estéreo em WAV (até 4 min; o botão mostra o tempo). Vai para Música/RasgoModular como rec-data-hora-seedN.wav, ou -manual para patch editado à mão; ganha -montage se a seed mudou durante a gravação. Salvar patch e gravar áudio são ações diferentes.",

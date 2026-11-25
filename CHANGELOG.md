@@ -9,6 +9,20 @@ pronto.
 
 ## Não publicado (desde a v0.1.13)
 
+- **Cabos a 50% de opacidade** (25/11, decisão do autor; a mesma do VCV
+  Rack): os painéis ficam legíveis por baixo do cabeamento; o cabo sob o
+  mouse e o do inspetor continuam opacos. App e navegador, de uma regra só
+  (`src/ui/CableGeometry.hpp`).
+- **COMPACTO**, botão novo no cabeçalho, ao lado do RACK (25/11): a vista
+  compacta dos painéis — módulos mais estreitos, fileiras mais próximas,
+  knobs maiores onde há espaço; nada encolhe e o som não muda. As regras são
+  as do plugin VCV, agora em `src/ui/CompactPanel.hpp`, lidas pelo app (e o
+  plugin de DAW) e pelo navegador. A escolha fica guardada.
+- **Rack completo no navegador** (`apps/web/`, F1–F4b, 24–25/11): o rack da
+  seed tocável com a mão, cabos e inspetor, visores, cabeçalho do app,
+  paleta, banco de escalas, LEARN, os 4 idiomas, TUTORIAL e SOBRE. Plano e
+  estado em `dossies/ESTUDO_outras_plataformas.md` §6.
+
 - **VARIA no protótipo do navegador** (25/11, `apps/web/`): a mão caótica
   toca também no motor em WebAssembly, no mesmo caminho do app; botão VARIA
   e intensidade na página de teste. Conferido no Node (três seeds, 30 s,

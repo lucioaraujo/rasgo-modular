@@ -23,8 +23,8 @@ int main() {
             if (lang != Lang::en) check(entry.quick != row.entries[0].quick, "help translated, not English fallback");
         }
     }
-    check(actions.size() == 22 && keys.size() == 22, "22 commands and editing fields covered");
-    for (int i = 0; i < 22; ++i)
+    check(actions.size() == 23 && keys.size() == 23, "23 commands and editing fields covered (COMPACT since 25/11/2026)");
+    for (int i = 0; i < 23; ++i)
         check(headerHelp(static_cast<HeaderAction>(i)) != nullptr, "every action has help");
     check(headerHelp(static_cast<HeaderAction>(999)) == nullptr, "unknown action rejected");
     check(headerHelp(HeaderAction::bank)->entries[1].quick.find("Guarda") != std::string::npos,
@@ -51,5 +51,5 @@ int main() {
     check(ReadingPreferences{999, false}.fontHeight() == 16, "invalid size bounded");
     check(ReadingPreferences{-999, false}.fontHeight() == 12, "negative size bounded");
     if (failures) return 1;
-    std::cout << "UI guidance: 22 commands, 4 languages; reading presets and persistence format OK\n";
+    std::cout << "UI guidance: 23 commands, 4 languages; reading presets and persistence format OK\n";
 }

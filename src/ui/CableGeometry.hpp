@@ -17,6 +17,13 @@
 
 namespace rasgo::ui {
 
+// Opacidade de base dos cabos (autor, 25/11/2026: "opacidade 50%", a mesma
+// do VCV Rack): os painéis ficam legíveis por baixo do cabeamento. O cabo sob
+// o mouse e o do inspetor são desenhados opacos por cima; "não conduz agora"
+// (22%) e a ESPERA (32%) multiplicam sobre esta base. A página do navegador
+// usa o mesmo valor (`apps/web/rack.js`).
+inline constexpr float kCableOpacity = 0.5f;
+
 struct CablePoint {
     float x = 0.0f;
     float y = 0.0f;
