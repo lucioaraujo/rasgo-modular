@@ -5,57 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rasgo Modular no navegador — protótipo</title>
 <style>
-  :root { --bg: #131a1a; --surface: #262b36; --line: #485060; --text: #f0f3f8; --muted: #a8b0bf; --prata: #d8dde6; }
+  :root { --bg: #131a1a; --surface: #262b36; --recessed: #0e1015; --line: #485060; --text: #f0f3f8;
+          --muted: #bec8d8; --prata: #d8dde6; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
-         font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; padding: 16px; }
-  main { width: 100%; max-width: 520px; background: var(--surface); border: 1px solid var(--line);
-         border-radius: 6px; padding: 24px; }
-  h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: .04em; }
-  p { margin: 0 0 16px; color: var(--muted); }
-  .linha { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-  button { background: transparent; color: var(--prata); border: 1px solid var(--line); padding: 8px 14px;
-           font: inherit; font-size: 14px; letter-spacing: .06em; cursor: pointer; border-radius: 3px; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif;
+         display: flex; flex-direction: column; overflow: hidden; }
+  header { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 14px;
+           background: var(--surface); border-bottom: 1px solid var(--line); }
+  header strong { letter-spacing: .08em; margin-right: 8px; }
+  button { background: transparent; color: var(--prata); border: 1px solid var(--line); padding: 5px 12px;
+           font: inherit; font-size: 13px; letter-spacing: .06em; cursor: pointer; border-radius: 3px; }
   button:hover:not(:disabled) { border-color: var(--prata); }
   button.on { background: var(--prata); color: var(--bg); }
   button:disabled { opacity: .45; cursor: default; }
-  input[type=text] { flex: 1; min-width: 0; background: #0e1015; color: var(--text); border: 1px solid var(--line);
-                     padding: 8px; font: 14px ui-monospace, monospace; border-radius: 3px; }
-  input[type=range] { flex: 1; accent-color: var(--prata); }
-  #estado { font-size: 14px; color: var(--muted); min-height: 1.5em; margin: 0; }
+  input[type=text] { width: 13em; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
+                     padding: 5px 8px; font: 13px ui-monospace, monospace; border-radius: 3px; }
+  input[type=range] { width: 7em; accent-color: var(--prata); }
+  label { color: var(--muted); font-size: 13px; }
+  #estado { color: var(--muted); font-size: 13px; margin-left: auto; }
+  #rolagem { flex: 1; position: relative; overflow-y: auto; overflow-x: hidden; }
+  #rack { position: sticky; top: 0; display: block; }
+  .espaco { position: absolute; top: 0; left: 0; width: 1px; pointer-events: none; }
 </style>
 </head>
 <body>
-<main>
-  <h1>RASGO MODULAR</h1>
-  <p>Protótipo: o mesmo motor do aplicativo, compilado para o navegador. Uma seed monta um patch com os 110 módulos do rack e toca.</p>
-  <div class="linha">
-    <button id="tocar" disabled>TOCAR</button>
-    <button id="nova" disabled>SEED NOVA</button>
-    <button id="parar" disabled>PARAR</button>
-  </div>
-  <div class="linha">
-    <input id="seed" type="text" inputmode="numeric" value="4303935450909092226" aria-label="Número da seed" />
-  </div>
-  <div class="linha">
-    <button id="varia" class="on" aria-pressed="true">VARIA</button>
-    <input id="intensidade" type="range" min="0" max="2" step="0.01" value="1" aria-label="Intensidade do VARIA" />
-  </div>
-  <div class="linha">
-    <label for="volume">Volume</label>
-    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" />
-  </div>
-  <p id="estado">Carregando o motor…</p>
-</main>
-<script>
+<header>
+  <strong>RASGO MODULAR</strong>
+  <button id="tocar" disabled>TOCAR</button>
+  <button id="nova" disabled>SEED NOVA</button>
+  <button id="parar" disabled>PARAR</button>
+  <input id="seed" type="text" inputmode="numeric" value="4303935450909092226" aria-label="Número da seed" />
+  <button id="varia" class="on" aria-pressed="true">VARIA</button>
+  <input id="intensidade" type="range" min="0" max="2" step="0.01" value="1" aria-label="Intensidade do VARIA" />
+  <button id="vista" aria-pressed="false" title="RACK: todos os módulos · SAÍDA: só os que chegam ao som">RACK · SAÍDA</button>
+  <label for="volume">Volume</label>
+  <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" />
+  <span id="estado">Carregando o motor…</span>
+</header>
+<div id="rolagem">
+  <div class="espaco"></div>
+  <canvas id="rack"></canvas>
+</div>
+<script type="module">
+import { Rack } from './rack.js';
 const $ = (id) => document.getElementById(id);
 let ctx = null, no = null, bytes = null;
 const estado = (t) => { $('estado').textContent = t; };
+const rack = new Rack($('rack'), $('rolagem'));
+rack.layout();
 
 fetch('rasgo.wasm').then(r => r.arrayBuffer()).then(b => {
   bytes = b;
   $('tocar').disabled = false; $('nova').disabled = false;
   estado('Pronto. Aperte TOCAR.');
+  // `?auto`: toca sem clique (capturas de teste num navegador sem janela)
+  if (new URLSearchParams(location.search).has('auto')) tocar();
+  if (new URLSearchParams(location.search).has('previa')) previa().catch((x) => estado('Erro na prévia: ' + x + ' ' + (x.stack || '').split('\n')[1]));
 }).catch(() => estado('Não consegui carregar rasgo.wasm (abra por um servidor http).'));
 
 async function ligar() {
@@ -68,12 +74,53 @@ async function ligar() {
     no.port.onmessage = (ev) => {
       const m = ev.data;
       if (m.tipo === 'pronto') ok();
-      if (m.tipo === 'seed') { estado(`Seed ${m.seed} · ${m.cabos} cabos`); $('parar').disabled = false; $('tocar').classList.add('on'); }
+      if (m.tipo === 'seed') {
+        estado(`Seed ${m.seed} · ${m.cabos} cabos · ${ctx.sampleRate} Hz`);
+        $('parar').disabled = false; $('tocar').classList.add('on');
+        rack.carregar(m.texto, m.wordmark);
+      }
+      if (m.tipo === 'quadro') rack.quadro(m.valores, m.cabos);
     };
     no.port.postMessage({ tipo: 'wasm', bytes });
   });
   no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) });
   enviarVaria();
+}
+
+// `?previa[=segundos]`: o motor roda AQUI, sem som, alguns segundos, e o
+// rack é desenhado com o estado a que chegou. Só para capturas de teste num
+// navegador sem saída de áudio; tocar continua sendo pelo worklet.
+async function previa() {
+  const q = new URLSearchParams(location.search);
+  const seg = Number(q.get('previa')) || 4;
+  let mem;
+  const stub = new Proxy({}, { get: (_, n) => (...a) => {
+    if (n === 'fd_write') { const v = new DataView(mem.buffer); let s = 0;
+      for (let k = 0; k < a[2]; k++) s += v.getUint32(a[1] + 8 * k + 4, true); v.setUint32(a[3], s, true); }
+    return 0; } });
+  const { instance } = await WebAssembly.instantiate(bytes, { wasi_snapshot_preview1: stub, env: stub });
+  const e = instance.exports; mem = e.memory; if (e._initialize) e._initialize();
+  e.rw_iniciar(48000);
+  const s = BigInt(seedValida() || '1');
+  e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
+  const dec = new TextDecoder();
+  const texto = dec.decode(new Uint8Array(mem.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
+  const wp = e.rw_wordmark(), b = new Uint8Array(mem.buffer); let fim = wp; while (b[fim]) fim++;
+  rack.carregar(texto, dec.decode(b.slice(wp, fim)));
+  for (let i = 0; i < seg * 48000 / 128; i++) e.rw_processar();
+  const nc = e.rw_num_controles();
+  rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
+              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 9).slice());
+  estado(`Prévia sem som · seed ${s} · ${rack.vistos.length}/${rack.mods.length} mód · ${e.rw_cabos()} cabos · ${seg} s`);
+  if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
+    rack.desenhar();
+    const t0 = performance.now();
+    for (let i = 0; i < 60; i++) rack.desenhar();
+    const t1 = performance.now();
+    for (let i = 0; i < 20; i++) { rack.chaveCabos = null; rack.desenhar(); }
+    estado(`${rack.vistos.length} mód · quadro ${((t1 - t0) / 60).toFixed(2)} ms · com cabos mudando ${((performance.now() - t1) / 20).toFixed(2)} ms`);
+  }
+  document.title += ' · pronto';
 }
 
 function enviarVaria() {
@@ -112,6 +159,12 @@ $('varia').onclick = () => {
   enviarVaria();
 };
 $('intensidade').oninput = enviarVaria;
+$('vista').onclick = () => {
+  const on = $('vista').classList.toggle('on');
+  $('vista').setAttribute('aria-pressed', String(on));
+  rack.vistaSaida(on);
+};
+if (new URLSearchParams(location.search).has('saida')) $('vista').click();
 $('volume').oninput = () => { if (no) no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) }); };
 </script>
 </body>

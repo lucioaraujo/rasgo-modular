@@ -12,6 +12,12 @@
 //   rw_processar()          um bloco de 128; devolve o endereço das
 //                           amostras intercaladas (L, R, L, R…)
 //   rw_cabos()              quantos cabos a seed ligou
+//   rw_descrever()          o rack em JSON (módulos, painéis, parâmetros,
+//                           portas), para a página desenhar; tamanho em
+//                           rw_texto_tamanho()
+//   rw_valores()            o valor atual de cada controle do JSON, na
+//                           mesma ordem (Float32)
+//   rw_cabos_estado()       os cabos agora: 9 números por cabo (Float32)
 //   rw_varia(ligado, int.)  o VARIA (a mão caótica, `MotionEngine`): ligado
 //                           por padrão, intensidade 0–2 (1 = a do app)
 //
@@ -25,16 +31,20 @@
 #include "dsp/Loudness.hpp"
 #include "dsp/Master.hpp"
 #include "escalas/BancoEscalas.hpp"
+#include "juce/RasgoWordmark.h"   // só o vetor do wordmark, sem JUCE
 #include "panel/ModuleCatalog.hpp"
+#include "panel/Instances.hpp"
 #include "panel/MotionEngine.hpp"
 #include "panel/PatchSeed.hpp"
 #include "panel/SeedBalance.hpp"
 #include "panel/SinkOut.hpp"
 
 #include <cmath>
+#include <cstdio>
 #include <cstdint>
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <vector>
 
 using rasgo::modular::AudioBlock;
@@ -57,6 +67,143 @@ std::vector<rasgo::modular::Master*> g_masters;
 bool g_varia = true;
 int g_blocosPorPasso = 12;   // ~1/30 s em blocos de 128
 int g_blocos = 0, g_passos = 0;
+
+// a descrição do rack para a página (`rw_descrever`) e os controles que ela
+// lê a cada quadro (`rw_valores`), na mesma ordem
+std::string g_texto;
+struct Controle { std::size_t no; std::string bind; };
+std::vector<Controle> g_controles;
+std::vector<float> g_valores, g_cabos;
+
+std::string familia(const std::string& tipo) {
+    for (const auto& grp : rasgo::panel::moduleCatalog())
+        for (const char* t : grp.types)
+            if (tipo == t) return grp.family;
+    return {};
+}
+
+void json(std::string& o, const std::string& s) {
+    o += '"';
+    for (const char c : s) {
+        if (c == '"' || c == '\\') { o += '\\'; o += c; }
+        else if (static_cast<unsigned char>(c) < 0x20) o += ' ';
+        else o += c;
+    }
+    o += '"';
+}
+
+void numero(std::string& o, float v) {
+    if (!std::isfinite(v)) v = 0.0f;
+    char b[32];
+    std::snprintf(b, sizeof b, "%.6g", static_cast<double>(v));
+    o += b;
+}
+
+// a porta de um jack ("in:<nome>" / "out:<nome>"), como `resolveJack` do app
+bool porta(const Signal& n, const std::string& bind, bool& saida, int& idx, int& tipo) {
+    saida = bind.rfind("out:", 0) == 0;
+    if (!saida && bind.rfind("in:", 0) != 0) return false;
+    const std::string nome = bind.substr(saida ? 4 : 3);
+    const std::size_t k = saida ? n.outputCount() : n.inputCount();
+    for (std::size_t i = 0; i < k; ++i) {
+        const auto& d = saida ? n.outputDescriptor(i) : n.inputDescriptor(i);
+        if (d.name == nome) { idx = static_cast<int>(i); tipo = static_cast<int>(d.kind); return true; }
+    }
+    return false;
+}
+
+void descrever() {
+    using Kind = rasgo::modular::Widget::Kind;
+    g_texto.clear();
+    g_controles.clear();
+    auto& g = *g_grafo;
+    // os módulos à vista, na ordem do app (`Rack::build` +
+    // `syncSeedCopies`): o rack de fábrica por família, alfabético dentro
+    // dela, MIXER e MASTER no fim; das cópias que a seed criou, só as
+    // cabeadas, junto da sua família
+    std::vector<std::size_t> shown;
+    {
+        std::vector<std::size_t> primeiro;   // 1ª instância de cada tipo
+        for (const auto& fam : rasgo::panel::moduleCatalog()) {
+            std::vector<const char*> ord(fam.types.begin(), fam.types.end());
+            rasgo::panel::sortFamilyForDisplay(ord);
+            for (const char* t : ord)
+                for (std::size_t i = 0; i < g.nodeCount(); ++i)
+                    if (g.node(i).type() == t) { shown.push_back(i); break; }
+        }
+        std::vector<char> cabeado(g.nodeCount(), 0);
+        for (std::size_t i = 0; i < g.cableCount(); ++i) {
+            const auto& c = g.cable(i);
+            if (c.source().node < cabeado.size()) cabeado[c.source().node] = 1;
+            if (c.target().node < cabeado.size()) cabeado[c.target().node] = 1;
+        }
+        for (std::size_t id = 0; id < g.nodeCount(); ++id) {
+            if (id == g_saida || !cabeado[id]) continue;
+            const std::string t = g.node(id).type();
+            bool antes = false;
+            for (std::size_t j = 0; j < id && !antes; ++j) antes = g.node(j).type() == t;
+            if (!antes) continue;
+            const auto at = rasgo::panel::moduleInsertionIndex(
+                shown, t, [&g](std::size_t i) { return g.node(i).type(); });
+            shown.insert(shown.begin() + static_cast<std::ptrdiff_t>(at), id);
+        }
+    }
+    const std::vector<char> chega = g.nodesFeeding(g_saida);
+    std::string& o = g_texto;
+    o += "{\"saida\":";
+    o += std::to_string(g_saida);
+    o += ",\"modulos\":[";
+    bool primeiro = true;
+    for (const std::size_t id : shown) {
+        Signal& n = g.node(id);
+        const rasgo::modular::Panel p = n.panel();
+        if (!primeiro) o += ',';
+        primeiro = false;
+        o += "{\"id\":" + std::to_string(id) + ",\"tipo\":";
+        json(o, n.type());
+        o += ",\"familia\":";
+        json(o, familia(n.type()));
+        o += ",\"hp\":" + std::to_string(p.hp);
+        o += ",\"inst\":" + std::to_string(rasgo::panel::instanceNumber(g, shown, id));
+        o += ",\"chega\":" + std::string(id < chega.size() && chega[id] ? "1" : "0");
+        o += ",\"w\":[";
+        for (std::size_t k = 0; k < p.widgets.size(); ++k) {
+            const auto& w = p.widgets[k];
+            if (k) o += ',';
+            o += "{\"k\":" + std::to_string(static_cast<int>(w.kind)) + ",\"l\":";
+            json(o, w.label);
+            o += ",\"b\":";
+            json(o, w.bind);
+            o += ",\"x\":"; numero(o, w.x);
+            o += ",\"y\":"; numero(o, w.y);
+            o += ",\"s\":"; numero(o, w.span);
+            o += ",\"h\":"; numero(o, w.height);
+            if ((w.kind == Kind::Knob || w.kind == Kind::Slider || w.kind == Kind::Toggle)
+                && !w.bind.empty()) {
+                for (const auto& par : n.parameters())
+                    if (par.descriptor.id == w.bind) {
+                        o += ",\"v\":" + std::to_string(g_controles.size());
+                        o += ",\"min\":"; numero(o, par.descriptor.minimum);
+                        o += ",\"max\":"; numero(o, par.descriptor.maximum);
+                        o += ",\"def\":"; numero(o, par.descriptor.defaultValue);
+                        o += ",\"u\":"; json(o, par.descriptor.unit);
+                        g_controles.push_back({id, w.bind});
+                        break;
+                    }
+            } else if (w.kind == Kind::Jack) {
+                bool saida = false; int idx = -1, tipo = 0;
+                if (porta(n, w.bind, saida, idx, tipo))
+                    o += ",\"out\":" + std::string(saida ? "1" : "0")
+                       + ",\"p\":" + std::to_string(idx)
+                       + ",\"pk\":" + std::to_string(tipo);
+            }
+            o += '}';
+        }
+        o += "]}";
+    }
+    o += "]}";
+    g_valores.assign(g_controles.size(), 0.0f);
+}
 
 std::unique_ptr<Signal> fabrica(const std::string& t) {
     if (t == "OUT") return std::make_unique<rasgo::panel::SinkOut>();
@@ -103,6 +250,7 @@ void rw_seed(std::uint32_t alto, std::uint32_t baixo) {
     g_lufs.reset();
     g_blocos = 0; g_passos = 0;
     g_grafo = std::move(g);
+    descrever();
 }
 
 __attribute__((used, visibility("default")))
@@ -138,6 +286,50 @@ float* rw_processar() {
 
 __attribute__((used, visibility("default")))
 int rw_cabos() { return g_grafo ? static_cast<int>(g_grafo->cableCount()) : 0; }
+
+__attribute__((used, visibility("default")))
+const char* rw_descrever() { return g_texto.c_str(); }
+
+__attribute__((used, visibility("default")))
+int rw_texto_tamanho() { return static_cast<int>(g_texto.size()); }
+
+// o wordmark RASGO (caminho SVG, caixa em rasgo::ui::kWordmark*)
+__attribute__((used, visibility("default")))
+const char* rw_wordmark() { return rasgo::ui::kWordmarkPath; }
+
+__attribute__((used, visibility("default")))
+int rw_num_controles() { return static_cast<int>(g_controles.size()); }
+
+__attribute__((used, visibility("default")))
+float* rw_valores() {
+    if (!g_grafo) return g_valores.data();
+    for (std::size_t i = 0; i < g_controles.size(); ++i) {
+        try { g_valores[i] = g_grafo->node(g_controles[i].no).parameterValue(g_controles[i].bind); }
+        catch (...) { g_valores[i] = 0.0f; }
+    }
+    return g_valores.data();
+}
+
+// por cabo (9 números): origem, porta, destino, porta, rompido, conduzindo
+// agora, ganho, tem relação, condutância
+__attribute__((used, visibility("default")))
+float* rw_cabos_estado() {
+    g_cabos.clear();
+    if (!g_grafo) return g_cabos.data();
+    for (std::size_t i = 0; i < g_grafo->cableCount(); ++i) {
+        const auto& c = g_grafo->cable(i);
+        g_cabos.push_back(static_cast<float>(c.source().node));
+        g_cabos.push_back(static_cast<float>(c.source().port));
+        g_cabos.push_back(static_cast<float>(c.target().node));
+        g_cabos.push_back(static_cast<float>(c.target().port));
+        g_cabos.push_back(c.state() == rasgo::modular::CableState::Ruptured ? 1.0f : 0.0f);
+        g_cabos.push_back(c.conductingNow() ? 1.0f : 0.0f);
+        g_cabos.push_back(c.gain());
+        g_cabos.push_back(c.hasRelation() ? 1.0f : 0.0f);
+        g_cabos.push_back(c.conductance());
+    }
+    return g_cabos.data();
+}
 
 __attribute__((used, visibility("default")))
 void rw_varia(int ligado, float intensidade) {

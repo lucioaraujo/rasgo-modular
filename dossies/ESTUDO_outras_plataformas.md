@@ -87,12 +87,55 @@ decisão do autor: sem fork. Ver `ESTUDO_port_vcv_cardinal.md`.
   30 s por seed (4303935450909092226, 597512815, 42): 4–11× o tempo real
   com o VARIA, pico sempre abaixo de 0 dBFS (−19 a −7 dBFS), nível e brilho
   mudando segundo a segundo em relação ao VARIA desligado.
-- **Escuta do autor** (25/11, Firefox no Linux): "funciona, mas parece mais simples que o
+- **Escuta do autor** (25/11, Firefox e Chrome no Linux; VARIA e volume funcionam): "funciona, mas parece mais simples que o
   estágio atual de desenvolvimento do rasgo modular juce". O som é o do
   app; falta o instrumento em volta (rack, cabos, knobs, visores, LEARN,
   REC…). Caminhos propostos: (1) demonstração de escuta no site; (2) o
   rack da seed só para ver, com as imagens de painel do site; (3) rack
-  tocável em canvas, uma segunda interface. Decisão do autor.
+  tocável em canvas, uma segunda interface. Decisão do autor: **o 3**, "rack
+  tocável completo". No Opera o som pareceu "mais estranho" — sem saber se
+  eram as seeds; o motor soa igual em 44,1 e 48 kHz (conferido no Node), e a
+  página passou a mostrar a taxa do navegador. Teste pendente: a mesma seed
+  no Opera e no Chrome.
+
+## 6. O rack tocável no navegador (desde 25/11)
+
+Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
+
+1. **F1 — o rack aparece** (feito, 25/11): os módulos da seed desenhados
+   como no app, com os cabos, e os controles se mexendo com o VARIA.
+2. **F2 — a mão no instrumento:** girar knobs e sliders, apertar toggles,
+   ligar e tirar cabos, o inspetor do cabo.
+3. **F3 — o que falta do painel:** os visores (SCOPE, KEY, VU…), a MATRIX,
+   o cabeçalho do app (seed, banco, VARIA, volume, loudness), a paleta para
+   acrescentar e tirar módulos.
+4. **F4 — o resto do app:** tutorial, LEARN, REC (WAV e .mid para baixar),
+   4 idiomas, o lugar no site.
+
+**Como é feito.** O painel de cada módulo não é copiado: o motor web
+entrega o `Panel` do próprio módulo (`Signal::panel()`, posições em mm),
+os parâmetros com faixa e os cabos (`rw_descrever`, `rw_valores`,
+`rw_cabos_estado`); a página (`apps/web/rack.js`) traduz o desenho do app
+JUCE — `relayout`, `paintChrome`, `paintWidget`, `paintCables` — com as
+mesmas medidas, cores, regras de rótulo e o wordmark (`RasgoWordmark.h`).
+A ordem dos módulos e as cópias de voz seguem `Rack::build` +
+`syncSeedCopies`; a vista SAÍDA usa o mesmo `nodesFeeding` (seed
+4303935450909092226: 34 de 105, os mesmos do app).
+
+**Custo de desenho** (lição do Pong): camada fixa por módulo rasterizada uma
+vez; densidade de pixel até 1,5; sem sombra borrada; canvas do tamanho da
+janela, só os módulos à vista; controles móveis juntados por cor em poucos
+traços; cabos de condução 1 numa camada refeita só ao rolar. Medido num
+Chrome sem janela (desenho por software, CPU limitada a 2 núcleos): de
+9,4 ms para 0,3 ms por quadro na vista SAÍDA.
+
+**Testes:** `?previa[=s]` roda o motor na página, sem som, e desenha o
+estado (capturas num navegador sem saída de áudio); `?medir` mede o quadro;
+`?saida` abre na vista SAÍDA; `?auto` toca sem clique.
+
+**Ainda diferente do app na F1:** visores vazios (só a moldura), MATRIX sem
+as células, sem selo de relação nos cabos, sem cabeçalho/paleta/LEARN do
+app; fonte do sistema no lugar da fonte do JUCE.
 
 ## 5. Próximo passo
 

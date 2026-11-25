@@ -14,7 +14,7 @@ mkdir -p "$saida"
 nice -n 19 em++ -std=c++17 -O2 -I"$raiz/src" -I"$raiz/apps" -fwasm-exceptions \
     "$raiz/apps/web/rasgo_web.cpp" -sSTANDALONE_WASM --no-entry \
     -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB \
-    -sEXPORTED_FUNCTIONS=_rw_iniciar,_rw_seed,_rw_processar,_rw_cabos,_rw_varia \
+    -sEXPORTED_FUNCTIONS=_rw_iniciar,_rw_seed,_rw_processar,_rw_cabos,_rw_varia,_rw_descrever,_rw_texto_tamanho,_rw_num_controles,_rw_valores,_rw_cabos_estado,_rw_wordmark \
     -o "$saida/rasgo.wasm"
-cp "$raiz/apps/web/index.html" "$raiz/apps/web/rasgo-worklet.js" "$saida/"
+cp "$raiz/apps/web/index.html" "$raiz/apps/web/rasgo-worklet.js" "$raiz/apps/web/rack.js" "$saida/"
 ls -l "$saida"

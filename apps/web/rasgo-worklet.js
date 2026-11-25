@@ -9,6 +9,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
     this.mem = null;
     this.tocando = false;
     this.ganho = 1.0;
+    this.nc = 0;
+    this.quadro = 0;   // blocos desde o último quadro mandado à página
     this.port.onmessage = (ev) => this.mensagem(ev.data);
   }
 
@@ -33,7 +35,14 @@ class RasgoProcessor extends AudioWorkletProcessor {
       const s = BigInt(m.seed);
       this.e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
       this.tocando = true;
-      this.port.postMessage({ tipo: 'seed', seed: m.seed, cabos: this.e.rw_cabos() });
+      // o rack para a página desenhar (uma vez por seed)
+      const dec = new TextDecoder();
+      const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
+      const wp = this.e.rw_wordmark(), b = new Uint8Array(this.mem.buffer);
+      let fim = wp; while (b[fim]) fim++;
+      const wordmark = dec.decode(b.slice(wp, fim));
+      this.nc = this.e.rw_num_controles();
+      this.port.postMessage({ tipo: 'seed', seed: m.seed, cabos: this.e.rw_cabos(), texto, wordmark });
     } else if (m.tipo === 'parar') {
       this.tocando = false;
     } else if (m.tipo === 'varia' && this.e) {
@@ -50,6 +59,14 @@ class RasgoProcessor extends AudioWorkletProcessor {
     const f = new Float32Array(this.mem.buffer, p, 256);
     const L = out[0], R = out[1], g = this.ganho;
     for (let i = 0; i < L.length; i++) { L[i] = f[2 * i] * g; R[i] = f[2 * i + 1] * g; }
+    // ~30 quadros por segundo: os valores dos controles e os cabos
+    if (++this.quadro >= Math.round(sampleRate / 30 / 128)) {
+      this.quadro = 0;
+      const v = new Float32Array(this.mem.buffer, this.e.rw_valores(), this.nc).slice();
+      const nCab = this.e.rw_cabos();
+      const c = new Float32Array(this.mem.buffer, this.e.rw_cabos_estado(), nCab * 9).slice();
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c }, [v.buffer, c.buffer]);
+    }
     return true;
   }
 }
