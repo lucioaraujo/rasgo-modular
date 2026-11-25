@@ -185,7 +185,23 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      BASE/DSP ao vivo; os avisos aparecem ali por 6 s; "Aa (F2)" (12/14/16
      px, texto branco) e F1 para ler com o teclado. Conferido no Node
      (`teste_learn.mjs`: 1515 de 1520 controles e jacks com verbete) e por
-     captura (`?previa&learn=FILTER.cutoff`). REC: teto de 4 minutos, como no app (autor,
+     captura (`?previa&learn=FILTER.cutoff`).
+   - **F4b, idiomas, TUTORIAL e SOBRE** (feito, 25/11): os textos do app vêm
+     do motor (`rw_textos`, UiLanguage.hpp); os da página e os cartões do
+     TUTORIAL que no navegador são outros, em `apps/web/textos.js`. Faixa de
+     créditos com a versão, SOBRE com o LUFS ao vivo. A página abre com o
+     rack da seed já desenhado e o primeiro clique ou tecla liga o som
+     (autor, 25/11; o navegador não deixa soar sem um gesto).
+   - **F4c, o REC** (feito, 25/11): o botão é o relógio da tomada, para
+     sozinho aos 4 min (decisão do autor), Ctrl+R. A partitura é a do app
+     (`ScoreRecorder` no motor que toca: cabos, gestos nos controles, a mão
+     do VARIA 1×/s, troca de seed, notas do NOTE-OUT; o cabeçalho com data,
+     áudio, instrumento "(navegador)", autoria e licença), e o `.mid` do
+     NOTE-OUT. O WAV de 24 bits e a versão de entrega a -14 LUFS saem do
+     código do app (`writeWav24`, `DeliveryMaster`, em
+     `apps/web/rasgo_rec.cpp`), montados na página e baixados: `rec-…wav`,
+     `.streaming.wav` + `.txt`, `.score.txt`, `.mid`. Nada sai do navegador.
+     Conferido no Node (`teste_rec.mjs`) e no Firefox sem janela. REC: teto de 4 minutos, como no app (autor,
    25/11: "20 min é muito", "no app são 4 minutos"); o WAV montado na
    página e baixado, nada vai a servidor.
 

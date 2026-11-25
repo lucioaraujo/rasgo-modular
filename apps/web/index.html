@@ -31,6 +31,9 @@
                      outline: 1px solid var(--accent); outline-offset: 2px; }
   header button.prata.on { background: var(--prata); border-color: var(--prata); outline-color: var(--prata); }
   header button.tocar { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  /* REC gravando: o botão é também o relógio da tomada (`T.recording`) */
+  header button.gravando { background: #e0362c; border-color: #e0362c; color: var(--bg);
+                           outline: 1px solid #e0362c; outline-offset: 2px; }
   .rotulo { color: var(--muted); }
   .rotulo.vivo { color: var(--text); }
   #r-varia { cursor: pointer; }
@@ -191,6 +194,7 @@
     <div id="vu"><div></div></div>
     <span class="rotulo" id="r-volume">VOLUME</span>
     <div id="t-volume" class="trilho"><div class="cheio"></div></div>
+    <button data-acao="rec" id="b-rec">● REC</button>
     <button data-acao="abre" id="b-abre" class="prata">ABRE · SEED</button>
     <button data-acao="lingua" id="b-lingua">PT</button>
     <button data-acao="tutorial" id="b-tutorial">TUTORIAL</button>
@@ -240,7 +244,7 @@
 </div>
 <script type="module">
 import { Rack, corFamilia } from './rack.js';
-import { web, linguaInicial, ROTULO_LINGUA as ROTULO_L } from './textos.js';
+import { web, temWeb, linguaInicial, ROTULO_LINGUA as ROTULO_L } from './textos.js';
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
@@ -283,6 +287,7 @@ function aplicarTextos() {
   $('r-volume').textContent = W('volume');
   $('b-lingua').textContent = ROTULO_L[L];
   $('creditos').textContent = tx('footerCredit') + versao().replace(' ', '  ·  ');
+  relogioRec();
   $('b-titulo').textContent = tx('scaleBankTitle');
   $('b-busca').placeholder = tx('scaleBankSearch');
   $('b-dica').textContent = tx('scaleBankHint');
@@ -387,6 +392,7 @@ async function ligar() {
       }
       if (m.tipo === 'quadro') {
         est.lufs = m.lufs;
+        if ((m.rec >= 0) !== (est.rec >= 0) || Math.floor(m.rec) !== Math.floor(est.rec)) { est.rec = m.rec; relogioRec(); }
         if (m.learnValor !== learn.valor) { learn.valor = m.learnValor; if (learn.mostrado?.param) mostrarLearn(); }
         rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
         est.cabos = m.cabos.length / 14;
@@ -396,6 +402,8 @@ async function ligar() {
         vu.style.background = f < 0.85 ? 'var(--prata)' : 'var(--warning)';
       }
       if (m.tipo === 'salvo') salvo(m);
+      if (m.tipo === 'recAudio') est.tomada.push(m.bloco);
+      if (m.tipo === 'recFim') { est.rec = -1; relogioRec(); arquivosRec(m); }
       if (m.tipo === 'recusa') aviso(m.modulo + (m.motivo === -1 ? tx('instanceSingle') : m.motivo === -2 ? tx('instanceMax') : W('tipoDesconhecido')));
       if (m.tipo === 'bancoAtual') abrirBanco(m.id, Math.round(m.banco));
       if (m.tipo === 'nada' && m.acao === 'desfazer') aviso(W('nadaDesfazer'));
@@ -498,6 +506,12 @@ async function acao(a) {
     return;
   }
   if (a === 'abrir') { $('arquivo').click(); return; }
+  if (a === 'rec') {
+    if (!no) await tocar();
+    if (est.rec >= 0) no.port.postMessage({ tipo: 'rec', ligar: false });
+    else { est.tomada = []; est.rec = 0; relogioRec(); no.port.postMessage({ tipo: 'rec', ligar: true }); }
+    return;
+  }
   // COMPACTO: os painéis com as regras do plugin VCV (knobs em três
   // tamanhos, fileiras aproximadas, painel estreitado), à escolha de quem toca
   if (a === 'compacto') {
@@ -536,6 +550,52 @@ async function acao(a) {
   else if (a === 'descabear') no.port.postMessage({ tipo: 'descabear' });
   else if (a === 'romperTodos') no.port.postMessage({ tipo: 'romperTodos' });
   else if (a === 'salvar' || a === 'banco') no.port.postMessage({ tipo: 'salvar', destino: a });
+}
+
+// ---- REC ------------------------------------------------------------------
+// O botão é o relógio da tomada (`● REC 01:23`; no último meio minuto,
+// `/ 04:00`); ao parar, a página monta os arquivos com o código do app
+// (rasgo_rec.cpp) e os baixa: o WAV de 24 bits, a versão de entrega a
+// -14 LUFS (.streaming.wav + .txt), a partitura (.score.txt) e, se houve
+// notas no NOTE-OUT, o .mid. Nada sai do navegador.
+est.rec = -1; est.tomada = [];
+const mmss = (t) => { t = Math.max(0, Math.floor(t)); return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; };
+function relogioRec() {
+  const b = $('b-rec');
+  b.classList.toggle('gravando', est.rec >= 0);
+  b.textContent = '● ' + tx('hdrRec') + (est.rec >= 0 ? ' ' + mmss(est.rec) + (est.rec >= 210 ? ' / 04:00' : '') : '');
+}
+function baixar(nome, dados, tipo) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([dados], { type: tipo }));
+  a.download = nome; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function arquivosRec(m) {
+  const blocos = est.tomada; est.tomada = [];
+  const total = blocos.reduce((n, b) => n + b.length, 0);
+  if (!total || !local) return;
+  aviso(W('recMontando'), 1e9);
+  await new Promise((r) => setTimeout(r, 30));   // o aviso aparece antes do trabalho
+  const e = local, arquivos = [];
+  const p = e.rw_rec_buffer(total);
+  let off = 0;
+  for (const b of blocos) { new Float32Array(e.memory.buffer, p, total).set(b, off); off += b.length; }
+  const arquivo = () => new Uint8Array(e.memory.buffer, e.rw_rec_arquivo(), e.rw_rec_bytes()).slice();
+  e.rw_rec_wav(m.taxa);
+  baixar(m.nome + '.wav', arquivo(), 'audio/wav'); arquivos.push(m.nome + '.wav');
+  // a versão de entrega, com o nome da tomada no texto das medidas
+  const nb = new TextEncoder().encode(m.nome + '.wav');
+  const np = e.rw_entrada(nb.length); new Uint8Array(e.memory.buffer, np, nb.length).set(nb);
+  if (e.rw_rec_entrega(m.taxa, np)) {
+    baixar(m.nome + '.streaming.wav', arquivo(), 'audio/wav');
+    baixar(m.nome + '.streaming.txt', cTexto(e, e.rw_rec_texto()), 'text/plain');
+    arquivos.push(m.nome + '.streaming.wav', m.nome + '.streaming.txt');
+  }
+  e.rw_rec_liberar();
+  baixar(m.nome + '.score.txt', m.partitura, 'text/plain'); arquivos.push(m.nome + '.score.txt');
+  if (m.midi.length) { baixar(m.nome + '.mid', m.midi, 'audio/midi'); arquivos.push(m.nome + '.mid'); }
+  aviso(W('recPronto', { arquivos: arquivos.join(', ') }), 9000);
 }
 
 // SALVA guarda a sessão neste navegador; BANCO baixa o patch num arquivo
@@ -726,7 +786,8 @@ $('banco').addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.s
 const learn = { chave: '', desde: 0, mostrado: null, valor: '', foco: false, x: -1, y: -1, alvo: null };
 const CHAVES = { seed: 'seed', repor: 'restore', mudar: 'mutate', evoluir: 'evolve', cruzar: 'cross', banco: 'bank',
                  salvar: 'save', abrir: 'open', desfazer: 'undo', descabear: 'uncable', espera: 'standby',
-                 zoomMais: 'zoom-in', zoomMenos: 'zoom-out', vista: 'rack-view', abre: 'startup' };
+                 zoomMais: 'zoom-in', zoomMenos: 'zoom-out', vista: 'rack-view', abre: 'startup',
+                 rec: 'rec', compacto: 'compact', lingua: 'language', tutorial: 'tutorial', sobre: 'about' };
 function consultar(fn, texto, ...mais) {
   if (!local) return null;
   let n = 0;
@@ -753,7 +814,11 @@ function alvoLearn() {
   return null;
 }
 function verbete(h) {
-  if (h.cabecalho) return consultar(local.rw_learn_cabecalho, h.cabecalho, L);
+  if (h.cabecalho) {
+    const v = consultar(local.rw_learn_cabecalho, h.cabecalho, L);
+    if (v && temWeb('ajuda_' + h.cabecalho)) v.q = W('ajuda_' + h.cabecalho);   // a versão do navegador
+    return v;
+  }
   if (h.cabo) return consultar(local.rw_learn_cabo, null, L);
   if (h.modulo) return consultar(local.rw_learn_modulo, h.tipo, L);
   const v = consultar(local.rw_learn_widget, h.tipo + '\t' + h.bind, L);
@@ -940,7 +1005,7 @@ addEventListener('keydown', (ev) => {
   if (ev.key === 'F1') { ev.preventDefault(); focoLearn(!learn.foco); return; }
   if (ev.key === 'F2') { ev.preventDefault(); menuLeitura(); return; }
   const k = ev.key.toLowerCase(), ctrl = ev.ctrlKey || ev.metaKey;
-  const mapa = ctrl ? { z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
+  const mapa = ctrl ? { r: 'rec', z: 'desfazer', s: 'salvar', b: 'banco', o: 'abrir', '=': 'zoomMais', '+': 'zoomMais', '-': 'zoomMenos', '0': 'zoom0' }
                     : { g: 'seed', v: 'variaLiga', m: 'mudar', e: 'evoluir', c: 'cruzar', n: 'descabear', r: 'repor', ' ': 'romperTodos' };
   const a = mapa[k];
   if (!a || ev.altKey) {

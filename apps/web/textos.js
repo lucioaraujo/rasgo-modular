@@ -70,6 +70,25 @@ const T = {
   taxa: ['Hz   ·   WebAssembly, in this browser', 'Hz   ·   WebAssembly, neste navegador',
          'Hz   ·   WebAssembly, dans ce navigateur', 'Hz   ·   WebAssembly, en este navegador'],
 
+  // REC: os arquivos
+  recMontando: ['Preparing the recording files…', 'Preparando os arquivos da gravação…',
+                'Préparation des fichiers de l’enregistrement…', 'Preparando los archivos de la grabación…'],
+  recPronto: ['Recording downloaded: {arquivos}.', 'Gravação baixada: {arquivos}.',
+              'Enregistrement téléchargé : {arquivos}.', 'Grabación descargada: {arquivos}.'],
+  // as ajudas do cabeçalho (LEARN) que no navegador são outras
+  ajuda_bank: ['Download the current patch as a .rmp named after its seed (or the time, without a seed), to keep or to open in the RASGO Modular app. Use OPEN to load it back.',
+               'Baixa o patch atual num .rmp com o nome da seed (ou o horário, sem seed), para guardar ou abrir no app RASGO Modular. Use ABRIR para carregá-lo de volta.',
+               'Télécharge le patch actuel en .rmp au nom de son seed (ou l’heure, sans seed), à garder ou à ouvrir dans l’application RASGO Modular. Utilisez OUVRIR pour le recharger.',
+               'Descarga el patch actual como .rmp con el nombre de su seed (o la hora, sin seed), para guardar o abrir en la aplicación RASGO Modular. Use ABRIR para cargarlo de nuevo.'],
+  ajuda_save: ['Keep the current session in this browser: modules, parameters and connections. OPENS · LAST brings it back on the next visit. To record audio, use REC.',
+               'Guarda a sessão atual neste navegador: módulos, parâmetros e conexões. ABRE · ÚLTIMA a traz de volta na próxima visita. Para gravar áudio, use REC.',
+               'Garde la session actuelle dans ce navigateur : modules, paramètres et connexions. OUVRE · DERNIÈRE la ramène à la prochaine visite. Pour enregistrer l’audio, utilisez REC.',
+               'Guarda la sesión actual en este navegador: módulos, parámetros y conexiones. ABRE · ÚLTIMA la recupera en la próxima visita. Para grabar audio, use REC.'],
+  ajuda_rec: ['Start or stop recording the stereo output (up to 4 min; the button shows the time). On stop the browser downloads rec-date-time-seedN.wav (24-bit), its -14 LUFS delivery version, the .score.txt and, with a NOTE-OUT in line, a .mid. Saving a patch and recording audio are different actions.',
+              'Inicia ou termina a gravação da saída estéreo (até 4 min; o botão mostra o tempo). Ao parar, o navegador baixa rec-data-hora-seedN.wav (24 bits), a versão de entrega a -14 LUFS, o .score.txt e, com um NOTE-OUT no caminho, um .mid. Salvar patch e gravar áudio são ações diferentes.',
+              'Démarre ou arrête l’enregistrement de la sortie stéréo (jusqu’à 4 min ; le bouton affiche le temps). À l’arrêt, le navigateur télécharge rec-date-heure-seedN.wav (24 bits), sa version de diffusion à -14 LUFS, le .score.txt et, avec un NOTE-OUT sur le trajet, un .mid. Enregistrer un patch et l’audio sont deux actions différentes.',
+              'Inicia o detiene la grabación de la salida estéreo (hasta 4 min; el botón muestra el tiempo). Al parar, el navegador descarga rec-fecha-hora-seedN.wav (24 bits), su versión de entrega a -14 LUFS, el .score.txt y, con un NOTE-OUT en el camino, un .mid. Guardar un patch y grabar audio son acciones distintas.'],
+
   // ---- cartões do TUTORIAL no navegador ---------------------------------
   tutSeedBoxBody: [
     'The box beside SEED is a normal text field. Click to place the cursor, drag to select, double-click or Ctrl+A to select all. Backspace/Delete erase; arrows and Home/End move; Ctrl+C / Ctrl+X / Ctrl+V copy, cut, paste. Type a number and press Enter to load that exact patch.',

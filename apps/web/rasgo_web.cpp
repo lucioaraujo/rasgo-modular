@@ -47,6 +47,7 @@
 #include "dsp/Loudness.hpp"
 #include "dsp/Master.hpp"
 #include "dsp/Mixer.hpp"
+#include "dsp/NoteOut.hpp"
 #include "escalas/BancoEscalas.hpp"
 #include "juce/RasgoWordmark.h"   // só o vetor do wordmark, sem JUCE
 #include "panel/ModuleCatalog.hpp"
@@ -55,6 +56,8 @@
 #include "panel/PatchGenetics.hpp"
 #include "panel/PatchSeed.hpp"
 #include "panel/SeedBalance.hpp"
+#include "panel/ScoreMidi.hpp"
+#include "panel/ScoreRecorder.hpp"
 #include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
 #include "ui/CompactPanel.hpp"
@@ -130,6 +133,21 @@ constexpr std::size_t kUndo = 24;                  // `kUndoDepth` do app
 std::vector<std::string> g_undo;
 bool g_espera = false;
 bool g_todosRompidos = false;                      // [espaço]: todos rompidos
+
+// REC: a partitura da tomada (`ScoreRecorder`, como no app) — o áudio fica
+// no worklet; aqui o tempo é amostras gravadas / taxa, nunca relógio
+constexpr double kRecMax = 240.0;                  // 4 min (decisão do autor)
+bool g_gravando = false;
+std::size_t g_recFrames = 0;
+rasgo::panel::ScoreRecorder g_score;
+std::uint64_t g_recSeed = 0;
+std::vector<float> g_variaLog;
+std::uint64_t g_variaGen = 0;
+int g_variaTick = 0;
+float g_variaAmtLog = -1.0f;
+bool g_variaLigadoLog = true;
+std::string g_midi;
+double recTempo() { return static_cast<double>(g_recFrames) / static_cast<double>(g_taxa); }
 std::string g_salvo;
 std::vector<char> g_entrada;
 
@@ -498,6 +516,15 @@ void rw_seed(std::uint32_t alto, std::uint32_t baixo) {
     foto();
     g_ordem.clear();
     adotar(grafoDaSeed(seed), seed);
+    // seed trocada DURANTE a tomada: a partitura registra a nova e os cabos
+    if (g_gravando) {
+        const double t = recTempo();
+        g_score.seedChange(t, seed);
+        for (std::size_t i = 0; i < g_grafo->cableCount(); ++i) {
+            const auto& c = g_grafo->cable(i);
+            g_score.connection(t, c.source().node, c.source().port, c.target().node, c.target().port);
+        }
+    }
 }
 
 // REPOR: a seed atual de novo, sem a edição à mão (desfazível)
@@ -585,6 +612,112 @@ void rw_descabear() {
     rehabitar();
     descrever();
 }
+
+// ---- REC (`startRec`/`finishRec` do app) -------------------------------
+
+// começa a tomada: a fiação inteira em t = 0, o dicionário dos módulos, a
+// seed e o estado do VARIA, como no app
+__attribute__((used, visibility("default")))
+void rw_rec_iniciar() {
+    if (!g_grafo) return;
+    g_score.clear();
+    g_recFrames = 0;
+    for (std::size_t i = 0; i < g_grafo->cableCount(); ++i) {
+        const auto& c = g_grafo->cable(i);
+        g_score.connection(0.0, c.source().node, c.source().port, c.target().node, c.target().port);
+    }
+    g_score.setSeed(g_seedAtual);
+    g_recSeed = g_seedAtual;
+    g_variaLog.clear();
+    g_mao.forEachFiber([&](std::size_t, const std::string&, float v, float, float) { g_variaLog.push_back(v); });
+    g_variaTick = 0;
+    g_variaGen = g_mao.generation();
+    g_variaAmtLog = g_mao.intensity();
+    g_variaLigadoLog = g_varia;
+    {
+        char b[64];
+        std::snprintf(b, sizeof b, "varia %s intensidade=%.2f", g_varia ? "ligado" : "desligado",
+                      static_cast<double>(g_mao.intensity()));
+        g_score.instrument(0.0, b);
+    }
+    g_score.setSampleRate(g_taxa);
+    auto descreve = [](std::size_t id, bool comParametros) {
+        auto& nd = g_grafo->node(id);
+        rasgo::panel::ScoreNodeInfo info;
+        info.type = nd.type();
+        for (std::size_t p = 0; p < nd.inputCount(); ++p) info.inPorts.push_back(nd.inputDescriptor(p).name);
+        for (std::size_t p = 0; p < nd.outputCount(); ++p) info.outPorts.push_back(nd.outputDescriptor(p).name);
+        if (comParametros)
+            for (const auto& pr : nd.parameters()) info.params.emplace_back(pr.descriptor.id, pr.value);
+        g_score.describe(id, std::move(info));
+    };
+    for (const auto id : g_shown) descreve(id, true);
+    descreve(g_saida, false);   // o sink também aparece nas ligações
+    g_gravando = true;
+}
+
+// a tomada ainda corre? (para sozinha aos 4 min)
+__attribute__((used, visibility("default")))
+int rw_rec_ativo() { return g_gravando ? 1 : 0; }
+
+// a seed em que a tomada começou (alto/baixo) e se houve troca de seed
+// durante ela (o `-montage` do nome do arquivo)
+__attribute__((used, visibility("default")))
+std::uint32_t rw_rec_seed_alto() { return static_cast<std::uint32_t>(g_recSeed >> 32); }
+__attribute__((used, visibility("default")))
+std::uint32_t rw_rec_seed_baixo() { return static_cast<std::uint32_t>(g_recSeed & 0xffffffffu); }
+__attribute__((used, visibility("default")))
+int rw_rec_montagem() {
+    for (const auto& e : g_score.events())
+        if (e.type == rasgo::panel::RasgoEvent::Type::Seed && e.seed != g_recSeed) return 1;
+    return 0;
+}
+
+// um gesto do músico num controle (de → para), como `onParamGesture`
+__attribute__((used, visibility("default")))
+void rw_rec_param(int i, float de, float para) {
+    if (!g_gravando || i < 0 || static_cast<std::size_t>(i) >= g_controles.size()) return;
+    g_score.parameterChange(recTempo(), g_controles[i].no, g_controles[i].bind, de, para);
+}
+
+// para e devolve a partitura (.score.txt); o cabeçalho vem da página em
+// rw_entrada: "data\taudio\tinstrumento". As notas do NOTE-OUT saem em
+// rw_rec_midi()/rw_rec_midi_tamanho(), no andamento do primeiro CLOCK.
+__attribute__((used, visibility("default")))
+const char* rw_rec_parar(int tamanho) {
+    g_gravando = false;
+    std::string cab(g_entrada.data(), static_cast<std::size_t>(std::max(0, std::min<int>(tamanho, static_cast<int>(g_entrada.size())))));
+    std::vector<std::string> campos;
+    for (std::size_t a = 0, b; ; a = b + 1) {
+        b = cab.find('\t', a);
+        campos.push_back(cab.substr(a, b == std::string::npos ? std::string::npos : b - a));
+        if (b == std::string::npos) break;
+    }
+    while (campos.size() < 3) campos.emplace_back();
+    g_score.setHeader({
+        {"data", campos[0]},
+        {"audio", campos[1]},
+        {"instrumento", campos[2]},
+        {"autoria", "instrumento criado por L\xc3\xba" "cio Ara\xc3\xba" "jo "
+                    "\xe2\x80\x94 fam\xc3\xad" "lia RASGO, rasgoinstruments.arquiviagem.net"},
+        {"licenca", "instrumento sob GNU AGPL-3.0-or-later"},
+        {"contato", "rasgo.instruments@gmail.com"},
+    });
+    g_salvo = g_score.toText();
+    double bpm = 120.0;
+    if (g_grafo)
+        for (std::size_t i = 0; i < g_grafo->nodeCount(); ++i)
+            if (g_grafo->node(i).type() == "CLOCK") {
+                try { bpm = g_grafo->parameterUserValue(i, "bpm"); } catch (...) {}
+                break;
+            }
+    g_midi = rasgo::panel::scoreToMidi(g_score.events(), bpm);
+    return g_salvo.c_str();
+}
+__attribute__((used, visibility("default")))
+const char* rw_rec_midi() { return g_midi.data(); }
+__attribute__((used, visibility("default")))
+int rw_rec_midi_tamanho() { return static_cast<int>(g_midi.size()); }
 
 // COMPACTO: a vista compacta dos painéis (a mesma regra do app)
 __attribute__((used, visibility("default")))
@@ -953,6 +1086,19 @@ float* rw_processar() {
     }
     g_grafo->process(*g_bloco, g_saida, 0);
     alimentarVisores();
+    if (g_gravando) {
+        g_recFrames += kQuantum;
+        // as notas que os NOTE-OUT fecharam (`collectNotes`)
+        const double agora = recTempo();
+        for (const auto id : g_shown)
+            if (auto* no = dynamic_cast<rasgo::modular::NoteOut*>(&g_grafo->node(id))) {
+                rasgo::modular::NoteOut::CompletedNote cn;
+                while (no->takeCompletedNote(cn))
+                    g_score.note(agora - cn.durationSeconds, id, cn.pitch, cn.velocity,
+                                 cn.durationSeconds, cn.accent);
+            }
+        if (g_recFrames >= static_cast<std::size_t>(kRecMax * g_taxa)) g_gravando = false;   // 4 min
+    }
     double s2 = 0.0;
     for (std::size_t i = 0; i < kQuantum; ++i) {
         float l = g_bloco->at(0, i), r = g_bloco->at(1, i);
@@ -973,6 +1119,22 @@ float* rw_processar() {
         g_mao.tick(*g_grafo,
                    static_cast<float>(g_blocosPorPasso * kQuantum) / g_taxa,
                    energia, g_lufs.shortTerm());
+        // a mão do VARIA na partitura, 1×/s: cada fibra que andou mais de 2 %
+        // do curso desde a última anotação (como no app)
+        if (g_gravando && ++g_variaTick >= 30) {
+            g_variaTick = 0;
+            const double t = recTempo();
+            if (g_mao.generation() != g_variaGen) { g_variaGen = g_mao.generation(); g_variaLog.clear(); }
+            std::size_t i = 0;
+            g_mao.forEachFiber([&](std::size_t node, const std::string& pid, float v, float lo, float hi) {
+                if (i >= g_variaLog.size()) { g_variaLog.push_back(v); ++i; return; }
+                if (std::fabs(v - g_variaLog[i]) > 0.02f * std::max(1e-4f, hi - lo)) {
+                    g_score.parameterChange(t, node, pid, g_variaLog[i], v, /*byVaria=*/true);
+                    g_variaLog[i] = v;
+                }
+                ++i;
+            });
+        }
     }
     return g_pcm;
 }
@@ -1074,6 +1236,7 @@ int rw_ligar(int o, int po, int d, int pd) {
     } catch (...) {
         try { g_grafo->disconnect(t, tp); } catch (...) {}
     }
+    if (g_gravando) g_score.connection(recTempo(), s, sp, t, tp);
     depoisDosCabos();
     return 1;
 }
@@ -1217,6 +1380,16 @@ void rw_mao(int ativa) { g_musico = ativa != 0; }
 
 __attribute__((used, visibility("default")))
 void rw_varia(int ligado, float intensidade) {
+    if (g_gravando && (ligado != 0) != g_variaLigadoLog) {
+        g_variaLigadoLog = ligado != 0;
+        g_score.instrument(recTempo(), g_variaLigadoLog ? "varia ligado" : "varia desligado");
+    }
+    if (g_gravando && std::fabs(intensidade - g_variaAmtLog) >= 0.05f) {
+        g_variaAmtLog = intensidade;
+        char b[48];
+        std::snprintf(b, sizeof b, "varia intensidade=%.2f", static_cast<double>(intensidade));
+        g_score.instrument(recTempo(), b);
+    }
     g_varia = ligado != 0;
     g_mao.setIntensity(intensidade);
 }

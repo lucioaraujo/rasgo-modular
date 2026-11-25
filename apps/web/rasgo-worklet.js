@@ -109,14 +109,20 @@ class RasgoProcessor extends AudioWorkletProcessor {
     } else if (m.tipo === 'arrasto' && this.e && this.arrasto) {
       this.e.rw_param(m.i, valorArrastado(this.arrasto.v0, m.dy, m.lo, m.hi));
     } else if (m.tipo === 'solta' && this.e) {
+      // o gesto inteiro vira um evento na partitura do REC (`onParamGesture`)
+      if (this.arrasto) this.e.rw_rec_param(this.arrasto.i, this.arrasto.v0, this.e.rw_param_usuario(this.arrasto.i));
       this.arrasto = null;
       this.e.rw_mao(0);
     } else if (m.tipo === 'mao' && this.e) {
       this.e.rw_mao(m.ativa ? 1 : 0);
     } else if (m.tipo === 'alterna' && this.e) {
-      this.e.rw_param(m.i, this.e.rw_param_usuario(m.i) >= 0.5 ? 0 : 1);
+      const de = this.e.rw_param_usuario(m.i), para = de >= 0.5 ? 0 : 1;
+      this.e.rw_param(m.i, para);
+      this.e.rw_rec_param(m.i, de, para);
     } else if (m.tipo === 'roda' && this.e) {
-      this.e.rw_param(m.i, valorRoda(this.e.rw_param_usuario(m.i), m.dir, m.fino, m.lo, m.hi));
+      const de = this.e.rw_param_usuario(m.i), para = valorRoda(de, m.dir, m.fino, m.lo, m.hi);
+      this.e.rw_param(m.i, para);
+      this.e.rw_rec_param(m.i, de, para);
     } else if ((m.tipo === 'ligar' || m.tipo === 'cortarEntrada' || m.tipo === 'cortarSaida') && this.e) {
       const mudou = m.tipo === 'ligar' ? this.e.rw_ligar(m.o, m.po, m.d, m.pd)
         : m.tipo === 'cortarEntrada' ? this.e.rw_cortar_entrada(m.d, m.pd)
@@ -173,6 +179,9 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_escolher_escala(m.id, m.banco);
     } else if (m.tipo === 'lerBanco' && this.e) {
       this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
+    } else if (m.tipo === 'rec' && this.e) {
+      if (m.ligar && !this.gravando) this.iniciarRec();
+      else if (!m.ligar && this.gravando) this.terminarRec();
     } else if (m.tipo === 'compacto' && this.e) {
       this.e.rw_compacto(m.ligado ? 1 : 0);
       this.mandarRack('redesenho');
@@ -185,6 +194,45 @@ class RasgoProcessor extends AudioWorkletProcessor {
     } else if (m.tipo === 'ganho') {
       this.ganho = m.valor;
     }
+  }
+
+  // ---- REC: o som da saída do motor (antes do volume da página), em blocos
+  // de 1 s mandados à página; a partitura fica no motor (rw_rec_*)
+  iniciarRec() {
+    this.e.rw_rec_iniciar();
+    this.gravando = true;
+    this.recQuadros = 0;
+    this.novoBlocoRec();
+  }
+  // ~1 s, múltiplo exato do quantum (256 números = 128 quadros L R)
+  novoBlocoRec() { this.recBloco = new Float32Array(256 * Math.round(sampleRate / 128)); this.recPos = 0; }
+  mandarBlocoRec() {
+    if (!this.recPos) return;
+    const b = this.recBloco.slice(0, this.recPos);
+    this.port.postMessage({ tipo: 'recAudio', bloco: b }, [b.buffer]);
+    this.novoBlocoRec();
+  }
+  terminarRec() {
+    this.gravando = false;
+    this.mandarBlocoRec();
+    const seed = (BigInt(this.e.rw_rec_seed_alto() >>> 0) << 32n) | BigInt(this.e.rw_rec_seed_baixo() >>> 0);
+    // o nome como no app: rec-data-hora-seedN (ou -manual), -montage se a
+    // seed mudou durante a tomada
+    const d = new Date(), z = (n, k = 2) => String(n).padStart(k, '0');
+    const nome = `rec-${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`
+      + (seed ? `-seed${seed}` : '-manual') + (this.e.rw_rec_montagem() ? '-montage' : '');
+    const tz = -d.getTimezoneOffset();
+    const data = `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())} `
+      + `${tz < 0 ? '-' : '+'}${z(Math.floor(Math.abs(tz) / 60))}${z(Math.abs(tz) % 60)}`;
+    const seg = (this.recQuadros / sampleRate).toFixed(1);
+    const vp = this.e.rw_versao(), u8 = new Uint8Array(this.mem.buffer); let f = vp; while (u8[f]) f++;
+    const versao = deUtf8(u8.slice(vp, f));
+    const cab = `${data}\t${nome}.wav (24 bits, ${sampleRate} Hz, ${seg} s)\tRasgo Modular ${versao} (navegador)`;
+    const sp = this.e.rw_rec_parar(this.texto(cab)), u = new Uint8Array(this.mem.buffer);
+    let g = sp; while (u[g]) g++;
+    const partitura = deUtf8(u.slice(sp, g));
+    const midi = new Uint8Array(this.mem.buffer, this.e.rw_rec_midi(), this.e.rw_rec_midi_tamanho()).slice();
+    this.port.postMessage({ tipo: 'recFim', nome, partitura, midi, taxa: sampleRate, quadros: this.recQuadros }, [midi.buffer]);
   }
 
   // um texto na entrada do motor (`rw_entrada`); devolve o tamanho
@@ -220,6 +268,12 @@ class RasgoProcessor extends AudioWorkletProcessor {
     const f = new Float32Array(this.mem.buffer, p, 256);
     const L = out[0], R = out[1], g = this.ganho;
     for (let i = 0; i < L.length; i++) { L[i] = f[2 * i] * g; R[i] = f[2 * i + 1] * g; }
+    if (this.gravando) {
+      this.recBloco.set(f, this.recPos);
+      this.recPos += 256; this.recQuadros += 128;
+      if (this.recPos >= this.recBloco.length) this.mandarBlocoRec();
+      if (!this.e.rw_rec_ativo()) this.terminarRec();   // os 4 minutos
+    }
     // ~30 quadros por segundo: os valores dos controles e os cabos
     if (++this.quadro >= Math.round(sampleRate / 30 / 128)) {
       this.quadro = 0;
@@ -245,7 +299,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
         let f = p; while (u[f]) f++;
         learnValor = deUtf8(u.slice(p, f));
       }
-      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor,
+      this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor, rec: this.gravando ? this.recQuadros / sampleRate : -1,
                               lufs: Array.from(new Float32Array(this.mem.buffer, this.e.rw_lufs(), 4)) },
                             [v.buffer, c.buffer, vis.buffer]);
     }
