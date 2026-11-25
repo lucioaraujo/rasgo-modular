@@ -104,8 +104,22 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
 
 1. **F1 — o rack aparece** (feito, 25/11): os módulos da seed desenhados
    como no app, com os cabos, e os controles se mexendo com o VARIA.
-2. **F2 — a mão no instrumento:** girar knobs e sliders, apertar toggles,
-   ligar e tirar cabos, o inspetor do cabo.
+2. **F2 — a mão no instrumento** (feito, 25/11; falta o teste do autor):
+   arrastar knob/slider (220 px = a faixa; exponencial nas frequências),
+   roda do mouse (2 %, Shift 0,5 %, seletores um passo), clicar toggle;
+   puxar cabo de um jack, com os halos do app (duplo = mesmo tipo de sinal,
+   contínuo = chega ao som, tracejado = ainda não); puxar de uma entrada
+   ocupada leva o cabo dali; botão direito num jack corta; um laço vira
+   realimentação (o `prepare` dentro do try, como `tryPatch`); clique num
+   cabo abre o inspetor (NONE/RING/FOLD/DIFF, companion escolhido num jack
+   de saída, AMT, GAIN, COND, ROMPER/RECONECTAR, DESPLUGAR); cabo sob o
+   mouse em destaque; selo da relação no meio do cabo; na vista SAÍDA quem
+   deixa de chegar ao som fica tracejado; o VARIA espera enquanto a mão
+   está num controle. Conferido no motor pelo Node (`teste_f2.mjs`: girar,
+   cortar, religar, laço, cortar saída, GAIN, COND, RING, NONE, ROMPER) e
+   por captura (`?insp=N&rel`). A interação com o mouse não foi testada
+   por mim: sem entrada sintética na máquina do autor. Ainda sem: DESFAZ,
+   mover módulos pelo título, o [x] de remover (vão com a paleta, F3).
 3. **F3 — o que falta do painel:** os visores (SCOPE, KEY, VU…), a MATRIX,
    o cabeçalho do app (seed, banco, VARIA, volume, loudness), a paleta para
    acrescentar e tirar módulos.

@@ -2,6 +2,36 @@
 // manda os bytes do .wasm e as seeds; aqui cada quantum de 128 amostras sai
 // do mesmo motor do app (24/11/2026).
 
+// O arrasto de knob/slider do app (`RackView::mouseDrag`): 220 px de
+// movimento vertical = a faixa inteira; faixas largas (hi/lo > 30, as
+// frequências) andam em escala exponencial.
+function valorArrastado(v0, dy, lo, hi) {
+  let v;
+  if (lo > 0 && hi / lo > 30) {
+    const k = Math.log(hi / lo);
+    const t = Math.min(1, Math.max(0, Math.log(Math.max(v0, lo) / lo) / k + dy));
+    v = lo * Math.exp(k * t);
+  } else {
+    v = v0 + dy * (hi - lo);
+  }
+  return Math.min(hi, Math.max(lo, v));
+}
+
+// A roda do mouse num controle (`wheelOnControl`): ~2 % da faixa por clique
+// (Shift: ~0,5 %); seletores de 2 a 16 valores andam um passo.
+function valorRoda(v0, dir, fino, lo, hi) {
+  const discreto = hi - lo >= 2 && hi - lo <= 16 && Math.floor(lo) === lo && Math.floor(hi) === hi;
+  const passo = fino ? 0.005 : 0.02;
+  let v;
+  if (discreto) v = Math.round(v0) + dir;
+  else if (lo > 0 && hi / lo > 30) {
+    const k = Math.log(hi / lo);
+    const t = Math.min(1, Math.max(0, Math.log(Math.max(v0, lo) / lo) / k + dir * passo));
+    v = lo * Math.exp(k * t);
+  } else v = v0 + dir * passo * (hi - lo);
+  return Math.min(hi, Math.max(lo, v));
+}
+
 class RasgoProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
@@ -35,21 +65,54 @@ class RasgoProcessor extends AudioWorkletProcessor {
       const s = BigInt(m.seed);
       this.e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
       this.tocando = true;
-      // o rack para a página desenhar (uma vez por seed)
-      const dec = new TextDecoder();
-      const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
-      const wp = this.e.rw_wordmark(), b = new Uint8Array(this.mem.buffer);
-      let fim = wp; while (b[fim]) fim++;
-      const wordmark = dec.decode(b.slice(wp, fim));
-      this.nc = this.e.rw_num_controles();
-      this.port.postMessage({ tipo: 'seed', seed: m.seed, cabos: this.e.rw_cabos(), texto, wordmark });
+      this.mandarRack('seed', m.seed);
     } else if (m.tipo === 'parar') {
       this.tocando = false;
+    } else if (m.tipo === 'pega' && this.e) {
+      // o músico pegou um knob/slider: o arrasto parte do valor DELE (sem
+      // a modulação), e a mão do VARIA espera até ele soltar
+      this.arrasto = { i: m.i, v0: this.e.rw_param_usuario(m.i) };
+      this.e.rw_mao(1);
+    } else if (m.tipo === 'arrasto' && this.e && this.arrasto) {
+      this.e.rw_param(m.i, valorArrastado(this.arrasto.v0, m.dy, m.lo, m.hi));
+    } else if (m.tipo === 'solta' && this.e) {
+      this.arrasto = null;
+      this.e.rw_mao(0);
+    } else if (m.tipo === 'mao' && this.e) {
+      this.e.rw_mao(m.ativa ? 1 : 0);
+    } else if (m.tipo === 'alterna' && this.e) {
+      this.e.rw_param(m.i, this.e.rw_param_usuario(m.i) >= 0.5 ? 0 : 1);
+    } else if (m.tipo === 'roda' && this.e) {
+      this.e.rw_param(m.i, valorRoda(this.e.rw_param_usuario(m.i), m.dir, m.fino, m.lo, m.hi));
+    } else if ((m.tipo === 'ligar' || m.tipo === 'cortarEntrada' || m.tipo === 'cortarSaida') && this.e) {
+      const mudou = m.tipo === 'ligar' ? this.e.rw_ligar(m.o, m.po, m.d, m.pd)
+        : m.tipo === 'cortarEntrada' ? this.e.rw_cortar_entrada(m.d, m.pd)
+        : this.e.rw_cortar_saida(m.o, m.po);
+      if (mudou) this.mandarRack('rack');
+    } else if (m.tipo === 'caboRelacao' && this.e) {
+      this.e.rw_cabo_relacao(m.d, m.pd, m.rel, m.cn ?? 0, m.cp ?? 0, m.amt ?? 0);
+    } else if (m.tipo === 'caboCondutancia' && this.e) {
+      this.e.rw_cabo_condutancia(m.d, m.pd, m.v);
+    } else if (m.tipo === 'caboGanho' && this.e) {
+      this.e.rw_cabo_ganho(m.d, m.pd, m.v);
+    } else if (m.tipo === 'caboRomper' && this.e) {
+      this.e.rw_cabo_romper(m.d, m.pd);
     } else if (m.tipo === 'varia' && this.e) {
       this.e.rw_varia(m.ligado ? 1 : 0, m.intensidade);
     } else if (m.tipo === 'ganho') {
       this.ganho = m.valor;
     }
+  }
+
+  // o rack para a página desenhar: a cada seed e a cada mudança de cabos
+  mandarRack(tipo, seed) {
+    const dec = new TextDecoder();
+    const texto = dec.decode(new Uint8Array(this.mem.buffer, this.e.rw_descrever(), this.e.rw_texto_tamanho()).slice());
+    const wp = this.e.rw_wordmark(), b = new Uint8Array(this.mem.buffer);
+    let fim = wp; while (b[fim]) fim++;
+    const wordmark = dec.decode(b.slice(wp, fim));
+    this.nc = this.e.rw_num_controles();
+    this.port.postMessage({ tipo, seed, cabos: this.e.rw_cabos(), texto, wordmark });
   }
 
   process(_in, outputs) {
@@ -64,7 +127,7 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.quadro = 0;
       const v = new Float32Array(this.mem.buffer, this.e.rw_valores(), this.nc).slice();
       const nCab = this.e.rw_cabos();
-      const c = new Float32Array(this.mem.buffer, this.e.rw_cabos_estado(), nCab * 9).slice();
+      const c = new Float32Array(this.mem.buffer, this.e.rw_cabos_estado(), nCab * 14).slice();
       this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c }, [v.buffer, c.buffer]);
     }
     return true;

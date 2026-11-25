@@ -65,16 +65,36 @@ export class Rack {
     this.escala = 2;
     this.pedido = false;
     this.soSaida = false;   // vista SAÍDA: só os módulos que chegam ao som
+    this.pendentes = new Set();   // à vista na SAÍDA por exceção (cortados agora)
+    this.enviar = () => {};       // mensagens ao motor (o worklet)
+    this.gesto = null;            // o que o mouse está fazendo
+    this.insp = null;             // inspetor: { d, pd } = a ponta de destino do cabo
+    this.escolhendo = false;      // escolhendo o companion da relação
+    this.sobCabo = -1;            // índice do cabo sob o mouse (destaque)
+    this.aviso = () => {};        // texto de aviso para a página
+    this.mouse = { x: 0, y: 0 };
     addEventListener('resize', () => this.layout());
     rolagem.addEventListener('scroll', () => this.redesenhar(), { passive: true });
+    canvas.addEventListener('pointerdown', (e) => this.baixa(e));
+    canvas.addEventListener('pointermove', (e) => this.move(e));
+    canvas.addEventListener('pointerup', (e) => this.sobe(e));
+    canvas.addEventListener('pointercancel', () => this.cancela());
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    canvas.addEventListener('wheel', (e) => this.roda(e), { passive: false });
   }
 
   mmpx(mm) { return Math.round(mm * this.escala); }
 
-  vistaSaida(v) { this.soSaida = v; this.layout(); }
+  vistaSaida(v) { this.soSaida = v; this.pendentes.clear(); this.layout(); }
 
-  carregar(texto, wordmark) {
+  // `mesmoPatch`: a descrição veio de um cabo ligado/cortado (não de uma
+  // seed nova) — na vista SAÍDA, quem deixou de chegar ao som fica à vista,
+  // tracejado, até voltar a chegar (`keepVisibleAfterCut` do app)
+  carregar(texto, wordmark, mesmoPatch = false) {
     const r = JSON.parse(texto);
+    if (mesmoPatch) {
+      for (const m of this.vistos) this.pendentes.add(m.id);
+    } else this.pendentes.clear();
     this.saida = r.saida;
     this.mods = r.modulos.map((m) => {
       const w = m.w.map((x) => ({ ...x }));
@@ -82,8 +102,8 @@ export class Rack {
       return { ...m, w, cromo: null };
     });
     if (wordmark) this.marca = new Path2D(wordmark);
-    this.valores = null;
-    this.cabos = null;
+    for (const m of this.mods) if (m.chega) this.pendentes.delete(m.id);
+    if (!mesmoPatch) { this.valores = null; this.cabos = null; }
     this.layout();
   }
 
@@ -102,7 +122,7 @@ export class Rack {
     this.escala = clamp((budget - PAD - 0.5) / MM_3U, S_MIN, S_MAX);
     this.modH = this.mmpx(MM_3U);
     let x = PAD, y = TOPO;
-    this.vistos = this.soSaida ? this.mods.filter((m) => m.chega) : this.mods;
+    this.vistos = this.soSaida ? this.mods.filter((m) => m.chega || this.pendentes.has(m.id)) : this.mods;
     for (const m of this.vistos) {
       const w = this.mmpx(m.hp * MM_HP);
       if (x + w > vw - PAD && x > PAD) { x = PAD; y += this.modH + PAD; }
@@ -122,7 +142,8 @@ export class Rack {
     for (const m of this.vistos)
       for (const w of m.w)
         if (w.k === K.Jack && w.p !== undefined)
-          this.jacks.set(`${m.id}:${w.p}:${w.out}`, { x: m.bx + this.mmpx(w.x), y: m.by + this.mmpx(w.y), pk: w.pk });
+          this.jacks.set(`${m.id}:${w.p}:${w.out}`, { x: m.bx + this.mmpx(w.x), y: m.by + this.mmpx(w.y), pk: w.pk, no: m.id, p: w.p, out: w.out });
+    this.porId = new Map(this.mods.map((m) => [m.id, m]));
     this.redesenhar();
   }
 
@@ -204,6 +225,280 @@ export class Rack {
     this.desenharCabos(g, topo, vh, false);
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.drawImage(this.camadaCabos, 0, 0);
+    g.setTransform(dpr, 0, 0, dpr, 0, -topo * dpr);
+    // módulo à vista por exceção na SAÍDA: borda tracejada
+    if (this.soSaida) {
+      g.strokeStyle = T.accent; g.lineWidth = 1; g.setLineDash([4, 3]);
+      for (const m of this.vistos)
+        if (!m.chega && this.pendentes.has(m.id)) g.strokeRect(m.bx + 0.5, m.by + 0.5, m.bw - 1, m.bh - 1);
+      g.setLineDash([]);
+    }
+    this.desenharDestaques(g, topo, vh);
+    if (this.gesto?.tipo === 'cabo') this.desenharPuxada(g);
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.desenharInspetor(g, vw, vh);
+  }
+
+  // os pontos de um cabo, para desenho e clique (`ui::cablePoints`)
+  pontosCabo(x0, y0, x1, y1) {
+    const sag = 18 + Math.abs(x1 - x0) / 6, cx = (x0 + x1) / 2, cy = Math.max(y0, y1) + sag;
+    const pts = [];
+    for (let k = 0; k < 15; k++) {
+      const t = k / 14, u = 1 - t;
+      pts.push([u * u * x0 + 2 * u * t * cx + t * t * x1, u * u * y0 + 2 * u * t * cy + t * t * y1]);
+    }
+    return pts;
+  }
+
+  // os cabos à vista como { i, s, t, campos }
+  *cabosVisiveis() {
+    const c = this.cabos;
+    if (!c) return;
+    for (let i = 0, k = 0; i + 13 < c.length; i += 14, k++) {
+      const s = this.jacks.get(`${c[i]}:${c[i + 1]}:1`), t = this.jacks.get(`${c[i + 2]}:${c[i + 3]}:0`);
+      if (s && t) yield { k, i, s, t, c };
+    }
+  }
+
+  // o cabo mais perto do ponto, até `mmpx(5) + 3` px (`cableUnder`)
+  caboEm(p) {
+    const tol = this.mmpx(5) + 3;
+    let melhor = -1, bestD = tol;
+    for (const { k, s, t } of this.cabosVisiveis()) {
+      const pts = this.pontosCabo(s.x, s.y, t.x, t.y);
+      for (let n = 0; n + 1 < pts.length; n++) {
+        const [ax, ay] = pts[n], [bx, by] = pts[n + 1];
+        const abx = bx - ax, aby = by - ay, len2 = abx * abx + aby * aby;
+        let u = len2 > 1e-6 ? ((p.x - ax) * abx + (p.y - ay) * aby) / len2 : 0;
+        u = clamp(u, 0, 1);
+        const d = Math.hypot(p.x - (ax + u * abx), p.y - (ay + u * aby));
+        if (d <= bestD) { bestD = d; melhor = k; }
+      }
+    }
+    return melhor;
+  }
+
+  corCabo(s, c, i) {
+    const h = c[i] * 7 + c[i + 1] * 3 + c[i + 2] * 5 + c[i + 3];
+    return c[i + 4] ? T.warning : (s.pk === 1 ? CABO_CTRL[h & 3] : CABO_AUDIO[h & 3]);
+  }
+
+  // o cabo sob o mouse e o do inspetor: por cima, mais grossos e claros; e
+  // o selo das relações (operação no meio do cabo, arco = AMT, pontilhado
+  // até o companion)
+  desenharDestaques(g, topo, vh) {
+    for (const { k, i, s, t, c } of this.cabosVisiveis()) {
+      const quente = k === this.sobCabo || (this.insp && c[i + 2] === this.insp.d && c[i + 3] === this.insp.pd);
+      if (quente) {
+        g.save();
+        g.filter = 'brightness(1.45)';
+        this.tracarCabo(g, s.x, s.y, t.x, t.y, this.corCabo(s, c, i), !!c[i + 4], 1 + clamp(c[i + 6], 0, 2) + 2);
+        g.restore();
+      }
+      if (c[i + 7]) {
+        const pts = this.pontosCabo(s.x, s.y, t.x, t.y);
+        const comp = this.jacks.get(`${c[i + 11]}:${c[i + 12]}:1`);
+        this.selo(g, pts[7][0], pts[7][1], comp, this.corCabo(s, c, i), c[i + 9], c[i + 10], quente);
+      }
+    }
+  }
+
+  selo(g, x, y, comp, cor, rel, amt, aceso) {
+    const r = 9;
+    if (comp) {
+      g.save();
+      g.globalAlpha = aceso ? 0.95 : 0.6;
+      g.strokeStyle = cor; g.lineWidth = 1; g.setLineDash([1.5, 3]);
+      g.beginPath(); g.moveTo(comp.x, comp.y); g.lineTo(x, y); g.stroke();
+      g.restore();
+    }
+    g.fillStyle = T.surface;
+    g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+    g.save(); g.globalAlpha = 0.45; g.strokeStyle = cor; g.lineWidth = 1;
+    g.beginPath(); g.arc(x, y, r - 0.5, 0, 2 * Math.PI); g.stroke(); g.restore();
+    if (amt > 0) {
+      g.strokeStyle = cor; g.lineWidth = 2;
+      g.beginPath(); g.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * clamp(amt, 0, 1)); g.stroke();
+    }
+    const a = 4;
+    g.beginPath();
+    if (rel === 1) { g.moveTo(x - a, y - a); g.lineTo(x + a, y + a); g.moveTo(x + a, y - a); g.lineTo(x - a, y + a); }
+    else if (rel === 2) { g.moveTo(x - a, y + a * 0.6); g.lineTo(x - a * 0.35, y - a * 0.6); g.lineTo(x + a * 0.35, y + a * 0.6); g.lineTo(x + a, y - a * 0.6); }
+    else if (rel === 3) { g.moveTo(x - a, y); g.lineTo(x + a, y); }
+    g.strokeStyle = aceso ? T.textPrimary : cor; g.lineWidth = 1.6; g.stroke();
+  }
+
+  // o nome de um módulo como no rack ("OSC 2" quando há cópias)
+  nomeModulo(id) {
+    const m = this.porId.get(id);
+    if (!m) return '?';
+    return m.w.length && m.w[0].k === K.Label ? m.w[0].l : m.tipo;
+  }
+
+  nomePorta(id, p, saida) {
+    const m = this.porId.get(id);
+    const w = m && m.w.find((x) => x.k === K.Jack && x.p === p && !!x.out === saida);
+    return w ? w.b.slice(saida ? 4 : 3) : '';
+  }
+
+  // o cabo do inspetor no estado atual (índice no array), ou -1
+  caboInspecionado() {
+    const c = this.cabos;
+    if (!this.insp || !c) return -1;
+    for (let i = 0; i + 13 < c.length; i += 14)
+      if (c[i + 2] === this.insp.d && c[i + 3] === this.insp.pd) return i;
+    return -1;
+  }
+
+  // O inspetor (`paintInspector`): canto de baixo à direita da vista
+  desenharInspetor(g, vw, vh) {
+    this.inspAlvos = [];
+    const i = this.caboInspecionado();
+    if (i < 0) { if (this.insp && this.cabos) this.insp = null; return; }
+    const c = this.cabos;
+    const temRel = !!c[i + 7];
+    const pad = 8, rowH = 20, bw = 210, rows = temRel ? 8 : 6, bh = pad * 2 + rowH * rows;
+    const bx = Math.max(4, vw - bw - 12), by = Math.max(4, vh - bh - 12);
+    this.inspCaixa = { x: bx, y: by, w: bw, h: bh };
+    g.fillStyle = T.surface; g.fillRect(bx, by, bw, bh);
+    g.strokeStyle = T.accent; g.lineWidth = 1; g.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+    let ry = by + pad;
+    const dot = '  \u00b7  ';
+    g.font = fonte(10, true); g.fillStyle = T.textPrimary;
+    const tw = bw - pad * 2 - 16;
+    const corta = (txt) => { while (txt.length > 1 && g.measureText(txt).width > tw) txt = txt.slice(0, -1); return txt; };
+    g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.fillText(corta(this.nomeModulo(c[i]) + dot + this.nomePorta(c[i], c[i + 1], true)), bx + pad, ry + 7);
+    g.fillText(corta('\u2192 ' + this.nomeModulo(c[i + 2]) + dot + this.nomePorta(c[i + 2], c[i + 3], false)), bx + pad, ry + rowH + 3);
+    const lx = bx + bw - pad - 9;
+    g.fillStyle = c[i + 5] && !c[i + 4] ? T.accent : T.recessed;
+    g.beginPath(); g.arc(lx + 4, ry + 7, 4, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = T.line; g.stroke();
+    if (c[i + 13]) {
+      g.font = fonte(8); g.fillStyle = T.warning; g.textAlign = 'right';
+      g.fillText('\u21ba REALIMENTA', bx + bw - pad, ry + 2 * rowH - 3);
+      g.textAlign = 'left';
+    }
+    ry += 2 * rowH;
+    const botao = (x, y, w, h, txt, ativo, acao) => {
+      if (ativo) { g.fillStyle = T.accent; g.fillRect(x, y, w, h); }
+      g.strokeStyle = ativo ? T.accent : T.line; g.lineWidth = 1; g.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+      g.fillStyle = ativo ? T.bg : T.textSecondary; g.font = fonte(9);
+      textoAjustado(g, txt, x + 2, y, w - 4, h);
+      this.inspAlvos.push({ x, y, w, h, acao });
+    };
+    const rel = c[i + 9];
+    const relW = Math.floor((bw - pad * 2) / 4);
+    let cx = bx + pad;
+    [['NONE', 0], ['RING', 1], ['FOLD', 2], ['DIFF', 3]].forEach(([txt, r], n) => {
+      const w = n < 3 ? relW : bw - pad - cx + bx;
+      botao(cx, ry, w, rowH - 2, txt, rel === r, { tipo: 'rel', r });
+      cx += relW;
+    });
+    ry += rowH;
+    const trilha = (txt, v, acao, meio) => {
+      g.fillStyle = T.textSecondary; g.font = fonte(9);
+      textoAjustado(g, txt, bx + pad, ry, 40, rowH - 2, 'esquerda');
+      const tx = bx + pad + 42, tw2 = bw - pad * 2 - 42;
+      g.strokeStyle = T.line; g.strokeRect(tx + 0.5, ry + 3.5, tw2 - 1, rowH - 9);
+      const fw = Math.floor(tw2 * clamp(v, 0, 1));
+      if (fw > 0) { g.fillStyle = T.accent; g.fillRect(tx, ry + 3, fw, rowH - 8); }
+      if (meio) {
+        g.strokeStyle = 'rgba(190, 200, 216, 0.8)';
+        g.beginPath(); g.moveTo(tx + Math.floor(tw2 / 2) + 0.5, ry + 4); g.lineTo(tx + Math.floor(tw2 / 2) + 0.5, ry + rowH - 6); g.stroke();
+      }
+      this.inspAlvos.push({ x: tx, y: ry, w: tw2, h: rowH - 2, acao, trilha: true });
+      ry += rowH;
+    };
+    if (temRel) {
+      const cr = { x: bx + pad, y: ry, w: bw - pad * 2, h: rowH - 2 };
+      g.strokeStyle = T.line; g.strokeRect(cr.x + 0.5, cr.y + 0.5, cr.w - 1, cr.h - 1);
+      g.fillStyle = this.escolhendo ? T.accent : T.textSecondary; g.font = fonte(9);
+      textoAjustado(g, 'COMP  ' + this.nomeModulo(c[i + 11]) + dot + this.nomePorta(c[i + 11], c[i + 12], true), cr.x + 4, cr.y, cr.w - 8, cr.h, 'esquerda');
+      this.inspAlvos.push({ ...cr, acao: { tipo: 'comp' } });
+      ry += rowH;
+      trilha('AMT', c[i + 10], { tipo: 'amt' }, false);
+    }
+    trilha('GAIN', c[i + 6] * 0.5, { tipo: 'ganho' }, true);
+    trilha('COND', c[i + 8], { tipo: 'cond' }, false);
+    const metade = Math.floor((bw - pad * 2 - 4) / 2);
+    botao(bx + pad, ry, metade, rowH - 2, c[i + 4] ? 'RECONECTAR' : 'ROMPER', !!c[i + 4], { tipo: 'romper' });
+    botao(bx + pad + metade + 4, ry, metade, rowH - 2, 'DESPLUGAR', false, { tipo: 'tirar' });
+  }
+
+  // um clique no inspetor; true = o clique era dele
+  cliqueInspetor(e) {
+    const r = this.cv.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const alvo = (this.inspAlvos || []).find((a) => x >= a.x && x < a.x + a.w && y >= a.y && y < a.y + a.h);
+    const cx = this.inspCaixa;
+    if (!alvo) {
+      if (cx && x >= cx.x && x < cx.x + cx.w && y >= cx.y && y < cx.y + cx.h) return true;
+      this.insp = null; this.escolhendo = false; this.redesenhar();
+      return false;                     // fora: fecha, e o clique segue
+    }
+    const i = this.caboInspecionado();
+    if (i < 0) return true;
+    const c = this.cabos, d = this.insp.d, pd = this.insp.pd, a = alvo.acao;
+    if (a.tipo === 'rel') {
+      if (a.r === 0) this.enviar({ tipo: 'caboRelacao', d, pd, rel: 0 });
+      else if (!c[i + 7]) {             // relação nova: companion = a própria origem, e escolher
+        this.enviar({ tipo: 'caboRelacao', d, pd, rel: a.r, cn: c[i], cp: c[i + 1], amt: 0.5 });
+        this.escolhendo = true;
+      } else this.enviar({ tipo: 'caboRelacao', d, pd, rel: a.r, cn: c[i + 11], cp: c[i + 12], amt: c[i + 10] });
+    } else if (a.tipo === 'comp') this.escolhendo = true;
+    else if (a.tipo === 'romper') this.enviar({ tipo: 'caboRomper', d, pd });
+    else if (a.tipo === 'tirar') { this.enviar({ tipo: 'cortarEntrada', d, pd }); this.insp = null; }
+    else if (alvo.trilha) {
+      this.cv.setPointerCapture(e.pointerId);
+      this.gesto = { tipo: 'trilha', acao: a.tipo, x0: alvo.x + r.left, w: alvo.w, comp: [c[i + 9], c[i + 11], c[i + 12]] };
+      this.trilha(e);
+    }
+    this.redesenhar();
+    return true;
+  }
+
+  // arrastando AMT / GAIN / COND (`applyCableSlider`)
+  trilha(e) {
+    const gs = this.gesto, d = this.insp?.d, pd = this.insp?.pd;
+    if (d === undefined) return;
+    const v = clamp((e.clientX - gs.x0) / Math.max(1, gs.w), 0, 1);
+    if (gs.acao === 'amt') this.enviar({ tipo: 'caboRelacao', d, pd, rel: gs.comp[0], cn: gs.comp[1], cp: gs.comp[2], amt: v });
+    else if (gs.acao === 'cond') this.enviar({ tipo: 'caboCondutancia', d, pd, v });
+    else this.enviar({ tipo: 'caboGanho', d, pd, v: v * 2 });
+  }
+
+  // Puxando um cabo (`paintWidget`/Jack + `paintCables` com `cdrag_`): os
+  // destinos de polaridade oposta acendem — anel duplo se o tipo de sinal
+  // casa, simples se cruza domínio; contínuo se o destino chega ao som,
+  // tracejado se ainda não. Os inválidos recuam.
+  desenharPuxada(g) {
+    const c = this.gesto;
+    const r = this.mmpx(2.4);
+    for (const [, j] of this.jacks) {
+      if (j.out === c.deSaida) {   // mesma polaridade: recua
+        g.strokeStyle = 'rgba(72, 80, 96, 0.55)'; g.lineWidth = 1.5;
+        g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
+        continue;
+      }
+      const forte = j.pk === c.pk;
+      const soa = !!this.porId.get(j.no)?.chega;
+      const hr = r + this.mmpx(forte ? 2.4 : 1.6);
+      const anel = (rad) => {
+        g.lineWidth = soa ? 1.8 : 1.2;
+        g.strokeStyle = soa ? T.accent : 'rgba(255, 157, 76, 0.55)';
+        g.setLineDash(soa ? [] : [3, 3]);
+        g.beginPath(); g.arc(j.x, j.y, rad, 0, 2 * Math.PI); g.stroke();
+      };
+      anel(hr);
+      if (forte) anel(hr + 2);
+      g.setLineDash([]);
+      if (soa) { g.fillStyle = 'rgba(255, 157, 76, 0.28)'; g.beginPath(); g.arc(j.x, j.y, r, 0, 2 * Math.PI); g.fill(); }
+      g.strokeStyle = T.accent; g.lineWidth = 1.5;
+      g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
+    }
+    const cor = c.pk === 1 ? CABO_CTRL[0] : CABO_AUDIO[0];
+    this.tracarCabo(g, c.ax, c.ay, this.mouse.x, this.mouse.y, cor, true);
   }
 
   pega() {
@@ -430,13 +725,196 @@ export class Rack {
     return clamp((v - w.min) / (w.max - w.min), 0, 1);
   }
 
+  // ---- a mão no instrumento (`RackView::mouseDown/Drag/Up`) -----------
+  ponto(e) {
+    const r = this.cv.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top + this.rolagem.scrollTop };
+  }
+
+  jackEm(p) {
+    const r = this.mmpx(3.2) + 2;
+    for (const [, j] of this.jacks) {
+      const dx = p.x - j.x, dy = p.y - j.y;
+      if (dx * dx + dy * dy <= r * r) return j;
+    }
+    return null;
+  }
+
+  moduloEm(p) {
+    for (const m of this.vistos)
+      if (p.x >= m.bx && p.x < m.bx + m.bw && p.y >= m.by && p.y < m.by + m.bh) return m;
+    return null;
+  }
+
+  // a área de toque de um controle (`ui::footprintMM`)
+  caixa(m, w) {
+    const lbl = w.l.length;
+    let r;
+    if (w.k === K.Knob) { const d = diamKnob(w); r = [w.x - 0.5, w.y - 1, d + 2, d + 7]; }
+    else if (w.k === K.Slider) r = [w.x - 1, w.y - 1, 10, 36];
+    else if (w.k === K.Toggle) r = w.s > 1 ? [w.x + 2 - w.s * 0.5 - 0.5, w.y - 0.5, Math.max(w.s, 4) + 1, 9] : [w.x - 0.5, w.y - 0.5, 5 + lbl * 1.7, 6];
+    else return null;
+    return { x: m.bx + this.mmpx(r[0]), y: m.by + this.mmpx(r[1]), w: this.mmpx(r[2]), h: this.mmpx(r[3]) };
+  }
+
+  dentro(p, c) { return c && p.x >= c.x && p.x < c.x + c.w && p.y >= c.y && p.y < c.y + c.h; }
+
+  // o knob/slider sob o ponto ou o mais perto até `tol` mm (`nearestControl`)
+  controlePerto(m, p, tol) {
+    let melhor = null, bestD = this.mmpx(tol) + 1;
+    for (const w of m.w) {
+      if ((w.k !== K.Knob && w.k !== K.Slider) || w.v === undefined) continue;
+      if (m.tipo === 'MATRIX' && celulaMatriz(w.b)) continue;
+      const c = this.caixa(m, w);
+      const d = Math.max(Math.max(c.x - p.x, 0, p.x - (c.x + c.w)), Math.max(c.y - p.y, 0, p.y - (c.y + c.h)));
+      if (d < bestD) { bestD = d; melhor = w; }
+    }
+    return melhor;
+  }
+
+  // o controle do ponto, para pegar: toggle, knob ou slider
+  controleEm(m, p) {
+    for (const w of m.w) {
+      if (w.v === undefined || (w.k !== K.Knob && w.k !== K.Slider && w.k !== K.Toggle)) continue;
+      if (m.tipo === 'MATRIX' && w.k === K.Knob && celulaMatriz(w.b)) continue;
+      if (this.dentro(p, this.caixa(m, w))) return w;
+    }
+    return this.controlePerto(m, p, 4);
+  }
+
+  baixa(e) {
+    if (e.button === 1) return;                  // o meio: o navegador rola
+    const p = this.ponto(e);
+    this.mouse = p;
+    // escolhendo o companion: o próximo clique numa saída o define
+    if (this.escolhendo) {
+      const j = this.jackEm(p), i = this.caboInspecionado();
+      if (j && j.out && i >= 0) {
+        const c = this.cabos;
+        this.enviar({ tipo: 'caboRelacao', d: this.insp.d, pd: this.insp.pd, rel: c[i + 9], cn: j.no, cp: j.p, amt: c[i + 10] });
+      }
+      this.escolhendo = false;
+      this.redesenhar();
+      return;
+    }
+    if (this.insp && e.button === 0 && this.cliqueInspetor(e)) return;
+    const j = this.jackEm(p);
+    if (j) {
+      if (e.button === 2) {                      // direito: corta
+        if (j.out) this.enviar({ tipo: 'cortarSaida', o: j.no, po: j.p });
+        else this.enviar({ tipo: 'cortarEntrada', d: j.no, pd: j.p });
+        return;
+      }
+      this.cv.setPointerCapture(e.pointerId);
+      // entrada com cabo: puxa o cabo dali, a partir da origem dele
+      if (!j.out && this.cabos) {
+        const c = this.cabos;
+        for (let i = 0; i + 13 < c.length; i += 14)
+          if (c[i + 2] === j.no && c[i + 3] === j.p) {
+            const s = this.jacks.get(`${c[i]}:${c[i + 1]}:1`);
+            this.enviar({ tipo: 'cortarEntrada', d: j.no, pd: j.p });
+            this.gesto = { tipo: 'cabo', no: c[i], p: c[i + 1], deSaida: true, pk: s ? s.pk : 0,
+                           ax: s ? s.x : p.x, ay: s ? s.y : p.y };
+            this.enviar({ tipo: 'mao', ativa: true });
+            this.redesenhar();
+            return;
+          }
+      }
+      this.gesto = { tipo: 'cabo', no: j.no, p: j.p, deSaida: !!j.out, pk: j.pk, ax: j.x, ay: j.y };
+      this.enviar({ tipo: 'mao', ativa: true });
+      this.redesenhar();
+      return;
+    }
+    if (e.button !== 0) return;
+    const m = this.moduloEm(p);
+    const w = m && this.controleEm(m, p);
+    if (!w) {
+      // um clique (sem arrastar) num cabo abre o inspetor dele
+      const k = this.caboEm(p);
+      if (k >= 0) this.gesto = { tipo: 'clique-cabo', k, x0: e.clientX, y0: e.clientY };
+      return;
+    }
+    if (w.k === K.Toggle) {
+      this.enviar({ tipo: 'alterna', i: w.v });
+      if (this.valores) { this.valores[w.v] = this.valores[w.v] >= 0.5 ? 0 : 1; this.redesenhar(); }
+      return;
+    }
+    this.cv.setPointerCapture(e.pointerId);
+    this.gesto = { tipo: 'controle', w, y0: e.clientY };
+    this.enviar({ tipo: 'pega', i: w.v });
+  }
+
+  move(e) {
+    const p = this.ponto(e);
+    this.mouse = p;
+    const gs = this.gesto;
+    if (gs?.tipo === 'controle') {
+      this.enviar({ tipo: 'arrasto', i: gs.w.v, dy: (gs.y0 - e.clientY) / 220, lo: gs.w.min, hi: gs.w.max });
+      return;
+    }
+    if (gs?.tipo === 'cabo') { this.redesenhar(); return; }
+    if (gs?.tipo === 'trilha') { this.trilha(e); return; }
+    if (gs?.tipo === 'clique-cabo') {
+      if (Math.hypot(e.clientX - gs.x0, e.clientY - gs.y0) > 6) this.gesto = null;
+      return;
+    }
+    // o cursor diz o que dá para pegar; fora de controle, o cabo acende
+    let pega = !!this.jackEm(p);
+    if (!pega) { const m = this.moduloEm(p); pega = !!(m && this.controleEm(m, p)); }
+    const sob = pega ? -1 : this.caboEm(p);
+    if (sob !== this.sobCabo) { this.sobCabo = sob; this.redesenhar(); }
+    this.cv.style.cursor = pega || sob >= 0 ? 'pointer' : 'default';
+  }
+
+  sobe(e) {
+    const gs = this.gesto;
+    this.gesto = null;
+    if (!gs) return;
+    if (gs.tipo === 'controle') { this.enviar({ tipo: 'solta' }); return; }
+    if (gs.tipo === 'trilha') return;
+    if (gs.tipo === 'clique-cabo') {
+      const c = this.cabos;
+      for (const v of this.cabosVisiveis())
+        if (v.k === gs.k) this.insp = { d: c[v.i + 2], pd: c[v.i + 3] };
+      this.redesenhar();
+      return;
+    }
+    this.enviar({ tipo: 'mao', ativa: false });
+    const j = this.jackEm(this.ponto(e));
+    if (j && !!j.out !== gs.deSaida) {
+      const [o, po, d, pd] = gs.deSaida ? [gs.no, gs.p, j.no, j.p] : [j.no, j.p, gs.no, gs.p];
+      this.enviar({ tipo: 'ligar', o, po, d, pd });
+      if (!this.porId.get(d)?.chega)
+        this.aviso('Ligado — mas este caminho ainda não chega ao som. Siga cabeando até o MASTER pra ouvir.');
+    }
+    this.redesenhar();
+  }
+
+  cancela() {
+    if (this.gesto?.tipo === 'controle') this.enviar({ tipo: 'solta' });
+    else if (this.gesto) this.enviar({ tipo: 'mao', ativa: false });
+    this.gesto = null;
+    this.redesenhar();
+  }
+
+  // a roda sobre um knob/slider gira o controle; fora dele, rola o rack
+  roda(e) {
+    if (!e.deltaY) return;
+    const p = this.ponto(e);
+    const m = this.moduloEm(p);
+    const w = m && this.controlePerto(m, p, 2);
+    if (!w) return;
+    e.preventDefault();
+    this.enviar({ tipo: 'roda', i: w.v, dir: e.deltaY < 0 ? 1 : -1, fino: e.shiftKey, lo: w.min, hi: w.max });
+  }
+
   // ---- cabos (`paintCables` + `strokeCable`) --------------------------
   // `fixos`: true = só os cabos de condução 1 (a camada guardada), false =
   // só os que piscam (redesenhados a cada quadro)
   desenharCabos(g, topo, vh, fixos) {
     const c = this.cabos;
     if (!c) return;
-    for (let i = 0; i + 8 < c.length; i += 9) {
+    for (let i = 0; i + 13 < c.length; i += 14) {
       const [sn, sp, tn, tp, rompido, conduz, ganho, , condut] = c.subarray(i, i + 9);
       if ((condut >= 1) !== fixos) continue;
       const s = this.jacks.get(`${sn}:${sp}:1`), t = this.jacks.get(`${tn}:${tp}:0`);
@@ -457,7 +935,7 @@ export class Rack {
     const c = this.cabos;
     if (!c) return '';
     let k = '';
-    for (let i = 0; i + 8 < c.length; i += 9)
+    for (let i = 0; i + 13 < c.length; i += 14)
       if (c[i + 8] >= 1) k += `${c[i]},${c[i + 1]},${c[i + 2]},${c[i + 3]},${c[i + 4]},${c[i + 6]};`;
     return k;
   }

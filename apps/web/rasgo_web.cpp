@@ -17,7 +17,18 @@
 //                           rw_texto_tamanho()
 //   rw_valores()            o valor atual de cada controle do JSON, na
 //                           mesma ordem (Float32)
-//   rw_cabos_estado()       os cabos agora: 9 números por cabo (Float32)
+//   rw_cabos_estado()       os cabos agora: 14 números por cabo (Float32)
+//   rw_cabo_*(d, pd, …)     o inspetor do cabo que chega em (d, pd):
+//                           relação, condutância, ganho, romper/reconectar
+//   rw_param(i, v)          o músico gira o controle i (base do parâmetro,
+//                           como `setParameterBase` no app)
+//   rw_param_usuario(i)     o valor do músico no controle i, sem modulação
+//   rw_ligar(o, po, d, pd)  um cabo, como `tryPatch` no app (laço vira
+//                           realimentação); devolve 1 se mudou o patch
+//   rw_cortar_entrada(d, p) tira o cabo que chega numa entrada
+//   rw_cortar_saida(o, p)   tira todos os cabos que saem de uma saída
+//   rw_mao(ativa)           o músico está com a mão num controle: o VARIA
+//                           não disputa (como `interacting()` no app)
 //   rw_varia(ligado, int.)  o VARIA (a mão caótica, `MotionEngine`): ligado
 //                           por padrão, intensidade 0–2 (1 = a do app)
 //
@@ -44,6 +55,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -65,6 +77,7 @@ rasgo::panel::MotionEngine g_mao;
 rasgo::modular::LoudnessMeter g_lufs;
 std::vector<rasgo::modular::Master*> g_masters;
 bool g_varia = true;
+bool g_musico = false;   // o músico mexendo: a mão do VARIA espera
 int g_blocosPorPasso = 12;   // ~1/30 s em blocos de 128
 int g_blocos = 0, g_passos = 0;
 
@@ -270,7 +283,7 @@ float* rw_processar() {
         g_lufs.push(l, r);
         s2 += static_cast<double>(l) * l + static_cast<double>(r) * r;
     }
-    if (g_varia && ++g_blocos >= g_blocosPorPasso) {
+    if (g_varia && !g_musico && ++g_blocos >= g_blocosPorPasso) {
         g_blocos = 0;
         if (++g_passos >= 30) { g_passos = 0; g_mao.refreshCables(*g_grafo); }
         const float rms = static_cast<float>(std::sqrt(s2 / (2.0 * kQuantum)));
@@ -310,8 +323,9 @@ float* rw_valores() {
     return g_valores.data();
 }
 
-// por cabo (9 números): origem, porta, destino, porta, rompido, conduzindo
-// agora, ganho, tem relação, condutância
+// por cabo (14 números): origem, porta, destino, porta, rompido, conduzindo
+// agora, ganho, tem relação, condutância, relação (0 nenhuma, 1 ring, 2 fold,
+// 3 diferença), quantidade, companion (nó, porta), realimentação
 __attribute__((used, visibility("default")))
 float* rw_cabos_estado() {
     g_cabos.clear();
@@ -327,9 +341,133 @@ float* rw_cabos_estado() {
         g_cabos.push_back(c.gain());
         g_cabos.push_back(c.hasRelation() ? 1.0f : 0.0f);
         g_cabos.push_back(c.conductance());
+        g_cabos.push_back(static_cast<float>(static_cast<int>(c.relation())));
+        g_cabos.push_back(c.relationAmount());
+        g_cabos.push_back(static_cast<float>(c.companion().node));
+        g_cabos.push_back(static_cast<float>(c.companion().port));
+        g_cabos.push_back(c.isFeedback() ? 1.0f : 0.0f);
     }
     return g_cabos.data();
 }
+
+__attribute__((used, visibility("default")))
+void rw_param(int i, float v) {
+    if (!g_grafo || i < 0 || static_cast<std::size_t>(i) >= g_controles.size()) return;
+    try { g_grafo->setParameterBase(g_controles[i].no, g_controles[i].bind, v); } catch (...) {}
+}
+
+__attribute__((used, visibility("default")))
+float rw_param_usuario(int i) {
+    if (!g_grafo || i < 0 || static_cast<std::size_t>(i) >= g_controles.size()) return 0.0f;
+    try { return g_grafo->parameterUserValue(g_controles[i].no, g_controles[i].bind); }
+    catch (...) { return 0.0f; }
+}
+
+// depois de mexer nos cabos: o grafo se prepara de novo (como `reprepare`
+// no app), a mão do VARIA relê os cabos e a descrição do rack é refeita
+// (quem chega à saída, cópias de voz que passaram a ter cabo)
+void depoisDosCabos() {
+    g_grafo->prepare(g_taxa, 2, kQuantum);
+    g_grafo->setActiveOutput(g_saida);
+    g_mao.refreshCables(*g_grafo);
+    descrever();
+}
+
+__attribute__((used, visibility("default")))
+int rw_ligar(int o, int po, int d, int pd) {
+    if (!g_grafo || o < 0 || d < 0) return 0;
+    const auto s = static_cast<std::size_t>(o), sp = static_cast<std::size_t>(po);
+    const auto t = static_cast<std::size_t>(d), tp = static_cast<std::size_t>(pd);
+    if (s >= g_grafo->nodeCount() || t >= g_grafo->nodeCount()) return 0;
+    // como `tryPatch`: o laço só aparece no `prepare`, que por isso fica
+    // dentro do mesmo try — um ciclo vira ligação de realimentação
+    auto preparar = [] { g_grafo->prepare(g_taxa, 2, kQuantum); };
+    try { g_grafo->disconnect(t, tp); } catch (...) {}
+    try {
+        g_grafo->connect(s, sp, t, tp);
+        preparar();
+    } catch (const std::logic_error&) {            // ciclo: realimentação
+        try { g_grafo->disconnect(t, tp); } catch (...) {}
+        try { g_grafo->connect(s, sp, t, tp, /*feedback=*/true); preparar(); }
+        catch (...) { try { g_grafo->disconnect(t, tp); } catch (...) {} }
+    } catch (...) {
+        try { g_grafo->disconnect(t, tp); } catch (...) {}
+    }
+    depoisDosCabos();
+    return 1;
+}
+
+__attribute__((used, visibility("default")))
+int rw_cortar_entrada(int d, int pd) {
+    if (!g_grafo || d < 0 || static_cast<std::size_t>(d) >= g_grafo->nodeCount()) return 0;
+    bool mudou = false;
+    try { mudou = g_grafo->disconnect(static_cast<std::size_t>(d), static_cast<std::size_t>(pd)); } catch (...) {}
+    if (mudou) depoisDosCabos();
+    return mudou ? 1 : 0;
+}
+
+__attribute__((used, visibility("default")))
+int rw_cortar_saida(int o, int po) {
+    if (!g_grafo || o < 0) return 0;
+    bool mudou = false;
+    for (std::size_t i = g_grafo->cableCount(); i-- > 0;) {
+        const auto& c = g_grafo->cable(i);
+        if (c.target().node == g_saida) continue;   // a ligação ao sink fica
+        if (c.source().node == static_cast<std::size_t>(o)
+            && c.source().port == static_cast<std::size_t>(po)) {
+            const auto t = c.target();
+            g_grafo->disconnect(t.node, t.port);
+            mudou = true;
+        }
+    }
+    if (mudou) depoisDosCabos();
+    return mudou ? 1 : 0;
+}
+
+// o cabo que chega numa entrada (cada entrada aceita um só): é assim que o
+// app identifica o cabo do inspetor, estável entre ligações e cortes
+rasgo::modular::Cable* caboEm(int d, int pd) {
+    if (!g_grafo) return nullptr;
+    for (std::size_t i = 0; i < g_grafo->cableCount(); ++i) {
+        auto& c = g_grafo->cable(i);
+        if (static_cast<int>(c.target().node) == d && static_cast<int>(c.target().port) == pd) return &c;
+    }
+    return nullptr;
+}
+
+// relação: 0 nenhuma, 1 ring, 2 fold, 3 diferença; companion = uma saída
+__attribute__((used, visibility("default")))
+void rw_cabo_relacao(int d, int pd, int rel, int cn, int cp, float amt) {
+    auto* c = caboEm(d, pd);
+    if (!c || rel < 0 || rel > 3) return;
+    try {
+        if (rel == 0) c->setRelation(rasgo::modular::Relation{}, 0, 0, 0.0f);
+        else c->setRelation(static_cast<rasgo::modular::Relation>(rel),
+                            static_cast<std::size_t>(cn), static_cast<std::size_t>(cp),
+                            std::clamp(amt, 0.0f, 1.0f));
+    } catch (...) {}
+}
+
+__attribute__((used, visibility("default")))
+void rw_cabo_condutancia(int d, int pd, float v) {
+    if (auto* c = caboEm(d, pd)) c->setConductance(std::clamp(v, 0.0f, 1.0f));
+}
+
+__attribute__((used, visibility("default")))
+void rw_cabo_ganho(int d, int pd, float v) {
+    if (auto* c = caboEm(d, pd)) c->setGain(std::clamp(v, 0.0f, 2.0f));
+}
+
+__attribute__((used, visibility("default")))
+void rw_cabo_romper(int d, int pd) {
+    auto* c = caboEm(d, pd);
+    if (!c) return;
+    if (c->state() == rasgo::modular::CableState::Ruptured) c->reconnect();
+    else c->rupture();
+}
+
+__attribute__((used, visibility("default")))
+void rw_mao(int ativa) { g_musico = ativa != 0; }
 
 __attribute__((used, visibility("default")))
 void rw_varia(int ligado, float intensidade) {

@@ -79,9 +79,12 @@ async function ligar() {
         $('parar').disabled = false; $('tocar').classList.add('on');
         rack.carregar(m.texto, m.wordmark);
       }
+      if (m.tipo === 'rack') { estado(`Seed ${$('seed').value} · ${m.cabos} cabos · ${ctx.sampleRate} Hz`); rack.carregar(m.texto, m.wordmark, true); }
       if (m.tipo === 'quadro') rack.quadro(m.valores, m.cabos);
     };
     no.port.postMessage({ tipo: 'wasm', bytes });
+    rack.enviar = (msg) => no.port.postMessage(msg);
+    rack.aviso = (t) => estado(t);
   });
   no.port.postMessage({ tipo: 'ganho', valor: Number($('volume').value) });
   enviarVaria();
@@ -107,10 +110,19 @@ async function previa() {
   const texto = dec.decode(new Uint8Array(mem.buffer, e.rw_descrever(), e.rw_texto_tamanho()).slice());
   const wp = e.rw_wordmark(), b = new Uint8Array(mem.buffer); let fim = wp; while (b[fim]) fim++;
   rack.carregar(texto, dec.decode(b.slice(wp, fim)));
+  // `?insp=N`: abre o inspetor do cabo N; com `&rel`, liga nele uma relação
+  // RING (companion = a origem do cabo seguinte), para ver o selo
+  if (q.has('insp')) {
+    const n = Number(q.get('insp')) || 0;
+    const c = new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice();
+    const d = c[n * 14 + 2], pd = c[n * 14 + 3];
+    if (q.has('rel')) e.rw_cabo_relacao(d, pd, 1, c[(n + 1) * 14], c[(n + 1) * 14 + 1], 0.6);
+    rack.insp = { d, pd };
+  }
   for (let i = 0; i < seg * 48000 / 128; i++) e.rw_processar();
   const nc = e.rw_num_controles();
   rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
-              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 9).slice());
+              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice());
   estado(`Prévia sem som · seed ${s} · ${rack.vistos.length}/${rack.mods.length} mód · ${e.rw_cabos()} cabos · ${seg} s`);
   if (q.has('medir')) {   // custo de um quadro (camada fixa já pronta)
     rack.desenhar();
