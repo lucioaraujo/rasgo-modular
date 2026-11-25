@@ -521,7 +521,6 @@ async function acao(a) {
   if (a === 'zoomMenos' || a === 'zoomMais' || a === 'zoom0') { rack.mudarZoom(a === 'zoom0' ? 0 : a === 'zoomMais' ? 1 : -1); return; }
   if (a === 'vista') {
     rack.vistaSaida(!rack.soSaida); syncCabecalho();
-    guardar('vista', rack.soSaida ? 'saida' : 'todos');
     aviso(W(rack.soSaida ? 'vistaSaida' : 'vistaTodos') + `${rack.vistos.length}/${rack.mods.length}`);
     return;
   }
@@ -563,6 +562,9 @@ async function acao(a) {
     if (no) no.port.postMessage({ tipo: 'espera', ligada: est.espera });
     return;
   }
+  // toda seed abre em RACK · SAÍDA (autor, 26/11/2026: "que o seed abra em
+  // rack output por padrão"); durante o uso o RACK alterna à vontade
+  if (a === 'seed' || a === 'repor') { rack.vistaSaida(true); syncCabecalho(); }
   if (a === 'seed') {
     const s = novaSeed();
     $('seed').value = s;
@@ -709,6 +711,7 @@ $('seed').addEventListener('keydown', (ev) => {
     const s = seedValida();
     if (!s) { aviso(W('seedInvalida')); return; }
     $('seed').blur();
+    rack.vistaSaida(true); syncCabecalho();
     if (!no) tocar(); else no.port.postMessage({ tipo: 'seed', seed: s });
   } else if (ev.key === 'Escape') { $('seed').value = est.seed; $('seed').blur(); }
 });
@@ -1200,7 +1203,7 @@ async function previa() {
 
 // a vista abre em RACK · SAÍDA (autor, 26/11/2026: "que o seed abra em rack
 // output por padrão"); a escolha de quem toca fica guardada
-rack.vistaSaida(!q.has('todos') && (q.has('saida') || (ler('vista') ?? 'saida') === 'saida'));
+rack.vistaSaida(!q.has('todos'));
 aplicarLeitura();
 syncCabecalho();
 </script>

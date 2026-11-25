@@ -4178,15 +4178,30 @@ private:
         dw = std::min(dw, m.bounds.getWidth() - mmpx(w.x) - mmpx(2.0f));
         const int dh = mmpx(w.height);
         const juce::Rectangle<int> box(wx, wy, dw, dh);
+        // visor redondo (ui::roundDisplay): o círculo inscrito, centrado
+        const bool redondo = ui::roundDisplay(node.type());
+        const int dd = std::min(dw, dh);
+        const juce::Rectangle<float> roda(static_cast<float>(wx + (dw - dd) / 2),
+                                          static_cast<float>(wy + (dh - dd) / 2),
+                                          static_cast<float>(dd), static_cast<float>(dd));
         if (staticPass) {      // só a moldura; o conteúdo anima
             g.setColour(T.recessed);
-            g.fillRect(box);
+            if (redondo) g.fillEllipse(roda); else g.fillRect(box);
             g.setColour(T.line);
-            g.drawRect(box, 1);
+            if (redondo) g.drawEllipse(roda.reduced(0.5f), 1.0f); else g.drawRect(box, 1);
             return;
         }
+        std::optional<juce::Graphics::ScopedSaveState> recorte;
         g.setColour(T.recessed);
-        g.fillRect(box.reduced(1));
+        if (redondo) {
+            g.fillEllipse(roda.reduced(1.0f));
+            juce::Path circulo;
+            circulo.addEllipse(roda.reduced(1.0f));
+            recorte.emplace(g);
+            g.reduceClipRegion(circulo);
+        } else {
+            g.fillRect(box.reduced(1));
+        }
 
         const std::string mtype = node.type();
         // o traço na cor da família do módulo, a mesma da faixa (visual novo,
@@ -5361,6 +5376,7 @@ public:
             rack_.applySeed(seed_, sampleRate_, blockSize_);
             rack_.populateMotion();
             view_->resetForPatch();   // ver a nota em onSeedTyped
+            view_->setOutputOnly(true);   // toda seed abre em RACK · SAÍDA (autor, 26/11)
             view_->refresh();
             syncHeader();
         };
@@ -5525,6 +5541,7 @@ public:
             // autor, 11/11/2026: "não era pra aparecer módulos descabeados
             // no seed".
             view_->resetForPatch();
+            view_->setOutputOnly(true);   // toda seed abre em RACK · SAÍDA (autor, 26/11)
             view_->refresh();
             syncHeader();
             grabKeyboardFocus();   // devolve o teclado aos atalhos
@@ -5546,6 +5563,7 @@ public:
             rack_.populateMotion();
             syncSignalIn();
             view_->resetForPatch();   // ver a nota em onSeedTyped
+            view_->setOutputOnly(true);   // toda seed abre em RACK · SAÍDA (autor, 26/11)
             view_->refresh();
             syncHeader();
             grabKeyboardFocus();
@@ -5645,7 +5663,9 @@ public:
                 rack_.starvedBlocks.load(std::memory_order_relaxed)};
         };
 
-        if (rackOutputPref_) view_->setOutputOnly(true);
+        // a seed abre em RACK · SAÍDA (autor, 26/11/2026); um patch aberto
+        // de arquivo ou sem cabos segue a vista guardada
+        if (rackOutputPref_ || startMode_ == rasgo::panel::StartMode::seed) view_->setOutputOnly(true);
         palette_.setLanguage(lang_);
         credits_.setLanguage(lang_);
         view_->setLanguage(lang_);
