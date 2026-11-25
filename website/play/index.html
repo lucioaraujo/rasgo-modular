@@ -259,6 +259,12 @@ const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
 const rack = new Rack($('rack'), $('rolagem'));
+// Antes de o som estar pronto, os gestos no rack (cabos, knobs) ficam numa
+// fila e são aplicados ao motor que toca logo depois da seed: sem isto, um
+// cabo feito antes do TOCAR, ou no instante em que o som carrega, sumia
+// (relato do autor, 26/11: "tento cabear e não cabeiam")
+const fila = [];
+rack.enviar = (msg) => fila.push(msg);
 // COMPACTO (a vista compacta dos painéis, src/ui/CompactPanel.hpp, a mesma
 // regra do app) e `?cabos=` (opacidade dos cabos, para comparar; o padrão é 0,5)
 let compacto = q.has('estreito') || (() => { try { return localStorage.getItem('rasgoModular.compacto') === '1'; } catch { return false; } })();
@@ -423,7 +429,7 @@ async function ligar() {
     n.port.postMessage({ tipo: 'wasm', bytes });
   });
   no = n;
-  rack.enviar = (msg) => no.port.postMessage(msg);
+  // (rack.enviar continua na fila até a seed ser montada: ver tocar1)
   // a lista dos visores na tela foi calculada antes de haver motor: reenviar
   rack.idsVisiveis = ''; rack.redesenhar();
   no.port.postMessage({ tipo: 'ganho', valor: est.volume });
@@ -487,6 +493,9 @@ async function tocar1() {
     no.port.postMessage({ tipo: 'seed', seed: s });
     if (modo === 'uncabled') no.port.postMessage({ tipo: 'descabear' });
   }
+  // o que se fez no rack enquanto o som carregava, na mesma ordem
+  for (const msg of fila.splice(0)) no.port.postMessage(msg);
+  rack.enviar = (msg) => no.port.postMessage(msg);
   est.avisoAte = 0; mostrarLearn();
   if (caiu && (ler('abre') === 'init' || ler('abre') === 'last')) aviso(tx('startNoteSafe'), 12000);
   syncCabecalho();
@@ -1155,6 +1164,13 @@ async function previa() {
   // `?banco`: abre o banco de escalas do QUANTIZER (captura de teste)
   if (q.has('banco')) { local = e; const qz = rack.mods.find((m) => m.tipo === 'QUANTIZER'); abrirBanco(qz.id, Math.round(e.rw_parametro(qz.id, 0))); }
   if (q.has('paletaTipo')) rack.paletaTipo = q.get('paletaTipo');
+  // `?puxar=TIPO.bind`: um cabo sendo puxado desse jack (captura dos halos)
+  if (q.has('puxar')) {
+    const [t, b] = q.get('puxar').split('.');
+    const md = rack.mods.find((m) => m.tipo === t), w = md?.w.find((x) => x.b === b);
+    const j = w && rack.jacks.get(`${md.id}:${w.p}:${w.out}`);
+    if (j) { rack.gesto = { tipo: 'cabo', no: j.no, p: j.p, deSaida: !!j.out, pk: j.pk, ax: j.x, ay: j.y }; rack.mouse = { x: j.x + 260, y: j.y + 160 }; }
+  }
   // `?learn=TIPO.bind` (ou só TIPO): mostra esse verbete na caixa
   if (q.has('learn')) {
     const [t, b] = q.get('learn').split('.');

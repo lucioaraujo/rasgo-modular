@@ -591,7 +591,7 @@ export class Rack {
     const c = this.gesto;
     const r = this.mmpx(2.4);
     for (const [, j] of this.jacks) {
-      if (j.out === c.deSaida) {   // mesma polaridade: recua
+      if (!!j.out === c.deSaida) {   // mesma polaridade: recua (j.out é 0/1, deSaida é booleano)
         g.strokeStyle = 'rgba(72, 80, 96, 0.55)'; g.lineWidth = 1.5;
         g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
         continue;
