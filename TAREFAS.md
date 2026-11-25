@@ -28,7 +28,29 @@ pelo `git log` e pela conversa.
 - Falta (autor): ouvir o protótipo no navegador (`bash apps/web/build.sh`,
   servir `.local-build/web` e abrir `http://localhost:8765`); testar o LV2
   no Ardour e no MOD Desktop; decidir o push e quando sai a próxima versão;
-  aparência e lugar do protótipo no site. VCV Library: aguardando resposta.
+  aparência e lugar do protótipo no site.
+- **Rack no navegador** (25/11, depois): F1–F3 feitas e commitadas (rack,
+  mão no instrumento, visores e MATRIX, cabeçalho, paleta, banco de
+  escalas); em curso a F4 (LEARN, TUTORIAL/SOBRE, idiomas, REC com teto de
+  4 min, lugar no site). Falta o teste do autor com o mouse (F2 e F3).
+  Plano e estado: dossiê `ESTUDO_outras_plataformas.md` §6.
+- **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
+  appears to have substantial functionality, it is not at the level of
+  human polish we require for plugins on the VCV Library." O Cardinal já
+  tinha recusado em 24/11 (código gerado por IA). O plugin segue distribuído
+  por conta própria (v2.0.0).
+- **Pedido do autor (25/11): uma frente de acabamento módulo a módulo, no
+  app e no plugin**, depois da F4 do navegador:
+  1. convenções de sinal conferidas em cada módulo: no plugin as do VCV
+     (±5 V, 0–10 V, 1 V/oct, gates de 10 V, polifonia, menu do botão
+     direito, presets, bypass); no app, a coerência das faixas do próprio
+     Rasgo (áudio, controle, gate, pitch);
+  2. documentação: uma página por módulo, com imagem e patch de exemplo
+     (serve ao site, ao PDF da fase didática e ao manual do plugin);
+  3. o "human": o que é visivelmente do autor — desenho e aprovação dos
+     painéis um a um, escuta, curadoria. Primeiro passo proposto: auditoria
+     do plugin contra os guias de painel e de plugin da VCV, módulo a
+     módulo, para virar lista concreta.
 
 ## ▶ Ponto de retomada — 23/11/2026: imagens de painel, tutorial, cópias de vozes
 
