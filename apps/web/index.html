@@ -512,6 +512,7 @@ async function acao(a) {
   if (a === 'zoomMenos' || a === 'zoomMais' || a === 'zoom0') { rack.mudarZoom(a === 'zoom0' ? 0 : a === 'zoomMais' ? 1 : -1); return; }
   if (a === 'vista') {
     rack.vistaSaida(!rack.soSaida); syncCabecalho();
+    guardar('vista', rack.soSaida ? 'saida' : 'todos');
     aviso(W(rack.soSaida ? 'vistaSaida' : 'vistaTodos') + `${rack.vistos.length}/${rack.mods.length}`);
     return;
   }
@@ -1177,7 +1178,9 @@ async function previa() {
   document.title += ' · pronto';
 }
 
-if (q.has('saida')) rack.vistaSaida(true);
+// a vista abre em RACK · SAÍDA (autor, 26/11/2026: "que o seed abra em rack
+// output por padrão"); a escolha de quem toca fica guardada
+rack.vistaSaida(!q.has('todos') && (q.has('saida') || (ler('vista') ?? 'saida') === 'saida'));
 aplicarLeitura();
 syncCabecalho();
 </script>

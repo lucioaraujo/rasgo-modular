@@ -7492,7 +7492,9 @@ private:
     float starve_ = 1.0f;
     int motionThrottle_ = 0;
     std::uint64_t lastSeed_ = 0;
-    bool rackOutputPref_ = false;
+    // RACK · SAÍDA por padrão (autor, 26/11/2026: "que o seed abra em rack
+    // output por padrão"); a escolha guardada em rack-view continua mandando
+    bool rackOutputPref_ = true;
     rasgo::panel::ReadingPreferences reading_;
     rasgo::panel::StartMode startMode_ = rasgo::panel::StartMode::seed;
     std::atomic<bool> signalIn_{false};   // há SIGNAL-IN/POLY-IN no patch?
