@@ -245,9 +245,9 @@ const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 let ctx = null, no = null, bytes = null, local = null;   // local: o motor na página (marca, catálogo, banco)
 const rack = new Rack($('rack'), $('rolagem'));
-// PROTÓTIPO para o autor comparar: `?estreito` (as regras de painel do
-// plugin VCV) e `?cabos=0.5` (a opacidade dos cabos; o VCV usa 0,5)
-rack.estreito = q.has('estreito') || ler('compacto') === '1';
+// COMPACTO (a vista compacta dos painéis, src/ui/CompactPanel.hpp, a mesma
+// regra do app) e `?cabos=` (opacidade dos cabos, para comparar; o padrão é 0,5)
+let compacto = q.has('estreito') || (() => { try { return localStorage.getItem('rasgoModular.compacto') === '1'; } catch { return false; } })();
 if (q.has('cabos')) rack.opacidade = Math.min(1, Math.max(0.1, Number(q.get('cabos')) || 1));
 rack.layout();
 
@@ -320,7 +320,7 @@ function syncCabecalho() {
   $('b-tocar').hidden = !!no;
   $('b-espera').classList.toggle('on', est.espera);
   $('b-vista').classList.toggle('on', rack.soSaida);
-  $('b-compacto').classList.toggle('on', rack.estreito);
+  $('b-compacto').classList.toggle('on', compacto);
   $('b-compacto').textContent = W('compacto');
   $('b-vista').textContent = 'RACK · ' + tx(rack.soSaida ? 'hdrRackOut' : 'hdrRackAll');
   trilho($('t-varia'), est.variaOn ? est.variaAmt * 0.5 : 0);
@@ -376,10 +376,11 @@ async function ligar() {
     n.port.onmessage = (ev) => {
       const m = ev.data;
       if (m.tipo === 'pronto') ok();
-      // seed nova, DESFAZ, REPOR, ABRIR: patch novo; 'rack': os cabos mudaram
-      if (m.tipo === 'seed' || m.tipo === 'patch' || m.tipo === 'rack') {
+      // seed nova, DESFAZ, REPOR, ABRIR: patch novo; 'rack': os cabos mudaram;
+      // 'redesenho': o mesmo patch com outra vista (o COMPACTO)
+      if (m.tipo === 'seed' || m.tipo === 'patch' || m.tipo === 'rack' || m.tipo === 'redesenho') {
         est.seed = m.seed; est.cabos = m.cabos;
-        rack.carregar(m.texto, m.wordmark, m.tipo === 'rack');
+        rack.carregar(m.texto, m.wordmark, m.tipo === 'redesenho' ? 'manter' : m.tipo === 'rack');
         // módulo novo: à vista na SAÍDA por exceção, até chegar ao som
         if (m.novo >= 0 && !rack.porId.get(m.novo)?.chega) { rack.pendentes.add(m.novo); rack.layout(); }
         syncCabecalho();
@@ -407,6 +408,7 @@ async function ligar() {
   // a lista dos visores na tela foi calculada antes de haver motor: reenviar
   rack.idsVisiveis = ''; rack.redesenhar();
   no.port.postMessage({ tipo: 'ganho', valor: est.volume });
+  if (compacto) no.port.postMessage({ tipo: 'compacto', ligado: true });
   enviarVaria();
   if (est.espera) no.port.postMessage({ tipo: 'espera', ligada: true });
 }
@@ -417,6 +419,7 @@ async function ligar() {
 function mostrarAntes() {
   const e = local;
   e.rw_iniciar(48000);
+  e.rw_compacto(compacto ? 1 : 0);
   const modo = ler('abre') || 'seed';
   const guardado = modo === 'init' ? ler('init') : modo === 'last' ? ler('sessao') : null;
   let aberto = false;
@@ -493,9 +496,10 @@ async function acao(a) {
   // COMPACTO: os painéis com as regras do plugin VCV (knobs em três
   // tamanhos, fileiras aproximadas, painel estreitado), à escolha de quem toca
   if (a === 'compacto') {
-    rack.estreito = !rack.estreito;
-    guardar('compacto', rack.estreito ? '1' : '0');
-    if (rack.textoAtual) rack.carregar(rack.textoAtual, null, 'manter');
+    compacto = !compacto;
+    guardar('compacto', compacto ? '1' : '0');
+    if (no) no.port.postMessage({ tipo: 'compacto', ligado: compacto });   // o motor que toca manda o rack
+    else if (local) { local.rw_compacto(compacto ? 1 : 0); mostrarAntes(); }
     syncCabecalho();
     return;
   }
@@ -936,6 +940,7 @@ async function previa() {
   const seg = Number(q.get('previa')) || 4;
   const e = await instanciar(), mem = e.memory;
   e.rw_iniciar(48000);
+  e.rw_compacto(compacto ? 1 : 0);
   const s = BigInt(seedValida() || '1');
   e.rw_seed(Number(s >> 32n), Number(s & 0xffffffffn));
   if (q.has('descabear')) e.rw_descabear();

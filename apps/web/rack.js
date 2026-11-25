@@ -54,86 +54,6 @@ function textoAjustado(g, txt, x, y, w, h, alinhar = 'centro') {
   g.restore();
 }
 
-// ---- PROTÓTIPO (25/11/2026, para o autor ver antes de decidir) ----------
-// As regras de painel que o autor aprovou para o plugin VCV em 24/11
-// (RASGO_MODULAR_VCV/src/Casca.hpp: `tamanhoKnob`, `aproximarFileiras`,
-// `estreitar`), aplicadas aqui só na hora de desenhar: knobs em três
-// tamanhos (o grande onde o módulo declara, o médio onde há 15 mm livres em
-// volta), fileiras muito espaçadas aproximadas e o painel estreitado sem
-// encolher nada. Os módulos e o app não mudam. Liga com `?estreito`.
-function centroW(w) {
-  let cx = w.x, cy = w.y;
-  if (w.k === K.Knob) { const d = diamKnob(w); cx += d / 2; cy += d / 2; }
-  else if (w.k === K.Slider) { cx += 3; cy += 15; }
-  else if (w.k === K.Toggle) { cx += 2; cy += 2; }
-  return [cx, cy];
-}
-function tamanhoKnob(m, w) {
-  if (w.s > 11) return 2;
-  const [cx, cy] = centroW(w), W = m.hp * MM_HP;
-  if (cx < 7 || cx > W - 7) return 0;
-  for (const o of m.w) {
-    if (o === w || o.k === K.Label) continue;
-    let [ox, oy] = centroW(o);
-    if (o.k === K.Display) { const dw = o.s > 1 ? o.s : 16; ox = clamp(cx, o.x, o.x + dw); oy = clamp(cy, o.y, o.y + o.h); }
-    if (Math.hypot(ox - cx, oy - cy) < 15) return 0;
-  }
-  return 1;
-}
-function remodelar(m) {
-  if (m.tipo === 'MATRIX') return;   // a grade de células tem geometria própria
-  const ws = m.w;
-  const tam = ws.map((w) => (w.k === K.Knob ? tamanhoKnob(m, w) : 0));
-  const larg = ws.map((w, i) => w.k === K.Knob ? [8, 10, 12.7][tam[i]] : w.k === K.Jack ? 8.4 : (w.k === K.Slider || w.k === K.Toggle) ? 6 : 0);
-  // o knob médio cresce em volta do próprio centro
-  ws.forEach((w, i) => { if (tam[i] === 1 && !(w.s > 1)) { w.s = 10; w.x -= 1; w.y -= 1; } });
-  const it = [];
-  ws.forEach((w, i) => {
-    if (w.k === K.Label || w.k === K.Display) return;
-    const [cx, cy] = centroW(w);
-    it.push({ w, cx, cy, meia: 0.5 * Math.max(larg[i], 1.55 * w.l.length + 1), jack: w.k === K.Jack });
-  });
-  const mover = (e, ncx) => { e.w.x += ncx - e.cx; e.cx = ncx; };
-  // aproximarFileiras: numa fileira com todos os vizinhos a mais de 18 mm
-  const feito = new Array(it.length).fill(false);
-  for (let a = 0; a < it.length; a++) {
-    if (feito[a]) continue;
-    const fila = [];
-    for (let b = 0; b < it.length; b++) if (!feito[b] && Math.abs(it[b].cy - it[a].cy) < 4) { fila.push(it[b]); feito[b] = true; }
-    if (fila.length < 2) continue;
-    fila.sort((x, y) => x.cx - y.cx);
-    let menor = 1e9;
-    for (let k = 1; k < fila.length; k++) menor = Math.min(menor, fila[k].cx - fila[k - 1].cx);
-    if (menor <= 18) continue;
-    const c = 0.5 * (fila[0].cx + fila.at(-1).cx), pos = [0];
-    for (let k = 1; k < fila.length; k++) pos.push(pos[k - 1] + Math.max(fila[k - 1].jack && fila[k].jack ? 10.16 : 12.7, fila[k - 1].meia + fila[k].meia + 1.5));
-    const meio = pos.at(-1) / 2;
-    fila.forEach((e, k) => mover(e, c - meio + pos[k]));
-  }
-  // estreitar: um fator único, até dois vizinhos ficarem a 1,5 mm
-  if (it.length < 2) return;
-  let s = 0;
-  for (let a = 0; a < it.length; a++)
-    for (let b = a + 1; b < it.length; b++) {
-      if (Math.abs(it[a].cy - it[b].cy) > 6) continue;
-      const dx = Math.abs(it[a].cx - it[b].cx);
-      if (dx >= 0.5) s = Math.max(s, (it[a].meia + it[b].meia + 1.5) / dx);
-    }
-  s = Math.min(1, Math.max(s, 0.3));
-  let xmin = 1e9, xmax = -1e9;
-  for (const e of it) { xmin = Math.min(xmin, e.cx - e.meia); xmax = Math.max(xmax, e.cx + e.meia); }
-  const conteudo = (xmax - xmin) * s;
-  const hp = Math.max(6, Math.ceil((conteudo + 6) / MM_HP), Math.min(m.hp, 7));
-  if (hp >= m.hp) return;
-  const W = hp * MM_HP, desloc = (W - conteudo) / 2;
-  for (const e of it) mover(e, desloc + (e.cx - xmin) * s);
-  for (const w of ws) {
-    if (w.k === K.Display) { w.x = 2.5; w.s = W - 5; }
-    else if (w.k === K.Label) w.x = Math.min(w.x, W - 4);
-  }
-  m.hp = hp;
-}
-
 export class Rack {
   constructor(canvas, rolagem) {
     this.cv = canvas;
@@ -169,7 +89,6 @@ export class Rack {
     this.ultimaOrdem = 0;
     this.opacidade = 0.5;         // dos cabos: 50%, como o VCV (autor, 25/11; `ui::kCableOpacity` no app)
     this.silenciado = false;      // ESPERA: os cabos esmaecem (32%), como no app
-    this.estreito = false;        // PROTÓTIPO: as regras de painel do plugin VCV
     addEventListener('resize', () => this.layout());
     rolagem.addEventListener('scroll', () => this.redesenhar(), { passive: true });
     canvas.addEventListener('pointerdown', (e) => this.baixa(e));
@@ -206,9 +125,7 @@ export class Rack {
     this.mods = r.modulos.map((m) => {
       const w = m.w.map((x) => ({ ...x }));
       if (m.inst > 0 && w.length && w[0].k === K.Label) w[0].l += ' ' + m.inst;
-      const mod = { ...m, w, cromo: null };
-      if (this.estreito) remodelar(mod);
-      return mod;
+      return { ...m, w, cromo: null };
     });
     if (wordmark) this.marca = new Path2D(wordmark);
     for (const m of this.mods) if (m.chega) this.pendentes.delete(m.id);

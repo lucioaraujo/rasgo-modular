@@ -173,6 +173,9 @@ class RasgoProcessor extends AudioWorkletProcessor {
       this.e.rw_escolher_escala(m.id, m.banco);
     } else if (m.tipo === 'lerBanco' && this.e) {
       this.port.postMessage({ tipo: 'bancoAtual', id: m.id, banco: this.e.rw_parametro(m.id, this.texto('bank')) });
+    } else if (m.tipo === 'compacto' && this.e) {
+      this.e.rw_compacto(m.ligado ? 1 : 0);
+      this.mandarRack('redesenho');
     } else if (m.tipo === 'lingua' && this.e) {
       this.e.rw_lingua(m.l);
     } else if (m.tipo === 'learnAlvo') {

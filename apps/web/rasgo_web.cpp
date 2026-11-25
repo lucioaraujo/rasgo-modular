@@ -57,6 +57,7 @@
 #include "panel/SeedBalance.hpp"
 #include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
+#include "ui/CompactPanel.hpp"
 #include "ui/ScopeTrace.hpp"
 
 #include <cmath>
@@ -122,6 +123,7 @@ std::string g_nomeEscala;
 // dos módulos no rack (vazia = a de fábrica), a pilha do DESFAZ (fotos em
 // texto, como `Rack::snapshot`), a ESPERA e o texto de SALVA/ABRIR
 std::uint64_t g_seedAtual = 0;
+bool g_compacto = false;   // a vista COMPACTA (src/ui/CompactPanel.hpp), como no app
 std::vector<std::size_t> g_ordem;
 std::vector<std::size_t> g_shown;                  // a última ordem mostrada
 constexpr std::size_t kUndo = 24;                  // `kUndoDepth` do app
@@ -225,7 +227,8 @@ void descrever() {
     bool primeiro = true;
     for (const std::size_t id : shown) {
         Signal& n = g.node(id);
-        const rasgo::modular::Panel p = n.panel();
+        rasgo::modular::Panel p = n.panel();
+        if (g_compacto) rasgo::ui::compactPanel(p, n.type());
         if (!primeiro) o += ',';
         primeiro = false;
         o += "{\"id\":" + std::to_string(id) + ",\"tipo\":";
@@ -581,6 +584,13 @@ void rw_descabear() {
     g_grafo->setActiveOutput(g_saida);
     rehabitar();
     descrever();
+}
+
+// COMPACTO: a vista compacta dos painéis (a mesma regra do app)
+__attribute__((used, visibility("default")))
+void rw_compacto(int ligado) {
+    g_compacto = ligado != 0;
+    if (g_grafo) descrever();
 }
 
 // [espaço]: rompe e reata todos os cabos de uma vez (`toggleRupture`)
