@@ -89,7 +89,18 @@ export class Rack {
     this.ultimaOrdem = 0;
     this.opacidade = 0.5;         // dos cabos: 50%, como o VCV (autor, 25/11; `ui::kCableOpacity` no app)
     this.silenciado = false;      // ESPERA: os cabos esmaecem (32%), como no app
+    // a área do rack muda de altura sem a janela mudar (o cabeçalho quebra em
+    // duas linhas quando os textos da língua entram, o REC aparece…): medir
+    // de novo, senão a base da última fileira fica cortada (relato do autor,
+    // 26/11)
     addEventListener('resize', () => this.layout());
+    if (typeof ResizeObserver !== 'undefined') {
+      let medida = '';
+      new ResizeObserver(() => {
+        const m = `${rolagem.clientWidth}x${rolagem.clientHeight}`;
+        if (m !== medida) { medida = m; requestAnimationFrame(() => this.layout()); }   // no quadro seguinte: sem laço
+      }).observe(rolagem);
+    }
     rolagem.addEventListener('scroll', () => this.redesenhar(), { passive: true });
     canvas.addEventListener('pointerdown', (e) => this.baixa(e));
     canvas.addEventListener('pointermove', (e) => this.move(e));
@@ -264,7 +275,10 @@ export class Rack {
         const wx = m.bx + this.mmpx(w.x), wy = m.by + this.mmpx(w.y);
         if (m.tipo === 'MASTER' && v && v[VISOR - 16] > 0.05) this.clipAte.set(m.id, agora + 2000);
         g.save();
-        g.beginPath(); g.rect(wx + 1, wy + 1, dw - 2, this.mmpx(w.h) - 2); g.clip();
+        g.beginPath();
+        if (w.rd) g.arc(wx + dw / 2, wy + this.mmpx(w.h) / 2, Math.min(dw, this.mmpx(w.h)) / 2 - 1, 0, 2 * Math.PI);
+        else g.rect(wx + 1, wy + 1, dw - 2, this.mmpx(w.h) - 2);
+        g.clip();
         desenharVisor(g, { T, wx, wy, dw, dh: this.mmpx(w.h), tipo: m.tipo, v, rotulo: w.l,
           traco: !m.familia || m.familia === 'OUT' ? T.prata : corFamilia(m.familia),
           espectro: this.espectro.has(m.id), clip: (this.clipAte.get(m.id) || 0) > agora,
@@ -814,6 +828,12 @@ export class Rack {
         let dw = this.mmpx(w.s > 1 ? w.s : 16);
         dw = Math.min(dw, m.bw - this.mmpx(w.x) - this.mmpx(2));
         const dh = this.mmpx(w.h);
+        if (w.rd) {   // visor redondo (`ui::roundDisplay`): o círculo inscrito
+          const d = Math.min(dw, dh);
+          g.fillStyle = T.recessed; g.beginPath(); g.arc(wx + dw / 2, wy + dh / 2, d / 2, 0, 2 * Math.PI); g.fill();
+          g.strokeStyle = T.line; g.lineWidth = 1; g.beginPath(); g.arc(wx + dw / 2, wy + dh / 2, d / 2 - 0.5, 0, 2 * Math.PI); g.stroke();
+          break;
+        }
         g.fillStyle = T.recessed; g.fillRect(wx, wy, dw, dh);
         g.strokeStyle = T.line; g.lineWidth = 1; g.strokeRect(wx + 0.5, wy + 0.5, dw - 1, dh - 1);
         break;
