@@ -201,7 +201,10 @@ Plano em quatro lotes, cada um com imagens para o autor antes do seguinte:
      código do app (`writeWav24`, `DeliveryMaster`, em
      `apps/web/rasgo_rec.cpp`), montados na página e baixados: `rec-…wav`,
      `.streaming.wav` + `.txt`, `.score.txt`, `.mid`. Nada sai do navegador.
-     Conferido no Node (`teste_rec.mjs`) e no Firefox sem janela.
+     Conferido no Node (`teste_rec.mjs`) e no Firefox sem janela. Onde ficam: na
+     pasta de downloads de cada pessoa (decisão do autor, 26/11: "a gravação
+     pode ficar no downloads de cada usuário"); no app, em
+     `~/Music/RasgoModular`.
    - **Conferência completa app → página** (25/11, pedido do autor): o que
      faltava entrou — microfone e MIDI no SIGNAL-IN (e MIDI no POLY-IN), com
      a regra do app (só com o ON ligado e uma saída cabeada; o navegador pede
