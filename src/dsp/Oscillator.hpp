@@ -101,29 +101,33 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026: "variar as ideias de
+        // distribuição de acordo com o módulo", "o layout pode trazer algo
+        // do conceito"): o knob herói (14 mm) no centro, a afinação
+        // nos dois lados dele; as formas de onda saem embaixo, lado a lado.
         p.hp = 12;
         p.add(Widget::Kind::Label, "OSC", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 21.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "PW", "pw", 35.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FM", "fm_amount", 49.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 7.0f, 52.0f);
-        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 35.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "PROX", "prox", 49.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "PD", "pd", 7.0f, 72.0f);
-        p.add(Widget::Kind::Knob, "UNI", "unison", 21.0f, 72.0f);
-        p.add(Widget::Kind::Knob, "SUBD", "sub_div", 35.0f, 72.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 5.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 17.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "PWM", "in:pwm", 29.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 41.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SUBD", "in:sub_cv", 53.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SIN", "out:sine", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "TRI", "out:tri", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SAW", "out:saw", 29.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PLS", "out:pulse", 41.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SUB", "out:sub", 53.0f, 116.0f);
+        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "FM", "fm_amount", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "PW", "pw", 5.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 19.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "PROX", "prox", 33.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "PD", "pd", 47.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "UNI", "unison", 12.48f, 66.0f);
+        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 28.48f, 69.0f);
+        p.add(Widget::Kind::Knob, "SUBD", "sub_div", 40.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 6.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 18.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "PWM", "in:pwm", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 42.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "SUBD", "in:sub_cv", 54.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "SIN", "out:sine", 6.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "TRI", "out:tri", 18.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "SAW", "out:saw", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "PLS", "out:pulse", 42.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "SUB", "out:sub", 54.48f, 110.0f);
         return p;
     }
 

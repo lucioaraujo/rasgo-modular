@@ -56,22 +56,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // dois heróis (12 mm) lado a lado — os dois
+        // osciladores que se modulam — e o LOOP (o registrador) entre eles.
         p.hp = 10;
         p.add(Widget::Kind::Label, "RUNGLER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "rungler", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "FRQA", "freq_a", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FRQB", "freq_b", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "LOOP", "loop", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MODA", "mod_a", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "MODB", "mod_b", 20.5f, 50.0f);
-        p.add(Widget::Kind::Knob, "LEVEL", "level", 36.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "PTA", "in:pitch_a", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "PTB", "in:pitch_b", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "LOOP", "in:loop_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RUNG", "out:rung", 44.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TRIA", "out:tri_a", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "TRIB", "out:tri_b", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PWM", "out:pwm", 31.0f, 116.0f);
+        p.add(Widget::Kind::Display, "rungler", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "FRQA", "freq_a", 8.40f, 27.0f, 12.0f);   // herói
+        p.add(Widget::Kind::Knob, "FRQB", "freq_b", 30.40f, 27.0f, 12.0f);   // herói
+        p.add(Widget::Kind::Knob, "MODA", "mod_a", 10.40f, 48.0f);
+        p.add(Widget::Kind::Knob, "LOOP", "loop", 21.40f, 48.0f);
+        p.add(Widget::Kind::Knob, "MODB", "mod_b", 32.40f, 48.0f);
+        p.add(Widget::Kind::Knob, "LEVEL", "level", 21.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "PTA", "in:pitch_a", 14.40f, 88.0f);
+        p.add(Widget::Kind::Jack, "LOOP", "in:loop_cv", 25.40f, 88.0f);
+        p.add(Widget::Kind::Jack, "PTB", "in:pitch_b", 36.40f, 88.0f);
+        p.add(Widget::Kind::Jack, "TRIA", "out:tri_a", 8.60f, 110.0f);
+        p.add(Widget::Kind::Jack, "PWM", "out:pwm", 19.80f, 110.0f);
+        p.add(Widget::Kind::Jack, "RUNG", "out:rung", 31.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "TRIB", "out:tri_b", 42.20f, 110.0f);
         return p;
     }
 

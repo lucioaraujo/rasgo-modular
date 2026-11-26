@@ -3944,7 +3944,7 @@ private:
         case Widget::Kind::Knob: {
             const int r = mmpx(ui::knobDiameterMM(w) * 0.5f);
             const juce::Rectangle<int> box(wx, wy, 2 * r, 2 * r);
-            const bool principal = !w.bind.empty() && w.bind == ui::primaryControl(node.type());
+            const bool principal = ui::isPrimaryControl(node.type(), w.bind);
             if (st && principal) {   // o controle principal: escala e corpo invertido
                 const auto c = box.getCentre().toFloat();
                 g.setColour(T.textSecondary);

@@ -55,20 +55,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // os pontos e a banda nos lados.
         p.hp = 10;
         p.add(Widget::Kind::Label, "GENDYN", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "gendyn", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "PTS", "points", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "BAND", "band", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "AMP", "amp_step", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DUR", "dur_step", 20.5f, 50.0f);
-        p.add(Widget::Kind::Knob, "DIST", "dist", 36.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "LEVEL", "level", 5.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "AMP", "in:amp_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "gendyn", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "PTS", "points", 6.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 18.40f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "BAND", "band", 36.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "AMP", "amp_step", 7.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "DUR", "dur_step", 21.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "DIST", "dist", 35.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "LEVEL", "level", 21.40f, 66.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 11.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "AMP", "in:amp_cv", 39.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 25.40f, 110.0f);
         return p;
     }
 

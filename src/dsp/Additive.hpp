@@ -79,27 +79,29 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // os parciais (forma do espectro) em volta.
         p.hp = 12;
         p.add(Widget::Kind::Label, "ADDITIVE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "spec", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 22.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "TILT", "tilt", 37.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "COMB", "comb", 52.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ODD", "odd", 7.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "STRCH", "stretch", 22.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 37.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "FM", "fm_amount", 52.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "TENS", "tension", 7.0f, 74.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 7.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "TILT", "in:tilt", 21.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "STRCH", "in:stretch", 36.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "TENS", "in:tension", 51.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 29.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "RSG", "out:tear", 40.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "INT", "out:intact", 51.0f, 116.0f);
+        p.add(Widget::Kind::Display, "spec", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "TILT", "tilt", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "COMB", "comb", 5.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "ODD", "odd", 19.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "STRCH", "stretch", 33.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "FM", "fm_amount", 47.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "TENS", "tension", 19.48f, 63.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 33.48f, 63.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 16.48f, 82.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 30.48f, 82.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 44.48f, 82.0f);
+        p.add(Widget::Kind::Jack, "TILT", "in:tilt", 16.48f, 96.0f);
+        p.add(Widget::Kind::Jack, "STRCH", "in:stretch", 30.48f, 96.0f);
+        p.add(Widget::Kind::Jack, "TENS", "in:tension", 44.48f, 96.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 16.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "RSG", "out:tear", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "INT", "out:intact", 44.48f, 110.0f);
         return p;
     }
 

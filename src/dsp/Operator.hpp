@@ -56,20 +56,22 @@ public:
         Panel p;
         // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
         // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // afinação fina e índice nos lados.
         p.hp = 13;
         p.add(Widget::Kind::Label, "OPERATOR", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "fm", "", 2.5f, 6.0f, 61.04f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 3.62f, 28.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 16.32f, 28.0f);
-        p.add(Widget::Kind::Knob, "ALGO", "algo", 29.02f, 28.0f);
-        p.add(Widget::Kind::Knob, "INDEX", "index", 41.72f, 28.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback", 54.42f, 28.0f);
-        p.add(Widget::Kind::Knob, "RB", "ratio_b", 9.97f, 48.0f);
-        p.add(Widget::Kind::Knob, "RC", "ratio_c", 22.67f, 48.0f);
-        p.add(Widget::Kind::Knob, "RD", "ratio_d", 35.37f, 48.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 48.07f, 48.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 26.67f, 88.0f);
-        p.add(Widget::Kind::Jack, "IDX", "in:index", 39.37f, 88.0f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 11.02f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 26.02f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "INDEX", "index", 47.02f, 31.0f);
+        p.add(Widget::Kind::Knob, "ALGO", "algo", 8.02f, 50.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback", 22.02f, 50.0f);
+        p.add(Widget::Kind::Knob, "RB", "ratio_b", 36.02f, 50.0f);
+        p.add(Widget::Kind::Knob, "RC", "ratio_c", 50.02f, 50.0f);
+        p.add(Widget::Kind::Knob, "RD", "ratio_d", 22.02f, 66.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 36.02f, 66.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 26.02f, 92.0f);
+        p.add(Widget::Kind::Jack, "IDX", "in:index", 40.02f, 92.0f);
         p.add(Widget::Kind::Jack, "OUT", "out:out", 33.02f, 110.0f);
         return p;
     }

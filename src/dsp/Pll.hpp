@@ -105,27 +105,29 @@ public:
         Panel p;
         // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
         // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // afinação fina e trava nos lados.
         p.hp = 14;
         p.add(Widget::Kind::Label, "PLL", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "lock", "", 2.5f, 6.0f, 66.12f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 3.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 17.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "SHAPE", "shape", 31.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 45.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "LOCK", "lock_gain", 59.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "FM", "fm_amount", 10.56f, 48.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback_amount", 24.56f, 48.0f);
-        p.add(Widget::Kind::Knob, "FTYP", "feedback_type", 38.56f, 48.0f);
-        p.add(Widget::Kind::Knob, "PERTO", "near_hz", 52.56f, 48.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 22.86f, 80.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 35.56f, 80.0f);
-        p.add(Widget::Kind::Jack, "REF", "in:ref", 48.26f, 80.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 22.86f, 96.0f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 11.56f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 28.56f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "LOCK", "lock_gain", 51.56f, 31.0f);
+        p.add(Widget::Kind::Knob, "SHAPE", "shape", 10.56f, 50.0f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 24.56f, 50.0f);
+        p.add(Widget::Kind::Knob, "FM", "fm_amount", 38.56f, 50.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback_amount", 52.56f, 50.0f);
+        p.add(Widget::Kind::Knob, "FTYP", "feedback_type", 24.56f, 66.0f);
+        p.add(Widget::Kind::Knob, "PERTO", "near_hz", 38.56f, 66.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 21.56f, 82.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 35.56f, 82.0f);
+        p.add(Widget::Kind::Jack, "REF", "in:ref", 49.56f, 82.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 21.56f, 96.0f);
         p.add(Widget::Kind::Jack, "RING", "out:ring", 35.56f, 96.0f);
-        p.add(Widget::Kind::Jack, "LOCK", "out:lock", 48.26f, 96.0f);
-        p.add(Widget::Kind::Jack, "ENC", "out:meet", 22.86f, 110.0f);
+        p.add(Widget::Kind::Jack, "LOCK", "out:lock", 49.56f, 96.0f);
+        p.add(Widget::Kind::Jack, "ENC", "out:meet", 21.56f, 110.0f);
         p.add(Widget::Kind::Jack, "SEP", "out:part", 35.56f, 110.0f);
-        p.add(Widget::Kind::Jack, "BAT", "out:beat", 48.26f, 110.0f);
+        p.add(Widget::Kind::Jack, "BAT", "out:beat", 49.56f, 110.0f);
         return p;
     }
 

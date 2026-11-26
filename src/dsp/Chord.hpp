@@ -44,21 +44,23 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // o acorde e as vozes nos lados.
         p.hp = 12;
         p.add(Widget::Kind::Label, "CHORD", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "voices", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 8.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "CHORD", "chord", 28.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "VOX", "voices", 48.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "INV", "inversion", 8.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DTUNE", "detune", 28.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "WAVE", "wave", 48.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 8.0f, 72.0f);
-        p.add(Widget::Kind::Knob, "VLEAD", "voicing", 28.0f, 72.0f);
-        p.add(Widget::Kind::Jack, "PITCH", "in:pitch", 6.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "CHRD", "in:chord_cv", 20.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 34.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 48.0f, 110.0f);
+        p.add(Widget::Kind::Display, "voices", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "CHORD", "chord", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "VOX", "voices", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "INV", "inversion", 12.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DTUNE", "detune", 26.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "WAVE", "wave", 40.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 19.48f, 66.0f);
+        p.add(Widget::Kind::Knob, "VLEAD", "voicing", 33.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "PITCH", "in:pitch", 16.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "CHRD", "in:chord_cv", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 44.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 30.48f, 110.0f);
         return p;
     }
 

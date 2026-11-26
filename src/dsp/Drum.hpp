@@ -56,21 +56,24 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // o herói é o DECAY (a forma do golpe), com
+        // TONE e SNAP nos lados. 14 → 12 HP.
+        p.hp = 12;
         p.add(Widget::Kind::Label, "DRUM", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "hit", "", 2.5f, 6.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 7.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "BEND", "bend", 24.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "DECAY", "decay", 41.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SNAP", "snap", 58.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "MAP", "map", 7.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 24.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "ROLL", "roll", 41.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 58.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 8.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "ACC", "in:accent", 24.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:tone", 40.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 114.0f);
+        p.add(Widget::Kind::Display, "hit", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "DECAY", "decay", 23.48f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "SNAP", "snap", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "BEND", "bend", 5.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "MAP", "map", 19.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 33.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "ROLL", "roll", 47.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 26.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 16.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "ACC", "in:accent", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:tone", 44.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 30.48f, 110.0f);
         return p;
     }
 

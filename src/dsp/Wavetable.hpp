@@ -72,23 +72,27 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026: "variar as ideias de
+        // distribuição de acordo com o módulo", "o layout pode trazer algo
+        // do conceito"): o knob herói (14 mm) no centro, e o POS
+        // (varrer a tabela, o conceito do módulo) logo ao lado, à direita.
         p.hp = 12;
         p.add(Widget::Kind::Label, "WAVETABLE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 22.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "POS", "pos", 37.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "WARP", "warp", 52.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FM", "fm_amount", 7.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 22.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DEF", "deform", 37.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "MODO", "deform_mode", 52.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 8.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "POS", "in:pos", 22.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 36.0f, 94.0f);
-        p.add(Widget::Kind::Jack, "CAP", "in:capture", 8.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GRAB", "in:grab", 22.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 40.0f, 116.0f);
+        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "POS", "pos", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "WARP", "warp", 5.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "FM", "fm_amount", 19.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DEF", "deform", 33.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "MODO", "deform_mode", 47.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 26.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 6.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "POS", "in:pos", 18.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "CAP", "in:capture", 42.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "GRAB", "in:grab", 54.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 30.48f, 110.0f);
         return p;
     }
 

@@ -65,22 +65,24 @@ public:
         Panel p;
         // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
         // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // o borrão e o desvio nos lados.
         p.hp = 10;
         p.add(Widget::Kind::Label, "SPECTRA", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "spectra", "", 2.5f, 6.0f, 45.80f);
-        p.add(Widget::Kind::Knob, "VOICE", "voices", 7.40f, 28.0f);
-        p.add(Widget::Kind::Knob, "BLUR", "blur", 21.40f, 28.0f);
-        p.add(Widget::Kind::Knob, "SHIFT", "shift", 35.40f, 28.0f);
-        p.add(Widget::Kind::Knob, "STRCH", "stretch", 7.40f, 48.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 21.40f, 48.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 35.40f, 48.0f);
-        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 17.40f, 70.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 27.40f, 68.0f);
+        p.add(Widget::Kind::Knob, "BLUR", "blur", 6.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "VOICE", "voices", 18.40f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "SHIFT", "shift", 36.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "STRCH", "stretch", 7.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 21.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 35.40f, 50.0f);
+        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 16.40f, 70.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 28.40f, 66.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 11.40f, 92.0f);
         p.add(Widget::Kind::Jack, "PIT", "in:pitch", 25.40f, 92.0f);
         p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 39.40f, 92.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 19.40f, 110.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 31.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 18.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 32.40f, 110.0f);
         return p;
     }
 

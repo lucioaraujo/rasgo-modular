@@ -114,4 +114,12 @@ inline const std::string& primaryControl(const std::string& type) {
     return it == tabela.end() ? nada : it->second;
 }
 
+// É o controle principal? Alguns módulos têm DOIS, gêmeos (autor,
+// 27/11/2026: o RUNGLER são dois osciladores que se modulam — FRQA e FRQB).
+inline bool isPrimaryControl(const std::string& type, const std::string& bind) {
+    if (bind.empty()) return false;
+    if (bind == primaryControl(type)) return true;
+    return type == "RUNGLER" && bind == "freq_b";
+}
+
 }  // namespace rasgo::ui

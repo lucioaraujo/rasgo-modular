@@ -55,25 +55,23 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Arquétipo das FONTES (autor, 26/11/2026): o knob herói no centro;
+        // formante e forma do pulso nos lados.
         p.hp = 12;
         p.add(Widget::Kind::Label, "PULSAR", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pulsar", "", 2.5f, 6.0f, 56.0f);
-        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
-        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
-        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
-        // 26/11: "manter no centro e subir um pouco os jacks").
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 13.78f, 28.0f);
-        p.add(Widget::Kind::Knob, "FRMT", "formant", 26.48f, 28.0f);
-        p.add(Widget::Kind::Knob, "SHAPE", "shape", 39.18f, 28.0f);
-        p.add(Widget::Kind::Knob, "WIND", "window", 13.78f, 48.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 26.48f, 48.0f);
-        p.add(Widget::Kind::Knob, "MASK", "mask", 39.18f, 48.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 20.13f, 68.0f);
-        p.add(Widget::Kind::Knob, "LEVEL", "level", 32.83f, 68.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 24.13f, 92.0f);
-        p.add(Widget::Kind::Jack, "FQM", "in:formant_mod", 36.83f, 92.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 24.13f, 110.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 36.83f, 110.0f);
+        p.add(Widget::Kind::Display, "pulsar", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "FRMT", "formant", 8.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // herói
+        p.add(Widget::Kind::Knob, "SHAPE", "shape", 44.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "WIND", "window", 12.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 26.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "MASK", "mask", 40.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 19.48f, 66.0f);
+        p.add(Widget::Kind::Knob, "LEVEL", "level", 33.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 23.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FQM", "in:formant_mod", 37.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 23.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 37.48f, 110.0f);
         return p;
     }
 
