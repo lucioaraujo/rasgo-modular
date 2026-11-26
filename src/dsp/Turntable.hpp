@@ -64,22 +64,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 14;
         p.add(Widget::Kind::Label, "TURNTABLE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "vinyl", "", 2.5f, 6.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 7.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "TORQ", "torque", 24.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "FRIC", "friction", 41.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "GRAB", "grab", 58.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "START", "start", 7.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "WEAR", "wear", 24.0f, 50.0f);
-        p.add(Widget::Kind::Toggle, "LOOP", "loop", 42.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "in:trig", 8.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 22.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "REC", "in:rec", 34.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "SCR", "in:scratch", 46.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "BRK", "in:brake", 58.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 114.0f);
+        p.add(Widget::Kind::Display, "vinyl", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 10.56f, 30.0f);
+        p.add(Widget::Kind::Knob, "TORQ", "torque", 24.56f, 30.0f);
+        p.add(Widget::Kind::Knob, "FRIC", "friction", 38.56f, 30.0f);
+        p.add(Widget::Kind::Knob, "GRAB", "grab", 52.56f, 30.0f);
+        p.add(Widget::Kind::Knob, "START", "start", 24.56f, 50.0f);
+        p.add(Widget::Kind::Knob, "WEAR", "wear", 38.56f, 50.0f);
+        p.add(Widget::Kind::Toggle, "LOOP", "loop", 54.56f, 54.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "in:trig", 10.16f, 90.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 22.86f, 90.0f);
+        p.add(Widget::Kind::Jack, "REC", "in:rec", 35.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "SCR", "in:scratch", 48.26f, 90.0f);
+        p.add(Widget::Kind::Jack, "BRK", "in:brake", 60.96f, 90.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 35.56f, 110.0f);
         return p;
     }
 

@@ -56,26 +56,28 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 15;
         p.add(Widget::Kind::Label, "SCOPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scope", "", 2.5f, 6.0f, 71.2f);   // a largura do painel menos 5 mm (26/11)
-        p.add(Widget::Kind::Knob, "TRIG", "trigger", 9.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "EDGE", "edge", 27.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "REJ", "reject", 45.0f, 34.0f);
-        p.add(Widget::Kind::Knob, "RESP", "response", 9.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "HOLD", "hold", 27.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "SENS", "sens", 45.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "OCT", "pit_oct", 63.0f, 34.0f);
-        p.add(Widget::Kind::Toggle, "KEEP", "pit_keep", 65.3f, 58.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 82.0f);
-        p.add(Widget::Kind::Jack, "EXT", "in:ext", 19.0f, 82.0f);
-        p.add(Widget::Kind::Jack, "CONF", "out:conf", 55.0f, 82.0f);
-        p.add(Widget::Kind::Jack, "THRU", "out:thru", 7.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "out:trig", 19.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "LVL", "out:level", 31.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "BRT", "out:bright", 43.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "PIT", "out:pitch", 55.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "ONS", "out:onset", 67.0f, 106.0f);
+        p.add(Widget::Kind::Display, "scope", "", 2.5f, 6.0f, 71.20f);
+        p.add(Widget::Kind::Knob, "TRIG", "trigger", 13.10f, 30.0f);
+        p.add(Widget::Kind::Knob, "EDGE", "edge", 27.10f, 30.0f);
+        p.add(Widget::Kind::Knob, "REJ", "reject", 41.10f, 30.0f);
+        p.add(Widget::Kind::Knob, "OCT", "pit_oct", 55.10f, 30.0f);
+        p.add(Widget::Kind::Knob, "RESP", "response", 13.10f, 50.0f);
+        p.add(Widget::Kind::Knob, "HOLD", "hold", 27.10f, 50.0f);
+        p.add(Widget::Kind::Knob, "SENS", "sens", 41.10f, 50.0f);
+        p.add(Widget::Kind::Toggle, "KEEP", "pit_keep", 57.10f, 54.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 31.10f, 76.0f);
+        p.add(Widget::Kind::Jack, "EXT", "in:ext", 45.10f, 76.0f);
+        p.add(Widget::Kind::Jack, "CONF", "out:conf", 17.10f, 93.0f);
+        p.add(Widget::Kind::Jack, "THRU", "out:thru", 31.10f, 93.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "out:trig", 45.10f, 93.0f);
+        p.add(Widget::Kind::Jack, "LVL", "out:level", 59.10f, 93.0f);
+        p.add(Widget::Kind::Jack, "BRT", "out:bright", 24.10f, 110.0f);
+        p.add(Widget::Kind::Jack, "PIT", "out:pitch", 38.10f, 110.0f);
+        p.add(Widget::Kind::Jack, "ONS", "out:onset", 52.10f, 110.0f);
         return p;
     }
 

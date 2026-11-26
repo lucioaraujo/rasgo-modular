@@ -52,19 +52,21 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): duas colunas alinhadas, os
+        // jacks embaixo, centrados (G1–G4).
         p.hp = 8;
         p.add(Widget::Kind::Label, "MASTER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "vu", "", 2.5f, 6.0f, 35.6f);
-        p.add(Widget::Kind::Slider, "GAIN", "gain", 8.0f, 26.0f);
-        p.add(Widget::Kind::Knob, "WIDTH", "width", 26.0f, 28.0f);
-        p.add(Widget::Kind::Toggle, "MUTE", "mute", 24.0f, 42.0f);
-        p.add(Widget::Kind::Toggle, "MONO", "mono", 24.0f, 54.0f);
-        p.add(Widget::Kind::Toggle, "DC", "dc_block", 24.0f, 66.0f);
-        p.add(Widget::Kind::Toggle, "LIMIT", "limit", 24.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "BODY", "body_guard", 9.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 5.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 17.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "VU", "out:level", 29.0f, 104.0f);
+        p.add(Widget::Kind::Display, "vu", "", 2.5f, 6.0f, 35.64f);
+        p.add(Widget::Kind::Slider, "GAIN", "gain", 9.32f, 26.0f);
+        p.add(Widget::Kind::Knob, "WIDTH", "width", 24.32f, 28.0f);
+        p.add(Widget::Kind::Toggle, "MUTE", "mute", 26.32f, 42.0f);
+        p.add(Widget::Kind::Toggle, "MONO", "mono", 26.32f, 54.0f);
+        p.add(Widget::Kind::Toggle, "DC", "dc_block", 26.32f, 66.0f);
+        p.add(Widget::Kind::Toggle, "LIMIT", "limit", 26.32f, 78.0f);
+        p.add(Widget::Kind::Knob, "BODY", "body_guard", 8.32f, 76.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 8.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 20.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "VU", "out:level", 32.32f, 110.0f);
         return p;
     }
 
