@@ -52,23 +52,27 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 10;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
+        p.hp = 11;
         p.add(Widget::Kind::Label, "MULT", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "taps", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 32.0f);
-        p.add(Widget::Kind::Jack, "IN2", "in:in2", 19.0f, 32.0f);
-        p.add(Widget::Kind::Toggle, "DUAL", "dual", 31.0f, 29.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 41.0f, 32.0f);
-        for (int k = 0; k < 4; ++k) {
-            const float y = 44.0f + static_cast<float>(k) * 16.0f;
-            const std::string n = std::to_string(k + 1);
-            p.add(Widget::Kind::Knob, "SCL" + n, "scale" + n, 8.0f, y);
-            p.add(Widget::Kind::Knob, "OFF" + n, "offset" + n, 24.0f, y);
-        }
-        for (int k = 0; k < 4; ++k)
-            p.add(Widget::Kind::Jack, "O" + std::to_string(k + 1),
-                  "out:out" + std::to_string(k + 1),
-                  7.0f + static_cast<float>(k) * 11.0f, 112.0f);
+        p.add(Widget::Kind::Display, "taps", "", 2.5f, 6.0f, 50.88f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 8.89f, 32.0f);
+        p.add(Widget::Kind::Jack, "IN2", "in:in2", 21.59f, 32.0f);
+        p.add(Widget::Kind::Toggle, "DUAL", "dual", 32.29f, 29.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 42.99f, 28.0f);
+        p.add(Widget::Kind::Knob, "SCL1", "scale1", 4.89f, 46.0f);
+        p.add(Widget::Kind::Knob, "SCL2", "scale2", 17.59f, 46.0f);
+        p.add(Widget::Kind::Knob, "SCL3", "scale3", 30.29f, 46.0f);
+        p.add(Widget::Kind::Knob, "SCL4", "scale4", 42.99f, 46.0f);
+        p.add(Widget::Kind::Knob, "OFF1", "offset1", 4.89f, 64.0f);
+        p.add(Widget::Kind::Knob, "OFF2", "offset2", 17.59f, 64.0f);
+        p.add(Widget::Kind::Knob, "OFF3", "offset3", 30.29f, 64.0f);
+        p.add(Widget::Kind::Knob, "OFF4", "offset4", 42.99f, 64.0f);
+        p.add(Widget::Kind::Jack, "O1", "out:out1", 8.89f, 110.0f);
+        p.add(Widget::Kind::Jack, "O2", "out:out2", 21.59f, 110.0f);
+        p.add(Widget::Kind::Jack, "O3", "out:out3", 34.29f, 110.0f);
+        p.add(Widget::Kind::Jack, "O4", "out:out4", 46.99f, 110.0f);
         return p;
     }
 

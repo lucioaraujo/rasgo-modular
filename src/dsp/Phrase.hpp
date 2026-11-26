@@ -37,24 +37,29 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 20;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
+        p.hp = 14;
         p.add(Widget::Kind::Label, "PHRASE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "phrase", "", 2.5f, 7.0f, 96.6f);   // a largura do painel menos 5 mm (26/11)
-        const char* labels[] = {"LEN", "SPAN", "DIR", "VAR", "SPACE", "CAD", "GATE", "SEED"};
-        const char* binds[] = {"length", "span", "direction", "variation", "space", "cadence", "gate_ms", "seed"};
-        for (int i = 0; i < 8; ++i)
-            p.add(Widget::Kind::Knob, labels[i], binds[i],
-                  9.0f + static_cast<float>(i % 4) * 24.0f,
-                  i < 4 ? 32.0f : 56.0f);
-        const char* ins[] = {"pitch", "clock", "reset", "stim", "return"};
-        const char* il[] = {"PITCH", "CLK", "RST", "STIM", "RET"};
-        const char* outs[] = {"pitch", "gate", "accent", "end", "phase"};
-        const char* ol[] = {"PITCH", "GATE", "ACC", "END", "PHASE"};
-        for (int i = 0; i < 5; ++i) {
-            const float x = 10.0f + static_cast<float>(i) * 20.0f;
-            p.add(Widget::Kind::Jack, il[i], std::string("in:") + ins[i], x, 88.0f);
-            p.add(Widget::Kind::Jack, ol[i], std::string("out:") + outs[i], x, 115.0f);
-        }
+        p.add(Widget::Kind::Display, "phrase", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "LEN", "length", 10.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "SPAN", "span", 24.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "DIR", "direction", 38.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "VAR", "variation", 52.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "SPACE", "space", 10.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "CAD", "cadence", 24.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_ms", 38.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 52.56f, 48.0f);
+        p.add(Widget::Kind::Jack, "PITCH", "in:pitch", 7.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 21.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 35.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "STIM", "in:stim", 49.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "RET", "in:return", 63.56f, 90.0f);
+        p.add(Widget::Kind::Jack, "PITCH", "out:pitch", 7.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "GATE", "out:gate", 21.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "ACC", "out:accent", 35.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "END", "out:end", 49.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "PHASE", "out:phase", 63.56f, 110.0f);
         return p;
     }
 

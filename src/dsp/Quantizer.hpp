@@ -171,31 +171,33 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 14;
         p.add(Widget::Kind::Label, "QUANTIZER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "scale", "", 2.5f, 6.0f, 66.1f);
-        p.add(Widget::Kind::Knob, "SCALE", "scale", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ROOT", "root", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RANGE", "range", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "GLIDE", "glide", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "HYST", "hysteresis", 23.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "AFIN", "tuning", 38.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "M1", "sieve_m1", 55.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "R1", "sieve_r1", 55.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "M2", "sieve_m2", 55.0f, 62.0f);
-        p.add(Widget::Kind::Knob, "R2", "sieve_r2", 55.0f, 78.0f);
-        p.add(Widget::Kind::Toggle, "AND", "sieve_and", 45.0f, 80.0f, 8.0f);
-        p.add(Widget::Kind::Jack, "CV", "in:cv", 5.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "TRSP", "in:transpose", 17.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 29.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "ROOT", "in:root_cv", 29.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "SCL", "in:scale_cv", 41.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "B", "scale_b", 8.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "MRPH", "morph", 55.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "MRPH", "in:morph_cv", 41.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GATE", "out:gate", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "ST", "out:semitone", 29.0f, 116.0f);
+        p.add(Widget::Kind::Display, "scale", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "SCALE", "scale", 10.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "ROOT", "root", 24.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "RANGE", "range", 38.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "AFIN", "tuning", 52.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "GLIDE", "glide", 10.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "HYST", "hysteresis", 24.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "B", "scale_b", 38.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "MRPH", "morph", 52.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "M1", "sieve_m1", 10.56f, 64.0f);
+        p.add(Widget::Kind::Knob, "R1", "sieve_r1", 24.56f, 64.0f);
+        p.add(Widget::Kind::Knob, "M2", "sieve_m2", 38.56f, 64.0f);
+        p.add(Widget::Kind::Knob, "R2", "sieve_r2", 52.56f, 64.0f);
+        p.add(Widget::Kind::Toggle, "AND", "sieve_and", 33.56f, 74.0f, 8.0f);
+        p.add(Widget::Kind::Jack, "CV", "in:cv", 7.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "TRSP", "in:transpose", 18.76f, 92.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 29.96f, 92.0f);
+        p.add(Widget::Kind::Jack, "ROOT", "in:root_cv", 41.16f, 92.0f);
+        p.add(Widget::Kind::Jack, "SCL", "in:scale_cv", 52.36f, 92.0f);
+        p.add(Widget::Kind::Jack, "MRPH", "in:morph_cv", 63.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 21.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "GATE", "out:gate", 35.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "ST", "out:semitone", 49.56f, 110.0f);
         return p;
     }
 

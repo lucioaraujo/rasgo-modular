@@ -55,22 +55,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, saídas
+        // embaixo no centro (G1–G4).
         p.hp = 10;
         p.add(Widget::Kind::Label, "VIA", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Toggle, "RES", "res", 5.0f, 12.0f);
-        p.add(Widget::Kind::Toggle, "DIODO", "diode", 26.0f, 12.0f);
-        p.add(Widget::Kind::Toggle, "CAP", "capacitor", 5.0f, 21.0f);
-        p.add(Widget::Kind::Toggle, "PULSO", "pulse", 26.0f, 21.0f);
-        p.add(Widget::Kind::Toggle, "TRANS", "transistor", 5.0f, 30.0f);
-        p.add(Widget::Kind::Toggle, "REFLX", "reflux", 26.0f, 30.0f);
-        p.add(Widget::Kind::Toggle, "FALANTE", "speaker", 5.0f, 39.0f);
-        p.add(Widget::Kind::Knob, "MEM", "memory", 8.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "CORPO", "body", 23.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "NIVEL", "level", 38.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "MEM", "in:memory_cv", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "CAP", "out:cap", 19.0f, 116.0f);
+        p.add(Widget::Kind::Toggle, "RES", "res", 6.0f, 12.0f);
+        p.add(Widget::Kind::Toggle, "DIODO", "diode", 28.0f, 12.0f);
+        p.add(Widget::Kind::Toggle, "CAP", "capacitor", 6.0f, 21.0f);
+        p.add(Widget::Kind::Toggle, "PULSO", "pulse", 28.0f, 21.0f);
+        p.add(Widget::Kind::Toggle, "TRANS", "transistor", 6.0f, 30.0f);
+        p.add(Widget::Kind::Toggle, "REFLX", "reflux", 28.0f, 30.0f);
+        p.add(Widget::Kind::Toggle, "FALANTE", "speaker", 6.0f, 39.0f);
+        p.add(Widget::Kind::Knob, "MEM", "memory", 7.40f, 54.0f);
+        p.add(Widget::Kind::Knob, "CORPO", "body", 21.40f, 54.0f);
+        p.add(Widget::Kind::Knob, "NIVEL", "level", 35.40f, 54.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 18.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "MEM", "in:memory_cv", 32.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 18.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "CAP", "out:cap", 32.40f, 110.0f);
         return p;
     }
 

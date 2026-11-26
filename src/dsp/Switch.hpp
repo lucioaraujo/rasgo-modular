@@ -63,29 +63,31 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;   // 12 → 14 HP em 11/11/2026: FANT e ATRAS
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
+        p.hp = 14;
         p.add(Widget::Kind::Label, "SWITCH", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pos", "", 2.5f, 6.0f, 66.1f);
-        p.add(Widget::Kind::Knob, "STEP", "steps", 8.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 28.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "GLID", "glide", 8.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 28.0f, 46.0f);
-        p.add(Widget::Kind::Toggle, "DEMUX", "dir", 46.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "ATRAS", "ghost_lag", 46.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "FANT", "ghost", 60.0f, 46.0f);
-        p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "B", "in:b", 19.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "C", "in:c", 31.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "D", "in:d", 43.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 7.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 19.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "ADR", "in:addr", 31.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "OA", "out:out", 7.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OB", "out:out_b", 19.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OC", "out:out_c", 31.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OD", "out:out_d", 43.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "STP", "out:step", 55.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "FANT", "out:ghost_out", 55.0f, 86.0f);
+        p.add(Widget::Kind::Display, "pos", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "STEP", "steps", 10.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 24.56f, 28.0f);
+        p.add(Widget::Kind::Toggle, "DEMUX", "dir", 40.56f, 30.0f);
+        p.add(Widget::Kind::Knob, "GLID", "glide", 10.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 24.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "ATRAS", "ghost_lag", 38.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "FANT", "ghost", 52.56f, 48.0f);
+        p.add(Widget::Kind::Jack, "A", "in:a", 14.56f, 74.0f);
+        p.add(Widget::Kind::Jack, "B", "in:b", 28.56f, 74.0f);
+        p.add(Widget::Kind::Jack, "C", "in:c", 42.56f, 74.0f);
+        p.add(Widget::Kind::Jack, "D", "in:d", 56.56f, 74.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 21.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 35.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "ADR", "in:addr", 49.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "OA", "out:out", 7.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "OB", "out:out_b", 18.76f, 110.0f);
+        p.add(Widget::Kind::Jack, "OC", "out:out_c", 29.96f, 110.0f);
+        p.add(Widget::Kind::Jack, "OD", "out:out_d", 41.16f, 110.0f);
+        p.add(Widget::Kind::Jack, "STP", "out:step", 52.36f, 110.0f);
+        p.add(Widget::Kind::Jack, "FANT", "out:ghost_out", 63.56f, 110.0f);
         return p;
     }
 
