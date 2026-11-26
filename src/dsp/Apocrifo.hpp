@@ -51,20 +51,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 10;
         p.add(Widget::Kind::Label, "APOCRIFO", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "apocrifo", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "MODO", "mode", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "IDADE", "min_age", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DUR", "length", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CHANCE", "chance", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "PROF", "depth", 23.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "SEED", "seed", 38.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "CIT", "in:trigger", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "ATIVO", "out:active", 19.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "IDADE", "out:age", 31.0f, 116.0f);
+        p.add(Widget::Kind::Display, "apocrifo", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "MODO", "mode", 7.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "IDADE", "min_age", 21.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "DUR", "length", 35.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "CHANCE", "chance", 7.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "PROF", "depth", 21.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 35.40f, 50.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 18.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "CIT", "in:trigger", 32.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 11.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "ATIVO", "out:active", 25.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "IDADE", "out:age", 39.40f, 110.0f);
         return p;
     }
 
