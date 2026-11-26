@@ -58,18 +58,22 @@ public:
         p.hp = 12;
         p.add(Widget::Kind::Label, "PULSAR", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "pulsar", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FRMT", "formant", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SHAPE", "shape", 40.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "WIND", "window", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 24.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "MASK", "mask", 40.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 8.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "LEVEL", "level", 24.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "FQM", "in:formant_mod", 22.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 22.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 13.78f, 28.0f);
+        p.add(Widget::Kind::Knob, "FRMT", "formant", 26.48f, 28.0f);
+        p.add(Widget::Kind::Knob, "SHAPE", "shape", 39.18f, 28.0f);
+        p.add(Widget::Kind::Knob, "WIND", "window", 13.78f, 48.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 26.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "MASK", "mask", 39.18f, 48.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 20.13f, 68.0f);
+        p.add(Widget::Kind::Knob, "LEVEL", "level", 32.83f, 68.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 24.13f, 92.0f);
+        p.add(Widget::Kind::Jack, "FQM", "in:formant_mod", 36.83f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 24.13f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 36.83f, 110.0f);
         return p;
     }
 

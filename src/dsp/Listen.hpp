@@ -35,20 +35,27 @@ public:
         p.hp = 16;
         p.add(Widget::Kind::Label, "LISTEN", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "bands", "", 2.5f, 7.0f, 75.0f);
-        p.add(Widget::Kind::Knob, "LOW", "low_cut", 9.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "HIGH", "high_cut", 33.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "RESP", "response", 57.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "SENS", "sens", 9.0f, 55.0f);
-        p.add(Widget::Kind::Knob, "FLOOR", "floor", 33.0f, 55.0f);
-        p.add(Widget::Kind::Knob, "REARM", "rearm", 57.0f, 55.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 83.0f);
-        p.add(Widget::Kind::Jack, "THRU", "out:thru", 30.0f, 83.0f);
-        p.add(Widget::Kind::Jack, "LOW", "out:low", 8.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "MID", "out:mid", 30.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "HIGH", "out:high", 52.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "L-HIT", "out:low_hit", 8.0f, 121.0f);
-        p.add(Widget::Kind::Jack, "M-HIT", "out:mid_hit", 30.0f, 121.0f);
-        p.add(Widget::Kind::Jack, "H-HIT", "out:high_hit", 52.0f, 121.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras com os
+        // centros em 32, 54, 72, 92 e 110 mm; a última em 110 deixa a marca
+        // RASGO no centro (autor: "é mais fácil manter no centro e subir um
+        // pouco os jacks").
+        // 16 HP (81,28 mm): três colunas largas, as mesmas para knobs e jacks
+        constexpr float c1 = 16.64f, c2 = 40.64f, c3 = 64.64f;
+        p.add(Widget::Kind::Knob, "LOW", "low_cut", c1 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "HIGH", "high_cut", c2 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "RESP", "response", c3 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "SENS", "sens", c1 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "FLOOR", "floor", c2 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "REARM", "rearm", c3 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", c1, 72.0f);
+        p.add(Widget::Kind::Jack, "THRU", "out:thru", c3, 72.0f);
+        p.add(Widget::Kind::Jack, "LOW", "out:low", c1, 92.0f);
+        p.add(Widget::Kind::Jack, "MID", "out:mid", c2, 92.0f);
+        p.add(Widget::Kind::Jack, "HIGH", "out:high", c3, 92.0f);
+        p.add(Widget::Kind::Jack, "L-HIT", "out:low_hit", c1, 110.0f);
+        p.add(Widget::Kind::Jack, "M-HIT", "out:mid_hit", c2, 110.0f);
+        p.add(Widget::Kind::Jack, "H-HIT", "out:high_hit", c3, 110.0f);
         return p;
     }
 

@@ -70,23 +70,32 @@ public:
         p.hp = 12;   // 10 → 12 HP em 11/11/2026: RESID e ELAST
         p.add(Widget::Kind::Label, "DRIFT", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "field", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "DEPTH", "depth", 30.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "MOMT", "momentum", 9.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "STRD", "stride", 30.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "BIAS", "bias", 9.0f, 70.0f);
-        p.add(Widget::Kind::Knob, "ANCHR", "anchor", 30.0f, 70.0f);
-        p.add(Widget::Kind::Knob, "RESID", "residue", 49.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "ELAST", "elastic", 49.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "CAPT", "in:capture", 32.0f, 90.0f);
-        p.add(Widget::Kind::Jack, "ADV", "in:advance", 8.0f, 90.0f);
-        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 20.0f, 90.0f);
-        p.add(Widget::Kind::Jack, "A", "out:a", 8.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "B", "out:b", 17.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "C", "out:c", 26.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "D", "out:d", 35.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "FLD", "out:field", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "EVT", "out:event", 21.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras com os
+        // centros em 32, 54, 72, 92 e 110 mm; a última em 110 deixa a marca
+        // RASGO no centro (autor: "é mais fácil manter no centro e subir um
+        // pouco os jacks").
+        // quatro colunas a 14 mm (não 12,7: os rótulos de 5 letras ANCHR,
+        // RESID, ELAST se encostavam), simétricas nos 12 HP
+        constexpr float c1 = 9.48f, c2 = 23.48f, c3 = 37.48f, c4 = 51.48f;
+        constexpr float m1 = 16.48f, m2 = 30.48f, m3 = 44.48f;              // três, centradas
+        p.add(Widget::Kind::Knob, "RATE", "rate", c1 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "DEPTH", "depth", c2 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "MOMT", "momentum", c3 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "STRD", "stride", c4 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "BIAS", "bias", c1 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "ANCHR", "anchor", c2 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "RESID", "residue", c3 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Knob, "ELAST", "elastic", c4 - 4.0f, 50.0f);
+        p.add(Widget::Kind::Jack, "ADV", "in:advance", m1, 72.0f);
+        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", m2, 72.0f);
+        p.add(Widget::Kind::Jack, "CAPT", "in:capture", m3, 72.0f);
+        p.add(Widget::Kind::Jack, "A", "out:a", c1, 92.0f);
+        p.add(Widget::Kind::Jack, "B", "out:b", c2, 92.0f);
+        p.add(Widget::Kind::Jack, "C", "out:c", c3, 92.0f);
+        p.add(Widget::Kind::Jack, "D", "out:d", c4, 92.0f);
+        p.add(Widget::Kind::Jack, "FLD", "out:field", c2, 110.0f);
+        p.add(Widget::Kind::Jack, "EVT", "out:event", c3, 110.0f);
         return p;
     }
 

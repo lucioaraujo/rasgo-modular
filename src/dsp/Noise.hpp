@@ -72,7 +72,7 @@ public:
         Panel p;
         p.hp = 14;   // 8 saídas em 2 fileiras de 4; +POIS 2026-09-06 (era 12)
         p.add(Widget::Kind::Label, "NOISE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "noise", "", 2.5f, 6.0f, 56.0f);
+        p.add(Widget::Kind::Display, "noise", "", 2.5f, 6.0f, 66.1f);   // a largura do painel menos 5 mm, como os outros visores (autor, 26/11)
         p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SLEW", "slew", 25.0f, 30.0f);
         p.add(Widget::Kind::Knob, "SPRD", "spread", 41.0f, 30.0f);

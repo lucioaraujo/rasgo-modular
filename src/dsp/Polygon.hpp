@@ -55,25 +55,29 @@ public:
         p.hp = 14;
         p.add(Widget::Kind::Label, "POLYGON", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "polygon", "", 2.5f, 6.0f, 66.1f);
-        p.add(Widget::Kind::Knob, "N1", "n1", 9.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "N2", "n2", 25.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "N3", "n3", 41.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "N4", "n4", 57.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "F1", "phi1", 9.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "F2", "phi2", 25.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "F3", "phi3", 41.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "F4", "phi4", 57.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "CICLO", "cycle", 9.0f, 64.0f);
-        p.add(Widget::Kind::Knob, "PASSOS", "steps", 25.0f, 64.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 7.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 19.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "G1", "out:g1", 7.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "G2", "out:g2", 19.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "G3", "out:g3", 31.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "G4", "out:g4", 43.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "COINC", "out:coinc", 7.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "EOS", "out:eos", 21.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "FASE", "out:phase", 35.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "N1", "n1", 12.51f, 26.0f);
+        p.add(Widget::Kind::Knob, "N2", "n2", 25.21f, 26.0f);
+        p.add(Widget::Kind::Knob, "N3", "n3", 37.91f, 26.0f);
+        p.add(Widget::Kind::Knob, "N4", "n4", 50.61f, 26.0f);
+        p.add(Widget::Kind::Knob, "F1", "phi1", 12.51f, 44.0f);
+        p.add(Widget::Kind::Knob, "F2", "phi2", 25.21f, 44.0f);
+        p.add(Widget::Kind::Knob, "F3", "phi3", 37.91f, 44.0f);
+        p.add(Widget::Kind::Knob, "F4", "phi4", 50.61f, 44.0f);
+        p.add(Widget::Kind::Knob, "CICLO", "cycle", 25.21f, 62.0f);
+        p.add(Widget::Kind::Knob, "PASSOS", "steps", 37.91f, 62.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 29.21f, 80.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 41.91f, 80.0f);
+        p.add(Widget::Kind::Jack, "G1", "out:g1", 16.51f, 95.0f);
+        p.add(Widget::Kind::Jack, "G2", "out:g2", 29.21f, 95.0f);
+        p.add(Widget::Kind::Jack, "G3", "out:g3", 41.91f, 95.0f);
+        p.add(Widget::Kind::Jack, "G4", "out:g4", 54.61f, 95.0f);
+        p.add(Widget::Kind::Jack, "COINC", "out:coinc", 22.86f, 110.0f);
+        p.add(Widget::Kind::Jack, "EOS", "out:eos", 35.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "FASE", "out:phase", 48.26f, 110.0f);
         return p;
     }
 

@@ -63,6 +63,7 @@
 #include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
 #include "ui/CompactPanel.hpp"
+#include "ui/PanelGeometry.hpp"
 #include "ui/ScopeTrace.hpp"
 
 #include <cmath>
@@ -270,6 +271,7 @@ void descrever() {
             o += ",\"y\":"; numero(o, w.y);
             o += ",\"s\":"; numero(o, w.span);
             o += ",\"h\":"; numero(o, w.height);
+            if (w.kind == Kind::Display && rasgo::ui::roundDisplay(n.type())) o += ",\"rd\":1";
             if ((w.kind == Kind::Knob || w.kind == Kind::Slider || w.kind == Kind::Toggle)
                 && !w.bind.empty()) {
                 for (const auto& par : n.parameters())

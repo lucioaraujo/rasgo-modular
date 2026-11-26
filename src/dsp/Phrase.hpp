@@ -39,7 +39,7 @@ public:
         Panel p;
         p.hp = 20;
         p.add(Widget::Kind::Label, "PHRASE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "phrase", "", 2.5f, 7.0f, 94.0f);
+        p.add(Widget::Kind::Display, "phrase", "", 2.5f, 7.0f, 96.6f);   // a largura do painel menos 5 mm (26/11)
         const char* labels[] = {"LEN", "SPAN", "DIR", "VAR", "SPACE", "CAD", "GATE", "SEED"};
         const char* binds[] = {"length", "span", "direction", "variation", "space", "cadence", "gate_ms", "seed"};
         for (int i = 0; i < 8; ++i)

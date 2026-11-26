@@ -59,20 +59,24 @@ public:
         p.hp = 12;
         p.add(Widget::Kind::Label, "STAGES", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "stages", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "SEGS", "segments", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CNTR", "contour", 40.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CURVE", "curve", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "HOLD", "hold", 24.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "TILT", "tilt", 40.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 8.0f, 78.0f);
-        p.add(Widget::Kind::Toggle, "LOOP", "loop", 26.0f, 80.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 20.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 32.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "EOC", "out:eoc", 20.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "STEP", "out:step", 32.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "SEGS", "segments", 13.78f, 28.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 26.48f, 28.0f);
+        p.add(Widget::Kind::Knob, "CNTR", "contour", 39.18f, 28.0f);
+        p.add(Widget::Kind::Knob, "CURVE", "curve", 13.78f, 48.0f);
+        p.add(Widget::Kind::Knob, "HOLD", "hold", 26.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "TILT", "tilt", 39.18f, 48.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 20.13f, 68.0f);
+        p.add(Widget::Kind::Toggle, "LOOP", "loop", 34.83f, 70.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 17.78f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 43.18f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 17.78f, 110.0f);
+        p.add(Widget::Kind::Jack, "EOC", "out:eoc", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "STEP", "out:step", 43.18f, 110.0f);
         return p;
     }
 

@@ -58,19 +58,23 @@ public:
         p.hp = 12;
         p.add(Widget::Kind::Label, "SWIRL", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "swirl", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "TYPE", "type", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DEPTH", "depth", 40.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 24.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 40.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "AGE", "age", 8.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 24.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 21.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "MXM", "in:mix_mod", 34.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "L", "out:l", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 21.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "TYPE", "type", 13.78f, 28.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 26.48f, 28.0f);
+        p.add(Widget::Kind::Knob, "DEPTH", "depth", 39.18f, 28.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback", 13.78f, 48.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 26.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 39.18f, 48.0f);
+        p.add(Widget::Kind::Knob, "AGE", "age", 20.13f, 68.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 32.83f, 68.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 17.78f, 92.0f);
+        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "MXM", "in:mix_mod", 43.18f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:l", 24.13f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 36.83f, 110.0f);
         return p;
     }
 

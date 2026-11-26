@@ -65,15 +65,19 @@ public:
         p.hp = 10;
         p.add(Widget::Kind::Label, "SHIFTER", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "shifter", "", 2.5f, 6.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "SHIFT", "shift", 9.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback", 27.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 9.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 27.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 9.0f, 80.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "SFT", "in:shift_mod", 22.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "UP", "out:up", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "DN", "out:down", 22.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "SHIFT", "shift", 15.05f, 28.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback", 27.75f, 28.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 15.05f, 48.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 27.75f, 48.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 21.40f, 68.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 19.05f, 92.0f);
+        p.add(Widget::Kind::Jack, "SFT", "in:shift_mod", 31.75f, 92.0f);
+        p.add(Widget::Kind::Jack, "UP", "out:up", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "DN", "out:down", 31.75f, 110.0f);
         return p;
     }
 

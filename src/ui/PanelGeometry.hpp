@@ -41,6 +41,12 @@ inline float panelWidthMM(const int hp) {
 
 struct RectMM { float x, y, w, h; };
 
+// Visores redondos (autor, 26/11/2026: "gostaria que o visor do pendulum
+// fosse um círculo"): o círculo inscrito no retângulo do visor, centrado.
+// Um lugar só para todos os front-ends (o app lê aqui; o navegador recebe
+// pelo motor, `"rd"` no painel).
+inline bool roundDisplay(const std::string& type) { return type == "PENDULUM"; }
+
 inline float knobDiameterMM(const rasgo::modular::Widget& w) {
     return w.span > 1.0f ? w.span : 8.0f;
 }

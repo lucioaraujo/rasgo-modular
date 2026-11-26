@@ -50,6 +50,11 @@ Folhas: `.local-build/web/capturas/auditoria/` (`piores-normal.png`,
 | apertos (< 1,5 mm) | 14 | 39 |
 | visores mais estreitos que o painel | 4 | 0 |
 
+Em 26/11 (o autor: "o noise ainda está com o display menor") os visores do
+NOISE, SCOPE e PHRASE passaram à largura do painel menos 5 mm, como os
+outros. O do MIXER fica como está: é o PALCO, embaixo, entre os canais e as
+saídas, de propósito.
+
 O COMPACTO acerta o centro e o visor, mas não resolve colunas nem o vão do
 meio — e cria apertos (ele só aperta o que existe). **A diagramação ruim não
 é um defeito do modo: está no desenho de cada módulo.**
@@ -76,7 +81,7 @@ meio — e cria apertos (ele só aperta o que existe). **A diagramação ruim n�
    do LADDER. O controle que define o módulo (RATE do NOISE, FREQ do OSC, SIZE
    do HALL, GRAIN do MEMORY) não se distingue.
 
-## 4. Proposta: uma gramática de painel (para aprovar)
+## 4. A gramática de painel — **aprovada pelo autor em 26/11/2026** ("a gramatica ok")
 
 Uma regra comum, com espaço para o estilo de cada módulo — o mesmo
 princípio que o autor deu para o VCV ("cada módulo pode ter seu estilo
@@ -151,7 +156,7 @@ aplicado aqui: o RATE poderia ser o knob grande.
 
 ## 7. Próximos passos
 
-1. O autor aprova (ou ajusta) a gramática G1–G6 e o NOISE.
+1. ~~O autor aprova a gramática G1–G6~~ (aprovada em 26/11) e o NOISE.
 2. Os módulos passam por ela **em lotes de 5**, dos piores para os
    melhores, cada lote com antes/depois nos dois modos para o OK.
 3. Ao fim de cada lote, a auditoria roda de novo (a nota tem de cair) e o

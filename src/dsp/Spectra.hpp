@@ -66,19 +66,23 @@ public:
         p.hp = 14;
         p.add(Widget::Kind::Label, "SPECTRA", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "spectra", "", 2.5f, 6.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "VOICE", "voices", 9.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "BLUR", "blur", 27.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "SHIFT", "shift", 45.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "STRCH", "stretch", 9.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 27.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 45.0f, 56.0f);
-        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 9.0f, 80.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 27.0f, 80.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 22.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 36.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 22.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "VOICE", "voices", 18.86f, 28.0f);
+        p.add(Widget::Kind::Knob, "BLUR", "blur", 31.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "SHIFT", "shift", 44.26f, 28.0f);
+        p.add(Widget::Kind::Knob, "STRCH", "stretch", 18.86f, 48.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 31.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 44.26f, 48.0f);
+        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 27.21f, 70.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 37.91f, 68.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 22.86f, 92.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 35.56f, 92.0f);
+        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 48.26f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 29.21f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 41.91f, 110.0f);
         return p;
     }
 

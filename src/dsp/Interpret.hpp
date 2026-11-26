@@ -65,21 +65,27 @@ public:
         p.hp = 12;
         p.add(Widget::Kind::Label, "INTERPRET", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "interpret", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "EXPR", "expression", 7.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "GLIDE", "glide", 22.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "VIB", "vibrato", 37.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "ENERG", "energy", 7.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "SUAV", "softness", 22.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "BRILHO", "brightness", 37.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "DERIVA", "drift", 52.0f, 48.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 7.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 19.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "CAR", "in:character", 31.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 7.0f, 108.0f);
-        p.add(Widget::Kind::Jack, "AMP", "out:amp", 19.0f, 108.0f);
-        p.add(Widget::Kind::Jack, "BRT", "out:bright", 31.0f, 108.0f);
-        p.add(Widget::Kind::Jack, "FRASE", "out:phrase", 43.0f, 108.0f);
-        p.add(Widget::Kind::Jack, "GT", "out:gate", 55.0f, 108.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas a 12,7 mm simétricas; o DERIVA
+        // saiu do canto direito para a fileira de baixo, no centro (autor:
+        // "tem um knob muito no canto, há espaço para colocar abaixo").
+        constexpr float c1 = 17.78f, c2 = 30.48f, c3 = 43.18f;   // as três do meio
+        p.add(Widget::Kind::Knob, "EXPR", "expression", c1 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "GLIDE", "glide", c2 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "VIB", "vibrato", c3 - 4.0f, 28.0f);
+        p.add(Widget::Kind::Knob, "ENERG", "energy", c1 - 4.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "SUAV", "softness", c2 - 4.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "BRILHO", "brightness", c3 - 4.0f, 48.0f);
+        p.add(Widget::Kind::Knob, "DERIVA", "drift", c2 - 4.0f, 68.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", c1, 90.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", c2, 90.0f);
+        p.add(Widget::Kind::Jack, "CAR", "in:character", c3, 90.0f);
+        // as cinco saídas a 12,7 mm: as três do meio nas colunas de cima
+        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", c1 - 12.7f, 110.0f);
+        p.add(Widget::Kind::Jack, "AMP", "out:amp", c1, 110.0f);
+        p.add(Widget::Kind::Jack, "BRT", "out:bright", c2, 110.0f);
+        p.add(Widget::Kind::Jack, "FRASE", "out:phrase", c3, 110.0f);
+        p.add(Widget::Kind::Jack, "GT", "out:gate", c3 + 12.7f, 110.0f);
         return p;
     }
 

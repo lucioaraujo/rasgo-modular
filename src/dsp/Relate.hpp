@@ -51,15 +51,19 @@ public:
         p.hp = 8;
         p.add(Widget::Kind::Label, "RELATE", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "relate", "", 2.5f, 6.0f, 35.6f);
-        p.add(Widget::Kind::Knob, "VERBO", "verb", 6.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "INT", "intensity", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "TEMPO", "time", 15.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 90.0f);
-        p.add(Widget::Kind::Jack, "B", "in:b", 21.0f, 90.0f);
-        p.add(Widget::Kind::Jack, "OA", "out:out_a", 7.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "OB", "out:out_b", 21.0f, 104.0f);
-        p.add(Widget::Kind::Jack, "MIX", "out:mix", 7.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "ENC", "out:meeting", 21.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "VERBO", "verb", 9.97f, 28.0f);
+        p.add(Widget::Kind::Knob, "INT", "intensity", 22.67f, 28.0f);
+        p.add(Widget::Kind::Knob, "TEMPO", "time", 16.32f, 48.0f);
+        p.add(Widget::Kind::Jack, "A", "in:a", 13.97f, 72.0f);
+        p.add(Widget::Kind::Jack, "B", "in:b", 26.67f, 72.0f);
+        p.add(Widget::Kind::Jack, "OA", "out:out_a", 13.97f, 92.0f);
+        p.add(Widget::Kind::Jack, "OB", "out:out_b", 26.67f, 92.0f);
+        p.add(Widget::Kind::Jack, "MIX", "out:mix", 13.97f, 110.0f);
+        p.add(Widget::Kind::Jack, "ENC", "out:meeting", 26.67f, 110.0f);
         return p;
     }
 

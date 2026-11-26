@@ -61,20 +61,24 @@ public:
         p.hp = 12;
         p.add(Widget::Kind::Label, "RESONATOR", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "reso", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "STRC", "structure", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "PRTS", "partials", 40.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DECAY", "decay", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DAMP", "damp", 24.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "TILT", "tilt", 40.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "POS", "position", 8.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 24.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "STRK", "in:strike", 20.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "FQM", "in:freq_mod", 32.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "LOW", "out:low", 8.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "MID", "out:mid", 20.0f, 120.0f);
-        p.add(Widget::Kind::Jack, "HIGH", "out:high", 32.0f, 120.0f);
+        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
+        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
+        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
+        // 26/11: "manter no centro e subir um pouco os jacks").
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 13.78f, 28.0f);
+        p.add(Widget::Kind::Knob, "STRC", "structure", 26.48f, 28.0f);
+        p.add(Widget::Kind::Knob, "PRTS", "partials", 39.18f, 28.0f);
+        p.add(Widget::Kind::Knob, "DECAY", "decay", 13.78f, 48.0f);
+        p.add(Widget::Kind::Knob, "DAMP", "damp", 26.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "TILT", "tilt", 39.18f, 48.0f);
+        p.add(Widget::Kind::Knob, "POS", "position", 20.13f, 68.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 32.83f, 68.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 17.78f, 92.0f);
+        p.add(Widget::Kind::Jack, "STRK", "in:strike", 30.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FQM", "in:freq_mod", 43.18f, 92.0f);
+        p.add(Widget::Kind::Jack, "LOW", "out:low", 17.78f, 110.0f);
+        p.add(Widget::Kind::Jack, "MID", "out:mid", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "HIGH", "out:high", 43.18f, 110.0f);
         return p;
     }
 
