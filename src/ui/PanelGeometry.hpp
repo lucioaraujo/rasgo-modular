@@ -51,6 +51,35 @@ inline float knobDiameterMM(const rasgo::modular::Widget& w) {
     return w.span > 1.0f ? w.span : 8.0f;
 }
 
+// O lugar do wordmark RASGO na base do módulo (26/11/2026): 22 mm de
+// largura, na mesma altura em todos; no centro, ou à esquerda/direita se um
+// controle de baixo esbarraria. Em mm, para o app e o navegador darem o mesmo
+// resultado em qualquer zoom (antes a conta tinha margens em pixels e cada
+// front-end decidia diferente). `aspecto` = altura/largura da marca.
+// Devolve o x da marca em mm a partir da borda esquerda; < 0 se não cabe.
+inline float wordmarkXMM(const rasgo::modular::Panel& p, float aspecto, float largura = 22.0f) {
+    using Kind = rasgo::modular::Widget::Kind;
+    const float W = panelWidthMM(p.hp);
+    if (largura > W - 3.0f) return -1.0f;
+    const float topo = kMM3U - 2.5f - largura * aspecto;
+    const auto bate = [&](float xa, float xb) {
+        for (const auto& w : p.widgets) {
+            float cx, meia, fundo;
+            if (w.kind == Kind::Jack) { cx = w.x; meia = 3.0f; fundo = w.y + 2.6f; }
+            else if (w.kind == Kind::Knob) { const float d = knobDiameterMM(w); cx = w.x + d * 0.5f; meia = d * 0.6f; fundo = w.y + d; }
+            else if (w.kind == Kind::Toggle) { cx = w.x + 2.0f; meia = 3.0f; fundo = w.y + 8.0f; }
+            else continue;
+            if (cx + meia > xa && cx - meia < xb && fundo > topo - 1.0f) return true;
+        }
+        return false;
+    };
+    const float c = 0.5f * (W - largura);
+    if (!bate(c, c + largura)) return c;
+    if (!bate(2.0f, 2.0f + largura)) return 2.0f;
+    if (!bate(W - 2.0f - largura, W - 2.0f)) return W - 2.0f - largura;
+    return c;
+}
+
 inline bool envelopeTimeSlider(const std::string& type, const std::string& bind) {
     return type == "ENVELOPE" && (bind == "attack" || bind == "decay" || bind == "release");
 }

@@ -3856,32 +3856,13 @@ private:
             p.applyTransform(juce::AffineTransform::translation(-ui::kWordmarkX, -ui::kWordmarkY));
             return p;
         }();
+        // o lugar sai de `ui::wordmarkXMM` (o mesmo do navegador)
+        const float xmm = ui::wordmarkXMM(m.panel, ui::kWordmarkH / ui::kWordmarkW);
+        if (xmm < 0.0f) return;
         const float lw = static_cast<float>(mmpx(22.0f));
-        if (lw > static_cast<float>(m.bounds.getWidth()) - 6.0f) return;
         const float lh = lw * ui::kWordmarkH / ui::kWordmarkW;
-        const float topo = static_cast<float>(m.bounds.getBottom()) - 5.0f - lh;
-        auto bate = [&](float xa, float xb) {
-            for (const auto& w : m.panel.widgets) {
-                float cx = 0, meia = 0, fundo = 0;
-                if (w.kind == Widget::Kind::Jack) { cx = static_cast<float>(mmpx(w.x)); meia = static_cast<float>(mmpx(3.0f)); fundo = static_cast<float>(mmpx(w.y + 2.6f)); }
-                else if (w.kind == Widget::Kind::Knob) { const float d = ui::knobDiameterMM(w); cx = static_cast<float>(mmpx(w.x + d * 0.5f)); meia = static_cast<float>(mmpx(d * 0.6f)); fundo = static_cast<float>(mmpx(w.y + d)); }
-                else if (w.kind == Widget::Kind::Toggle) { cx = static_cast<float>(mmpx(w.x + 2.0f)); meia = static_cast<float>(mmpx(3.0f)); fundo = static_cast<float>(mmpx(w.y + 8.0f)); }
-                else continue;
-                cx += static_cast<float>(m.bounds.getX());
-                fundo += static_cast<float>(m.bounds.getY());
-                if (cx + meia > xa && cx - meia < xb && fundo > topo - 2.0f) return true;
-            }
-            return false;
-        };
-        float x = static_cast<float>(m.bounds.getCentreX()) - lw * 0.5f;
-        if (bate(x, x + lw)) {
-            const float xe = static_cast<float>(m.bounds.getX()) + 4.0f;
-            const float xd = static_cast<float>(m.bounds.getRight()) - 4.0f - lw;
-            if (!bate(xe, xe + lw)) x = xe;
-            else if (!bate(xd, xd + lw)) x = xd;
-            else if (std::getenv("RASGO_LOGO_LOG"))
-                std::fprintf(stderr, "[logo] modulo %zu: sem lugar livre\n", m.id);
-        }
+        const float topo = static_cast<float>(m.bounds.getY() + mmpx(ui::kMM3U - 2.5f)) - lh;
+        const float x = static_cast<float>(m.bounds.getX() + mmpx(xmm));
         g.setColour(kPrata.withAlpha(0.85f));
         g.fillPath(marca, juce::AffineTransform::scale(lw / ui::kWordmarkW).translated(x, topo));
     }

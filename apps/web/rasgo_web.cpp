@@ -259,6 +259,7 @@ void descrever() {
         o += ",\"hp\":" + std::to_string(p.hp);
         o += ",\"inst\":" + std::to_string(rasgo::panel::instanceNumber(g, shown, id));
         o += ",\"chega\":" + std::string(id < chega.size() && chega[id] ? "1" : "0");
+        o += ",\"wm\":"; numero(o, rasgo::ui::wordmarkXMM(p, 30.75f / 258.74f));
         o += ",\"w\":[";
         for (std::size_t k = 0; k < p.widgets.size(); ++k) {
             const auto& w = p.widgets[k];

@@ -707,31 +707,13 @@ export class Rack {
     return c;
   }
 
-  // `paintWordmark`: 22 mm, na base; no centro, ou de lado se esbarrar
+  // o wordmark: 22 mm, na base; o lugar vem do motor (`ui::wordmarkXMM`)
   wordmark(g, m) {
-    if (!this.marca) return;
+    if (!this.marca || !(m.wm >= 0)) return;
     const lw = this.mmpx(22);
-    if (lw > m.bw - 6) return;
     const lh = lw * WM.h / WM.w;
-    const topo = m.by + m.bh - 5 - lh;
-    const bate = (xa, xb) => {
-      for (const w of m.w) {
-        let cx, meia, fundo;
-        if (w.k === K.Jack) { cx = this.mmpx(w.x); meia = this.mmpx(3); fundo = this.mmpx(w.y + 2.6); }
-        else if (w.k === K.Knob) { const d = diamKnob(w); cx = this.mmpx(w.x + d * 0.5); meia = this.mmpx(d * 0.6); fundo = this.mmpx(w.y + d); }
-        else if (w.k === K.Toggle) { cx = this.mmpx(w.x + 2); meia = this.mmpx(3); fundo = this.mmpx(w.y + 8); }
-        else continue;
-        cx += m.bx; fundo += m.by;
-        if (cx + meia > xa && cx - meia < xb && fundo > topo - 2) return true;
-      }
-      return false;
-    };
-    let x = m.bx + m.bw / 2 - lw * 0.5;
-    if (bate(x, x + lw)) {
-      const xe = m.bx + 4, xd = m.bx + m.bw - 4 - lw;
-      if (!bate(xe, xe + lw)) x = xe;
-      else if (!bate(xd, xd + lw)) x = xd;
-    }
+    const topo = m.by + this.mmpx(MM_3U - 2.5) - lh;
+    const x = m.bx + this.mmpx(m.wm);
     g.save();
     g.translate(x, topo);
     g.scale(lw / WM.w, lw / WM.w);
