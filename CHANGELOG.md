@@ -9,6 +9,11 @@ pronto.
 
 ## Não publicado (desde a v0.1.13)
 
+- **Painéis centrados, com margem lateral e knobs médios** (26/11, autor):
+  o conteúdo de cada módulo fica centrado (antes 46 dos 105 tinham uma
+  lateral maior que a outra); knobs a 3 mm da borda; na vista normal, uma
+  fileira de knobs passa a 10 mm quando cabe inteira. A marca RASGO tem a
+  mesma regra, em mm, no app e no navegador. Regras em `src/ui/`.
 - **Cabos a 50% de opacidade** (25/11, decisão do autor; a mesma do VCV
   Rack): os painéis ficam legíveis por baixo do cabeamento; o cabo sob o
   mouse e o do inspetor continuam opacos. App e navegador, de uma regra só

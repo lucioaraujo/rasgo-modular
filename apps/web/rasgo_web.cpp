@@ -249,7 +249,9 @@ void descrever() {
     for (const std::size_t id : shown) {
         Signal& n = g.node(id);
         rasgo::modular::Panel p = n.panel();
+        rasgo::ui::centerPanel(p, n.type());
         if (g_compacto) rasgo::ui::compactPanel(p, n.type());
+        else rasgo::ui::knobSizes(p, n.type());
         if (!primeiro) o += ',';
         primeiro = false;
         o += "{\"id\":" + std::to_string(id) + ",\"tipo\":";

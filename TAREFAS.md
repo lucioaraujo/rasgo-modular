@@ -42,7 +42,21 @@ pelo `git log` e pela conversa.
   `tools/auditar_paineis.mjs`, normal e compacto, com a leitura de "human
   polish"). Primeiro exemplo: o NOISE, proposta guardada em
   `.local-build/proposta_noise.patch` (10 HP, quatro colunas, fileiras a cada
-  24 mm), ainda sem OK do autor.
+  24 mm), ainda sem OK do autor (`dossies/propostas_paineis/NOISE.patch`).
+  Feito em 26/11 (OK do autor, regras únicas em `src/ui/`, app e página):
+  marca RASGO centrada em 13 módulos, MIXER com visor em cima, PENDULUM
+  redondo, DERIVA do INTERPRET; marca com regra única em mm
+  (`ui::wordmarkXMM`); **centro e margem lateral** (`ui::centerPanel`, 3 mm)
+  e **knobs médios na vista normal** por fileira inteira (`ui::knobSizes`).
+  Pendentes para a auditoria módulo a módulo: 7 módulos largos demais para
+  3 mm (FORM, INTERPRET, POLY-IN, SIGNAL-IN, ADDITIVE, LOGIC, MARKOV);
+  fileiras curtas fora do eixo (G2); controle principal grande/invertido
+  (G5). Folhas: `.local-build/web/capturas/auditoria/` (todos-*, knobs-*).
+  Ideias do autor para o polish (26/11, a propor em prova): mais sliders
+  verticais/horizontais, knobs de cores invertidas, visores em pixel;
+  proposta de ordem: área de saídas + luzes, escala nos knobs principais.
+  O plugin VCV recebe `centerPanel`/`knobSizes`/`wordmarkXMM` na próxima
+  regeração.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

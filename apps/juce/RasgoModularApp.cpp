@@ -208,7 +208,9 @@ struct Rack {
         const auto it = panelCache.find(id);
         if (it != panelCache.end()) return it->second;
         Panel p = graph.node(id).panel();
+        rasgo::ui::centerPanel(p, graph.node(id).type());
         if (compact) rasgo::ui::compactPanel(p, graph.node(id).type());
+        else rasgo::ui::knobSizes(p, graph.node(id).type());
         return panelCache.emplace(id, std::move(p)).first->second;
     }
     void invalidatePanels() { panelCache.clear(); }

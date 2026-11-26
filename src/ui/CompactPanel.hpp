@@ -75,6 +75,112 @@ struct Item { std::size_t i; float cx, cy, meia; bool jack; };
 
 }  // namespace compacto
 
+// Margem lateral e centro (26/11/2026; autor: "estipulou margem para as
+// laterais dos módulos?", "muitos módulos tem as fileiras de knobs
+// descentralizadas"). Cada módulo declarou as posições à mão e nada as
+// centrava: 46 dos 105 tinham uma lateral mais de 1,5 mm maior que a outra.
+// Aqui o conteúdo (knobs, jacks, sliders, toggles, com os rótulos de texto
+// livres) anda junto, num passo só, até as duas sobras ficarem iguais; as
+// colunas entre fileiras se mantêm. O visor de largura cheia não anda; um
+// painel com visor estreito ou de lado fica como está (geometria própria).
+inline constexpr float kMargemLateral = 3.0f;   // mm do corpo do objeto à borda
+
+inline void centerPanel(rasgo::modular::Panel& p, const std::string& type) {
+    using Kind = rasgo::modular::Widget::Kind;
+    if (type == "MATRIX") return;
+    const float W = static_cast<float>(p.hp) * 5.08f;
+    float a = 1e9f, b = -1e9f;
+    for (const auto& w : p.widgets) {
+        float x0, x1;
+        if (w.kind == Kind::Knob) { x0 = w.x; x1 = w.x + compacto::diametro(w); }
+        else if (w.kind == Kind::Jack) { x0 = w.x - 3.2f; x1 = w.x + 3.2f; }
+        else if (w.kind == Kind::Slider) { x0 = w.x; x1 = w.x + 6.0f; }
+        else if (w.kind == Kind::Toggle) { x0 = w.x; x1 = w.x + 4.0f; }
+        else if (w.kind == Kind::Display) {
+            if ((w.span > 1.0f ? w.span : 16.0f) < W - 8.0f) return;
+            continue;
+        } else continue;
+        a = std::min(a, x0); b = std::max(b, x1);
+    }
+    if (!(a < b)) return;
+    const float dx = 0.5f * ((W - b) - a);
+    if (std::fabs(dx) < 0.25f) return;
+    for (auto& w : p.widgets) if (w.kind != Kind::Display) w.x += dx;
+}
+
+// Knobs MÉDIOS (10 mm) também na vista NORMAL (26/11/2026; autor: "na versão
+// compacta os knobs tem tamanhos diferentes, verifique porque não acontece as
+// variações de tamanho no modo normal"; escolheu a regra própria do normal).
+// Mede o espaço livre real: uma fileira de knobs cresce INTEIRA para 10 mm
+// (em volta dos mesmos centros, rótulos juntos) quando nenhum knob dela,
+// já crescido, chega a menos de 1 mm de outro objeto, do rótulo dele, do
+// visor ou da borda. A fileira decide junta, para a variação ser regular.
+namespace normal {
+
+struct Caixa { float x0, x1, y0, y1; };
+
+inline Caixa caixa(const rasgo::modular::Widget& w, float dKnob = 0.0f) {
+    using Kind = rasgo::modular::Widget::Kind;
+    const float rot = 0.5f * (1.55f * static_cast<float>(w.label.size()) + 1.0f);
+    switch (w.kind) {
+    case Kind::Knob: {
+        const float d0 = compacto::diametro(w);
+        const float cx = w.x + d0 * 0.5f, cy = w.y + d0 * 0.5f;
+        const float d = dKnob > 0.0f ? dKnob : d0, m = std::max(d * 0.5f, rot);
+        return {cx - m, cx + m, cy - d * 0.5f - 4.0f, cy + d * 0.5f};
+    }
+    case Kind::Jack: { const float m = std::max(3.2f, rot); return {w.x - m, w.x + m, w.y - 7.0f, w.y + 3.2f}; }
+    case Kind::Slider: return {w.x, w.x + 6.0f, w.y, w.y + 34.0f};
+    case Kind::Toggle: { const float m = std::max(3.0f, rot); return {w.x + 2.0f - m, w.x + 2.0f + m, w.y, w.y + 8.0f}; }
+    case Kind::Display: return {w.x, w.x + (w.span > 1.0f ? w.span : 16.0f), w.y, w.y + w.height};
+    default: return {0, 0, 0, 0};
+    }
+}
+
+inline bool batem(const Caixa& a, const Caixa& b, float folga) {
+    return a.x0 < b.x1 + folga && b.x0 < a.x1 + folga && a.y0 < b.y1 + folga && b.y0 < a.y1 + folga;
+}
+
+}  // namespace normal
+
+inline void knobSizes(rasgo::modular::Panel& p, const std::string& type) {
+    using namespace compacto;
+    if (type == "MATRIX") return;
+    const float W = static_cast<float>(p.hp) * 5.08f;
+    std::vector<std::size_t> knobs;
+    for (std::size_t k = 0; k < p.widgets.size(); ++k)
+        if (p.widgets[k].kind == Kind::Knob && !(p.widgets[k].span > 1.0f)) knobs.push_back(k);
+    std::vector<char> feito(p.widgets.size(), 0);
+    for (const std::size_t a : knobs) {
+        if (feito[a]) continue;
+        const float ya = p.widgets[a].y;
+        std::vector<std::size_t> fila;
+        for (const std::size_t b : knobs)
+            if (!feito[b] && std::fabs(p.widgets[b].y - ya) < 4.0f) { fila.push_back(b); feito[b] = 1; }
+        bool cabe = true;
+        for (const std::size_t k : fila) {
+            const auto nova = normal::caixa(p.widgets[k], 10.0f);
+            const auto velha = normal::caixa(p.widgets[k]);
+            // longe das laterais (autor: "só cuide para não haver botões e
+            // jacks muito nas extremidades"): corpo a 3 mm, rótulo a 2 mm
+            const float cx = 0.5f * (velha.x0 + velha.x1);
+            if (cx - 5.0f < kMargemLateral || cx + 5.0f > W - kMargemLateral
+                || nova.x0 < 2.0f || nova.x1 > W - 2.0f || nova.y0 < 1.0f) { cabe = false; break; }
+            for (std::size_t o = 0; o < p.widgets.size() && cabe; ++o) {
+                if (o == k || p.widgets[o].kind == Kind::Label) continue;
+                const bool irma = std::find(fila.begin(), fila.end(), o) != fila.end();
+                const auto outra = irma ? normal::caixa(p.widgets[o], 10.0f) : normal::caixa(p.widgets[o]);
+                const auto outraVelha = normal::caixa(p.widgets[o]);
+                if (normal::batem(velha, outraVelha, 1.0f)) continue;   // já encostavam: não é o crescer
+                if (normal::batem(nova, outra, 1.0f)) cabe = false;
+            }
+            if (!cabe) break;
+        }
+        if (!cabe) continue;
+        for (const std::size_t k : fila) { auto& w = p.widgets[k]; w.span = 10.0f; w.x -= 1.0f; w.y -= 1.0f; }
+    }
+}
+
 inline void compactPanel(rasgo::modular::Panel& p, const std::string& type) {
     using namespace compacto;
     if (type == "MATRIX" || p.widgets.empty()) return;

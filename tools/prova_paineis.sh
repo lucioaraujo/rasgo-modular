@@ -7,7 +7,10 @@ raiz=$(cd "$(dirname "$0")/.." && pwd)
 tmp=$raiz/.local-build/prova-src
 rm -rf "$tmp"; mkdir -p "$tmp"
 cp -r "$raiz/src" "$raiz/apps" "$tmp/"
-for p in "$raiz"/dossies/propostas_paineis/*.patch; do (cd "$tmp" && patch -p1 -s < "$p"); done
+# argumentos: só esses patches (nomes sem .patch); sem argumentos, todos
+if [ $# -gt 0 ]; then lista=(); for n in "$@"; do lista+=("$raiz/dossies/propostas_paineis/$n.patch"); done
+else lista=("$raiz"/dossies/propostas_paineis/*.patch); fi
+for p in "${lista[@]}"; do (cd "$tmp" && patch -p1 -s < "$p"); done
 source "$raiz/../../third_party/emsdk/emsdk_env.sh" >/dev/null 2>&1
 obj=$raiz/.local-build/web-obj; out=$raiz/.local-build/web-prova
 mkdir -p "$out"
