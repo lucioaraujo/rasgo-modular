@@ -9,6 +9,25 @@ pronto.
 
 ## Não publicado (desde a v0.1.13)
 
+- **Frente de acabamento ("human polish"), 26/11** — tudo de regras únicas em
+  `src/ui/`, no app (e plugin de DAW) e na página; o plugin VCV recebe na
+  próxima regeração:
+  - **área de saídas**: as saídas numa placa mais clara (`ui::outputPlates`);
+  - **luzes** nas saídas: LED verde (positivo) / vermelho (negativo), brilho
+    pela amplitude, pico guardado entre quadros (`ui/OutputLights.hpp`);
+  - **controle principal** de 87 módulos com corpo claro, ponteiro escuro e
+    escala de 11 marcas (`ui/PrimaryControl.hpp`; módulos simétricos sem);
+  - **margem de baixo**: a última fileira de jacks em 110 mm em 90 dos 105
+    módulos (`ui::centerPanel`); **visores** de largura cheia todos a 2,5 mm
+    das laterais e 6 mm do topo;
+  - **MATRIX** com as células na cor da família;
+  - **painéis revistos** (colunas pelo centro, knobs e jacks nas mesmas
+    colunas, saída no centro): NOISE (10 HP), MATTER e STRING (11 HP),
+    OPERATOR (13), PLL (14), SPECTRA e FORMANT (10), SIGNAL-IN, VCA4;
+  - **VCA4**: entradas novas **CHAIN** (áudio somado à mistura, encadeia dois
+    VCA4) e **MXCV** (CV do ganho da mistura), na coluna do MIX;
+  - página: a leitura "módulos · cabos" desceu para a faixa de créditos (o
+    cabeçalho quebrava em duas linhas ao começar o som).
 - **Painéis centrados, com margem lateral e knobs médios** (26/11, autor):
   o conteúdo de cada módulo fica centrado (antes 46 dos 105 tinham uma
   lateral maior que a outra); knobs a 3 mm da borda; na vista normal, uma

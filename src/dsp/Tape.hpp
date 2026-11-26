@@ -53,20 +53,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 10;
         p.add(Widget::Kind::Label, "TAPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "tape", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "WOW", "wow", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FLUT", "flutter", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "HISS", "hiss", 20.5f, 50.0f);
-        p.add(Widget::Kind::Knob, "WEAR", "wear", 36.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "WEAR", "in:wear_cv", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "DRV", "in:drive_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "DROP", "out:dropout", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "tape", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 7.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 21.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "WOW", "wow", 35.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "FLUT", "flutter", 7.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "HISS", "hiss", 21.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "WEAR", "wear", 35.40f, 50.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 11.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "WEAR", "in:wear_cv", 25.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "DRV", "in:drive_cv", 39.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "DROP", "out:dropout", 18.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 32.40f, 110.0f);
         return p;
     }
 

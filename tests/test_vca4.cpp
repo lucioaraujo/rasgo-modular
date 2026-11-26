@@ -28,6 +28,7 @@ using Gen = std::function<float(std::size_t)>;
 struct Ins {
     Gen in[4] = {nullptr, nullptr, nullptr, nullptr};
     Gen cv[4] = {nullptr, nullptr, nullptr, nullptr};
+    Gen chain = nullptr, mixcv = nullptr;   // as entradas da mistura (26/11/2026)
 };
 
 // devolve os 5 canais de saída (out1..out4, mix) concatenados? não —
@@ -39,6 +40,7 @@ std::vector<float> run(Vca4& v, int blocks, const Ins& g, int pick) {
                         AudioBlock(kSr, 1, kB), AudioBlock(kSr, 1, kB)};
     AudioBlock bc[4] = {AudioBlock(kSr, 1, kB), AudioBlock(kSr, 1, kB),
                         AudioBlock(kSr, 1, kB), AudioBlock(kSr, 1, kB)};
+    AudioBlock bch(kSr, 1, kB), bmc(kSr, 1, kB);
     std::vector<float> r;
     std::size_t n = 0;
     for (int b = 0; b < blocks; ++b) {
@@ -51,6 +53,12 @@ std::vector<float> run(Vca4& v, int blocks, const Ins& g, int pick) {
             ins.push_back(g.in[k] ? &bi[k] : nullptr);
             ins.push_back(g.cv[k] ? &bc[k] : nullptr);
         }
+        for (std::size_t s = 0; s < kB; ++s) {
+            if (g.chain) bch.at(0, s) = g.chain(n + s);
+            if (g.mixcv) bmc.at(0, s) = g.mixcv(n + s);
+        }
+        ins.push_back(g.chain ? &bch : nullptr);
+        ins.push_back(g.mixcv ? &bmc : nullptr);
         v.process(ins, out);
         for (std::size_t s = 0; s < kB; ++s)
             r.push_back(out[static_cast<std::size_t>(pick)].at(0, s));
@@ -73,6 +81,22 @@ Gen sine(double hz, float amp = 0.5f) {
 Gen dc(float v) { return [v](std::size_t) { return v; }; }
 
 // ---- testes ----
+
+// CHAIN soma à mistura; MXCV multiplica o MIXG (0 cala, sem cabo = MIXG)
+void testChainAndMixCv() {
+    Ins g; g.chain = sine(220.0);
+    Vca4 a;
+    EXPECT(rms(run(a, 60, g, 4), 6000) > 0.30);              // só o CHAIN já sai no MIX
+    g.mixcv = dc(0.0f);
+    Vca4 b;
+    EXPECT(rms(run(b, 60, g, 4), 6000) < 0.01);              // MXCV em 0 fecha a mistura
+    g.mixcv = dc(0.5f);
+    Vca4 c;
+    const double meio = rms(run(c, 60, g, 4), 6000);
+    Ins h; h.chain = sine(220.0);
+    Vca4 d;
+    EXPECT(std::fabs(meio / rms(run(d, 60, h, 4), 6000) - 0.5) < 0.06);   // metade
+}
 
 void testPerChannelGain() {
     Vca4 v;
@@ -196,6 +220,7 @@ void testPanel() {
 }  // namespace
 
 int main() {
+    testChainAndMixCv();
     testPerChannelGain();
     testCvOpensChannel();
     testCvAttenuvert();

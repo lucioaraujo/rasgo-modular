@@ -25,6 +25,12 @@
 // - `mix_gain`(0–2)      ganho da saída `mix` (soma dos 4 canais).
 // - `drift`   (0–1, desvio Rasgo)  wobble lento e SEMEADO nos 4 ganhos.
 //
+// Entradas da mistura (autor, 26/11/2026, junto com a coluna do MIX):
+// - `chain`  áudio somado à mistura antes do MIXG: encadeia dois VCA4
+//            (o MIX de um no CHAIN do outro = 8 canais numa saída).
+// - `mixcv`  CV do ganho da mistura: com cabo, multiplica o MIXG pela CV
+//            (0..1) — um envelope ou LFO faz o fade geral.
+//
 // Modulação por PORTA: `cvN` atenuvertida SOMA ao knob (o knob fica
 // vivo). `process()` não aloca. `drift=0` → determinístico.
 
@@ -40,21 +46,29 @@ public:
     Panel panel() const override {
         Panel p;
         p.hp = 18;
+        // Cinco colunas simétricas (autor, 26/11/2026: "somente um jack
+        // ocupando a coluna da direita, fica muito espaço vazio"): os quatro
+        // canais e a coluna do MIX, com o ganho (MIXG) e a saturação (SAT)
+        // da mistura em cima da saída MIX. CURVE e DRIFT, que valem para
+        // todos os canais, no meio deles (G1/G2). Centros das colunas:
+        const float c[5] = {12.72f, 29.22f, 45.72f, 62.22f, 78.72f};
         p.add(Widget::Kind::Label, "VCA4", "", 2.5f, 2.0f);
         for (int ch = 0; ch < 4; ++ch) {
             const std::string n = std::to_string(ch + 1);
-            const float x = 8.0f + static_cast<float>(ch) * 18.0f;
-            p.add(Widget::Kind::Knob, ("LVL" + n), "level" + n, x, 16.0f);
-            p.add(Widget::Kind::Knob, ("CV" + n), "cv" + n + "_amt", x, 34.0f);
-            p.add(Widget::Kind::Jack, ("IN" + n), "in:in" + n, x, 78.0f);
-            p.add(Widget::Kind::Jack, ("C" + n), "in:cv" + n, x, 98.0f);
-            p.add(Widget::Kind::Jack, ("O" + n), "out:out" + n, x, 118.0f);
+            const float x = c[ch];
+            p.add(Widget::Kind::Knob, ("LVL" + n), "level" + n, x - 4.0f, 16.0f);
+            p.add(Widget::Kind::Knob, ("CV" + n), "cv" + n + "_amt", x - 4.0f, 34.0f);
+            p.add(Widget::Kind::Jack, ("IN" + n), "in:in" + n, x, 74.0f);
+            p.add(Widget::Kind::Jack, ("C" + n), "in:cv" + n, x, 92.0f);
+            p.add(Widget::Kind::Jack, ("O" + n), "out:out" + n, x, 110.0f);
         }
-        p.add(Widget::Kind::Knob, "CURVE", "curve", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "MIXG", "mix_gain", 26.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 44.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "SAT", "saturation", 62.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "MIX", "out:mix", 80.0f, 118.0f);
+        p.add(Widget::Kind::Knob, "MIXG", "mix_gain", c[4] - 4.0f, 16.0f);
+        p.add(Widget::Kind::Knob, "SAT", "saturation", c[4] - 4.0f, 34.0f);
+        p.add(Widget::Kind::Knob, "CURVE", "curve", c[1] - 4.0f, 52.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", c[2] - 4.0f, 52.0f);
+        p.add(Widget::Kind::Jack, "CHAIN", "in:chain", c[4], 74.0f);
+        p.add(Widget::Kind::Jack, "MXCV", "in:mixcv", c[4], 92.0f);
+        p.add(Widget::Kind::Jack, "MIX", "out:mix", c[4], 110.0f);
         return p;
     }
 
@@ -94,6 +108,8 @@ public:
 
         const AudioBlock* in[4] = {inputs[0], inputs[2], inputs[4], inputs[6]};
         const AudioBlock* cv[4] = {inputs[1], inputs[3], inputs[5], inputs[7]};
+        const AudioBlock* chain = inputs.size() > 8 ? inputs[8] : nullptr;
+        const AudioBlock* mixCv = inputs.size() > 9 ? inputs[9] : nullptr;
 
         for (std::size_t f = 0; f < frames; ++f) {
             if (++driftCounter_ >= driftInterval_) {
@@ -118,7 +134,9 @@ public:
                 y[k] = softSat(x * gSmooth_[k]);
                 sum += y[k];
             }
-            const float m = softSat(sum * mixGain);
+            if (chain != nullptr) sum += chain->at(0, f);
+            const float g = mixCv != nullptr ? mixGain * clamp01(mixCv->at(0, f)) : mixGain;
+            const float m = softSat(sum * g);
 
             for (std::size_t c = 0; c < channels; ++c) {
                 outputs[0].at(c, f) = y[0];
@@ -137,6 +155,9 @@ private:
             v.push_back({"in" + std::to_string(k), PortKind::Audio, ""});
             v.push_back({"cv" + std::to_string(k), PortKind::Control, ""});
         }
+        // no FIM, para os patches salvos manterem os índices (26/11/2026)
+        v.push_back({"chain", PortKind::Audio, ""});
+        v.push_back({"mixcv", PortKind::Control, ""});
         return v;
     }
     static std::vector<PortDescriptor> makeOutputs() {

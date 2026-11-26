@@ -50,7 +50,9 @@
 #include "panel/WindowPolicy.hpp"   // mesma política de abertura do painel X11
 #include "ui/CableGeometry.hpp"
 #include "ui/CompactPanel.hpp"
+#include "ui/OutputLights.hpp"
 #include "ui/PanelGeometry.hpp"
+#include "ui/PrimaryControl.hpp"
 #include "ui/ScopeTrace.hpp"
 #include "ui/Shortcuts.hpp"        // tabela ÚNICA de atalhos (testada)
 
@@ -154,6 +156,9 @@ struct Rack {
     // pode atrasar um quadro, o áudio nunca espera a imagem.
     std::map<std::size_t, rasgo::ui::ScopeTrace> scopes;
     std::map<std::size_t, rasgo::ui::ScopeTrace> scopeSnap;
+    // as luzes das saídas como a UI as mostra (lidas de `scopeSnap` a cada
+    // quadro e caindo devagar, `ui::lightFollow`); só a UI mexe aqui
+    std::map<std::size_t, std::array<float, rasgo::ui::ScopeTrace::kLights>> lightShown;
 
     // Instantâneo dos cabos PARA DESENHO. A UI desenha a partir daqui e
     // NÃO trava o grafo no `paint` — travar 30×/s fazia o thread de áudio
@@ -437,6 +442,10 @@ struct Rack {
             if (!ob) continue;
             const auto it = scopes.find(id);
             if (it == scopes.end()) continue;
+            // as luzes: o pico com sinal de cada saída (`ui/OutputLights.hpp`)
+            for (std::size_t p = 0; p < std::min(graph.node(id).outputCount(), ui::ScopeTrace::kLights); ++p)
+                if (const AudioBlock* lb = graph.lastOutput(id, p))
+                    it->second.outPeak[p] = ui::blockSignedPeak(*lb, it->second.outPeak[p]);
             for (std::size_t i = 0; i < ob->frames(); i += stride)
                 it->second.push(ob->at(0, i));
             if (graph.node(id).outputCount() >= 4
@@ -3741,6 +3750,13 @@ private:
 
         const juce::Graphics::ScopedSaveState clip(g);
         g.reduceClipRegion(m.bounds.reduced(1));
+        // a área das saídas (`ui::outputPlates`)
+        g.setColour(juce::Colour(0xff000000u | ui::kOutputPlate));
+        for (const auto& r : ui::outputPlates(m.panel))
+            g.fillRoundedRectangle(static_cast<float>(m.bounds.getX() + mmpx(r.x)),
+                                   static_cast<float>(m.bounds.getY() + mmpx(r.y)),
+                                   static_cast<float>(mmpx(r.w)), static_cast<float>(mmpx(r.h)),
+                                   static_cast<float>(mmpx(ui::kOutputPlateRadius)));
         const bool matrix = node.type() == "MATRIX";
         for (const auto& w : m.panel.widgets) {
             if (matrix && w.kind == Widget::Kind::Knob
@@ -3772,7 +3788,10 @@ private:
                 const int mid = cy + chh / 2;
                 const int bar = static_cast<int>(v * (chh / 2 - 2));
                 if (bar != 0) {
-                    g.setColour(v >= 0.0f ? T.accent : kCableCtrl[0]);
+                    // a cor da família (autor, 26/11/2026: "deveria ser da cor
+                    // do degradê"); o negativo, a mesma cor apagada
+                    const auto fc = familyColour(familyOfType(node.type()));
+                    g.setColour(v >= 0.0f ? fc : fc.withAlpha(0.45f));
                     g.fillRect(cx + 2, bar > 0 ? mid - bar : mid,
                                cw - 4, bar > 0 ? bar : -bar);
                 }
@@ -3925,6 +3944,28 @@ private:
         case Widget::Kind::Knob: {
             const int r = mmpx(ui::knobDiameterMM(w) * 0.5f);
             const juce::Rectangle<int> box(wx, wy, 2 * r, 2 * r);
+            const bool principal = !w.bind.empty() && w.bind == ui::primaryControl(node.type());
+            if (st && principal) {   // o controle principal: escala e corpo invertido
+                const auto c = box.getCentre().toFloat();
+                g.setColour(T.textSecondary);
+                for (int k = 0; k < ui::kScaleTicks; ++k) {
+                    const float a = juce::degreesToRadians(-135.0f + 27.0f * static_cast<float>(k));
+                    const float r0 = static_cast<float>(r + mmpx(0.5f));
+                    const float r1 = static_cast<float>(r + mmpx(k % 5 == 0 ? 1.5f : 1.2f));
+                    g.drawLine(c.x + std::sin(a) * r0, c.y - std::cos(a) * r0,
+                               c.x + std::sin(a) * r1, c.y - std::cos(a) * r1, 1.0f);
+                }
+                const auto bf = box.toFloat();
+                g.setGradientFill(juce::ColourGradient(juce::Colour(0xffeef1f6), bf.getX(), bf.getY(),
+                                                       juce::Colour(0xffaab2c0), bf.getX(), bf.getBottom(), false));
+                g.fillEllipse(bf);
+                g.setColour(T.line);
+                g.drawEllipse(bf, 1.0f);
+                g.setColour(T.textSecondary);
+                rotulo(g, m, w.label, wx - mmpx(2.0f), wy - mmpx(4.6f),
+                       2 * r + mmpx(4.0f), mmpx(3.5f));
+                break;
+            }
             if (st) {
                 // corpo escuro com leve volume (mais claro em cima) e o reflexo
                 // prata no contorno, claro no alto à esquerda e sumindo embaixo
@@ -3949,7 +3990,8 @@ private:
             // ponteiro: -135° a +135°, como o painel X11
             const float a = juce::degreesToRadians(-135.0f + 270.0f * norm);
             const auto c = box.getCentre().toFloat();
-            g.setColour(juce::Colour(0xffd8dde6));   // ponteiro prata (autor, 24/11/2026)
+            g.setColour(principal ? juce::Colour(0xff000000u | ui::kPrimaryPointer)
+                                  : juce::Colour(0xffd8dde6));   // ponteiro prata (autor, 24/11/2026)
             g.drawLine(c.x, c.y, c.x + std::sin(a) * static_cast<float>(r) * 0.8f,
                        c.y - std::cos(a) * static_cast<float>(r) * 0.8f, 2.0f);
             break;
@@ -4037,13 +4079,41 @@ private:
             // duplo quando o tipo de sinal casa (áudio→áudio,
             // controle→controle), simples quando cruza domínio; os
             // inválidos apagam. É o que ensina onde dá pra ligar.
+            bool luzSaida = false;
+            int luzPorta = -1;
+            {
+                PortKind lk = PortKind::Audio;
+                if (!resolveJack(node, w.bind, luzSaida, luzPorta, lk)) luzSaida = false;
+            }
+            const float lx = static_cast<float>(wx + mmpx(ui::kLightDX));
+            const float ly = static_cast<float>(wy + mmpx(ui::kLightDY));
+            const float lr = static_cast<float>(mmpx(ui::kLightRadius));
             if (st) {
                 g.setColour(T.recessed);
                 g.fillEllipse(box);
+                if (luzSaida) {   // o LED apagado
+                    g.setColour(juce::Colour(0xff000000u | ui::kLightOff));
+                    g.fillEllipse(lx - lr, ly - lr, 2 * lr, 2 * lr);
+                }
                 g.setColour(T.textSecondary);
                 rotulo(g, m, w.label, wx - mmpx(5.0f), wy - mmpx(6.5f),
                        mmpx(10.0f), mmpx(3.5f));
                 break;
+            }
+            // o LED aceso: verde no positivo, vermelho no negativo (`ui/OutputLights.hpp`)
+            if (luzSaida && luzPorta >= 0 && static_cast<std::size_t>(luzPorta) < ui::ScopeTrace::kLights) {
+                const auto li = rack_.lightShown.find(m.id);
+                const float v = li == rack_.lightShown.end() ? 0.0f : li->second[static_cast<std::size_t>(luzPorta)];
+                const float b = ui::lightBrightness(v);
+                if (b > 0.0f) {
+                    const auto cor = juce::Colour(0xff000000u | (v > 0.0f ? ui::kLightPositive : ui::kLightNegative));
+                    g.setColour(cor.withAlpha(b));
+                    g.fillEllipse(lx - lr, ly - lr, 2 * lr, 2 * lr);
+                    if (b > 0.5f) {
+                        g.setColour(cor.withAlpha(0.18f * b));
+                        g.fillEllipse(lx - 2.2f * lr, ly - 2.2f * lr, 4.4f * lr, 4.4f * lr);
+                    }
+                }
             }
 
             int halo = 0;   // 0 nada · 1 forte · 2 válido · 3 apagado
@@ -6315,8 +6385,15 @@ private:
             // atribui entrada a entrada em vez de `scopeSnap = scopes`:
             // reaproveita os vetores já alocados. A troca do mapa inteiro
             // realocava ~175 KB por quadro, 30×/s, à toa.
-            for (const auto& [id, sc] : rack_.scopes) rack_.scopeSnap[id] = sc;
+            for (auto& [id, sc] : rack_.scopes) {
+                rack_.scopeSnap[id] = sc;
+                sc.outPeak.fill(0.0f);   // as luzes: lido, zera
+            }
             rack_.snapshotCables();
+            for (const auto& [id, sc] : rack_.scopeSnap) {
+                auto& luz = rack_.lightShown[id];
+                for (std::size_t p = 0; p < luz.size(); ++p) luz[p] = ui::lightFollow(luz[p], sc.outPeak[p]);
+            }
             rack_.gmx.unlock();
         }
 

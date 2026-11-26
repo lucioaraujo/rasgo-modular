@@ -62,8 +62,12 @@
   #corpo { flex: 1; display: flex; min-height: 0; }
   #direita { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   /* a faixa de crédito (`CreditsStrip`): 16 px, à direita, em cima do rack */
-  #creditos { height: 16px; flex: none; text-align: right; padding-right: 10px; color: var(--muted);
+  #creditos { height: 16px; flex: none; display: flex; justify-content: space-between; gap: 12px;
+              padding: 0 10px 0 14px; color: var(--muted);
               font: 8.6px/16px system-ui, sans-serif; white-space: nowrap; overflow: hidden; }
+  /* a leitura (módulos · cabos) desceu do cabeçalho para esta faixa (26/11/2026):
+     ao começar o som ela alargava o cabeçalho, que quebrava em duas linhas */
+  #creditos #leitura { font-size: 8.6px; }
   /* TUTORIAL e SOBRE (`OverlayView`): véu sobre o rack e um cartão */
   #sobrepor { position: fixed; inset: 0; background: rgba(19, 26, 26, .82); display: none; z-index: 9;
               align-items: center; justify-content: center; }
@@ -200,7 +204,6 @@
     <button data-acao="compacto" id="b-compacto" class="prata">COMPACTO</button>
   </div>
   <div class="grupo direita">
-    <span id="leitura"></span>
     <div id="vu"><div></div></div>
     <span class="rotulo" id="r-volume">VOLUME</span>
     <div id="t-volume" class="trilho" tabindex="0"><div class="cheio"></div></div>
@@ -223,7 +226,7 @@
   </nav>
   <div id="leitura-menu" role="menu"></div>
   <div id="direita">
-  <div id="creditos"></div>
+  <div id="creditos"><span id="leitura"></span><span id="credito"></span></div>
   <div id="rolagem">
     <div class="espaco"></div>
     <canvas id="rack"></canvas>
@@ -302,7 +305,7 @@ function aplicarTextos() {
   $('b-tocar').textContent = W('tocar');
   $('r-volume').textContent = W('volume');
   $('b-lingua').textContent = ROTULO_L[L];
-  $('creditos').textContent = tx('footerCredit') + versao().replace(' ', '  ·  ');
+  $('credito').textContent = tx('footerCredit') + versao().replace(' ', '  ·  ');
   relogioRec();
   $('b-titulo').textContent = tx('scaleBankTitle');
   $('b-busca').placeholder = tx('scaleBankSearch');
@@ -411,7 +414,7 @@ async function ligar() {
         if (m.entrada !== est.entrada) { est.entrada = m.entrada; entradas(m.entrada); }
         if ((m.rec >= 0) !== (est.rec >= 0) || Math.floor(m.rec) !== Math.floor(est.rec)) { est.rec = m.rec; relogioRec(); }
         if (m.learnValor !== learn.valor) { learn.valor = m.learnValor; if (learn.mostrado?.param) mostrarLearn(); }
-        rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas);
+        rack.quadro(m.valores, m.cabos, m.ids, m.visores, m.escalas, m.luzes);
         est.cabos = m.cabos.length / 14;
         // o VU do cabeçalho (`setReadout`): pico contra −1 dBFS
         const f = Math.min(1, m.vu / 0.891), vu = $('vu').firstChild;
@@ -1163,7 +1166,8 @@ async function previa() {
     }
   if (q.has('espectro')) for (const md of rack.mods) if (md.tipo === 'SCOPE') rack.espectro.add(md.id);
   rack.quadro(new Float32Array(mem.buffer, e.rw_valores(), nc).slice(),
-              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice(), ids, vis, escalas);
+              new Float32Array(mem.buffer, e.rw_cabos_estado(), e.rw_cabos() * 14).slice(), ids, vis, escalas,
+              new Float32Array(mem.buffer, e.rw_luzes(), e.rw_num_luzes()).slice());
   if (q.has('rolar')) { $('rolagem').scrollTop = q.get('rolar') === 'fim' ? 1e9 : Number(q.get('rolar')); rack.desenhar(); }
   const vu = Math.min(1, e.rw_vu() / 0.891);
   $('vu').firstChild.style.width = Math.round(vu * 54) + 'px';

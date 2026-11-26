@@ -43,18 +43,20 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 10;
         p.add(Widget::Kind::Label, "KEY", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "key", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "MEM", "memory", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ESTAB", "stability", 30.0f, 30.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "ROOT", "out:root", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SCL", "out:scale", 19.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "CERT", "out:certainty", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "MUD", "out:changed", 43.0f, 116.0f);
+        p.add(Widget::Kind::Display, "key", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "MEM", "memory", 14.40f, 32.0f);
+        p.add(Widget::Kind::Knob, "ESTAB", "stability", 28.40f, 32.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 11.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 25.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 39.40f, 90.0f);
+        p.add(Widget::Kind::Jack, "ROOT", "out:root", 7.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "SCL", "out:scale", 19.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "CERT", "out:certainty", 31.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "MUD", "out:changed", 43.40f, 110.0f);
         return p;
     }
 

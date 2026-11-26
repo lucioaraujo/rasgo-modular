@@ -63,26 +63,24 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
+        // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        p.hp = 10;
         p.add(Widget::Kind::Label, "SPECTRA", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "spectra", "", 2.5f, 6.0f, 66.0f);
-        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
-        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
-        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
-        // 26/11: "manter no centro e subir um pouco os jacks").
-        p.add(Widget::Kind::Knob, "VOICE", "voices", 18.86f, 28.0f);
-        p.add(Widget::Kind::Knob, "BLUR", "blur", 31.56f, 28.0f);
-        p.add(Widget::Kind::Knob, "SHIFT", "shift", 44.26f, 28.0f);
-        p.add(Widget::Kind::Knob, "STRCH", "stretch", 18.86f, 48.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 31.56f, 48.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 44.26f, 48.0f);
-        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 27.21f, 70.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 37.91f, 68.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 22.86f, 92.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 35.56f, 92.0f);
-        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 48.26f, 92.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 29.21f, 110.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 41.91f, 110.0f);
+        p.add(Widget::Kind::Display, "spectra", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "VOICE", "voices", 7.40f, 28.0f);
+        p.add(Widget::Kind::Knob, "BLUR", "blur", 21.40f, 28.0f);
+        p.add(Widget::Kind::Knob, "SHIFT", "shift", 35.40f, 28.0f);
+        p.add(Widget::Kind::Knob, "STRCH", "stretch", 7.40f, 48.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 21.40f, 48.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 35.40f, 48.0f);
+        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 17.40f, 70.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 27.40f, 68.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 11.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "FRZ", "in:freeze", 39.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 19.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 31.40f, 110.0f);
         return p;
     }
 

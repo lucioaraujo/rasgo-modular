@@ -162,6 +162,20 @@ aplicado aqui: o RATE poderia ser o knob grande.
 3. Ao fim de cada lote, a auditoria roda de novo (a nota tem de cair) e o
    teste de layout do app (`rasgo_modular_panel_layout_tests`) tem de passar.
 
+### 7.1 O que foi feito em 26/11 (com OK do autor)
+
+- Regras gerais em `src/ui/CompactPanel.hpp` (`centerPanel`): conteúdo
+  centrado, margem lateral de 3 mm, visor de largura cheia em 2,5/6 mm,
+  bloco de jacks de baixo com a última fileira em 110 mm (90 de 105).
+- Achado que se repete: knobs eram posicionados pelo CANTO e jacks pelo
+  CENTRO — as colunas ficavam desencontradas ~4 mm. Os painéis revistos
+  usam centros de coluna (`cx - 4` para o knob de 8 mm).
+- Rótulos: o teste de layout conta 2,8 mm por letra — rótulos de 5 letras
+  pedem 14 mm entre colunas; de 4, 12,7.
+- Lotes: NOISE; lote 1 (MATTER, STRING, OPERATOR, PLL, SIGNAL-IN, SPECTRA,
+  FORMANT, VCA4); lote 2 (VOCODER, TAPE, BLEFE, TAP, DECISION, KEY,
+  INTERPRET). Folhas em `.local-build/web/capturas/auditoria/`.
+
 ## 8. A tabela dos 105 (do pior para o melhor)
 
 n = normal, c = compacto. Gerada por `tools/auditar_paineis.mjs` em

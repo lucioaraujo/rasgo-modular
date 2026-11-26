@@ -84,11 +84,45 @@ struct Item { std::size_t i; float cx, cy, meia; bool jack; };
 // colunas entre fileiras se mantêm. O visor de largura cheia não anda; um
 // painel com visor estreito ou de lado fica como está (geometria própria).
 inline constexpr float kMargemLateral = 3.0f;   // mm do corpo do objeto à borda
+inline constexpr float kBottomRowMM = 110.0f;   // a última fileira de jacks (G4)
 
 inline void centerPanel(rasgo::modular::Panel& p, const std::string& type) {
     using Kind = rasgo::modular::Widget::Kind;
     if (type == "MATRIX") return;
     const float W = static_cast<float>(p.hp) * 5.08f;
+    // o visor de largura cheia sempre no mesmo lugar (autor, 26/11/2026:
+    // "verifique os alinhamentos dos displays"): 2,5 mm de cada lado, a
+    // 6 mm do topo — cinco módulos tinham 0,6 a 1,3 mm a menos ou 1 mm abaixo
+    for (auto& w : p.widgets)
+        if (w.kind == Kind::Display && (w.span > 1.0f ? w.span : 16.0f) >= W - 8.0f) {
+            w.x = 2.5f; w.span = W - 5.0f; w.y = 6.0f;
+        }
+    // a margem de BAIXO (autor, 26/11/2026: "não há um padrão de margem em
+    // relação à logo"): o bloco de jacks/toggles abaixo do último knob ou
+    // slider anda junto, na vertical, até a última fileira ficar em
+    // `kBottomRowMM` — até onde houver espaço acima dele (3 mm do knob).
+    {
+        float limite = 0.0f, ultimo = 0.0f, topo = 1e9f;
+        for (const auto& w : p.widgets) {
+            if (w.kind == Kind::Knob) limite = std::max(limite, w.y + compacto::diametro(w));
+            else if (w.kind == Kind::Slider) limite = std::max(limite, w.y + 34.0f);
+            else if (w.kind == Kind::Display) limite = std::max(limite, w.y + w.height);
+        }
+        for (const auto& w : p.widgets)
+            if ((w.kind == Kind::Jack && w.y - 7.0f >= limite) || (w.kind == Kind::Toggle && w.y >= limite)) {
+                ultimo = std::max(ultimo, w.kind == Kind::Jack ? w.y : w.y + 4.0f);
+                topo = std::min(topo, w.kind == Kind::Jack ? w.y - 7.0f : w.y);
+            }
+        if (ultimo > 0.0f) {
+            float dy = kBottomRowMM - ultimo;
+            if (dy < 0.0f) dy = std::max(dy, (limite + 3.0f) - topo);
+            if (std::fabs(dy) > 0.25f)
+                for (auto& w : p.widgets)
+                    if (((w.kind == Kind::Jack && w.y - 7.0f >= limite) || (w.kind == Kind::Toggle && w.y >= limite))
+                        || (w.kind == Kind::Label && w.y >= topo - 1.0f && w.y <= ultimo + 4.0f))
+                        w.y += dy;
+        }
+    }
     float a = 1e9f, b = -1e9f;
     for (const auto& w : p.widgets) {
         float x0, x1;

@@ -31,6 +31,11 @@ inline constexpr std::size_t kScopeLen = 220;
 inline constexpr std::size_t kLaneLen = 128;
 
 struct ScopeTrace {
+    // o pico com sinal de cada saída desde a última leitura (as luzes,
+    // `ui/OutputLights.hpp`); até 16 saídas por módulo
+    static constexpr std::size_t kLights = 16;
+    std::array<float, kLights> outPeak{};
+
     std::vector<float> buf = std::vector<float>(kScopeLen, 0.0f);
     std::size_t w = 0;
 

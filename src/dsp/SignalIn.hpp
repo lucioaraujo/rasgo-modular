@@ -82,23 +82,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
+        // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
         p.hp = 8;
         p.add(Widget::Kind::Label, "SIGNAL-IN", "", 2.0f, 2.0f);
-        p.add(Widget::Kind::Display, "in", "", 2.5f, 6.0f, 35.0f);
-        p.add(Widget::Kind::Knob, "GAIN", "gain", 4.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "BEND", "bend", 17.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DIV", "clk_div", 30.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CC#", "cc_num", 10.5f, 50.0f);
-        p.add(Widget::Kind::Toggle, "ON", "listen", 3.0f, 60.0f);
-        p.add(Widget::Kind::Jack, "L", "out:out", 5.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 16.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "out:pitch", 5.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "GATE", "out:gate", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "VEL", "out:vel", 5.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "CC", "out:cc", 18.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "CLK", "out:clk", 31.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "RUN", "out:run", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "out:rst", 31.0f, 114.0f);
+        p.add(Widget::Kind::Display, "in", "", 2.5f, 6.0f, 35.64f);
+        p.add(Widget::Kind::Knob, "GAIN", "gain", 5.32f, 30.0f);
+        p.add(Widget::Kind::Knob, "BEND", "bend", 16.32f, 30.0f);
+        p.add(Widget::Kind::Knob, "DIV", "clk_div", 27.32f, 30.0f);
+        p.add(Widget::Kind::Toggle, "ON", "listen", 7.32f, 54.0f);
+        p.add(Widget::Kind::Knob, "CC#", "cc_num", 16.32f, 50.0f);
+        p.add(Widget::Kind::Jack, "L", "out:out", 9.32f, 78.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 20.32f, 78.0f);
+        p.add(Widget::Kind::Jack, "CLK", "out:clk", 31.32f, 78.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "out:pitch", 9.32f, 94.0f);
+        p.add(Widget::Kind::Jack, "GATE", "out:gate", 20.32f, 94.0f);
+        p.add(Widget::Kind::Jack, "RUN", "out:run", 31.32f, 94.0f);
+        p.add(Widget::Kind::Jack, "VEL", "out:vel", 9.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "CC", "out:cc", 20.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "RST", "out:rst", 31.32f, 110.0f);
         return p;
     }
 

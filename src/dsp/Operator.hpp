@@ -54,21 +54,23 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
+        // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        p.hp = 13;
         p.add(Widget::Kind::Label, "OPERATOR", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "fm", "", 2.5f, 6.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 6.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 19.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "ALGO", "algo", 32.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "INDEX", "index", 45.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback", 58.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "RB", "ratio_b", 6.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "RC", "ratio_c", 19.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "RD", "ratio_d", 32.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 45.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 8.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "IDX", "in:index", 24.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 114.0f);
+        p.add(Widget::Kind::Display, "fm", "", 2.5f, 6.0f, 61.04f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 3.62f, 28.0f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 16.32f, 28.0f);
+        p.add(Widget::Kind::Knob, "ALGO", "algo", 29.02f, 28.0f);
+        p.add(Widget::Kind::Knob, "INDEX", "index", 41.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback", 54.42f, 28.0f);
+        p.add(Widget::Kind::Knob, "RB", "ratio_b", 9.97f, 48.0f);
+        p.add(Widget::Kind::Knob, "RC", "ratio_c", 22.67f, 48.0f);
+        p.add(Widget::Kind::Knob, "RD", "ratio_d", 35.37f, 48.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 48.07f, 48.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 26.67f, 88.0f);
+        p.add(Widget::Kind::Jack, "IDX", "in:index", 39.37f, 88.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 33.02f, 110.0f);
         return p;
     }
 

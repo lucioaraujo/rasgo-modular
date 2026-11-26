@@ -103,27 +103,29 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
-        p.hp = 16;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e jacks
+        // nas mesmas colunas, rótulos com folga; mais estreito onde sobrava (G1–G4).
+        p.hp = 14;
         p.add(Widget::Kind::Label, "PLL", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "lock", "", 2.5f, 6.0f, 76.3f);
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FINE", "fine", 22.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SHAPE", "shape", 37.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 52.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LOCK", "lock_gain", 67.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FM", "fm_amount", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback_amount", 22.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "FTYP", "feedback_type", 37.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 5.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FM", "in:fm", 17.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "REF", "in:ref", 29.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 41.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RING", "out:ring", 53.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "LOCK", "out:lock", 65.0f, 96.0f);
-        p.add(Widget::Kind::Knob, "PERTO", "near_hz", 52.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "ENC", "out:meet", 41.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "SEP", "out:part", 53.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "BAT", "out:beat", 65.0f, 114.0f);
+        p.add(Widget::Kind::Display, "lock", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 3.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "FINE", "fine", 17.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "SHAPE", "shape", 31.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 45.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "LOCK", "lock_gain", 59.56f, 28.0f);
+        p.add(Widget::Kind::Knob, "FM", "fm_amount", 10.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback_amount", 24.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "FTYP", "feedback_type", 38.56f, 48.0f);
+        p.add(Widget::Kind::Knob, "PERTO", "near_hz", 52.56f, 48.0f);
+        p.add(Widget::Kind::Jack, "1V/O", "in:pitch", 22.86f, 80.0f);
+        p.add(Widget::Kind::Jack, "FM", "in:fm", 35.56f, 80.0f);
+        p.add(Widget::Kind::Jack, "REF", "in:ref", 48.26f, 80.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 22.86f, 96.0f);
+        p.add(Widget::Kind::Jack, "RING", "out:ring", 35.56f, 96.0f);
+        p.add(Widget::Kind::Jack, "LOCK", "out:lock", 48.26f, 96.0f);
+        p.add(Widget::Kind::Jack, "ENC", "out:meet", 22.86f, 110.0f);
+        p.add(Widget::Kind::Jack, "SEP", "out:part", 35.56f, 110.0f);
+        p.add(Widget::Kind::Jack, "BAT", "out:beat", 48.26f, 110.0f);
         return p;
     }
 

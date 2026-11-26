@@ -54,22 +54,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 10;
         p.add(Widget::Kind::Label, "BLEFE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "blefe", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "VERD", "truthfulness", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "JAN", "window", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MEM", "memory", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LIM", "threshold", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "SEED", "seed", 23.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 19.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "SIG", "out:signal", 7.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "VERD", "out:truth", 19.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "CONF", "out:confirm", 31.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "CNF", "out:trust", 7.0f, 118.0f);
-        p.add(Widget::Kind::Jack, "RESP", "out:response", 19.0f, 118.0f);
-        p.add(Widget::Kind::Jack, "TRAI", "out:betrayal", 31.0f, 118.0f);
+        p.add(Widget::Kind::Display, "blefe", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "VERD", "truthfulness", 7.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "JAN", "window", 21.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "MEM", "memory", 35.40f, 30.0f);
+        p.add(Widget::Kind::Knob, "LIM", "threshold", 14.40f, 50.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 28.40f, 50.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 18.40f, 76.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 32.40f, 76.0f);
+        p.add(Widget::Kind::Jack, "SIG", "out:signal", 11.40f, 94.0f);
+        p.add(Widget::Kind::Jack, "VERD", "out:truth", 25.40f, 94.0f);
+        p.add(Widget::Kind::Jack, "CONF", "out:confirm", 39.40f, 94.0f);
+        p.add(Widget::Kind::Jack, "CNF", "out:trust", 11.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "RESP", "out:response", 25.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "TRAI", "out:betrayal", 39.40f, 110.0f);
         return p;
     }
 

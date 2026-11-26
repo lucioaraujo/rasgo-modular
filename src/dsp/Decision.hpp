@@ -59,23 +59,25 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
         p.hp = 12;
         p.add(Widget::Kind::Label, "DECISION", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "history", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "BIAS", "bias", 21.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 35.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SHAPE", "shape", 49.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "STEPS", "steps", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 21.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "DEJA", "dejavu", 35.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "LOOP", "loop_length", 49.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 5.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "BIAS", "in:bias_mod", 17.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "SPRD", "in:spread_mod", 29.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "X", "out:x", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "Y", "out:y", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GATE", "out:gate", 29.0f, 116.0f);
+        p.add(Widget::Kind::Display, "history", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 5.48f, 30.0f);
+        p.add(Widget::Kind::Knob, "BIAS", "bias", 19.48f, 30.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 33.48f, 30.0f);
+        p.add(Widget::Kind::Knob, "SHAPE", "shape", 47.48f, 30.0f);
+        p.add(Widget::Kind::Knob, "STEPS", "steps", 5.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 19.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "DEJA", "dejavu", 33.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "LOOP", "loop_length", 47.48f, 50.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", 16.48f, 90.0f);
+        p.add(Widget::Kind::Jack, "BIAS", "in:bias_mod", 30.48f, 90.0f);
+        p.add(Widget::Kind::Jack, "SPRD", "in:spread_mod", 44.48f, 90.0f);
+        p.add(Widget::Kind::Jack, "X", "out:x", 16.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "Y", "out:y", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "GATE", "out:gate", 44.48f, 110.0f);
         return p;
     }
 

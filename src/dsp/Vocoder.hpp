@@ -63,20 +63,22 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 14;
+        // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
+        // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
+        p.hp = 11;
         p.add(Widget::Kind::Label, "VOCODER", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "vocoder", "", 2.5f, 6.0f, 66.0f);
-        p.add(Widget::Kind::Knob, "BANDS", "bands", 9.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "SHIFT", "shift", 27.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "SIBIL", "sibilance", 45.0f, 32.0f);
-        p.add(Widget::Kind::Knob, "ATK", "attack", 9.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "REL", "release", 27.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 45.0f, 56.0f);
-        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 9.0f, 80.0f);
-        p.add(Widget::Kind::Jack, "CAR", "in:carrier", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "MOD", "in:mod", 22.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 36.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 120.0f);
+        p.add(Widget::Kind::Display, "vocoder", "", 2.5f, 6.0f, 50.88f);
+        p.add(Widget::Kind::Knob, "BANDS", "bands", 9.94f, 30.0f);
+        p.add(Widget::Kind::Knob, "SHIFT", "shift", 23.94f, 30.0f);
+        p.add(Widget::Kind::Knob, "SIBIL", "sibilance", 37.94f, 30.0f);
+        p.add(Widget::Kind::Knob, "ATK", "attack", 9.94f, 50.0f);
+        p.add(Widget::Kind::Knob, "REL", "release", 23.94f, 50.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 37.94f, 50.0f);
+        p.add(Widget::Kind::Toggle, "FRZ", "freeze", 25.94f, 68.0f);
+        p.add(Widget::Kind::Jack, "CAR", "in:carrier", 13.94f, 90.0f);
+        p.add(Widget::Kind::Jack, "MOD", "in:mod", 27.94f, 90.0f);
+        p.add(Widget::Kind::Jack, "PIT", "in:pitch", 41.94f, 90.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 27.94f, 110.0f);
         return p;
     }
 

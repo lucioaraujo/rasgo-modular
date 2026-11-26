@@ -63,7 +63,9 @@
 #include "panel/SinkOut.hpp"
 #include "panel/UiLanguage.hpp"
 #include "ui/CompactPanel.hpp"
+#include "ui/OutputLights.hpp"
 #include "ui/PanelGeometry.hpp"
+#include "ui/PrimaryControl.hpp"
 #include "ui/ScopeTrace.hpp"
 
 #include <cmath>
@@ -105,6 +107,11 @@ int g_blocos = 0, g_passos = 0;
 std::string g_texto;
 struct Controle { std::size_t no; std::string bind; };
 std::vector<Controle> g_controles;
+// as luzes das saídas (`ui/OutputLights.hpp`): uma por jack de saída do JSON,
+// na ordem de "li"; o pico com sinal desde a última leitura (`rw_luzes`)
+struct Luz { std::size_t no, porta; };
+std::vector<Luz> g_luzes;
+std::vector<float> g_luzPico, g_luzLida;
 std::vector<float> g_valores, g_cabos;
 
 // os visores (`Display`): a mesma telemetria do app (`Rack::feedScopes`),
@@ -196,6 +203,7 @@ void descrever() {
     using Kind = rasgo::modular::Widget::Kind;
     g_texto.clear();
     g_controles.clear();
+    g_luzes.clear();
     auto& g = *g_grafo;
     // os módulos à vista, na ordem do app (`Rack::build` +
     // `syncSeedCopies`): o rack de fábrica por família, alfabético dentro
@@ -262,6 +270,16 @@ void descrever() {
         o += ",\"inst\":" + std::to_string(rasgo::panel::instanceNumber(g, shown, id));
         o += ",\"chega\":" + std::string(id < chega.size() && chega[id] ? "1" : "0");
         o += ",\"wm\":"; numero(o, rasgo::ui::wordmarkXMM(p, 30.75f / 258.74f));
+        o += ",\"pl\":[";
+        {
+            bool pr = true;
+            for (const auto& r : rasgo::ui::outputPlates(p)) {
+                if (!pr) o += ',';
+                pr = false;
+                numero(o, r.x); o += ','; numero(o, r.y); o += ','; numero(o, r.w); o += ','; numero(o, r.h);
+            }
+        }
+        o += ']';
         o += ",\"w\":[";
         for (std::size_t k = 0; k < p.widgets.size(); ++k) {
             const auto& w = p.widgets[k];
@@ -275,6 +293,7 @@ void descrever() {
             o += ",\"s\":"; numero(o, w.span);
             o += ",\"h\":"; numero(o, w.height);
             if (w.kind == Kind::Display && rasgo::ui::roundDisplay(n.type())) o += ",\"rd\":1";
+            if (w.kind == Kind::Knob && !w.bind.empty() && w.bind == rasgo::ui::primaryControl(n.type())) o += ",\"pr\":1";
             if ((w.kind == Kind::Knob || w.kind == Kind::Slider || w.kind == Kind::Toggle)
                 && !w.bind.empty()) {
                 for (const auto& par : n.parameters())
@@ -289,10 +308,15 @@ void descrever() {
                     }
             } else if (w.kind == Kind::Jack) {
                 bool saida = false; int idx = -1, tipo = 0;
-                if (porta(n, w.bind, saida, idx, tipo))
+                if (porta(n, w.bind, saida, idx, tipo)) {
                     o += ",\"out\":" + std::string(saida ? "1" : "0")
                        + ",\"p\":" + std::to_string(idx)
                        + ",\"pk\":" + std::to_string(tipo);
+                    if (saida) {
+                        o += ",\"li\":" + std::to_string(g_luzes.size());
+                        g_luzes.push_back({id, static_cast<std::size_t>(idx)});
+                    }
+                }
             }
             o += '}';
         }
@@ -300,6 +324,8 @@ void descrever() {
     }
     o += "]}";
     g_valores.assign(g_controles.size(), 0.0f);
+    g_luzPico.assign(g_luzes.size(), 0.0f);
+    g_luzLida.assign(g_luzes.size(), 0.0f);
 }
 
 // `Rack::feedScopes` do app, quantum a quantum (ver `kBlocoApp`)
@@ -1136,6 +1162,18 @@ float rw_vu() {
     return p;
 }
 
+// as luzes das saídas: o pico com sinal de cada uma desde a última
+// leitura (Float32, na ordem de "li"; quantas em rw_num_luzes), e zera
+__attribute__((used, visibility("default")))
+int rw_num_luzes() { return static_cast<int>(g_luzes.size()); }
+
+__attribute__((used, visibility("default")))
+float* rw_luzes() {
+    g_luzLida = g_luzPico;
+    std::fill(g_luzPico.begin(), g_luzPico.end(), 0.0f);
+    return g_luzLida.data();
+}
+
 __attribute__((used, visibility("default")))
 float* rw_processar() {
     if (!g_grafo || !g_bloco) {
@@ -1144,6 +1182,9 @@ float* rw_processar() {
     }
     g_grafo->process(*g_bloco, g_saida, 0);
     alimentarVisores();
+    for (std::size_t k = 0; k < g_luzes.size(); ++k)
+        if (const AudioBlock* b = g_grafo->lastOutput(g_luzes[k].no, g_luzes[k].porta))
+            g_luzPico[k] = rasgo::ui::blockSignedPeak(*b, g_luzPico[k]);
     if (g_gravando) {
         g_recFrames += kQuantum;
         // as notas que os NOTE-OUT fecharam (`collectNotes`)

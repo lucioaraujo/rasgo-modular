@@ -16,6 +16,7 @@ const T = {
   bg: '#131a1a', surface: '#262b36', recessed: '#0e1015', line: '#485060',
   textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#ff9d4c',
   warning: '#ff6b5b', prata: '#d8dde6',
+  placa: '#3a4252',   // `ui::kOutputPlate`
 };
 const CABO_AUDIO = ['#d97b4a', '#c96f6f', '#d9a24a', '#b5734f'];
 const CABO_CTRL = ['#5cb0d4', '#6f96c9', '#4aa9b5', '#7f8fd9'];
@@ -26,6 +27,8 @@ const MM_HP = 5.08, MM_3U = 128.5;
 const S_MIN = 1.6, S_MAX = 2.6, FILEIRAS = 3, PAD = 14, TOPO = 2, VAO_MM = 3;
 const DPR_MAX = 1.5;
 const WM = { x: 6.63, y: 12.62, w: 258.74, h: 30.75 };
+// as luzes das saídas: as mesmas constantes de `src/ui/OutputLights.hpp`
+const LUZ = { dx: 3.4, dy: -2.6, r: 0.8, pos: [143, 227, 154], neg: [255, 107, 91], decai: 0.82 };
 
 export function corFamilia(f, alfa = 1) {
   if (!(f in MATIZ)) return T.line;
@@ -147,7 +150,15 @@ export class Rack {
     this.layout();
   }
 
-  quadro(valores, cabos, ids = [], visores = null, escalas = {}) {
+  quadro(valores, cabos, ids = [], visores = null, escalas = {}, luzes = null) {
+    // as luzes das saídas (`ui::lightFollow`): a leitura nova ou a de antes caindo
+    if (luzes) {
+      if (!this.luzes || this.luzes.length !== luzes.length) this.luzes = new Float32Array(luzes.length);
+      for (let k = 0; k < luzes.length; k++) {
+        const caindo = this.luzes[k] * LUZ.decai;
+        this.luzes[k] = Math.abs(luzes[k]) >= Math.abs(caindo) ? luzes[k] : caindo;
+      }
+    }
     this.valores = valores;
     this.cabos = cabos;
     this.visores.clear();
@@ -219,7 +230,7 @@ export class Rack {
     g.fillStyle = T.bg;
     g.fillRect(0, 0, vw, vh);
     g.translate(0, -topo);
-    const ponteiros = new Path2D(), ligados = new Path2D(), desligados = new Path2D();
+    const ponteiros = new Path2D(), escuros = new Path2D(), ligados = new Path2D(), desligados = new Path2D();
     const bordas = new Path2D(), brilhos = new Path2D(), pegas = [];
     const cheios = new Map();   // cor da família → retângulos dos sliders
     for (const m of this.vistos) {
@@ -234,8 +245,9 @@ export class Rack {
           // ponteiro: -135° a +135°, como no app
           const r = this.mmpx(diamKnob(w) * 0.5), cx = wx + r, cy = wy + r;
           const a = (-135 + 270 * this.norma(m, w)) * Math.PI / 180;
-          ponteiros.moveTo(cx, cy);
-          ponteiros.lineTo(cx + Math.sin(a) * r * 0.8, cy - Math.cos(a) * r * 0.8);
+          const pp = w.pr ? escuros : ponteiros;   // no principal (claro), ponteiro escuro
+          pp.moveTo(cx, cy);
+          pp.lineTo(cx + Math.sin(a) * r * 0.8, cy - Math.cos(a) * r * 0.8);
         } else if (w.k === K.Slider) {
           const bw = this.mmpx(6), bh = this.mmpx(30), fundo = wy + bh;
           const fill = Math.round(bh * this.norma(m, w));
@@ -262,6 +274,7 @@ export class Rack {
     g.strokeStyle = T.line; g.lineWidth = 1; g.stroke(bordas);
     g.strokeStyle = 'rgba(216, 221, 230, 0.56)'; g.stroke(brilhos);
     g.strokeStyle = T.prata; g.lineWidth = 2; g.lineCap = 'butt'; g.stroke(ponteiros);
+    g.strokeStyle = T.bg; g.stroke(escuros);
     this.visiveis(topo, vh);
     const agora = performance.now();
     for (const m of this.vistos) {
@@ -284,6 +297,26 @@ export class Rack {
           espectro: this.espectro.has(m.id), clip: (this.clipAte.get(m.id) || 0) > agora,
           escala: this.escalas[m.id] });
         g.restore();
+      }
+    }
+    // as luzes acesas: verde para o positivo, vermelho para o negativo
+    if (this.luzes) {
+      const r = this.mmpx(LUZ.r);
+      for (const m of this.vistos) {
+        if (m.by + m.bh < topo || m.by > topo + vh) continue;
+        for (const w of m.w) {
+          if (w.li === undefined) continue;
+          const v = this.luzes[w.li] || 0, a = Math.abs(v);
+          if (a < 0.01) continue;
+          const c = v > 0 ? LUZ.pos : LUZ.neg, b = Math.sqrt(Math.min(1, a));
+          const x = m.bx + this.mmpx(w.x + LUZ.dx), y = m.by + this.mmpx(w.y + LUZ.dy);
+          g.fillStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${b})`;
+          g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill();
+          if (b > 0.5) {   // o halo de um LED aceso
+            g.fillStyle = `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${0.18 * b})`;
+            g.beginPath(); g.arc(x, y, r * 2.2, 0, 2 * Math.PI); g.fill();
+          }
+        }
       }
     }
     // borda acesa: o módulo sendo arrastado e os do tipo sob o mouse na paleta
@@ -355,7 +388,7 @@ export class Rack {
         g.fillStyle = T.recessed; g.fillRect(r.x, r.y, r.w, r.h);
         const mid = r.y + Math.floor(r.h / 2), bar = Math.trunc(v * (Math.floor(r.h / 2) - 2));
         if (bar !== 0) {
-          g.fillStyle = v >= 0 ? T.accent : CABO_CTRL[0];
+          g.fillStyle = corFamilia(m.familia, v >= 0 ? 1 : 0.45);   // a cor da família, como a faixa
           g.fillRect(r.x + 2, bar > 0 ? mid - bar : mid, r.w - 4, Math.abs(bar));
         }
         g.fillStyle = T.line; g.fillRect(r.x + 1, mid, r.w - 3, 1);
@@ -682,6 +715,16 @@ export class Rack {
     g.beginPath();
     g.rect(m.bx + 1, m.by + 1, m.bw - 2, m.bh - 2);
     g.clip();
+    // a área das saídas (`ui::outputPlates`)
+    if (m.pl) {
+      g.fillStyle = T.placa;
+      for (let k = 0; k + 3 < m.pl.length; k += 4) {
+        g.beginPath();
+        g.roundRect(m.bx + this.mmpx(m.pl[k]), m.by + this.mmpx(m.pl[k + 1]),
+                    this.mmpx(m.pl[k + 2]), this.mmpx(m.pl[k + 3]), this.mmpx(1.5));
+        g.fill();
+      }
+    }
     for (const w of m.w) {
       if (m.tipo === 'MATRIX' && w.k === K.Knob && celulaMatriz(w.b)) continue;
       this.widgetFixo(g, m, w);
@@ -694,6 +737,10 @@ export class Rack {
       if (w.k === K.Jack) {
         g.strokeStyle = T.line; g.lineWidth = 1.5;
         g.beginPath(); g.arc(wx, wy, this.mmpx(2.4) - 0.75, 0, 2 * Math.PI); g.stroke();
+      }
+      if (w.k === K.Jack && w.li !== undefined) {   // o LED apagado
+        g.fillStyle = T.recessed;
+        g.beginPath(); g.arc(wx + this.mmpx(LUZ.dx), wy + this.mmpx(LUZ.dy), this.mmpx(LUZ.r), 0, 2 * Math.PI); g.fill();
       }
     }
     if (m.tipo === 'MATRIX') {
@@ -756,6 +803,25 @@ export class Rack {
       case K.Knob: {
         const r = this.mmpx(diamKnob(w) * 0.5);
         const cx = wx + r, cy = wy + r;
+        if (w.pr) {   // o controle principal (`ui::primaryControl`): escala e corpo invertido
+          g.strokeStyle = T.textSecondary; g.lineWidth = 1;
+          g.beginPath();
+          for (let k = 0; k < 11; k++) {
+            const a = (-135 + 27 * k) * Math.PI / 180, s = Math.sin(a), c = -Math.cos(a);
+            const r0 = r + this.mmpx(0.5), r1 = r + this.mmpx(k % 5 === 0 ? 1.5 : 1.2);
+            g.moveTo(cx + s * r0, cy + c * r0); g.lineTo(cx + s * r1, cy + c * r1);
+          }
+          g.stroke();
+          const gp = g.createLinearGradient(0, wy, 0, wy + 2 * r);
+          gp.addColorStop(0, '#eef1f6'); gp.addColorStop(1, '#aab2c0');
+          g.fillStyle = gp;
+          g.beginPath(); g.arc(cx, cy, r, 0, 2 * Math.PI); g.fill();
+          g.strokeStyle = T.line; g.lineWidth = 1;
+          g.beginPath(); g.arc(cx, cy, r - 0.5, 0, 2 * Math.PI); g.stroke();
+          g.fillStyle = T.textSecondary;
+          this.rotulo(g, m, w.l, wx - this.mmpx(2), wy - this.mmpx(4.6), 2 * r + this.mmpx(4), this.mmpx(3.5));
+          break;
+        }
         const gr = g.createLinearGradient(0, wy, 0, wy + 2 * r);
         gr.addColorStop(0, '#2c303a');   // recessed.brighter(0.35)
         gr.addColorStop(1, T.recessed);

@@ -1467,6 +1467,10 @@ inline const LearnTable& learnTable() {
             {"out:out4", {"Saída do canal 4.", "", ""}},
             {"out:mix", {"Soma dos 4 canais × MIXG, com teto suave.",
                         "", ""}},
+            {"in:chain", {"CHAIN: áudio somado à mistura antes do MIXG.",
+                          "Encadeia dois VCA4: o MIX de um no CHAIN do outro dá 8 canais numa saída só.", ""}},
+            {"in:mixcv", {"MXCV: CV do ganho da mistura — com cabo, o MIXG é multiplicado pela CV (0..1).",
+                          "Um ENVELOPE ou LFO aqui faz o fade geral dos 4 canais de uma vez.", ""}},
         }},
         {"CLOCK", {
             {"in:rate", {"RATE: o andamento multiplicado — 1 V dobra, −1 V corta pela metade, 0 V é o do knob. Ligue o RATE do TEMPO aqui.", "", ""}},

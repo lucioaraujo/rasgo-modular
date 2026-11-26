@@ -2227,6 +2227,8 @@ inline void registrarLotesTraduzidos() {
         t["VCA4"]["mix_gain"] = LearnEntry{"Gain of the MIX output (0–2×) — the sum of the 4 channels with a soft ceiling. A free 4-channel mixer.", "", ""};
         t["VCA4"]["drift"] = LearnEntry{"Slow, SEEDED oscillation in the 4 gains (±~3 %) — the bank breathes. Deterministic. 0 = static.", "", ""};
         t["VCA4"]["out:mix"] = LearnEntry{"Sum of the 4 channels × MIXG, with a soft ceiling.", "", ""};
+        t["VCA4"]["in:chain"] = LearnEntry{"CHAIN: audio added to the mix before MIXG.", "Chains two VCA4s: the MIX of one into the CHAIN of the other gives 8 channels on one output.", ""};
+        t["VCA4"]["in:mixcv"] = LearnEntry{"MXCV: CV of the mix gain — when patched, MIXG is multiplied by the CV (0..1).", "An ENVELOPE or LFO here fades all 4 channels at once.", ""};
         t["DYNAMICS"]["thresh"] = LearnEntry{"Threshold: above it (compressor) the sound is turned down; below it (gate) the sound is shut. −48 to 0 dB; the THR CV adds ±24 dB.", "The detector compares the level it hears with the threshold, in dB — the compressor's static curve (Giannoulis, Massberg and Reiss, 2012).", ""};
         t["DYNAMICS"]["ratio"] = LearnEntry{"How much it turns down: 4 = every 4 dB above the threshold become 1. At maximum (20) it becomes a limiter: nothing passes the threshold. In GATE, how much it shuts below it.", "", ""};
         t["DYNAMICS"]["attack"] = LearnEntry{"How fast it starts turning down once the sound passes the threshold (0.1–200 ms). Fast cuts the hit; slow lets the attack through and compresses the body.", "", "Attack ~20 ms on a DRUM: the hit gets through and the tail is held — more 'punch'."};
@@ -3030,6 +3032,8 @@ inline void registrarLotesTraduzidos() {
         t["VCA4"]["mix_gain"] = LearnEntry{"Gain de la sortie MIX (0–2×) — la somme des 4 canaux avec un plafond doux. Un mixeur 4 canaux offert.", "", ""};
         t["VCA4"]["drift"] = LearnEntry{"Oscillation lente et SEMÉE dans les 4 gains (±~3 %) — le banc respire. Déterministe. 0 = statique.", "", ""};
         t["VCA4"]["out:mix"] = LearnEntry{"Somme des 4 canaux × MIXG, avec un plafond doux.", "", ""};
+        t["VCA4"]["in:chain"] = LearnEntry{"CHAIN : audio ajouté au mix avant MIXG.", "Enchaîne deux VCA4 : le MIX de l’un dans le CHAIN de l’autre donne 8 canaux sur une sortie.", ""};
+        t["VCA4"]["in:mixcv"] = LearnEntry{"MXCV : CV du gain du mix — branchée, MIXG est multiplié par la CV (0..1).", "Une ENVELOPPE ou un LFO ici fait le fondu des 4 canaux à la fois.", ""};
         t["DYNAMICS"]["thresh"] = LearnEntry{"Seuil : au-dessus (compresseur) le son est baissé ; en dessous (gate) le son est fermé. −48 à 0 dB ; la CV THR ajoute ±24 dB.", "Le détecteur compare le niveau qu’il entend au seuil, en dB — la courbe statique du compresseur (Giannoulis, Massberg et Reiss, 2012).", ""};
         t["DYNAMICS"]["ratio"] = LearnEntry{"De combien il baisse : 4 = chaque 4 dB au-dessus du seuil deviennent 1. Au maximum (20) il devient limiteur : rien ne passe le seuil. En GATE, de combien il ferme en dessous.", "", ""};
         t["DYNAMICS"]["attack"] = LearnEntry{"À quelle vitesse il commence à baisser quand le son passe le seuil (0,1–200 ms). Rapide coupe le coup ; lent laisse passer l’attaque et comprime le corps.", "", "Attaque ~20 ms sur un DRUM : le coup passe et la queue est tenue — plus de « punch »."};
@@ -3833,6 +3837,8 @@ inline void registrarLotesTraduzidos() {
         t["VCA4"]["mix_gain"] = LearnEntry{"Ganancia de la salida MIX (0–2×) — la suma de los 4 canales con techo suave. Un mezclador de 4 canales de regalo.", "", ""};
         t["VCA4"]["drift"] = LearnEntry{"Oscilación lenta y SEMBRADA en las 4 ganancias (±~3 %) — el banco respira. Determinista. 0 = estático.", "", ""};
         t["VCA4"]["out:mix"] = LearnEntry{"Suma de los 4 canales × MIXG, con techo suave.", "", ""};
+        t["VCA4"]["in:chain"] = LearnEntry{"CHAIN: audio sumado a la mezcla antes de MIXG.", "Encadena dos VCA4: el MIX de uno en el CHAIN del otro da 8 canales en una salida.", ""};
+        t["VCA4"]["in:mixcv"] = LearnEntry{"MXCV: CV de la ganancia de la mezcla — con cable, MIXG se multiplica por la CV (0..1).", "Una ENVOLVENTE o un LFO aquí hace el fundido de los 4 canales a la vez.", ""};
         t["DYNAMICS"]["thresh"] = LearnEntry{"Umbral: por encima (compresor) el sonido se baja; por debajo (gate) el sonido se cierra. −48 a 0 dB; la CV THR suma ±24 dB.", "El detector compara el nivel que oye con el umbral, en dB — la curva estática del compresor (Giannoulis, Massberg y Reiss, 2012).", ""};
         t["DYNAMICS"]["ratio"] = LearnEntry{"Cuánto baja: 4 = cada 4 dB por encima del umbral se vuelven 1. Al máximo (20) se vuelve limitador: nada pasa del umbral. En GATE, cuánto cierra por debajo.", "", ""};
         t["DYNAMICS"]["attack"] = LearnEntry{"Qué tan rápido empieza a bajar cuando el sonido pasa el umbral (0,1–200 ms). Rápido corta el golpe; lento deja pasar el ataque y comprime el cuerpo.", "", "Ataque ~20 ms en un DRUM: el golpe pasa y la cola se sostiene — más «pegada»."};

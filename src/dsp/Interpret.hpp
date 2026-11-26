@@ -62,14 +62,14 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 12;
+        p.hp = 13;   // 26/11/2026: as cinco saídas pediam margem
         p.add(Widget::Kind::Label, "INTERPRET", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "interpret", "", 2.5f, 6.0f, 56.0f);
+        p.add(Widget::Kind::Display, "interpret", "", 2.5f, 6.0f, 61.04f);
         // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
         // §4, aprovada em 26/11/2026): colunas a 12,7 mm simétricas; o DERIVA
         // saiu do canto direito para a fileira de baixo, no centro (autor:
         // "tem um knob muito no canto, há espaço para colocar abaixo").
-        constexpr float c1 = 17.78f, c2 = 30.48f, c3 = 43.18f;   // as três do meio
+        constexpr float c1 = 20.32f, c2 = 33.02f, c3 = 45.72f;   // as três do meio
         p.add(Widget::Kind::Knob, "EXPR", "expression", c1 - 4.0f, 28.0f);
         p.add(Widget::Kind::Knob, "GLIDE", "glide", c2 - 4.0f, 28.0f);
         p.add(Widget::Kind::Knob, "VIB", "vibrato", c3 - 4.0f, 28.0f);

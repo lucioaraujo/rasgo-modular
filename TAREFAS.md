@@ -57,6 +57,22 @@ pelo `git log` e pela conversa.
   proposta de ordem: área de saídas + luzes, escala nos knobs principais.
   O plugin VCV recebe `centerPanel`/`knobSizes`/`wordmarkXMM` na próxima
   regeração.
+  **Ponto de retomada (26/11, noite):** aprovados e aplicados — área de
+  saídas, luzes, controle principal (87 módulos), margem de baixo, visores,
+  MATRIX na cor da família, NOISE 10 HP, lote 1 da revisão (MATTER, STRING,
+  OPERATOR, PLL, SIGNAL-IN, SPECTRA, FORMANT, VCA4 + CHAIN/MXCV), leitura
+  na faixa de créditos. Lote 2 escrito (VOCODER, TAPE, BLEFE, TAP, DECISION,
+  KEY, INTERPRET 13 HP), a mostrar. Fila da revisão pedida pelo autor:
+  PHRASE, QUANTIZER, MULT, RELATE, SWITCH, VIA, APOCRIFO, HALL, LOOPER,
+  PRISM, SAMPLER, SPACE, SWIRL, TURNTABLE, LISTEN, SCOPE, MIXER, MASTER; os
+  outros, só verificação (alinhamento, margens, passo, tamanhos, jacks).
+  14 módulos sem espaço para a margem de baixo (PARAMETRIC, FORM, TEMPO,
+  VOLTA, ACCENT, BOXCAR, HARMONY, CONTROL, ADDITIVE, ENVELOPE, QUANTIZER,
+  CRUSH, SEQUENCE, DYNAMICS). Propostas à espera: knob herói de 14 mm onde
+  sobra espaço; depois sliders, visores novos (LCD de pontos, sete
+  segmentos, polar, fósforo…), atenuverters, grafismo, tipografia,
+  comportamento, manual por módulo e dados técnicos no site. Depois do
+  layout: push e publicação da página (pedido do autor).
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

@@ -71,36 +71,43 @@ public:
 
     Panel panel() const override {
         Panel p;
-        p.hp = 16;
+        // 18 HP (autor, 26/11/2026: "o módulo form há itens encostando nas
+        // margens laterais"): sete jacks por fileira não cabiam em 16 HP com
+        // 3 mm de margem. Entradas juntas numa fileira, saídas nas duas de
+        // baixo (G4); knobs em cinco colunas de 14 mm.
+        p.hp = 18;
         p.add(Widget::Kind::Label, "FORM", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "arc", "", 2.5f, 6.0f, 76.0f);
-        p.add(Widget::Kind::Knob, "GRAM", "grammar", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LEN", "length", 22.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DEPTH", "depth", 37.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "GEST", "gesture", 52.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 67.0f, 30.0f);
-        for (int k = 0; k < 4; ++k) {
-            const std::string n = std::to_string(k + 1);
-            p.add(Widget::Kind::Knob, "SEG" + n, "follow" + n, 7.0f + 15.0f * static_cast<float>(k), 50.0f);
-        }
-        p.add(Widget::Kind::Knob, "SEED", "seed", 67.0f, 50.0f);
-        p.add(Widget::Kind::Toggle, "LOOP", "loop", 56.0f, 99.0f);
-        for (int k = 0; k < 4; ++k) {
-            const std::string n = std::to_string(k + 1);
-            p.add(Widget::Kind::Jack, "IN" + n, "in:in" + n, 5.0f + 12.0f * static_cast<float>(k), 70.0f);
-            p.add(Widget::Kind::Jack, "O" + n, "out:out" + n, 5.0f + 12.0f * static_cast<float>(k), 86.0f);
-        }
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 53.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "NEXT", "in:next", 65.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 77.0f, 70.0f);
-        p.add(Widget::Kind::Jack, "ENV", "in:env", 53.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "MIX", "out:mix", 77.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "TENS", "out:tension", 5.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "SECT", "out:section", 17.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "ROLE", "out:role", 29.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "CLMX", "out:climax", 41.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "BRTH", "out:breath", 53.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "END", "out:end", 65.0f, 114.0f);
+        p.add(Widget::Kind::Display, "arc", "", 2.5f, 6.0f, 86.44f);
+        p.add(Widget::Kind::Knob, "GRAM", "grammar", 13.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "LEN", "length", 27.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "DEPTH", "depth", 41.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "GEST", "gesture", 55.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 69.72f, 28.0f);
+        p.add(Widget::Kind::Knob, "SEG1", "follow1", 13.72f, 48.0f);
+        p.add(Widget::Kind::Knob, "SEG2", "follow2", 27.72f, 48.0f);
+        p.add(Widget::Kind::Knob, "SEG3", "follow3", 41.72f, 48.0f);
+        p.add(Widget::Kind::Knob, "SEG4", "follow4", 55.72f, 48.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 69.72f, 48.0f);
+        p.add(Widget::Kind::Toggle, "LOOP", "loop", 71.72f, 60.0f);
+        p.add(Widget::Kind::Jack, "IN1", "in:in1", 6.52f, 80.0f);
+        p.add(Widget::Kind::Jack, "IN2", "in:in2", 17.72f, 80.0f);
+        p.add(Widget::Kind::Jack, "IN3", "in:in3", 28.92f, 80.0f);
+        p.add(Widget::Kind::Jack, "IN4", "in:in4", 40.12f, 80.0f);
+        p.add(Widget::Kind::Jack, "ENV", "in:env", 51.32f, 80.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 62.52f, 80.0f);
+        p.add(Widget::Kind::Jack, "NEXT", "in:next", 73.72f, 80.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 84.92f, 80.0f);
+        p.add(Widget::Kind::Jack, "O1", "out:out1", 20.32f, 95.0f);
+        p.add(Widget::Kind::Jack, "O2", "out:out2", 33.02f, 95.0f);
+        p.add(Widget::Kind::Jack, "O3", "out:out3", 45.72f, 95.0f);
+        p.add(Widget::Kind::Jack, "O4", "out:out4", 58.42f, 95.0f);
+        p.add(Widget::Kind::Jack, "MIX", "out:mix", 71.12f, 95.0f);
+        p.add(Widget::Kind::Jack, "TENS", "out:tension", 13.97f, 110.0f);
+        p.add(Widget::Kind::Jack, "SECT", "out:section", 26.67f, 110.0f);
+        p.add(Widget::Kind::Jack, "ROLE", "out:role", 39.37f, 110.0f);
+        p.add(Widget::Kind::Jack, "CLMX", "out:climax", 52.07f, 110.0f);
+        p.add(Widget::Kind::Jack, "BRTH", "out:breath", 64.77f, 110.0f);
+        p.add(Widget::Kind::Jack, "END", "out:end", 77.47f, 110.0f);
         return p;
     }
 

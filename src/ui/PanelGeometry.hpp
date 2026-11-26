@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cmath>
+#include <vector>
 
 namespace rasgo::ui {
 
@@ -46,6 +47,45 @@ struct RectMM { float x, y, w, h; };
 // Um lugar só para todos os front-ends (o app lê aqui; o navegador recebe
 // pelo motor, `"rd"` no painel).
 inline bool roundDisplay(const std::string& type) { return type == "PENDULUM"; }
+
+// A área das SAÍDAS (26/11/2026, frente de human polish; convenção do VCV:
+// as saídas numa placa de cor contrastante, para achar de relance onde tirar
+// o sinal). Uma placa por trecho contínuo de saídas numa fileira (jacks
+// `out:` lado a lado, sem entrada no meio), cobrindo o jack e o rótulo de
+// cima. Cor: `kOutputPlate` (RGB), canto `kOutputPlateRadius` mm.
+inline constexpr unsigned kOutputPlate = 0x3a4252;
+inline constexpr float kOutputPlateRadius = 1.5f;
+
+inline std::vector<RectMM> outputPlates(const rasgo::modular::Panel& p) {
+    using Kind = rasgo::modular::Widget::Kind;
+    struct J { float x, y, meia; bool out; };
+    std::vector<J> js;
+    for (const auto& w : p.widgets)
+        if (w.kind == Kind::Jack)
+            js.push_back({w.x, w.y, std::max(4.4f, 0.5f * (1.55f * static_cast<float>(w.label.size()) + 1.0f) + 0.6f),
+                          w.bind.rfind("out:", 0) == 0});
+    std::vector<RectMM> r;
+    std::vector<char> feito(js.size(), 0);
+    for (std::size_t a = 0; a < js.size(); ++a) {
+        if (feito[a]) continue;
+        std::vector<J> fila;
+        for (std::size_t b = 0; b < js.size(); ++b)
+            if (!feito[b] && std::fabs(js[b].y - js[a].y) < 3.0f) { fila.push_back(js[b]); feito[b] = 1; }
+        std::sort(fila.begin(), fila.end(), [](const J& x, const J& y) { return x.x < y.x; });
+        for (std::size_t k = 0; k < fila.size();) {
+            if (!fila[k].out) { ++k; continue; }
+            std::size_t f = k;
+            while (f + 1 < fila.size() && fila[f + 1].out) ++f;
+            const float x0 = fila[k].x - fila[k].meia, x1 = fila[f].x + fila[f].meia;
+            float y = 0.0f;
+            for (std::size_t q = k; q <= f; ++q) y += fila[q].y;
+            y /= static_cast<float>(f - k + 1);
+            r.push_back({x0, y - 8.6f, x1 - x0, 13.4f});
+            k = f + 1;
+        }
+    }
+    return r;
+}
 
 inline float knobDiameterMM(const rasgo::modular::Widget& w) {
     return w.span > 1.0f ? w.span : 8.0f;

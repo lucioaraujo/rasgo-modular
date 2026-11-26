@@ -290,6 +290,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
       const v = new Float32Array(this.mem.buffer, this.e.rw_valores(), this.nc).slice();
       const nCab = this.e.rw_cabos();
       const c = new Float32Array(this.mem.buffer, this.e.rw_cabos_estado(), nCab * 14).slice();
+      // as luzes das saídas (`rw_luzes`: o pico com sinal desde o quadro anterior)
+      const luzes = new Float32Array(this.mem.buffer, this.e.rw_luzes(), this.e.rw_num_luzes()).slice();
       // os visores na tela (748 números cada, `rw_visor`) e, no QUANTIZER,
       // o nome da escala do banco
       const ids = this.visiveis, VISOR = 748;
@@ -310,8 +312,8 @@ class RasgoProcessor extends AudioWorkletProcessor {
         learnValor = deUtf8(u.slice(p, f));
       }
       this.port.postMessage({ tipo: 'quadro', valores: v, cabos: c, ids, visores: vis, escalas, vu: this.e.rw_vu(), learnValor, entrada: this.e.rw_entrada_necessaria(), rec: this.gravando ? this.recQuadros / sampleRate : -1,
-                              lufs: Array.from(new Float32Array(this.mem.buffer, this.e.rw_lufs(), 4)) },
-                            [v.buffer, c.buffer, vis.buffer]);
+                              lufs: Array.from(new Float32Array(this.mem.buffer, this.e.rw_lufs(), 4)), luzes },
+                            [v.buffer, c.buffer, vis.buffer, luzes.buffer]);
     }
     return true;
   }
