@@ -58,22 +58,26 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): os dois
+        // períodos cuja coincidência faz o eclipse, SYN (o sinódico, a Lua
+        // cheia) e DRAC (o dracônico, os nós), em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "ECLIPSE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "eclipse", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LIMIT", "limit", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SYN", "synodic", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRAC", "draconic", 20.5f, 50.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "ALIGN", "out:align", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "PHASE", "out:phase", 44.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SUN", "out:sun", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "MOON", "out:moon", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "NEW", "out:new", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "NODE", "out:node", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "eclipse", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "SYN", "synodic", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "DRAC", "draconic", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "LIMIT", "limit", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 35.40f, 46.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.00f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 18.00f, 92.0f);
+        p.add(Widget::Kind::Jack, "ALIGN", "out:align", 31.00f, 92.0f);
+        p.add(Widget::Kind::Jack, "PHASE", "out:phase", 44.00f, 92.0f);
+        p.add(Widget::Kind::Jack, "SUN", "out:sun", 6.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "MOON", "out:moon", 18.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "NEW", "out:new", 31.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "NODE", "out:node", 44.00f, 110.0f);
         return p;
     }
 

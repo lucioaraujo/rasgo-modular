@@ -50,21 +50,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): as duas
+        // ondas que se cruzam, SPEED e RATIO, em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "INTERFERENCE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "interference", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "THIRD", "third", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "THR", "threshold", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "COHER", "coherence", 20.5f, 50.0f);
-        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RATIO", "in:ratio_cv", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "INT", "out:int", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "FRNG", "out:fringe", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "DARK", "out:dark", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "MOIRE", "out:moire", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "interference", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "THIRD", "third", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "THR", "threshold", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "COHER", "coherence", 35.40f, 46.0f);
+        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 10.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "RATIO", "in:ratio_cv", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 40.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "INT", "out:int", 6.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "FRNG", "out:fringe", 18.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "DARK", "out:dark", 31.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "MOIRE", "out:moire", 44.00f, 110.0f);
         return p;
     }
 

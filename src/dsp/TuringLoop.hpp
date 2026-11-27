@@ -53,21 +53,25 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o LOCK (a
+        // chance de o laço se repetir, o coração do registrador) grande no
+        // centro; o andamento e o tamanho do laço nos lados.
         p.hp = 12;
         p.add(Widget::Kind::Label, "TURING", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "register", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LEN", "length", 21.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LOCK", "lock", 35.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MUT", "mutate", 49.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RANGE", "range", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "STEPS", "steps", 21.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "OFST", "offset", 35.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 5.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "LOCK", "in:lock_mod", 17.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "CV", "out:cv", 5.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "CV2", "out:cv2", 17.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PLS", "out:pulse", 29.0f, 116.0f);
+        p.add(Widget::Kind::Display, "register", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 7.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "LOCK", "lock", 23.48f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "LEN", "length", 45.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "MUT", "mutate", 12.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "RANGE", "range", 26.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "STEPS", "steps", 40.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "OFST", "offset", 26.48f, 66.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 24.13f, 92.0f);
+        p.add(Widget::Kind::Jack, "LOCK", "in:lock_mod", 36.83f, 92.0f);
+        p.add(Widget::Kind::Jack, "CV", "out:cv", 17.78f, 110.0f);
+        p.add(Widget::Kind::Jack, "CV2", "out:cv2", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "PLS", "out:pulse", 43.18f, 110.0f);
         return p;
     }
 

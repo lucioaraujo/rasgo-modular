@@ -107,6 +107,8 @@ pelo `git log` e pela conversa.
   em par TEMP+FIELD; SH com os dois canais espelhados e RATE/CORR no meio.
   O acento laranja saiu de vez (cabeçalho, paleta, LEARN, banco, cabos):
   agora é o prata, no app e na página.
+  Aplicado (27/11, lote 5, TEMPO): TURING com herói LOCK; ECLIPSE em par
+  SYN+DRAC; INTERFERENCE em par SPEED+RATIO.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já
