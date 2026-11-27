@@ -55,21 +55,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Par em 12 mm (autor, 27/11/2026: "avance na personalização dos
+        // módulos", depois do NOISE): os dois eixos da
+        // degradação, RATE (o tempo) e BITS (a amplitude); o resto embaixo.
         p.hp = 10;
         p.add(Widget::Kind::Label, "CRUSH", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "crush", "", 2.5f, 6.0f, 45.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "BITS", "bits", 24.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 40.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "WRAP", "wrap", 8.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "GLTCH", "glitch", 24.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "JITR", "jitter", 40.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "TONE", "tone", 8.0f, 78.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 24.0f, 78.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 8.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 20.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "MXM", "in:mix_mod", 32.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 8.0f, 120.0f);
+        p.add(Widget::Kind::Display, "crush", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "BITS", "bits", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "WRAP", "wrap", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GLTCH", "glitch", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "JITR", "jitter", 7.40f, 64.0f);
+        p.add(Widget::Kind::Knob, "TONE", "tone", 21.40f, 64.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 35.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "RTM", "in:rate_mod", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "MXM", "in:mix_mod", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 25.40f, 110.0f);
         return p;
     }
 

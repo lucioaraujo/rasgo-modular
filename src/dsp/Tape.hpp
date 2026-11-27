@@ -55,20 +55,23 @@ public:
         Panel p;
         // Revisão de painel (autor, 26/11/2026): colunas pelo centro, knobs e
         // jacks nas mesmas colunas, saídas embaixo no centro (G1–G4).
+        // Par em 12 mm (autor, 27/11/2026: "avance na personalização dos
+        // módulos", depois do NOISE): os dois carretéis,
+        // SPEED (a velocidade) e WEAR (o desgaste da fita).
         p.hp = 10;
         p.add(Widget::Kind::Label, "TAPE", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "tape", "", 2.5f, 6.0f, 45.80f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 7.40f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 21.40f, 30.0f);
-        p.add(Widget::Kind::Knob, "WOW", "wow", 35.40f, 30.0f);
-        p.add(Widget::Kind::Knob, "FLUT", "flutter", 7.40f, 50.0f);
-        p.add(Widget::Kind::Knob, "HISS", "hiss", 21.40f, 50.0f);
-        p.add(Widget::Kind::Knob, "WEAR", "wear", 35.40f, 50.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 11.40f, 90.0f);
-        p.add(Widget::Kind::Jack, "WEAR", "in:wear_cv", 25.40f, 90.0f);
-        p.add(Widget::Kind::Jack, "DRV", "in:drive_cv", 39.40f, 90.0f);
-        p.add(Widget::Kind::Jack, "DROP", "out:dropout", 18.40f, 110.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 32.40f, 110.0f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "WEAR", "wear", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "WOW", "wow", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "FLUT", "flutter", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "HISS", "hiss", 21.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "WEAR", "in:wear_cv", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "DRV", "in:drive_cv", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "DROP", "out:dropout", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 31.75f, 110.0f);
         return p;
     }
 

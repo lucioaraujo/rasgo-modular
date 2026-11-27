@@ -96,6 +96,10 @@ pelo `git log` e pela conversa.
   4,4 → 5,4 mm, `ui::kOutputPlateMinHalf`).
   Aplicado (27/11, autor: "ficou bom o noise com a inovação"): NOISE com o
   par do sorteio em 12 mm (RATE, SLEW), escuros; SPRD e POIS embaixo.
+  Aplicado (27/11, "ok avance"): pares de 12 mm ligados ao conceito em
+  CRUSH (RATE+BITS), TAPE (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE
+  (FOLD+WRAP), jacks embaixo. Ainda sem escolha: herói no FILTER/SHIFTER
+  (`HEROI_TRANSFORMAR.patch`).
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

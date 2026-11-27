@@ -63,21 +63,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Par em 12 mm (autor, 27/11/2026: "avance na personalização dos
+        // módulos", depois do NOISE): os dois jeitos
+        // de dobrar a onda, FOLD e WRAP.
         p.hp = 10;
         p.add(Widget::Kind::Label, "SHAPE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "RING", "ring", 8.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "FOLD", "fold", 28.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SYM", "symmetry", 8.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "WRAP", "wrap", 28.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "SAT", "sat", 8.0f, 68.0f);
-        p.add(Widget::Kind::Knob, "LVL", "level", 28.0f, 68.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 8.0f, 84.0f);
-        p.add(Widget::Kind::Knob, "TEAR", "tear", 28.0f, 84.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "MOD", "in:mod", 18.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "FCV", "in:fold_mod", 30.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 42.0f, 110.0f);
+        p.add(Widget::Kind::Display, "wave", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "FOLD", "fold", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "WRAP", "wrap", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "RING", "ring", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "SYM", "symmetry", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "SAT", "sat", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "TEAR", "tear", 7.40f, 64.0f);
+        p.add(Widget::Kind::Knob, "LVL", "level", 21.40f, 64.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 35.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 10.16f, 110.0f);
+        p.add(Widget::Kind::Jack, "MOD", "in:mod", 20.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "FCV", "in:fold_mod", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 40.64f, 110.0f);
         return p;
     }
 
