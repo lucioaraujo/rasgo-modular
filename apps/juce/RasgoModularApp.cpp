@@ -128,7 +128,7 @@ struct Tokens {
     juce::Colour bg{0xff131a1a}, surface{0xff262b36}, recessed{0xff0e1015},
         line{0xff485060}, textPrimary{rasgo::panel::kLearnTextPrimary},
         textSecondary{rasgo::panel::kLearnTextSecondary},
-        accent{0xffff9d4c}, warning{0xffff6b5b},
+        accent{0xffd8dde6} /* prata: o laranja saiu de vez (autor, 27/11/2026) */, warning{0xffff6b5b},
         // REC aceso: vermelho de gravação, não o laranja de "ligado" dos
         // outros botões — pedido do autor, 2 out. 2026. O `warning` (coral)
         // ao lado do laranja não chegava a ler como vermelho.

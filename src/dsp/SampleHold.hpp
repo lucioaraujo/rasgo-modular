@@ -47,23 +47,27 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): dois canais
+        // espelhados (o 1 à esquerda, o 2 à direita) e, no meio, o que os une:
+        // o RATE comum em 12 mm e a CORR (a correlação entre os dois).
         p.hp = 12;
         p.add(Widget::Kind::Label, "SH", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "hold", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 8.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 26.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SLOPE", "slope", 44.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SLW1", "slew1", 8.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "SLW2", "slew2", 26.0f, 48.0f);
-        p.add(Widget::Kind::Knob, "CORR", "correlation", 44.0f, 48.0f);
-        p.add(Widget::Kind::Toggle, "TRK1", "track1", 8.0f, 68.0f);
-        p.add(Widget::Kind::Toggle, "TRK2", "track2", 26.0f, 68.0f);
-        p.add(Widget::Kind::Jack, "IN1", "in:in1", 7.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "T1", "in:trig1", 19.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "IN2", "in:in2", 34.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "T2", "in:trig2", 46.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "O1", "out:out1", 16.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "O2", "out:out2", 40.0f, 112.0f);
+        p.add(Widget::Kind::Display, "hold", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "SLW1", "slew1", 7.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 24.48f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "SLW2", "slew2", 45.48f, 31.0f);
+        p.add(Widget::Kind::Toggle, "TRK1", "track1", 9.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 18.48f, 45.0f);
+        p.add(Widget::Kind::Knob, "SLOPE", "slope", 34.48f, 45.0f);
+        p.add(Widget::Kind::Toggle, "TRK2", "track2", 47.48f, 48.0f);
+        p.add(Widget::Kind::Knob, "CORR", "correlation", 26.48f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN1", "in:in1", 8.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "T1", "in:trig1", 19.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "IN2", "in:in2", 41.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "T2", "in:trig2", 52.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "O1", "out:out1", 14.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "O2", "out:out2", 47.00f, 110.0f);
         return p;
     }
 

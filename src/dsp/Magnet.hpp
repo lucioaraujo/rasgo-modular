@@ -60,23 +60,26 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o par do
+        // modelo de Ising, TEMP (a agitação) e FIELD (o campo), em 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "MAGNET", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "magnet", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "TEMP", "temp", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "COUPL", "coupling", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "FIELD", "field", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SWEEP", "sweep", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 20.5f, 50.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 36.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "QNCH", "in:quench", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TEMP", "in:temp_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FLD", "in:field_cv", 44.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "GT", "out:gate", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "MAG", "out:mag", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "ENER", "out:energy", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "FLIP", "out:flips", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "magnet", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "TEMP", "temp", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "FIELD", "field", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "COUPL", "coupling", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "SWEEP", "sweep", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 21.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.35f, 92.0f);
+        p.add(Widget::Kind::Jack, "QNCH", "in:quench", 19.05f, 92.0f);
+        p.add(Widget::Kind::Jack, "TEMP", "in:temp_cv", 31.75f, 92.0f);
+        p.add(Widget::Kind::Jack, "FLD", "in:field_cv", 44.45f, 92.0f);
+        p.add(Widget::Kind::Jack, "GT", "out:gate", 6.35f, 110.0f);
+        p.add(Widget::Kind::Jack, "MAG", "out:mag", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "ENER", "out:energy", 31.75f, 110.0f);
+        p.add(Widget::Kind::Jack, "FLIP", "out:flips", 44.45f, 110.0f);
         return p;
     }
 

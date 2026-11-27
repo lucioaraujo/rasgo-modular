@@ -15,7 +15,7 @@
 <style>
   /* os tokens do app (`T` em RasgoModularApp.cpp) */
   :root { --bg: #131a1a; --surface: #262b36; --recessed: #0e1015; --line: #485060; --text: #f0f3f8;
-          --muted: #bec8d8; --prata: #d8dde6; --accent: #ff9d4c; --warning: #ff6b5b; }
+          --muted: #bec8d8; --prata: #d8dde6; --accent: #d8dde6; /* o acento é o prata (o laranja saiu de vez, autor 27/11/2026) */ --warning: #ff6b5b; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif;
@@ -124,7 +124,7 @@
                   font: 11px system-ui, sans-serif; min-width: 270px; padding: 4px 0; display: none; }
   #leitura-menu.aberto { display: block; }
   #leitura-menu div { padding: 6px 14px; color: var(--text); cursor: pointer; }
-  #leitura-menu div:hover { background: rgba(255, 157, 76, .18); }
+  #leitura-menu div:hover { background: rgba(216, 221, 230, .18); }
   #leitura-menu .cab { color: var(--muted); cursor: default; }
   #leitura-menu .cab:hover { background: none; }
   #leitura-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
@@ -155,7 +155,7 @@
   #banco .lista div { height: 22px; line-height: 22px; padding: 0 6px; color: var(--text); cursor: pointer;
                       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #banco .lista div:hover { color: var(--accent); }
-  #banco .lista div.on { background: rgba(255, 157, 76, .18); color: var(--accent); }
+  #banco .lista div.on { background: rgba(216, 221, 230, .18); color: var(--accent); }
   #b-conta { text-align: right; color: var(--muted); font-size: 9.5px; height: 12px; }
   #b-info { border-top: 1px solid var(--line); padding: 8px 4px 0; height: 124px; display: flex; flex-direction: column; gap: 3px; }
   #b-info b { color: var(--text); font-size: 11px; }

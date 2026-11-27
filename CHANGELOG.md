@@ -32,6 +32,9 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - **o acento laranja saiu de vez**: paleta, LEARN, banco de escalas,
+    cabos e realces usam o prata; FUNCTION com herói, MAGNET em par, SH
+    com os dois canais espelhados;
   - **cabeçalho todo em prata** (27/11, autor), no app e na página: botões
     ligados, realce de clique, botão de tocar, foco do teclado e campo da
     seed (antes só VARIA, RACK e ABRE); o REC segue vermelho ao gravar;

@@ -14,7 +14,8 @@ import { VISOR, desenharVisor } from './visores.js';
 
 const T = {
   bg: '#131a1a', surface: '#262b36', recessed: '#0e1015', line: '#485060',
-  textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#ff9d4c',
+  textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#d8dde6',   // prata: o laranja saiu de vez (autor, 27/11/2026)
+ 
   warning: '#ff6b5b', prata: '#d8dde6',
   placa: '#3a4252',   // `ui::kOutputPlate`
 };
@@ -648,14 +649,14 @@ export class Rack {
       const hr = r + this.mmpx(forte ? 2.4 : 1.6);
       const anel = (rad) => {
         g.lineWidth = soa ? 1.8 : 1.2;
-        g.strokeStyle = soa ? T.accent : 'rgba(255, 157, 76, 0.55)';
+        g.strokeStyle = soa ? T.accent : 'rgba(216, 221, 230, 0.55)';
         g.setLineDash(soa ? [] : [3, 3]);
         g.beginPath(); g.arc(j.x, j.y, rad, 0, 2 * Math.PI); g.stroke();
       };
       anel(hr);
       if (forte) anel(hr + 2);
       g.setLineDash([]);
-      if (soa) { g.fillStyle = 'rgba(255, 157, 76, 0.28)'; g.beginPath(); g.arc(j.x, j.y, r, 0, 2 * Math.PI); g.fill(); }
+      if (soa) { g.fillStyle = 'rgba(216, 221, 230, 0.28)'; g.beginPath(); g.arc(j.x, j.y, r, 0, 2 * Math.PI); g.fill(); }
       g.strokeStyle = T.accent; g.lineWidth = 1.5;
       g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
     }

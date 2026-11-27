@@ -57,18 +57,21 @@ public:
         // 4 letras) não cabiam a 12 mm num painel de 40 mm. Display cheio,
         // knobs 2 col centradas, entradas numa fileira, saídas na de baixo.
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): RATE grande
+        // no centro, a forma (SLOPE) e a deriva nos lados, o SYNC embaixo dele.
         p.hp = 10;
         p.add(Widget::Kind::Label, "FUNCTION", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "shape", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 11.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SLOPE", "slope", 31.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 11.0f, 50.0f);
-        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 32.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 8.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SLOPE", "in:slope_mod", 22.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 38.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "UNI", "out:uni", 8.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "BI", "out:bi", 21.0f, 116.0f);
+        p.add(Widget::Kind::Display, "shape", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "SLOPE", "slope", 5.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 18.40f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 37.40f, 31.0f);
+        p.add(Widget::Kind::Toggle, "SYNC", "sync_enable", 23.40f, 48.0f);
+        p.add(Widget::Kind::Jack, "RATE", "in:rate_mod", 10.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "SLOPE", "in:slope_mod", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "SYNC", "in:sync", 40.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "UNI", "out:uni", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "BI", "out:bi", 31.75f, 110.0f);
         return p;
     }
 
