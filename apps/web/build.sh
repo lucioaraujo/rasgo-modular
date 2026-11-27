@@ -44,5 +44,5 @@ nice -n 19 em++ -O2 -fwasm-exceptions "$tmp/rasgo_web.o" "$tmp/rasgo_learn.o" "$
 # o motor só vai para a pasta servida pronto: o link escreve um arquivo
 # intermediário por minutos, e a página o pegaria pela metade
 cp "$tmp/rasgo.wasm" "$saida/rasgo.wasm.novo" && mv "$saida/rasgo.wasm.novo" "$saida/rasgo.wasm"
-cp "$raiz/apps/web/index.html" "$raiz/apps/web/rasgo-worklet.js" "$raiz/apps/web/rack.js" "$raiz/apps/web/visores.js" "$raiz/apps/web/textos.js" "$saida/"
+cp "$raiz/apps/web/index.html" "$raiz/apps/web/rasgo-worklet.js" "$raiz/apps/web/rack.js" "$raiz/apps/web/visores.js" "$raiz/apps/web/textos.js" "$raiz/apps/web/rasgo-rec-worker.js" "$saida/"
 ls -l "$saida"

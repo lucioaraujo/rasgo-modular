@@ -9,7 +9,7 @@ raiz=$(cd "$(dirname "$0")/../.." && pwd)
 de=$raiz/.local-build/web
 para=$raiz/website/play
 mkdir -p "$para"
-for f in index.html rack.js visores.js textos.js rasgo-worklet.js rasgo.wasm; do
+for f in index.html rack.js visores.js textos.js rasgo-worklet.js rasgo-rec-worker.js rasgo.wasm; do
   cp "$de/$f" "$para/$f"
 done
 ls -l "$para"

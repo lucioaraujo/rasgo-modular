@@ -32,6 +32,9 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - página: a montagem dos arquivos do REC (WAV, versão de entrega a
+    -14 LUFS) passou para um Worker; antes as animações travavam alguns
+    segundos depois de parar a gravação (~3,6 s por 30 s de tomada);
   - GLIDE com **sliders** de subida e descida; WASP e ELASTIC em par;
     RESONATOR com herói;
   - **NOISE**: RATE e SLEW (o par do sorteio) em 12 mm; placa das saídas
