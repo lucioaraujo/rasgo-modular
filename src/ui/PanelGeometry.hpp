@@ -56,13 +56,19 @@ inline bool roundDisplay(const std::string& type) { return type == "PENDULUM"; }
 inline constexpr unsigned kOutputPlate = 0x3a4252;
 inline constexpr float kOutputPlateRadius = 1.5f;
 
+// meia largura mínima da placa em volta de cada saída: a luz fica a 3,4 mm
+// do centro do jack com raio 0,8 (`ui/OutputLights.hpp`), ou seja, até 4,2;
+// com 4,4 o ponto encostava na borda e o da última saída saía para fora
+// (autor, 27/11/2026). 5,4 deixa 1,2 mm de placa em volta da luz.
+inline constexpr float kOutputPlateMinHalf = 5.4f;
+
 inline std::vector<RectMM> outputPlates(const rasgo::modular::Panel& p) {
     using Kind = rasgo::modular::Widget::Kind;
     struct J { float x, y, meia; bool out; };
     std::vector<J> js;
     for (const auto& w : p.widgets)
         if (w.kind == Kind::Jack)
-            js.push_back({w.x, w.y, std::max(4.4f, 0.5f * (1.55f * static_cast<float>(w.label.size()) + 1.0f) + 0.6f),
+            js.push_back({w.x, w.y, std::max(kOutputPlateMinHalf, 0.5f * (1.55f * static_cast<float>(w.label.size()) + 1.0f) + 0.6f),
                           w.bind.rfind("out:", 0) == 0});
     std::vector<RectMM> r;
     std::vector<char> feito(js.size(), 0);

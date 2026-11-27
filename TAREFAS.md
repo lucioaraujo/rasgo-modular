@@ -86,6 +86,14 @@ pelo `git log` e pela conversa.
   horizontais e MIX grande), em prova; depois o resto da lista; então push
   e publicação da página. Provas: `dossies/propostas_paineis/`,
   `tools/prova_paineis.sh NOME`.
+  **27/11, tarde:** o arquétipo TRANSFORMAR em lote (IN no alto, saída
+  embaixo) foi provado em 8 módulos e **recusado** pelo autor: "prefiro
+  antes, mas nada impede de ter um ou dois módulos nesse formato novo,
+  mantendo os jacks embaixo". Revertido (provas guardadas em
+  `.local-build/propostas-descartadas/`). Em prova: herói no alto só em
+  FILTER e SHIFTER, jacks embaixo (`HEROI_TRANSFORMAR.patch`). Corrigido:
+  a placa das saídas cortava a luz da última saída (meia largura mínima
+  4,4 → 5,4 mm, `ui::kOutputPlateMinHalf`).
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já
