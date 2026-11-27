@@ -79,12 +79,18 @@ public:
         constexpr float c1 = 6.35f, c2 = 19.05f, c3 = 31.75f, c4 = 44.45f;
         p.add(Widget::Kind::Label, "NOISE", "", 2.5f, 2.0f);
         p.add(Widget::Kind::Display, "noise", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", c1 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", c2 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", c3 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "POIS", "poisson", c4 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", c2, 56.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", c3, 56.0f);
+        // O par do sorteio em 12 mm (autor, 27/11/2026: "o noise pode ter um
+        // ou dois knobs maiores"): RATE (quando sorteia) e SLEW (como
+        // desliza) maiores, SPRD e POIS (os ajustes do ritmo) embaixo deles,
+        // nas mesmas colunas. Knobs escuros: o RATE não é o centro do
+        // módulo, as cores de ruído não dependem dele.
+        constexpr float e = 15.24f, d = 35.56f;   // as duas colunas do par
+        p.add(Widget::Kind::Knob, "RATE", "rate", e - 6.0f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", d - 6.0f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", e - 4.0f, 45.0f);
+        p.add(Widget::Kind::Knob, "POIS", "poisson", d - 4.0f, 45.0f);
+        p.add(Widget::Kind::Jack, "TRIG", "in:trigger", c2, 62.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", c3, 62.0f);
         // 8 saídas simultâneas, 2 fileiras de 4
         p.add(Widget::Kind::Jack, "WHT", "out:white", c1, 80.0f);
         p.add(Widget::Kind::Jack, "PNK", "out:pink", c2, 80.0f);

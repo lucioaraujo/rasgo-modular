@@ -94,6 +94,8 @@ pelo `git log` e pela conversa.
   FILTER e SHIFTER, jacks embaixo (`HEROI_TRANSFORMAR.patch`). Corrigido:
   a placa das saídas cortava a luz da última saída (meia largura mínima
   4,4 → 5,4 mm, `ui::kOutputPlateMinHalf`).
+  Aplicado (27/11, autor: "ficou bom o noise com a inovação"): NOISE com o
+  par do sorteio em 12 mm (RATE, SLEW), escuros; SPRD e POIS embaixo.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

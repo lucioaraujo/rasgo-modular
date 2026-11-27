@@ -30,6 +30,8 @@ pronto.
     polar nos ciclos (POLYGON, ORBIT, EPICYCLE, SEASON), relevo de espectros
     (SPECTRA, VOCODER), retrato de fase (CHAOS, DRIFT), VU de ponteiro no
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
+  - **NOISE**: RATE e SLEW (o par do sorteio) em 12 mm; placa das saídas
+    com margem em volta da luz;
   - **arquétipo FONTE**: knob herói de 14 mm no centro (RUNGLER com dois);
     FORM em 18 HP; lotes 2–5 da revisão de painéis;
   - página: a leitura "módulos · cabos" desceu para a faixa de créditos (o
