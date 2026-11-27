@@ -329,7 +329,9 @@ void descrever() {
 }
 
 // `Rack::feedScopes` do app, quantum a quantum (ver `kBlocoApp`)
+std::uint32_t g_lentoQuanta = 0;
 void alimentarVisores() {
+    g_lentoQuanta = (g_lentoQuanta + 1) % 12;
     auto& g = *g_grafo;
     const bool fimDoBloco = ++g_quantaBloco >= kQuantaPorBloco;
     if (fimDoBloco) g_quantaBloco = 0;
@@ -344,6 +346,15 @@ void alimentarVisores() {
         const std::size_t fr = ob->frames(), ult = fr - 1;
         for (std::size_t i = inicio; i < fr; i += kPassoOnda) sc.push(ob->at(0, i));
         const std::string t = n.type();
+        // histórico LENTO (~4 s) para os visores polar e
+        // de fase — os moduladores se movem em segundos, a onda guarda ms
+        if (t == "POLYGON" || t == "ORBIT" || t == "EPICYCLE" || t == "SEASON" || t == "CHAOS" || t == "DRIFT") {
+            if (g_lentoQuanta == 0) {
+                const AudioBlock* o1 = n.outputCount() > 1 ? g.lastOutput(id, 1) : nullptr;
+                sc.pushLanes(ob->at(0, ult), o1 ? o1->at(0, o1->frames() - 1) : 0.0f, 0.0f, 0.0f);
+            }
+            continue;
+        }
         float& mx = g_maxBloco[id];
         auto maxDe = [](const AudioBlock* b) {
             float r = 0.0f;

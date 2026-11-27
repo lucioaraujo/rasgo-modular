@@ -26,6 +26,12 @@ pronto.
     OPERATOR (13), PLL (14), SPECTRA e FORMANT (10), SIGNAL-IN, VCA4;
   - **VCA4**: entradas novas **CHAIN** (áudio somado à mistura, encadeia dois
     VCA4) e **MXCV** (CV do ganho da mistura), na coluna do MIX;
+  - **visores com desenho próprio** (27/11, OK do autor): fósforo no SCOPE,
+    polar nos ciclos (POLYGON, ORBIT, EPICYCLE, SEASON), relevo de espectros
+    (SPECTRA, VOCODER), retrato de fase (CHAOS, DRIFT), VU de ponteiro no
+    MASTER; os moduladores guardam ~4 s de histórico para o desenho;
+  - **arquétipo FONTE**: knob herói de 14 mm no centro (RUNGLER com dois);
+    FORM em 18 HP; lotes 2–5 da revisão de painéis;
   - página: a leitura "módulos · cabos" desceu para a faixa de créditos (o
     cabeçalho quebrava em duas linhas ao começar o som).
 - **Painéis centrados, com margem lateral e knobs médios** (26/11, autor):

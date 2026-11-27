@@ -15,7 +15,7 @@ source "$raiz/../../third_party/emsdk/emsdk_env.sh" >/dev/null 2>&1
 obj=$raiz/.local-build/web-obj; out=$raiz/.local-build/web-prova
 mkdir -p "$out"
 nice -n 19 em++ -std=c++17 -O2 -I"$tmp/src" -I"$tmp/apps" -fwasm-exceptions -c "$tmp/apps/web/rasgo_web.cpp" -o "$obj/prova_web.o"
-exp=$(grep -o 'EXPORTED_FUNCTIONS=[^ ]*' "$raiz/apps/web/build.sh")
+exp=$(grep -o 'EXPORTED_FUNCTIONS=[^ ]*' "$tmp/apps/web/build.sh")
 nice -n 19 em++ -O2 -fwasm-exceptions "$obj/prova_web.o" "$obj/rasgo_learn.o" "$obj/rasgo_rec.o" "$obj"/saida_*.o -sSTANDALONE_WASM --no-entry \
   -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB -sSTACK_SIZE=4MB -s$exp -o "$out/rasgo.wasm"
 cp "$tmp"/apps/web/{index.html,rack.js,visores.js,textos.js,rasgo-worklet.js} "$out/"

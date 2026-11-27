@@ -434,8 +434,19 @@ struct Rack {
             if (t == "MIXER" || t == "MASTER") frozen.insert(i);
         }
     }
+    // histórico LENTO dos visores polar e de fase (`visores.js`, variações
+    // aprovadas em 27/11/2026): um ponto a cada 1536 amostras (~4 s nos
+    // 128 lugares) — os moduladores se movem em segundos, a onda guarda ms
+    std::size_t slowFrames_ = 0;
+    static bool slowDisplay(const std::string& t) {
+        return t == "POLYGON" || t == "ORBIT" || t == "EPICYCLE" || t == "SEASON"
+            || t == "CHAOS" || t == "DRIFT";
+    }
     void feedScopes(const std::size_t block) {   // chamado sob `gmx`, no áudio
         const std::size_t stride = std::max<std::size_t>(1, block / 44);
+        slowFrames_ += block;
+        const bool slowTick = slowFrames_ >= 1536;
+        if (slowTick) slowFrames_ = 0;
         for (const auto id : shown) {
             if (graph.node(id).outputCount() == 0) continue;
             const AudioBlock* ob = graph.lastOutput(id, 0);
@@ -448,7 +459,13 @@ struct Rack {
                     it->second.outPeak[p] = ui::blockSignedPeak(*lb, it->second.outPeak[p]);
             for (std::size_t i = 0; i < ob->frames(); i += stride)
                 it->second.push(ob->at(0, i));
-            if (graph.node(id).outputCount() >= 4
+            if (slowDisplay(graph.node(id).type())) {
+                if (slowTick) {
+                    const AudioBlock* o1 = graph.node(id).outputCount() > 1 ? graph.lastOutput(id, 1) : nullptr;
+                    it->second.pushLanes(ob->at(0, ob->frames() - 1),
+                                         o1 && o1->frames() ? o1->at(0, o1->frames() - 1) : 0.0f, 0.0f, 0.0f);
+                }
+            } else if (graph.node(id).outputCount() >= 4
                 && graph.node(id).type() == "TRIGSEQ") {
                 const AudioBlock* o1 = graph.lastOutput(id, 1);
                 const AudioBlock* o2 = graph.lastOutput(id, 2);
@@ -4266,8 +4283,147 @@ private:
 
         if (si != rack_.scopeSnap.end() && dw > 6) {
             const rasgo::ui::ScopeTrace& sc = si->second;
+            // variações de visor (aprovadas pelo autor em 27/11/2026), as
+            // mesmas de `apps/web/visores.js`, cada uma ligada ao conceito
+            const std::string variante =
+                  mtype == "SCOPE" && scopeView_[m.id] == 0 ? "fosforo"
+                : mtype == "POLYGON" || mtype == "ORBIT" || mtype == "EPICYCLE" || mtype == "SEASON" ? "polar"
+                : mtype == "SPECTRA" || mtype == "VOCODER" ? "relevo"
+                : mtype == "CHAOS" || mtype == "DRIFT" ? "fase"
+                : mtype == "MASTER" ? "ponteiro" : "";
+            const float fx = static_cast<float>(wx), fy = static_cast<float>(wy);
+            const float fw = static_cast<float>(dw), fh = static_cast<float>(dh);
+            const std::size_t NL = rasgo::ui::kLaneLen, NS = sc.buf.size();
+            const float pico = sc.peak();
+            if (!variante.empty() && !redondo) {   // o ponteiro e o brilho ficam dentro do visor
+                recorte.emplace(g);
+                g.reduceClipRegion(box.reduced(1));
+            }
 
-            if (mtype == "MASTER") {
+            if (variante == "fosforo") {
+                // osciloscópio de fósforo: grade, traço verde com brilho,
+                // o trecho mais antigo apagando (o rastro)
+                g.setColour(juce::Colour(0x1478ffaa));
+                for (int k = 1; k < 8; ++k) g.drawVerticalLine(wx + dw * k / 8, fy, fy + fh);
+                for (int k = 1; k < 4; ++k) g.drawHorizontalLine(wy + dh * k / 4, fx, fx + fw);
+                const float norm = 0.92f / std::max(pico, 1.0e-4f);
+                const float meio = fy + fh / 2.0f, a = fh / 2.0f - 2.0f;
+                constexpr int seg = 4;
+                const std::size_t n = NS / seg;
+                for (int s = 0; s < seg; ++s) {
+                    juce::Path p;
+                    for (std::size_t k = s * n; k <= std::min(NS - 1, (s + 1) * n); ++k) {
+                        const float x = fx + 1.0f + static_cast<float>(k) * (fw - 2.0f) / static_cast<float>(NS - 1);
+                        const float y = meio - sc.at(k) * norm * a;
+                        if (k == s * n) p.startNewSubPath(x, y); else p.lineTo(x, y);
+                    }
+                    const float al = 0.25f + 0.75f * static_cast<float>(s + 1) / seg;
+                    g.setColour(juce::Colour(0xff78ffaa).withAlpha(0.22f * al));   // o brilho
+                    g.strokePath(p, juce::PathStrokeType(3.2f));
+                    g.setColour(juce::Colour(0xff96ffbe).withAlpha(al));
+                    g.strokePath(p, juce::PathStrokeType(1.3f));
+                }
+            } else if (variante == "polar") {
+                // o ciclo como círculo: o tempo dá a volta, o valor é o raio
+                const float cx = fx + fw / 2.0f, cy = fy + fh / 2.0f, R = std::min(fw, fh) / 2.0f - 2.0f;
+                g.setColour(T.textSecondary.withAlpha(0.15f));
+                for (const float f : {0.35f, 0.6f, 0.85f})
+                    g.drawEllipse(cx - R * f, cy - R * f, 2.0f * R * f, 2.0f * R * f, 1.0f);
+                float lm = 1.0e-4f;
+                for (std::size_t k = 0; k < NL; ++k) lm = std::max(lm, std::fabs(sc.lane(0, k)));
+                const auto raio = [&](std::size_t k) { return R * (0.6f + 0.38f * sc.lane(0, k) * 0.92f / lm); };
+                juce::Path p;
+                for (std::size_t k = 0; k <= NL; ++k) {
+                    const float ang = 6.2831853f * static_cast<float>(k) / NL - 1.5707963f, r = raio(k % NL);
+                    const float x = cx + std::cos(ang) * r, y = cy + std::sin(ang) * r;
+                    if (k == 0) p.startNewSubPath(x, y); else p.lineTo(x, y);
+                }
+                g.setColour(traco);
+                g.strokePath(p, juce::PathStrokeType(1.2f));
+                const float rr = raio(NL - 1);   // o agora, no alto
+                g.setColour(T.textPrimary);
+                g.fillEllipse(cx - 2.0f, cy - rr - 2.0f, 4.0f, 4.0f);
+                dlabel.clear();
+            } else if (variante == "relevo") {
+                // espectros sucessivos empilhados, do mais antigo (no fundo) ao de agora
+                constexpr int janelas = 7, tam = 64, nb = 22;
+                for (int j = 0; j < janelas; ++j) {
+                    const std::size_t ini = static_cast<std::size_t>(j) * (NS - tam) / (janelas - 1);
+                    float mag[nb], mmax = 1.0e-6f;
+                    for (int b = 0; b < nb; ++b) {
+                        const float f = 80.0f * std::pow(120.0f, static_cast<float>(b) / (nb - 1));
+                        const float cr = std::cos(6.2831853f * f / rasgo::ui::kLegacySpectrumRateHz);
+                        float s1 = 0.0f, s2 = 0.0f;
+                        for (int k = 0; k < tam; ++k) { const float s0 = sc.at(ini + k) + 2.0f * cr * s1 - s2; s2 = s1; s1 = s0; }
+                        mag[b] = std::sqrt(std::fabs(s1 * s1 + s2 * s2 - 2.0f * cr * s1 * s2));
+                        mmax = std::max(mmax, mag[b]);
+                    }
+                    const float atras = static_cast<float>(janelas - 1 - j);
+                    const float base = fy + fh - 3.0f - atras * fh * 0.09f, alt = fh * 0.42f;
+                    const float x0 = fx + 3.0f + atras * 3.0f, larg = fw - 6.0f - atras * 6.0f;
+                    juce::Path linha, corpo;
+                    corpo.startNewSubPath(x0, base);
+                    for (int b = 0; b < nb; ++b) {
+                        const float db = 20.0f * std::log10(mag[b] / mmax + 1.0e-6f);
+                        const float x = x0 + static_cast<float>(b) * larg / (nb - 1);
+                        const float y = base - juce::jlimit(0.0f, 1.0f, 1.0f + db / 48.0f) * alt;
+                        corpo.lineTo(x, y);
+                        if (b == 0) linha.startNewSubPath(x, y); else linha.lineTo(x, y);
+                    }
+                    corpo.lineTo(x0 + larg, base);
+                    corpo.closeSubPath();
+                    g.setColour(juce::Colour(0xff0e1015));
+                    g.fillPath(corpo);
+                    g.setColour(traco.withAlpha(0.3f + 0.7f * static_cast<float>(j + 1) / janelas));
+                    g.strokePath(linha, juce::PathStrokeType(1.0f));
+                }
+                dlabel.clear();
+            } else if (variante == "fase") {
+                // retrato de fase: x = saída 1, y = saída 2 (ou a 1 atrasada),
+                // nos últimos ~4 s — o atrator desenhado
+                const float cx = fx + fw / 2.0f, cy = fy + fh / 2.0f, R = std::min(fw, fh) / 2.0f - 3.0f;
+                float m0 = 1.0e-4f, m1 = 1.0e-4f;
+                bool temY = false;
+                for (std::size_t k = 0; k < NL; ++k) {
+                    m0 = std::max(m0, std::fabs(sc.lane(0, k)));
+                    m1 = std::max(m1, std::fabs(sc.lane(1, k)));
+                    if (sc.lane(1, k) != 0.0f) temY = true;
+                }
+                const auto X = [&](std::size_t k) { return cx + sc.lane(0, k) / m0 * R * 1.5f; };
+                const auto Y = [&](std::size_t k) {
+                    return cy - (temY ? sc.lane(1, k) / m1 : sc.lane(0, k > 6 ? k - 6 : 0) / m0) * R;
+                };
+                for (std::size_t k = 1; k < NL; ++k) {
+                    g.setColour(traco.withAlpha(0.12f + 0.88f * static_cast<float>(k) / NL));
+                    g.drawLine(X(k - 1), Y(k - 1), X(k), Y(k), 1.0f);
+                }
+                g.setColour(T.textPrimary);
+                g.fillEllipse(X(NL - 1) - 2.0f, Y(NL - 1) - 2.0f, 4.0f, 4.0f);
+                dlabel.clear();
+            } else if (variante == "ponteiro") {
+                // VU de ponteiro: arco de −40 a 0 dB, o vermelho no fim; o
+                // ponteiro acende quando o LIMITADOR segurou algo (~2 s)
+                if (auto* mst = dynamic_cast<rasgo::modular::Master*>(&node))
+                    if (mst->gainReductionDb() > 0.05f)
+                        clipSeen_[m.id] = std::chrono::steady_clock::now();
+                const auto ic = clipSeen_.find(m.id);
+                const bool clip = ic != clipSeen_.end()
+                    && std::chrono::steady_clock::now() - ic->second < std::chrono::seconds(2);
+                const float db = 20.0f * std::log10(std::max(pico, 1.0e-4f));
+                const float f = juce::jlimit(0.0f, 1.0f, (db + 40.0f) / 40.0f);
+                const float cx = fx + fw / 2.0f, cy = fy + fh * 1.25f, R = fh * 1.05f, a0 = -0.85f, a1 = 0.85f;
+                for (int k = 0; k <= 10; ++k) {
+                    const float ang = a0 + (a1 - a0) * static_cast<float>(k) / 10.0f, r0 = R - (k % 5 ? 3.0f : 6.0f);
+                    g.setColour(k >= 9 ? T.warning : T.textSecondary);
+                    g.drawLine(cx + std::sin(ang) * r0, cy - std::cos(ang) * r0,
+                               cx + std::sin(ang) * R, cy - std::cos(ang) * R, 1.0f);
+                }
+                const float ang = a0 + (a1 - a0) * f;
+                g.setColour(clip ? T.warning : kPrata);
+                g.drawLine(cx, cy, cx + std::sin(ang) * (R - 1.0f), cy - std::cos(ang) * (R - 1.0f), 1.5f);
+                dlabel = juce::String(db, 0) + "dB";
+
+            } else if (mtype == "MASTER") {
                 // VU com clip-latch — "o medidor esconde estouros" (achado
                 // §3.3 da auditoria de saída, NAVALHA 2). A barra é o pico
                 // da janela recente contra o teto de −1 dBFS (0,891); o

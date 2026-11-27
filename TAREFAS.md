@@ -73,6 +73,19 @@ pelo `git log` e pela conversa.
   segmentos, polar, fósforo…), atenuverters, grafismo, tipografia,
   comportamento, manual por módulo e dados técnicos no site. Depois do
   layout: push e publicação da página (pedido do autor).
+  **Ponto de retomada (27/11):** aplicados também os lotes 2–5 da revisão,
+  FORM em 18 HP, o arquétipo da família FONTE (knob herói de 14 mm no
+  centro; RUNGLER com dois heróis) e as **variações de visor** (OK do autor
+  após a prova antes/depois): fósforo no SCOPE (o clique ainda alterna para
+  o espectro), polar em POLYGON/ORBIT/EPICYCLE/SEASON, relevo de espectros
+  em SPECTRA/VOCODER, retrato de fase em CHAOS/DRIFT e VU de ponteiro no
+  MASTER; histórico lento (~4 s) dos moduladores no app (`feedScopes`) e na
+  página (`alimentarVisores`). Recusado: visores LCD de pontos. Próximo:
+  arquétipos das outras famílias (TRANSFORMAR em fluxo de cima para baixo,
+  MODULAR em arco, TEMPO com sliders, ROTEAR em canais, ESPAÇO com sliders
+  horizontais e MIX grande), em prova; depois o resto da lista; então push
+  e publicação da página. Provas: `dossies/propostas_paineis/`,
+  `tools/prova_paineis.sh NOME`.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

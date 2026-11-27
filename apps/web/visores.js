@@ -38,6 +38,112 @@ function espectro(v, nb) {
 
 // `c`: { T, wx, wy, dw, dh, tipo, v, traco, rotulo, espectro (SCOPE),
 //        clip (MASTER: até quando o aviso fica aceso), escala (QUANTIZER) }
+// Variações de visor (aprovadas pelo autor em 27/11/2026): visores
+// que desenham o sinal de outros jeitos, cada um ligado ao conceito do módulo
+const VARIANTE = { SCOPE: 'fosforo', POLYGON: 'polar', ORBIT: 'polar', EPICYCLE: 'polar', SEASON: 'polar',
+                   SPECTRA: 'relevo', VOCODER: 'relevo', CHAOS: 'fase', DRIFT: 'fase', MASTER: 'ponteiro' };
+
+function variante(g, c, qual, pico, rotulo) {
+  const { T, wx, wy, dw, dh, v, traco } = c;
+  const norm = 0.92 / Math.max(pico, 1e-4);
+  if (qual === 'fosforo') {
+    // osciloscópio de fósforo: grade, traço verde com brilho, o mais
+    // antigo apagando (o rastro)
+    g.strokeStyle = 'rgba(120, 255, 170, 0.08)'; g.lineWidth = 1; g.beginPath();
+    for (let k = 1; k < 8; k++) { const x = wx + dw * k / 8; g.moveTo(x, wy); g.lineTo(x, wy + dh); }
+    for (let k = 1; k < 4; k++) { const y = wy + dh * k / 4; g.moveTo(wx, y); g.lineTo(wx + dw, y); }
+    g.stroke();
+    const meio = wy + dh / 2, a = dh / 2 - 2, seg = 4, n = Math.floor(NS / seg);
+    g.save(); g.shadowColor = '#78ffaa'; g.shadowBlur = 6; g.lineWidth = 1.3;
+    for (let s = 0; s < seg; s++) {
+      g.strokeStyle = `rgba(150, 255, 190, ${0.25 + 0.75 * (s + 1) / seg})`; g.beginPath();
+      for (let k = s * n; k <= Math.min(NS - 1, (s + 1) * n); k++) {
+        const x = wx + 1 + k * (dw - 2) / (NS - 1), y = meio - v[k] * norm * a;
+        k === s * n ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    g.restore();
+    return rotulo;
+  }
+  if (qual === 'polar') {
+    // o ciclo como círculo: o tempo dá a volta, o valor é o raio
+    const cx = wx + dw / 2, cy = wy + dh / 2, R = Math.min(dw, dh) / 2 - 2;
+    g.strokeStyle = comAlfa(T.textSecondary, 0.15); g.lineWidth = 1;
+    for (const f of [0.35, 0.6, 0.85]) { g.beginPath(); g.arc(cx, cy, R * f, 0, 2 * Math.PI); g.stroke(); }
+    g.strokeStyle = traco; g.lineWidth = 1.2; g.beginPath();
+    let lm = 1e-4; for (let k = 0; k < NL; k++) lm = Math.max(lm, Math.abs(v[NS + k]));
+    const ln = 0.92 / lm, val = (k) => v[NS + k] * ln;   // a faixa 0: ~4 s
+    for (let k = 0; k <= NL; k++) {
+      const i = k % NL, ang = 2 * Math.PI * k / NL - Math.PI / 2, r = R * (0.6 + 0.38 * val(i));
+      const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r;
+      k ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.stroke();
+    const ang = 2 * Math.PI - Math.PI / 2, rr = R * (0.6 + 0.38 * val(NL - 1));   // o agora
+    g.fillStyle = T.textPrimary; g.beginPath(); g.arc(cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr, 2, 0, 2 * Math.PI); g.fill();
+    return '';
+  }
+  if (qual === 'relevo') {
+    // espectros sucessivos empilhados, do mais antigo (no fundo) ao de agora
+    const janelas = 7, tam = 64, nb = 22;
+    for (let j = 0; j < janelas; j++) {
+      const ini = Math.floor(j * (NS - tam) / (janelas - 1)), mag = [];
+      let mmax = 1e-6;
+      for (let b = 0; b < nb; b++) {
+        const f = 80 * Math.pow(120, b / (nb - 1)), cr = Math.cos(2 * Math.PI * f / 24000);
+        let s1 = 0, s2 = 0;
+        for (let k = 0; k < tam; k++) { const s0 = v[ini + k] + 2 * cr * s1 - s2; s2 = s1; s1 = s0; }
+        const m = Math.sqrt(Math.abs(s1 * s1 + s2 * s2 - 2 * cr * s1 * s2)); mag.push(m); mmax = Math.max(mmax, m);
+      }
+      const base = wy + dh - 3 - (janelas - 1 - j) * (dh * 0.09), alt = dh * 0.42, x0 = wx + 3 + (janelas - 1 - j) * 3, larg = dw - 6 - (janelas - 1 - j) * 6;
+      const pts = [];
+      for (let b = 0; b < nb; b++) {
+        const db = 20 * Math.log10(mag[b] / mmax + 1e-6);
+        pts.push(x0 + b * larg / (nb - 1), base - clamp(1 + db / 48, 0, 1) * alt);
+      }
+      g.fillStyle = '#0e1015'; g.beginPath(); g.moveTo(x0, base);
+      for (let k = 0; k < pts.length; k += 2) g.lineTo(pts[k], pts[k + 1]);
+      g.lineTo(x0 + larg, base); g.closePath(); g.fill();
+      g.strokeStyle = comAlfa(traco, 0.3 + 0.7 * (j + 1) / janelas); g.lineWidth = 1; g.beginPath();
+      for (let k = 0; k < pts.length; k += 2) (k ? g.lineTo : g.moveTo).call(g, pts[k], pts[k + 1]);
+      g.stroke();
+    }
+    return '';
+  }
+  if (qual === 'fase') {
+    // retrato de fase: o sinal contra ele mesmo atrasado (o atrator)
+    // x = saída 1, y = saída 2 (ou a 1 atrasada), nos últimos ~4 s
+    const cx = wx + dw / 2, cy = wy + dh / 2, R = Math.min(dw, dh) / 2 - 3;
+    let m0 = 1e-4, m1 = 1e-4, temY = false;
+    for (let k = 0; k < NL; k++) { m0 = Math.max(m0, Math.abs(v[NS + k])); m1 = Math.max(m1, Math.abs(v[NS + NL + k])); if (v[NS + NL + k]) temY = true; }
+    const X = (k) => v[NS + k] / m0, Y = (k) => temY ? v[NS + NL + k] / m1 : v[NS + Math.max(0, k - 6)] / m0;
+    g.lineWidth = 1;
+    for (let k = 1; k < NL; k++) {
+      g.strokeStyle = comAlfa(traco, 0.12 + 0.88 * k / NL); g.beginPath();
+      g.moveTo(cx + X(k - 1) * R * 1.5, cy - Y(k - 1) * R); g.lineTo(cx + X(k) * R * 1.5, cy - Y(k) * R); g.stroke();
+    }
+    g.fillStyle = T.textPrimary; g.beginPath(); g.arc(cx + X(NL - 1) * R * 1.5, cy - Y(NL - 1) * R, 2, 0, 2 * Math.PI); g.fill();
+    return '';
+  }
+  if (qual === 'ponteiro') {
+    // VU de ponteiro: arco de −40 a 0 dB, o vermelho no fim, o ponteiro pelo pico
+    const db = 20 * Math.log10(Math.max(pico, 1e-4)), f = clamp((db + 40) / 40, 0, 1);
+    const cx = wx + dw / 2, cy = wy + dh * 1.25, R = dh * 1.05, a0 = -0.85, a1 = 0.85;
+    g.lineWidth = 1;
+    for (let k = 0; k <= 10; k++) {
+      const ang = a0 + (a1 - a0) * k / 10, r0 = R - (k % 5 ? 3 : 6);
+      g.strokeStyle = k >= 9 ? T.warning : T.textSecondary; g.beginPath();
+      g.moveTo(cx + Math.sin(ang) * r0, cy - Math.cos(ang) * r0); g.lineTo(cx + Math.sin(ang) * R, cy - Math.cos(ang) * R); g.stroke();
+    }
+    const ang = a0 + (a1 - a0) * f;
+    g.strokeStyle = c.clip ? T.warning : T.prata; g.lineWidth = 1.5; g.beginPath();
+    g.moveTo(cx, cy); g.lineTo(cx + Math.sin(ang) * (R - 1), cy - Math.cos(ang) * (R - 1)); g.stroke();
+    return Math.round(db) + 'dB';
+  }
+  return rotulo;
+}
+
 export function desenharVisor(g, c) {
   const { T, wx, wy, dw, dh, tipo, v, traco } = c;
   let rotulo = c.rotulo;
@@ -54,7 +160,9 @@ export function desenharVisor(g, c) {
   if (v) for (let k = 0; k < NS; k++) pico = Math.max(pico, Math.abs(v[k]));
 
   if (v && dw > 6) {
-    if (tipo === 'MASTER') {
+    if (VARIANTE[tipo] && !(tipo === 'SCOPE' && c.espectro)) {   // o clique no SCOPE ainda alterna para o espectro
+      rotulo = variante(g, c, VARIANTE[tipo], pico, rotulo);
+    } else if (tipo === 'MASTER') {
       // VU com clip-latch: o pico contra −1 dBFS; o aviso acende quando o
       // limitador segurou algo e fica ~2 s
       const frac = Math.min(1, pico / 0.891);
