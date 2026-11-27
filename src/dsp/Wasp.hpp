@@ -53,20 +53,23 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o par do filtro,
+        // CUT e RESO, em 12 mm; o timbre sujo (GRIT, BIAS) embaixo.
         p.hp = 10;
         p.add(Widget::Kind::Label, "WASP", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "response", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "CUT", "cutoff", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RESO", "resonance", 30.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 8.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "DRIVE", "drive", 30.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "GRIT", "grit", 8.0f, 70.0f);
-        p.add(Widget::Kind::Knob, "BIAS", "bias", 30.0f, 70.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 19.0f, 87.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 113.0f);
-        p.add(Widget::Kind::Jack, "FC", "in:cutoff_mod", 18.0f, 113.0f);
-        p.add(Widget::Kind::Jack, "Q", "in:res_mod", 30.0f, 113.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 42.0f, 113.0f);
+        p.add(Widget::Kind::Display, "response", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "CUT", "cutoff", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "RESO", "resonance", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "DRIVE", "drive", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GRIT", "grit", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "BIAS", "bias", 14.40f, 64.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 28.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 10.16f, 110.0f);
+        p.add(Widget::Kind::Jack, "FC", "in:cutoff_mod", 20.32f, 110.0f);
+        p.add(Widget::Kind::Jack, "Q", "in:res_mod", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 40.64f, 110.0f);
         return p;
     }
 

@@ -100,6 +100,9 @@ pelo `git log` e pela conversa.
   CRUSH (RATE+BITS), TAPE (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE
   (FOLD+WRAP), jacks embaixo. Ainda sem escolha: herói no FILTER/SHIFTER
   (`HEROI_TRANSFORMAR.patch`).
+  Aplicado (27/11, lote 3 da personalização, "avance"): GLIDE com TIME e
+  FALL em sliders verticais; WASP (CUT+RESO) e ELASTIC (TUNE+DAMP) em par
+  de 12 mm; RESONATOR com herói FREQ de 14 mm, DECAY e DAMP nos lados.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

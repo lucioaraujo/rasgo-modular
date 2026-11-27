@@ -32,6 +32,8 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - GLIDE com **sliders** de subida e descida; WASP e ELASTIC em par;
+    RESONATOR com herói;
   - **NOISE**: RATE e SLEW (o par do sorteio) em 12 mm; placa das saídas
     com margem em volta da luz;
   - **arquétipo FONTE**: knob herói de 14 mm no centro (RUNGLER com dois);

@@ -58,21 +58,20 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o corpo que
+        // ressoa: FREQ grande no centro, DECAY e DAMP nos lados.
         p.hp = 12;
         p.add(Widget::Kind::Label, "RESONATOR", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "reso", "", 2.5f, 6.0f, 56.0f);
-        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
-        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras em passo
-        // regular e a última em 110 mm — a marca RASGO volta ao centro (autor,
-        // 26/11: "manter no centro e subir um pouco os jacks").
-        p.add(Widget::Kind::Knob, "FREQ", "freq", 13.78f, 28.0f);
-        p.add(Widget::Kind::Knob, "STRC", "structure", 26.48f, 28.0f);
-        p.add(Widget::Kind::Knob, "PRTS", "partials", 39.18f, 28.0f);
-        p.add(Widget::Kind::Knob, "DECAY", "decay", 13.78f, 48.0f);
-        p.add(Widget::Kind::Knob, "DAMP", "damp", 26.48f, 48.0f);
-        p.add(Widget::Kind::Knob, "TILT", "tilt", 39.18f, 48.0f);
-        p.add(Widget::Kind::Knob, "POS", "position", 20.13f, 68.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 32.83f, 68.0f);
+        p.add(Widget::Kind::Display, "reso", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "DECAY", "decay", 7.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "FREQ", "freq", 23.48f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "DAMP", "damp", 45.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "STRC", "structure", 12.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "PRTS", "partials", 26.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "TILT", "tilt", 40.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "POS", "position", 19.48f, 66.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 33.48f, 66.0f);
         p.add(Widget::Kind::Jack, "IN", "in:in", 17.78f, 92.0f);
         p.add(Widget::Kind::Jack, "STRK", "in:strike", 30.48f, 92.0f);
         p.add(Widget::Kind::Jack, "FQM", "in:freq_mod", 43.18f, 92.0f);

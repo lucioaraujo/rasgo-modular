@@ -49,19 +49,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): TIME e FALL em
+        // sliders verticais, a subida e a descida do glide lado a lado.
         p.hp = 10;
         p.add(Widget::Kind::Label, "GLIDE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "trace", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "TIME", "time", 11.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "FALL", "fall", 31.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CURVE", "curve", 11.0f, 54.0f);
-        p.add(Widget::Kind::Knob, "MODE", "mode", 31.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "PITCH", "in:pitch", 9.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "SLIDE", "in:slide", 24.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 39.0f, 92.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 9.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "MOV", "out:moving", 24.0f, 114.0f);
-        p.add(Widget::Kind::Jack, "DONE", "out:done", 39.0f, 114.0f);
+        p.add(Widget::Kind::Display, "trace", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Slider, "TIME", "time", 11.24f, 26.0f);
+        p.add(Widget::Kind::Slider, "FALL", "fall", 31.56f, 26.0f);
+        p.add(Widget::Kind::Knob, "CURVE", "curve", 14.40f, 67.0f);
+        p.add(Widget::Kind::Knob, "MODE", "mode", 28.40f, 67.0f);
+        p.add(Widget::Kind::Jack, "PITCH", "in:pitch", 10.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "SLIDE", "in:slide", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 40.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 10.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "MOV", "out:moving", 25.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "DONE", "out:done", 40.40f, 110.0f);
         return p;
     }
 

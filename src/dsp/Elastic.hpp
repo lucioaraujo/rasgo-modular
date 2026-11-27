@@ -53,20 +53,23 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): a mola em 12 mm,
+        // TUNE (a afinação) e DAMP (quanto ela segura a vibração).
         p.hp = 10;
         p.add(Widget::Kind::Label, "ELASTIC", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "elastic", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "N", "masses", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "TUNE", "tune", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "DAMP", "damping", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "STRCH", "stretch", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "PICK", "pickup", 20.5f, 50.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 36.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "PLUK", "in:pluck", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TUNE", "in:tune_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "L", "out:l", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "elastic", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "TUNE", "tune", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "DAMP", "damping", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "N", "masses", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "STRCH", "stretch", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "PICK", "pickup", 35.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 21.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "PLUK", "in:pluck", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "TUNE", "in:tune_cv", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:l", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 31.75f, 110.0f);
         return p;
     }
 
