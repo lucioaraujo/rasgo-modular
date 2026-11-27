@@ -111,6 +111,9 @@ pelo `git log` e pela conversa.
   SYN+DRAC; INTERFERENCE em par SPEED+RATIO.
   Aplicado (27/11, lote 6, ESPAÇO): SPRING com três sliders (as molas);
   LENS com herói FOCUS; HALL em par SIZE+DECAY.
+  Aplicado (28/11, lote 7): PLANAR em par X+Y; MARKOV em par TEMP+MEM;
+  COHERENCE com herói LIM. Destaque de módulo (paleta/arrasto) passou a
+  anel prata de 2 px com halo (o contorno de 1 px se perdia no prata).
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

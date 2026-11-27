@@ -49,20 +49,23 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o LIM (onde a
+        // ordem vira colapso) grande no centro; a janela e a paciência nos lados.
         p.hp = 10;
         p.add(Widget::Kind::Label, "COHERENCE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "coherence", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "JAN", "window", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "LIM", "threshold", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "PAC", "patience", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "CIC", "scar", 20.5f, 52.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "ORD", "out:order", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PRES", "out:pressure", 19.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "COL", "out:collapse", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SURP", "out:surprise", 43.0f, 116.0f);
+        p.add(Widget::Kind::Display, "coherence", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "JAN", "window", 5.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "LIM", "threshold", 18.40f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "PAC", "patience", 37.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "CIC", "scar", 21.40f, 52.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "ORD", "out:order", 6.35f, 110.0f);
+        p.add(Widget::Kind::Jack, "PRES", "out:pressure", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "COL", "out:collapse", 31.75f, 110.0f);
+        p.add(Widget::Kind::Jack, "SURP", "out:surprise", 44.45f, 110.0f);
         return p;
     }
 

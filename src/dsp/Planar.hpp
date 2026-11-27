@@ -65,25 +65,28 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o plano: X e
+        // Y em par de 12 mm, lado a lado como os dois eixos.
         p.hp = 12;
         p.add(Widget::Kind::Label, "PLANAR", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "xy", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "X", "x", 8.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "Y", "y", 28.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "CURVE", "curve", 48.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "SMTH", "smooth", 8.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 28.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "DRIFT", "drift", 48.0f, 46.0f);
-        p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "B", "in:b", 19.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "C", "in:c", 31.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "D", "in:d", 43.0f, 66.0f);
-        p.add(Widget::Kind::Jack, "X", "in:x", 7.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "Y", "in:y", 19.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "GST", "in:gesture", 33.0f, 86.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "X'", "out:x_out", 21.0f, 110.0f);
-        p.add(Widget::Kind::Jack, "Y'", "out:y_out", 33.0f, 110.0f);
+        p.add(Widget::Kind::Display, "xy", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "X", "x", 14.32f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "Y", "y", 34.64f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "CURVE", "curve", 12.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "SMTH", "smooth", 26.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 40.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "DRIFT", "drift", 26.48f, 62.0f);
+        p.add(Widget::Kind::Jack, "A", "in:a", 11.43f, 78.0f);
+        p.add(Widget::Kind::Jack, "B", "in:b", 24.13f, 78.0f);
+        p.add(Widget::Kind::Jack, "C", "in:c", 36.83f, 78.0f);
+        p.add(Widget::Kind::Jack, "D", "in:d", 49.53f, 78.0f);
+        p.add(Widget::Kind::Jack, "X", "in:x", 17.78f, 94.0f);
+        p.add(Widget::Kind::Jack, "Y", "in:y", 30.48f, 94.0f);
+        p.add(Widget::Kind::Jack, "GST", "in:gesture", 43.18f, 94.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 17.78f, 110.0f);
+        p.add(Widget::Kind::Jack, "X'", "out:x_out", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "Y'", "out:y_out", 43.18f, 110.0f);
         return p;
     }
 

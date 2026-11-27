@@ -57,22 +57,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): a cadeia: TEMP
+        // (o quanto ela arrisca) e MEM (o quanto lembra), em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "MARKOV", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "markov", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "TEMP", "temp", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MEM", "memory", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "OCT", "octave", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 20.5f, 50.0f);
-        p.add(Widget::Kind::Toggle, "LEARN", "learn", 38.3f, 54.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "LRN.P", "in:learn_pitch", 18.5f, 96.0f);
-        p.add(Widget::Kind::Jack, "LRN.G", "in:learn_gate", 33.5f, 96.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 45.5f, 96.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "GT", "out:gate", 19.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "SURP", "out:surprise", 31.0f, 116.0f);
+        p.add(Widget::Kind::Display, "markov", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "TEMP", "temp", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "MEM", "memory", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "OCT", "octave", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 35.40f, 46.0f);
+        p.add(Widget::Kind::Toggle, "LEARN", "learn", 23.40f, 64.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 6.00f, 92.0f);
+        p.add(Widget::Kind::Jack, "LRN.P", "in:learn_pitch", 18.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "LRN.G", "in:learn_gate", 33.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 45.50f, 92.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "out:pitch", 12.70f, 110.0f);
+        p.add(Widget::Kind::Jack, "GT", "out:gate", 25.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "SURP", "out:surprise", 38.10f, 110.0f);
         return p;
     }
 
