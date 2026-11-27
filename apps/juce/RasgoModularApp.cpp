@@ -1349,11 +1349,11 @@ public:
         seedBox_.setInputRestrictions(20, "0123456789");
         seedBox_.setColour(juce::TextEditor::backgroundColourId, T.recessed);
         seedBox_.setColour(juce::TextEditor::outlineColourId, T.line);
-        seedBox_.setColour(juce::TextEditor::focusedOutlineColourId, T.accent);
+        seedBox_.setColour(juce::TextEditor::focusedOutlineColourId, kPrata);
         seedBox_.setColour(juce::TextEditor::textColourId, T.textPrimary);
-        seedBox_.setColour(juce::TextEditor::highlightColourId, T.accent);
+        seedBox_.setColour(juce::TextEditor::highlightColourId, kPrata);
         seedBox_.setColour(juce::TextEditor::highlightedTextColourId, T.bg);
-        seedBox_.setColour(juce::CaretComponent::caretColourId, T.accent);
+        seedBox_.setColour(juce::CaretComponent::caretColourId, kPrata);
         seedBox_.setFont(juce::FontOptions(11.0f));
         // Enter aplica; perder o foco sem confirmar volta ao seed atual —
         // digitar um número e clicar fora não deve trocar o patch sem
@@ -1511,7 +1511,7 @@ public:
         rx -= buttonR(g, rx, u8("\xe2\x97\x8f ")
                       + str(rasgo::panel::strings::hdrRec) + recClock,
                       recording_ || flashing(Act::rec), Act::rec,
-                      recording_ ? T.recording : T.accent);
+                      recording_ ? T.recording : kPrata);
         // (o RACK saiu daqui em 2 out. 2026: foi para junto do ZOOM, no
         // grupo de visualização — ver o fim de `paint`)
 
@@ -1682,7 +1682,7 @@ public:
         if (hasKeyboardFocus(false) && keyboardAction_)
             for (const auto& hit : keyboardChoices())
                 if (hit.act == *keyboardAction_) {
-                    g.setColour(T.accent);
+                    g.setColour(kPrata);   // o foco do teclado no cabeçalho, em prata como na página
                     g.drawRect(hit.bounds.expanded(2), 1);
                 }
     }
@@ -1883,7 +1883,7 @@ private:
     }
 
     int drawButton(juce::Graphics& g, int bx, const juce::String& label,
-                   bool active, Act act, juce::Colour on = T.accent) {
+                   bool active, Act act, juce::Colour on = kPrata) {   // cabeçalho em prata (autor, 27/11/2026)
         g.setFont(juce::FontOptions(11.0f));
         const int w = juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), label)) + 14;
@@ -1901,7 +1901,7 @@ private:
         return drawButton(g, bx, l, a, c);
     }
     int buttonR(juce::Graphics& g, int rightEdge, const juce::String& label,
-                bool active, Act act, juce::Colour on = T.accent) {
+                bool active, Act act, juce::Colour on = kPrata) {
         g.setFont(juce::FontOptions(11.0f));
         const int w = juce::roundToInt(
             juce::GlyphArrangement::getStringWidth(g.getCurrentFont(), label)) + 14;

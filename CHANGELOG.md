@@ -32,6 +32,9 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - **cabeçalho todo em prata** (27/11, autor), no app e na página: botões
+    ligados, realce de clique, botão de tocar, foco do teclado e campo da
+    seed (antes só VARIA, RACK e ABRE); o REC segue vermelho ao gravar;
   - página: a montagem dos arquivos do REC (WAV, versão de entrega a
     -14 LUFS) passou para um Worker; antes as animações travavam alguns
     segundos depois de parar a gravação (~3,6 s por 30 s de tomada);
