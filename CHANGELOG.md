@@ -32,6 +32,8 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - SPRING com três sliders (as molas do tanque); LENS com herói FOCUS;
+    HALL em par SIZE+DECAY;
   - TURING com herói LOCK; ECLIPSE e INTERFERENCE em par;
   - **o acento laranja saiu de vez**: paleta, LEARN, banco de escalas,
     cabos e realces usam o prata; FUNCTION com herói, MAGNET em par, SH

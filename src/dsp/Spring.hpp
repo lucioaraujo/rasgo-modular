@@ -55,19 +55,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): as molas
+        // do tanque em pé: DECAY, TENS e DAMP em sliders verticais.
         p.hp = 10;
         p.add(Widget::Kind::Label, "SPRING", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "spring", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "DECAY", "decay", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "TENS", "tension", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "DAMP", "damp", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DRIP", "drip", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 20.5f, 50.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "KICK", "in:kick", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TENS", "in:tension_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "WET", "out:wet", 19.0f, 116.0f);
+        p.add(Widget::Kind::Display, "spring", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Slider, "DECAY", "decay", 7.40f, 26.0f);
+        p.add(Widget::Kind::Slider, "TENS", "tension", 21.40f, 26.0f);
+        p.add(Widget::Kind::Slider, "DAMP", "damp", 35.40f, 26.0f);
+        p.add(Widget::Kind::Knob, "DRIP", "drip", 14.40f, 67.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 28.40f, 67.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "KICK", "in:kick", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "TENS", "in:tension_cv", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "WET", "out:wet", 31.75f, 110.0f);
         return p;
     }
 

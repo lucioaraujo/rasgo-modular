@@ -109,6 +109,8 @@ pelo `git log` e pela conversa.
   agora é o prata, no app e na página.
   Aplicado (27/11, lote 5, TEMPO): TURING com herói LOCK; ECLIPSE em par
   SYN+DRAC; INTERFERENCE em par SPEED+RATIO.
+  Aplicado (27/11, lote 6, ESPAÇO): SPRING com três sliders (as molas);
+  LENS com herói FOCUS; HALL em par SIZE+DECAY.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

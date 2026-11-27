@@ -52,18 +52,21 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o anel de
+        // foco da lente, grande no centro; BLUR e DEPTH nos lados.
         p.hp = 10;
         p.add(Widget::Kind::Label, "LENS", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "lens", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "FOCUS", "focus", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "BLUR", "blur", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "DEPTH", "depth", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 5.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FOC", "in:focus_cv", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "BLUR", "in:blur_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "L", "out:l", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "R", "out:r", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "lens", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "BLUR", "blur", 5.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "FOCUS", "focus", 18.40f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "DEPTH", "depth", 37.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "MIX", "mix", 21.40f, 52.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "FOC", "in:focus_cv", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "BLUR", "in:blur_cv", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "L", "out:l", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "R", "out:r", 31.75f, 110.0f);
         return p;
     }
 
