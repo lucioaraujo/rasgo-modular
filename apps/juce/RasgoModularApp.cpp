@@ -3745,9 +3745,16 @@ private:
         // ---- borda: fora da camada fixa porque muda com hover/arrasto -
         const bool dragging = mdrag_.active && mdrag_.moved && mdrag_.id == m.id;
         const bool palHit = !palHover_.empty() && node.type() == palHover_;
-        g.setColour((dragging || palHit) ? T.accent : T.line);
+        g.setColour(T.line);
         g.drawRect(m.bounds, 1);
-        if (dragging || palHit) g.drawRect(m.bounds.expanded(1), 1);
+        if (dragging || palHit) {
+            // em prata desde que o laranja saiu: anel de 2 px e um halo em
+            // volta, senão se perdia nos detalhes prata do painel (autor, 27/11/2026)
+            g.setColour(T.accent.withAlpha(0.28f));
+            g.drawRect(m.bounds.expanded(7), 6);
+            g.setColour(T.accent);
+            g.drawRect(m.bounds.expanded(2), 2);
+        }
 
         // Módulo à vista por EXCEÇÃO (entrou agora e ainda não chega à
         // saída): borda tracejada, pra ficar claro que ele está ali porque

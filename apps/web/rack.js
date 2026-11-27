@@ -322,12 +322,15 @@ export class Rack {
     }
     // borda acesa: o módulo sendo arrastado e os do tipo sob o mouse na paleta
     const arrastado = this.gesto?.tipo === 'modulo' && this.gesto.movido ? this.gesto.id : -1;
-    g.strokeStyle = T.accent; g.lineWidth = 1;
+    // em prata desde que o laranja saiu: um anel de 2 px e um halo em volta,
+    // senão o contorno se perdia nos detalhes prata do painel (autor, 27/11/2026)
     for (const m of this.vistos) {
       if (m.id !== arrastado && (!this.paletaTipo || m.tipo !== this.paletaTipo)) continue;
       if (m.by + m.bh < topo || m.by > topo + vh) continue;
-      g.strokeRect(m.bx + 0.5, m.by + 0.5, m.bw - 1, m.bh - 1);
-      g.strokeRect(m.bx - 0.5, m.by - 0.5, m.bw + 1, m.bh + 1);
+      g.strokeStyle = 'rgba(216, 221, 230, 0.28)'; g.lineWidth = 6;
+      g.strokeRect(m.bx - 4, m.by - 4, m.bw + 8, m.bh + 8);
+      g.strokeStyle = T.accent; g.lineWidth = 2;
+      g.strokeRect(m.bx - 1, m.by - 1, m.bw + 2, m.bh + 2);
     }
     // os cabos: uma camada própria, refeita só quando um cabo muda (ganho,
     // condução, ruptura) ou a vista rola — redesenhar 63 cabos atravessando
