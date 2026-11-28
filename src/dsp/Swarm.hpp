@@ -54,22 +54,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o bando: RATE
+        // (o voo) e COHES (o quanto fica junto), em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "SWARM", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "swarm", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPRD", "spread", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "COHES", "cohesion", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 5.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "SCAR", "in:scare", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "LEAD", "in:lead", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "COH", "in:cohesion_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SYNC", "out:sync", 44.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "G1", "out:g1", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "G2", "out:g2", 15.5f, 116.0f);
-        p.add(Widget::Kind::Jack, "G3", "out:g3", 25.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "G4", "out:g4", 34.5f, 116.0f);
-        p.add(Widget::Kind::Jack, "ALL", "out:all", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "swarm", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "COHES", "cohesion", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "SPRD", "spread", 14.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 28.40f, 46.0f);
+        p.add(Widget::Kind::Jack, "SCAR", "in:scare", 6.35f, 92.0f);
+        p.add(Widget::Kind::Jack, "LEAD", "in:lead", 19.05f, 92.0f);
+        p.add(Widget::Kind::Jack, "COH", "in:cohesion_cv", 31.75f, 92.0f);
+        p.add(Widget::Kind::Jack, "SYNC", "out:sync", 44.45f, 92.0f);
+        p.add(Widget::Kind::Jack, "G1", "out:g1", 6.35f, 110.0f);
+        p.add(Widget::Kind::Jack, "G2", "out:g2", 15.88f, 110.0f);
+        p.add(Widget::Kind::Jack, "G3", "out:g3", 25.40f, 110.0f);
+        p.add(Widget::Kind::Jack, "G4", "out:g4", 34.93f, 110.0f);
+        p.add(Widget::Kind::Jack, "ALL", "out:all", 44.45f, 110.0f);
         return p;
     }
 

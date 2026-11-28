@@ -50,21 +50,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): a CHANCE
+        // (de cortar) grande no centro; MICRO e MIX nos lados, SEED embaixo.
         p.hp = 10;
         p.add(Widget::Kind::Label, "CUT-UP", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "cutup", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "CHANCE", "chance", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MICRO", "micro_n", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MIX", "mix", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SEED", "seed", 8.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 7.0f, 82.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 19.0f, 82.0f);
-        p.add(Widget::Kind::Jack, "STUT", "in:stutter", 7.0f, 98.0f);
-        p.add(Widget::Kind::Jack, "BURST", "in:burst", 19.0f, 98.0f);
-        p.add(Widget::Kind::Jack, "MICRO", "in:micro", 31.0f, 98.0f);
-        p.add(Widget::Kind::Jack, "GAP", "in:gap", 43.0f, 98.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "ATIVO", "out:active", 19.0f, 116.0f);
+        p.add(Widget::Kind::Display, "cutup", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "MICRO", "micro_n", 5.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "CHANCE", "chance", 18.40f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "MIX", "mix", 37.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "SEED", "seed", 21.40f, 52.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 19.05f, 76.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 31.75f, 76.0f);
+        p.add(Widget::Kind::Jack, "STUT", "in:stutter", 6.00f, 93.0f);
+        p.add(Widget::Kind::Jack, "BURST", "in:burst", 19.00f, 93.0f);
+        p.add(Widget::Kind::Jack, "MICRO", "in:micro", 32.00f, 93.0f);
+        p.add(Widget::Kind::Jack, "GAP", "in:gap", 45.00f, 93.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "ATIVO", "out:active", 31.75f, 110.0f);
         return p;
     }
 

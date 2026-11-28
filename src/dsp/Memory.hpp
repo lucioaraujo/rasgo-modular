@@ -55,22 +55,25 @@ public:
     Panel panel() const override {
         // coordenadas em mm; painel 3U (128,5 mm) x hp*5,08 mm
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): a memória
+        // granular: GRAIN (o tamanho do grão) e POS (onde se lê), em par de 12 mm.
         p.hp = 12;
         p.add(Widget::Kind::Label, "MEMORY", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "buffer", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "GRAIN", "grain", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "DENS", "density", 21.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "POS", "position", 35.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SPRAY", "spray", 49.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "PITCH", "pitch", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "FBK", "feedback", 21.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "BLEND", "blend", 35.0f, 52.0f);
-        p.add(Widget::Kind::Toggle, "HOLD", "freeze", 49.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "IN", "in:in", 5.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "POS", "in:position_mod", 17.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch_mod", 29.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "FRZ", "in:freeze_gate", 41.0f, 100.0f);
-        p.add(Widget::Kind::Jack, "OUT", "out:out", 5.0f, 116.0f);
+        p.add(Widget::Kind::Display, "buffer", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "GRAIN", "grain", 14.32f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "POS", "position", 34.64f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "DENS", "density", 12.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "SPRAY", "spray", 26.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "PITCH", "pitch", 40.48f, 46.0f);
+        p.add(Widget::Kind::Knob, "FBK", "feedback", 12.48f, 62.0f);
+        p.add(Widget::Kind::Toggle, "HOLD", "freeze", 28.48f, 64.0f);
+        p.add(Widget::Kind::Knob, "BLEND", "blend", 40.48f, 62.0f);
+        p.add(Widget::Kind::Jack, "IN", "in:in", 9.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "POS", "in:position_mod", 23.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch_mod", 37.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "FRZ", "in:freeze_gate", 51.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "OUT", "out:out", 30.48f, 110.0f);
         return p;
     }
 

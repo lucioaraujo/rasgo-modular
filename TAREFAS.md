@@ -114,6 +114,8 @@ pelo `git log` e pela conversa.
   Aplicado (28/11, lote 7): PLANAR em par X+Y; MARKOV em par TEMP+MEM;
   COHERENCE com herói LIM. Destaque de módulo (paleta/arrasto) passou a
   anel prata de 2 px com halo (o contorno de 1 px se perdia no prata).
+  Aplicado (28/11, lote 8): MEMORY (GRAIN+POS), PRESSURE (TEMP+VOL) e
+  SWARM (RATE+COHES) em par; CUT-UP com herói CHANCE.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

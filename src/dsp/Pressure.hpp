@@ -55,22 +55,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o gás: TEMP
+        // e VOL (PV = nRT), em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "PRESSURE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "pressure", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "N", "particles", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "TEMP", "temp", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "VOL", "volume", 36.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ATTR", "attract", 5.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "GATE", "gate_len", 20.5f, 50.0f);
-        p.add(Widget::Kind::Jack, "HEAT", "in:heat", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "VOL", "in:volume_cv", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TEMP", "in:temp_cv", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "HIT", "out:hit", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "PRES", "out:pressure", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "TEMP", "out:temperature", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "X", "out:x", 44.0f, 106.0f);
-        p.add(Widget::Kind::Jack, "Y", "out:y", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "pressure", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "TEMP", "temp", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "VOL", "volume", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "N", "particles", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "ATTR", "attract", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "GATE", "gate_len", 35.40f, 46.0f);
+        p.add(Widget::Kind::Jack, "HEAT", "in:heat", 6.35f, 92.0f);
+        p.add(Widget::Kind::Jack, "VOL", "in:volume_cv", 19.05f, 92.0f);
+        p.add(Widget::Kind::Jack, "TEMP", "in:temp_cv", 31.75f, 92.0f);
+        p.add(Widget::Kind::Jack, "X", "out:x", 44.45f, 92.0f);
+        p.add(Widget::Kind::Jack, "HIT", "out:hit", 6.35f, 110.0f);
+        p.add(Widget::Kind::Jack, "PRES", "out:pressure", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "TEMP", "out:temperature", 31.75f, 110.0f);
+        p.add(Widget::Kind::Jack, "Y", "out:y", 44.45f, 110.0f);
         return p;
     }
 
