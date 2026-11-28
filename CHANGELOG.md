@@ -32,6 +32,8 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - FRONTEIRA com herói; STAGES com sliders; ABACUS em par; paleta com o
+    nome sob o mouse na cor da família;
   - MEMORY, PRESSURE e SWARM em par; CUT-UP com herói;
   - PLANAR e MARKOV em par; COHERENCE com herói; destaque do módulo
     (paleta, arrasto) em anel prata com halo;

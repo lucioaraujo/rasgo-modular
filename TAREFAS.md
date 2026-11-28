@@ -116,6 +116,9 @@ pelo `git log` e pela conversa.
   anel prata de 2 px com halo (o contorno de 1 px se perdia no prata).
   Aplicado (28/11, lote 8): MEMORY (GRAIN+POS), PRESSURE (TEMP+VOL) e
   SWARM (RATE+COHES) em par; CUT-UP com herói CHANCE.
+  Aplicado (28/11, lote 9): FRONTEIRA com herói LIM; STAGES com CURVE,
+  HOLD e TILT em sliders; ABACUS em par OP+MOD. Paleta: hover na cor da
+  família. Restam ~20 candidatos (~5 lotes); os utilitários ficam simples.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

@@ -48,19 +48,22 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o LIM (onde
+        // a frase acaba) grande no centro; MEM e MIN nos lados, o silêncio embaixo.
         p.hp = 10;
         p.add(Widget::Kind::Label, "FRONTEIRA", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "fronteira", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "LIM", "threshold", 8.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MEM", "memory", 23.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MIN", "min_notes", 38.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "SIL", "silence", 8.0f, 54.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 7.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "GATE", "in:gate", 19.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "FRONT", "out:boundary", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "FORCA", "out:strength", 19.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "NOTAS", "out:notes", 31.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "FIM", "out:end", 43.0f, 116.0f);
+        p.add(Widget::Kind::Display, "fronteira", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "MEM", "memory", 5.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "LIM", "threshold", 18.40f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "MIN", "min_notes", 37.40f, 31.0f);
+        p.add(Widget::Kind::Knob, "SIL", "silence", 21.40f, 52.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 19.05f, 92.0f);
+        p.add(Widget::Kind::Jack, "GATE", "in:gate", 31.75f, 92.0f);
+        p.add(Widget::Kind::Jack, "FRONT", "out:boundary", 7.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "FORCA", "out:strength", 19.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "NOTAS", "out:notes", 31.00f, 110.0f);
+        p.add(Widget::Kind::Jack, "FIM", "out:end", 43.00f, 110.0f);
         return p;
     }
 

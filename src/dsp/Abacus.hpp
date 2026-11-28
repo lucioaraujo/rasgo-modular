@@ -57,28 +57,31 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): a conta: OP
+        // (a operação) e MOD (o módulo), em par de 12 mm.
         p.hp = 14;
         p.add(Widget::Kind::Label, "ABACUS", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "count", "", 2.5f, 6.0f, 66.1f);
-        p.add(Widget::Kind::Knob, "OP", "op", 9.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "MOD", "modulus", 25.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "STEP", "steps", 41.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "RNG", "range", 57.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "RECT", "rect_mode", 9.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "CNT", "count_step", 25.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "PAT", "pattern", 41.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "SLEW", "slew", 57.0f, 46.0f);
-        p.add(Widget::Kind::Knob, "RATE", "rate", 9.0f, 64.0f);
-        p.add(Widget::Kind::Jack, "A", "in:a", 7.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "B", "in:b", 19.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "CLK", "in:clock", 31.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 43.0f, 88.0f);
-        p.add(Widget::Kind::Jack, "MTH", "out:math", 7.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "QNT", "out:quant", 18.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "RCT", "out:rect", 29.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "P1", "out:p1", 40.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "P2", "out:p2", 51.0f, 112.0f);
-        p.add(Widget::Kind::Jack, "CRY", "out:carry", 62.0f, 112.0f);
+        p.add(Widget::Kind::Display, "count", "", 2.5f, 6.0f, 66.12f);
+        p.add(Widget::Kind::Knob, "OP", "op", 19.40f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "MOD", "modulus", 39.72f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "STEP", "steps", 10.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "RNG", "range", 24.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "RECT", "rect_mode", 38.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "CNT", "count_step", 52.56f, 46.0f);
+        p.add(Widget::Kind::Knob, "PAT", "pattern", 17.56f, 62.0f);
+        p.add(Widget::Kind::Knob, "SLEW", "slew", 31.56f, 62.0f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 45.56f, 62.0f);
+        p.add(Widget::Kind::Jack, "A", "in:a", 16.51f, 90.0f);
+        p.add(Widget::Kind::Jack, "B", "in:b", 29.21f, 90.0f);
+        p.add(Widget::Kind::Jack, "CLK", "in:clock", 41.91f, 90.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 54.61f, 90.0f);
+        p.add(Widget::Kind::Jack, "MTH", "out:math", 8.06f, 110.0f);
+        p.add(Widget::Kind::Jack, "QNT", "out:quant", 19.06f, 110.0f);
+        p.add(Widget::Kind::Jack, "RCT", "out:rect", 30.06f, 110.0f);
+        p.add(Widget::Kind::Jack, "P1", "out:p1", 41.06f, 110.0f);
+        p.add(Widget::Kind::Jack, "P2", "out:p2", 52.06f, 110.0f);
+        p.add(Widget::Kind::Jack, "CRY", "out:carry", 63.06f, 110.0f);
         return p;
     }
 
