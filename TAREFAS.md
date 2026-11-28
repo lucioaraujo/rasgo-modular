@@ -130,7 +130,10 @@ pelo `git log` e pela conversa.
   SWIRL, PRISM, APOCRIFO, LOOPER, SAMPLER, TURNTABLE, LPG, FORMANT,
   VOCODER, SUPPLY); herói do FILTER/SHIFTER sem escolha do autor; publicar
   a página (`apps/web/publicar_no_site.sh`) quando o autor pedir. Push
-  feito em 28/11 a pedido do autor.
+  feito em 28/11 a pedido do autor. Em seguida (28/11) a página de tocar
+  foi publicada (website/play, build de ee245a8) e o site ganhou a seção
+  "Tocar no navegador" nas quatro línguas, com a pílula do topo dizendo
+  "toque no navegador ou baixe" (`estado.py`).
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

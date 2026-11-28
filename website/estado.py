@@ -52,7 +52,7 @@ PLUGINS = [
 TEXTO = {
     "pt": {
         "pilula_antes": "Em desenvolvimento — ainda sem release",
-        "pilula_depois": "v%s — disponível para Linux, Windows e macOS",
+        "pilula_depois": "v%s — toque no navegador ou baixe para Linux, Windows e macOS",
         "antes": """  <div class="note">
     <p><strong>Ainda não há release.</strong> O instrumento roda, é
       reproduzível a partir do código e a integração contínua já empacota os
@@ -110,7 +110,7 @@ TEXTO = {
     },
     "en": {
         "pilula_antes": "In development — no release yet",
-        "pilula_depois": "v%s — available for Linux, Windows and macOS",
+        "pilula_depois": "v%s — play in the browser or download for Linux, Windows and macOS",
         "antes": """  <div class="note">
     <p><strong>There is no release yet.</strong> The instrument runs, is
       reproducible from source, and continuous integration already packages
@@ -167,7 +167,7 @@ TEXTO = {
     },
     "fr": {
         "pilula_antes": "En développement — pas encore de release",
-        "pilula_depois": "v%s — disponible pour Linux, Windows et macOS",
+        "pilula_depois": "v%s — jouez dans le navigateur ou téléchargez pour Linux, Windows et macOS",
         "antes": """  <div class="note">
     <p><strong>Il n'y a pas encore de release.</strong> L'instrument
       fonctionne, il est reproductible depuis les sources, et l'intégration
@@ -227,7 +227,7 @@ TEXTO = {
     },
     "es": {
         "pilula_antes": "En desarrollo — todavía sin release",
-        "pilula_depois": "v%s — disponible para Linux, Windows y macOS",
+        "pilula_depois": "v%s — toca en el navegador o descarga para Linux, Windows y macOS",
         "antes": """  <div class="note">
     <p><strong>Todavía no hay release.</strong> El instrumento funciona, es
       reproducible desde el código y la integración continua ya empaqueta los

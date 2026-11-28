@@ -15,7 +15,7 @@
 <style>
   /* os tokens do app (`T` em RasgoModularApp.cpp) */
   :root { --bg: #131a1a; --surface: #262b36; --recessed: #0e1015; --line: #485060; --text: #f0f3f8;
-          --muted: #bec8d8; --prata: #d8dde6; --accent: #ff9d4c; --warning: #ff6b5b; }
+          --muted: #bec8d8; --prata: #d8dde6; --accent: #d8dde6; /* o acento é o prata (o laranja saiu de vez, autor 27/11/2026) */ --warning: #ff6b5b; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif;
@@ -35,12 +35,13 @@
                   white-space: nowrap; }
   header button:hover { border-color: var(--muted); }
   /* o foco do teclado no cabeçalho (F6): o contorno de acento, como no app */
-  header button:focus-visible, header .trilho:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  header button:focus-visible, header .trilho:focus-visible { outline: 1px solid var(--prata); outline-offset: 2px; }
   /* ligado / o realce de um instante (`flashing`): cheio, com o anel */
-  header button.on { background: var(--accent); border-color: var(--accent); color: var(--bg);
-                     outline: 1px solid var(--accent); outline-offset: 2px; }
-  header button.prata.on { background: var(--prata); border-color: var(--prata); outline-color: var(--prata); }
-  header button.tocar { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  /* o cabeçalho inteiro em prata (autor, 27/11/2026: "há botões no cabeçalho
+     ainda em laranja"; em 24/11 só VARIA, RACK e ABRE tinham passado) */
+  header button.on { background: var(--prata); border-color: var(--prata); color: var(--bg);
+                     outline: 1px solid var(--prata); outline-offset: 2px; }
+  header button.tocar { background: var(--prata); border-color: var(--prata); color: var(--bg); }
   /* REC gravando: o botão é também o relógio da tomada (`T.recording`) */
   header button.gravando { background: #e0362c; border-color: #e0362c; color: var(--bg);
                            outline: 1px solid #e0362c; outline-offset: 2px; }
@@ -49,7 +50,7 @@
   #r-varia { cursor: pointer; }
   #seed { width: 21ch; height: 22px; background: var(--recessed); color: var(--text); border: 1px solid var(--line);
           padding: 0 4px; font: 11px ui-monospace, monospace; border-radius: 0; }
-  #seed:focus { outline: none; border-color: var(--accent); }
+  #seed:focus { outline: none; border-color: var(--prata); }
   /* slider do VARIA e do volume (`varySlider_`): 84 × 14, zero = desligado */
   .trilho { position: relative; width: 84px; height: 14px; background: var(--recessed); border-radius: 3px;
             cursor: pointer; touch-action: none; }
@@ -123,7 +124,7 @@
                   font: 11px system-ui, sans-serif; min-width: 270px; padding: 4px 0; display: none; }
   #leitura-menu.aberto { display: block; }
   #leitura-menu div { padding: 6px 14px; color: var(--text); cursor: pointer; }
-  #leitura-menu div:hover { background: rgba(255, 157, 76, .18); }
+  #leitura-menu div:hover { background: rgba(216, 221, 230, .18); }
   #leitura-menu .cab { color: var(--muted); cursor: default; }
   #leitura-menu .cab:hover { background: none; }
   #leitura-menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
@@ -133,7 +134,7 @@
   #paleta h3 i { width: 8px; height: 8px; display: inline-block; }
   #paleta li { list-style: none; padding-left: 18px; height: 15px; line-height: 15px; color: var(--muted);
                cursor: grab; }
-  #paleta li:hover { color: var(--accent); }
+  #paleta li:hover { color: var(--fam, var(--accent)); }   /* a cor da família (autor, 28/11/2026) */
   #paleta ul { margin: 0 0 4px; padding: 0; }
   /* o banco de escalas do QUANTIZER (`ScaleBrowser`) */
   #banco { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); display: none; z-index: 10;
@@ -154,7 +155,7 @@
   #banco .lista div { height: 22px; line-height: 22px; padding: 0 6px; color: var(--text); cursor: pointer;
                       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #banco .lista div:hover { color: var(--accent); }
-  #banco .lista div.on { background: rgba(255, 157, 76, .18); color: var(--accent); }
+  #banco .lista div.on { background: rgba(216, 221, 230, .18); color: var(--accent); }
   #b-conta { text-align: right; color: var(--muted); font-size: 9.5px; height: 12px; }
   #b-info { border-top: 1px solid var(--line); padding: 8px 4px 0; height: 124px; display: flex; flex-direction: column; gap: 3px; }
   #b-info b { color: var(--text); font-size: 11px; }
@@ -637,28 +638,27 @@ function baixar(nome, dados, tipo) {
   a.download = nome; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
+// a montagem roda num Worker (`rasgo-rec-worker.js`): na página ela segurava
+// as animações por alguns segundos depois de parar (autor, 27/11/2026)
+let recWorker = null;
+function montarNoWorker(dados, trans) {
+  if (!recWorker) recWorker = new Worker('rasgo-rec-worker.js');
+  else dados.bytes = null;   // o worker já tem o motor (só a primeira tomada leva os bytes)
+  return new Promise((ok) => { recWorker.onmessage = (ev) => ok(ev.data); recWorker.postMessage(dados, trans); });
+}
 async function arquivosRec(m) {
   const blocos = est.tomada; est.tomada = [];
   const total = blocos.reduce((n, b) => n + b.length, 0);
-  if (!total || !local) return;
+  if (!total || !bytes) return;
   aviso(W('recMontando'), 1e9);
-  await new Promise((r) => setTimeout(r, 30));   // o aviso aparece antes do trabalho
-  const e = local, arquivos = [];
-  const p = e.rw_rec_buffer(total);
-  let off = 0;
-  for (const b of blocos) { new Float32Array(e.memory.buffer, p, total).set(b, off); off += b.length; }
-  const arquivo = () => new Uint8Array(e.memory.buffer, e.rw_rec_arquivo(), e.rw_rec_bytes()).slice();
-  e.rw_rec_wav(m.taxa);
-  baixar(m.nome + '.wav', arquivo(), 'audio/wav'); arquivos.push(m.nome + '.wav');
-  // a versão de entrega, com o nome da tomada no texto das medidas
-  const nb = new TextEncoder().encode(m.nome + '.wav');
-  const np = e.rw_entrada(nb.length); new Uint8Array(e.memory.buffer, np, nb.length).set(nb);
-  if (e.rw_rec_entrega(m.taxa, np)) {
-    baixar(m.nome + '.streaming.wav', arquivo(), 'audio/wav');
-    baixar(m.nome + '.streaming.txt', cTexto(e, e.rw_rec_texto()), 'text/plain');
+  const r = await montarNoWorker({ bytes, blocos, taxa: m.taxa, nome: m.nome }, blocos.map((b) => b.buffer));
+  const arquivos = [];
+  if (r.wav) { baixar(m.nome + '.wav', r.wav, 'audio/wav'); arquivos.push(m.nome + '.wav'); }
+  if (r.entrega) {
+    baixar(m.nome + '.streaming.wav', r.entrega, 'audio/wav');
+    baixar(m.nome + '.streaming.txt', r.medidas, 'text/plain');
     arquivos.push(m.nome + '.streaming.wav', m.nome + '.streaming.txt');
   }
-  e.rw_rec_liberar();
   baixar(m.nome + '.score.txt', m.partitura, 'text/plain'); arquivos.push(m.nome + '.score.txt');
   if (m.midi.length) { baixar(m.nome + '.mid', m.midi, 'audio/midi'); arquivos.push(m.nome + '.mid'); }
   aviso(W('recPronto', { arquivos: arquivos.join(', ') }), 9000);
@@ -748,6 +748,7 @@ function construirPaleta(cat) {
     for (const t of f.tipos) {
       const li = document.createElement('li');
       li.textContent = t; li.dataset.tipo = t;
+      li.style.setProperty('--fam', corFamilia(f.familia));
       ul.append(li);
     }
     nav.append(h, ul);

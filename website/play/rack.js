@@ -14,7 +14,8 @@ import { VISOR, desenharVisor } from './visores.js';
 
 const T = {
   bg: '#131a1a', surface: '#262b36', recessed: '#0e1015', line: '#485060',
-  textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#ff9d4c',
+  textPrimary: '#f0f3f8', textSecondary: '#bec8d8', accent: '#d8dde6',   // prata: o laranja saiu de vez (autor, 27/11/2026)
+ 
   warning: '#ff6b5b', prata: '#d8dde6',
   placa: '#3a4252',   // `ui::kOutputPlate`
 };
@@ -321,12 +322,15 @@ export class Rack {
     }
     // borda acesa: o módulo sendo arrastado e os do tipo sob o mouse na paleta
     const arrastado = this.gesto?.tipo === 'modulo' && this.gesto.movido ? this.gesto.id : -1;
-    g.strokeStyle = T.accent; g.lineWidth = 1;
+    // em prata desde que o laranja saiu: um anel de 2 px e um halo em volta,
+    // senão o contorno se perdia nos detalhes prata do painel (autor, 27/11/2026)
     for (const m of this.vistos) {
       if (m.id !== arrastado && (!this.paletaTipo || m.tipo !== this.paletaTipo)) continue;
       if (m.by + m.bh < topo || m.by > topo + vh) continue;
-      g.strokeRect(m.bx + 0.5, m.by + 0.5, m.bw - 1, m.bh - 1);
-      g.strokeRect(m.bx - 0.5, m.by - 0.5, m.bw + 1, m.bh + 1);
+      g.strokeStyle = 'rgba(216, 221, 230, 0.28)'; g.lineWidth = 6;
+      g.strokeRect(m.bx - 4, m.by - 4, m.bw + 8, m.bh + 8);
+      g.strokeStyle = T.accent; g.lineWidth = 2;
+      g.strokeRect(m.bx - 1, m.by - 1, m.bw + 2, m.bh + 2);
     }
     // os cabos: uma camada própria, refeita só quando um cabo muda (ganho,
     // condução, ruptura) ou a vista rola — redesenhar 63 cabos atravessando
@@ -648,14 +652,14 @@ export class Rack {
       const hr = r + this.mmpx(forte ? 2.4 : 1.6);
       const anel = (rad) => {
         g.lineWidth = soa ? 1.8 : 1.2;
-        g.strokeStyle = soa ? T.accent : 'rgba(255, 157, 76, 0.55)';
+        g.strokeStyle = soa ? T.accent : 'rgba(216, 221, 230, 0.55)';
         g.setLineDash(soa ? [] : [3, 3]);
         g.beginPath(); g.arc(j.x, j.y, rad, 0, 2 * Math.PI); g.stroke();
       };
       anel(hr);
       if (forte) anel(hr + 2);
       g.setLineDash([]);
-      if (soa) { g.fillStyle = 'rgba(255, 157, 76, 0.28)'; g.beginPath(); g.arc(j.x, j.y, r, 0, 2 * Math.PI); g.fill(); }
+      if (soa) { g.fillStyle = 'rgba(216, 221, 230, 0.28)'; g.beginPath(); g.arc(j.x, j.y, r, 0, 2 * Math.PI); g.fill(); }
       g.strokeStyle = T.accent; g.lineWidth = 1.5;
       g.beginPath(); g.arc(j.x, j.y, r - 0.75, 0, 2 * Math.PI); g.stroke();
     }

@@ -32,6 +32,10 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - **site**: a página de tocar no navegador atualizada com tudo acima, e
+    uma seção "Tocar no navegador" nas quatro línguas (o que funciona lá:
+    105 módulos, REC, salvar, MIDI, microfone); a pílula do topo diz
+    "toque no navegador ou baixe";
   - o teste de layout audita o **catálogo inteiro** (a lista à mão tinha
     parado de crescer); 11 módulos com achados ficam como pendentes até o
     próximo lote;
