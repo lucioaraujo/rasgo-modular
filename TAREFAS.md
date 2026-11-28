@@ -119,6 +119,18 @@ pelo `git log` e pela conversa.
   Aplicado (28/11, lote 9): FRONTEIRA com herói LIM; STAGES com CURVE,
   HOLD e TILT em sliders; ABACUS em par OP+MOD. Paleta: hover na cor da
   família. Restam ~20 candidatos (~5 lotes); os utilitários ficam simples.
+  Aplicado (28/11, lote 10): ORBIT com herói SPEED; EPICYCLE (RATE+CIRC)
+  e SEASON (DAY+YEAR) em par; SEASON com os 9 jacks em três fileiras (as
+  legendas LIGHT/DAWN/DUSK se tocavam e o teste de layout não pegava).
+  **Ponto de retomada (28/11, madrugada):** o teste de layout agora audita
+  o catálogo inteiro; 11 módulos ficaram como pendentes nele (lista e
+  achados em `dossies/AUDITORIA_diagramacao_paineis.md` §7.2) — corrigir
+  primeiro no próximo lote. Depois: os ~16 candidatos restantes da
+  personalização (PENDULUM, BOUNCE, DRIFT, PREDATOR, REFRACT, MOUSSE,
+  SWIRL, PRISM, APOCRIFO, LOOPER, SAMPLER, TURNTABLE, LPG, FORMANT,
+  VOCODER, SUPPLY); herói do FILTER/SHIFTER sem escolha do autor; publicar
+  a página (`apps/web/publicar_no_site.sh`) quando o autor pedir. Push
+  feito em 28/11 a pedido do autor.
 - **VCV Library recusou** (#1048, 25/11, Andrew Belt): "While this plugin
   appears to have substantial functionality, it is not at the level of
   human polish we require for plugins on the VCV Library." O Cardinal já

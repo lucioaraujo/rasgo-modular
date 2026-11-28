@@ -59,24 +59,27 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): o sol no
+        // centro: SPEED grande, a razão e a excentricidade das órbitas nos lados.
         p.hp = 12;
         p.add(Widget::Kind::Label, "ORBIT", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "orbit", "", 2.5f, 6.0f, 56.0f);
-        p.add(Widget::Kind::Knob, "PLNTS", "planets", 7.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "RATIO", "ratio", 25.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "ECC", "ecc", 43.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "MASS", "mass", 7.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "SPEED", "speed", 25.0f, 52.0f);
-        p.add(Widget::Kind::Knob, "LIGHT", "light", 43.0f, 52.0f);
-        p.add(Widget::Kind::Jack, "NUDGE", "in:nudge", 8.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 22.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "CONJ", "out:conj", 35.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "PERI", "out:peri", 48.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "X1", "out:x1", 7.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "Y1", "out:y1", 18.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "X2", "out:x2", 29.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "Y2", "out:y2", 40.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "DIST", "out:dist", 52.0f, 116.0f);
+        p.add(Widget::Kind::Display, "orbit", "", 2.5f, 6.0f, 55.96f);
+        p.add(Widget::Kind::Knob, "RATIO", "ratio", 7.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "SPEED", "speed", 23.48f, 27.0f, 14.0f);   // o herói
+        p.add(Widget::Kind::Knob, "ECC", "ecc", 45.48f, 31.0f);
+        p.add(Widget::Kind::Knob, "PLNTS", "planets", 12.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "MASS", "mass", 26.48f, 50.0f);
+        p.add(Widget::Kind::Knob, "LIGHT", "light", 40.48f, 50.0f);
+        p.add(Widget::Kind::Jack, "NUDGE", "in:nudge", 9.98f, 92.0f);
+        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 23.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "CONJ", "out:conj", 36.98f, 92.0f);
+        p.add(Widget::Kind::Jack, "PERI", "out:peri", 50.48f, 92.0f);
+        p.add(Widget::Kind::Jack, "X1", "out:x1", 8.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "Y1", "out:y1", 19.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "X2", "out:x2", 30.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "Y2", "out:y2", 41.48f, 110.0f);
+        p.add(Widget::Kind::Jack, "DIST", "out:dist", 52.48f, 110.0f);
         return p;
     }
 

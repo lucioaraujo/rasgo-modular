@@ -53,22 +53,25 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): os dois
+        // ciclos do sol, DAY e YEAR, em par de 12 mm; a latitude embaixo.
         p.hp = 10;
         p.add(Widget::Kind::Label, "SEASON", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "season", "", 2.5f, 6.0f, 45.8f);
-        p.add(Widget::Kind::Knob, "DAY", "day", 5.0f, 30.0f);
-        p.add(Widget::Kind::Knob, "YEAR", "year", 20.5f, 30.0f);
-        p.add(Widget::Kind::Knob, "LAT", "latitude", 36.0f, 30.0f);
-        p.add(Widget::Kind::Toggle, "HEMI", "hemisphere", 5.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", 6.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 18.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SCL", "out:scale", 31.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "TEMPO", "out:tempo", 44.0f, 96.0f);
-        p.add(Widget::Kind::Jack, "SUN", "out:sun", 6.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "LIGHT", "out:light", 15.5f, 116.0f);
-        p.add(Widget::Kind::Jack, "DAWN", "out:dawn", 25.0f, 116.0f);
-        p.add(Widget::Kind::Jack, "DUSK", "out:dusk", 34.5f, 116.0f);
-        p.add(Widget::Kind::Jack, "YEAR", "out:year", 44.0f, 116.0f);
+        p.add(Widget::Kind::Display, "season", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "DAY", "day", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "YEAR", "year", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "LAT", "latitude", 14.40f, 46.0f);
+        p.add(Widget::Kind::Toggle, "HEMI", "hemisphere", 30.40f, 48.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 19.05f, 76.0f);
+        p.add(Widget::Kind::Jack, "SPD", "in:speed_cv", 31.75f, 76.0f);
+        p.add(Widget::Kind::Jack, "SCL", "out:scale", 12.70f, 93.0f);
+        p.add(Widget::Kind::Jack, "TEMPO", "out:tempo", 25.40f, 93.0f);
+        p.add(Widget::Kind::Jack, "SUN", "out:sun", 38.10f, 93.0f);
+        p.add(Widget::Kind::Jack, "LIGHT", "out:light", 6.35f, 110.0f);
+        p.add(Widget::Kind::Jack, "DAWN", "out:dawn", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "DUSK", "out:dusk", 31.75f, 110.0f);
+        p.add(Widget::Kind::Jack, "YEAR", "out:year", 44.45f, 110.0f);
         return p;
     }
 

@@ -176,6 +176,43 @@ aplicado aqui: o RATE poderia ser o knob grande.
   FORMANT, VCA4); lote 2 (VOCODER, TAPE, BLEFE, TAP, DECISION, KEY,
   INTERPRET). Folhas em `.local-build/web/capturas/auditoria/`.
 
+### 7.2 Personalização módulo a módulo (27–28/11, com OK do autor)
+
+Pedido do autor: variar a distribuição por módulo ("ritmo visual", "quebra
+a uniformidade feita pelos cálculos padronizados de IA") e trazer o
+conceito do módulo para o layout. Recusados no caminho: visores LCD de
+pontos; o arquétipo TRANSFORMAR em lote (IN no alto, saída embaixo —
+"prefiro antes, mas nada impede de ter um ou dois módulos nesse formato
+novo, mantendo os jacks embaixo"). Regra que ficou: **jacks embaixo**, e
+cada módulo ganha UMA forma ligada ao conceito, escolhida entre:
+
+- **par de 12 mm** (os dois controles que dizem o módulo): NOISE (RATE+SLEW,
+  escuros), CRUSH, TAPE, DYNAMICS, SHAPE, WASP, ELASTIC, MAGNET, ECLIPSE,
+  INTERFERENCE, HALL, PLANAR, MARKOV, MEMORY, PRESSURE, SWARM, ABACUS,
+  EPICYCLE, SEASON;
+- **herói de 14 mm** no centro com dois flancos: RESONATOR, FUNCTION,
+  TURING (LOCK), LENS, COHERENCE, CUT-UP, FRONTEIRA, ORBIT (e as FONTES,
+  26/11);
+- **sliders verticais**: GLIDE (subida e descida), SPRING (as molas),
+  STAGES (a forma de cada etapa);
+- **canais espelhados**: SH (o canal 1 à esquerda, o 2 à direita, RATE e
+  CORR no meio).
+
+Os utilitários e os muito cheios (MATRIX, MULT, VCA4, SWITCH, SEQUENCE,
+MIXER, SCOPE…) ficam simples: o ritmo também depende deles. Junto vieram:
+visores com desenho próprio (fósforo, polar, relevo, fase, ponteiro), o
+acento laranja trocado pelo prata em tudo, placa de saída com margem em
+volta da luz, destaque de módulo em anel prata com halo, hover da paleta
+na cor da família.
+
+**O teste de layout passou a auditar o catálogo inteiro** (28/11): a lista
+dele era escrita à mão e não tinha os módulos novos. Achados em 11 módulos
+(rótulos que se tocam, rótulos com mais de 5 letras, VIA com rótulo fora
+do painel) — ficam como PENDENTES no teste (`ergonomiaPendente`), que os
+mostra sem falhar, até o próximo lote os corrigir: POLY-IN, SUPPLY,
+PREDATOR, POLYGON, ECLIPSE, TEMPO, FRONTEIRA, INTERPRET, VIA, APOCRIFO,
+CUT-UP.
+
 ## 8. A tabela dos 105 (do pior para o melhor)
 
 n = normal, c = compacto. Gerada por `tools/auditar_paineis.mjs` em

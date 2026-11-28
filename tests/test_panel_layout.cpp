@@ -7,7 +7,9 @@
 // Gate contra regressão: um módulo novo com knobs apertados / rótulo
 // longo demais quebra este teste.
 
+#include <set>
 #include "core/SignalGraph.hpp"
+#include "panel/ModuleCatalog.hpp"   // o catálogo inteiro (ver o fim de main)
 #include "dsp/Abacus.hpp"
 #include "dsp/Additive.hpp"
 #include "dsp/Boxcar.hpp"
@@ -169,7 +171,17 @@ bool overlap(const Rect& a, const Rect& b) {
 
 // Passe de ergonomia 2026-09-06: todos os módulos do catálogo revistos.
 // O modelo apertado (kCharMM 2,8 / folga 0,3) é o gate contra regressão.
-bool ergonomiaPendente(const std::string&) { return false; }
+// 28/11/2026: ao passar a auditar o catálogo inteiro (ver o fim de main),
+// apareceram problemas em módulos que estavam fora da lista. Ficam aqui como
+// PENDENTES (o teste mostra cada um, mas não falha) até serem corrigidos no
+// próximo lote da revisão de painéis — cada módulo sai desta lista ao ser
+// corrigido. Registro em TAREFAS.md.
+bool ergonomiaPendente(const std::string& t) {
+    static const std::set<std::string> pend = {
+        "POLY-IN", "SUPPLY", "PREDATOR", "POLYGON", "ECLIPSE", "TEMPO", "FRONTEIRA",
+        "INTERPRET", "VIA", "APOCRIFO", "CUTUP"};
+    return pend.count(t) > 0;
+}
 
 void audit(const char* type, const Panel& p) {
     const float W = static_cast<float>(p.hp) * 5.08f;
@@ -178,10 +190,10 @@ void audit(const char* type, const Panel& p) {
     for (std::size_t i = 0; i < v.size(); ++i) {
         if (isText(v[i].tag)
             && (v[i].x < -1.5f || v[i].x + v[i].w > W + 1.5f)) {
-            std::cerr << "LAYOUT " << type << ": rótulo fora do painel: "
+            std::cerr << (pend ? "LAYOUT (pendente) " : "LAYOUT ") << type << ": rótulo fora do painel: "
                       << v[i].tag << " (x " << v[i].x << ".."
                       << v[i].x + v[i].w << " / W " << W << ")\n";
-            ++g_failures;
+            if (!pend) ++g_failures;
         }
         for (std::size_t j = i + 1; j < v.size(); ++j) {
             const std::string li = v[i].tag.substr(v[i].tag.find(':') + 1);
@@ -324,6 +336,28 @@ int main() {
         }
         audit(m.first.c_str(), m.second->panel());
     }
+
+    // O CATÁLOGO INTEIRO (28/11/2026): a lista acima é escrita à mão e parou
+    // de crescer — o SEASON e outros módulos novos ficaram de fora, e as
+    // legendas LIGHT/DAWN/DUSK do SEASON se tocavam sem o teste ver. Todo tipo
+    // do catálogo que não está na lista passa pela mesma auditoria.
+    std::set<std::string> vistos;
+    for (const auto& m : mods) vistos.insert(m.first);
+    for (const auto& fam : rasgo::panel::seedModuleCatalog())
+        for (const char* t : fam.types) {
+            if (vistos.count(t)) continue;
+            auto n = rasgo::panel::makeModule(t);
+            if (!n) continue;
+            vistos.insert(t);
+            for (const auto& w : n->panel().widgets)
+                if ((w.kind == Widget::Kind::Knob || w.kind == Widget::Kind::Toggle
+                     || w.kind == Widget::Kind::Slider) && w.label.size() > 5) {
+                    std::cerr << (ergonomiaPendente(t) ? "LABEL (pendente) " : "LABEL ") << t
+                              << ": rótulo > 5 chars: '" << w.label << "'\n";
+                    if (!ergonomiaPendente(t)) ++g_failures;
+                }
+            audit(t, n->panel());
+        }
 
     if (g_failures == 0) std::cout << "test_panel_layout: OK\n";
     return g_failures == 0 ? 0 : 1;

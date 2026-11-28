@@ -32,6 +32,11 @@ pronto.
     MASTER; os moduladores guardam ~4 s de histórico para o desenho;
   - **pares de 12 mm** ligados ao conceito: CRUSH (RATE+BITS), TAPE
     (SPEED+WEAR), DYNAMICS (THRES+RATIO), SHAPE (FOLD+WRAP);
+  - o teste de layout audita o **catálogo inteiro** (a lista à mão tinha
+    parado de crescer); 11 módulos com achados ficam como pendentes até o
+    próximo lote;
+  - ORBIT com herói; EPICYCLE e SEASON em par (SEASON com as legendas das
+    saídas separadas);
   - FRONTEIRA com herói; STAGES com sliders; ABACUS em par; paleta com o
     nome sob o mouse na cor da família;
   - MEMORY, PRESSURE e SWARM em par; CUT-UP com herói;

@@ -52,28 +52,24 @@ public:
 
     Panel panel() const override {
         Panel p;
+        // Personalização (autor, 27/11/2026: "avance na personalização dos
+        // módulos"; jacks embaixo): círculos
+        // sobre círculos: RATE (o giro) e CIRC (quantos), em par de 12 mm.
         p.hp = 10;
         p.add(Widget::Kind::Label, "EPICYCLE", "", 2.5f, 2.0f);
-        p.add(Widget::Kind::Display, "epicycle", "", 2.5f, 6.0f, 45.8f);
-        // Pela gramática de painel (dossies/AUDITORIA_diagramacao_paineis.md
-        // §4, aprovada em 26/11/2026): colunas simétricas, fileiras com os
-        // centros em 32, 54, 72, 92 e 110 mm; a última em 110 deixa a marca
-        // RASGO no centro (autor: "é mais fácil manter no centro e subir um
-        // pouco os jacks").
-        constexpr float m1 = 12.7f, m2 = 25.4f, m3 = 38.1f;    // três, centradas
-        constexpr float d1 = 19.05f, d2 = 31.75f;              // duas, centradas
-        p.add(Widget::Kind::Knob, "RATE", "rate", m1 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "CIRC", "circles", m2 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "MODO", "mode", m3 - 4.0f, 28.0f);
-        p.add(Widget::Kind::Knob, "DESV", "detune", d1 - 4.0f, 50.0f);
-        p.add(Widget::Kind::Knob, "FASE", "phase", d2 - 4.0f, 50.0f);
-        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", d1, 72.0f);
-        p.add(Widget::Kind::Jack, "RST", "in:reset", d2, 72.0f);
-        p.add(Widget::Kind::Jack, "X", "out:x", m1, 92.0f);
-        p.add(Widget::Kind::Jack, "Y", "out:y", m2, 92.0f);
-        p.add(Widget::Kind::Jack, "R", "out:radius", m3, 92.0f);
-        p.add(Widget::Kind::Jack, "ANG", "out:angle", d1, 110.0f);
-        p.add(Widget::Kind::Jack, "GT", "out:gate", d2, 110.0f);
+        p.add(Widget::Kind::Display, "epicycle", "", 2.5f, 6.0f, 45.80f);
+        p.add(Widget::Kind::Knob, "RATE", "rate", 9.24f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "CIRC", "circles", 29.56f, 27.0f, 12.0f);
+        p.add(Widget::Kind::Knob, "MODO", "mode", 7.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "DESV", "detune", 21.40f, 46.0f);
+        p.add(Widget::Kind::Knob, "FASE", "phase", 35.40f, 46.0f);
+        p.add(Widget::Kind::Jack, "PTCH", "in:pitch", 19.05f, 72.0f);
+        p.add(Widget::Kind::Jack, "RST", "in:reset", 31.75f, 72.0f);
+        p.add(Widget::Kind::Jack, "X", "out:x", 12.70f, 92.0f);
+        p.add(Widget::Kind::Jack, "Y", "out:y", 25.40f, 92.0f);
+        p.add(Widget::Kind::Jack, "R", "out:radius", 38.10f, 92.0f);
+        p.add(Widget::Kind::Jack, "ANG", "out:angle", 19.05f, 110.0f);
+        p.add(Widget::Kind::Jack, "GT", "out:gate", 31.75f, 110.0f);
         return p;
     }
 

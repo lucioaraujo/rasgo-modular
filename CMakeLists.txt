@@ -286,6 +286,7 @@ if(BUILD_TESTING)
 
     add_executable(rasgo_modular_panel_layout_tests tests/test_panel_layout.cpp)
     target_link_libraries(rasgo_modular_panel_layout_tests PRIVATE rasgo_modular_core)
+    target_include_directories(rasgo_modular_panel_layout_tests PRIVATE apps)   # o catálogo inteiro
     target_compile_options(rasgo_modular_panel_layout_tests PRIVATE ${rasgo_modular_warnings})
     add_test(NAME rasgo_modular_panel_layout_tests COMMAND rasgo_modular_panel_layout_tests)
 
