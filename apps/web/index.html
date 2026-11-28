@@ -134,7 +134,7 @@
   #paleta h3 i { width: 8px; height: 8px; display: inline-block; }
   #paleta li { list-style: none; padding-left: 18px; height: 15px; line-height: 15px; color: var(--muted);
                cursor: grab; }
-  #paleta li:hover { color: var(--accent); }
+  #paleta li:hover { color: var(--fam, var(--accent)); }   /* a cor da família (autor, 28/11/2026) */
   #paleta ul { margin: 0 0 4px; padding: 0; }
   /* o banco de escalas do QUANTIZER (`ScaleBrowser`) */
   #banco { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); display: none; z-index: 10;
@@ -748,6 +748,7 @@ function construirPaleta(cat) {
     for (const t of f.tipos) {
       const li = document.createElement('li');
       li.textContent = t; li.dataset.tipo = t;
+      li.style.setProperty('--fam', corFamilia(f.familia));
       ul.append(li);
     }
     nav.append(h, ul);

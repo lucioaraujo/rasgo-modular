@@ -906,7 +906,8 @@ public:
         for (const auto& r : rows_) {
             const int y = r.bounds.getY() - scroll_;
             if (y < -14 || y > learnTop) continue;
-            g.setColour(hover_ == r.type ? T.accent : T.textSecondary);
+            // hover na cor da família do módulo (autor, 28/11/2026)
+            g.setColour(hover_ == r.type ? familyColour(familyOfType(r.type)) : T.textSecondary);
             g.drawText(u8(r.type), 18, y, kWidth - 26, 14,
                        juce::Justification::centredLeft, false);
         }
